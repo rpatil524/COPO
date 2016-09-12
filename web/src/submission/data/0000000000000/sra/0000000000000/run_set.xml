@@ -1,0 +1,10 @@
+<RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.run.xsd">
+  <RUN alias="0000000000000:assay:EXP1.1" broker_name="" center_name="EI">
+    <EXPERIMENT_REF refname="0000000000000:generic_assay:a_57a1d46168236ba7ef4741cc.EXP1" />
+    <DATA_BLOCK>
+      <FILES>
+        <FILE checksum="418830bb47454ab685c98777354204bf" checksum_method="MD5" filename="small1.fastq" filetype="fastq" />
+      </FILES>
+    </DATA_BLOCK>
+  </RUN>
+</RUN_SET>

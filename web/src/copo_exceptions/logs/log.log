@@ -1,0 +1,5 @@
+[2016-07-28 10:13:36.956888]: Traceback (most recent call last):
+  File "/Users/etuka/Dropbox/Dev/COPO/web/apps/web_copo/schemas/utils/converters/copo_isa_ena.py", line 963, in get_config_source
+    raise KeyError(d_utils.get_copo_exception("101").get("message"))
+KeyError: 'Unresolved configuration source!'
+Unable to resolve ISA configuration source from study type! Possible causes: 1. The supplied study type 'metagenomeSeq1' might not be present in the study type list in lookup 2. The key 'config_source' is not set

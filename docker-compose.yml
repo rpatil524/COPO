@@ -1,0 +1,57 @@
+web:
+  container_name: copo-web
+  restart: always
+  build: ./web/
+  expose:
+    - "8000"
+  links:
+    - mongo:mongo
+    - postgres:postgres
+    - redis:redis
+  volumes:
+    - ./web/src:/copo
+  env_file: .env
+  environment:
+    DEBUG: 'true'
+  command: bash -c "python manage.py migrate sites && python manage.py migrate auth && python manage.py migrate && /usr/local/bin/gunicorn web.wsgi:application -w 2 -b :8000"
+
+nginx:
+  container_name: copo-nginx
+  restart: always
+  build: ./nginx/
+  ports:
+    - "80:80"
+  volumes:
+    - ./web/src/static:/www/static
+  volumes_from:
+    - web
+  links:
+    - web:web
+
+mongo:
+  container_name: copo-mongo
+  image: mongo:latest
+  ports:
+    - "27017:27017"
+  volumes:
+    - /data/db
+
+redis:
+  container_name: copo-redis
+  restart: always
+  image: redis:latest
+  ports:
+    - "6379:6379"
+  volumes:
+    - redisdata:/data
+
+postgres:
+  container_name: copo-pg
+  restart: always
+  image: library/postgres
+  ports:
+    - "5432:5432"
+  env_file: .env
+  volumes:
+    - pgdata:/var/lib/postgresql/data/
+#    - ./postgres/copo_social_setup.sql:/docker-entrypoint-initdb.d/copo_social_setup.sql

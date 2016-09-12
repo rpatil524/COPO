@@ -1,0 +1,228 @@
+{
+  "investigation": {
+    "commentCreatedWithConfiguration": "",
+    "commentLastOpenedWithConfiguration": "",
+    "investigationContacts": [
+      {
+        "commentInvestigationPersonREF": "",
+        "investigationPersonLastName": "",
+        "investigationPersonFirstName": "",
+        "investigationPersonMidInitials": "",
+        "investigationPersonEmail": "",
+        "investigationPersonPhone": "",
+        "investigationPersonFax": "",
+        "investigationPersonAddress": "",
+        "investigationPersonAffiliation": "",
+        "investigationPersonRoles": "",
+        "investigationPersonRolesTermAccessionNumber": "",
+        "investigationPersonRolesTermSourceREF": ""
+      }
+    ],
+    "investigationDescription": "",
+    "investigationIdentifier": "",
+    "investigationPublicReleaseDate": "",
+    "investigationPublications": [
+      {
+        "investigationPubMedID": "",
+        "investigationPublicationDOI": "",
+        "investigationPublicationAuthorList": "",
+        "investigationPublicationTitle": "",
+        "investigationPublicationStatus": "",
+        "investigationPublicationStatusTermAccessionNumber": "",
+        "investigationPublicationStatusTermSourceREF": ""
+      }
+    ],
+    "investigationSubmissionDate": "",
+    "investigationTitle": ""
+  },
+  "ontologySourceReference": [
+    {
+      "termSourceDescription": "",
+      "termSourceFile": "",
+      "termSourceName": "",
+      "termSourceVersion": ""
+    }
+  ],
+  "studies": [
+    {
+      "study": {
+        "assays": [
+          {
+            "assaysTable": [
+              [
+                {
+                  "name": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "items": [
+                    {
+                      "parameterTerm": "",
+                      "parameterValue": "",
+                      "termAccessionNumber": "",
+                      "termSourceREF": ""
+                    }
+                  ],
+                  "type": ""
+                },
+                {
+                  "commentTerm": "",
+                  "name": "",
+                  "type": "",
+                  "value": ""
+                }
+              ]
+            ],
+            "studyAssayFileName": "",
+            "studyAssayMeasurementType": "",
+            "studyAssayMeasurementTypeTermAccessionNumber": "",
+            "studyAssayMeasurementTypeTermSourceREF": "",
+            "studyAssayTechnologyPlatform": "",
+            "studyAssayTechnologyType": "",
+            "studyAssayTechnologyTypeTermAccessionNumber": "",
+            "studyAssayTechnologyTypeTermSourceREF": ""
+          }
+        ],
+        "commentStudyFundingAgency": "",
+        "commentStudyGrantNumber": "",
+        "studyContacts": [
+          {
+            "commentStudyPersonREF": "",
+            "studyPersonLastName": "",
+            "studyPersonFirstName": "",
+            "studyPersonMidInitials": "",
+            "studyPersonEmail": "",
+            "studyPersonPhone": "",
+            "studyPersonFax": "",
+            "studyPersonAddress": "",
+            "studyPersonAffiliation": "",
+            "studyPersonRoles": "",
+            "studyPersonRolesTermAccessionNumber": "",
+            "studyPersonRolesTermSourceREF": ""
+          }
+        ],
+        "studyDescription": "",
+        "studyDesignDescriptors": [
+          {
+            "studyDesignType": "",
+            "studyDesignTypeTermAccessionNumber": "",
+            "studyDesignTypeTermSourceREF": ""
+          }
+        ],
+        "studyFactors": [
+          {
+            "studyFactorName": "",
+            "studyFactorType": "",
+            "studyFactorTypeTermAccessionNumber": "",
+            "studyFactorTypeTermSourceREF": ""
+          }
+        ],
+        "studyFileName": "",
+        "studyIdentifier": "",
+        "studyProtocols": [
+          {
+            "studyProtocolComponentsName": "",
+            "studyProtocolComponentsType": "",
+            "studyProtocolComponentsTypeTermAccessionNumber": "",
+            "studyProtocolComponentsTypeTermSourceREF": "",
+            "studyProtocolDescription": "",
+            "studyProtocolName": "",
+            "studyProtocolParametersName": "",
+            "studyProtocolParametersNameTermAccessionNumber": "",
+            "studyProtocolParametersNameTermSourceREF": "",
+            "studyProtocolType": "",
+            "studyProtocolTypeTermAccessionNumber": "",
+            "studyProtocolTypeTermSourceREF": "",
+            "studyProtocolURI": "",
+            "studyProtocolVersion": ""
+          }
+        ],
+        "studyPublicReleaseDate": "",
+        "studyPublications": [
+          {
+            "studyPubMedID": "",
+            "studyPublicationDOI": "",
+            "studyPublicationAuthorList": "",
+            "studyPublicationTitle": "",
+            "studyPublicationStatus": "",
+            "studyPublicationStatusTermAccessionNumber": "",
+            "studyPublicationStatusTermSourceREF": ""
+          }
+        ],
+        "studySamples": [
+          [
+            {
+              "name": "",
+              "type": "",
+              "value": ""
+            },
+            {
+              "items": [
+                {
+                  "categoryTerm": "",
+                  "characteristics": "",
+                  "termAccessionNumber": "",
+                  "termSourceREF": ""
+                }
+              ],
+              "type": ""
+            }
+          ]
+        ],
+        "studySubmissionDate": "",
+        "studyTitle": ""
+      },
+      "studyCOPOMetadata": {
+        "id": "",
+        "studyType": "",
+        "studyReference": "",
+        "deleted": "1",
+        "samples": [
+          {
+            "id": "",
+            "deleted": "1"
+          }
+        ],
+        "dataFiles": [
+          {
+            "id": "",
+            "fileId": "",
+            "samples": [],
+            "attributes": [],
+            "deleted": "1"
+          }
+        ]
+      }
+    }
+  ],
+  "collectionCOPOMetadata": {
+    "samples": [
+      {
+        "sourceName": "",
+        "sampleName": "",
+        "characteristics": [
+          {
+            "categoryTerm": "",
+            "characteristics": "",
+            "unit": "",
+            "termSourceREF": "",
+            "termAccessionNumber": ""
+          }
+        ],
+        "factorvalue": [
+          {
+            "factorName": "",
+            "factorValue": "",
+            "unit": "",
+            "termSourceREF": "",
+            "termAccessionNumber": ""
+          }
+        ]
+      }
+    ]
+  }
+}
+
+
+

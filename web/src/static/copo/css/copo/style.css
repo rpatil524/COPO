@@ -1,0 +1,751 @@
+body {
+    position: relative;
+    min-height: 100%;
+    top: 0px;
+
+    color: #333;
+    font-family: arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.42857;
+}
+
+.container {
+    width: 100%;
+}
+
+.full-height {
+    height: 100%
+}
+
+.table {
+    font-size: 13px;
+}
+
+.button-rw {
+    background: rgba(242, 242, 242, 0.5);
+    margin-left: 0px;
+    margin-right: 0px;
+    border: 1px solid rgba(242, 242, 242, 1.0);
+    border-radius: 2px;
+    overflow: auto;
+    padding: 5px 5px 0px;
+}
+
+div[class^="col-"], div[class*=" col-"] {
+/ / border: 1 px solid black;
+}
+
+.row {
+/ / border: 1 px solid black;
+}
+
+#sidebar > ul > li {
+    cursor: pointer
+}
+
+/*HEADER CSS*/
+
+.header-level-1 {
+    z-index: 1000;
+    background: rgba(38, 38, 38, 0.95);
+    height: 50px;
+    position: fixed;
+    top: 0px;
+}
+
+.header-level-2 {
+    min-height: 100%;
+    position: absolute;
+    top: 0px;
+}
+
+#copo_global_links {
+    height: 100%;
+    border-radius: 0px;
+    background-color: rgba(245, 245, 240, 0.95);
+    display: none;
+    overflow: hidden;
+    position: fixed !important;
+    z-index: 900;
+    margin-top: 0px;
+}
+
+/*table styling*/
+.copo-datatable {
+    font-size: 12px;
+}
+
+/*page title*/
+.global-page-title {
+    font-weight: 300;
+    font-size: 21px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.page-title-breadcrumb {
+    background: transparent !important;
+    border-radius: 8px;
+    padding: 8px 0 !important;
+}
+
+.page-title-breadcrumb > .active {
+    color: inherit;
+}
+
+/* end page title */
+
+/*h1 {*/
+/*font-size: x-large;*/
+/*}*/
+
+/*.h2 {*/
+/*font-family: 'Quattrocento Sans', sans-serif;*/
+
+/*color: #163657;*/
+/*}*/
+
+/*.h2 small {*/
+/*color: #163657*/
+/*}*/
+
+/*.h3 {*/
+/*color: #163657;*/
+/*font-family: 'Quattrocento Sans', sans-serif;*/
+
+/*}*/
+
+.list-group.panel > .list-group-item {
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px
+}
+
+.list-group-submenu {
+    margin-left: 20px;
+}
+
+#sidebar {
+    margin-left: 30px;
+    width: 150px;
+}
+
+#sidebar ul {
+
+    margin-top: 60px;
+
+}
+
+#sidebar li {
+    margin-bottom: 10px;
+}
+
+#sidebar ul li .icon_text {
+    margin-left: 10px;
+}
+
+#browse_header_left {
+    margin-top: 30px;
+    float: left;
+}
+
+#search_bar {
+    float: left;
+}
+
+.work_area {
+    margin-top: 30px;
+    margin-right: 50px;
+}
+
+/*custom nav items*/
+.copo-custom-nav-1 a, .copo-custom-nav-1 > div > a {
+    color: #fff;
+}
+
+/*global status*/
+#global_status_message {
+    background-color: rgba(245, 245, 240, 0.95);
+    border-color: rgba(245, 245, 240, 0.8);
+    color: #000000;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    width: 300px;
+    overflow: auto;
+    top: 50px;
+    display: none;
+    z-index: 1;
+    position: fixed;
+}
+
+.copo-status-item a {
+    color: #337ab7 !important;
+}
+
+.copo-status-item:hover {
+    background: #ce6f14;
+}
+
+.copo-status-item {
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 15px;
+}
+
+.copo-custom-nav-1 > li > a,
+.copo-custom-nav-1 > li > div {
+    font-size: 12px;
+    padding: 7px 12px;
+}
+
+.copo-custom-nav-1 > li > a:hover,
+.copo-custom-nav-1 > li > div > a:hover,
+.copo-custom-nav-1 .open > a,
+.copo-custom-nav-1 .open > div > a,
+.copo-custom-nav-1 .open > a:hover,
+.copo-custom-nav-1 .open > a:focus {
+    color: #ce6f14;
+    background: transparent;
+}
+
+.copo-custom-nav-1 > li > a:focus, .copo-custom-nav-1 > li > div > a:focus {
+    color: #000;
+    background: transparent;
+}
+
+.copo-custom-nav-1 > li.active > a, .copo-custom-nav-1 > li.active > div > a {
+    background: transparent;
+}
+
+/*end custom nav items*/
+
+/*sidebar*/
+.copo-side-nav > li > a {
+    color: #000;
+    font-size: 12px;
+}
+
+#toggle_global_links:hover {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #ce6f14;
+}
+
+#toggle_global_links {
+    color: #fff;
+    background: transparent;
+    margin-top: 13px;
+    cursor: hand;
+    cursor: pointer;
+    height: 30px;
+    float: left;
+    width: 15%;
+    overflow: hidden;
+}
+
+#copo_logo_links {
+    margin-top: -2px;
+    float: left;
+    width: 75%;
+    overflow: hidden;
+}
+
+/*end sidebar*/
+
+/*search box*/
+.copo-search-box {
+    position: relative;
+    margin-left: 400px;
+}
+
+.copo-search-icon {
+    color: #fff;
+    position: absolute;
+    right: 0px;
+    cursor: pointer;
+    cursor: hand;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+.copo-search-icon:hover {
+    color: #000;
+}
+
+.copo-search-icon-open {
+    z-index: 1000;
+    color: #000;
+    right: 375px;
+    margin-top: 2px;
+    cursor: pointer;
+    cursor: hand;
+}
+
+.copo-search-bar {
+    background: #fff;
+    color: #000;
+    border: 0 none;
+    border-radius: 20px;
+    width: 400px;
+    height: 40px;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+    width: 0px;
+    padding: 0;
+    position: absolute;
+    right: 0;
+}
+
+.copo-search-bar-open {
+    display: block;
+    width: 400px;
+    padding-left: 40px;
+    padding-right: 10px;
+    margin-top: -11px;
+}
+
+/*end search box*/
+
+/* ICON CSS */
+.blue_icon {
+    float: left;
+    color: #163657;
+    margin-right: 20px;
+    margin-top: 5px;
+}
+
+.blue_icon > a {
+    color: #163657;
+}
+
+.blue_icon > a:hover {
+    color: grey;
+}
+
+/*.panel-heading {*/
+/*padding: 8px 15px;*/
+/*}*/
+
+.btn {
+    border-radius: 4px
+}
+
+/* REPOSITORY CONTROLS CSS */
+#repo-feedback-cnt-1 {
+    display: none;
+}
+
+#repo-alert-cnt-1 {
+    display: none;
+}
+
+.spacer {
+    margin-right: 20px; /* define margin as you see fit */
+}
+
+.vert-align {
+    float: none;
+    display: inline-block;
+    vertical-align: middle;
+
+}
+
+.login_box {
+    margin: 0 auto;
+    background-color: white;
+    padding: 10px;
+    box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.1), 0 0 3px rgba(0, 0, 0, 0.8);
+    width: 300px;
+}
+
+.serif {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif
+}
+
+.bolder {
+/ / font-weight: bold;
+}
+
+.copo-modal2 > .modal-dialog {
+    width: 90% !important;
+    height: 90% !important;
+    overflow: scroll !important;
+}
+
+.input-copo {
+    height: 30px !important;
+}
+
+.breadcrumb {
+    margin: 0 !important;
+    background-color: whitesmoke;
+
+}
+
+/* Overriding some properties of Popover */
+
+.copo-wizard-message-label {
+    font-weight: bold;
+    color: #163657;
+}
+
+.copo-icon-danger {
+    color: #c12e2a;
+    text-shadow: 1px 1px 1px #ccc;
+}
+
+.copo-icon-success {
+    color: #419641;
+    text-shadow: 1px 1px 1px #ccc;
+}
+
+.copo-icon-warning {
+    color: #f0ad4e;
+    text-shadow: 1px 1px 1px #ccc;
+}
+
+.copo-icon-primary {
+    color: #265a88;
+    text-shadow: 1px 1px 1px #ccc;
+}
+
+.copo-icon-info {
+    color: #2aabd2;
+    /*text-shadow: 1px 1px 1px #ccc;*/
+}
+
+.copo-icon-default {
+    color: #626262;
+    text-shadow: 1px 1px 1px #ccc;
+}
+
+/* CUSTOM POPOVERS */
+.copo-popover-title1 {
+    background-color: #D4E4ED !important;
+    color: #202D38 !important;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 25px;
+    text-align: left;
+}
+
+/*overrides popover's property*/
+.popover {
+    max-width: 400px !important;
+}
+
+.popover-content {
+    word-wrap: break-word !important;
+}
+
+.copo-popover-popover1 {
+    font-size: 14px;
+    border-radius: 5px !important;
+}
+
+.popover1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1060;
+    display: block;
+    min-width: 250px;
+    padding: 1px;
+    text-align: left;
+    white-space: nowrap;
+    background-color: #fff !important;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 5px !important;
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+    color: #1b2b32;
+    font-size: 12px;
+}
+
+.popover1-title {
+    padding: 7px 2px;
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 25px;
+    text-align: left;
+    color: #1b2b32;
+    background-color: #D4E4ED;
+    border-bottom: 1px solid #ccc;
+    border-radius: 5px 5px 0 0;
+}
+
+.popover1.left {
+    margin-left: -10px;
+}
+
+.popover1 > .arrow,
+.popover1 > .arrow:after {
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+}
+
+.popover1 > .arrow {
+    border-width: 11px;
+}
+
+.popover1 > .arrow:after {
+    content: "";
+    border-width: 10px;
+}
+
+.popover1.left > .arrow {
+    top: 50%;
+    right: -11px;
+    margin-top: -11px;
+    border-right-width: 0;
+    border-left-color: #999;
+    border-left-color: rgba(0, 0, 0, .25);
+}
+
+.popover1.left > .arrow:after {
+    right: 1px;
+    bottom: -10px;
+    content: " ";
+    border-right-width: 0;
+    border-left-color: #ebebeb;
+}
+
+/* END CUSTOM POPOVERS*/
+
+/*customising Bootstrap badge*/
+.label-as-badge {
+    border-radius: 1em;
+}
+
+/*class for highlighting delete target*/
+.row-delete-higlight {
+    color: red;
+}
+
+.row-insert-higlight {
+    color: blue;
+}
+
+/*class for help tips switch displayed on forms*/
+.tips-switch-form-div {
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 5px !important;
+    font-size: 12px;
+}
+
+/*class for actions bar displayed alongside tabular data*/
+.tab-actions-div {
+    position: fixed;
+    z-index: 1000;
+    display: none;
+}
+
+.copo-table-header th {
+    color: white;
+}
+
+.sample_attributes_div > div {
+    margin: 5px;
+}
+
+hr {
+    margin: 10px 0 10px 0;
+}
+
+.char_factor {
+    margin: 10px 0 10px 10px;
+}
+
+#source_select {
+    margin-bottom: 0px
+}
+
+/*custom panel */
+.copo-panel {
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.12), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
+    border-radius: 4px !important;
+    padding: 0.1em;
+    margin-bottom: 20px;
+}
+
+.copo-panel-title {
+    color: #fff;
+    line-height: 40px;
+    padding: 10px;
+    height: 50px;
+    top: 0;
+    border-radius: 4px !important;
+}
+
+.copo-panel-sub-title {
+    color: #ccc;
+    line-height: 20px;
+    padding: 10px;
+    margin-bottom: 10px;
+    height: 30px;
+    top: 0;
+    background-color: transparent;
+}
+
+.copo-panel-body {
+    padding: 10px 25px;
+}
+
+/*.panel > .panel-heading {*/
+/*background: #ff0000;*/
+/*color: #fff;*/
+/*}*/
+
+/*end custom panel*/
+
+/*removing padding from columns*/
+.nopadding {
+    padding: 5px !important;
+    /*margin: 0 !important;*/
+}
+
+/*end removing padding from columns*/
+
+.typeahead, .tt-query, .tt-hint {
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    height: 30px;
+    line-height: 30px;
+    outline: medium none;
+}
+
+.typeahead {
+    background-color: #fff;
+}
+
+.typeahead:focus {
+    border: 2px solid #0097cf;
+}
+
+.tt-query {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+}
+
+.tt-hint {
+    color: #999;
+}
+
+.tt-menu {
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    margin: 12px 0;
+    padding: 8px 0;
+}
+
+.tt-suggestion {
+    /*font-size: 18px;*/
+    line-height: 24px;
+    padding: 3px 20px;
+}
+
+.tt-suggestion:hover {
+    background-color: #0097cf;
+    color: #fff;
+    cursor: pointer;
+}
+
+.tt-suggestion.tt-cursor {
+    background-color: #0097cf;
+    color: #fff;
+}
+
+.tt-suggestion p {
+    margin: 0;
+}
+
+.gist {
+    font-size: 14px;
+}
+
+#custom-templates .empty-message {
+    padding: 5px 10px;
+    text-align: center;
+}
+
+#multiple-datasets .league-name {
+    border-bottom: 1px solid #ccc;
+    margin: 0 20px 5px;
+    padding: 3px 0;
+}
+
+#scrollable-dropdown-menu .tt-menu {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+#rtl-support .tt-menu {
+    text-align: right;
+}
+
+.ontology_span {
+    min-width: 550px;
+}
+
+/*close button used on elements such as popovers, etc.*/
+.copo-close {
+    color: #202D38;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    opacity: 0.4;
+    position: relative;
+}
+
+.copo-close:hover, .copo-close:focus {
+    color: #202D38;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.warning-banner {
+    height: 75px;
+    border: none;
+    background-color: #FFFAE3;
+    border: 1px solid #FFD02B;
+    color: #FFD02B;
+    padding: 10px 20px 0 20px;
+}
+
+.warning-banner .icon {
+    float: left;
+    margin-right: 20px;
+}
+
+.warning-banner .resume-text {
+    float: left;
+}
+
+.warning-banner .resume-text h3 {
+    color: #FFD02B;
+    margin-top: 0;
+}
+
+div.pad-it {
+    margin-right: 10px;
+}
+
+.zip-image h4{
+    margin-right: 150px
+}
+
+th{
+     background-color: #3d3f46;
+}

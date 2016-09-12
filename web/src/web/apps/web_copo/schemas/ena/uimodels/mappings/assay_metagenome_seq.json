@@ -1,0 +1,301 @@
+{
+  "description": "Mappings of attribute in the Assay schema to a UI configuration source. Configuration ref is defined in UI_CONFIG_SOURCES in services.py",
+  "configuration": {
+    "type": "xml",
+    "ref": "STUDY_ASSAY_METAGENOME_SEQ_FILE_XML",
+    "provider": "isa"
+  },
+  "properties": [
+    {
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.sampleName",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Sample Name",
+      "required": "true",
+      "rank": 1,
+      "control": "text",
+      "deprecated": false,
+      "versions": [
+        "sampleName"
+      ],
+      "label": "Sample Name",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "option_values": [
+        "AMPLICON",
+        "OTHER"
+      ],
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.libraryConstruction.libraryStrategy",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Parameter Value[library strategy]",
+      "required": "false",
+      "rank": 3,
+      "control": "select",
+      "deprecated": false,
+      "versions": [
+        "libraryStrategy"
+      ],
+      "label": "Parameter Value[library strategy]",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.nucleicAcidSequencing.qualityScorer",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Parameter Value[quality scorer]",
+      "required": "false",
+      "rank": 9,
+      "control": "ontology term",
+      "deprecated": false,
+      "versions": [
+        "qualityScorer"
+      ],
+      "label": "Parameter Value[quality scorer]",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.nucleicAcidSequencing.baseCaller",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Parameter Value[base caller]",
+      "required": "false",
+      "rank": 8,
+      "control": "ontology term",
+      "deprecated": false,
+      "versions": [
+        "baseCaller"
+      ],
+      "label": "Parameter Value[base caller]",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "option_values": [
+        "SINGLE",
+        "PAIRED"
+      ],
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.libraryConstruction.libraryLayout",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Parameter Value[library layout]",
+      "required": "false",
+      "rank": 5,
+      "control": "select",
+      "deprecated": false,
+      "versions": [
+        "libraryLayout"
+      ],
+      "label": "Parameter Value[library layout]",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.sequenceAssembly.normalizationName",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Normalization Name",
+      "required": "false",
+      "rank": 13,
+      "control": "text",
+      "deprecated": false,
+      "versions": [
+        "normalizationName"
+      ],
+      "label": "Normalization Name",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.libraryConstruction.mid",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Parameter Value[mid]",
+      "required": "false",
+      "rank": 6,
+      "control": "text",
+      "deprecated": false,
+      "versions": [
+        "mid"
+      ],
+      "label": "Parameter Value[mid]",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.sequenceAssembly.derivedDataFile",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Derived Data File",
+      "required": "false",
+      "rank": 15,
+      "control": "file",
+      "deprecated": false,
+      "versions": [
+        "derivedDataFile"
+      ],
+      "label": "Derived Data File",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "option_values": [
+        "yes",
+        "no"
+      ],
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.nucleicAcidSequencing.export",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Comment[Export]",
+      "required": "false",
+      "rank": 11,
+      "control": "select",
+      "deprecated": false,
+      "versions": [
+        "export"
+      ],
+      "label": "Comment[Export]",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.nucleicAcidSequencing.rawDataFile",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Raw Data File",
+      "required": "true",
+      "rank": 12,
+      "control": "file",
+      "deprecated": false,
+      "versions": [
+        "rawDataFile"
+      ],
+      "label": "Raw Data File",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "option_values": [
+        "PCR",
+        "RANDOM-PCR",
+        "Restriction Digest",
+        "size fractionation",
+        "other",
+        "unspecified"
+      ],
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.libraryConstruction.librarySelection",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Parameter Value[library selection]",
+      "required": "false",
+      "rank": 4,
+      "control": "select",
+      "deprecated": false,
+      "versions": [
+        "librarySelection"
+      ],
+      "label": "Parameter Value[library selection]",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "option_values": [
+        "454 GS",
+        "454 GS 20",
+        "454 GS FLX",
+        "454 GS FLX Plus",
+        "454 GS FLX Titanium",
+        "454 GS Junior",
+        "AB SOLiD System",
+        "AB SOLiD System 2.0",
+        "AB SOLiD System 3.0",
+        "AB SOLiD 4 System",
+        "AB SOLiD 4hq System",
+        "AB SOLiD PI System",
+        "AB SOLiD 5500",
+        "AB SOLiD 5500xl",
+        "AB 5500 Genetic Analyzer",
+        "AB 5500xl Genetic analyzer",
+        "Illumina Genome Analyzer",
+        "Illumina Genome Analyzer II",
+        "Illumina Genome Analyzer IIx",
+        "Illumina HiSeq 1000",
+        "Illumina HiSeq 2000",
+        "Illumina HiSeq 2500",
+        "Illumina HiScanSQ",
+        "Illumina MiSeq",
+        "Ion Torrent PGM",
+        "Ion Torrent Proton",
+        "Sanger sequencing instrument",
+        "unspecified"
+      ],
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.nucleicAcidSequencing.sequencingInstrument",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Parameter Value[sequencing instrument]",
+      "required": "false",
+      "rank": 7,
+      "control": "select",
+      "deprecated": false,
+      "versions": [
+        "sequencingInstrument"
+      ],
+      "label": "Parameter Value[sequencing instrument]",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.nucleicAcidSequencing.assayName",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Assay Name",
+      "required": "true",
+      "rank": 10,
+      "control": "text",
+      "deprecated": false,
+      "versions": [
+        "assayName"
+      ],
+      "label": "Assay Name",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.nucleicAcidExtraction.extractName",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Extract Name",
+      "required": "true",
+      "rank": 2,
+      "control": "text",
+      "deprecated": false,
+      "versions": [
+        "extractName"
+      ],
+      "label": "Extract Name",
+      "type": "string",
+      "hidden": "false"
+    },
+    {
+      "id": "ena.studies.study.assays.assaysTable.metagenomeSeq.sequenceAssembly.dataTransformationName",
+      "help_tip": "",
+      "default_value": "",
+      "ref": "Data Transformation Name",
+      "required": "false",
+      "rank": 14,
+      "control": "text",
+      "deprecated": false,
+      "versions": [
+        "dataTransformationName"
+      ],
+      "label": "Data Transformation Name",
+      "type": "string",
+      "hidden": "false"
+    }
+  ],
+  "title": "Metagenome Sequencing Assay schema mappings"
+}

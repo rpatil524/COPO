@@ -1,0 +1,604 @@
+{% extends 'copo/base.html' %}
+
+{% load staticfiles %}
+{% load web_tags %}
+{% load html_tags %}
+
+{% block stylesheet_block %}
+    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}">
+
+    <link rel="stylesheet" href="{% static 'copo/css/bootstrap/bootstrapValidator.css' %}">
+
+    <!-- Generic page styles -->
+
+    <!-- blueimp Gallery styles -->
+    <link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
+    <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
+    <link rel="stylesheet" href="{% static 'copo/css/uploader/jquery.fileupload.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/css/uploader/jquery.fileupload-ui.css' %}">
+    <!-- CSS adjustments for browsers with JavaScript disabled -->
+    <noscript>
+        <link rel="stylesheet" href="{% static 'copo/css/uploader/jquery.fileupload-noscript.css' %}">
+    </noscript>
+    <noscript>
+        <link rel="stylesheet" href="{% static 'copo/css/jquery.fileupload-ui-noscript.css' %}">
+    </noscript>
+    <link rel="stylesheet" href="{% static 'copo/css/copo/collection.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/study.css' %}">
+
+{% endblock %}
+
+
+{% block title %} ENA Collection {% endblock %}
+
+{% block tagline_block %}{% endblock %}
+
+{% block breadcrumb_block %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'copo:index' %}">Home</a></li>
+        <li><a title="{{ profile.title }}" href="{% url 'copo:view_profile' profile_id=profile_id %}">Profile</a></li>
+        <li class="active"><a title="ENA Submission"
+                              href="{% url 'copo:view_collection' collection_head_id=collection_head_id %}">Collection</a>
+        </li>
+    </ol>
+{% endblock %}
+
+{% block browse_header_block %}
+
+    <div hidden id="hidden_attrs">
+
+        <!-- hidden attributes required to make the page remember where it is and what its dealing with -->
+        <input type="hidden" id="collection_head_id" name="collection_head_id" value="{{ collection_head_id }}">
+
+        <input type="hidden" id="ena_collection_id" value="{{ ena_collection_id }}"/>
+
+        <input type="hidden" id="attr_counter" value="1"/>
+
+        <input type="hidden" id="sample_attr_counter" value="1"/>
+
+        <input type="hidden" id="file_id" value=""/>
+
+        <!-- this hidden field is to keep track of the number of upload info divs currently displaying-->
+        <input type="hidden" id="upload_info_count" value="0"/>
+
+        <input type="hidden" id="zipping_image" value="{% static 'copo/img/pacman.gif' %}"/>
+
+        <input type="hidden" id="hashing_image" value="{% static 'copo/img/pacman.gif' %}"/>
+
+        {% csrf_token %}
+        <input type="hidden" id="upload_counter" value="1"/>
+
+        <input type="hidden" id="current_sample_id" value=""/>
+        <input type="hidden" id="current_sample_task" value=""/>
+
+    </div>
+
+    <div id="browse_header">
+        <span class="blue_icon">
+           <a><i class="fa fa-plus-circle" data-toggle="modal" data-target="#newStudyModal"></i></a>
+        </span>
+        <span class="blue_icon">
+            <a><i class="fa fa-pencil-square-o"></i></a>
+        </span>
+        <span class="blue_icon">
+            <a><i class="fa fa-trash-o"></i></a>
+        </span>
+
+        <div class="input-group input-group-sm">
+            <span class="input-group-addon">
+                <i class="fa fa-search"></i>
+            </span>
+            <input type="search" class="form-control" placeholder="Search">
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block content %}
+
+    <h2 class="h2"><span title="Profile Name">{{ profile.title }}</span> / <span
+            title="Collection Name">{{ collection_head.name }}</span></h2>
+
+    <div class="panel-group" id="accordion">
+
+        <!-- Panel for Study Samples -->
+        <div class="panel panel-default" id="panel1">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-target="#collapseOne" href="#collapseOne">
+                        Samples
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse in">
+                <div class="panel-body">
+                    <div style="display: inline-block; text-indent: 0.5em;">
+                        <a class="sample-refresh-modal" data-toggle="modal" data-target="#newStudySampleModal"
+                           href="#">
+                            <button type="button" class="btn btn-primary btn-xs">Add
+                                Sample
+                            </button>
+                        </a>
+                    </div>
+                    <div id="sample_table_div">{{ ena_collection_id|generate_sample_table }} </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel for Study Types -->
+        <div class="panel panel-default" id="panel2">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-target="#collapseTwo" href="#collapseTwo">
+                        Studies
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseTwo" class="panel-collapse collapse in">
+                <div class="panel-body">
+                    <div style="display: inline-block; text-indent: 0.5em;">
+                        <a data-toggle="modal" data-target="#newStudyTypeModal" href="#">
+                            <button type="button" class="btn btn-primary btn-xs">Add
+                                New Study
+                            </button>
+                        </a>
+                        <a class="study-refresh-modal" data-toggle="modal" data-target="#studyTypeCloneModal" href="#">
+                            <button type="button" class="btn btn-primary btn-xs">Clone Existing
+                                Study
+                            </button>
+                        </a>
+                    </div>
+
+                    <div id="studies_table_div">
+                        {{ ena_collection_id|generate_study_table }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for deleting study -->
+    <div class="modal fade" id="studyDeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content alert alert-warning">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Confirm Study Delete</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form role="form" id="delete_study_form_2" action="{% url 'copo:add_to_collection' %}"
+                          method="post">
+                        {% csrf_token %}
+                        <input type="hidden" id="target_study_delete" value="">
+
+                        <p>You are about to delete the study: <span id="target_study_delete_span"
+                                                                    class="study-node-title"></span>. Please note that
+                            this
+                            procedure
+                            is irreversible.</p>
+
+                        <p>Do you want to proceed?</p>
+
+                        <p class="debug-url"></p>
+
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <a id="delete_study_btn" class="btn btn-danger btn-ok">Delete</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding new study type -->
+    <div class="modal fade" id="newStudyTypeModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span
+                            aria-hidden="true">&times;</span><span
+                            class="sr-only">Close</span></button>
+                    <div style="display: inline-block;"><h4 class="modal-title" id="myModalLabel">Add Study Type</h4>
+                    </div>
+                    <div style="display: inline-block;">
+                        <span class="blue_icon"><a href="#" data-toggle="tooltip"
+                                                   title="{{ "study_type_add_info"|lookup_info }}">
+                            <i class="glyphicon glyphicon-info-sign"></i></a></span></div>
+
+                </div>
+                <div class="modal-body">
+                    <form role="form" id="add_new_study_form_2" action="{% url 'copo:add_to_collection' %}"
+                          method="post">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="profile_id" value="{{ profile_id }}">
+
+                        <div id="study_type_div" class="form-group">
+                            <label for="study_type">New Study Type
+                                <div style="display: inline-block;">
+                                    <a class="btn btn-xs btn-success study-type-add" href="#">
+                                        <i class="fa fa-plus-square-o fa-sm"></i> Add</a>
+                                </div>
+                            </label>
+
+                            <div id="study_types_lists_div">
+                                <div id="study_type_select_divs_0" style="white-space: nowrap; margin-bottom: 0.5em;">
+                                    <div style="display: inline-block;">
+                                        <select name="study_type_select_0" id="study_type_select_0"
+                                                class="form-control">
+                                            {% for stud in study_types %}
+                                                <option value="{{ stud.value }}">{{ stud.label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div style="display: inline-block;">
+                                        <input type="text" name="study_type_reference_0" id="study_type_reference_0"
+                                               class=" input-copo"
+                                               placeholder="Enter Study Reference"/>
+                                    </div>
+                                    <div style="display: inline-block;">
+                                        <a id="study_type_remove_0" name="study_type_remove_0"
+                                           class="btn btn-xs btn-danger study-type-remove" href="#">
+                                            <i class="fa fa-trash-o fa-sm"></i> Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr/>
+                        <div>
+                            <button id="submit_study_type_btn" type="button" class="btn btn-primary text-center">
+                                Submit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for cloning study types -->
+    <div class="modal fade copo-modal2 " id="studyTypeCloneModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span
+                            aria-hidden="true">&times;</span><span
+                            class="sr-only">Close</span></button>
+                    <div style="display: inline-block;"><h4 class="modal-title" id="myModalLabel">Clone Existing
+                        Study</h4>
+                    </div>
+                    <div style="display: inline-block;"><span class="blue_icon"><a href="#" data-toggle="tooltip"
+                                                                                   title="{{ "study_type_clone_info"|lookup_info }}"><i
+                            class="glyphicon glyphicon-info-sign"></i></a></span></div>
+
+                </div>
+                <div class="modal-body">
+                    <form role="form" id="clone_new_study_form_2" action="{% url 'copo:add_to_collection' %}"
+                          method="post">
+                        {% csrf_token %}
+
+                        <div id="study_tree_table">
+                            <div style="display: inline-block;">
+                                <input type="text"
+                                       id="studyReference_clone_value"
+                                       class=" input-copo"
+                                       placeholder="Enter Study Reference"/>
+                            </div>
+                            <table class="table-bordered fixed-copo-table">
+                                <col width="40%"/>
+                                <col width="30%"/>
+                                <col width="30%"/>
+
+                                <tr>
+                                    <th>Existing Studies</th>
+                                    <th>View Pane</th>
+                                    <th>Cloned Pane</th>
+                                </tr>
+                                <tr>
+                                    <td valign="top">
+                                        <ul id="study_type_tree" class="easyui-tree"
+                                            checkbox="true"
+                                            animate="true"
+                                            lines="true"
+                                            onlyLeafCheck="true">
+                                        </ul>
+                                    </td>
+                                    <td valign="top">
+                                        <div id="info_panel_display"></div>
+                                    </td>
+                                    <td valign="top">
+                                        <div id="cloned_panel_display" hidden="hidden">
+
+                                            <div class="list-group">
+                                                <div id="studyType_clone_div" hidden="hidden">
+                                                    <div class="study-select-status"></div>
+                                                    <div class="study-node-data"><span class="study-node-title">Study Type</span>:
+                                                        <span id="studyType_clone_span"></span>
+                                                        <input type="hidden" id="studyType_clone_value" value=""/>
+                                                    </div>
+                                                </div>
+
+                                                <div id="studyTitle_clone_div" hidden="hidden">
+                                                    <div class="study-select-status"></div>
+                                                    <div class="study-node-data"><span
+                                                            class="study-node-title">{{ "ena.studies.study.studyTitle" | generate_ui_labels }}</span>:
+                                                        <span id="studyTitle_clone_span"></span>
+                                                        <input type="hidden" id="studyTitle_clone_value" value=""/>
+                                                    </div>
+                                                </div>
+
+                                                <div id="commentStudyFundingAgency_clone_div" hidden="hidden">
+                                                    <div class="study-select-status"></div>
+                                                    <div class="study-node-data"><span
+                                                            class="study-node-title">{{ "ena.studies.study.commentStudyFundingAgency" | generate_ui_labels }}</span>:
+                                                        <span id="commentStudyFundingAgency_clone_span"></span>
+                                                        <input type="hidden"
+                                                               id="commentStudyFundingAgency_clone_value"
+                                                               value=""/>
+                                                    </div>
+                                                </div>
+
+                                                <div id="studyDescription_clone_div" hidden="hidden">
+                                                    <div class="study-select-status"></div>
+                                                    <div class="study-node-data"><span
+                                                            class="study-node-title">{{ "ena.studies.study.studyDescription" | generate_ui_labels }}</span>:
+                                                        <span id="studyDescription_clone_span"></span>
+                                                        <input type="hidden" id="studyDescription_clone_value"
+                                                               value=""/>
+                                                    </div>
+                                                </div>
+
+                                                <div id="sample_clone_div" hidden="hidden">
+                                                    <div class="study-list-status"></div>
+                                                    <div class="study-node-list-data"><label>Samples</label></div>
+                                                    <div class="study-list-data-passive">
+                                                        <div class="study-list-data-status"></div>
+                                                        <div class="study-node-data"></div>
+                                                        <input class="study-node-data-value" type="hidden" value=""/>
+                                                    </div>
+                                                </div>
+
+                                                <div id="publication_clone_div" hidden="hidden">
+                                                    <div class="study-list-status"></div>
+                                                    <div class="study-node-list-data">
+                                                        <label>Publications</label>
+                                                    </div>
+                                                    <div class="study-list-data-passive">
+                                                        <div class="study-list-data-status"></div>
+                                                        <div class="study-node-data"></div>
+                                                        <input type="hidden" value=""/>
+                                                    </div>
+                                                </div>
+
+                                                <div id="contact_clone_div" hidden="hidden">
+                                                    <div class="study-list-status"></div>
+                                                    <div class="study-node-list-data"><label>Contacts</label>
+                                                    </div>
+                                                    <div class="study-list-data-passive">
+                                                        <div class="study-list-data-status"></div>
+                                                        <div class="study-node-data"></div>
+                                                        <input type="hidden" value=""/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <hr/>
+                        <div style="display: inline-block;">
+                            <button id="submit_study_clone_btn" type="button" class="btn btn-primary text-center">
+                                Submit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding new study sample -->
+    <div class="modal fade" id="newStudySampleModal" tabindex="-1" role="dialog" aria-labelledby="mySampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span><span
+                            class="sr-only">Close</span></button>
+
+                    <div style="display: inline-block;"><h4 class="modal-title" id="mySampleModalLabel">Add Study
+                        Sample</h4>
+                    </div>
+                    <div style="display: inline-block;"><span class="blue_icon">
+                        <a href="#" data-toggle="tooltip" title="{{ "sample_add_info"|lookup_info }}">
+                            <i class="glyphicon glyphicon-info-sign"></i></a></span></div>
+                </div>
+                <div class="modal-body">
+                    <form role="form" id="add_new_study_sample_form" action="{% url 'copo:add_to_collection' %}"
+                          method="post">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="termAccessionNumber_organism" id="termAccessionNumber_organism"/>
+                        <input type="hidden" name="termSourceREF_organism" id="termSourceREF_organism"/>
+
+                        <div>
+                            {% for sf in ui_template.studies.study.studySamples.sampleCollection.fields %}
+                                <div class='form-group'>
+                                    {{ sf.id|generate_ui_tags }}
+                                </div>
+                            {% endfor %}
+
+                            {% for sf in ui_template.studies.study.studySamples.fields %}
+                                <div class='form-group'>
+                                    {{ sf.id|generate_ui_tags }}
+                                </div>
+                            {% endfor %}
+
+                            <hr/>
+
+                            <div class="form-group">
+                                <label>Sample Attributes</label><br/>
+                            </div>
+                            <div class="form-group">
+                                <div id="sample_attributes_div">
+                                    <!-- Section for system-suggested attributes -->
+                                    {% if sample_attributes %}
+                                        {% for satt in sample_attributes %}
+                                            <div id="sample_attribute_div_{{ forloop.counter }}"
+                                                 style="white-space: nowrap; margin-bottom: 0.5em;">
+                                                <div style="display: inline-block;">
+                                                    <input type="text" name="categoryTerm_{{ forloop.counter }}"
+                                                           id="categoryTerm_{{ forloop.counter }}"
+                                                           class=" input-copo"
+                                                           value="{{ satt.label }}" readonly/>
+                                                </div>
+                                                <div style="display: inline-block;">
+                                                    <input type="text" name="characteristics_{{ forloop.counter }}"
+                                                           id="characteristics_{{ forloop.counter }}"
+                                                           class=" input-copo"
+                                                           placeholder="value"/>
+                                                </div>
+                                                {% if satt.has_unit == "yes" %}
+                                                    <div style="display: inline-block;">
+                                                        <input type="text" name="unit_{{ forloop.counter }}"
+                                                               id="unit_{{ forloop.counter }}"
+                                                               class="input-copo"
+                                                               placeholder="unit"/>
+                                                    </div>
+                                                {% else %}
+                                                    <div style="display: inline-block;">
+                                                        <input type="text" name="unit_{{ forloop.counter }}"
+                                                               id="unit_{{ forloop.counter }}"
+                                                               class="input-copo"
+                                                               value="n/a" readonly/>
+                                                    </div>
+                                                {% endif %}
+                                                <input type="hidden" name="termAccessionNumber_{{ forloop.counter }}"
+                                                       id="termAccessionNumber_{{ forloop.counter }}"/>
+                                                <input type="hidden" name="termSourceREF_{{ forloop.counter }}"
+                                                       id="termSourceREF_{{ forloop.counter }}"/>
+
+                                                <div style="display: inline-block;">
+                                                    <a id="sample_attribute_message_{{ forloop.counter }}"
+                                                       name="sample_attribute_message_{{ forloop.counter }}"
+                                                       data-toggle="popover" data-trigger="hover"
+                                                       title="Attributes Info"
+                                                       data-html="true"
+                                                       data-content="{{ messages.system_suggested_attribute_message }}"
+                                                       href="#">
+                                                        <i class="fa fa-sticky-note"></i></a>
+                                                </div>
+
+                                                <div style="display: inline-block;">
+                                                    <a id="sample_attribute_remove_{{ forloop.counter }}"
+                                                       name="sample_attribute_remove_{{ forloop.counter }}"
+                                                       class="btn btn-xs btn-danger sample-attribute-remove" href="#">
+                                                        <i class="fa fa-trash-o fa-sm"></i> Delete</a>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    <!-- Section for user-defined attributes -->
+                                    <div id="sample_attribute_div_0"
+                                         style="white-space: nowrap; margin-bottom: 0.5em; display: none;">
+                                        <div style="display: inline-block;">
+                                            <input type="text" name="categoryTerm_0" id="categoryTerm_0"
+                                                   class=" input-copo"
+                                                   placeholder="term"/>
+                                        </div>
+                                        <div style="display: inline-block;">
+                                            <input type="text" name="characteristics_0" id="characteristics_0"
+                                                   class=" input-copo"
+                                                   placeholder="value"/>
+                                        </div>
+                                        <div style="display: inline-block;">
+                                            <input type="text" name="unit_0" id="unit_0"
+                                                   class="input-copo"
+                                                   placeholder="unit"/>
+                                        </div>
+                                        <input type="hidden" name="termAccessionNumber_0" id="termAccessionNumber_0"/>
+                                        <input type="hidden" name="termSourceREF_0" id="termSourceREF_0"/>
+
+                                        <div style="display: inline-block;">
+                                            <a id="sample_attribute_message_0" name="sample_attribute_message_0"
+                                               data-toggle="popover" data-trigger="hover" title="Attributes Info"
+                                               data-content="{{ messages.user_defined_attribute_message }}"
+                                               href="#">
+                                                <i class="fa fa-sticky-note"></i></a>
+                                        </div>
+                                        <div style="display: inline-block;">
+                                            <a id="sample_attribute_remove_0" name="sample_attribute_remove_0"
+                                               class="btn btn-xs btn-danger sample-attribute-remove" href="#">
+                                                <i class="fa fa-trash-o fa-sm"></i> Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="padding-top: 1.0em;">
+                                    <div style="display: inline-block;">
+                                        <a class="btn btn-xs btn-success sample-attribute-add" href="#">
+                                            <i class="fa fa-plus-square-o fa-sm"></i> Add Sample Attribute</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr/>
+
+                            <div class="form-group">
+                                <label>Assign Sample to...</label><br/>
+
+                                <div id="study_type_sample_tree"></div>
+                            </div>
+                            <hr/>
+                            <div>
+                                <button id="btn_add_new_sample" type="button"
+                                        class="btn btn-primary text-center">Submit
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+
+{% block js_block %}
+    <script src="{% static 'copo/js/collection_functions.js' %}"></script>
+    <script src="{% static 'copo/js/collection_ext.js' %}"></script>
+    {#    <script src="{% static 'copo/js/collection.js' %}"></script>#}
+    <script src="{% static 'copo/js/jquery.form.js' %}"></script>
+    <script src="{% static 'copo/js/bootstrapValidator.js' %}"></script>
+    <script src="{% static 'copo/js/uploader/vendor/jquery.ui.widget.js' %}"></script>
+    <script src="{% static 'copo/js/uploader/jquery.iframe-transport.js' %}"></script>
+    <script src="{% static 'copo/js/uploader/jquery.fileupload.js' %}"></script>
+    <script src="{% static 'copo/js/uploader/jquery.fileupload-process.js' %}"></script>
+    <script src="{% static 'copo/js/uploader/jquery.fileupload-ui.js' %}"></script>
+    <script src="{% static 'copo/js/uploader/upload_wrapper.js' %}"></script>
+    <script src="{% static 'copo/js/uploader/bootstrap_panel.js' %}"></script>
+    <script src="{% static 'copo/js/uploader/upload_util.js' %}"></script>
+
+{% endblock %}

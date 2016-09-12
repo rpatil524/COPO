@@ -1,0 +1,318 @@
+{
+  "properties": [
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "Sample Name",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": true,
+      "id": "copo.metagenomeSeq.sample_name",
+      "show_in_table": true,
+      "control": "text",
+      "versions": [
+        "sample_name"
+      ],
+      "help_tip": "",
+      "label": "Sample Name"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "Parameter Value[library strategy]",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": true,
+      "id": "copo.metagenomeSeq.library_strategy",
+      "show_in_table": true,
+      "option_values": [
+        "AMPLICON",
+        "OTHER"
+      ],
+      "control": "select",
+      "versions": [
+        "library_strategy"
+      ],
+      "help_tip": "",
+      "label": "Parameter Value[library strategy]"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "Parameter Value[quality scorer]",
+      "ontology_names": [],
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": true,
+      "id": "copo.metagenomeSeq.quality_scorer",
+      "show_in_table": true,
+      "control": "ontology term",
+      "versions": [
+        "quality_scorer"
+      ],
+      "help_tip": "",
+      "label": "Parameter Value[quality scorer]"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "Parameter Value[base caller]",
+      "ontology_names": [],
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": true,
+      "id": "copo.metagenomeSeq.base_caller",
+      "show_in_table": true,
+      "control": "ontology term",
+      "versions": [
+        "base_caller"
+      ],
+      "help_tip": "",
+      "label": "Parameter Value[base caller]"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "Parameter Value[library layout]",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": true,
+      "id": "copo.metagenomeSeq.library_layout",
+      "show_in_table": true,
+      "option_values": [
+        "SINGLE",
+        "PAIRED"
+      ],
+      "control": "select",
+      "versions": [
+        "library_layout"
+      ],
+      "help_tip": "",
+      "label": "Parameter Value[library layout]"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "Normalization Name",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.metagenomeSeq.normalization_name",
+      "show_in_table": false,
+      "control": "text",
+      "versions": [
+        "normalization_name"
+      ],
+      "help_tip": "",
+      "label": "Normalization Name"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "Parameter Value[mid]",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.metagenomeSeq.mid",
+      "show_in_table": false,
+      "control": "text",
+      "versions": [
+        "mid"
+      ],
+      "help_tip": "",
+      "label": "Parameter Value[mid]"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "Derived Data File",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.metagenomeSeq.derived_data_file",
+      "show_in_table": false,
+      "control": "file",
+      "versions": [
+        "derived_data_file"
+      ],
+      "help_tip": "",
+      "label": "Derived Data File"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "Comment[Export]",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.metagenomeSeq.export",
+      "show_in_table": false,
+      "option_values": [
+        "yes",
+        "no"
+      ],
+      "control": "select",
+      "versions": [
+        "export"
+      ],
+      "help_tip": "",
+      "label": "Comment[Export]"
+    },
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "Raw Data File",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.metagenomeSeq.raw_data_file",
+      "show_in_table": false,
+      "control": "file",
+      "versions": [
+        "raw_data_file"
+      ],
+      "help_tip": "",
+      "label": "Raw Data File"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "Parameter Value[library selection]",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": true,
+      "id": "copo.metagenomeSeq.library_selection",
+      "show_in_table": true,
+      "option_values": [
+        "PCR",
+        "RANDOM-PCR",
+        "Restriction Digest",
+        "size fractionation",
+        "other",
+        "unspecified"
+      ],
+      "control": "select",
+      "versions": [
+        "library_selection"
+      ],
+      "help_tip": "",
+      "label": "Parameter Value[library selection]"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "Parameter Value[sequencing instrument]",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": true,
+      "id": "copo.metagenomeSeq.sequencing_instrument",
+      "show_in_table": true,
+      "option_values": [
+        "454 GS",
+        "454 GS 20",
+        "454 GS FLX",
+        "454 GS FLX Plus",
+        "454 GS FLX Titanium",
+        "454 GS Junior",
+        "AB SOLiD System",
+        "AB SOLiD System 2.0",
+        "AB SOLiD System 3.0",
+        "AB SOLiD 4 System",
+        "AB SOLiD 4hq System",
+        "AB SOLiD PI System",
+        "AB SOLiD 5500",
+        "AB SOLiD 5500xl",
+        "AB 5500 Genetic Analyzer",
+        "AB 5500xl Genetic analyzer",
+        "Illumina Genome Analyzer",
+        "Illumina Genome Analyzer II",
+        "Illumina Genome Analyzer IIx",
+        "Illumina HiSeq 1000",
+        "Illumina HiSeq 2000",
+        "Illumina HiSeq 2500",
+        "Illumina HiScanSQ",
+        "Illumina MiSeq",
+        "Ion Torrent PGM",
+        "Ion Torrent Proton",
+        "Sanger sequencing instrument",
+        "unspecified"
+      ],
+      "control": "select",
+      "versions": [
+        "sequencing_instrument"
+      ],
+      "help_tip": "",
+      "label": "Parameter Value[sequencing instrument]"
+    },
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "Assay Name",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.metagenomeSeq.assay_name",
+      "show_in_table": false,
+      "control": "text",
+      "versions": [
+        "assay_name"
+      ],
+      "help_tip": "",
+      "label": "Assay Name"
+    },
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "Extract Name",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.metagenomeSeq.extract_name",
+      "show_in_table": false,
+      "control": "text",
+      "versions": [
+        "extract_name"
+      ],
+      "help_tip": "",
+      "label": "Extract Name"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "Data Transformation Name",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.metagenomeSeq.data_transformation_name",
+      "show_in_table": false,
+      "control": "text",
+      "versions": [
+        "data_transformation_name"
+      ],
+      "help_tip": "",
+      "label": "Data Transformation Name"
+    }
+  ],
+  "description": "Mappings of attribute in the Assay schema to a UI configuration source. Configuration ref is defined in UI_CONFIG_SOURCES in services.py",
+  "configuration": {
+    "type": "xml",
+    "provider": "isa",
+    "ref": "STUDY_ASSAY_METAGENOME_SEQ_FILE_XML"
+  },
+  "title": "Metagenome Sequencing Assay schema mappings"
+}

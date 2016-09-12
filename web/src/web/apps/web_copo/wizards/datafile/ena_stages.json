@@ -1,0 +1,70 @@
+{
+  "title": "ENA Datafile Description",
+  "description": "Definitions for elements that appear in different stages of a wizard targeted at submissions to the ENA (European Nucleotide Archive) repository. 'ref', id of stage; 'title',  header used for the stage; 'content', the function to call to generate stage html; items, actual form elements on the page; 'is_stage_stub', if the stage entry is a complete stage or a bootstrap; 'is_conditional_stage', displays a stage based on some condition being satisfied; 'is_singular_stage', if all items must have same value for this stage",
+  "properties": [
+    {
+      "ref": "study_type",
+      "title": "Study Type",
+      "content": "get_stage_html",
+      "is_singular_stage": true,
+      "deposition_context": "ena",
+      "message": "Select the study type under which this file was created. The study type presents a controlled vocabulary for expressing the overall purpose of the study.",
+      "items": [
+        {
+          "id": "study_type",
+          "help_tip": "Select Study Type from the list drop-down",
+          "label": "Study Type",
+          "hidden": "false",
+          "type": "string",
+          "control": "select",
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_study_type_options",
+              "parameter": ""
+            }
+          },
+          "trigger": {
+            "type": "change",
+            "callback": {
+              "function": "study_type_change",
+              "parameter": "{item_id!s},{old_value!s},{new_value!s}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ref": "attach_samples",
+      "title": "Samples",
+      "content": "get_stage_html",
+      "deposition_context": "ena",
+      "message": "Select samples associated with this file from the list. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",
+      "items": [
+        {
+          "id": "study_samples",
+          "help_tip": "",
+          "label": "Samples",
+          "hidden": "false",
+          "control": "copo-multi-search",
+          "data_maxItems": 1,
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_samples_json",
+              "parameter": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ref": "protocol_refs",
+      "is_stage_stub": true,
+      "callback": {
+        "function": "get_dynamic_elements_ena",
+        "parameter": "{stub_ref!s}"
+      }
+    }
+  ]
+}

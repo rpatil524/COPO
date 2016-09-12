@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SUBMISSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.submission.xsd" center_name="EI" accession="" alias="0000000000000" broker_name="">
+  <CONTACTS>
+    <CONTACT name="Felix O Shaw" inform_on_status="dkjsadjalk@kjsdalsjkla.dska" inform_on_error="dkjsadjalk@kjsdalsjkla.dska"/>
+  </CONTACTS>
+  <ACTIONS>
+    <ACTION>
+      <VALIDATE schema="study" source="study.xml"/>
+    </ACTION>
+    <ACTION>
+      <VALIDATE schema="sample" source="sample_set.xml"/>
+    </ACTION>
+    <ACTION>
+      <VALIDATE schema="experiment" source="experiment_set.xml"/>
+    </ACTION>
+    <ACTION>
+      <VALIDATE schema="run" source="run_set.xml"/>
+    </ACTION>
+  </ACTIONS>
+</SUBMISSION>

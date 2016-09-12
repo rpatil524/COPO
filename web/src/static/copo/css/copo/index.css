@@ -1,0 +1,56 @@
+.profile-header {
+    font-size: 16px;
+    padding-left: 1px;
+}
+
+.profile-header > a {
+    color: #1a0dab;
+}
+
+.profile-column {
+    padding: 3px 0px;
+    font-size: 12px
+}
+
+.profile-column-title {
+    padding-right: 10px;
+}
+
+.profile-column-data {
+    line-height: 15px;
+}
+
+.pad-left {
+    padding-left: 5px;
+}
+
+.space-left {
+    margin-left: 20px;
+}
+
+span.summary-details-control {
+    position: relative;
+    cursor: pointer;
+}
+
+span.summary-details-control:before {
+    position: absolute;
+    font-family: 'FontAwesome';
+    content: "\f196";
+    color: #3a6c55;
+    top: 10%;
+    left: 50%;
+    font-size: 13px;
+
+}
+
+div.shown span.summary-details-control:before {
+    position: absolute;
+    font-family: 'FontAwesome';
+    content: "\f147";
+    color: #3a6c55;
+    top: 10%;
+    left: 50%;
+    font-size: 13px;
+
+}

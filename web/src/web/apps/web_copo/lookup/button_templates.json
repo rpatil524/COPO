@@ -1,0 +1,48 @@
+{
+  "title": "Button templates",
+  "description": "Provides templates for composing reusable buttons",
+  "templates": {
+    "edit_row": {
+      "text": "Edit",
+      "className": "copo-dt btn btn-success",
+      "iconClass": "fa fa-pencil-square-o",
+      "btnAction": "edit"
+    },
+    "delete_row": {
+      "text": "Delete",
+      "className": "copo-dt btn btn-danger",
+      "iconClass": "fa fa-trash-o",
+      "btnAction": "delete"
+    },
+    "describe_row": {
+      "text": "Describe",
+      "className": "copo-dt btn btn-primary",
+      "iconClass": "fa fa-tags",
+      "btnAction": "describe"
+    },
+    "info_row": {
+      "text": "Info",
+      "className": "copo-dt btn btn-info",
+      "iconClass": "fa fa-info-circle",
+      "btnAction": "info"
+    },
+    "delete_global": {
+      "text": "Delete selected",
+      "className": "copo-dt btn btn-danger",
+      "iconClass": "fa fa-trash-o",
+      "btnAction": "delete"
+    },
+    "describe_global": {
+      "text": "Describe",
+      "className": "copo-dt btn btn-primary",
+      "iconClass": "fa fa-tags",
+      "btnAction": "describe"
+    },
+    "undescribe_global": {
+      "text": "[Un]Describe",
+      "className": "copo-dt btn btn-danger",
+      "iconClass": "fa fa-tags",
+      "btnAction": "undescribe"
+    }
+  }
+}

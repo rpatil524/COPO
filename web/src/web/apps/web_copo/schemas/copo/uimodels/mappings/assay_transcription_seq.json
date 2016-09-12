@@ -1,0 +1,272 @@
+{
+  "title": "Transcriptome Analysis Assay schema mappings",
+  "properties": [
+    {
+      "show_in_form": true,
+      "default_value": "",
+      "versions": [
+        "sample_name"
+      ],
+      "help_tip": "",
+      "show_in_table": true,
+      "id": "copo.transcriptomeAnalysis.sample_name",
+      "control": "text",
+      "ref": "Sample Name",
+      "type": "string",
+      "label": "Sample Name",
+      "hidden": "false",
+      "required": "true",
+      "deprecated": false
+    },
+    {
+      "show_in_form": false,
+      "default_value": "",
+      "versions": [
+        "extract_name"
+      ],
+      "help_tip": "",
+      "show_in_table": false,
+      "id": "copo.transcriptomeAnalysis.extract_name",
+      "control": "text",
+      "ref": "Extract Name",
+      "type": "string",
+      "label": "Extract Name",
+      "hidden": "true",
+      "required": "true",
+      "deprecated": false
+    },
+    {
+      "option_values": [
+        "SINGLE",
+        "PAIRED"
+      ],
+      "versions": [
+        "library_layout"
+      ],
+      "show_in_form": true,
+      "default_value": "",
+      "required": "false",
+      "help_tip": "",
+      "show_in_table": true,
+      "id": "copo.transcriptomeAnalysis.library_layout",
+      "control": "select",
+      "ref": "Parameter Value[library layout]",
+      "type": "string",
+      "hidden": "false",
+      "label": "Parameter Value[library layout]",
+      "deprecated": false
+    },
+    {
+      "show_in_form": false,
+      "default_value": "",
+      "versions": [
+        "mid"
+      ],
+      "help_tip": "",
+      "show_in_table": false,
+      "id": "copo.transcriptomeAnalysis.mid",
+      "control": "text",
+      "ref": "Parameter Value[mid]",
+      "type": "string",
+      "label": "Parameter Value[mid]",
+      "hidden": "true",
+      "required": "false",
+      "deprecated": false
+    },
+    {
+      "option_values": [
+        "454 GS",
+        "454 GS 20",
+        "454 GS FLX",
+        "454 GS FLX Plus",
+        "454 GS FLX Titanium",
+        "454 GS Junior",
+        "AB SOLiD\n                System",
+        "AB SOLiD System 2.0",
+        "AB SOLiD System 3.0",
+        "AB SOLiD 4 System",
+        "AB SOLiD 4hq System",
+        "AB SOLiD PI\n                System",
+        "AB SOLiD 5500",
+        "AB SOLiD 5500xl",
+        "AB 5500 Genetic Analyzer",
+        "AB 5500xl Genetic analyzer",
+        "Illumina Genome\n                Analyzer",
+        "Illumina Genome Analyzer II",
+        "Illumina Genome Analyzer IIx",
+        "Illumina HiSeq 1000",
+        "Illumina HiSeq\n                2000",
+        "Illumina HiSeq 2500",
+        "Illumina HiScanSQ",
+        "Illumina MiSeq",
+        "Ion Torrent PGM",
+        "Ion Torrent Proton",
+        "Sanger\n                sequencing instrument",
+        "unspecified\n            "
+      ],
+      "show_in_form": true,
+      "default_value": "",
+      "versions": [
+        "sequencing_instrument"
+      ],
+      "required": "false",
+      "show_in_table": true,
+      "id": "copo.transcriptomeAnalysis.sequencing_instrument",
+      "control": "select",
+      "ref": "Parameter Value[sequencing instrument]",
+      "type": "string",
+      "hidden": "false",
+      "label": "Parameter Value[sequencing instrument]",
+      "deprecated": false,
+      "help_tip": ""
+    },
+    {
+      "show_in_form": true,
+      "default_value": "",
+      "versions": [
+        "base_caller"
+      ],
+      "required": "false",
+      "show_in_table": true,
+      "id": "copo.transcriptomeAnalysis.base_caller",
+      "control": "ontology term",
+      "ref": "Parameter Value[base caller]",
+      "type": "string",
+      "ontology_names": [],
+      "hidden": "false",
+      "label": "Parameter Value[base caller]",
+      "deprecated": false,
+      "help_tip": ""
+    },
+    {
+      "show_in_form": true,
+      "default_value": "",
+      "versions": [
+        "quality_scorer"
+      ],
+      "required": "false",
+      "show_in_table": true,
+      "id": "copo.transcriptomeAnalysis.quality_score",
+      "control": "ontology term",
+      "ref": "Parameter Value[quality score]",
+      "type": "string",
+      "ontology_names": [],
+      "hidden": "false",
+      "label": "Parameter Value[quality score]",
+      "deprecated": false,
+      "help_tip": ""
+    },
+    {
+      "show_in_form": false,
+      "default_value": "",
+      "versions": [
+        "assay_name"
+      ],
+      "help_tip": "",
+      "show_in_table": false,
+      "id": "copo.transcriptomeAnalysis.assay_name",
+      "control": "text",
+      "ref": "Assay Name",
+      "type": "string",
+      "label": "Assay Name",
+      "hidden": "true",
+      "required": "true",
+      "deprecated": false
+    },
+    {
+      "option_values": [
+        "yes",
+        "no"
+      ],
+      "show_in_form": false,
+      "default_value": "",
+      "versions": [
+        "export"
+      ],
+      "required": "false",
+      "show_in_table": false,
+      "id": "copo.transcriptomeAnalysis.export",
+      "control": "select",
+      "ref": "Comment[Export]",
+      "type": "string",
+      "hidden": "true",
+      "label": "Comment[Export]",
+      "deprecated": false,
+      "help_tip": ""
+    },
+    {
+      "show_in_form": false,
+      "default_value": "",
+      "versions": [
+        "raw_data_file"
+      ],
+      "help_tip": "",
+      "show_in_table": false,
+      "id": "copo.transcriptomeAnalysis.raw_data_file",
+      "control": "file",
+      "ref": "Raw Data File",
+      "type": "string",
+      "label": "Raw Data File",
+      "hidden": "true",
+      "required": "true",
+      "deprecated": false
+    },
+    {
+      "show_in_form": false,
+      "default_value": "",
+      "versions": [
+        "normalization_name"
+      ],
+      "help_tip": "",
+      "show_in_table": false,
+      "id": "copo.transcriptomeAnalysis.normalization_name",
+      "control": "text",
+      "ref": "Normalization Name",
+      "type": "string",
+      "label": "Normalization Name",
+      "hidden": "true",
+      "required": "false",
+      "deprecated": false
+    },
+    {
+      "show_in_form": false,
+      "default_value": "",
+      "versions": [
+        "data_transformation_name"
+      ],
+      "help_tip": "",
+      "show_in_table": false,
+      "id": "copo.transcriptomeAnalysis.data_transformation_name",
+      "control": "text",
+      "ref": "Data Transformation Name",
+      "type": "string",
+      "label": "Data Transformation Name",
+      "hidden": "true",
+      "required": "false",
+      "deprecated": false
+    },
+    {
+      "show_in_form": false,
+      "default_value": "",
+      "versions": [
+        "derived_data_file"
+      ],
+      "help_tip": "",
+      "show_in_table": false,
+      "id": "copo.transcriptomeAnalysis.derived_data_file",
+      "control": "file",
+      "ref": "Derived Data File",
+      "type": "string",
+      "label": "Derived Data File",
+      "hidden": "true",
+      "required": "false",
+      "deprecated": false
+    }
+  ],
+  "description": "Mappings of attribute in the Assay schema to a UI configuration source. Configuration ref is points to the actual file to map to, defined in schemas",
+  "configuration": {
+    "ref": "transcription_seq.xml",
+    "provider": "isa",
+    "type": "xml"
+  }
+}

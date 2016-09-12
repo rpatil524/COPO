@@ -1,0 +1,75 @@
+.panel-body {
+    height: 600px
+}
+
+#bandwidth_chart {
+}
+
+#completed_chart {
+}
+
+.submission_pending {
+
+    background-color: #0E9D57;
+}
+
+.submission_complete {
+    background-color: #5BC0DE;
+}
+
+.submission_unavailable {
+    background-color: #0E9D57;
+}
+
+.submission_header {
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-right: 10px;
+    position: relative;
+    margin-top: 10px;
+    width: 100%;
+    height: 40px;
+    z-index: 0;
+    color: white;
+    font-family: Arial;
+    font-size: 18px;
+
+}
+
+.text-center {
+    text-align: center;
+}
+
+.padding {
+    margin-top: 35px
+}
+
+
+.panel-overflow {
+    overflow: scroll;
+}
+
+.submission_info_panel {
+    position: relative;
+    width: 100%;
+    height: 100px;
+    box-shadow: 0 2px 5px #888888;
+    z-index: 5;
+    padding-left: 10px
+}
+
+small {
+    color: lightgrey;
+}
+
+.panel-body {
+      height: auto !important;
+}
+
+#current-submissions_wrapper{
+    margin:20px
+}
+
+th{
+    color: white
+}
