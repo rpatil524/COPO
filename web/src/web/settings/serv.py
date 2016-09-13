@@ -1,5 +1,5 @@
 # define parameters for repositories
-
+import os
 REPOSITORIES = {
     'ASPERA': {
         'resource_path': 'reposit/aspera/Aspera Connect.app/Contents/Resources/',
@@ -27,7 +27,7 @@ REPOSITORIES = {
             'ouath/token': 'https://api.sandbox.orcid.org/oauth/token?',
             'base_url': 'https://sandbox.orcid.org',
             'authorise_url': 'http://orcid.org/oauth/authorize?client_id=0000-0002-4011-2520&response_type=code&scope=/authenticate&redirect_uri=http://127.0.0.1:8000/copo/',
-            'redirect': 'http://127.0.0.1:8000/copo/',
+            'redirect': os.environ['ORCID_REDIRECT'],
         }
     },
     'ENA':{

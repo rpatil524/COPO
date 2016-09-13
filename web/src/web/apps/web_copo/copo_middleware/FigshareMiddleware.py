@@ -8,7 +8,7 @@ from django_tools.middlewares import ThreadLocal
 import ast
 import web.apps.web_copo.lookup.lookup as lkup
 
-FIGSHARE_CREDENTIALS = settings['FIGSHARE_CREDENTIALS']
+FIGSHARE_CREDENTIALS = settings.FIGSHARE_CREDENTIALS
 figshare = lkup.VOCAB['REPO_NAMES']['figshare']['value']
 
 

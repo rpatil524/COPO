@@ -30,12 +30,13 @@ DJANGO_APPS = [
 
 # user-defined applications definition
 PROJECT_APPS = [
+    'web.apps.web_copo',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.orcid',
     'allauth.socialaccount.providers.google',
-    'web.apps.web_copo',
+
     'rest_framework',
     'web.apps.chunked_upload',
     'compressor',
@@ -68,10 +69,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
+    'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware',
+    'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth'
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -98,6 +99,8 @@ ROOT_URLCONF = 'web.urls'
 import web.apps.web_copo.templates.copo
 import web.apps.web_copo.templates.account
 
+print(os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'templates', 'copo'))
+
 TEMPLATES = [
 
     {
@@ -105,8 +108,10 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             # insert your TEMPLATE_DIRS here
-            os.path.dirname(web.apps.web_copo.templates.copo.__file__),
-            os.path.dirname(web.apps.web_copo.templates.account.__file__),
+            os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'templates', 'copo'),
+            os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'templates', 'account'),
+            os.path.join(BASE_DIR, 'allauth', 'templates', 'account'),
+            os.path.join(BASE_DIR, 'allauth', 'templates', 'socialaccount')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -160,7 +165,6 @@ STATIC_URL = '/static/'
 # )
 # print(STATICFILES_DIRS)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-print(STATIC_ROOT)
 # MEDIA_ROOT = STATIC_ROOT
 
 # MEDIA_ROOT = BASE_DIR
