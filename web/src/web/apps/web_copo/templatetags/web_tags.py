@@ -2,7 +2,7 @@ __author__ = 'fshaw'
 from django import template
 
 register = template.Library()
-from copo_da import DataFile
+from dal.copo_da import DataFile
 
 @register.filter("mongo_id")
 def mongo_id(value):

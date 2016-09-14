@@ -1,7 +1,6 @@
 # module provides a lookup service for various resources
 
 import os
-
 from .resolver import RESOLVER
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
@@ -50,15 +49,15 @@ API_ERRORS = {
 
 # The path to the files holding the configs are defined below:
 CONFIG_FILES = {
-    'ENA_MAPPINGS': os.path.join(RESOLVER['schemas_ena'],  'uimodels', 'mappings'),
-    'COPO_MAPPINGS': os.path.join(RESOLVER['schemas_copo'],  'uimodels', 'mappings')
+    'ENA_MAPPINGS': os.path.join(RESOLVER['uimodels_ena'], 'mappings'),
+    'COPO_MAPPINGS': os.path.join(RESOLVER['uimodels_copo'], 'mappings')
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
 # X_FILES dictionary holds paths other (non-categorised) schemas
 X_FILES = {
-    'ISA_JSON_REFACTOR_TYPES': os.path.join(RESOLVER['schemas_ena'], 'uimodels',  'isajson_refactor.json'),
-    'SAMPLE_ATTRIBUTES': os.path.join(RESOLVER['schemas_ena'], 'uimodels',  'sample_characteristics.json')
+    'ISA_JSON_REFACTOR_TYPES': '',
+    'SAMPLE_ATTRIBUTES': ''
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
@@ -596,3 +595,5 @@ ISA_SCHEMAS = {
     'protocol_schema': '/schemas/copo/dbmodels/protocol_schema.json',
     'protocol_parameter_schema': '/schemas/copo/dbmodels/protocol_parameter_schema.json',
 }
+
+

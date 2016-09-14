@@ -1,21 +1,20 @@
 # resolves from imports to absolute paths
 
 import os
-import web.apps.web_copo.lookup
-import copo_exceptions
-import api.return_templates
-import web.apps.web_copo.schemas.utils
-import web.apps.web_copo.wizards.datafile
-import web.apps.web_copo.schemas.ena.dbmodels
-import web.apps.web_copo.schemas.copo.dbmodels
-import web.apps.web_copo.schemas.copo.dbmodels.xmls
+from django.conf import settings
+
+web_copo = os.path.join(settings.BASE_DIR, 'web', 'apps', 'web_copo')
 
 RESOLVER = dict()
-RESOLVER['schemas_copo'] = os.path.dirname(web.apps.web_copo.schemas.copo.dbmodels.__file__)
-RESOLVER['schemas_ena'] = os.path.dirname(web.apps.web_copo.schemas.ena.dbmodels.__file__)
-RESOLVER['api_return_templates'] = os.path.dirname(api.return_templates.__file__)
-RESOLVER['wizards_datafile'] = os.path.dirname(web.apps.web_copo.wizards.datafile.__file__)
-RESOLVER['lookup'] = os.path.dirname(web.apps.web_copo.lookup.__file__)
-RESOLVER['copo_exceptions'] = os.path.dirname(copo_exceptions.__file__)
-RESOLVER['schemas_utils'] = os.path.dirname(web.apps.web_copo.schemas.utils.__file__)
-RESOLVER['schemas_xml_copo'] = os.path.dirname(web.apps.web_copo.schemas.copo.dbmodels.xmls.__file__)
+RESOLVER['schemas_copo'] = os.path.join(web_copo, 'schemas', 'copo', 'dbmodels')
+RESOLVER['schemas_ena'] = os.path.join(web_copo, 'schemas', 'ena', 'dbmodels')
+RESOLVER['uimodels_copo'] = os.path.join(web_copo, 'schemas', 'copo', 'uimodels')
+RESOLVER['uimodels_ena'] = os.path.join(web_copo, 'schemas', 'ena', 'uimodels')
+RESOLVER['api_return_templates'] = os.path.join(settings.BASE_DIR, 'api', 'return_templates')
+RESOLVER['wizards_datafile'] = os.path.join(web_copo, 'wizards', 'datafile')
+RESOLVER['lookup'] = os.path.join(web_copo, 'lookup')
+RESOLVER['copo_exceptions'] = os.path.join(settings.BASE_DIR, 'copo_exceptions')
+RESOLVER['schemas_utils'] = os.path.join(web_copo, 'schemas', 'utils')
+RESOLVER['schemas_xml_copo'] = os.path.join(web_copo, 'schemas', 'copo', 'dbmodels', 'xmls')
+
+
