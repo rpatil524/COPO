@@ -36,7 +36,7 @@ PROJECT_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.orcid',
     'allauth.socialaccount.providers.google',
-
+    # 'web.apps.web_copo',
     'rest_framework',
     'web.apps.chunked_upload',
     'compressor',
