@@ -1,5 +1,4 @@
-/**
- * Created by etuka on 06/05/2016.
+/**Created by etuka on 06/05/2016.
  * contains functions for generating form html from JSON-based tags
  */
 
@@ -7,7 +6,7 @@ var olsURL = ""; // url of ols lookup for ontology fields
 var copoSchemas = {};
 var copoFormsURL = "/copo/copo_forms/";
 var globalDataBuffer = {};
-var htmlForm = $('<div/>'); //global form object
+var htmlForm = $('<div/>'); //global form div
 
 $(document).ready(function () {
     var csrftoken = $.cookie('csrftoken');
@@ -66,6 +65,7 @@ $(document).ready(function () {
     $(document).on("click", ".popover .copo-close", function () {
         $(this).parents(".popover").popover('destroy');
     });
+
 
 }); //end of document ready
 
@@ -146,29 +146,17 @@ function json2HtmlForm(data) {
                 }
             });
 
+            htmlForm.find("#dynamic_form_level_1").validator().on('submit', function (e) {
+                if (e.isDefaultPrevented()) {
+                    return false;
+                } else {
+                    e.preventDefault();
+                    save_form(data.form);
+                    dialogRef.close();
+                }
+            });
 
-            //save_form(data.form);
-
-
-            //$(".copo-dynamic-forms").validator().on('submit', function (e) {
-            //    if (e.isDefaultPrevented()) {
-            //        return false;
-            //    } else {
-            //        e.preventDefault();
-            //        save_form(data.form);
-            //        dialogRef.close();
-            //    }
-            //});
-
-
-            //refresh controls
-            refresh_tool_tips();
-
-            //set up help tips
-            set_up_help_ctrl();
-
-            //set up validator
-            refresh_validator();
+            refresh_form_aux_controls();
 
         },
         onhide: function (dialogRef) {
@@ -190,16 +178,7 @@ function json2HtmlForm(data) {
                 id: 'global_form_save_btn',
                 cssClass: 'btn-primary',
                 action: function (dialogRef) {
-                    try {
-                        //validate_forms();
-                        save_form(data.form);
-                        dialogRef.close();
-                    }
-                    catch (err) {
-                        console.log(err);
-                        alert("Cannot resolve save action!");
-                    }
-
+                    validate_forms(htmlForm.find("#dynamic_form_level_1"));
                 }
             }
         ]
@@ -210,13 +189,18 @@ function build_form_body(data) {
     var formJSON = data.form;
     var formValue = formJSON.form_value;
 
-    htmlForm.html("");
+    //clean slate for form
+    var formCtrl = htmlForm.find("#dynamic_form_level_1");
+    if (formCtrl.length) {
+        formCtrl.empty();
+    } else {
+        formCtrl = $('<form/>',
+            {
+                "data-toggle": "validator",
+                "id": "dynamic_form_level_1"
+            });
+    }
 
-    var formCtrl = $('<form/>',
-        {
-            "data-toggle": "validator",
-            class: "copo-dynamic-forms"
-        });
 
     //generate controls given component schema
     for (var i = 0; i < formJSON.form_schema.length; ++i) {
@@ -300,7 +284,7 @@ function get_help_ctrl() {
 }
 
 function set_up_help_ctrl() {
-    setup_formelement_hint($('input[name="helptips-chk"]'), htmlForm.find(":input"));
+    setup_formelement_hint($('input[name="helptips-chk"]'), htmlForm.find("#dynamic_form_level_1").find(":input"));
 
     // now set up switch button to support the tool tips
     $("[name='helptips-chk']").bootstrapSwitch(
@@ -332,25 +316,18 @@ function set_up_clone_ctrl(data) {
         {
             type: "hidden",
             class: "copo-multi-values",
+            "data-maxItems": 1, //makes this a single select box, instead of the default multiple
             change: function (event) {
                 event.preventDefault();
 
                 data.form.form_value = form_values[$(this).val()];
-                htmlForm.html("");
+
                 build_form_body(data);
 
-                //refresh controls
-                refresh_tool_tips();
-
-                //set up help tips
-                set_up_help_ctrl();
+                refresh_form_aux_controls();
 
             }
         });
-
-
-    //make this a single select box, instead of the default multiple
-    hiddenValuesCtrl.attr('data-maxItems', '1');
 
     //build select
     var selectCtrl = $('<select/>',
@@ -379,7 +356,7 @@ function set_up_clone_ctrl(data) {
 
             //generate unique characters to append to label elem
             var rand_postfix = (Math.floor(Math.random() * (max - min + 1)) + min).toString();
-            option[labelElem] = option[labelElem] + "_(CLONED" + rand_postfix + ")";
+            option[labelElem] = option[labelElem] + "_CLONED" + rand_postfix;
 
             form_values[vl] = option;
 
@@ -396,6 +373,17 @@ function set_up_clone_ctrl(data) {
     }
 
     return cloneCtrl;
+}
+
+function refresh_form_aux_controls() {
+    //refresh controls
+    refresh_tool_tips();
+
+    //set up help tips
+    set_up_help_ctrl();
+
+    //refresh form validator
+    refresh_validator(htmlForm.find("#dynamic_form_level_1"));
 }
 
 function set_required_markers(formElem) {
@@ -733,6 +721,8 @@ var dispatchFormControl = {
                 class: "ctrlDIV"
             });
 
+        formElem["data_maxItems"] = 1; //enforces single item selection rather than the default multiple
+
         ctrlsDiv = get_multi_search_span(formElem, ctrlsDiv);
 
         if (Object.prototype.toString.call(elemValue) === '[object Array]' && elemValue.length > 1) {
@@ -742,7 +732,6 @@ var dispatchFormControl = {
         //resolve control values
         var ctrlObjects = resolve_ctrl_values(ctrlsDiv.clone(), 0, formElem, elemValue);
         var ctrlsWithValuesDiv = ctrlObjects.ctrlsWithValuesDiv;
-
 
         var newSourcePanel = $('<div/>', {
             class: "panel panel-primary",
@@ -795,7 +784,7 @@ var dispatchFormControl = {
 
                                     //preserve already set value
                                     var sampleSourceValues = null;
-                                    htmlForm.find(":input").each(function () {
+                                    htmlForm.find("#dynamic_form_level_1").find(":input").each(function () {
                                         if (this.id == formElem.id) {
                                             sampleSourceValues = $(this).val();
                                         }
@@ -821,11 +810,13 @@ var dispatchFormControl = {
                                         },
                                         success: function (data) {
                                             //refresh sample source list
-                                            if (sampleSourceValues) {
-                                                sampleSourceValues = sampleSourceValues.split(",");
-                                            } else {
-                                                sampleSourceValues = [];
-                                            }
+                                            //if (sampleSourceValues) {
+                                            //    sampleSourceValues = sampleSourceValues.split(",");
+                                            //} else {
+                                            //    sampleSourceValues = [];
+                                            //}
+
+                                            sampleSourceValues = []; //basically, this means only the created source is ever being set (i.e., only set one sample source)
 
                                             if (data.last_record_id) {
                                                 sampleSourceValues.push(data.last_record_id);
@@ -895,7 +886,7 @@ var dispatchFormControl = {
                             var min = 10000;
                             var max = 99999;
                             var rand_postfix = (Math.floor(Math.random() * (max - min + 1)) + min).toString();
-                            component_record[labelElem] = component_record[labelElem] + "_(CLONED" + rand_postfix + ")";
+                            component_record[labelElem] = component_record[labelElem] + "_CLONED" + rand_postfix;
 
                             copo_sample_source_ctrl_aux_1(sourceForm, component_record);
 
@@ -1246,12 +1237,19 @@ function get_ontology_span(ontologySpan, formElem) {
 
 function get_multi_search_span(formElem, ctrlsDiv) {
     //build hidden fields to hold selected options and supply control data respectively
+
+    var data_maxItems = 'null';
+    if (formElem.data_maxItems) {
+        data_maxItems = formElem.data_maxItems;
+    }
+
     var hiddenValuesCtrl = $('<input/>',
         {
             type: "hidden",
             id: formElem.id,
             name: formElem.id,
-            class: "copo-multi-values"
+            class: "copo-multi-values",
+            "data-maxItems": data_maxItems, //sets the maximum selectable elements, default is 'null'
         });
 
     var hiddenJsonCtrl = $('<input/>',
@@ -1293,10 +1291,8 @@ function get_form_ctrl(ctrlsDiv, formElem, elemValue) {
         .append(form_help_ctrl(formElem.help_tip));
 }
 
-function validate_forms() {
-    htmlForm.find(".copo-dynamic-forms").each(function () {
-        $(this).trigger('submit');
-    });
+function validate_forms(formObject) {
+    formObject.trigger('submit');
 }
 
 function save_form(formJSON) {
@@ -1309,7 +1305,7 @@ function save_form(formJSON) {
 
     //manage auto-generated fields
     var form_values = Object();
-    htmlForm.find(":input").each(function () {
+    htmlForm.find("#dynamic_form_level_1").find(":input").each(function () {
         form_values[this.id] = $(this).val();
     });
 

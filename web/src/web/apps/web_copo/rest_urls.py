@@ -10,7 +10,7 @@ import submission.submissionDelegator as submit
 import web.apps.web_copo.utils.ajax_handlers as ajax
 
 
-urlpatterns = patterns('web.apps.web_copo.rest.EnaRest',
+urlpatterns = patterns('',
                        url(r'^ena_sample_form/', rest.get_ena_sample_controls, name='get_ena_sample_controls'),
                        url(r'^ena_new_study/', rest.save_ena_study, name='save_ena_study'),
                        url(r'^ena_new_sample/', rest.save_ena_sample_callback, name='save_ena_sample'),

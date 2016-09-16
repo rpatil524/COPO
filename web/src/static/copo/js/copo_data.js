@@ -49,13 +49,15 @@ $(document).ready(function () {
 
 
     // get table data to display via the DataTables API
-    var tableLoadingDiv = $('<div>',
+    var loaderObject = $('<div>',
         {
             style: 'text-align: center',
             html: "<span class='fa fa-spinner fa-pulse fa-3x'></span>"
         });
 
-    $("#data_all_data").append(tableLoadingDiv);
+
+    var tLoader = loaderObject.clone();
+    $("#data_all_data").append(tLoader);
 
     csrftoken = $.cookie('csrftoken');
 
@@ -69,7 +71,7 @@ $(document).ready(function () {
         },
         success: function (data) {
             do_render_table(data);
-            tableLoadingDiv.remove();
+            tLoader.remove();
         },
         error: function () {
             alert("Couldn't retrieve data files!");
@@ -629,33 +631,120 @@ $(document).ready(function () {
             var reviewElem = $('.steps li:last-child');
 
             if (reviewElem.hasClass('active')) {
-                //get submission choice; initiate submission is true
-                var submitChoice = $("[name='do-submission-check']").bootstrapSwitch('state');
-                if (submitChoice) {
-                    var datafile_ids = [];
-                    descriptionBundle.forEach(function (item) {
-                        datafile_ids.push(item.recordID);
-                    });
+                //validate description for completeness; get submission decision; and, consequently, initiate submission
 
-                    $.ajax({
-                        url: copoFormsURL,
-                        type: "POST",
-                        headers: {'X-CSRFToken': csrftoken},
-                        data: {
-                            'task': 'initiate_submission',
-                            'component': "submission",
-                            'datafile_ids': JSON.stringify(datafile_ids)
-                        },
-                        success: function (data) {
-                            //if successful, should return a valid submission token (id of an submission record)
-                        },
-                        error: function () {
-                            alert("Couldn't initiate submission!");
+                //are all items in bundle good to go?
+                var datafile_ids = []; //for metadata rating
+                descriptionBundle.forEach(function (item) {
+                    datafile_ids.push(item.recordID);
+                });
+
+                var dialogHandle = processing_request_dialog('Validating description bundle...');
+
+                $.ajax({
+                    url: copoVisualsURL,
+                    type: "POST",
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: {
+                        'task': 'metadata_ratings',
+                        'component': component,
+                        'datafile_ids': JSON.stringify(datafile_ids)
+                    },
+                    success: function (data) {
+                        if (data.metadata_ratings) {
+                            var currentMetadataRating = data.metadata_ratings;
+
+                            var isAllValid = true;
+
+                            for (var i = 0; i < currentMetadataRating.length; ++i) {
+                                if (currentMetadataRating[i].item_rating.hasOwnProperty("rating_level")) {
+                                    if (currentMetadataRating[i].item_rating.rating_level != "good") {
+                                        isAllValid = false;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            dialogHandle.close();
+
+                            //display dialog based on validation result
+
+                            if (isAllValid) {
+                                var dialog = new BootstrapDialog({
+                                    buttons: [
+                                        {
+                                            label: 'Exit Wizard',
+                                            action: function (dialogRef) {
+                                                clear_wizard();
+                                                dialogRef.close();
+                                            }
+                                        },
+                                        {
+                                            label: 'Initiate',
+                                            cssClass: 'btn-primary',
+                                            action: function (dialogRef) {
+
+                                                dialogRef.getModalFooter().hide();
+                                                dialogRef.getModalBody().find(".copo-custom-modal-message").html('<div class="loading">Redirecting</div>');
+
+                                                $.ajax({
+                                                    url: copoFormsURL,
+                                                    type: "POST",
+                                                    headers: {'X-CSRFToken': csrftoken},
+                                                    data: {
+                                                        'task': 'initiate_submission',
+                                                        'component': "submission",
+                                                        'datafile_ids': JSON.stringify(datafile_ids)
+                                                    },
+                                                    success: function (data) {
+                                                        //if successful, redirect to submissions
+                                                        var locus = $("#submission_url").val();
+                                                        window.location.replace(locus);
+                                                    },
+                                                    error: function () {
+                                                        alert("Couldn't initiate submission!");
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    ]
+                                });
+
+                                dialog_display(dialog, "Initiate Submission", wizardMessages.confirm_initiate_submission.text, "info");
+
+                            } else {
+                                var dialog = new BootstrapDialog({
+                                    buttons: [
+                                        {
+                                            label: 'Exit Wizard',
+                                            action: function (dialogRef) {
+                                                clear_wizard();
+                                                dialogRef.close();
+                                            }
+                                        },
+                                        {
+                                            label: 'Describe',
+                                            cssClass: 'btn-primary',
+                                            action: function (dialogRef) {
+                                                dialogRef.close();
+                                            }
+                                        }
+                                    ]
+                                });
+
+                                dialog_display(dialog, "Description Alert", wizardMessages.metadata_validation_failed.text, "warning");
+
+                            }
                         }
-                    });
-                }
-                clear_wizard();
+                    },
+                    error: function () {
+                        alert("Couldn't validate bundle!");
+                    }
+                });
+
+
                 return false;
+
             }
 
             //set current stage
@@ -808,6 +897,7 @@ $(document).ready(function () {
 
         if (elem.hasClass('active')) {
             //call to set description summary data
+
             set_summary_data();
             elem.show();
         } else {
@@ -1681,11 +1771,42 @@ $(document).ready(function () {
                             style: 'margin-top:1px;'
                         });
 
+                        var headingRow = $('<div/>', {
+                            class: "row"
+                        });
+
+                        var headingRowTxt = $('<div/>', {
+                            class: "col-sm-11 col-md-11 col-lg-11",
+                            html: '<span style="font-weight: bold; margin-left: 5px;">Description Metadata</span>'
+                        });
+
+                        var metadataClass = 'itemMetadata-flag-ind poor';
+
+                        if (tr.find('.itemMetadata-flag').find('.meta-active').length) {
+                            metadataClass = tr.find('.itemMetadata-flag').find('.meta-active').attr("class");
+                        }
+
+                        var headingRowIconSpan = $('<span/>', {
+                            class: "pull-right " + metadataClass,
+                            style: "width: 15px; height: 15px; border: 1px solid #ddd;"
+                        });
+
+                        var headingRowIconDiv = $('<div/>', {
+                            class: "itemMetadata-flag",
+                            title: "Metadata Rating"
+                        }).append(headingRowIconSpan);
+
+                        var headingRowIcon = $('<div/>', {
+                            class: "col-sm-1 col-md-1 col-lg-1",
+                            style: "padding-left: 5px;"
+                        }).append(headingRowIconDiv);
+
+                        headingRow.append(headingRowTxt).append(headingRowIcon);
+
                         var descriptionInfoPanelPanelHeading = $('<div/>', {
                             class: "panel-heading",
-                            style: "background-image: none;",
-                            html: "Description Metadata"
-                        });
+                            style: "background-image: none;"
+                        }).append(headingRow);
 
                         var descriptionInfoPanelPanelBody = $('<div/>', {
                             class: "panel-body",
@@ -1954,24 +2075,20 @@ $(document).ready(function () {
             pane: '<div class="alert alert-default">' +
             '<div style="line-height: 150%;" class="' + wizardMessages.review_message.text_class + '">' +
             wizardMessages.review_message.text + '</div>' +
-            '<div class="alert alert-default"><span class="text-default" style="padding-right: 5px; color:#3a87ad; font-weight:bold; font-size: 12px;">' +
-            'Do you want to submit this bundle now?</span><span>' +
-            '<input type="checkbox" name="do-submission-check" checked data-size="mini" data-on-color="primary" ' +
-            'data-off-color="default" data-on-text="Yes" data-off-text="No"></span></div>' +
             '<div style="margin-top: 10px; max-width: 100%; overflow-x: auto;">' +
             '<table id="description_summary_table" class="display copo-datatable copo-table-header" cellspacing="0" width="100%">' +
-            '<thead><tr><th></th><th>Description Bundle</th>' +
+            '<thead><tr><th></th><th>File</th><th>Rating</th>' +
             '</tr> </thead></table>' +
             '</div></div>'
         };
     }
 
     function set_summary_data() {
-        //set up submission button
-        $("[name='do-submission-check']").bootstrapSwitch({});
 
         //set up data source
         var dtd = [];
+
+        var datafile_ids = []; //for metadata rating
 
         descriptionBundle.forEach(function (item) {
             var option = new Object();
@@ -1980,6 +2097,7 @@ $(document).ready(function () {
             option["attributes"] = item.attributes;
             dtd.push(option);
 
+            datafile_ids.push(item.recordID);
         });
 
         //set data
@@ -1995,7 +2113,7 @@ $(document).ready(function () {
             table.rows.add(dtd);
             table.columns.adjust().draw();
         } else {
-            var table = $('#description_summary_table').DataTable({
+            table = $('#description_summary_table').DataTable({
                 "data": dtd,
                 "columns": [
                     {
@@ -2004,7 +2122,31 @@ $(document).ready(function () {
                         "data": null,
                         "defaultContent": ''
                     },
-                    {"data": "target"}
+                    {"data": "target"},
+                    {
+                        "orderable": false,
+                        data: "target_id",
+                        render: function (rdata) {
+                            var metadataClass = 'itemMetadata-flag-ind poor';
+                            var metadataRating = 'None';
+
+                            var headingRowIconSpan = $('<span/>', {
+                                id: "summary_tbl_rating_span_" + rdata,
+                                class: "pull-right " + metadataClass,
+                                style: "width: 15px; height: 15px; border: 1px solid #ddd;"
+                            });
+
+                            var headingRowIconDiv = $('<div/>', {
+                                id: "summary_tbl_rating_div_" + rdata,
+                                class: "itemMetadata-flag",
+                                title: "Rating level = " + metadataRating
+                            }).append(headingRowIconSpan);
+
+
+                            return $('<div></div>').append(headingRowIconDiv).html();
+
+                        }
+                    }
                 ]
             });
 
@@ -2045,6 +2187,42 @@ $(document).ready(function () {
                 }
             });
         }
+
+        $.ajax({
+            url: copoVisualsURL,
+            type: "POST",
+            headers: {'X-CSRFToken': csrftoken},
+            data: {
+                'task': 'metadata_ratings',
+                'component': component,
+                'datafile_ids': JSON.stringify(datafile_ids)
+            },
+            success: function (data) {
+                if (data.metadata_ratings) {
+
+                    var currentMetadataRating = data.metadata_ratings;
+
+                    for (var i = 0; i < currentMetadataRating.length; ++i) {
+                        if (currentMetadataRating[i].item_rating.hasOwnProperty("rating_level")) {
+                            var metadataClass = "itemMetadata-flag-ind " + currentMetadataRating[i].item_rating.rating_level + " meta-active";
+                            var metadataRating = currentMetadataRating[i].item_rating.rating_level;
+                            if ($("#summary_tbl_rating_span_" + currentMetadataRating[i].item_id).length) {
+                                $("#summary_tbl_rating_span_" + currentMetadataRating[i].item_id).attr("class", "pull-right " + metadataClass);
+                            }
+
+                            if ($("#summary_tbl_rating_div_" + currentMetadataRating[i].item_id).length) {
+                                $("#summary_tbl_rating_div_" + currentMetadataRating[i].item_id).prop("title", "Rating level = " + metadataRating);
+                            }
+                        }
+                    }
+
+                }
+            },
+            error: function () {
+                alert("Couldn't resolve metadata ratings!");
+            }
+        });
+
 
     }//end of func
 
@@ -2695,7 +2873,9 @@ $(document).ready(function () {
         //function sets/updates metadata flag for datafiles
         var datafile_ids = [];
         $('.itemMetadata-flag').each(function () {
-            datafile_ids.push($(this).attr("data-record-id"));
+            if ($(this).attr("data-record-id")) {
+                datafile_ids.push($(this).attr("data-record-id"));
+            }
         });
 
         if (datafile_ids.length) {
@@ -2712,28 +2892,43 @@ $(document).ready(function () {
                     if (data.metadata_ratings) {
                         for (var i = 0; i < data.metadata_ratings.length; ++i) {
                             $('.itemMetadata-flag').each(function () {
-                                if (data.metadata_ratings[i].item_id == $(this).attr("data-record-id")) {
-                                    $(this).find(".itemMetadata-flag-ind").removeClass("meta-active");
-                                    $(this).find("." + data.metadata_ratings[i].item_rating.rating_level).addClass("meta-active");
+                                if ($(this).attr("data-record-id")) {
+                                    var rating_object = data.metadata_ratings[i];
+                                    if (rating_object.item_id == $(this).attr("data-record-id")) {
+                                        $(this).find(".itemMetadata-flag-ind").removeClass("meta-active");
 
-                                    if ($(this).data('bs.popover')) {
-                                        var pop = $(this).data('bs.popover');
-                                        pop.options.content = "<span>" + data.metadata_ratings[i].item_rating.rating_level_description + "</span>";
-                                    } else {
-                                        $(this).popover({
-                                            title: 'Metadata Rating',
-                                            content: "<span>" + data.metadata_ratings[i].item_rating.rating_level_description + "</span>",
-                                            container: 'body',
-                                            html: true,
-                                            trigger: 'hover',
-                                            template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
-                                            '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
-                                            '</h3><div class="popover-content"><p></p></div></div></div>'
-                                        });
+                                        var metadataDescription = "Couldn't resolve metadata rating!";
 
+                                        if (rating_object.item_rating.hasOwnProperty("rating_level")) {
+                                            $(this).find("." + rating_object.item_rating.rating_level).addClass("meta-active");
+                                        }
+
+                                        if (rating_object.item_rating.hasOwnProperty("rating_level_description")) {
+                                            metadataDescription = rating_object.item_rating.rating_level_description;
+                                        }
+
+                                        metadataDescription += '<div style="margin-top: 10px;">Click the <span class="btn btn-info btn-xs"><i class="fa fa-info-circle"> </i></span> button on the right for more details.</div>';
+
+
+                                        if ($(this).data('bs.popover')) {
+                                            var pop = $(this).data('bs.popover');
+                                            pop.options.content = "<span>" + metadataDescription + "</span>";
+                                        } else {
+                                            $(this).popover({
+                                                title: 'Metadata Rating',
+                                                content: "<span>" + metadataDescription + "</span>",
+                                                container: 'body',
+                                                html: true,
+                                                trigger: 'hover',
+                                                template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
+                                                '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
+                                                '</h3><div class="popover-content"><p></p></div></div></div>'
+                                            });
+
+                                        }
+
+                                        return false;
                                     }
-
-                                    return false;
                                 }
                             });
                         }
