@@ -9,6 +9,7 @@ from django.contrib.auth import logout as auth_logout
 from django.shortcuts import redirect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.utils.decorators import method_decorator
+from django.conf import settings
 
 from ..exceptions import ImmediateHttpResponse
 from ..utils import get_form_class, get_request_param, get_current_site

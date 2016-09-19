@@ -12,6 +12,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 LOGIN_URL = '/accounts/login/'
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if os.getenv('DEBUG') == 'true' else False
 
