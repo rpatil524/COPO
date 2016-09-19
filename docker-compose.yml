@@ -10,6 +10,7 @@ web:
     - redis:redis
   volumes:
     - ./web/src:/copo
+    - ./media:/copo/media  
   env_file: .env
   environment:
     DEBUG: 'true'
