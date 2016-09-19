@@ -11,7 +11,6 @@ class OAuth2Error(Exception):
 
 
 class OAuth2Client(object):
-
     def __init__(self, request, consumer_key, consumer_secret,
                  access_token_method,
                  access_token_url,
@@ -36,7 +35,19 @@ class OAuth2Client(object):
         if self.state:
             params['state'] = self.state
         params.update(extra_params)
-        return '%s?%s' % (authorization_url, urlencode(params))
+        return '%s?%s' % (authorization_url, self.enc_url(params))
+
+    def enc_url(self, params):
+        s = str()
+        lc = False
+        for item, idx in params.items():
+            if lc == False:
+                s = s + item + '=' + params[item]
+                lc = True
+            else:
+                s = s + '&' + item + '=' + params[item]
+        return s
+
 
     def get_access_token(self, code):
         data = {'client_id': self.consumer_key,

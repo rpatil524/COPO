@@ -62,9 +62,9 @@ class OAuth2View(object):
         callback_url = reverse(self.adapter.provider_id + "_callback")
         protocol = (self.adapter.redirect_uri_protocol
                     or app_settings.DEFAULT_HTTP_PROTOCOL)
-        callback_url = build_absolute_uri(
-            request, callback_url,
-            protocol=protocol)
+
+        from django.conf import settings
+        callback_url = settings.REPOSITORIES['ORCID']['urls']['authorise_url']
         provider = self.adapter.get_provider()
         scope = provider.get_scope(request)
         client = OAuth2Client(self.request, app.client_id, app.secret,
