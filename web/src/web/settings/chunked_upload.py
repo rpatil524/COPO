@@ -1,8 +1,7 @@
 __author__ = 'fshaw'
 from datetime import timedelta
-
+import os
 from django.conf import settings
-
 try:
     from django.core.serializers.json import DjangoJSONEncoder
 except ImportError:
@@ -23,11 +22,9 @@ DEFAULT_EXPIRATION_DELTA = timedelta(days=1)
 EXPIRATION_DELTA = getattr(settings, 'CHUNKED_UPLOAD_EXPIRATION_DELTA',
                            DEFAULT_EXPIRATION_DELTA)
 
-
 # Path where uploading files will be stored until completion
-DEFAULT_UPLOAD_PATH = '/chunked_uploads/%Y/%m/%d'
+DEFAULT_UPLOAD_PATH = os.path.join(settings.MEDIA_ROOT,'chunked_uploads/%Y/%m/%d')
 UPLOAD_PATH = getattr(settings, 'CHUNKED_UPLOAD_PATH', DEFAULT_UPLOAD_PATH)
-
 
 # Storage system
 STORAGE = getattr(settings, 'CHUNKED_UPLOAD_STORAGE_CLASS', lambda: None)()
