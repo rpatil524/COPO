@@ -88,3 +88,10 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+.idea/workspace.xml
+
+# add ignore for cached sass css files
+**sass.*.css
+**/.sass-cache
+**/.sass-cache/*
