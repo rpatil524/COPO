@@ -99,8 +99,6 @@ ROOT_URLCONF = 'web.urls'
 import web.apps.web_copo.templates.copo
 import web.apps.web_copo.templates.account
 
-print(os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'templates', 'copo'))
-
 TEMPLATES = [
 
     {
