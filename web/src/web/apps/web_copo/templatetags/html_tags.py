@@ -217,10 +217,10 @@ def generate_copo_profiles_data(profiles=list()):
     for pr in profiles:
         temp_set = list()
         temp_set.append({"header": "ID", "data": str(pr["_id"]), "key": "_id"})
-        for f in Profile().get_schema().get("schema_dict"):
-            if f.get("show_in_table", True):
-                temp_set.append({"header": f.get("label", str()), "data": resolve_control_output(pr, f),
-                                 "key": f["id"].split(".")[-1]})
+        for f in Profile().get_schema().get("schema"):
+            if f.show_in_table:
+                temp_set.append({"header": f.label, "data": resolve_control_output(pr, dict(f.__dict__)),
+                                 "key": f.id.split(".")[-1]})
 
         data_set.append(temp_set)
 

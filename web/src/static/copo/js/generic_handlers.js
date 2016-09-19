@@ -587,10 +587,8 @@ function refresh_tool_tips() {
 
 } //end of func
 
-function refresh_validator() {
-    $(".copo-dynamic-forms").each(function () {
-       $(this).validator('update');
-    });
+function refresh_validator(formObject) {
+    formObject.validator('update');
 
 } //end of func
 
@@ -816,7 +814,7 @@ var auto_complete = function () {
 
                 $(li).attr('data-id', doc.id)
                 var styles = {
-                    margin : "2px",
+                    margin: "2px",
                     marginTop: '4px',
                     fontSize: "large",
 
@@ -1021,5 +1019,6 @@ function get_data_item_collapse(link, itemData, itemCount) {
 
     return ctrlDiv.html();
 }
+
 
 
