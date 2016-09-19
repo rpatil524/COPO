@@ -9,10 +9,12 @@ from django.core.files.uploadedfile import UploadedFile
 from django_tools.middlewares import ThreadLocal
 from django.utils import timezone
 
-from .settings_old import EXPIRATION_DELTA, UPLOAD_PATH, STORAGE, ABSTRACT_MODEL
+from .settings_old import EXPIRATION_DELTA, STORAGE, ABSTRACT_MODEL
 from .constants import CHUNKED_UPLOAD_CHOICES, UPLOADING
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+UPLOAD_PATH = settings.UPLOAD_PATH
+
 
 
 def generate_upload_id():
