@@ -166,8 +166,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # MEDIA_ROOT = STATIC_ROOT
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-print("MEDIA ROOT !!!!!! : " + MEDIA_ROOT)
+MEDIA_ROOT = os.path.join(BASE_DIR, os.environ['MEDIA_PATH'])
+
 ELASTIC_SEARCH_URL = 'http://localhost:9200/ontologies/plant_ontology/_search'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
