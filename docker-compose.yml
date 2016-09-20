@@ -35,7 +35,8 @@ mongo:
   ports:
     - "27017:27017"
   volumes:
-    - /data/db
+    - ./mongo/mongodata:/data/db
+
 
 redis:
   container_name: copo-redis
@@ -54,5 +55,5 @@ postgres:
     - "5432:5432"
   env_file: .env
   volumes:
-    - pgdata:/var/lib/postgresql/data/
+    - ./postgres/pgdata:/var/lib/postgresql/data
 
