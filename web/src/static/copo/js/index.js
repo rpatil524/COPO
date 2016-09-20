@@ -275,7 +275,7 @@ $(document).ready(function () {
                             rightColHTML += '<div>';
                             for (var i = 0; i < bTns.length; ++i) {
                                 if (bTns[i].className.indexOf("profile-item-url") > -1) {
-                                    var locus = $("#" + bTns[i].btnAction + "_url").val().replace("999", record_id); //matches url hidden in index.html
+                                    var locus = $("#" + bTns[i].btnAction + "_url").val().replace("999", record_id); //matches url hidden in landing_page.html
                                     rightColHTML += '<div class="col-sm-2 col-md-2 col-lg-2" style="text-align: center; padding-right: 0px !important; padding-left: 5px !important;">';
 
                                     rightColHTML += '<div class="panel-group">';

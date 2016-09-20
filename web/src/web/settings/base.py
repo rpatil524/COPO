@@ -110,7 +110,8 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'templates', 'copo'),
             os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'templates', 'account'),
             os.path.join(BASE_DIR, 'allauth', 'templates', 'account'),
-            os.path.join(BASE_DIR, 'allauth', 'templates', 'socialaccount')
+            os.path.join(BASE_DIR, 'allauth', 'templates', 'socialaccount'),
+            os.path.join(BASE_DIR, 'web', 'landing_page')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
