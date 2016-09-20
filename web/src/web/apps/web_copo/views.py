@@ -31,7 +31,7 @@ def index(request):
 
     context['haha'] = 'testing123'
 
-    return render(request, 'copo/landing_page.html', context)
+    return render(request, 'copo/index.html', context)
 
 
 def test(request):
