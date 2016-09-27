@@ -148,7 +148,7 @@ def get_authorize_url():
     authorize_url = authorization_url + '?oauth_token='
     authorize_url = authorize_url + request.session['resource_owner_key']
 
-    #redirect user to login page
+    #redirect user to auth page
     return authorize_url
 
 

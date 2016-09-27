@@ -6,7 +6,7 @@ import gzip
 import hashlib
 from django.conf import settings
 from django.http import HttpResponse
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from rest_framework.renderers import JSONRenderer
 import jsonpickle
 from django.core.files.base import ContentFile

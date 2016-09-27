@@ -15,6 +15,7 @@ from .lookup.lookup import HTML_TAGS
 from exceptions_and_logging.logger import Logtype, Loglvl
 from exceptions_and_logging.CopoRuntimeError import CopoRuntimeError
 from django.conf import settings
+from allauth.account.forms import LoginForm
 
 LOGGER = settings.LOGGER
 
@@ -33,6 +34,11 @@ def index(request):
 
     return render(request, 'copo/index.html', context)
 
+def login(request):
+    context = {
+        'login_form': LoginForm(),
+    }
+    return render(request, 'copo/auth/login.html', context)
 
 def test(request):
     try:
@@ -240,14 +246,14 @@ def goto_error(request, message="Something went wrong, but we're not sure what!"
 
 def copo_logout(request):
     logout(request)
-    return render_to_response(request, 'copo/templates/account/login.html')
+    return render(request, 'copo/auth/logout.html', {})
 
 
 def copo_register(request):
     if request.method == 'GET':
         return render(request, 'copo/register.html')
     else:
-        # create user and return to login page
+        # create user and return to auth page
         firstname = request.POST['frm_register_firstname']
         lastname = request.POST['frm_register_lastname']
         email = request.POST['frm_register_email']
@@ -260,7 +266,7 @@ def copo_register(request):
         user.first_name = firstname
         user.save()
 
-        return render(request, 'copo/templates/account/login.html')
+        return render(request, 'copo/templates/account/auth.html')
 
 
 @login_required

@@ -99,3 +99,5 @@ ENV/
 # add ignore for chunked_uploads
 web/src/chunked_uploads/
 media/chunked_uploads/
+.env
+web/src/static/CACHE/css/**

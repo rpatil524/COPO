@@ -1,12 +1,9 @@
 body {
-    position: relative;
-    min-height: 100%;
-    top: 0px;
 
-    color: #333;
-    font-family: arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.42857;
+    font-family: "Helvetica", serif;
+    font-size: 1.8em;
+    font-weight: 400;
+
 }
 
 .container {
@@ -355,10 +352,18 @@ div[class^="col-"], div[class*=" col-"] {
 
 .login_box {
     margin: 0 auto;
-    background-color: white;
+    background-color: #fff;
+    opacity: 0.85;
     padding: 10px;
-    box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.1), 0 0 3px rgba(0, 0, 0, 0.8);
-    width: 300px;
+    overflow: auto;
+    width: 100%;
+    min-height: 200px;
+    /*
+    -webkit-box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.75);
+    */
+
 }
 
 .serif {
@@ -742,10 +747,34 @@ div.pad-it {
     margin-right: 10px;
 }
 
-.zip-image h4{
+.zip-image h4 {
     margin-right: 150px
 }
 
-th{
-     background-color: #3d3f46;
+th {
+    background-color: #3d3f46;
+}
+
+.login-li {
+    margin-top: 30px
+}
+
+.login-button {
+    padding-left: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.login-underline {
+
+    margin-bottom: 50px
+}
+
+.login-ul {
+    padding-bottom: 20px
+}
+
+.clear {
+    clear: both;
 }

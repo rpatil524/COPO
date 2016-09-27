@@ -4,14 +4,12 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
-
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ['SECRET_KEY']
 
-LOGIN_URL = '/accounts/login/'
-
+LOGIN_URL = '/accounts/auth/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if os.getenv('DEBUG') == 'true' else False
@@ -37,6 +35,8 @@ PROJECT_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.orcid',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.twitter',
+    'allauth.socialaccount.providers.facebook',
     # 'web.apps.web_copo',
     'rest_framework',
     'web.apps.chunked_upload',
@@ -44,7 +44,6 @@ PROJECT_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS
-
 
 # sass, social accounts...
 sass_exe = '/usr/local/bin/sass'
@@ -64,7 +63,6 @@ SOCIALACCOUNT_PROVIDERS = \
          {'SCOPE': ['profile', 'email'],
           'AUTH_PARAMS': {'access_type': 'online'}}}
 
-
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -73,13 +71,14 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware',
-    'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth'
+    'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth',
+    'web.apps.web_copo.copo_middleware.OrcidMiddleware.OrcidOAuth'
 )
 
 AUTHENTICATION_BACKENDS = (
-    # Needed to login by username in Django admin, regardless of `allauth`
+    # Needed to auth by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
-    # `allauth` specific authentication methods, such as login by e-mail
+    # `allauth` specific authentication methods, such as auth by e-mail
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
@@ -93,12 +92,11 @@ CORS_ORIGIN_WHITELIST = (
     'http://127.0.0.1:8000'
 )
 
-ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/copo/login'
 
 ROOT_URLCONF = 'web.urls'
 
-import web.apps.web_copo.templates.copo
-import web.apps.web_copo.templates.account
+LOGIN_URL = '/copo/login'
 
 TEMPLATES = [
 
@@ -108,16 +106,11 @@ TEMPLATES = [
         'DIRS': [
             # insert your TEMPLATE_DIRS here
             os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'templates', 'copo'),
-            os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'templates', 'account'),
-            os.path.join(BASE_DIR, 'allauth', 'templates', 'account'),
-            os.path.join(BASE_DIR, 'allauth', 'templates', 'socialaccount'),
             os.path.join(BASE_DIR, 'web', 'landing_page')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
-                # list if you haven't customized them:
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.i18n',
@@ -132,9 +125,7 @@ TEMPLATES = [
                 "web.apps.web_copo.context_processors.get_status",
                 "web.apps.web_copo.context_processors.add_partial_submissions_to_context",
 
-                # `allauth` specific context processors
-                'allauth.account.context_processors.account',
-                'allauth.socialaccount.context_processors.socialaccount',
+                'django.contrib.auth.context_processors.auth',
             ],
             'debug': True,
         },
@@ -174,7 +165,4 @@ ELASTIC_SEARCH_URL = 'http://localhost:9200/ontologies/plant_ontology/_search'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 48 * 60 * 60  #
 
-
-SITE_ID = 3
-
-
+SITE_ID = 1
