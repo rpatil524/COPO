@@ -276,7 +276,7 @@ def view_orcid_profile(request):
     data_dict = {'op': op}
     # data_dict = jsonpickle.encode(data_dict)
 
-    return render(request, 'copo/orcid_profile.html', data_dict, context_instance=RequestContext(request))
+    return render(request, 'copo/orcid_profile.html', data_dict)
 
 
 def register_to_irods(request):
