@@ -104,3 +104,4 @@ web/src/static/CACHE/css/**
 .idea/**
 .idea/COPO.iml
 .idea/misc.xml
+mongo/mongodata
