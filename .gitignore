@@ -101,3 +101,6 @@ web/src/chunked_uploads/
 media/chunked_uploads/
 .env
 web/src/static/CACHE/css/**
+.idea/**
+.idea/COPO.iml
+.idea/misc.xml

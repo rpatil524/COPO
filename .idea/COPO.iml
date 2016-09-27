@@ -11,8 +11,10 @@
     </facet>
   </component>
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$" />
-    <orderEntry type="jdk" jdkName="Python 3.4.3 virtualenv at ~/Dropbox/tgac_dev/environments/django_10" jdkType="Python SDK" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/web/src" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="Python 3.4.3 virtualenv at ~/Documents/dev/environments/django10" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">
@@ -23,6 +25,7 @@
     <option name="TEMPLATE_FOLDERS">
       <list>
         <option value="$MODULE_DIR$/web/src/api/return_templates" />
+        <option value="$MODULE_DIR$/web/src/web/apps/web_copo/templates" />
       </list>
     </option>
   </component>
