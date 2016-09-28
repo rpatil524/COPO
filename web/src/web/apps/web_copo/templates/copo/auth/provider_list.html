@@ -25,15 +25,15 @@
 
                     <a style="margin-left: -20px; padding-bottom:20px"  title="{{ provider.name }}" class="socialaccount_provider {{ provider.id }}"
                        href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}"><img
-                            height="130px" src="{% static 'copo/img/'|add:image_static %}"/>
-                        <span style="margin-left: -10px; font-size: x-large" class="lead login-button">Sign in with {{ provider.name }}</span></a>
+                            height="100px" src="{% static 'copo/img/'|add:image_static %}"/>
+                        <span style="margin-left: -10px; font-size: large" class="login-button">Sign in with {{ provider.name }}</span></a>
                     <hr style="margin-top:40px"/>
                 {% else %}
 
                     <a title="{{ provider.name }}" class="socialaccount_provider {{ provider.id }}"
                        href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}"><img
                             height="64px" src="{% static 'copo/img/'|add:image_static %}"/><span
-                            class="lead login-button">Sign in with {{ provider.name }}</span></a>
+                            class="login-button">Sign in with {{ provider.name }}</span></a>
                 {% endif %}
 
             {% endwith %}
