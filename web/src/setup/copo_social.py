@@ -48,10 +48,10 @@ def main():
         cursor.execute("INSERT INTO socialaccount_socialapp (id, provider, name, client_id, secret, key) VALUES (%s, %s, %s, %s, %s, %s)", (4, "twitter", "Twitter", "qrwJCJG9aBngGnBKrnvwgGNYc", os.environ['TWITTER_SECRET'], " "))
 
         print("Creating 'socialaccount_socialapp_sites' record...\n")
-        cursor.execute("INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (%s, %s, %s)", (1,1,3))
-        cursor.execute("INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (%s, %s, %s)", (2,2,3))
-        cursor.execute("INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (%s, %s, %s)", (3,3,3))
-        cursor.execute("INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (%s, %s, %s)", (4,4,3))
+        cursor.execute("INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (%s, %s, %s)", (1,1,1))
+        cursor.execute("INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (%s, %s, %s)", (2,2,1))
+        cursor.execute("INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (%s, %s, %s)", (3,3,1))
+        cursor.execute("INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (%s, %s, %s)", (4,4,1))
     except (Exception, psycopg2.DatabaseError) as error:
         print("Couldn't insert records into target tables!")
         print(error)
