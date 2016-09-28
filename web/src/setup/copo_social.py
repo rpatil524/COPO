@@ -39,7 +39,7 @@ def main():
     
     try:
         print("Creating 'django_site' record...\n")
-        cursor.execute("INSERT INTO django_site (id, domain, name) VALUES (%s, %s, %s)", (3, "www.copo-project1.org", "www.copo-project1.org"))
+        cursor.execute("INSERT INTO django_site (id, domain, name) VALUES (%s, %s, %s)", (1, "www.copo-project1.org", "www.copo-project1.org"))
 
         print("Creating 'socialaccount_socialapp' records...\n")
         cursor.execute("INSERT INTO socialaccount_socialapp (id, provider, name, client_id, secret, key) VALUES (%s, %s, %s, %s, %s, %s)", (1, "google", "Google", "197718904608-mubhgir39dr8e159ef4hb3l5i8me71b6.apps.googleusercontent.com", os.environ['GOOGLE_SECRET'], " "))
