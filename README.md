@@ -30,6 +30,6 @@ Featuring:
 2. update apt - `sudo apt-get update`
 3. install docker - `sudo apt-get install docker-engine`
 4. install docker-compose - `sudo apt-get install docker-compose`
-5. pull latest version of COPO 'git clone -b deployment https://github.com/collaborative-open-plant-omics/COPO.git'
+5. pull latest version of COPO `git clone -b deployment https://github.com/collaborative-open-plant-omics/COPO.git`
 6. Build images - `docker-compose build`
 7. Start services - `docker-compose up -d`
