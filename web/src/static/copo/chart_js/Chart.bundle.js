@@ -28,7 +28,7 @@ module.exports = {
    hslaString: hslaString,
    hwbString: hwbString,
    keyword: keyword
-}
+};
 
 function getRgba(string) {
    if (!string) {
@@ -247,7 +247,7 @@ var Color = function(obj) {
     hwb: [0, 0, 0],
     cmyk: [0, 0, 0, 0],
     alpha: 1
-  }
+  };
 
   // parse Color() argument
   if (typeof obj == "string") {
@@ -277,7 +277,7 @@ var Color = function(obj) {
       throw new Error("Unable to parse color from object " + JSON.stringify(obj));
     }
   }
-}
+};
 
 Color.prototype = {
   rgb: function(vals) {
@@ -419,8 +419,8 @@ Color.prototype = {
     var lum2 = color2.luminosity();
     if (lum1 > lum2) {
       return (lum1 + 0.05) / (lum2 + 0.05)
-    };
-    return (lum2 + 0.05) / (lum1 + 0.05);
+    }
+      return (lum2 + 0.05) / (lum1 + 0.05);
   },
 
   level: function(color2) {
@@ -440,7 +440,7 @@ Color.prototype = {
   },
 
   negate: function() {
-    var rgb = []
+    var rgb = [];
     for (var i = 0; i < 3; i++) {
       rgb[i] = 255 - this.values.rgb[i];
     }
@@ -543,7 +543,7 @@ Color.prototype = {
   clone: function() {
     return new Color(this.rgb());
   }
-}
+};
 
 
 Color.prototype.getValues = function(space) {
@@ -556,7 +556,7 @@ Color.prototype.getValues = function(space) {
   }
   // {r: 255, g: 255, b: 255, a: 0.4}
   return vals;
-}
+};
 
 Color.prototype.setValues = function(space, vals) {
   var spaces = {
@@ -620,7 +620,7 @@ Color.prototype.setValues = function(space, vals) {
     }
   }
   return true;
-}
+};
 
 Color.prototype.setSpace = function(space, args) {
   var vals = args[0];
@@ -634,7 +634,7 @@ Color.prototype.setSpace = function(space, args) {
   }
   this.setValues(space, vals);
   return this;
-}
+};
 
 Color.prototype.setChannel = function(space, index, val) {
   if (val === undefined) {
@@ -645,7 +645,7 @@ Color.prototype.setChannel = function(space, index, val) {
   this.values[space][index] = val;
   this.setValues(space, this.values[space]);
   return this;
-}
+};
 
 window.Color = module.exports = Color
 
@@ -705,7 +705,7 @@ module.exports = {
   lch2lab: lch2lab,
   lch2xyz: lch2xyz,
   lch2rgb: lch2rgb
-}
+};
 
 
 function rgb2hsl(rgb) {
@@ -1354,7 +1354,7 @@ var conversions = require("./conversions");
 
 var convert = function() {
    return new Converter();
-}
+};
 
 for (var func in conversions) {
   // export Raw versions
@@ -1600,8 +1600,8 @@ module.exports = {
 //! license : MIT
 //! momentjs.com
 
-;(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+(function (global, factory) {
+        typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
     global.moment = factory()
 }(this, function () { 'use strict';

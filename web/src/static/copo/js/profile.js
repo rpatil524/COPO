@@ -4,18 +4,18 @@
 
 $(document).ready(function () {
 
-    $('.spinner').hide()
+    $('.spinner').hide();
     $('.coolHandLuke li').on('click', function (e) {
         if ($(e.target).prev().hasClass('red')) {
             // find type of submission
-            var collection_id = $(e.target).closest('tr').attr('data-collection_id')
+            var collection_id = $(e.target).closest('tr').attr('data-collection_id');
             var type = delegate_handler(e, collection_id)
         }
         else {
             view_in_figshare(e)
         }
 
-    })
+    });
 
     //handle modal hide event
     $('.modal').on('hidden.bs.modal', function () {
@@ -24,7 +24,6 @@ $(document).ready(function () {
         try {
             $(this).find('form')[0].reset();
         } catch (err) {
-            ;
         }
 
         if (this.id == "newCollectionModal") {
@@ -57,9 +56,9 @@ $(document).ready(function () {
     function submit_to_figshare(e) {
 
 
-        var spinner = $(e.target).closest('td').find('.spinner')
-        var color_span = $(e.target).prev()
-        $(spinner).show()
+        var spinner = $(e.target).closest('td').find('.spinner');
+        var color_span = $(e.target).prev();
+        $(spinner).show();
 
         // ajax call checks if figshare creds are valid
         $.ajax({
@@ -69,12 +68,12 @@ $(document).ready(function () {
         }).done(function (data) {
             // if creds invalid, prompt user
             if (data.exists == false) {
-                url = data.url
+                url = data.url;
                 window.open(url, "_blank", "toolbar=no, scrollbars=yes, resizable=no, top=500, left=20, width=800, height=600");
             }
             // if creds valid call submit_to_figshare backend handler
             else {
-                var article_id = $(e.target).closest('tr').attr('data-collection_id')
+                var article_id = $(e.target).closest('tr').attr('data-collection_id');
                 $.ajax({
                     type: "GET",
                     url: "/api/submit_to_figshare/" + article_id,
@@ -87,7 +86,7 @@ $(document).ready(function () {
                             title: 'Success',
                             message: 'Figshare Object Deposited'
                         });
-                        $(color_span).removeClass('red').addClass('green')
+                        $(color_span).removeClass('red').addClass('green');
                         $(e.target).text('Inspect')
                     }
                     $(spinner).hide()
@@ -115,7 +114,7 @@ $(document).ready(function () {
 
 
     function delegate_handler(e, collection_id) {
-        e.preventDefault()
+        e.preventDefault();
         var csrftoken = $.cookie('csrftoken');
         $.get("/api/get_collection_type/", {'collection_id': collection_id})
             .done(function (data) {
@@ -145,4 +144,4 @@ $(document).ready(function () {
                 }
             });
     }
-})
+});

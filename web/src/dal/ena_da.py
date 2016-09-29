@@ -9,7 +9,7 @@ import re
 
 import random
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
-from web.apps.chunked_upload.models import ChunkedUpload
+from chunked_upload.models import ChunkedUpload
 from dal.mongo_util import get_collection_ref
 from dal.base_resource import Resource
 from dal import ObjectId

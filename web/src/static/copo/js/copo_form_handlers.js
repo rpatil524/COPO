@@ -247,7 +247,6 @@ function get_form_message(data) {
         message_type = data.form.form_message.type;
 
     } catch (err) {
-        ;
     }
 
     if (message_text && message_type) {
@@ -1148,7 +1147,7 @@ function resolve_ctrl_values(ctrlsDiv, counter, formElem, elemValue) {
         }
     }
 
-    var ctrlObjects = new Object();
+    var ctrlObjects = {};
     ctrlObjects['counter'] = counter;
     ctrlObjects['ctrlsWithValuesDivArray'] = ctrlsWithValuesDivArray;
     ctrlObjects['ctrlsWithValuesDiv'] = ctrlsWithValuesDiv;

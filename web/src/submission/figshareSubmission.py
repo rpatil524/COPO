@@ -3,7 +3,7 @@ import json
 import requests
 import os
 from web.apps.web_copo.lookup.lookup import FIGSHARE_API_URLS
-from web.apps.chunked_upload.models import ChunkedUpload
+from chunked_upload.models import ChunkedUpload
 from django.conf import settings
 from dal.copo_da import DataFile, Submission
 import threading

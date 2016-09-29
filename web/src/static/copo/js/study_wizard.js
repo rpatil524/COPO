@@ -9,7 +9,7 @@ $(document).ready(function () {
 
 function handle_click(file_id) {
 
-    process_stage(true, false)
+    process_stage(true, false);
     /*
     if ($('#wizard').find('section').length == 0) {
 
@@ -49,16 +49,16 @@ function next_step() {
 
 function process_stage(get_new_stage, last_stage) {
     var study_type = $('#study_type').val();
-    var study_id = $('#study_id').val()
-    var datafile_id = $('#wizard_file_id').val()
+    var study_id = $('#study_id').val();
+    var datafile_id = $('#wizard_file_id').val();
     var prev_step_id;
     var prev_question;
     var current_answer = '';
     var current_step;
-    var process_stage_url = $('#process_stage_url').val()
+    var process_stage_url = $('#process_stage_url').val();
     try {
         current_step = $('#wizard').steps('getCurrentStep');
-        prev_question = $(current_step).data('step_id')
+        prev_question = $(current_step).data('step_id');
         if (prev_question == undefined) {
             prev_question = $(current_step.content).find("input, select").attr("id")
         }
@@ -96,10 +96,10 @@ function process_stage(get_new_stage, last_stage) {
         }
         else if (d.detail.length > 1) {
 
-            var last_step = ''
+            var last_step = '';
             if (get_new_stage) {
                 $(d.detail).each(function (key, value) {
-                    console.log(key + " " + value)
+                    console.log(key + " " + value);
                     $('#wizard').steps('add', {
                         title: value.title,
                         content: value.element
@@ -108,7 +108,7 @@ function process_stage(get_new_stage, last_stage) {
                 })
             }
 
-            $('#filesAssignModal').modal('show')
+            $('#filesAssignModal').modal('show');
             while ($('#wizard').steps("next"));
             var current_step = $('#wizard').steps('getCurrentStep');
             $(current_step).data('step_id', last_step)

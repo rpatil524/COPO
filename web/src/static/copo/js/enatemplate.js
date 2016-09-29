@@ -13,4 +13,4 @@ $(document).ready(function () {
         return "This is a placeholder for "+elemName+" details."
     }
 
-}) //end of document.ready
+}); //end of document.ready

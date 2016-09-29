@@ -6,15 +6,15 @@
 
 $(document).ready(function () {
     var csrftoken = $.cookie('csrftoken');
-    $('#current-submissions').DataTable()
-    $('tr').on('click', change_selected)
-    $('.file_info').on('click', get_file_info)
-    $('.upload_button').on('click', handle_upload)
-    $('.delete_button').on('click', handle_delete)
+    $('#current-submissions').DataTable();
+    $('tr').on('click', change_selected);
+    $('.file_info').on('click', get_file_info);
+    $('.upload_button').on('click', handle_upload);
+    $('.delete_button').on('click', handle_delete);
 
-    num_pts = 100
+    num_pts = 100;
     var ctx = document.getElementById("bandwidth_chart");
-    Chart.defaults.global.animation.duration = 0
+    Chart.defaults.global.animation.duration = 0;
     init_data = Array.apply(null, Array(num_pts)).map(Number.prototype.valueOf, 0);
     labels = Array.apply(null, Array(num_pts)).map(Number.prototype.valueOf, 0);
     var myChart = new Chart(ctx, {
@@ -88,51 +88,51 @@ $(document).ready(function () {
     setInterval(function () {
 
         //update chart data
-        var id_to_send = $('#displayed_submission').val()
+        var id_to_send = $('#displayed_submission').val();
         $.get("/rest/get_upload_information/", {submission_id: id_to_send})
             .done(function (data) {
 
-                data = JSON.parse(data)
-                var canvases = $('canvas')
+                data = JSON.parse(data);
+                var canvases = $('canvas');
                 if (data.found == false) {
                     $('canvas').each(function () {
-                        $(this).siblings('h4').hide()
+                        $(this).siblings('h4').hide();
                         $(this).hide()
                     })
                 }
                 else if (!data.finished) {
                     // update charts with returned upload status data
                     $('canvas').each(function () {
-                        $(this).siblings('h4').show()
+                        $(this).siblings('h4').show();
                         $(this).show()
-                    })
+                    });
 
 
-                    myChart.chart.config.data.datasets[0].data = data.speeds
-                    update = [data.complete, 100 - data.complete]
-                    completed_chart.config.data.datasets[0].data = update
+                    myChart.chart.config.data.datasets[0].data = data.speeds;
+                    update = [data.complete, 100 - data.complete];
+                    completed_chart.config.data.datasets[0].data = update;
 
-                    myChart.update()
+                    myChart.update();
                     completed_chart.update()
 
                 }
                 else {
                     // hide charts and show accession data
                     $('canvas').each(function () {
-                        $(this).siblings('h4').hide()
+                        $(this).siblings('h4').hide();
                         $(this).hide()
-                    })
+                    });
                     if (data.repo == 'ena' && $('#status-panel').data('accessions_visible') != true) {
 
 
-                        $('#status-panel').append('<h3 id="accessions-header">Accessions</h3>')
+                        $('#status-panel').append('<h3 id="accessions-header">Accessions</h3>');
 
                         // create accession panels
                         var panel_group = jQuery('<div/>', {
                             class: 'panel-group',
                             id: 'accessions-block'
-                        })
-                        var c = 1
+                        });
+                        var c = 1;
                         // for each key, create a collapsable panel
                         for (var key in data.accessions) {
 
@@ -149,27 +149,27 @@ $(document).ready(function () {
                             a_key = key[0].toUpperCase() + key.slice(1);
                             var title = $.parseHTML('<a data-toggle="collapse" href="#collapse' + c + '">' + a_key + '</a>');
 
-                            $(title).appendTo(panel_title)
-                            $(panel_title).appendTo(panel_heading)
-                            $(panel_heading).appendTo(panel)
+                            $(title).appendTo(panel_title);
+                            $(panel_title).appendTo(panel_heading);
+                            $(panel_heading).appendTo(panel);
 
                             var collapse = jQuery('<div/>', {
                                 id: 'collapse' + c,
                                 class: 'panel-collapse collapse'
-                            })
-                            c = c + 1
+                            });
+                            c = c + 1;
 
                             var panel_body = jQuery('<div/>', {
                                 class: 'panel-body'
-                            })
+                            });
 
-                            var ul = jQuery('<ul/>')
+                            var ul = jQuery('<ul/>');
 
                             if (key == 'sample') {
                                 $(data.accessions['sample']).each(function (count, smp) {
                                     var li = jQuery('<li/>', {
                                         html: '<span title="Biosample Accession: ' + smp.biosample_accession + '">' + smp.sample_accession + ' - <small>' + smp.sample_alias + '</small></span>'
-                                    })
+                                    });
                                     $(li).appendTo(ul)
                                 })
                             }
@@ -177,18 +177,18 @@ $(document).ready(function () {
 
                                 var li = jQuery('<li/>', {
                                     html: data.accessions[key].accession + ' - <small>' + data.accessions[key].alias + '</small>'
-                                })
+                                });
                                 $(li).appendTo(ul)
                             }
-                            $(ul).appendTo(panel_body)
-                            $(panel_body).appendTo(collapse)
-                            $(collapse).appendTo(panel)
+                            $(ul).appendTo(panel_body);
+                            $(panel_body).appendTo(collapse);
+                            $(collapse).appendTo(panel);
 
                             $(panel).appendTo(panel_group)
 
                         }
 
-                        $(panel_group).appendTo('#status-panel')
+                        $(panel_group).appendTo('#status-panel');
                         $('#status-panel').data('accessions_visible', true)
 
 
@@ -201,33 +201,33 @@ $(document).ready(function () {
 
     }, 1000)
 
-})
+});
 
 function change_selected(e) {
 
     // change colors of table rows
     $('#current-submissions').find('.active').each(function (counter, data) {
-        var cell = $(data).find('.status_cell')
+        var cell = $(data).find('.status_cell');
         if ($(cell).html() == 'True') {
             $(cell).parent().removeClass('active').addClass('success')
         }
         else {
             $(cell).parent().removeClass('active').addClass('info')
         }
-    })
-    $(e.currentTarget).removeClass('success info').addClass('active')
+    });
+    $(e.currentTarget).removeClass('success info').addClass('active');
 
     //change displayed_submission
-    var current_id = $(e.target).parent().data('submission_id')
-    $('#displayed_submission').val(current_id)
-    $('#accessions-block, #accessions-header').remove()
+    var current_id = $(e.target).parent().data('submission_id');
+    $('#displayed_submission').val(current_id);
+    $('#accessions-block, #accessions-header').remove();
     $('#status-panel').data('accessions_visible', false)
 
 }
 
 
 function handle_upload(e) {
-    $(e.currentTarget).hide()
+    $(e.currentTarget).hide();
     BootstrapDialog.show({
         title: 'Upload Submission',
         message: 'Are you sure you want to upload this submission bundle.',
@@ -235,12 +235,12 @@ function handle_upload(e) {
             label: 'Yes',
             action: function (dialog) {
                 dialog.close();
-                message: $(e.currentTarget).data('submission_id')
+                $(e.currentTarget).data('submission_id');
                 $.post("/rest/submit_to_repo/", {
                     'sub_id': $(e.currentTarget).data('submission_id'),
                     'csrfmiddlewaretoken': csrftoken
                 }).done(function (data) {
-                    $(e.currentTarget).closest('tr').find('.delete_button', '.upload_button').remove()
+                    $(e.currentTarget).closest('tr').find('.delete_button', '.upload_button').remove();
                     $(e.currentTarget).closest('tr').removeClass('active').addClass('success')
                 })
             }
@@ -257,7 +257,7 @@ function handle_upload(e) {
 }
 
 function handle_delete(e) {
-    $(e.currentTarget).hide()
+    $(e.currentTarget).hide();
     BootstrapDialog.show({
         title: 'Delete Submission',
         message: 'Are you sure you want to delete this submission bundle.',
@@ -265,7 +265,7 @@ function handle_delete(e) {
             label: 'Yes',
             action: function (dialog) {
                 dialog.close();
-                message: $(e.currentTarget).data('submission_id')
+                $(e.currentTarget).data('submission_id');
                 $.post("/rest/delete_submission/", {
                     'sub_id': $(e.currentTarget).data('submission_id'),
                     'csrfmiddlewaretoken': csrftoken
@@ -287,8 +287,8 @@ function handle_delete(e) {
 
 
 function get_file_info(e) {
-    e.preventDefault
-    var file_id = $(e.currentTarget).data('file_id')
+    e.preventDefault;
+    var file_id = $(e.currentTarget).data('file_id');
     var copoVisualsURL = "/copo/copo_visualize/";
     var csrftoken = getCookie('csrftoken');
     $.ajax({
@@ -345,7 +345,7 @@ function get_file_info(e) {
                             displayedValue += "<div style='padding-left: 25px; padding-top: 3px;'>" + vv + "</div>";
                         });
                     } else if (Object.prototype.toString.call(Mdata.data) === '[object String]') {
-                        displayedValue = new String(Mdata.data);
+                        displayedValue = String(Mdata.data);
                     }
 
                     var mDataDataSpan = $('<span/>', {
@@ -382,11 +382,11 @@ function get_file_info(e) {
                 html: descriptionHtml
             });
 
-            descriptionInfoPanel.append(descriptionInfoPanelPanelHeading).append(descriptionInfoPanelPanelBody)
+            descriptionInfoPanel.append(descriptionInfoPanelPanelHeading).append(descriptionInfoPanelPanelBody);
 
             //row.child($('<div></div>').append(descriptionInfoPanel).html()).show();
-            $('#file_info_modal').find('.modal-body').empty()
-            $('#file_info_modal').find('.modal-body').append(descriptionInfoPanel)
+            $('#file_info_modal').find('.modal-body').empty();
+            $('#file_info_modal').find('.modal-body').append(descriptionInfoPanel);
             $('#file_info_modal').modal('show')
         },
         error: function () {

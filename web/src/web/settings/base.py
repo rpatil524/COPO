@@ -39,7 +39,7 @@ PROJECT_APPS = [
     'allauth.socialaccount.providers.facebook',
     # 'web.apps.web_copo',
     'rest_framework',
-    'web.apps.chunked_upload',
+    'chunked_upload',
     'compressor',
 ]
 

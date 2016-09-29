@@ -83,33 +83,33 @@ function get_upload_box_html(box_id, panel_id){
                                         + '</div>'
                                     + '</div>'
 
-                                + '</div>'
+                                + '</div>';
 
      return html
  }
 
 
  function get_files_table(files){
-    str = "<h4>Existing Files for Group</h4>"
-    str += "<table id='exp_data_table'>"
-    str += "<tr><th>File Name</th><th>Size</th><th>md5</th><th>Delete</th></tr>"
-    panel_id = ''
+    str = "<h4>Existing Files for Group</h4>";
+    str += "<table id='exp_data_table'>";
+    str += "<tr><th>File Name</th><th>Size</th><th>md5</th><th>Delete</th></tr>";
+    panel_id = '';
     for(file in files){
 
-        file = files[file]
-        console.log(file.panel_id)
+        file = files[file];
+        console.log(file.panel_id);
         if(file.panel_id != panel_id){
             str += '<tr><td></td><td></td><td></td></tr>'
         }
         //store the data modal id to check if there should be a break in the table next time
-        panel_id = file.panel_id
+        panel_id = file.panel_id;
         str += '<tr><td>' + file.name + '</td>' +
         '<td>' + file.size + '</td>' +
         '<td>' + file.md5 + '</td>' +
         '<td class="delete_cell text-center" data-file_id="' + file.id + '">' +
         '<span class="glyphicon glyphicon-remove-sign"></span></td></tr>'
     }
-    str += '</table>'
+    str += '</table>';
     return str
  }
 

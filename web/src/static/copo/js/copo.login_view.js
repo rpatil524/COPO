@@ -39,7 +39,7 @@ function frm_login_submit_callback(request) {
 }
 
 function orcid_btn_handler(e) {
-    e.preventDefault()
+    e.preventDefault();
     $.ajax({
         type: "GET",
         url: "/api/check_orcid_credentials/",
@@ -47,7 +47,7 @@ function orcid_btn_handler(e) {
     }).done(function (data) {
         // if creds invalid, prompt user
         if (data.exists == false) {
-            url = data.authorise_url
+            url = data.authorise_url;
             window.location.href = url;
         }
     })

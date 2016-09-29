@@ -43,3 +43,4 @@ requests-oauthlib==0.6.2
 rjsmin==1.0.12
 six==1.10.0
 gunicorn
+django-chunked-upload==1.1.1
