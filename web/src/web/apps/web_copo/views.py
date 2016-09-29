@@ -18,6 +18,7 @@ from django.conf import settings
 
 LOGGER = settings.LOGGER
 
+
 @login_required
 def index(request):
     context = {'user': request.user}
@@ -170,6 +171,7 @@ def copo_visualize(request):
                      wizard_messages=broker_visuals.do_wizard_messages,
                      metadata_ratings=broker_visuals.do_metadata_ratings,
                      description_summary=broker_visuals.do_description_summary,
+                     sources_json_component=broker_visuals.get_sources_json_component,
                      un_describe=broker_visuals.do_un_describe
                      )
 
@@ -218,7 +220,6 @@ def copo_forms(request):
     out = jsonpickle.encode(context)
 
     return HttpResponse(out, content_type='json')
-
 
 @login_required
 def copo_submissions(request, profile_id):

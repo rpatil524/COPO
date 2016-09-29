@@ -5,13 +5,16 @@
 var olsURL = ""; // url of ols lookup for ontology fields
 var copoSchemas = {};
 var copoFormsURL = "/copo/copo_forms/";
+var copoVisualsURL = "/copo/copo_visualize/";
 var globalDataBuffer = {};
 var htmlForm = $('<div/>'); //global form div
+var htmlFormSource = $('<div/>'); // form div for source
+var componentRecords = Object(); //components records...used for validation
 
 $(document).ready(function () {
     var csrftoken = $.cookie('csrftoken');
 
-    //get ontology url
+    //get urls
     olsURL = $("#elastic_search_ajax").val();
 
     //retrieve and set form resources
@@ -86,11 +89,15 @@ var controlsMapping = {
 };
 
 function json2HtmlForm(data) {
+    var dataCopy = $.extend(true, Object(), data.form.component_records);
+    componentRecords[data.form.component_name] = dataCopy;
 
     //tidy up before closing the modal
     var doTidyClose = {
         closeIt: function (dialogRef) {
             $('.popover').popover('destroy'); //hide any shown popovers
+            htmlForm.empty(); //clear form
+            htmlFormSource.empty(); //clear form
             dialogRef.close();
         }
     };
@@ -130,7 +137,10 @@ function json2HtmlForm(data) {
                 {
                     id: "copo_component_forms",
                     class: "col-sm-12 col-md-12 col-lg-12"
-                }).append(build_form_body(data)));
+                }).append(htmlForm).append(htmlFormSource));
+
+            //build main form
+            build_form_body(data);
 
             var $message = $('<div/>').append(form_help_div).append(form_message_div).append(form_body_div);
 
@@ -146,7 +156,11 @@ function json2HtmlForm(data) {
                 }
             });
 
-            htmlForm.find("#dynamic_form_level_1").validator().on('submit', function (e) {
+            //custom validators
+            custom_validate(htmlForm.find("form"));
+
+            //validate on submit event
+            htmlForm.find("form").validator().on('submit', function (e) {
                 if (e.isDefaultPrevented()) {
                     return false;
                 } else {
@@ -157,6 +171,9 @@ function json2HtmlForm(data) {
             });
 
             refresh_form_aux_controls();
+
+            setup_formelement_hint($('input[name="helptips-chk"]'), htmlForm.find("form").find(":input"));
+
 
         },
         onhide: function (dialogRef) {
@@ -178,7 +195,7 @@ function json2HtmlForm(data) {
                 id: 'global_form_save_btn',
                 cssClass: 'btn-primary',
                 action: function (dialogRef) {
-                    validate_forms(htmlForm.find("#dynamic_form_level_1"));
+                    validate_forms(htmlForm.find("form"));
                 }
             }
         ]
@@ -190,17 +207,15 @@ function build_form_body(data) {
     var formValue = formJSON.form_value;
 
     //clean slate for form
-    var formCtrl = htmlForm.find("#dynamic_form_level_1");
+    var formCtrl = htmlForm.find("form");
     if (formCtrl.length) {
         formCtrl.empty();
     } else {
         formCtrl = $('<form/>',
             {
-                "data-toggle": "validator",
-                "id": "dynamic_form_level_1"
+                "data-toggle": "validator"
             });
     }
-
 
     //generate controls given component schema
     for (var i = 0; i < formJSON.form_schema.length; ++i) {
@@ -284,7 +299,6 @@ function get_help_ctrl() {
 }
 
 function set_up_help_ctrl() {
-    setup_formelement_hint($('input[name="helptips-chk"]'), htmlForm.find("#dynamic_form_level_1").find(":input"));
 
     // now set up switch button to support the tool tips
     $("[name='helptips-chk']").bootstrapSwitch(
@@ -326,6 +340,8 @@ function set_up_clone_ctrl(data) {
 
                 refresh_form_aux_controls();
 
+                setup_formelement_hint($('input[name="helptips-chk"]'), htmlForm.find("form").find(":input"));
+
             }
         });
 
@@ -341,7 +357,7 @@ function set_up_clone_ctrl(data) {
     var min = 10000;
     var max = 99999;
 
-    if (data.form.component_records.length > 0) {
+    if (data.form.component_records.length > 0 && data.form.clonable) {
         showCloneCtrl = true;
 
         //construct options
@@ -356,7 +372,7 @@ function set_up_clone_ctrl(data) {
 
             //generate unique characters to append to label elem
             var rand_postfix = (Math.floor(Math.random() * (max - min + 1)) + min).toString();
-            option[labelElem] = option[labelElem] + "_CLONED" + rand_postfix;
+            option[labelElem] = option[labelElem] + "_CLONED_" + rand_postfix;
 
             form_values[vl] = option;
 
@@ -383,33 +399,42 @@ function refresh_form_aux_controls() {
     set_up_help_ctrl();
 
     //refresh form validator
-    refresh_validator(htmlForm.find("#dynamic_form_level_1"));
+    refresh_validator(htmlForm.find("form"));
+    refresh_validator(htmlFormSource.find("form"));
 }
 
-function set_required_markers(formElem) {
-    //validation markers for required fields
-
-    var required = false;
-    var requiredMessage = "";
-    var errorHelpDiv = "";
-
-    if (formElem.hasOwnProperty("required")) {
-        if (formElem.required == "true" || formElem.required == true) {
-            required = true;
-            requiredMessage = "The " + formElem.label + " is required!";
-            errorHelpDiv = $('<div/>',
-                {
-                    class: "help-block with-errors"
-                });
-        }
-
-    }
+function set_validation_markers(formElem, ctrl) {
+    //validation markers
 
     var validationMarkers = Object();
+    var errorHelpDiv = "";
 
-    validationMarkers['required'] = required;
-    validationMarkers['requiredMessage'] = requiredMessage;
+    //required marker
+    if (formElem.hasOwnProperty("required") && (formElem.required.toString() == "true")) {
+        ctrl.attr("required", true);
+        ctrl.attr("data-error", "The " + formElem.label + " is required!");
+
+        errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
+    }
+
+    //unique marker...
+    if (formElem.hasOwnProperty("unique") && (formElem.unique.toString() == "true")) {
+        ctrl.attr("data-unique", "unique");
+        ctrl.attr('data-unique-error', "The " + formElem.label + " value already exists!");
+
+        errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
+    }
+
+    //email marker...
+    if (formElem.hasOwnProperty("email") && (formElem.email.toString() == "true")) {
+        ctrl.attr("data-email", "email");
+        ctrl.attr('data-email-error', "Please enter a valid value for the "+ formElem.label);
+
+        errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
+    }
+
     validationMarkers['errorHelpDiv'] = errorHelpDiv;
+    validationMarkers['ctrl'] = ctrl;
 
     return validationMarkers;
 }
@@ -417,10 +442,6 @@ function set_required_markers(formElem) {
 //form controls
 var dispatchFormControl = {
     do_text_ctrl: function (formElem, elemValue) {
-        //set validation markers
-        var vM = set_required_markers(formElem);
-
-
         var ctrlsDiv = $('<div/>',
             {
                 class: "ctrlDIV"
@@ -431,21 +452,18 @@ var dispatchFormControl = {
                 type: "text",
                 class: "input-copo form-control",
                 id: formElem.id,
-                name: formElem.id,
-                required: vM.required,
-                "data-error": vM.requiredMessage
+                name: formElem.id
             });
 
+        //set validation markers
+        var vM = set_validation_markers(formElem, txt);
+
         ctrlsDiv.append(txt);
-        if (vM.errorHelpDiv) {
-            ctrlsDiv.append(vM.errorHelpDiv);
-        }
+        ctrlsDiv.append(vM.errorHelpDiv);
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
     do_textarea_ctrl: function (formElem, elemValue) {
-        //set validation markers
-        var vM = set_required_markers(formElem);
 
         var ctrlsDiv = $('<div/>',
             {
@@ -458,15 +476,14 @@ var dispatchFormControl = {
                 rows: 4,
                 cols: 40,
                 id: formElem.id,
-                name: formElem.id,
-                required: vM.required,
-                "data-error": vM.requiredMessage
+                name: formElem.id
             });
 
+        //set validation markers
+        var vM = set_validation_markers(formElem, txt);
+
         ctrlsDiv.append(txt);
-        if (vM.errorHelpDiv) {
-            ctrlsDiv.append(vM.errorHelpDiv);
-        }
+        ctrlsDiv.append(vM.errorHelpDiv);
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
@@ -557,9 +574,6 @@ var dispatchFormControl = {
     do_copo_comment_ctrl: function (formElem, elemValue) {
         var commentSchema = copoSchemas.comment_schema;
 
-        //set validation markers
-        var vM = set_required_markers(formElem);
-
         var ctrlsDiv = $('<div/>',
             {
                 class: "ctrlDIV"
@@ -575,16 +589,14 @@ var dispatchFormControl = {
                         rows: 4,
                         cols: 40,
                         id: formElem.id + '.' + fv,
-                        name: formElem.id + '.' + fv,
-                        required: vM.required,
-                        "data-error": vM.requiredMessage
+                        name: formElem.id + '.' + fv
                     });
 
-                ctrlsDiv.append(txt);
+                //set validation markers
+                var vM = set_validation_markers(formElem, txt);
 
-                if (vM.errorHelpDiv) {
-                    ctrlsDiv.append(vM.errorHelpDiv);
-                }
+                ctrlsDiv.append(txt);
+                ctrlsDiv.append(vM.errorHelpDiv);
 
             } else {
                 ctrlsDiv.append($('<input/>',
@@ -615,14 +627,9 @@ var dispatchFormControl = {
 
                 if ($(this).hasClass("ontology-field")) {
                     //set validation markers
-                    var vM = set_required_markers(formElem);
+                    var vM = set_validation_markers(formElem, $(this));
+                    $(vM.errorHelpDiv).insertAfter($(this));
 
-                    $(this).attr("required", vM.required);
-                    $(this).attr("data-error", vM.requiredMessage);
-
-                    if (vM.errorHelpDiv) {
-                        $(vM.errorHelpDiv).insertAfter($(this));
-                    }
                 }
             }
 
@@ -687,9 +694,6 @@ var dispatchFormControl = {
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
     do_copo_select_ctrl: function (formElem, elemValue) {
-        //set validation markers
-        var vM = set_required_markers(formElem);
-
         var ctrlsDiv = $('<div/>',
             {
                 class: "ctrlDIV"
@@ -701,20 +705,18 @@ var dispatchFormControl = {
                 type: "text",
                 class: "copo-select input-copo",
                 id: formElem.id,
-                name: formElem.id,
-                required: vM.required,
-                "data-error": vM.requiredMessage
+                name: formElem.id
             });
 
+        //set validation markers
+        var vM = set_validation_markers(formElem, txt);
+
         ctrlsDiv.append(txt);
-        if (vM.errorHelpDiv) {
-            ctrlsDiv.append(vM.errorHelpDiv);
-        }
+        ctrlsDiv.append(vM.errorHelpDiv);
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
     do_copo_sample_source_ctrl: function (formElem, elemValue) {
-        var sourceSchema = copoSchemas.source_schema;
 
         var ctrlsDiv = $('<div/>',
             {
@@ -729,210 +731,31 @@ var dispatchFormControl = {
             elemValue = elemValue.toString();
         }
 
+
         //resolve control values
         var ctrlObjects = resolve_ctrl_values(ctrlsDiv.clone(), 0, formElem, elemValue);
         var ctrlsWithValuesDiv = ctrlObjects.ctrlsWithValuesDiv;
-
-        var newSourcePanel = $('<div/>', {
-            class: "panel panel-primary",
-            style: 'margin-top:1px; display: none;'
-        });
-
-        var newSourcePanelHeading = $('<div/>', {
-            class: "panel-heading",
-            html: "New Source"
-        });
-
-        var newSourcePanelBody = $('<div/>', {
-            class: "panel-body"
-        });
 
         $("#global_form_save_btn").prop('disabled', false); //make sure outer save button is enabled by default
 
         var addBtn = $('<button/>',
             {
                 style: "border-radius:0;",
-                class: "btn btn-xs btn-primary",
-                html: '<i class="fa fa-plus-circle"></i> Create New Source',
+                class: "btn btn-xs btn-primary save-form-button",
+                html: '<i class="fa fa-plus-circle"></i> Create & Assign New Source',
                 click: function (event) {
                     event.preventDefault();
 
-                    if (newSourcePanel.is(":visible")) {
-                        newSourcePanel.hide();
-                        $("#global_form_save_btn").prop('disabled', false); //enable save button in parent form
+                    if (htmlFormSource.find("form").length) {
+                        hide_source_form();
                     } else {
-                        var sourceForm = $('<div/>');
+                        var funcParams = Object();
+                        funcParams['formElem'] = formElem;
+                        funcParams['formValue'] = null;
+                        funcParams['ctrlsDiv'] = ctrlsDiv;
+                        funcParams['ctrlsWithValuesDiv'] = ctrlsWithValuesDiv;
 
-                        sourceForm = copo_sample_source_ctrl_aux_1(sourceForm, null);
-
-
-                        //create submit button
-
-                        var saveSourceBtnDiv = $('<div/>',
-                            {
-                                style: 'margin-top:10px;',
-                                class: 'pull-right',
-                            });
-
-
-                        var saveSourcebtn = $('<button/>',
-                            {
-                                class: "btn btn-sm btn-primary",
-                                html: '<i class="glyphicon glyphicon-save"></i>Save Source',
-                                click: function (event) {
-                                    event.preventDefault();
-
-                                    //preserve already set value
-                                    var sampleSourceValues = null;
-                                    htmlForm.find("#dynamic_form_level_1").find(":input").each(function () {
-                                        if (this.id == formElem.id) {
-                                            sampleSourceValues = $(this).val();
-                                        }
-                                    });
-
-                                    // call to save source
-                                    var form_values = {};
-                                    sourceForm.find(":input").each(function () {
-                                        form_values[this.id] = $(this).val();
-                                    });
-
-                                    var auto_fields = JSON.stringify(form_values);
-
-                                    $.ajax({
-                                        url: copoFormsURL,
-                                        type: "POST",
-                                        headers: {'X-CSRFToken': csrftoken},
-                                        data: {
-                                            'task': "save",
-                                            'auto_fields': auto_fields,
-                                            'component': "source",
-                                            'visualize': "sources_json_and_last_record_id"
-                                        },
-                                        success: function (data) {
-                                            //refresh sample source list
-                                            //if (sampleSourceValues) {
-                                            //    sampleSourceValues = sampleSourceValues.split(",");
-                                            //} else {
-                                            //    sampleSourceValues = [];
-                                            //}
-
-                                            sampleSourceValues = []; //basically, this means only the created source is ever being set (i.e., only set one sample source)
-
-                                            if (data.last_record_id) {
-                                                sampleSourceValues.push(data.last_record_id);
-                                            }
-
-                                            if (sampleSourceValues.length > 0) {
-                                                sampleSourceValues = sampleSourceValues.join();
-                                            }
-
-                                            var ctrlObjectsSourceContext = resolve_ctrl_values(ctrlsDiv.clone(), 0, formElem, sampleSourceValues);
-                                            ctrlObjectsSourceContext.ctrlsWithValuesDiv.find(".elem-json").val(JSON.stringify(data.option_values));
-
-                                            ctrlsWithValuesDiv.html(ctrlObjectsSourceContext.ctrlsWithValuesDiv.html());
-
-                                            refresh_tool_tips();
-
-                                            newSourcePanel.hide();
-                                            $("#global_form_save_btn").prop('disabled', false); //enable save button in parent form
-
-                                            updated_option_values = data.option_values;
-                                        },
-                                        error: function () {
-                                            alert("Couldn't add source!");
-                                        }
-                                    });
-                                }
-                            });
-
-                        var cancelSourceBtn = $('<button/>',
-                            {
-                                style: 'margin-right:3px;',
-                                class: "btn btn-sm btn-default",
-                                html: 'Cancel',
-                                click: function (event) {
-                                    event.preventDefault();
-                                    newSourcePanel.hide();
-                                    $("#global_form_save_btn").prop('disabled', false); //enable save button in parent form
-                                }
-                            });
-
-
-                        //***clone source control
-
-                        var cloneSourceCtrlsDiv = get_multi_search_span(formElem, $('<div/>')).clone();
-
-                        //we don't need the id's and name's attr
-                        cloneSourceCtrlsDiv.find(".copo-multi-values").removeAttr("id");
-                        cloneSourceCtrlsDiv.find(".copo-multi-values").removeAttr("name");
-
-
-                        //set placeholder
-                        cloneSourceCtrlsDiv.find(".copo-multi-search").attr("placeholder", "Clone a Source record...");
-
-
-                        //make this a single select box, instead of the default multiple
-                        cloneSourceCtrlsDiv.find(".copo-multi-values").attr('data-maxItems', '1');
-
-                        //handle change event
-
-                        cloneSourceCtrlsDiv.find(".copo-multi-values").on('change', function (event) {
-                            event.preventDefault();
-
-                            var component_record = $.extend(true, Object(), formElem.option_values.component_records[$(this).val()]);
-                            var labelElem = sourceSchema[0].id.split(".").slice(-1)[0];
-
-                            //generate unique characters to append to label elem
-                            var min = 10000;
-                            var max = 99999;
-                            var rand_postfix = (Math.floor(Math.random() * (max - min + 1)) + min).toString();
-                            component_record[labelElem] = component_record[labelElem] + "_CLONED" + rand_postfix;
-
-                            copo_sample_source_ctrl_aux_1(sourceForm, component_record);
-
-                            //refresh controls
-                            refresh_tool_tips();
-
-                            //set up help tips
-                            set_up_help_ctrl();
-
-                        });
-
-                        var showCloneCtrl = false;
-
-                        if (formElem.option_values.options.length > 0) {
-                            showCloneCtrl = true;
-                        }
-
-
-                        var cloneCtrl = $('<div/>',
-                            {
-                                class: "col-sm-7 col-md-7 col-lg-7",
-                            }).append(form_div_ctrl().append(cloneSourceCtrlsDiv));
-
-                        if (!showCloneCtrl) {
-                            cloneCtrl = '';
-                        }
-
-                        var cloneSourceDivRow = $('<div/>',
-                            {
-                                class: "row",
-                                style: "margin-bottom:15px;"
-                            }).append(cloneCtrl);
-
-                        //***end clone source control
-
-
-                        saveSourceBtnDiv.append(cancelSourceBtn).append(saveSourcebtn);
-                        newSourcePanelBody.html(""); //clear previous html
-                        newSourcePanelBody.append(cloneSourceDivRow).append(sourceForm).append('<hr/>').append(saveSourceBtnDiv);
-                        newSourcePanel.show();
-                        $("#global_form_save_btn").prop('disabled', true); //disable save button in parent form
-
-                        //help tips
-                        setup_formelement_hint($('input[name="helptips-chk"]'), sourceForm.find(":input"));
-
-                        refresh_tool_tips();
+                        show_source_form(funcParams);
                     }
                 }
             });
@@ -941,9 +764,6 @@ var dispatchFormControl = {
             {
                 class: "col-sm-12 col-md-12 col-lg-12"
             }).append(addBtn);
-
-
-        newSourcePanel.append(newSourcePanelHeading).append(newSourcePanelBody);
 
         var addbtnDivRow = $('<div/>',
             {
@@ -955,7 +775,6 @@ var dispatchFormControl = {
             .append(ctrlsWithValuesDiv)
             .append(form_help_ctrl(formElem.help_tip))
             .append(addbtnDivRow)
-            .append(newSourcePanel)
     },
     do_hidden_ctrl: function (formElem, elemValue) {
 
@@ -977,6 +796,7 @@ var dispatchFormControl = {
         });
     }
 };
+
 
 function form_help_ctrl(tip) {
     return $('<span/>',
@@ -1173,10 +993,36 @@ function resolve_ctrl_values_aux_1(ctrlObjectID, formElem, elemValue) {
     return embedValue;
 }
 
-function copo_sample_source_ctrl_aux_1(sourceForm, formValue) {
+function build_source_form(funcParams) {
+    var formValue = funcParams.formValue;
+
+    //build panel to hold form
+    var newSourcePanel = $('<div/>', {
+        class: "panel panel-primary",
+        style: 'margin-top:1px;'
+    });
+
+    var newSourcePanelHeading = $('<div/>', {
+        class: "panel-heading",
+        html: "New Source"
+    });
+
+    var newSourcePanelBody = $('<div/>', {
+        class: "panel-body"
+    });
+
+    newSourcePanel.append(newSourcePanelHeading).append(newSourcePanelBody);
+
+    //form control
     var sourceSchema = copoSchemas.source_schema;
-    sourceForm.html("");
-    var formCtrl = $('<form/>');
+
+    var formCtrl = $('<form/>',
+        {
+            "data-toggle": "validator"
+        });
+
+    newSourcePanelBody.append(formCtrl);
+
 
     //generate controls given component schema
     for (var i = 0; i < sourceSchema.length; ++i) {
@@ -1203,7 +1049,216 @@ function copo_sample_source_ctrl_aux_1(sourceForm, formValue) {
         }
     }
 
-    return sourceForm.append(formCtrl);
+    //add source panel to DOM! This will enable us to begin registering events on form objects
+    htmlFormSource.append(newSourcePanel);
+
+    //save and cancel buttons
+    var saveSourceBtnDiv = $('<div/>',
+        {
+            style: 'margin-top:10px;',
+            class: 'pull-right',
+        });
+
+
+    var saveSourcebtn = $('<button/>',
+        {
+            class: "btn btn-sm btn-primary",
+            html: '<i class="glyphicon glyphicon-save"></i>Save Source',
+            click: function (event) {
+                event.preventDefault();
+                validate_forms(htmlFormSource.find("form"));
+            }
+        });
+
+    var cancelSourceBtn = $('<button/>',
+        {
+            style: 'margin-right:3px;',
+            class: "btn btn-sm btn-default",
+            html: 'Cancel',
+            click: function (event) {
+                event.preventDefault();
+                hide_source_form();
+            }
+        });
+
+    //add buttons div
+    saveSourceBtnDiv.append(cancelSourceBtn).append(saveSourcebtn);
+
+    //add buttons to panel
+    newSourcePanelBody.append('<hr/>').append(saveSourceBtnDiv);
+
+    //add clone control
+    source_clone_ctrl(funcParams);
+
+    //add custom validators
+    custom_validate(htmlFormSource.find("form"));
+
+    //add validate on submit event
+    htmlFormSource.find("form").validator().on('submit', function (e) {
+        if (e.isDefaultPrevented()) {
+            return false;
+        } else {
+            e.preventDefault();
+            save_source_form(funcParams);
+        }
+    });
+
+    refresh_form_aux_controls();
+
+    //help tips
+    setup_formelement_hint($('input[name="helptips-chk"]'), htmlFormSource.find("form").find(":input"));
+}
+
+function save_source_form(funcParams) {
+    //start save routine
+    var ctrlsDiv = funcParams.ctrlsDiv;
+    var formElem = funcParams.formElem;
+    var ctrlsWithValuesDiv = funcParams.ctrlsWithValuesDiv;
+
+    var form_values = {};
+    htmlFormSource.find("form").find(":input").each(function () {
+        form_values[this.id] = $(this).val();
+    });
+
+    var auto_fields = JSON.stringify(form_values);
+
+    $.ajax({
+        url: copoFormsURL,
+        type: "POST",
+        headers: {'X-CSRFToken': csrftoken},
+        data: {
+            'task': "save",
+            'auto_fields': auto_fields,
+            'component': "source",
+            'visualize': "sources_json_and_last_record_id"
+        },
+        success: function (data) {
+
+            var sampleSourceValues = []; //basically, this means the created source being set (or, only set one sample source)
+
+            if (data.last_record_id) {
+                sampleSourceValues.push(data.last_record_id);
+            }
+
+            if (sampleSourceValues.length > 0) {
+                sampleSourceValues = sampleSourceValues.join();
+            }
+
+            var ctrlObjectsSourceContext = resolve_ctrl_values(ctrlsDiv.clone(), 0, formElem, sampleSourceValues);
+            ctrlObjectsSourceContext.ctrlsWithValuesDiv.find(".elem-json").val(JSON.stringify(data.option_values));
+
+            ctrlsWithValuesDiv.html(ctrlObjectsSourceContext.ctrlsWithValuesDiv.html());
+
+            refresh_tool_tips();
+        },
+        error: function () {
+            alert("Couldn't add source!");
+        }
+    });
+    //end save routine
+
+
+    //after save...remove form
+    hide_source_form();
+}
+
+function hide_source_form() {
+    $('.popover').popover('destroy'); //hide any shown popovers
+    htmlFormSource.empty();
+    htmlForm.find(".save-form-button").find("i").attr({class: "fa fa-plus-circle"});
+    $("#global_form_save_btn").prop('disabled', false); //enable save button in parent form
+}
+
+function show_source_form(funcParams) {
+    htmlForm.find(".save-form-button").find("i").attr({class: "fa fa-minus-circle"});
+    $("#global_form_save_btn").prop('disabled', true); //disable save button in parent form
+    build_source_form(funcParams);
+}
+
+function source_clone_ctrl(funcParams) {
+    var component = "source";
+    var formElem = funcParams.formElem;
+    var sourceSchema = copoSchemas.source_schema;
+
+    //do clone only if there are 'clonables'
+    $.ajax({
+        url: copoVisualsURL,
+        type: "POST",
+        headers: {'X-CSRFToken': csrftoken},
+        data: {
+            'task': 'sources_json_component',
+            'component': component
+        },
+        success: function (data) {
+            componentRecords[component] = $.extend(true, Object(), data.component_records);
+            formElem.option_values = data.option_values;
+
+            if (formElem.option_values.options.length > 0) {
+                var cloneSourceCtrlsDiv = get_multi_search_span(formElem, $('<div/>')).clone();
+
+                //we don't need the id's and name's attr
+                cloneSourceCtrlsDiv.find(".copo-multi-values")
+                    .removeAttr("id")
+                    .removeAttr("name")
+                    .attr("placeholder", "Clone a Source record...") //set placeholder
+                    .attr('data-maxItems', '1') //make this a single select box; default is multiple
+
+
+                if (funcParams.hasOwnProperty("selectedSource")) {
+                    cloneSourceCtrlsDiv.find(".copo-multi-values").val(funcParams.selectedSource._id);
+                }
+
+
+                var cloneCtrl = $('<div/>',
+                    {
+                        class: "col-sm-7 col-md-7 col-lg-7",
+                    }).append(form_div_ctrl().append(cloneSourceCtrlsDiv));
+
+                var cloneSourceDivRow = $('<div/>',
+                    {
+                        class: "row",
+                        style: "margin-bottom:15px;"
+                    }).append(cloneCtrl);
+
+                cloneSourceDivRow.insertBefore(htmlFormSource.find("form"));
+
+                //handle change event for cloning source
+                cloneSourceCtrlsDiv.find(".copo-multi-values").on('change', function (event) {
+                    event.preventDefault();
+
+                    if (funcParams.hasOwnProperty("selectedSource") &&
+                        funcParams.selectedSource._id == $.extend(true, Object(), formElem.option_values.component_records[$(this).val()])["_id"]) {
+                        return false;
+                    }
+
+                    var component_record = $.extend(true, Object(), formElem.option_values.component_records[$(this).val()]);
+                    var labelElem = sourceSchema[0].id.split(".").slice(-1)[0];
+
+                    //generate unique characters to append to label elem
+                    var min = 10000;
+                    var max = 99999;
+                    var rand_postfix = (Math.floor(Math.random() * (max - min + 1)) + min).toString();
+                    component_record[labelElem] = component_record[labelElem] + "_CLONED_" + rand_postfix;
+
+                    hide_source_form();
+                    funcParams['formValue'] = component_record;
+                    funcParams['selectedSource'] = $.extend(true, Object(), formElem.option_values.component_records[$(this).val()]);
+                    show_source_form(funcParams);
+
+                    return false;
+                });
+
+                refresh_tool_tips();
+
+            }
+
+        },
+        error: function () {
+            alert("Couldn't retrieve sources!");
+        }
+    });
+
+
 }
 
 function get_ontology_span(ontologySpan, formElem) {
@@ -1295,6 +1350,47 @@ function validate_forms(formObject) {
     formObject.trigger('submit');
 }
 
+function custom_validate(formObject) {
+    formObject.validator({
+        custom: {
+            unique: function ($el) {//validates for unique fields
+                var parts = $el.attr("id").split(".").slice(1);
+                var component = parts[0];
+                var ctrl = parts[1];
+
+                var oKFlag = true;
+                if (componentRecords.hasOwnProperty(component)) {
+                    var matchValue = "";
+                    var newValue = $el.val().trim().toLowerCase();
+                    $.each(componentRecords[component], function (key, val) {
+                        matchValue = val[ctrl];
+                        if (Object.prototype.toString.call(matchValue) === '[object String]') {
+                            if (newValue == matchValue.trim().toLowerCase()) {
+                                oKFlag = false;
+                                return false;
+                            }
+                        }
+                    });
+                }
+
+                if (!oKFlag) {
+                    return "Not valid!";
+                }
+            },
+            email: function ($el) {//validates for email fields
+                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                var newValue = $el.val().trim();
+
+                var oKFlag = re.test(newValue);
+
+                if (!oKFlag) {
+                    return "Not valid!";
+                }
+            }
+        }
+    });
+}
+
 function save_form(formJSON) {
     var task = "save";
     var error_msg = "Couldn't add " + formJSON.form_label + "!";
@@ -1305,7 +1401,7 @@ function save_form(formJSON) {
 
     //manage auto-generated fields
     var form_values = Object();
-    htmlForm.find("#dynamic_form_level_1").find(":input").each(function () {
+    htmlForm.find("form").find(":input").each(function () {
         form_values[this.id] = $(this).val();
     });
 

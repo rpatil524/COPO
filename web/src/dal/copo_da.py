@@ -161,6 +161,11 @@ class DAComponent:
 
         return cursor_to_list(self.get_collection_handle().find(doc).sort([[sort_by, sort_direction]]))
 
+    def execute_query(self, query_dict=dict()):
+        if self.profile_id:
+            query_dict["profile_id"] = self.profile_id
+
+        return cursor_to_list(self.get_collection_handle().find(query_dict))
 
 class Publication(DAComponent):
     def __init__(self, profile_id=None):

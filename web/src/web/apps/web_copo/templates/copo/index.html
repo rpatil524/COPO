@@ -49,7 +49,16 @@
 {% endblock pill_items_sidebar_local %}
 
 {% block page_tile %}
-    Work Profiles
+    <ol class="breadcrumb page-title-breadcrumb">
+        <li class="active">Work Profiles
+        <li class="quick-component-create">
+                    <span class="new-form-call" data-component="profile">
+                        <i class="fa fa-plus-circle"></i>
+                        <span class="icon_text">New Profile</span>
+                    </span>
+        </li>
+        </li>
+    </ol>
 {% endblock page_tile %}
 
 {% block content %}

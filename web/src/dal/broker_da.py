@@ -94,7 +94,7 @@ class BrokerDA:
         component_dict = self.param_dict.get("component_dict", dict())
         message_dict = self.param_dict.get("message_dict", dict())
 
-        self.context["form"] = htags.generate_copo_form(self.component, target_id, component_dict, message_dict)
+        self.context["form"] = htags.generate_copo_form(self.component, target_id, component_dict, message_dict, self.profile_id)
         self.context["form"]["visualize"] = self.param_dict.get("visualize")
         return self.context
 
@@ -179,6 +179,12 @@ class BrokerVisuals:
 
         self.context = self.get_sources_json()
         self.context["last_record_id"] = str(record_object.get("_id", str()))
+        return self.context
+
+    def get_sources_json_component(self):
+        self.context["option_values"] = d_utils.generate_sources_json()
+        self.context["component_records"] = htags.generate_component_records(self.component, self.profile_id)
+
         return self.context
 
     def get_last_record(self):

@@ -711,16 +711,17 @@ function refresh_multisearch() {
 
 //set up tool tips; a medium for transmitting info about form elements
 function setup_formelement_hint(switchElem, inputElements) {
-    $('.popover').popover('destroy');
+    // $('.popover').popover('destroy');
 
     inputElements.focus(function () {
         var elem = $(this).closest(".copo-form-group");
+        var state = true;
         if (elem.length) {
             try {
-                var state = switchElem.bootstrapSwitch('state');
+                state = switchElem.bootstrapSwitch('state');
             }
             catch (err) {
-                var state = true;
+                ;
             }
 
             if (state) {
@@ -745,7 +746,7 @@ function setup_formelement_hint(switchElem, inputElements) {
                 pop.popover('show');
             } else {
                 elem.popover('destroy');
-                $('.popover').popover('destroy');
+                // $('.popover').popover('destroy');
             }
         }
 

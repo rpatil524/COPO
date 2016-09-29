@@ -2,7 +2,6 @@ from django.conf.urls import patterns, url
 from . import views
 from web.apps.web_copo.utils import ajax_handlers
 
-
 urlpatterns = patterns('web.apps.web_copo.views',
                        url(r'^$', 'index', name='index'),
                        url(r'^test_submission', 'test_submission', name='test_submission'),
@@ -36,4 +35,3 @@ urlpatterns = patterns('web.apps.web_copo.views',
                        url(r'^authenticate_figshare/$', 'authenticate_figshare', name='authenticate_figshare'),
 
                        )
-

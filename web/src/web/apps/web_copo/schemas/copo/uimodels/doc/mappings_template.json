@@ -21,7 +21,9 @@
       "deprecated": "This is a boolean, true or false, entry that is used to flag a control to be or not in use. That is, if true, the control will not be rendered anymore throughout the host application.",
       "label": "The 'label' provides a UI title for a rendered control",
       "help_tip": "Used to provide UI help tip for this property or control",
-      "default_value": "Provides a default value the this property or control"
+      "default_value": "Provides a default value the this property or control",
+      "unique": "A boolean true enforces the UI control to be validated as unique within the context of a profile",
+      "email": "A boolean true enforces the UI control to be validated as an email"
     }
   ]
 }

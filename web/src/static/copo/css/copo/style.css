@@ -742,10 +742,19 @@ div.pad-it {
     margin-right: 10px;
 }
 
-.zip-image h4{
+.zip-image h4 {
     margin-right: 150px
 }
 
-th{
-     background-color: #3d3f46;
+th {
+    background-color: #3d3f46;
+}
+
+.quick-component-create {
+    margin-left: 10px;
+    color: #000;
+    font-size: 12px;
+    cursor: pointer;
+    cursor: hand;
+
 }

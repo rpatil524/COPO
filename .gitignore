@@ -99,3 +99,12 @@ ENV/
 # add ignore for chunked_uploads
 web/src/chunked_uploads/
 media/chunked_uploads/
+/managedependencies.py
+/postgres/
+/nginx/
+/mongo/
+/media/
+/production.yml
+/docker-compose.yml
+/README.md
+/web/Dockerfile

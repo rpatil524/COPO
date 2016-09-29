@@ -34,8 +34,8 @@ mongo:
   image: mongo:latest
   ports:
     - "27017:27017"
-  volumes:
-    - ./mongo/mongodata:/data/db
+  # volumes:
+  #   - ./mongo/mongodata:/data/db
 
 
 redis:
@@ -54,6 +54,6 @@ postgres:
   ports:
     - "5432:5432"
   env_file: .env
-  volumes:
-    - ./postgres/pgdata:/var/lib/postgresql/data
+  # volumes:
+  #   - ./postgres/postgresdata:/var/lib/postgresql/data
 

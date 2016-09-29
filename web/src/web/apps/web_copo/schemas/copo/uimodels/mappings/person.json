@@ -56,6 +56,7 @@
       "required": "false",
       "ref": "Investigation Person Email",
       "hidden": "false",
+      "email": true,
       "deprecated": false,
       "default_value": "",
       "show_in_form": true,

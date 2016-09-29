@@ -157,7 +157,8 @@ def get_samples_json():
 
 def generate_sources_json():
     from dal.copo_da import Source
-    sources = Source().get_all_records()
+    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    sources = Source(profile_id).get_all_records()
     schema = Source().get_schema().get("schema_dict")
 
     value_field = str("id")
