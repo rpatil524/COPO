@@ -30,7 +30,6 @@ class CopoChunkedUploadCompleteView(ChunkedUploadCompleteView):
 
     do_md5_check = False
 
-
     def get_response_data(self, chunked_upload, request):
         """
         Data for the response. Should return a dictionary-like object.
@@ -49,10 +48,10 @@ class CopoChunkedUploadCompleteView(ChunkedUploadCompleteView):
         str = jsonpickle.encode(files)
         return files
 
+
 class CopoChunkedUploadView(ChunkedUploadView):
 
     '''
-
     '''
 
 class JSONResponse(HttpResponse):

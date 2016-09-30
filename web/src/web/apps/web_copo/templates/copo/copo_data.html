@@ -13,14 +13,14 @@
     <!-- blueimp Gallery styles -->
     <link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
     <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
-    <link rel="stylesheet" href="{% static 'copo/css/uploader/jquery.fileupload.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/css/uploader/jquery.fileupload-ui.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/jQuery-File-Upload-master/css/jquery.fileupload.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/jQuery-File-Upload-master/css/jquery.fileupload-ui.css' %}">
     <!-- CSS adjustments for browsers with JavaScript disabled -->
     <noscript>
-        <link rel="stylesheet" href="{% static 'copo/css/uploader/jquery.fileupload-noscript.css' %}">
+        <link rel="stylesheet" href="{% static 'copo/jQuery-File-Upload-master/css/jquery.fileupload-noscript.css' %}">
     </noscript>
     <noscript>
-        <link rel="stylesheet" href="{% static 'copo/css/jquery.fileupload-ui-noscript.css' %}">
+        <link rel="stylesheet" href="{% static 'copo/jQuery-File-Upload-master/css/jquery.fileupload-ui-noscript.css' %}">
     </noscript>
 
 {% endblock %}
@@ -39,8 +39,7 @@
         <input type="hidden" id="figshare_check_creds_url" value="{% url 'rest:check_figshare_credentials' %}"/>
         <input type="hidden" id="zipping_image" value="{% static 'copo/img/pacman.gif' %}"/>
         <input type="hidden" id="hashing_image" value="{% static 'copo/img/pacman.gif' %}"/>
-        <input type="hidden" value="{% url 'copo:copo_submissions' profile_id=profile_id %}" name="submission_url"
-               id="submission_url"/>
+        <input type="hidden" value="{% url 'copo:copo_submissions' profile_id=profile_id %}" name="submission_url" id="submission_url"/>
     </div>
 {% endblock browse_header_block %}
 
@@ -226,14 +225,14 @@
     <script src="{% static 'copo/js/copo_data.js' %}"></script>
     <script src="{% static 'copo/js/jquery.form.js' %}"></script>
     <script src="{% static 'copo/js/bootstrapValidator.js' %}"></script>
-    <script src="{% static 'copo/js/uploader/vendor/jquery.ui.widget.js' %}"></script>
-    <script src="{% static 'copo/js/uploader/jquery.iframe-transport.js' %}"></script>
-    <script src="{% static 'copo/js/uploader/jquery.fileupload.js' %}"></script>
-    <script src="{% static 'copo/js/uploader/jquery.fileupload-process.js' %}"></script>
-    <script src="{% static 'copo/js/uploader/jquery.fileupload-ui.js' %}"></script>
-    <script src="{% static 'copo/js/uploader/ena_upload_wrapper.js' %}"></script>
-    <script src="{% static 'copo/js/uploader/bootstrap_panel.js' %}"></script>
-    <script src="{% static 'copo/js/uploader/upload_util.js' %}"></script>
+    <script src="{% static 'copo/jQuery-File-Upload-master/js/vendor/jquery.ui.widget.js' %}"></script>
+    <script src="{% static 'copo/jQuery-File-Upload-master/js/jquery.iframe-transport.js' %}"></script>
+    <script src="{% static 'copo/jQuery-File-Upload-master/js/jquery.fileupload.js' %}"></script>
+    <script src="{% static 'copo/jQuery-File-Upload-master/js/jquery.fileupload-process.js' %}"></script>
+    <script src="{% static 'copo/jQuery-File-Upload-master/js/jquery.fileupload-ui.js' %}"></script>
+    <script src="{% static 'copo/js/uploader_old/ena_upload_wrapper.js' %}"></script>
+    <script src="{% static 'copo/js/uploader_old/bootstrap_panel.js' %}"></script>
+    <script src="{% static 'copo/js/uploader_old/upload_util.js' %}"></script>
     <script src="{% static 'copo/js/progressbar.js' %}"></script>
 
 {% endblock %}
