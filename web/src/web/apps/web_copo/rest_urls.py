@@ -24,5 +24,7 @@ urlpatterns = [
     url(r'^forward_to_figshare/', wizard.forward_to_figshare, name='forward_to_figshare'),
     url(r'^get_upload_information/', ajax.get_upload_information, name='get_upload_information'),
     url(r'^submit_to_repo/', submit.delegate_submission, name='delegate_submission'),
-    url(r'^test_submission', views.test_submission, name='test_ena_submission'),
+    url(r'^test_submission/', views.test_submission, name='test_ena_submission'),
+    url(r'^resume_chunked/', rest.resume_chunked, name='resume_chunked'),
+    url(r'^get_partial_uploads/', rest.get_partial_uploads, name='get_partial_uploads'),
 ]

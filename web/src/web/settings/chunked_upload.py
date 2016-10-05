@@ -18,10 +18,10 @@ CHUNKED_UPLOAD_ABSTRACT_MODEL = False
 CHUNKED_UPLOAD_MIMETYPE = 'text'
 
 # How long after creation the upload will expire
-DEFAULT_EXPIRATION_DELTA = timedelta(days=1)
+DEFAULT_EXPIRATION_DELTA = timedelta(days=7)
 EXPIRATION_DELTA = getattr(settings, 'CHUNKED_UPLOAD_EXPIRATION_DELTA',
                            DEFAULT_EXPIRATION_DELTA)
-
+CHUNKED_UPLOAD_EXPIRATION_DELTA = timedelta(days=7)
 # Path where uploading files will be stored until completion
 DEFAULT_UPLOAD_PATH = os.path.join(settings.MEDIA_ROOT,'chunked_uploads/%Y/%m/%d')
 UPLOAD_PATH = getattr(settings, 'CHUNKED_UPLOAD_PATH', DEFAULT_UPLOAD_PATH)

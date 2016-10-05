@@ -2,7 +2,8 @@
 //jquery file upload plugin. If the file is larger than chunk_threshold, it should be chunked
 var upload_size = 0;
 var chunk_size = 0;
-var chunk_threshold = 200000000; // size of chunks in bytes
+//var chunk_threshold = 200000000; // size of chunks in bytes
+var chunk_threshold = 10000000;
 
 function get_chunk_size(event) {
     upload_size = event.currentTarget.files[0].size;
@@ -48,6 +49,24 @@ $(document).ready(function () {
         $('#file_type_guess').animate({opacity: "0"}, "fast")
     });
 
+
+    $('body').on('click', '.file_info', function(data){
+        resume_upload()
+    })
+
+    // get partial uploads
+    /*
+    $.getJSON('/rest/get_partial_uploads/', function(result){
+        result = JSON.parse(result)
+        for(var k = 0; k < result.length; k++){
+            f = result[k].fields
+            html = make_upload_div(f.filename)
+            var insert_node = $('.file_status_label')
+            $(html).appendTo(insert_node);
+        }
+    })
+    */
+
     $(function () {
         'use strict';
         //file upload plugin
@@ -62,8 +81,19 @@ $(document).ready(function () {
                 maxChunkSize: chunk_size,
                 singleFileUploads: true,
                 sequentialUploads: true,
-                fail: function (e, data) {
-                    alert('FAIL!!!')
+                maxRetries: 100,
+                retryTimeout: 500,
+                fail: function(e, data){
+                    BootstrapDialog.show({
+                        title: 'Something Went Wrong',
+                        message: 'For some reason this upload failed. Please try again. If you are using a laptop, make sure you leave the lid open and adjust your settings to prevent hibernation. If this problem persists please contact the administrator.',
+                        buttons: [{
+                            label: 'Close',
+                            action: function (dialog) {
+                                dialog.close();
+                            }
+                        }]
+                    });
                 },
                 done: function (e, data) {
                     var final = data.result.upload_id;
@@ -78,28 +108,41 @@ $(document).ready(function () {
                 },
                 add: function (e, data) {
                     for (var k = 0; k < data.files.length; k++) {
-                        var insert_node = $(this).parents().eq(2).find('.file_status_label');
-                        var size = parseFloat(data.files[k].size);
-                        size = size / 1000000.0;
-                        size = size.toFixed(2) + ' MB';
-                        var file_name = data.files[k].name.substr(0, data.files[k].name.indexOf('.'));
-                        $('#upload_files_button').attr('disabled', 'disabled');
-                        $('<div/>').addClass('alert alert-warning file_info').attr('id', 'id_' + file_name).html("<strong>" + file_name + "</strong>").appendTo(insert_node);
+                        // for each file selected in the file picker
+                        //check if it has an existing unfinished entry in the backend
+                        var that = this;
+                        var d_file = data.files[k];
+                        $.ajax({
+                            url: '/rest/resume_chunked/',
+                            data: {'filename':d_file.name},
+                            type:'GET',
+                            contentType: false,
+                            dataType: 'json'
+                        }).done(function (result) {
 
-                        var html = '<div id="progress_info_' + file_name + '" class="progress_info">' +
-                            '<input type="hidden" id="upload_id_' + file_name + '" value="" />' +
-                            '<span id="progress_label"></span>' +
-                            '<span id="total_label"> of ' + size + '</span>' +
-                            '<span id="bitrate"></span>' +
-                            '</div>' +
-                            '<div id="progress_' + file_name + '" class="progress">' +
-                            '<div style="width: 0%;height: 20px;background: green" class="bar"></div>' +
-                            '<div class="progress-bar progress-bar-success"></div>' +
-                            '</div>';
+                            var insert_node = $('.file_status_label');
+                            var size = parseFloat(d_file.size);
+                            size = size / 1000000.0;
+                            size = size.toFixed(2) + ' MB';
+                            var file_name = d_file.name.substr(0, d_file.name.indexOf('.'));
+                            $('#upload_files_button').attr('disabled', 'disabled');
+                            var upload_div = make_upload_div(file_name)
+                            $(upload_div).appendTo(insert_node)
 
-                        $(html).appendTo(insert_node);
+                            var html = make_progress_bar(file_name, size)
+
+                            $(html).appendTo(insert_node);
+                            if (result != '') {
+                                // for existing files, set current offset and upload id to continue upload
+                                var file = JSON.parse(result)[0].fields
+                                data.uploadedBytes = parseInt(file && file.offset);
+                                data.formData = {'upload_id': file.upload_id}
+                            }
+                            $.blueimp.fileupload.prototype.options.add.call(that, e, data);
+                            data.data = null;
+                            data.submit();
+                        })
                     }
-                    data.submit();
                 },
                 progress: function (e, data) {
                     //get name of the file for which the progress update is for
@@ -124,17 +167,14 @@ $(document).ready(function () {
                 var file_name = data.files[0].name.substr(0, data.files[0].name.indexOf('.'));
                 //console.log(data)
                 $(this).find('input[name=upload_id]').val(data.result.upload_id);
-                console.log($(this).fileupload('active'))
-
             }).bind('fileuploadchange', function (e, data) {
-
-
             })
         })
-    });
+    })
+    ;
 
 
-    //function called to finalised chunked upload
+//function called to finalised chunked upload
     function finalise_upload(e, data, final, tform) {
         //serialise form
         form = $(tform).serializeFormJSON();
@@ -166,7 +206,7 @@ $(document).ready(function () {
 
     }
 
-    //update the html based on the results of the upload process
+//update the html based on the results of the upload process
     function update_html(data, tform) {
         var x;
         if (chunk_size > 0) {
@@ -258,7 +298,8 @@ $(document).ready(function () {
         })
     }
 
-});
+})
+;
 
 function get_hash(id, tform) {
     $("input[value='" + id + "']").parent().next().children('.hash-image').show();
@@ -278,5 +319,35 @@ function get_hash(id, tform) {
         $("input[value='" + id + "']").parent().next().children('.hash-image').hide();
 
     });
+
+}
+
+function make_progress_bar(file_name, size){
+    html = '<div id="progress_info_' + file_name + '" class="progress_info">' +
+    '<input type="hidden" id="upload_id_' + file_name + '" value="" />' +
+    '<span id="progress_label"></span>' +
+    '<span id="total_label"> of ' + size + '</span>' +
+    '<span id="bitrate"></span>' +
+    '</div>' +
+    '<div id="progress_' + file_name + '" class="progress">' +
+    '<div style="width: 0%;height: 20px;background: green" class="bar"></div>' +
+    '<div class="progress-bar progress-bar-success"></div>' +
+    '</div>';
+    return html
+}
+
+function make_upload_div(file_name){
+    //check if div with same name already exists
+    $('.file_info').each(function(index, value){
+        if($(value).text() == file_name){
+            $(this).remove()
+            $('#progress_info_' + $(value).text()).remove()
+            $('#progress_' + $(value).text()).remove()
+        }
+    })
+    return $('<div/>').addClass('alert alert-warning file_info').attr('id', 'id_' + file_name).html("<strong>" + file_name + "</strong><i class='fa fa-upload pull-right' aria-hidden='true'></i>")
+}
+
+function resume_upload(e, data){
 
 }

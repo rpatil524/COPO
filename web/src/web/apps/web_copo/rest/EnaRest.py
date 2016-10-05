@@ -14,13 +14,15 @@ from bson.json_util import dumps
 from chunked_upload.models import ChunkedUpload
 import web.apps.web_copo.utils.EnaUtils as u
 from dal.copo_base_da import Collection_Head
-from dal.mongo_util import cursor_to_list
+from dal.mongo_util import cursor_to_list, to_django_context
+from django.core import serializers
 from dal import EnaCollection
 from dal.copo_da import DataFile
 from dal.broker_da import BrokerDA, BrokerVisuals
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from chunked_upload.views import ChunkedUploadCompleteView
 from chunked_upload.views import ChunkedUploadView
+
 
 
 
@@ -107,6 +109,28 @@ def receive_data_file(request):
 
         str = jsonpickle.encode(files)
     return HttpResponse(str, content_type='json')
+
+
+def resume_chunked(request):
+    file_name = request.GET.get('filename')
+    user_id = request.user.id
+    # retrieve incomplete file for user with this name
+    d = ChunkedUpload.objects.filter(completed_on__isnull=True, user_id=user_id, filename=file_name).order_by('-offset')[:1]
+    if d:
+        out = serializers.serialize('json', d)
+        return HttpResponse(jsonpickle.encode(out))
+    else:
+        return HttpResponse(jsonpickle.encode(''))
+
+
+def get_partial_uploads(request):
+    user_id = request.user.id
+    d = ChunkedUpload.objects.filter(completed_on__isnull=True, user_id=user_id).order_by('created_on')
+    if d:
+        out = serializers.serialize('json', d)
+        return HttpResponse(jsonpickle.encode(out))
+    else:
+        return HttpResponse(jsonpickle.encode(''))
 
 
 def hash_upload(request):
