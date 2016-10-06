@@ -1333,8 +1333,7 @@ function get_multi_search_span(formElem, ctrlsDiv) {
 
     var hiddenValuesCtrl = $('<input/>',
         {
-            type: "text",
-            style: "display: none;",
+            type: "hidden",
             id: formElem.id,
             name: formElem.id,
             class: "copo-multi-values",
