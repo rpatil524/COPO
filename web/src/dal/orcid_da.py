@@ -13,14 +13,14 @@ class Orcid(Resource):
 
     def store_orcid_profile(self, profile_data, user):
 
-        user_id = user.id
-        social_account = SocialAccount.objects.get(user_id=user_id)
+
+        social_account = SocialAccount.objects.get(user_id=user)
         profile_data = social_account.extra_data
         profile_data = json.dumps(profile_data).replace('-', '_')
 
-        orcid_dict = {'user': user_id, 'op': json.loads(profile_data)}
+        orcid_dict = {'user': user, 'op': json.loads(profile_data)}
 
-        ORCID.update({'user': user_id},
+        ORCID.update({'user': user},
                      orcid_dict,
                      True)
 

@@ -124,7 +124,7 @@
 
         AutoComplete({
             post: do_post
-        })
+        });
 
 
         function do_post(result, response, custParams) {
@@ -250,6 +250,8 @@
                                             <span class="icon_text">Logout</span>
                                         </div>
                                     </a>
+                                <li role="presentation"><a role="menuitem" tabindex="-1"
+                                                           href="/copo/logout/">Logout</a>
                                 </li>
                             {% else %}
                                 <li>
@@ -287,7 +289,7 @@
 
                 <div class="global-page-title">
                     {% block page_tile %}
-                        Page Title Goes Here
+
                     {% endblock page_tile %}
 
                 </div>

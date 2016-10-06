@@ -2,15 +2,15 @@
  * felix.shaw@tgac.ac.uk - 27/10/15.
  */
 $(document).ready(function () {
-    apply_color()
+    apply_color();
 
     $('body').on('change', apply_color())
 
-})
+});
 
 
 function apply_color(){
-    var loc = window.location.href
+    var loc = window.location.href;
     if (loc.indexOf("publication") > -1) {
         // act on publications page
         $('header').addClass('pubs_color')

@@ -33,15 +33,15 @@ $(document).ready(function(){
             if(field_type == 'text'){
                 if(meta == 'many'){
                     //append a label
-                    theForm.append("<br/><label for='" + field_name + "'>" + field_name + "</label>")
+                    theForm.append("<br/><label for='" + field_name + "'>" + field_name + "</label>");
                     //append the control
-                    theForm.append("<input type='text' class='form-control' name=" + field_name + "></input>")
-                    theForm.append("<button type='button' class='btn btn-info btn-xs add_many_button'>add another</button>")
+                    theForm.append("<input type='text' class='form-control' name=" + field_name + "></input>");
+                    theForm.append("<button type='button' class='btn btn-info btn-xs add_many_button'>add another</button>");
                     theForm.append("<hr/>")
                 }
                 else if(meta == 'one'){
                     //append a label
-                    theForm.append("<br/><label for='" + field_name + "'>" + field_name + "</label>")
+                    theForm.append("<br/><label for='" + field_name + "'>" + field_name + "</label>");
                     //append the control
                     theForm.append("<input type='text' class='form-control' name=" + field_name + "></input>")
                 }

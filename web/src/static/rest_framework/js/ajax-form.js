@@ -9,7 +9,7 @@ function doAjaxSubmit(e) {
     var form = $(this);
     var btn = $(this.clk);
     var method = btn.data('method') || form.data('method') || form.attr('method') || 'GET';
-    method = method.toUpperCase()
+    method = method.toUpperCase();
     if (method === 'GET') {
         // GET requests can always use standard form submits.
         return;
@@ -32,7 +32,7 @@ function doAjaxSubmit(e) {
     if (contentType) {
         data = form.find('[data-override="content"]').val() || ''
     } else {
-        contentType = form.attr('enctype') || form.attr('encoding')
+        contentType = form.attr('enctype') || form.attr('encoding');
         if (contentType === 'multipart/form-data') {
             if (!window.FormData) {
                 alert('Your browser does not support AJAX multipart form submissions');
@@ -44,7 +44,7 @@ function doAjaxSubmit(e) {
             contentType = false;
             data = new FormData(form[0]);
         } else {
-            contentType = 'application/x-www-form-urlencoded; charset=UTF-8'
+            contentType = 'application/x-www-form-urlencoded; charset=UTF-8';
             data = form.serialize();
         }
     }
@@ -89,7 +89,7 @@ function captureSubmittingElement(e) {
 
 
 $.fn.ajaxForm = function() {
-    var options = {}
+    var options = {};
     return this
         .unbind('submit.form-plugin  click.form-plugin')
         .bind('submit.form-plugin', options, doAjaxSubmit)

@@ -1,6 +1,6 @@
 AutoComplete({
     post: do_post
-})
+});
 
 
 function do_post(result, response, custParams) {

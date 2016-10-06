@@ -138,7 +138,7 @@ setInterval('ss.scrollWindow('+ss_stepsize+','+desty+',"'+anchor+'")',10);
       alert("Handler could not be removed");
     }
   } 
-}
+};
 
 ss.STEPS = 25;
 

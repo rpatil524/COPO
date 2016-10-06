@@ -232,7 +232,7 @@ var dispatchComponentDelete = {
 
 function do_component_delete_confirmation(targetName, ids) {
     var targetComponentBody = "Please confirm delete action for the selected records.";
-    var targetComponentTitle = "Delete Alert!"
+    var targetComponentTitle = "Delete Alert!";
 
 
     var doTidyClose = {
@@ -252,7 +252,6 @@ function do_component_delete_confirmation(targetName, ids) {
         closable: true,
         animate: true,
         onhide: function () {
-            ;
         },
         buttons: [
             {
@@ -535,7 +534,6 @@ function do_render_table(data) {
                         $('<i class="' + bTns[value].iconClass + '">&nbsp;</i>').prependTo($(this));
                     }
                     catch (err) {
-                        ;
                     }
 
                 });
@@ -760,21 +758,21 @@ var auto_complete = function () {
         post: do_post,
         select: do_select,
         autoFocus: true
-    })
+    });
 
     function do_select(input, item) {
         // console.log(window.event)
-        item = $(item).closest('li')
-        $(input).val($(item).data('annotation_value'))
-        $(input).siblings("[id*='termSource']").val($(item).data('term_source'))
-        $(input).siblings("[id*='termAccession']").val($(item).data('term_accession'))
+        item = $(item).closest('li');
+        $(input).val($(item).data('annotation_value'));
+        $(input).siblings("[id*='termSource']").val($(item).data('term_source'));
+        $(input).siblings("[id*='termAccession']").val($(item).data('term_accession'));
 
         return false;
     }
 
     function do_post(result, response, custParams) {
         response = JSON.parse(response);
-        console.log("num_found " + response.response.numFound)
+        console.log("num_found " + response.response.numFound);
         var properties = Object.getOwnPropertyNames(response);
         //Try parse like JSON data
 
@@ -791,19 +789,19 @@ var auto_complete = function () {
 
         for (var item in response.response.docs) {
 
-            doc = response.response.docs[item]
+            doc = response.response.docs[item];
 
 
             try {
                 //
                 //console.log(response.highlighting[doc.id])
                 //console.log(doc)
-                var s
-                s = response.highlighting[doc.id].label
+                var s;
+                s = response.highlighting[doc.id].label;
                 if (s == undefined) {
                     s = response.highlighting[doc.id].synonym
                 }
-                var desc
+                var desc;
                 if (doc.ontology_prefix == undefined) {
                     desc = "Origin Unknown"
                 }
@@ -813,20 +811,20 @@ var auto_complete = function () {
                 li.innerHTML = '<span class="label label-info"><span title="' + desc + '" style="color:white; padding-top:3px; padding-bottom:3px"><img style="height:15px; margin-right:10px" src="/static/copo/img/ontology.png"/>' + doc.ontology_prefix + ':' + doc.label + ' ' + '</span>' + ' - ' + '<span style="color:#fcff5e">' + doc.obo_id + '</span></span>';
 
 
-                $(li).attr('data-id', doc.id)
+                $(li).attr('data-id', doc.id);
                 var styles = {
                     margin: "2px",
                     marginTop: '4px',
                     fontSize: "large",
 
                 };
-                $(li).css(styles)
-                $(li).attr('data-term_accession', doc.iri)
-                $(li).attr('data-annotation_value', doc.label)
-                var s = doc.obo_id
-                s = s.split(':')[0]
+                $(li).css(styles);
+                $(li).attr('data-term_accession', doc.iri);
+                $(li).attr('data-annotation_value', doc.label);
+                var s = doc.obo_id;
+                s = s.split(':')[0];
 
-                $(li).attr('data-term_source', s)
+                $(li).attr('data-term_source', s);
                 //$(li).attr("data-autocomplete-value", response.highlighting[item].label_autosuggest[0].replace('<b>', '').replace('</b>', '') + ' - ' + item);
 
                 //console.log($(li).data('label'))
@@ -835,7 +833,7 @@ var auto_complete = function () {
                 li = domCreate("li");
             }
             catch (err) {
-                console.log(err)
+                console.log(err);
                 li = domCreate("li");
             }
         }
@@ -899,7 +897,7 @@ function get_data_list_panel(itemData, link) {
             event.preventDefault();
             return false;
         }
-    })
+    });
 
 
     if (Object.prototype.toString.call(itemData) === '[object Array]') {
@@ -959,7 +957,6 @@ function get_data_list_panel(itemData, link) {
                 listGroupPanel.append(ctrlElemDiv);
 
             } else if (Object.prototype.toString.call(val) === '[object Object]') {
-                ;
             }
         });
 
@@ -974,9 +971,9 @@ function get_data_list_panel(itemData, link) {
     }
 
 
-    containerColumn.append(mainMenuDiv.append(listGroupPanel))
-    containerRow.append(containerColumn)
-    containerFuild.append(containerRow)
+    containerColumn.append(mainMenuDiv.append(listGroupPanel));
+    containerRow.append(containerColumn);
+    containerFuild.append(containerRow);
 
 
     return $('<div/>').append(containerFuild).html();

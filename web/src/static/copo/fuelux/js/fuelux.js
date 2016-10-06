@@ -3563,7 +3563,7 @@
 			 * `disclusuresUpperLimit` defaults to `0`, so by default this trigger
 			 * will never fire. The true hard the upper limit is the browser's
 			 * ability to load new items (i.e. it will keep loading until the browser
-			 * falls over and dies). On the Fuel UX `index.html` page, the point at
+			 * falls over and dies). On the Fuel UX `landing_page.html` page, the point at
 			 * which the page became super slow (enough to seem almost unresponsive)
 			 * was `4`, meaning 256 folders had been opened, and 1024 were attempting to open.
 			 */
@@ -3835,7 +3835,7 @@
 				var index = this.$element.find( '.steps li' ).index( li );
 
 				if ( index < this.currentStep && this.options.disablePreviousStep ) { //enforce restrictions
-					return;
+
 				} else {
 					var evt = $.Event( 'stepclicked.fu.wizard' );
 					this.$element.trigger( evt, {

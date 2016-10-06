@@ -34,7 +34,7 @@ $(document).ready(function () {
                 enablePagination: false
             });
 
-            $('.experiment-describe').on('click', check_file_status)
+            $('.experiment-describe').on('click', check_file_status);
 
             //handle event for date picker
             $('.pop_date_picker').datepick({
@@ -133,7 +133,6 @@ $(document).ready(function () {
                 try {
                     $(this).find('form')[0].reset();
                 } catch (err) {
-                    ;
                 }
 
                 if (this.id == "studyComponentsDeleteModal") {
@@ -146,11 +145,11 @@ $(document).ready(function () {
 
         function check_file_status(file_id) {
 
-            var study_id = $('#study_id').val()
-            var file_id = $(this).attr('target-id')
-            var ena_collection_id = $('#ena_collection_id').val()
+            var study_id = $('#study_id').val();
+            var file_id = $(this).attr('target-id');
+            var ena_collection_id = $('#ena_collection_id').val();
 
-            var url = $('#file_status_check_url').val()
+            var url = $('#file_status_check_url').val();
 
             try {
                 total_steps = $('#wizard').data('num_steps')
@@ -159,13 +158,13 @@ $(document).ready(function () {
                 total_steps = 0
             }
 
-            var steps = $('#wizard').find('section').length
+            var steps = $('#wizard').find('section').length;
             for (var i = 0; i < steps; i++) {
-                console.log('removing: ' + i)
+                console.log('removing: ' + i);
                 $('#wizard').steps('remove', i)
             }
 
-            $('#wizard_file_id').val($(this).attr('target-id'))
+            $('#wizard_file_id').val($(this).attr('target-id'));
 
             $.ajax({
                 url: url,
@@ -209,7 +208,7 @@ $(document).ready(function () {
                     $("input[name='study_samples_assign_chk']").each(function () {
                         if (!this.checked) {
                             checkedr = false;
-                            return;
+
                         }
                     });
 
@@ -226,7 +225,7 @@ $(document).ready(function () {
             var samples = [];
 
             value.forEach(function (item) {
-                var item = item.split(",")
+                var item = item.split(",");
                 dataFileId = item[0];
                 samples.push(item[1]);
             });
@@ -253,7 +252,6 @@ $(document).ready(function () {
                     'data_file_id': dataFileId
                 },
                 success: function (data) {
-                    ;
                 },
                 error: function () {
                     alert("Couldn't attach Samples to File!");
@@ -361,7 +359,7 @@ $(document).ready(function () {
                     }
                 });
             }
-        }
+        };
 
 
         function do_component_delete_confirmation(event) {
@@ -384,7 +382,7 @@ $(document).ready(function () {
                     elemRow.removeClass("row-delete-higlight");
                     dialogRef.close();
                 }
-            }
+            };
 
             var code = BootstrapDialog.show({
                 type: BootstrapDialog.TYPE_DANGER,
@@ -825,4 +823,4 @@ $(document).ready(function () {
 
 
     }
-)
+);

@@ -1575,7 +1575,7 @@
 	
 			if ((self.isFull() || self.isInputHidden) && !(IS_MAC ? e.metaKey : e.ctrlKey)) {
 				e.preventDefault();
-				return;
+
 			}
 		},
 	

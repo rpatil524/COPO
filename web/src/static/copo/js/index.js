@@ -142,7 +142,6 @@ $(document).ready(function () {
                     {
                         label: 'Cancel',
                         action: function (dialogRef) {
-                            ;
                             dialogRef.close();
                         }
                     },

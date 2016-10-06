@@ -3,7 +3,7 @@ __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 from datetime import datetime
 from django_tools.middlewares import ThreadLocal
 from bson import ObjectId
-from web.apps.chunked_upload.models import ChunkedUpload
+from chunked_upload.models import ChunkedUpload
 from web.apps.web_copo.lookup.lookup import DB_TEMPLATES
 import web.apps.web_copo.utils.EnaUtils as u
 from dal import cursor_to_list

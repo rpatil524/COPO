@@ -46,7 +46,7 @@ class CopoViewsTestCase(TestCase):
         self.assertNotEqual(p['copo_id'], '0000000000000',
                             'COPO ID not produced, are you able to ping the ID issuing server?')
         self.assertEqual(response.status_code, 200, 'Page not rendered correctly.')
-        self.assertTemplateUsed(response, 'copo/index.html',
+        self.assertTemplateUsed(response, 'copo/landing_page.html',
                                 'Correct Template not used, should have returned to index page.')
 
     def publications_tests(self):

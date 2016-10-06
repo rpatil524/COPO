@@ -3,10 +3,10 @@ var currentIndx = 0;
 var descriptionBundle = [];
 var descriptionToken = null;
 var tableID = null; //rendered table handle
-var stage_objects = new Object(); //retains info about rendered stages
+var stage_objects = {}; //retains info about rendered stages
 var stepIntercept = false; //flag indicates if activation of the last stage of the wizard has been intercepted
 var silenceAlert = false; //use to temporary suppress stage alerts
-var descriptionWizSummary = new Object(); //wizard summary stage content
+var descriptionWizSummary = {}; //wizard summary stage content
 
 $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
@@ -30,22 +30,22 @@ $(document).ready(function () {
     $('#dataFileWizard').on('keypress', function (event, data) {
 
         if (event.keyCode == 13) {
-            event.preventDefault()
+            event.preventDefault();
             //here do the stage advance call
         }
         else if (event.keyCode == 39) {
-            var d = {'step': $('#dataFileWizard').data('fu.wizard').currentStep, 'direction': 'next'}
+            var d = {'step': $('#dataFileWizard').data('fu.wizard').currentStep, 'direction': 'next'};
             //d.step = $('#dataFileWizard').data('fu.wizard').currentStep
             //d.direction = 'next'
             $('#dataFileWizard').trigger('actionclicked.fu.wizard', d)
         }
         else if (event.keyCode == 37) {
-            var d = {'step': $('#dataFileWizard').data('fu.wizard').currentStep, 'direction': 'previous'}
+            var d = {'step': $('#dataFileWizard').data('fu.wizard').currentStep, 'direction': 'previous'};
             //d.step = $('#dataFileWizard').data('fu.wizard').currentStep
             //d.direction = 'next'
             $('#dataFileWizard').trigger('actionclicked.fu.wizard', d)
         }
-    })
+    });
 
 
     // get table data to display via the DataTables API
@@ -177,11 +177,11 @@ $(document).ready(function () {
     $('body').on('addtoqueue', function (event) {
         //add item to batch
         var batchTargets = [];
-        var option = new Object();
+        var option = {};
 
         option["recordLabel"] = event.recordLabel;
         option["recordID"] = event.recordID;
-        option["attributes"] = new Object();
+        option["attributes"] = {};
 
         batchTargets.push(option);
         //add_to_batch(batchTargets, true); suspending this, as it becomes problematic for bundle validation
@@ -363,7 +363,7 @@ $(document).ready(function () {
 
     //handle events for step change
     $('#dataFileWizard').on('actionclicked.fu.wizard', function (evt, data) {
-        $(self).data('step', data.step)
+        $(self).data('step', data.step);
         stage_navigate(evt, data);
     });
 
@@ -397,7 +397,6 @@ $(document).ready(function () {
                         {
                             label: 'Cancel',
                             action: function (dialogRef) {
-                                ;
                                 dialogRef.close();
                             }
                         },
@@ -545,7 +544,7 @@ $(document).ready(function () {
                                     if (opt.value == "overwrite") {//do overwrite, if entries change, by default
                                         checked = " checked";
                                     }
-                                    displayHTML += '<div class="radio wizard-alert-radio">'
+                                    displayHTML += '<div class="radio wizard-alert-radio">';
                                     displayHTML += '<label><input type="radio" name="metadata_bundle_items" value="' + opt.value + '"' + checked + '>' + opt.label + '</label>';
                                     displayHTML += '</div>';
                                 });
@@ -1049,11 +1048,11 @@ $(document).ready(function () {
         stageHTML += stage_content;
         stageHTML += '</form>';
         stageHTML += '<hr/>';
-        stageHTML += '<button type="button" id="apply_to_btn_' + currentIndx + '" data-stage-indx="' + currentIndx + '"  class="apply-to-selected-btn btn btn-sm btn-primary">Apply to selected items in bundle</button>'
+        stageHTML += '<button type="button" id="apply_to_btn_' + currentIndx + '" data-stage-indx="' + currentIndx + '"  class="apply-to-selected-btn btn btn-sm btn-primary">Apply to selected items in bundle</button>';
         stageHTML += '</div>';
 
         stageHTML += '</div>';
-        stageHTML += '</div>'
+        stageHTML += '</div>';
 
 
         //description bundle
@@ -1064,7 +1063,7 @@ $(document).ready(function () {
         stageHTML += '<thead><tr><th></th><th>File</th><th>&nbsp;</th>';
         stageHTML += '</tr> </thead></table>';
         stageHTML += '</div>';
-        stageHTML += '</div>'
+        stageHTML += '</div>';
 
         stageHTML += '</div>';
 
@@ -1544,7 +1543,7 @@ $(document).ready(function () {
                         displayedValue += "<div style='padding-left: 25px; padding-top: 3px;'>" + vv + "</div>";
                     });
                 } else if (Object.prototype.toString.call(Mdata.data) === '[object String]') {
-                    displayedValue = new String(Mdata.data);
+                    displayedValue = String(Mdata.data);
                 }
 
                 var mDataDataSpan = $('<span/>', {
@@ -1581,7 +1580,7 @@ $(document).ready(function () {
             html: descriptionHtml
         });
 
-        descriptionInfoPanel.append(descriptionInfoPanelPanelHeading).append(descriptionInfoPanelPanelBody)
+        descriptionInfoPanel.append(descriptionInfoPanelPanelHeading).append(descriptionInfoPanelPanelBody);
 
         return $('<div></div>').append(descriptionInfoPanel).html();
     }
@@ -1613,10 +1612,10 @@ $(document).ready(function () {
     }
 
     function bundle_without_data() {
-        var bundle = []
+        var bundle = [];
 
         descriptionBundle.forEach(function (item) {
-            var option = new Object();
+            var option = {};
             option["recordLabel"] = item.recordLabel;
             option["recordID"] = item.recordID;
             bundle.push(option);
@@ -1633,7 +1632,7 @@ $(document).ready(function () {
 
         var ids = [];
         var records = [];
-        var table = null
+        var table = null;
 
 
         //retrieve event targets
@@ -1664,10 +1663,10 @@ $(document).ready(function () {
             var batchTargets = [];
             for (var i = 0; i < records.length; ++i) {
                 var item = records[i];
-                var option = new Object();
+                var option = {};
                 option["recordLabel"] = item[0];
                 option["recordID"] = item[item.length - 1];
-                option["attributes"] = new Object();
+                option["attributes"] = {};
                 batchTargets.push(option);
             }
 
@@ -1746,7 +1745,7 @@ $(document).ready(function () {
                                         displayedValue += "<div style='padding-left: 25px; padding-top: 3px;'>" + vv + "</div>";
                                     });
                                 } else if (Object.prototype.toString.call(Mdata.data) === '[object String]') {
-                                    displayedValue = new String(Mdata.data);
+                                    displayedValue = String(Mdata.data);
                                 }
 
                                 var mDataDataSpan = $('<span/>', {
@@ -1814,7 +1813,7 @@ $(document).ready(function () {
                             html: descriptionHtml
                         });
 
-                        descriptionInfoPanel.append(descriptionInfoPanelPanelHeading).append(descriptionInfoPanelPanelBody)
+                        descriptionInfoPanel.append(descriptionInfoPanelPanelHeading).append(descriptionInfoPanelPanelBody);
 
                         row.child($('<div></div>').append(descriptionInfoPanel).html()).show();
                     },
@@ -1877,7 +1876,7 @@ $(document).ready(function () {
                         $('#dataFileWizard').wizard('selectedItem', {
                             step: idx + 1
                         });
-                        var elems = $('.copo-wiz-button')
+                        var elems = $('.copo-wiz-button');
                         elems.removeClass();
                         elems.addClass('btn btn-default copo-wiz-button');
                         stp.removeClass();
@@ -1920,7 +1919,7 @@ $(document).ready(function () {
         //build form elements
         for (var i = 0; i < stage.items.length; ++i) {
             var formElem = stage.items[i];
-            var control = formElem.control
+            var control = formElem.control;
 
             var elemValue = null;
 
@@ -1957,7 +1956,6 @@ $(document).ready(function () {
                     dispatchEventHandler[formElem.trigger.callback.function](formElem);
                 }
                 catch (err) {
-                    ;
                 }
             }
 
@@ -2091,7 +2089,7 @@ $(document).ready(function () {
         var datafile_ids = []; //for metadata rating
 
         descriptionBundle.forEach(function (item) {
-            var option = new Object();
+            var option = {};
             option["target"] = item.recordLabel;
             option["target_id"] = item.recordID;
             option["attributes"] = item.attributes;
@@ -2277,7 +2275,7 @@ $(document).ready(function () {
                                         displayedValue += "<div style='padding-left: 25px; padding-top: 3px;'>" + vv + "</div>";
                                     });
                                 } else if (Object.prototype.toString.call(Mdata.data) === '[object String]') {
-                                    displayedValue = new String(Mdata.data);
+                                    displayedValue = String(Mdata.data);
                                 }
 
                                 var mDataDataSpan = $('<span/>', {
@@ -2322,7 +2320,7 @@ $(document).ready(function () {
             html: descriptionHtml
         });
 
-        descriptionInfoPanel.append(descriptionInfoPanelPanelHeading).append(descriptionInfoPanelPanelBody)
+        descriptionInfoPanel.append(descriptionInfoPanelPanelHeading).append(descriptionInfoPanelPanelBody);
 
         return $('<div></div>').append(descriptionInfoPanel).html();
 
@@ -2350,7 +2348,7 @@ $(document).ready(function () {
         var dtd = [];
 
         descriptionBundle.forEach(function (item) {
-            var option = new Object();
+            var option = {};
             option["target"] = [item.recordLabel, item.recordID];
             option["target_id"] = item.recordID;
             option["attributes"] = item.attributes;

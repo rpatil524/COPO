@@ -4,8 +4,8 @@
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ProgressBar = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*! shifty - v1.5.0 - 2015-05-31 - http://jeremyckahn.github.io/shifty */
-;(function () {
-  var root = this;
+  (function () {
+    var root = this;
 
 /*!
  * Shifty Core
@@ -622,9 +622,8 @@ var Tweenable = (function () {
  *  Easing Equations (c) 2003 Robert Penner, all rights reserved.
  */
 
-;(function () {
-
-  Tweenable.shallowCopy(Tweenable.prototype.formula, {
+(function () {
+      Tweenable.shallowCopy(Tweenable.prototype.formula, {
     easeInQuad: function (pos) {
       return Math.pow(pos, 2);
     },
@@ -847,8 +846,8 @@ var Tweenable = (function () {
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-;(function () {
-  // port of webkit cubic bezier handling by http://www.netzgesta.de/dev/
+    (function () {
+      // port of webkit cubic bezier handling by http://www.netzgesta.de/dev/
   function cubicBezierAtTime(t,p1x,p1y,p2x,p2y,duration) {
     var ax = 0,bx = 0,cx = 0,ay = 0,by = 0,cy = 0;
     function sampleCurveX(t) {
@@ -985,9 +984,8 @@ var Tweenable = (function () {
 
 })();
 
-;(function () {
-
-  function getInterpolatedValues (
+(function () {
+      function getInterpolatedValues (
     from, current, targetState, position, easing, delay) {
     return Tweenable.tweenProps(
       position, current, from, targetState, 1, delay, easing);
@@ -1204,9 +1202,9 @@ var Tweenable = (function () {
 // documentation and renders it.  It is never used, and is optimized away at
 // build time.
 
-;(function (Tweenable) {
+(function (Tweenable) {
 
-  /*!
+      /*!
    * @typedef {{
    *   formatString: string
    *   chunkNames: Array.<string>

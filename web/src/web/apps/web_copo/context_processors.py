@@ -16,21 +16,3 @@ def get_status(request):
 
 def add_partial_submissions_to_context(request):
     return {'partial_submissions':'ommitted'}
-'''
-def complete_oauth(request):
-    code = request.session['figshare_oauth_code']
-    state = request.session['fighsare_oauth_state']
-    data = {
-        'client_id'
-    }
-    r = requests.post('https://api.figshare.com/v2/token')
-
-def finish_oauth_authentication(request):
-    # check whether we want to continue with oauth dance
-    continue_sub = ast.literal_eval(request.GET.get('figshare_oauth', 'false').capitalize())
-    figshare_code = request.session.get('figshare_oauth_code', 'default')
-    if figshare_code != 'default' and continue_sub:
-        # we need to continue with the oauth dance
-        print(figshare_code)
-    return {}
-'''
