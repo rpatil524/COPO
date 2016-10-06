@@ -101,12 +101,6 @@ def get_control_options(f):
 def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), message_dict=dict(), profile_id=str()):
     # message_dict templates are defined in the lookup dictionary, "MESSAGES_LKUPS"
 
-    label_dict = dict(publication="Publication",
-                      person="Person",
-                      sample="Sample",
-                      source="Source",
-                      profile="Profile"
-
     label_dict = dict(publication=dict(label="Publication", clonable=False),
                       person=dict(label="Person", clonable=False),
                       sample=dict(label="Sample", clonable=True),
@@ -116,9 +110,6 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
 
     form_value = component_dict
     form_schema = list()
-
-    da_object = DAComponent(component=component)
-
 
     da_object = DAComponent(component=component, profile_id=profile_id)
 
@@ -170,17 +161,6 @@ def generate_component_records(component=str(), profile_id=str()):
                 rec_dict[key_split] = record.get(key_split, d_utils.default_jsontype(f.get("type", str())))
 
         component_records.append(rec_dict)
-
-    return dict(component_name=component,
-                form_label=label_dict.get(component, str()),
-                form_value=form_value,
-                target_id=target_id,
-                form_schema=form_schema,
-                form_message=message_dict,
-                component_records=component_records
-                )
-
-
 
     return component_records
 
