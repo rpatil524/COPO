@@ -3,7 +3,7 @@
 var upload_size = 0;
 var chunk_size = 0;
 //var chunk_threshold = 200000000; // size of chunks in bytes
-var chunk_threshold = 10000000;
+var chunk_threshold = 100000000;
 
 function get_chunk_size(event) {
     upload_size = event.currentTarget.files[0].size;
@@ -109,7 +109,7 @@ $(document).ready(function () {
                 add: function (e, data) {
                     for (var k = 0; k < data.files.length; k++) {
                         // for each file selected in the file picker
-                        //check if it has an existing unfinished entry in the backend
+                        // check if it has an existing unfinished entry in the backend
                         var that = this;
                         var d_file = data.files[k];
                         $.ajax({
@@ -148,7 +148,22 @@ $(document).ready(function () {
                     //get name of the file for which the progress update is for
                     var file_name = data.files[0].name;
                     file_name = file_name.substr(0, file_name.indexOf('.'));
-                    //increment progress bar
+
+                    //add new value to array
+                    var speeds = $(document).data(file_name)
+                    if(speeds == undefined){
+                        speeds = new Array()
+                    }
+                    speeds.push(data.bitrate)
+                    $(document).data(file_name, speeds)
+
+                    // calc mean bitrate
+                    var tot = 0
+                    for(var x = 0; x < speeds.length; x++){
+                        tot += speeds[x]
+                    }
+                    var bitrate = 1 / speeds.length * tot
+
                     var progress = parseInt(data.loaded / data.total * 100, 10);
                     var selector = '#progress_' + file_name;
                     $(selector + ' .bar').css(
@@ -160,7 +175,7 @@ $(document).ready(function () {
                     s = uploaded.toFixed(2) + " MB of";
                     $('#progress_info_' + file_name).children('#progress_label').html(s);
                     //display upload bitrate
-                    var bit = " @ " + (data.bitrate / 1000.0 / 1000.0 / 8).toFixed(2) + " MB/sec";
+                    var bit = " @ " + (bitrate / 1000.0 / 1000.0 / 8).toFixed(2) + " MB/sec";
                     $('#progress_info_' + file_name).children('#bitrate').html(bit)
                 }
             }).on('fileuploadchunkdone', function (e, data) {
