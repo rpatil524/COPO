@@ -100,53 +100,31 @@
     <script>
 
         $(document).ready(function () {
+            //global search box
             $("#global_search_form").submit(function (event) {
-                console.log($("#global_search_term").val());
                 event.preventDefault();
 
-                $('.copo-search-bar').toggleClass("copo-search-bar-open");
-                $('.copo-search-icon').toggleClass("copo-search-icon-open");
+                $(this).find("input:text").each(function () {
+                    console.log($(this).val()); //search term
+                    $(this).val('');
+                });
+            });//end global search
+
+            //suspended toggle
+            $(document).on('click', '.dropdown-menu', function (e) {
+                if ($(this).hasClass('keep-open-on-click')) {
+                    e.stopPropagation();
+                }
             });
-
-            $("#global_status_link, #sub_global_status_link").on('click', function (event) {
-                event.preventDefault();
-                $('#global_status_message').toggle();
-            });
-
-            $('.copo-search-box .copo-icon-magnifier').on('click', function (e) {
-                $("#global_search_term").val("");
-
-                $('.copo-search-bar').toggleClass("copo-search-bar-open");
-                $('.copo-search-icon').toggleClass("copo-search-icon-open");
-                e.preventDefault();
-            });
+            //end suspended toggle
 
 
-            $('#toggle_global_links, #sub_toggle_global').on('click', function (event) {
-                event.preventDefault();
-                toggle_global_side_links();
-            });
         });
 
 
         AutoComplete({
             post: do_post
         })
-
-
-        function toggle_global_side_links() {
-            var effect = 'slide';
-            var options = {direction: "left"};
-            var duration = 400;
-
-            $('#copo_global_links').toggle(effect, options, duration);
-        }
-
-        function close_side_links() {
-            if (($('#copo_global_links').is(":visible"))) {
-                $('#copo_global_links').hide(400);
-            }
-        }
 
 
         function do_post(result, response, custParams) {
@@ -196,72 +174,54 @@
 
 
 <div class="container header-level-1">
-    <div class="row" style="color:white;">
-        <div class="col-sm-3 col-md-3 col-lg-3">
-            <div id="toggle_global_links">
-                <i style="padding-left:3px;" class="fa fa-align-justify fa-lg" aria-hidden="true"></i>
-                <br/><span style="padding-right: 5px; font-size: 10px;">menu</span>
-            </div>
-            <div id="copo_logo_links">
-                <a href="{% url 'copo:index' %}">
-                    <img src="{% static "copo/img/logo7-white-leaves-trans.png" %}" style="height:50px;"/>
+    <div id="copo-global-nav" class="navbar navbar-default " role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header"><a class="navbar-brand" href="#"></a>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-menubuilder">
+                    <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span
+                        class="icon-bar"></span><span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{% url 'copo:index' %}">
+                    <img class="copo-home-img" src="{% static "copo/img/logo7-white-leaves-trans.png" %}"/>
                 </a>
             </div>
-        </div>
-        <div class="col-sm-9 col-md-9 col-lg-9">
-            <div style="margin-top: 10px;">
-                <ul class="nav nav-pills copo-custom-nav-1 pull-right">
-                    <li style="margin-top: 6px; margin-right: 15px;">
-                        <form id="global_search_form" class="copo-search-box pull-right" method="post"><span
-                                class="copo-icon-magnifier copo-search-icon"><i class="fa fa-search"></i></span>
-
-                            <input type="text" id="global_search_term" class="copo-search-bar"
-                                   placeholder="Search" value=""/>
-                        </form>
-                    </li>
-                    <li>
-                        <a id="global_status_link" href="#">
-                            <i style="padding-right: 5px;" class="fa fa-cloud-upload" aria-hidden="true"></i>Status
-                            <span class="badge">{{ num_issues }}</span>
-                        </a>
-                        <div id="global_status_message">
-                            <div style="margin-bottom: 20px;">
-                                <span id="sub_global_status_link" style="cursor:hand; cursor:pointer; color:#000000;"
-                                      title="close">
-                                <i class="fa fa-times-circle pull-right"></i></span>
-                                </span>
+            <div class="collapse navbar-collapse navbar-menubuilder">
+                <div class="col-sm-3 col-md-3">
+                    <form id="global_search_form" class="navbar-form" role="search">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search COPO">
+                            <div class="input-group-btn">
+                                <button class="btn btn-custom" type="submit"><i class="fa fa-search fa-fw"></i>
+                                </button>
                             </div>
-
-                            {% for issue in issue_description_list %}
-                            <div class="copo-status-item">
-                                {% autoescape off %}{{ issue }}{% endautoescape %}
-
-                            </div>
-                            {% empty %}
-                            <div class="copo-status-item">
-                                Profile up to date.
-                            </div>
-                            {% endfor %}
-
-                            <div class="copo-status-item">Issue no. 2</div>
-                            <div class="copo-status-item">Issue no. 3</div>
                         </div>
-                    </li>
-                    <li>
-                        <a href="{% url 'copo:index' %}">
-                            <i style="padding-right: 5px;" class="fa fa-bell" aria-hidden="true"></i>Alerts <span
-                                class="badge"></span></a>
-                    </li>
-                    <li>
-                        <a href="{% url 'copo:index' %}"><i style="padding-right: 5px;" class="fa fa-cogs"></i>Settings</a>
-                    </li>
-                    <li>
-                        <i style="padding-right: 20px;">&nbsp;</i>
-                    </li>
-                    <li>
-                        <a href="#" id="dropdownMenu1" data-toggle="dropdown"
-                           aria-expanded="true">
+                    </form>
+                </div>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
 
+                            <i style="padding-right: 5px;" class="fa fa-cloud-upload" aria-hidden="true"></i>
+                            Status
+
+                            <span class="caret"></span>
+                        </a>
+
+                        <ul class="dropdown-menu keep-open-on-click"
+                            style="width:320px !important; overflow: auto;">
+                            <li>
+                                <div id="global-status-message">
+                                    <div style="padding:10px; color: rgba(85, 85, 85, 1);">
+                                        No status message.
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
                             {% if user.is_authenticated %}
                                 <i style="padding-right: 5px;" class="fa fa-user" aria-hidden="true"></i>
                                 {{ user }}
@@ -269,34 +229,45 @@
                                 <i style="padding-right: 5px;" class="fa fa-sign-in" aria-hidden="true"></i>
                                 Login
                             {% endif %}
-
+                            <span class="caret"></span>
                         </a>
-                        {% if user.is_authenticated %}
-                            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                                <li role="presentation">
-                                    <a role="menuitem" tabindex="-1" href="{% url 'copo:view_orcid_profile' %}">Orcid
-                                        Profile</a>
-                                </li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1"
-                                                           href="/accounts/logout/">Logout</a>
-                                </li>
 
-                            </ul>
-                        {% else %}
-                            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                                <li role="presentation"><a role="menuitem" tabindex="-1"
-                                                           href="/copo/login/">Login</a>
-                                </li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Register</a>
-                                </li>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                            {% if user.is_authenticated %}
 
-                            </ul>
-                        {% endif %}
+                                <li>
+                                    <a href="{% url 'copo:view_orcid_profile' %}" role="menuitem" tabindex="-1">
+                                        <div class="custom-nav-items">
+                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                            <span class="icon_text">Orcid Profile</span>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/accounts/logout/" role="menuitem" tabindex="-1">
+                                        <div class="custom-nav-items">
+                                            <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                            <span class="icon_text">Logout</span>
+                                        </div>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <a href="/copo/login/" role="menuitem" tabindex="-1">
+                                        <div class="custom-nav-items">
+                                            <i class="fa fa-sign-in" aria-hidden="true"></i>
+                                            <span class="icon_text">Login</span>
+                                        </div>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
                     </li>
                 </ul>
             </div>
         </div>
     </div>
+
 </div>
 
 {% block page_banner %}
@@ -309,44 +280,6 @@
 <div class="container header-level-2">
     <div style="position: relative; height: 100%;">
         <div class="row">
-            <div id="copo_global_links" class="col-sm-2 col-md-2 col-lg-2">
-                <div style="position: relative; margin-top: 70px; min-height: 70%; overflow: auto;">
-                    <div style="margin-bottom: 20px;">
-                        <span id="sub_toggle_global" style="cursor:hand; cursor:pointer; " title="close">
-                        <i class="fa fa-times-circle pull-right"></i></span>
-                    </div>
-                    <ul class="nav nav-pills nav-stacked copo-side-nav">
-                        {% block pill_items_sidebar_local %}
-                        {% endblock pill_items_sidebar_local %}
-                        {% block pill_items_sidebar %}
-                            <li>
-                                <a href="{% url 'copo:index' %}">
-                                    <i class="fa fa-list fa"></i>
-                                    <span class="icon_text">Profiles</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a>
-                                    <i class="fa fa-area-chart"></i>
-                                    <span class="icon_text">Accessions</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a>
-                                    <i class="fa fa-file-o"></i>
-                                    <span class="icon_text">Publications</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a>
-                                    <i class="fa fa-link"></i>
-                                    <span class="icon_text">References</span>
-                                </a>
-                            </li>
-                        {% endblock pill_items_sidebar %}
-                    </ul>
-                </div>
-            </div>
             <div id="global_work_area" class="col-sm-12 col-md-12 col-lg-12 pull-right"
                  style="transition: all 0.4s ease 0s; margin-top: 70px;">
                 {% block browse_header_block %}

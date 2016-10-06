@@ -124,39 +124,6 @@ def copo_visualize(request):
     context = dict()
     task = request.POST.get("task", str())
 
-    # test
-    '''
-    import converters.ena.copo_isa_ena as cnv
-    from isatools.convert import json2sra
-    from isatools import isajson
-
-    submission_token = "57bd7bedd127fd9b7f1544f2"
-    isa_copo_object = cnv.Investigation(submission_token=submission_token)
-    copo_json = isa_copo_object.get_schema()
-
-
-    datafilehashes = isa_copo_object.get_datafilehashes()
-    sra_settings = {"sra_center": "EI", "sra_broker": "EI"}
-
-    copo_json_path = "/Users/etuka/Desktop/submissions/" + submission_token + ".json"
-    isa_output_path = "/Users/etuka/Desktop/submissions/"
-
-    with open(copo_json_path, 'w') as f:
-        json.dump(copo_json, f)
-
-    v = None
-
-    with open(copo_json_path) as json_file:
-            v = isajson.validate(json_file)
-
-    json2sra.convert2(json_fp=open(copo_json_path), path=isa_output_path, sra_settings=sra_settings,
-                      datafilehashes=datafilehashes, validate_first=False)
-
-    t = 1
-    '''
-
-    # test end
-
     profile_id = request.session.get("profile_id", str())
 
     broker_visuals = BrokerVisuals(context=context,
@@ -220,6 +187,7 @@ def copo_forms(request):
     out = jsonpickle.encode(context)
 
     return HttpResponse(out, content_type='json')
+
 
 @login_required
 def copo_submissions(request, profile_id):

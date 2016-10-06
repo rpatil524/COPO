@@ -37,31 +37,100 @@
 {% endblock browse_header_block %}
 
 {% block pill_items_sidebar_local %}
-    <li>
-        <a href="#" class="new-form-call" data-component="profile">
-            <i class="fa fa-newspaper-o"></i>
-            <span class="icon_text">New Profile</span>
-        </a>
-    </li>
-    <li>
-        <hr/>
-    </li>
+    <!-- add page specific menu item here -->
 {% endblock pill_items_sidebar_local %}
 
 {% block page_tile %}
-    <ol class="breadcrumb page-title-breadcrumb">
-        <li class="active">Work Profiles
-        <li class="quick-component-create">
-                    <span class="new-form-call" data-component="profile">
-                        <i class="fa fa-plus-circle"></i>
-                        <span class="icon_text">New Profile</span>
-                    </span>
-        </li>
-        </li>
-    </ol>
+    <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <span class="navbar-brand page-title-custom">Work Profiles</span>
+            </div>
+
+            <div class="collapse navbar-collapse quick-component-create">
+                <ul class="nav navbar-nav">
+                    <li class="active quick-component-create new-form-call" data-component="profile">
+                        <a style="color:#000 !important;" href="#">
+                            <span>
+                                <i class="fa fa-plus-circle"></i>
+                                <span class="icon_text">New Profile</span>
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 {% endblock page_tile %}
 
 {% block content %}
+
+    <div class="profile-components-copy" style="display: none;">
+        <div class="navbar navbar-default work-profiles-nav" role="navigation">
+            <div class="container-fluid">
+                <div class="collapse navbar-collapse navbar-menubuilder" style="margin-left: -30px;">
+                    <div class="col-sm-4 col-md-4 col-lg-4" style="margin-top: -15px;">
+                        <div class="navbar-text navbar-left">
+                            <div class="profile-header">
+                                <a class="profile-title-link" href="#"></a>
+                            </div>
+                            <div class="btn-group" style="box-shadow:none !important;">
+                                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"
+                                   style="box-shadow:none !important; padding: 6px 0; color: #000;">
+                                    Description
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu keep-open-on-click"
+                                    style="height:200px !important; width:320px !important; overflow: auto; box-shadow: 0 0 1px 1px rgba(212, 228, 237, 1);">
+                                    <li>
+                                        <div class="profile-description"></div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="profile-column"></div>
+                        </div>
+                    </div>
+                    <ul class="nav navbar-nav navbar-right profile-components-section">
+                        <li class="dropdown clonable-li" style="display: none;">
+                            <a href="#" class="dropdown-toggle " data-toggle="dropdown" role="button"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+                                <div style="text-align: center; margin-top: 10px;">
+                                    <i class="copo-components-icons"></i>
+                                    <span class="component-label"></span>
+                                    <span class="caret"></span>
+                                </div>
+                                <div style="text-align: center; margin-top: 5px;">
+                                    <span style="background: #595959; border-radius: 4px;" class="badge"></span>
+                                </div>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+                                <li class="inspect-li">
+                                    <a class="inspect-element" href="#" role="menuitem" tabindex="-1">
+                                        <div class="custom-nav-items">
+                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                            <span class="icon_text">Inspect</span>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li class="add-li">
+                                    <a href="#" role="menuitem" tabindex="-1" class="index-form-call"
+                                       data-component=""
+                                       data-profile="">
+                                        <div class="custom-nav-items">
+                                            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                                            <span class="icon_text">Add</span>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <table id="copo_profiles_table"
            cellspacing="0" width="100%">

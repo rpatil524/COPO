@@ -7,13 +7,18 @@
     color: #1a0dab;
 }
 
+.profile-description{
+    padding:10px;
+    line-height: 1.4;
+}
+
 .profile-column {
-    padding: 3px 0px;
+    padding:0px 10px 10px 0;
     font-size: 12px
 }
 
 .profile-column-title {
-    padding-right: 10px;
+    font-size: 13px;
 }
 
 .profile-column-data {
@@ -54,3 +59,67 @@ div.shown span.summary-details-control:before {
     font-size: 13px;
 
 }
+
+.profile-component-icons {
+    color: #000;
+    font-size: 12px;
+}
+
+/*start work profile navs*/
+.work-profiles-nav.navbar-default .navbar-brand {
+    color: rgba(119, 119, 119, 1);
+    background: transparent;
+}
+
+.work-profiles-nav.navbar-default {
+    border: none;
+    background: transparent;
+    box-shadow: none !important;
+}
+
+.work-profiles-nav.navbar-default .navbar-nav > li > a {
+    color: rgba(0, 0, 0, 1);
+    background: rgba(245, 245, 240, 0.95);
+    font-size: 12px;
+    margin-left: 10px;
+    border-radius: 4px;
+    width: 130px;
+    box-shadow: none !important;
+}
+
+.work-profiles-nav.navbar-default .navbar-nav > li > a:hover,
+.work-profiles-nav.navbar-default .navbar-nav > li > a:focus {
+    /*color: #fff;*/
+    background: rgba(240, 240, 240, 1.0);
+}
+
+.work-profiles-nav.navbar-default .navbar-nav > .active > a,
+.work-profiles-nav.navbar-default .navbar-nav > .active > a:hover,
+.work-profiles-nav.navbar-default .navbar-nav > .active > a:focus {
+    color: rgba(85, 85, 85, 1);
+    background-color: transparent;
+}
+
+.work-profiles-nav.navbar-default .navbar-nav .dropdown-menu li > a:hover,
+.work-profiles-nav.navbar-default .navbar-nav.dropdown-menu li > a:focus,
+.work-profiles-nav.navbar-default .navbar-nav.dropdown-submenu:hover > a {
+    background-image: none;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+}
+
+.work-profiles-nav.navbar-default .navbar-toggle:hover,
+.work-profiles-nav.navbar-default .navbar-toggle:focus {
+    background-color: transparent;
+}
+
+.work-profiles-nav.navbar-default .navbar-toggle .icon-bar {
+    background-color: transparent;
+}
+
+.work-profiles-nav.navbar-default .navbar-toggle:hover .icon-bar,
+.work-profiles-nav.navbar-default .navbar-toggle:focus .icon-bar {
+    background-color: transparent;
+}
+
+/*end work profile navs*/

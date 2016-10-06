@@ -446,76 +446,7 @@ class Study:
         return unit_categories
 
     def _comments(self, spec=dict()):
-        comments = [
-            {
-                "name": "Supplementary Information File Type",
-                "value": ""
-            },
-            {
-                "name": "Data Record URI",
-                "value": ""
-            },
-            {
-                "name": "Supplementary Information File URI",
-                "value": ""
-            },
-            {
-                "name": "SRA Center Project Name",
-                "value": "EI"
-            },
-            {
-                "name": "Supplementary Information File Name",
-                "value": ""
-            },
-            {
-                "name": "SRA Center Name",
-                "value": "EI"
-            },
-            {
-                "name": "Study Grant Number",
-                "value": ""
-            },
-            {
-                "name": "Subject Keyword",
-                "value": ""
-            },
-            {
-                "name": "Data Repository",
-                "value": ""
-            },
-            {
-                "name": "SRA Submission Action",
-                "value": "VALIDATE"
-            },
-            {
-                "name": "SRA Lab Name",
-                "value": "EI"
-            },
-            {
-                "name": "Experimental Metadata Licence",
-                "value": "CC0"
-            },
-            {
-                "name": "Manuscript Licence",
-                "value": "CC BY 3.0"
-            },
-            {
-                "name": "Data Record Accession",
-                "value": ""
-            },
-            {
-                "name": "SRA Broker Name",
-                "value": "COPO"
-            },
-            {
-                "name": "Study Funding Agency",
-                "value": ""
-            },
-            {
-                "name": "SRA Contact",
-                "value": "XYZ"
-            }
-        ]
+        comments = d_utils.json_to_pytype(lookup.SRA_COMMENTS).get("properties", list())
         return comments
 
     def _publicReleaseDate(self, spec=dict()):
@@ -797,6 +728,8 @@ class ISAHelpers:
         copo_records["publication"] = DAComponent(profile_id=profile_id, component="publication").get_all_records()
 
         # person
+        # check for sra person
+        DAComponent(profile_id=profile_id, component="person").create_sra_person()
         copo_records["person"] = DAComponent(profile_id=profile_id, component="person").get_all_records()
 
         # sample

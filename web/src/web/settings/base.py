@@ -97,9 +97,6 @@ ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login'
 
 ROOT_URLCONF = 'web.urls'
 
-import web.apps.web_copo.templates.copo
-import web.apps.web_copo.templates.account
-
 TEMPLATES = [
 
     {

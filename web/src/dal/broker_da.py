@@ -67,7 +67,8 @@ class BrokerDA:
         visualize_dict = dict(profiles_counts=self.broker_visuals.do_profiles_counts,
                               sources_json=self.broker_visuals.get_sources_json,
                               sources_json_and_last_record_id=self.broker_visuals.get_sources_json_last_record_id,
-                              last_record=self.broker_visuals.get_last_record
+                              last_record=self.broker_visuals.get_last_record,
+                              get_profile_count=self.broker_visuals.get_profile_count
                               )
 
         if self.visualize in visualize_dict:
@@ -94,7 +95,8 @@ class BrokerDA:
         component_dict = self.param_dict.get("component_dict", dict())
         message_dict = self.param_dict.get("message_dict", dict())
 
-        self.context["form"] = htags.generate_copo_form(self.component, target_id, component_dict, message_dict, self.profile_id)
+        self.context["form"] = htags.generate_copo_form(self.component, target_id, component_dict, message_dict,
+                                                        self.profile_id)
         self.context["form"]["visualize"] = self.param_dict.get("visualize")
         return self.context
 
@@ -168,6 +170,10 @@ class BrokerVisuals:
 
     def do_profiles_counts(self):
         self.context["profiles_counts"] = htags.generate_copo_profiles_counts(Profile().get_for_user())
+        return self.context
+
+    def get_profile_count(self):
+        self.context["profile_count"] = True
         return self.context
 
     def get_sources_json(self):

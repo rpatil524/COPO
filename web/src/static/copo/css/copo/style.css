@@ -25,6 +25,7 @@ body {
     background: rgba(242, 242, 242, 0.5);
     margin-left: 0px;
     margin-right: 0px;
+    margin-bottom: -5px;
     border: 1px solid rgba(242, 242, 242, 1.0);
     border-radius: 2px;
     overflow: auto;
@@ -157,11 +158,6 @@ div[class^="col-"], div[class*=" col-"] {
     margin-right: 50px;
 }
 
-/*custom nav items*/
-.copo-custom-nav-1 a, .copo-custom-nav-1 > div > a {
-    color: #fff;
-}
-
 /*global status*/
 #global_status_message {
     background-color: rgba(245, 245, 240, 0.95);
@@ -190,33 +186,6 @@ div[class^="col-"], div[class*=" col-"] {
     border-radius: 4px;
     padding: 15px;
 }
-
-.copo-custom-nav-1 > li > a,
-.copo-custom-nav-1 > li > div {
-    font-size: 12px;
-    padding: 7px 12px;
-}
-
-.copo-custom-nav-1 > li > a:hover,
-.copo-custom-nav-1 > li > div > a:hover,
-.copo-custom-nav-1 .open > a,
-.copo-custom-nav-1 .open > div > a,
-.copo-custom-nav-1 .open > a:hover,
-.copo-custom-nav-1 .open > a:focus {
-    color: #ce6f14;
-    background: transparent;
-}
-
-.copo-custom-nav-1 > li > a:focus, .copo-custom-nav-1 > li > div > a:focus {
-    color: #000;
-    background: transparent;
-}
-
-.copo-custom-nav-1 > li.active > a, .copo-custom-nav-1 > li.active > div > a {
-    background: transparent;
-}
-
-/*end custom nav items*/
 
 /*sidebar*/
 .copo-side-nav > li > a {
@@ -750,11 +719,111 @@ th {
     background-color: #3d3f46;
 }
 
+/*custom nav items*/
 .quick-component-create {
     margin-left: 10px;
     color: #000;
     font-size: 12px;
-    cursor: pointer;
-    cursor: hand;
+}
 
+.page-title-custom {
+    padding-left: 0px !important;
+    font-size: 20px;
+}
+
+.copo-components-icons {
+    margin-right: 3px;
+    font-size: 12px !important;
+}
+
+.navbar-brand, .navbar-nav > li > a {
+    text-shadow: none !important;
+}
+
+.navbar-custom-items {
+    color: #fff !important;
+}
+
+.copo-home-img {
+    height: 50px;
+    margin-top: -17px !important;
+    margin-left: -15px !important;
+    padding-right: 30px;
+}
+
+.custom-nav-items {
+    padding: 5px 0px 0px 0px;
+}
+
+#copo-global-nav.navbar-default .navbar-brand {
+    color: rgba(119, 119, 119, 1);
+}
+
+#copo-global-nav.navbar-default {
+    border: none;
+    background: transparent;
+}
+
+#copo-global-nav.navbar-default .navbar-nav > li > a {
+    color: rgba(245, 245, 240, 0.99);
+    background: transparent;
+    height: 50px !important;
+}
+
+#copo-global-nav.navbar-default .navbar-nav > li > a:hover,
+#copo-global-nav.navbar-default .navbar-nav > li > a:focus {
+    color: #D1B37F;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+#copo-global-nav.navbar-default .navbar-nav > .active > a,
+#copo-global-nav.navbar-default .navbar-nav > .active > a:hover,
+#copo-global-nav.navbar-default .navbar-nav > .active > a:focus {
+    color: rgba(85, 85, 85, 1);
+    background-color: transparent;
+}
+
+#copo-global-nav.navbar-default .navbar-nav .dropdown-menu li > a:hover,
+#copo-global-nav.navbar-default .navbar-nav.dropdown-menu li > a:focus,
+#copo-global-nav.navbar-default .navbar-nav.dropdown-submenu:hover > a {
+    background-image: none;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+}
+
+#copo-global-nav.navbar-default .navbar-toggle:hover,
+#copo-global-nav.navbar-default .navbar-toggle:focus {
+    background-color: transparent;
+}
+
+#copo-global-nav.navbar-default .navbar-toggle .icon-bar {
+    background-color: transparent;
+}
+
+#copo-global-nav.navbar-default .navbar-toggle:hover .icon-bar,
+#copo-global-nav.navbar-default .navbar-toggle:focus .icon-bar {
+    background-color: transparent;
+}
+
+/*end custom nav items*/
+
+.btn-custom {
+    background: rgba(104, 105, 104, 1);
+    border-color: rgba(104, 105, 104, 1);
+    color: rgba(255, 255, 255, 1);
+    font-size: 14px;
+    border-radius: 4px;
+    border-width: 1px;
+}
+
+.btn-custom:hover {
+    background: rgba(235, 235, 235, 1);
+    border-color: rgba(173, 173, 173, 1);
+    color: rgba(0, 0, 0, 1);
+}
+
+.btn-custom:active, .btn-custom:focus {
+    background: rgba(235, 235, 235, 1);
+    border-color: rgba(173, 173, 173, 1);
+    color: rgba(51, 51, 51, 1);
 }

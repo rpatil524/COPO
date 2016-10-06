@@ -19,6 +19,10 @@ DB_TEMPLATES = {
     'COPO_PROFILE': os.path.join(RESOLVER['schemas_copo'],  'copo_profile.json')
 }
 
+# SRA_SETTINGS
+SRA_SETTINGS = os.path.join(RESOLVER['schemas_generic'],  'sra_settings.json')
+SRA_COMMENTS = os.path.join(RESOLVER['schemas_generic'],  'sra_comments.json')
+
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
 # API_RETURN_TEMPLATES dictionary provides paths to api return templates
 API_RETURN_TEMPLATES = {
@@ -408,6 +412,7 @@ VOCAB = {
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
+# THIS IS DEPRECATED!!! SEE copo_form_handlers.js
 # tags for generating html elements
 HTML_TAGS = {
     "text": "<div class='form-group copo-form-group'><label for='{elem_id!s}'>{elem_label!s}</label><br/>"
@@ -578,6 +583,7 @@ FIGSHARE_API_URLS = {
     'authorization_token': 'https://api.figshare.com/v2/token'
 }
 
+# THIS IS DEPRECATED!!! SEE data_utils.get_isa_schema()
 ISA_SCHEMAS = {
     'investigation_schema': '/schemas/copo/dbmodels/investigation_schema.json',
     'publication_schema': '/schemas/copo/dbmodels/publication_schema.json',

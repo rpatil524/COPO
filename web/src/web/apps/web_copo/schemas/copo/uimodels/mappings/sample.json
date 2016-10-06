@@ -54,7 +54,7 @@
     },
     {
       "type": "array",
-      "required": "false",
+      "required": "true",
       "ref": "",
       "hidden": "false",
       "deprecated": false,

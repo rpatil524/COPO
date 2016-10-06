@@ -36,7 +36,6 @@ $(document).ready(function () {
     //handle event for form calls
     $(document).on("click", ".new-form-call", function (e) {//call to generate form
         e.preventDefault();
-        close_side_links(); //clears side menu
 
         var component = "";
         try {
@@ -90,7 +89,20 @@ var controlsMapping = {
 
 function json2HtmlForm(data) {
     var dataCopy = $.extend(true, Object(), data.form.component_records);
+
+    //remove record with target_id from this list...to enable unique validation in edit mode
+    var delKey = null;
+    $.each(dataCopy, function (key, val) {
+        if (val._id == data.form.target_id) {
+            delKey = key;
+            return false;
+        }
+
+    });
+
+    delete dataCopy[delKey];
     componentRecords[data.form.component_name] = dataCopy;
+
 
     //tidy up before closing the modal
     var doTidyClose = {
@@ -162,6 +174,7 @@ function json2HtmlForm(data) {
             //validate on submit event
             htmlForm.find("form").validator().on('submit', function (e) {
                 if (e.isDefaultPrevented()) {
+                    reset_custom_fields_validate();
                     return false;
                 } else {
                     e.preventDefault();
@@ -201,6 +214,23 @@ function json2HtmlForm(data) {
         ]
     });
 } //end of json2HTMLForm
+
+function reset_custom_fields_validate() {
+    $('.copo-select').each(function () {
+        if (this.id) {
+            $(this).css("display", "none");
+        }
+    });
+}
+
+function make_custom_fields_validate() {
+    $('.copo-select').each(function () {
+        if (this.id && $(this).val().trim() == "") {
+            $(this).removeAttr("style");
+            $(this).focus();
+        }
+    });
+}
 
 function build_form_body(data) {
     var formJSON = data.form;
@@ -428,7 +458,7 @@ function set_validation_markers(formElem, ctrl) {
     //email marker...
     if (formElem.hasOwnProperty("email") && (formElem.email.toString() == "true")) {
         ctrl.attr("data-email", "email");
-        ctrl.attr('data-email-error', "Please enter a valid value for the "+ formElem.label);
+        ctrl.attr('data-email-error', "Please enter a valid value for the " + formElem.label);
 
         errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
     }
@@ -705,7 +735,7 @@ var dispatchFormControl = {
                 type: "text",
                 class: "copo-select input-copo",
                 id: formElem.id,
-                name: formElem.id
+                name: formElem.id,
             });
 
         //set validation markers
@@ -713,6 +743,7 @@ var dispatchFormControl = {
 
         ctrlsDiv.append(txt);
         ctrlsDiv.append(vM.errorHelpDiv);
+
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
@@ -1114,6 +1145,7 @@ function save_source_form(funcParams) {
     var ctrlsDiv = funcParams.ctrlsDiv;
     var formElem = funcParams.formElem;
     var ctrlsWithValuesDiv = funcParams.ctrlsWithValuesDiv;
+    var csrftoken = $.cookie('csrftoken');
 
     var form_values = {};
     htmlFormSource.find("form").find(":input").each(function () {
@@ -1179,6 +1211,7 @@ function source_clone_ctrl(funcParams) {
     var component = "source";
     var formElem = funcParams.formElem;
     var sourceSchema = copoSchemas.source_schema;
+    var csrftoken = $.cookie('csrftoken');
 
     //do clone only if there are 'clonables'
     $.ajax({
@@ -1300,7 +1333,8 @@ function get_multi_search_span(formElem, ctrlsDiv) {
 
     var hiddenValuesCtrl = $('<input/>',
         {
-            type: "hidden",
+            type: "text",
+            style: "display: none;",
             id: formElem.id,
             name: formElem.id,
             class: "copo-multi-values",
@@ -1322,6 +1356,10 @@ function get_multi_search_span(formElem, ctrlsDiv) {
         });
 
     ctrlsDiv.append(selectCtrl).append(hiddenValuesCtrl).append(hiddenJsonCtrl);
+
+    //set validation markers
+    var vM = set_validation_markers(formElem, hiddenValuesCtrl);
+    ctrlsDiv.append(vM.errorHelpDiv);
 
     return ctrlsDiv;
 }
@@ -1347,6 +1385,7 @@ function get_form_ctrl(ctrlsDiv, formElem, elemValue) {
 }
 
 function validate_forms(formObject) {
+    make_custom_fields_validate(); //removes disruptions to validator
     formObject.trigger('submit');
 }
 
@@ -1451,6 +1490,9 @@ function save_form(formJSON) {
 
             } else if (data.profiles_counts) {
                 var event = jQuery.Event("refreshprofilescounts");
+                $('body').trigger(event);
+            } else if (data.profile_count) {
+                var event = jQuery.Event("getprofilecount");
                 $('body').trigger(event);
             }
 

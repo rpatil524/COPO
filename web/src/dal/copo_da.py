@@ -167,6 +167,7 @@ class DAComponent:
 
         return cursor_to_list(self.get_collection_handle().find(query_dict))
 
+
 class Publication(DAComponent):
     def __init__(self, profile_id=None):
         super(Publication, self).__init__(profile_id, "publication")
@@ -175,6 +176,41 @@ class Publication(DAComponent):
 class Person(DAComponent):
     def __init__(self, profile_id=None):
         super(Person, self).__init__(profile_id, "person")
+
+    def create_sra_person(self):
+        """
+        create an (SRA) person record and attach to profile
+
+        Args:
+            profile_id: to be linked to created record
+
+        Returns:
+
+        """
+        user = ThreadLocal.get_current_user()
+
+        auto_fields = {
+            'copo.person.roles.annotationValue': 'SRA Inform On Status',
+            'copo.person.lastName': user.last_name,
+            'copo.person.firstName': user.first_name,
+            'copo.person.roles.annotationValue_1': 'SRA Inform On Error',
+            'copo.person.email': user.email
+        }
+
+        people = self.get_all_records()
+        sra_roles = list()
+        for record in people:
+            for role in record.get("roles", list()):
+                sra_roles.append(role.get("annotationValue", str()))
+
+        # has sra roles?
+        has_sra_roles = all(x in sra_roles for x in ['SRA Inform On Status', 'SRA Inform On Error'])
+
+        if not has_sra_roles:
+            kwargs = dict()
+            self.save_record(auto_fields, **kwargs)
+
+        return
 
 
 class Source(DAComponent):
@@ -306,7 +342,15 @@ class Profile(DAComponent):
             ).items():
                 auto_fields[self.get_qualified_field(k)] = v
 
-        return super(Profile, self).save_record(auto_fields, **kwargs)
+        rec = super(Profile, self).save_record(auto_fields, **kwargs)
+
+        # trigger after save actions
+        if not kwargs.get("target_id", str()):
+            Person(profile_id=str(rec["_id"])).create_sra_person()
+
+        return rec
+
+
 
 
 class RemoteDataFile:
@@ -398,11 +442,11 @@ class Description:
         self.purge_descriptions()
 
         fields = dict(
-                    stages=stages,
-                    attributes=attributes,
-                    created_on=data_utils.get_datetime(),
-                    user_id=ThreadLocal.get_current_user().id
-            )
+            stages=stages,
+            attributes=attributes,
+            created_on=data_utils.get_datetime(),
+            user_id=ThreadLocal.get_current_user().id
+        )
         doc = self.DescriptionCollection.insert(fields)
 
         # return inserted record

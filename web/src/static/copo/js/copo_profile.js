@@ -2,6 +2,38 @@
  * felix.shaw@tgac.ac.uk - 22/10/15.
  */
 $(document).ready(function () {
+    csrftoken = $.cookie('csrftoken');
+
+    //form call
+    $(document).on('click', '.index-form-call', function (e) {
+        e.preventDefault();
+
+        var component = $(this).attr("data-component");
+        var profile_id = $("#profile_id").val();
+
+        $.ajax({
+            url: copoFormsURL,
+            type: "POST",
+            headers: {'X-CSRFToken': csrftoken},
+            data: {
+                'task': 'form',
+                'component': component,
+                'profile_id': profile_id,
+                'visualize': 'get_profile_count'
+            },
+            success: function (data) {
+                json2HtmlForm(data);
+            },
+            error: function () {
+                alert("Couldn't build " + component + " form!");
+            }
+        });
+    });
+
+    $('body').on('getprofilecount', function (event) {
+        update_counts();
+    });
+
 
     update_counts()
 
@@ -50,10 +82,10 @@ $(document).ready(function () {
 
 })
 
-function update_counts(){
+function update_counts() {
     var url = $(update_counts_url).val()
     $.getJSON(url)
-        .done(function(data){
+        .done(function (data) {
             $('.data .price span').html(data.num_data)
             $('.samples .price span').html(data.num_sample)
             $('.submissions .price span').html(data.num_submission)

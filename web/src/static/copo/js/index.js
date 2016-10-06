@@ -176,42 +176,48 @@ $(document).ready(function () {
                 'className': 'profile-item-url',
                 'iconClass': 'fa fa-database copo-icon-info',
                 'btnAction': 'datafile',
-                'countsKey': 'num_data'
+                'countsKey': 'num_data',
+                'actions': ["inspect"]
             },
             {
                 'text': 'Samples',
                 'className': 'profile-item-url',
-                'iconClass': 'fa fa-filter copo-icon-success pad-left',
+                'iconClass': 'fa fa-filter copo-icon-success',
                 'btnAction': 'sample',
-                'countsKey': 'num_sample'
+                'countsKey': 'num_sample',
+                'actions': ["inspect", "add"]
             },
             {
                 'text': 'Submissions',
                 'className': 'profile-item-url',
-                'iconClass': 'fa fa-envelope copo-icon-warning pad-left',
+                'iconClass': 'fa fa-envelope copo-icon-warning',
                 'btnAction': 'submission',
-                'countsKey': 'num_submission'
+                'countsKey': 'num_submission',
+                'actions': ["inspect"]
             },
             {
                 'text': 'Publications',
                 'className': 'profile-item-url',
-                'iconClass': 'fa fa-paperclip copo-icon-primary pad-left',
+                'iconClass': 'fa fa-paperclip copo-icon-primary',
                 'btnAction': 'publication',
-                'countsKey': 'num_pub'
+                'countsKey': 'num_pub',
+                'actions': ["inspect", "add"]
             },
             {
                 'text': 'People',
                 'className': 'profile-item-url',
-                'iconClass': 'fa fa-users copo-icon-default pad-left',
+                'iconClass': 'fa fa-users copo-icon-default',
                 'btnAction': 'person',
-                'countsKey': 'num_person'
+                'countsKey': 'num_person',
+                'actions': ["inspect", "add"]
             },
-            {
-                'text': 'Delete profile',
-                'className': 'profile-item-action',
-                'iconClass': 'fa fa-trash copo-icon-danger space-left',
-                'btnAction': 'delete'
-            }];
+            // {
+            //     'text': 'Delete profile',
+            //     'className': 'profile-item-action',
+            //     'iconClass': 'fa fa-trash copo-icon-danger space-left',
+            //     'btnAction': 'delete'
+            // }
+        ];
 
         var table = null;
 
@@ -233,7 +239,7 @@ $(document).ready(function () {
                 language: {
                     "info": "Showing _START_ to _END_ of _TOTAL_ work profiles",
                     "search": "Search work profiles:",
-                    "emptyTable": "No work profiles available! Use the 'New Profile' button in menu to create work profiles."
+                    "emptyTable": "No work profiles available! Use the 'New Profile' button to create work profiles."
                 },
                 order: [[1, "desc"]],
                 columns: [
@@ -241,109 +247,83 @@ $(document).ready(function () {
                         "data": null,
                         "orderable": false,
                         "render": function (data) {
-                            var cellHTML = '<div class="row" style="margin-bottom: 10px;">';
+                            //grab template from DOM
+                            var cellHTML = $(".profile-components-copy").clone().css("display", "block");
 
-                            //data div
-                            var leftColHTML = '<div class="col-sm-5 col-md-5 col-lg-5">';
-                            var record_id = data[0].data; //first item is record (profile) id
-                            var locus = $("#view_copo_profile_url").val().replace("999", record_id);
+                            //get profile id
+                            var record_id = null;
+                            var result = $.grep(data, function (e) {
+                                return e.key == "_id";
+                            });
 
-                            for (var i = 1; i < data.length; ++i) {
-                                if (data[i].key == "title") {
-                                    leftColHTML += '<div class="profile-header" style="margin-top: -20px;">';
-                                    leftColHTML += '<a href="' + locus + '">' + data[i].data + '</a>';
-                                    leftColHTML += '</div>';
-                                } else if (data[i].key == "description") {
-                                    var toggle_id = record_id + "_description";
-                                    leftColHTML += '<div class="profile-column">';
-                                    leftColHTML += '<span style="padding-right: 5px;" class="short-description profile-column-data">' + data[i].data.slice(0, 60) + '</span>';
-                                    leftColHTML += '<span style="padding-right:5px; display: none;" class="full-description profile-column-data">' + data[i].data + '</span>';
-                                    leftColHTML += '<span class="summary-details-control"></span>';
-                                    leftColHTML += '</div>';
-                                } else {
-                                    leftColHTML += '<div class="profile-column">';
-                                    leftColHTML += '<span class="profile-column-title">' + data[i].header + ':</span>';
-                                    leftColHTML += '<span class="profile-column-data">' + data[i].data + '</span>';
-                                    leftColHTML += '</div>';
-                                }
+                            if (result.length) {
+                                record_id = result[0].data;
                             }
-                            leftColHTML += '</div>';
 
-                            //icons div
-                            var rightColHTML = '<div class="col-sm-7 col-md-7 col-lg-7">';
-                            var bTns = buttons;
-                            rightColHTML += '<div>';
-                            for (var i = 0; i < bTns.length; ++i) {
-                                if (bTns[i].className.indexOf("profile-item-url") > -1) {
-                                    var locus = $("#" + bTns[i].btnAction + "_url").val().replace("999", record_id); //matches url hidden in index.html
-                                    rightColHTML += '<div class="col-sm-2 col-md-2 col-lg-2" style="text-align: center; padding-right: 0px !important; padding-left: 5px !important;">';
+                            //get title
+                            var result = $.grep(data, function (e) {
+                                return e.key == "title";
+                            });
 
-                                    rightColHTML += '<div class="panel-group">';
-                                    rightColHTML += '<div class="panel panel-default" style="border-top: 1px solid rgba(245, 245, 240, 0.95); border-color: rgba(245, 245, 240, 0.95);">';
-                                    rightColHTML += '<div class="panel-heading" style="background: rgba(245, 245, 240, 0.95);">';
-                                    rightColHTML += '<h4 class="panel-title">';
-                                    var panel_id = record_id + bTns[i].btnAction;
-                                    rightColHTML += '<a class="modules-panel" data-target-id="' + panel_id + '" data-toggle="collapse" href="#' + panel_id + '"><i style="margin-bottom: 5px; font-size: 16px;" class="' + bTns[i].iconClass + '"> </i>';
-                                    rightColHTML += '<div style="font-size: 11px; text-align: center;">' + bTns[i].text + '</div>';
-                                    var counts_id = record_id + "_" + bTns[i].countsKey;
-                                    rightColHTML += '<div style="font-size: 11px; margin-left: -10px; margin-top: 5px;"><span style="background: #595959; border-radius: 4px;" class="badge" id="' + counts_id + '"></span></div>';
-                                    rightColHTML += '</a>';
-                                    rightColHTML += '</h4>';
-                                    rightColHTML += '</div>';
-                                    rightColHTML += '<div id="' + panel_id + '" class="panel-collapse collapse">';
-                                    rightColHTML += '<div class="panel-body" style="border-top: 1px solid rgba(245, 245, 240, 0.95); overflow: auto;">';
+                            if (result.length) {
+                                cellHTML.find(".profile-header").find(".profile-title-link")
+                                    .html(result[0].data)
+                                    .attr("href", $("#view_copo_profile_url").val().replace("999", record_id));
+                            }
 
-                                    rightColHTML += '<ul class="nav">';
-                                    rightColHTML += '<li class="component-li" style="font-size: 11px; white-space: nowrap;"><a href="' + locus + '"><i class="fa fa-eye" aria-hidden="true"></i> Inspect</a></li>';
-                                    if (["datafile", "submission"].indexOf(bTns[i].btnAction) < 0) {
-                                        rightColHTML += '<li class="component-li" style="font-size: 11px; white-space: nowrap;"><a href="#" class="index-form-call" data-profile="' + record_id + '" data-component="' + bTns[i].btnAction + '"><i class="fa fa-plus-circle" aria-hidden="true"></i> New</a></li>';
-                                    }
+                            //get description
+                            var result = $.grep(data, function (e) {
+                                return e.key == "description";
+                            });
 
-                                    if (bTns[i].btnAction == "publication") {
-                                        rightColHTML += '<li class="component-li"><div style="margin: 0 auto;" class="doiLoader"></div></li>';
+                            if (result.length) {
+                                cellHTML.find(".profile-description")
+                                    .html(result[0].data);
+                            }
 
-                                        rightColHTML += '<li class="component-li" style="font-size: 11px; white-space: nowrap;">';
-                                        rightColHTML += '<div class="fuelux">';
-                                        rightColHTML += '<div data-initialize="placard" class="placard" style="margin: 0 auto;">';
-                                        rightColHTML += '<div class="placard-popup" style="bottom: -34px;"></div>';
-                                        rightColHTML += '<input style="font-size: 10px; margin: 0 auto;" size="11" type="text" placeholder="Resolve DOI"  data-profile="' + record_id + '" class="form-control placard-field glass resolver-data" data-resolver="doi">';
-                                        rightColHTML += '<div class="placard-footer" style="margin: 0 auto;">';
-                                        rightColHTML += '<button type="button" class="btn btn-primary btn-xs placard-cancel resolver-submit">Resolve</button>';
-                                        rightColHTML += '</div></div></div>';
-                                        rightColHTML += '</li>';
+                            //get date
+                            var result = $.grep(data, function (e) {
+                                return e.key == "date_created";
+                            });
 
-                                        rightColHTML += '<li class="component-li" style="font-size: 11px; white-space: nowrap;">';
-                                        rightColHTML += '<div class="fuelux">';
-                                        rightColHTML += '<div data-initialize="placard" class="placard" style="margin: 0 auto;">';
-                                        rightColHTML += '<div class="placard-popup" style="bottom: -34px;"></div>';
-                                        rightColHTML += '<input style="font-size: 10px; margin: 0 auto;" size="11" type="text" placeholder="Resolve PMID"  data-profile="' + record_id + '" class="form-control placard-field glass resolver-data" data-resolver="pmid">';
-                                        rightColHTML += '<div class="placard-footer" style="margin: 0 auto;">';
-                                        rightColHTML += '<button type="button" class="btn btn-primary btn-xs placard-cancel resolver-submit">Resolve</button>';
-                                        rightColHTML += '</div></div></div>';
-                                        rightColHTML += '</li>';
-                                    }
+                            if (result.length) {
+                                cellHTML.find(".profile-column")
+                                    .html("[" + result[0].data + "]");
+                            }
 
-                                    rightColHTML += '</ul>';
+                            var componentsSection = cellHTML.find(".profile-components-section");
+                            for (var i = 0; i < buttons.length; ++i) {
+                                var cloneLi = componentsSection.find(".clonable-li").clone().css("display", "block");
+                                cloneLi.removeClass("clonable-li");
 
-                                    rightColHTML += '</div>';
-                                    rightColHTML += '</div>';
-                                    rightColHTML += '</div>';
-                                    rightColHTML += '</div>';
+                                //icon
+                                cloneLi.find(".copo-components-icons").addClass(buttons[i].iconClass);
 
-                                    rightColHTML += '</div>';
+                                //label
+                                cloneLi.find(".component-label").html(buttons[i].text);
+
+                                //record count element
+                                cloneLi.find(".badge").attr("id", record_id + "_" + buttons[i].countsKey);
+
+                                //inspect element
+                                cloneLi.find(".inspect-element").attr("href", $("#" + buttons[i].btnAction + "_url").val().replace("999", record_id));
+
+
+                                //add action
+                                if ($.inArray("add", buttons[i].actions) > -1) {
+                                    //form-call element
+                                    cloneLi.find(".index-form-call")
+                                        .attr("data-profile", record_id)
+                                        .attr("data-component", buttons[i].btnAction);
                                 } else {
-                                    ;
+                                    cloneLi.find(".add-li").html("");
                                 }
 
+                                componentsSection.append(cloneLi);
                             }
-                            rightColHTML += '</div>';
-                            rightColHTML += '</div>';
 
-                            cellHTML += leftColHTML;
-                            cellHTML += rightColHTML;
 
-                            cellHTML += '</div>';
-                            return cellHTML;
+                            return cellHTML.html();
                         }
                     },
                     {

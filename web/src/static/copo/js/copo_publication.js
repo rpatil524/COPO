@@ -57,7 +57,6 @@ $(document).ready(function () {
             },
             success: function (data) {
                 json2HtmlForm(data);
-                toggle_global_side_links();
                 $("#doiLoader").html("");
             },
             error: function () {

@@ -19,12 +19,15 @@
 
 {% block page_tile %}
     {{ profile.title }}
+    <div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12" style="padding-top: 10px; font-size: 16px;">{{ profile.description }}</div>
+    </div>
 {% endblock page_tile %}
 
 {% block content %}
 
 	<!-- Hidden Fields Section -->
-	<input type="hidden" value="{{ profile_id }}" name="profile_id" id="profile_id"/>
+	<input type="hidden" value="{{ p_id }}" name="profile_id" id="profile_id"/>
 	<input type="hidden" value="{% url 'copo:copo_publications' profile_id=p_id %}"  name="publications_url" id="publications_url" />
 	<input type="hidden" value="{% url 'copo:copo_data' profile_id=p_id %}"  name="data_url" id="data_url" />
 	<input type="hidden" value="{% url 'copo:copo_samples' profile_id=p_id %}"  name="samples_url" id="samples_url" />
@@ -53,7 +56,7 @@
                 <!-- features -->
                 <ul class="features" data-control="data">
                     <li id="data_link"><span class="fa fa-eye fa-2x"></span>Inspect Data</li>
-					<li id="add_data_link" class="new_item"><span class="fa fa-plus-circle fa-2x"></span>New Data File</li>
+{#					<li id="add_data_link" class="new_item"><span class="fa fa-plus-circle fa-2x"></span>New Data File</li>#}
 				</ul>
                 <!-- /features -->
                 <!-- footer -->
@@ -76,7 +79,7 @@
 
                 <ul class="features" data-control="sample">
                     <li id="sample_link"><span class="fa fa-eye fa-2x"></span>Inspect Samples</li>
-					<li id="add_sample_link" class="new_item"><span class="fa fa-plus-circle fa-2x"></span>New Sample</li>
+					<li id="add_sample_link" class="index-form-call" data-component="sample"><span class="fa fa-plus-circle fa-2x"></span>Add Sample</li>
                 </ul>
 
                 <div class="pt-footer samples_color">
@@ -100,7 +103,7 @@
 
                 <ul class="features" data-control="submission">
                     <li id="submission_link"><span class="fa fa-eye fa-2x"></span>Inspect Submissions</li>
-					<li id="add_submission_link" class="new_item"><span class="fa fa-plus-circle fa-2x"></span>New Submission</li>
+{#					<li id="add_submission_link" class="new_item"><span class="fa fa-plus-circle fa-2x"></span>New Submission</li>#}
                 </ul>
 
                 <div class="pt-footer submissions_color">
@@ -123,7 +126,7 @@
 
                 <ul class="features" data-control="publication">
                     <li id="publication_link"><span class="fa fa-eye fa-2x"></span>Inspect Publications</li>
-					<li id="add_publication_link" class="new_item"><span class="fa fa-plus-circle fa-2x"></span>New Publication</li>
+					<li id="add_publication_link" class="index-form-call" data-component="publication"><span class="fa fa-plus-circle fa-2x"></span>Add Publication</li>
                 </ul>
 
                 <div class="pt-footer pubs_color">
@@ -146,7 +149,7 @@
 
                 <ul class="features" data-control="people">
                     <li id="people_link"><span class="fa fa-eye fa-2x"></span>Inspect People</li>
-					<li id="add_person_link" class="new_item"><span class="fa fa-plus-circle fa-2x"></span>New Person</li>
+					<li id="add_person_link" class="index-form-call" data-component="person"><span class="fa fa-plus-circle fa-2x"></span>Add Person</li>
                 </ul>
 
                 <div class="pt-footer people_color">
@@ -165,4 +168,5 @@
 {% block js_block %}
 	<script src="{% static "copo/js/copo_profile.js" %}"></script>
 	<script src="{% static "copo/js/generic_handlers.js" %}"></script>
+    <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
 {% endblock %}
