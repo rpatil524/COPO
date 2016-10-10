@@ -7,7 +7,7 @@
 $(document).ready(function () {
     var csrftoken = $.cookie('csrftoken');
     $('#current-submissions').DataTable();
-    $('tr').on('click', change_selected);
+    $('.submission_panel').on('click', change_selected);
     $('.file_info').on('click', get_file_info);
     $('.upload_button').on('click', handle_upload);
     $('.delete_button').on('click', handle_delete);
@@ -206,7 +206,7 @@ $(document).ready(function () {
 function change_selected(e) {
 
     // change colors of table rows
-    $('#current-submissions').find('.active').each(function (counter, data) {
+    $('.active').each(function (counter, data) {
         var cell = $(data).find('.status_cell');
         if ($(cell).html() == 'True') {
             $(cell).parent().removeClass('active').addClass('success')
@@ -236,6 +236,7 @@ function handle_upload(e) {
             action: function (dialog) {
                 dialog.close();
                 $(e.currentTarget).data('submission_id');
+                var csrftoken = $.cookie('csrftoken');
                 $.post("/rest/submit_to_repo/", {
                     'sub_id': $(e.currentTarget).data('submission_id'),
                     'csrfmiddlewaretoken': csrftoken
