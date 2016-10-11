@@ -11,7 +11,7 @@ urlpatterns = [url(r'^copo/', include('web.apps.web_copo.urls', namespace='copo'
                url(r'^api/', include('api.urls', namespace='api')),
                url(r'^accounts/', include('allauth.urls')),
                url(r'^accounts/profile/', views.index),
-               url(r'^$', TemplateView.as_view(template_name="landing_page.html"), name='index')
+               url(r'^$', TemplateView.as_view(template_name="index.html"), name='index')
                ]
 
 if settings.DEBUG is False:  # if DEBUG is True it will be served automatically

@@ -1,0 +1,333 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!--[if IE]>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <![endif]-->
+    <title>COPO - Collaborative Open Plant Omics</title>
+    <!--REQUIRED STYLE SHEETS-->
+    <!-- BOOTSTRAP CORE STYLE CSS -->
+    <link href="{% static 'landing/css/bootstrap.css' %}" rel="stylesheet"/>
+    <!-- FONTAWESOME STYLE CSS -->
+    <link href="{% static 'landing/css/font-awesome.min.css' %}" rel="stylesheet"/>
+    <!-- CUSTOM STYLE CSS -->
+    <link href="{% static 'landing/css/style.css' %}" rel="stylesheet"/>
+    <!-- GOOGLE FONT -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+
+<!-- Navigation -->
+<nav class="navbar-inverse" role="navigation">
+
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+    </div>
+    <!-- Collect the nav links for toggling -->
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav pull-right">
+            <li><a href="#home">HOME</a>
+            </li>
+            <li><a href="#about">Project</a>
+            </li>
+
+            <li><a href="#work-sec">People</a>
+            </li>
+            <li><a href="#contact-sec">Content</a>
+            </li>
+
+        </ul>
+    </div>
+    <!-- /.navbar-collapse -->
+
+    <!-- /.container -->
+
+</nav>
+
+<!--End Navigation -->
+
+
+<!--Header section  -->
+<div class="container" id="home">
+    <div class="row text-center">
+        <div class="col-md-12 col-md-12 col-sm-12">
+            <h1>
+                <img class="header-img" src="/static/copo/img/copo_white_800.png">
+            </h1>
+            <h2 class="head-sub-main">describe &nbsp deposit &nbsp discover</h2>
+        </div>
+    </div>
+</div>
+<!--End Header section  -->
+
+<!--About Section-->
+<section class="color-white" id="about">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-12 col-md-12 col-sm-12">
+                <h2 style="padding-top:50px;">Project</h2>
+                <h4>
+                    <strong>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Curabitur nec nisl odio. Mauris vehicula at nunc id posuere.
+                    </strong>
+                </h4>
+            </div>
+
+        </div>
+
+
+    </div>
+</section>
+
+
+<!--End About Section-->
+
+
+<!-- WORK Flow Section -->
+<section class="color-green" id="work-sec">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-12 col-md-12 col-sm-12">
+                <h2>2nd COPO Workshop Agenda - 12th/13th December 2016</h2>
+                <h4>
+                    Day 1
+                </h4>
+
+
+                <span class="lead">Short project and group introduction</span>
+                <ul>
+
+                    <li>Set out what we want to achieve</li>
+                    <li>Experimental metadata collection (spreadsheets, ISA standard)</li>
+                    <li>Spreadsheet annotation technologies (hypothes.is, RightField, OntoMaton)</li>
+                    <li>Raw sequence data submissions (ENA)</li>
+                </ul>
+                <span class="lead">Group Breakout</span>
+                <ul>
+                    <li>Real world sequence datasets that the groups are able to/want to share</li>
+                    <li>Understand breadth of experimental data collection and opportunities to standardise</li>
+                </ul>
+
+                <h4>Day 2</h4>
+
+                <span class="lead">Continue group breakouts</span>
+                <ul>
+                    <li>Start working on annotating experimental metadata using hypothes.is/annotator.js</li>
+                    <li>Use Ontology Lookup Service (OLS) to search and use ontology terms for annotation</li>
+                    <li>Use Zooma (https://www.ebi.ac.uk/spot/zooma/) to collate terms that don’t exist in ontologies
+                    </li>
+                    <li>Use COPO to submit ENA data</li>
+                </ul>
+
+                <div class="lead">Summary and thanks</div>
+                <div class="lead">Developer meetup</div>
+                <div class="lead">SAB Conference Call</div>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+</section>
+
+<section class="color-white">
+    <div class="container">
+
+
+        <div class="row">
+            <h2>People</h2>
+            <div class="col-md-3 col-md-3 col-sm-3 person">
+
+                <div class="p_image">
+                    <img src="/static/landing/img/bill.jpg"/>
+                </div>
+
+                <div class="p_bio">
+                    <h4>Tony Soprano</h4>
+                    <p class="p_position">Earlham Institute</p>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
+                    and
+                    scrambled it to make a type specimen book.
+                </div>
+            </div>
+            <div class="col-md-3 col-md-3 col-sm-3 person">
+                <img src="/static/landing/img/david.png"/>
+                <div class="p_bio">
+                    <h4>David Johnson</h4>
+                    <p class="p_position">Oxford eResearch Centre</p>
+                    David Johnson is a Senior Research Associate / Research Software Engineer in the Oxford e-Research
+                    Centre. His work concerns the development of data infrastructure to support data-intensive research
+                    in the life, natural, and biomedical sciences. In the COPO project, David is part of the ISA Team
+                    developing the underlying 'omics standards framework that COPO uses.
+                </div>
+            </div>
+            <div class="col-md-3 col-md-3 col-sm-3 person">
+                <img src="/static/landing/img/bill3.jpg"/>
+                <div class="p_bio">
+                    <h4>Pauli Gaultieri</h4>
+                    <p class="p_position">Oxford eResearch</p>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
+                    and
+                    scrambled it to make a type specimen book.
+                </div>
+            </div>
+            <div class="col-md-3 col-md-3 col-sm-3 person">
+                <img src="/static/landing/img/bill4.jpg"/>
+                <div class="p_bio">
+                    <h4>Christopher Molisanti</h4>
+                    <p class="p_position">Oxford eResearch</p>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
+                    and
+                    scrambled it to make a type specimen book.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 col-md-3 col-sm-3 person">
+                <img src="/static/landing/img/bill3.jpg"/>
+                <div class="p_bio">
+                    <h4>Pauli Gaultieri</h4>
+                    <p class="p_position">Oxford eResearch</p>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
+                    and
+                    scrambled it to make a type specimen book.
+                </div>
+            </div>
+            <div class="col-md-3 col-md-3 col-sm-3 person">
+                <img src="/static/landing/img/bill4.jpg"/>
+                <div class="p_bio">
+                    <h4>Christopher Molisanti</h4>
+                    <p class="p_position">Oxford eResearch</p>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
+                    and
+                    scrambled it to make a type specimen book.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!--End WORK Flow  Section -->
+<!-- Contact Section -->
+<section class="color-light " id="contact-sec">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-8 col-md-offset-2 ">
+                <h2>Locate Us here</h2>
+                <h4>
+                    <strong>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Curabitur nec nisl odio. Mauris vehicula at nunc id posuere.
+                    </strong>
+                </h4>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-5 contact-cls">
+                <h3>Physical Location</h3>
+                <div>
+                    <span><i class="fa fa-home"> </i> Address: 123/56, Your City, USA </span>
+                    <br/>
+                    <span><i class="fa fa-phone"> </i> Phone: 82-230-567-899</span>
+
+
+                </div>
+
+
+            </div>
+            <div class="col-md-7">
+
+                <form>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control" required="required" placeholder="Name">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control" required="required" placeholder="Email address">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <textarea name="message" id="message" required="required" class="form-control" rows="3"
+                                          placeholder="Message"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-default">Submit Request</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <br/>
+                <div id="social-icon">
+                    <a href="#"><i class="fa fa-facebook fa-2x"></i></a>
+                    <a href="#"><i class="fa fa-twitter fa-2x"></i></a>
+                    <a href="#"><i class="fa fa-linkedin fa-2x"></i></a>
+                    <a href="#"><i class="fa fa-google-plus fa-2x"></i></a>
+                    <a href="#"><i class="fa fa-pinterest fa-2x"></i></a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!--End Contact Section -->
+
+
+<div class="for-full-back " id="footer">
+
+
+    2014 www.yourdomain.com | All Right Reserved
+
+</div>
+<!--End footer Section -->
+<!-- JAVASCRIPT FILES PLACED AT THE BOTTOM TO REDUCE THE LOADING TIME  -->
+<!-- CORE JQUERY  -->
+<script src="../../static/landing/plugins/jquery-1.10.2.js"></script>
+<!-- BOOTSTRAP CORE SCRIPT   -->
+<script src="../../static/landing/plugins/bootstrap.js"></script>
+<!-- CUSTOM SCRIPTS -->
+<script src="../../static/landing/js/custom.js"></script>
+
+</body>
+</html>

@@ -105,8 +105,9 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             # insert your TEMPLATE_DIRS here
+
+            os.path.join(BASE_DIR, 'web', 'landing'),
             os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'templates', 'copo'),
-            os.path.join(BASE_DIR, 'web', 'landing_page')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
