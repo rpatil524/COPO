@@ -59,8 +59,25 @@ h4 {
 
 }
 
+
+
 .p_position{
     color:#cdcdcd
+}
+
+.person .p_orcid img{
+    width: 24px;
+    height: 24px;
+}
+
+a{
+    color: darkgrey;
+}
+a:hover{
+    color: darkgrey;
+}
+a:visited{
+    color: darkgrey;
 }
 
 p {
@@ -98,7 +115,6 @@ section {
 }
 .person img{
     width: 100%;
-
     padding: 3px;
 }
 

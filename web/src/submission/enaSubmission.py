@@ -34,12 +34,9 @@ class EnaSubmit(object):
     def __init__(self):
         self._dir = os.path.join(os.path.dirname(__file__), "data")
         self._config_dir = os.path.join(self._dir, "Configurations/isaconfig-default_v2015-07-02")
-        self._tmp = os.path.join(self._dir, './tmp/')
         self.d_files = []
         self.profile = str()
         self.submission = dict()
-        if not os.path.exists(self._tmp):
-            os.mkdir(self._tmp)
 
 
     def submit(self, sub_id, dataFile_ids):

@@ -59,7 +59,7 @@
 				<div class="panel-body panel-overflow">
 
 					{% for s in submission %}
-						<div class="submission_panel" data-submission-id="{{ s|mongo_id }}">
+						<div class="submission_panel" data-submission-id="{{ s|mongo_id }}" data-submission-status="{{ s.complete }}">
 							<div class="submission_header submission_pending">
 								{{ s|produce_submission_header }}
 								<span class="pull-right display-1">
@@ -102,8 +102,13 @@
 					<h3 class="panel-title">Submission Status</h3>
 				</div>
 				<div class="panel-body" id="status-panel">
-					<div class="row">
-						<div class="col-lg-6 col-md-6 col-sm-6">
+					<div class="row" id="not_running_text">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            This submission has not been started. To initiate, click the green button on the submission panel.
+                        </div>
+                    </div>
+                    <div class="row" id="upload_progress_info">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
 							<h4 class="h4">Upload Speed</h4>
 							<canvas id="bandwidth_chart"></canvas>
 						</div>

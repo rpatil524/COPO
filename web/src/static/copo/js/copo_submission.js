@@ -5,6 +5,7 @@
  */
 
 $(document).ready(function () {
+    $('#upload_progress_info').hide()
     var csrftoken = $.cookie('csrftoken');
     $('#current-submissions').DataTable();
     $('.submission_panel').on('click', change_selected);
@@ -99,6 +100,7 @@ $(document).ready(function () {
                         $(this).siblings('h4').hide();
                         $(this).hide()
                     })
+
                 }
                 else if (!data.finished) {
                     // update charts with returned upload status data
@@ -206,19 +208,20 @@ $(document).ready(function () {
 function change_selected(e) {
 
     // change colors of table rows
-    $('.active').each(function (counter, data) {
-        var cell = $(data).find('.status_cell');
-        if ($(cell).html() == 'True') {
-            $(cell).parent().removeClass('active').addClass('success')
+    $('.submission_active').each(function (counter, data) {
+        console.log(counter)
+        var complete = $(data.closest('.submission_panel')).data('submission-status');
+        if (complete == 'True') {
+            $(data).removeClass('submission_pending submission_active submission_complete').addClass('submission_complete')
         }
         else {
-            $(cell).parent().removeClass('active').addClass('info')
+            $(data).removeClass('submission_pending submission_active submission_complete').addClass('submission_pending')
         }
     });
-    $(e.currentTarget).removeClass('success info').addClass('active');
+    $(e.currentTarget).find('.submission_header').removeClass('submission_pending submission_active submission_complete').addClass('submission_active');
 
     //change displayed_submission
-    var current_id = $(e.target).parent().data('submission_id');
+    var current_id = $(e.target).closest('.submission_panel').data('submission-id');
     $('#displayed_submission').val(current_id);
     $('#accessions-block, #accessions-header').remove();
     $('#status-panel').data('accessions_visible', false)
@@ -235,10 +238,9 @@ function handle_upload(e) {
             label: 'Yes',
             action: function (dialog) {
                 dialog.close();
-                $(e.currentTarget).data('submission_id');
                 var csrftoken = $.cookie('csrftoken');
                 $.post("/rest/submit_to_repo/", {
-                    'sub_id': $(e.currentTarget).data('submission_id'),
+                    'sub_id': $('#displayed_submission').val(),
                     'csrfmiddlewaretoken': csrftoken
                 }).done(function (data) {
                     $(e.currentTarget).closest('tr').find('.delete_button', '.upload_button').remove();
