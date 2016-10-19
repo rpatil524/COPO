@@ -2,7 +2,7 @@
 import os
 REPOSITORIES = {
     'ASPERA': {
-        'resource_path': 'reposit/aspera/Aspera Connect.app/Contents/Resources/',
+        'resource_path': 'tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/',
         'user_token': 'Webin-39962@webin.ebi.ac.uk',
         'password': 'toni12',  # TODO: put defaults in secret_settings
         'remote_path': ''

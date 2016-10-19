@@ -175,7 +175,15 @@ def inspect_file(request):
     file_id = request.GET['file_id']
 
     chunked_upload = ChunkedUpload.objects.get(id=int(file_id))
-    file_name = os.path.join(settings.MEDIA_ROOT, chunked_upload.file.name)
+    # rename file in the database
+    old_name = os.path.join(settings.MEDIA_ROOT, chunked_upload.file.name)
+    file_name = old_name.split('/')[:-1]
+    file_name.append(chunked_upload.filename)
+    file_name = os.path.sep.join(file_name)
+
+    # rename file on the filesystem2
+    os.rename(old_name, file_name)
+
 
     # size threshold to determine if a file should be compressed
     zip_threshold = 200000000  # size in bytes
@@ -210,6 +218,7 @@ def inspect_file(request):
             output_dict['file_type'] = 'unknown'
 
     # add datafile schema
+    chunked_upload.filename = file_name
     chunked_upload.type = output_dict['file_type']
     chunked_upload.save()
 
@@ -258,11 +267,12 @@ def zip_file(request):
     file_obj = ChunkedUpload.objects.get(pk=file_id)
 
     # get the name of the file to zip and change its suffix to .gz
-    output_file_location = os.path.join(settings.MEDIA_ROOT, file_obj.file.name)
+    output_file_location = os.path.join(settings.MEDIA_ROOT, file_obj.filename)
     output_file_name = file_obj.filename + '.gz'
     try:
         # open the file as gzip acrchive...set compression level
-        temp_name = os.path.join(settings.MEDIA_ROOT, str(uuid.uuid4()) + '.tmp')
+        mypath = file_obj.file..split('/')[:-1]
+        temp_name = os.path.join(mypath, str(uuid.uuid4()) + '.tmp')
         myzip = gzip.open(temp_name, 'wb', compresslevel=1)
         src = open(output_file_location, 'r')
 
@@ -278,7 +288,7 @@ def zip_file(request):
     # now need to delete the old file and update the file record with the new file
     new_file_name = output_file_location + '.gz'
     os.rename(temp_name, new_file_name)
-    os.remove(output_file_location)
+    os.remove(temp_name)
 
     # calculate new file size
     stats = os.stat(new_file_name)

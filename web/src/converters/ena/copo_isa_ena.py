@@ -8,7 +8,7 @@ from dal import cursor_to_list
 import web.apps.web_copo.lookup.lookup as lookup
 import web.apps.web_copo.templatetags.html_tags as htags
 from web.apps.web_copo.schemas.utils import data_utils as d_utils
-from dal.copo_da import Submission, DataFile, DAComponent
+from dal.copo_da import Submission, DataFile, DAComponent, Person
 
 
 class Investigation:
@@ -729,7 +729,7 @@ class ISAHelpers:
 
         # person
         # check for sra person
-        DAComponent(profile_id=profile_id, component="person").create_sra_person()
+        Person(profile_id=profile_id).create_sra_person()
         copo_records["person"] = DAComponent(profile_id=profile_id, component="person").get_all_records()
 
         # sample

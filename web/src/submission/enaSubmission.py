@@ -1,7 +1,6 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 03/05/2016'
 
 import converters.ena.copo_isa_ena as cnv
-
 from bson.json_util import dumps
 from django.conf import settings
 from dal.copo_da import DataFile
@@ -97,7 +96,7 @@ class EnaSubmit(object):
             for f in file_path:
                 f_str = f_str + ' ' + f
             cmd = "./ascp -d -QT -l300M -L- {f_str!s} {user_name!s}:{remote_path!s}".format(**locals())
-            lg.log(cmd)
+            lg.log(cmd, level=Loglvl.INFO, type=Logtype.FILE)
             os.chdir(path2library)
 
             try:
@@ -219,7 +218,7 @@ class EnaSubmit(object):
 
         # convert to SRA with isatools converter
         lg.log('Converting to SRA', level=Loglvl.INFO, type=Logtype.FILE )
-        json2sra.convert(open(json_file_path), conv_dir, self._config_dir)
+        json2sra.convert2(open(json_file_path), conv_dir, self._config_dir)
 
         lg.log('Adjusting SRA XMLS', level=Loglvl.INFO, type=Logtype.FILE )
         # adjust hashes in SRA XML
