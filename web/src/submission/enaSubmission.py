@@ -26,6 +26,8 @@ from django_tools.middlewares import ThreadLocal
 REPOSITORIES = settings.REPOSITORIES
 BASE_DIR = settings.BASE_DIR
 lg = settings.LOGGER
+from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
+import web.apps.web_copo.schemas.utils.data_utils as d_utils
 
 
 class EnaSubmit(object):
@@ -188,12 +190,13 @@ class EnaSubmit(object):
         if not os.path.exists(os.path.join(conv_dir, 'json')):
             os.makedirs(os.path.join(conv_dir, 'json'))
         json_file_path = os.path.join(conv_dir, 'json', 'isa_json.json')
-        xml_dir = os.path.join(conv_dir, 'sra', sub_id)
+        xml_dir = conv_dir
         xml_path = os.path.join(xml_dir, 'run_set.xml')
         #  Convert COPO data to ISA_JSON
 
         lg.log('Obtaining ISA-JSON', level=Loglvl.INFO, type=Logtype.FILE )
-        meta = cnv.Investigation(submission_token=sub_id).get_schema()
+        conv = cnv.Investigation(submission_token=sub_id)
+        meta = conv.get_schema()
         json_file = open(json_file_path, '+w')
         # dump metadata to output file
         json_file.write(dumps(meta))
@@ -218,7 +221,11 @@ class EnaSubmit(object):
 
         # convert to SRA with isatools converter
         lg.log('Converting to SRA', level=Loglvl.INFO, type=Logtype.FILE )
-        json2sra.convert2(open(json_file_path), conv_dir, self._config_dir)
+        sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
+        datafilehashes = conv.get_datafilehashes()
+        json2sra.convert2(json_fp=open(json_file_path), path=conv_dir, sra_settings=sra_settings,
+                     datafilehashes=datafilehashes, validate_first=False)
+
 
         lg.log('Adjusting SRA XMLS', level=Loglvl.INFO, type=Logtype.FILE )
         # adjust hashes in SRA XML
@@ -234,9 +241,9 @@ class EnaSubmit(object):
         xml.write(xml_path)
 
         # make sure there is a study abstract supplied
-        xml_path = os.path.join(xml_dir, 'study.xml')
+        xml_path = os.path.join(xml_dir, 'project_set.xml')
         xml = ET.parse(xml_path)
-        desc = xml.find('DESCRIPTOR')
+        desc = xml.find('PROJECT')
         abstract_found = False
         for x in desc.iter():
             if x.tag == 'STUDY_ABSTRACT':
@@ -251,7 +258,7 @@ class EnaSubmit(object):
         # finally submit to SRA
         lg.log('Submitting XMLS to ENA via CURL', level=Loglvl.INFO, type=Logtype.FILE )
         submission_file = os.path.join(xml_dir, 'submission.xml')
-        study_file = os.path.join(xml_dir, 'study.xml')
+        study_file = os.path.join(xml_dir, 'project_set.xml')
         sample_file = os.path.join(xml_dir, 'sample_set.xml')
         experiment_file = os.path.join(xml_dir, 'experiment_set.xml')
         run_file = os.path.join(xml_dir, 'run_set.xml')

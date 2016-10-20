@@ -177,7 +177,7 @@ def inspect_file(request):
     chunked_upload = ChunkedUpload.objects.get(id=int(file_id))
     # rename file in the database
     old_name = os.path.join(settings.MEDIA_ROOT, chunked_upload.file.name)
-    file_name = old_name.split('/')[:-1]
+    file_name = old_name.split(os.path.sep)[:-1]
     file_name.append(chunked_upload.filename)
     file_name = os.path.sep.join(file_name)
 
@@ -218,7 +218,7 @@ def inspect_file(request):
             output_dict['file_type'] = 'unknown'
 
     # add datafile schema
-    chunked_upload.filename = file_name
+    chunked_upload.file.name = file_name
     chunked_upload.type = output_dict['file_type']
     chunked_upload.save()
 
@@ -267,14 +267,12 @@ def zip_file(request):
     file_obj = ChunkedUpload.objects.get(pk=file_id)
 
     # get the name of the file to zip and change its suffix to .gz
-    output_file_location = os.path.join(settings.MEDIA_ROOT, file_obj.filename)
-    output_file_name = file_obj.filename + '.gz'
+    input_file = os.path.join(settings.MEDIA_ROOT, file_obj.file.name)
+    zip_file = os.path.join(settings.MEDIA_ROOT, file_obj.file.name + '.gz')
     try:
         # open the file as gzip acrchive...set compression level
-        mypath = file_obj.file..split('/')[:-1]
-        temp_name = os.path.join(mypath, str(uuid.uuid4()) + '.tmp')
-        myzip = gzip.open(temp_name, 'wb', compresslevel=1)
-        src = open(output_file_location, 'r')
+        myzip = gzip.open(zip_file, 'wb', compresslevel=1)
+        src = open(input_file, 'r')
 
         # write input file to gzip archive in n byte chunks
         n = 100000000
@@ -286,30 +284,29 @@ def zip_file(request):
 
     print('zip complete ' + file_id)
     # now need to delete the old file and update the file record with the new file
-    new_file_name = output_file_location + '.gz'
-    os.rename(temp_name, new_file_name)
-    os.remove(temp_name)
+    os.remove(input_file)
 
     # calculate new file size
-    stats = os.stat(new_file_name)
+    stats = os.stat(zip_file)
     new_file_size = stats.st_size / 1000 / 1000
 
     # update filename
-    file_obj.filename = output_file_name
-    file_obj.file.name = new_file_name
+    zip_file_short = zip_file.split(os.path.sep)[-1]
+    file_obj.filename = zip_file_short
+    file_obj.file.name = zip_file
 
     # update file size
     file_obj.offset = stats.st_size
     file_obj.save()
 
-    out = {'zipped': True, 'file_name': output_file_name, 'file_size': new_file_size}
+    out = {'zipped': True, 'file_name': zip_file_short, 'file_size': new_file_size}
 
     # update record in mongo
     record_object = DataFile().get_by_file_id(file_id)
     auto_fields = dict()
     auto_fields[DataFile().get_qualified_field("file_size")] = u.filesize_toString(file_obj.offset)
-    auto_fields[DataFile().get_qualified_field("name")] = output_file_name
-    auto_fields[DataFile().get_qualified_field("file_location")] = new_file_name
+    auto_fields[DataFile().get_qualified_field("name")] = zip_file_short
+    auto_fields[DataFile().get_qualified_field("file_location")] = zip_file
 
     BrokerDA(target_id=str(record_object.get("_id", str())),
              component="datafile",
