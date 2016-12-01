@@ -607,11 +607,20 @@ var auto_complete = function () {
     });
 
     function do_select(input, item) {
-        // console.log(window.event)
-        item = $(item).closest('li');
-        $(input).val($(item).data('annotation_value'));
-        $(input).siblings("[id*='termSource']").val($(item).data('term_source'));
-        $(input).siblings("[id*='termAccession']").val($(item).data('term_accession'));
+
+        if ($(document).data('annotator')) {
+
+            item = $(item).closest('li');
+            console.log('here')
+            console.log($(item).data('term_accession'))
+            $(input).val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
+        }
+        else {
+            item = $(item).closest('li');
+            $(input).val($(item).data('annotation_value'));
+            $(input).siblings("[id*='termSource']").val($(item).data('term_source'));
+            $(input).siblings("[id*='termAccession']").val($(item).data('term_accession'));
+        }
 
         return false;
     }
