@@ -101,9 +101,6 @@ web/src/media
 web/src/media/chunked_uploads
 
 web/src/static/CACHE/css/**
-.idea/**
-.idea/COPO.iml
-.idea/misc.xml
 mongo/mongodata
 *.DS_Store
-.idea/
+
