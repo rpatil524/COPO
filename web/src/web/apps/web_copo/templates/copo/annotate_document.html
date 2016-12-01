@@ -6,17 +6,9 @@
 {% block stylesheet_block %}
     <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
 
-    <link rel="stylesheet" type="text/css" href="{% static "copo/annotator-2.0.0-alpha.3/css/annotator.min.css" %} "/>
+    <link rel="stylesheet" type="text/css" href="{% static "copo/annotator-2.0.0-alpha.3/css/annotator.css" %} "/>
+    <link rel="stylesheet" type="text/css" href="{% static "copo/css/copo/copo_autocomplete.css" %} "/>
 
-    <style>
-
-        #annotation_content {
-            width: 80%;
-            min-height: 800px;
-            text-align: left;
-        }
-
-    </style>
 {% endblock %}
 
 
@@ -179,44 +171,11 @@
 
 {% block js_block %}
     <script type="text/javascript" src="{% static "copo/annotator-2.0.0-alpha.3/pkg/annotator.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/js/generic_handlers.js" %}"></script>
     <script src="{% static 'copo/js/setup_annotator.js' %}"></script>
     <script>
 
-        $(document).ready(function () {
 
-            $(document).data('annotator', true)
-
-            $(document).ajaxStart(function () {
-                $('#processing_div').show()
-            })
-            $(document).ajaxStop(function () {
-                $('#processing_div').hide()
-            })
-
-
-            $('#processing_div').hide()
-            $('#file_picker_modal').modal('show')
-            $("#form_submit_btn").on('click', function () {
-                var formData = new FormData();
-                formData.append('file', $('#InputFile')[0].files[0]);
-                var csrftoken = $.cookie('csrftoken');
-                var url = "/api/upload_annotation_file/"
-                $.ajax({
-                    url: url,
-                    type: "POST",
-                    headers: {'X-CSRFToken': csrftoken},
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'json'
-                }).done(function (e) {
-                    $('#annotation_content').html(e.html)
-                    $.cookie('document_name', e.doc_name, {expires: 1, path: '/',});
-                    setup_annotator()
-                    $('#file_picker_modal').modal('hide')
-                });
-            })
-        })
 
     </script>
 {% endblock %}

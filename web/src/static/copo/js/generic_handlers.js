@@ -1,7 +1,19 @@
 //**some re-usable functions across different modules
-
+var AnnotationEventAdded = false;
 $(document).ready(function () {
     var copoFormsURL = "/copo/copo_forms/";
+
+    $(document).on('focus', 'input[id^="annotator-field"]', function (e) {
+        t = e.currentTarget
+        $('.annotator-listing').find('ul').empty()
+
+        if (!AnnotationEventAdded) {
+            $(t).attr('data-autocomplete', '/copo/ajax_search_ontology/999/')
+            auto_complete();
+            AnnotationEventAdded = true;
+        }
+
+    })
 
     auto_complete();
 
