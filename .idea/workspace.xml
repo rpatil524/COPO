@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/annotate_document.html" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/annotate_document.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -678,7 +677,14 @@
       <option name="project" value="LOCAL" />
       <updated>1480594622899</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="change base page inheritence for annotator">
+      <created>1480601697540</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1480601697540</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -715,7 +721,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="add some annotate stuff" />
     <MESSAGE value="add some annotate methods" />
-    <option name="LAST_COMMIT_MESSAGE" value="add some annotate methods" />
+    <MESSAGE value="change base page inheritence for annotator" />
+    <option name="LAST_COMMIT_MESSAGE" value="change base page inheritence for annotator" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
