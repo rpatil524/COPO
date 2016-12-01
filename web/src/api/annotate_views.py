@@ -13,8 +13,12 @@ def post_annotations(request):
     text = data.pop('text')
 
     tmp = text.split(':-:')
+
     short = str.strip(tmp[0])
-    ref = str.strip(tmp[1])
+    if len(tmp) > 1:
+        ref = str.strip(tmp[1])
+    else:
+        ref = ''
     data['@id'] = ref
     data["shortform"] = short
 

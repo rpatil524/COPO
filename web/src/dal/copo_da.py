@@ -22,6 +22,7 @@ DataFileCollection = 'DataFileCollection'
 RemoteFileCollection = 'RemoteFileCollection'
 DescriptionCollection = 'DescriptionCollection'
 ProfileCollection = 'Profiles'
+AnnotationReference = 'AnnotationCollection'
 
 handle_dict = dict(publication=get_collection_ref(PubCollection),
                    person=get_collection_ref(PersonCollection),
@@ -29,7 +30,8 @@ handle_dict = dict(publication=get_collection_ref(PubCollection),
                    source=get_collection_ref(SourceCollection),
                    profile=get_collection_ref(ProfileCollection),
                    submission=get_collection_ref(SubmissionCollection),
-                   datafile=get_collection_ref(DataFileCollection)
+                   datafile=get_collection_ref(DataFileCollection),
+                   annotation=get_collection_ref(AnnotationReference)
                    )
 
 
