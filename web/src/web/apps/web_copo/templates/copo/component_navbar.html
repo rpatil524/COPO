@@ -1,0 +1,124 @@
+<nav class="navbar" id="copo_components_navs">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <span class="navbar-brand page-title-custom"></span>
+        </div>
+
+        <div class="collapse navbar-collapse quick-component-create">
+            <ul class="nav navbar-nav nav-page-menu">
+                <li class="active quick-component-create new-form-call data-record-add-li" data-component=""
+                    data-add-li="simple">
+                    <a style="color:#000 !important;" href="#">
+                            <span class="component-add-label">
+                                <i class="fa fa-plus-circle"></i>
+                                <span class="icon_text"></span>
+                            </span>
+                    </a>
+                </li>
+                <li class="dropdown data-record-add-li" data-add-li="publication">
+                    <a style="color:#000 !important;" href="#" class="dropdown-toggle "
+                       data-toggle="dropdown" role="button"
+                       aria-haspopup="true"
+                       aria-expanded="false">
+                            <span class="component-add-label">
+                                <i class="fa fa-plus-circle"></i>
+                                <span class="icon_text"></span>
+                            </span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu keep-open-on-click"
+                        style="height:180px !important; min-width:210px !important;">
+                        <li class="new-form-call" data-component=""><a href="#">
+                            <div style="padding: 5px 5px 5px 5px;">New Publication</div>
+                        </a>
+                        </li>
+                        <li>
+                            <div class="fuelux" style="padding: 10px 0px 10px 15px;">
+                                <div data-initialize="placard" class="placard">
+                                    <div class="placard-popup" style="bottom: -34px;"></div>
+                                    <input style="font-size: 12px;" type="text" placeholder="Resolve DOI"
+                                           class="form-control placard-field glass resolver-data"
+                                           data-resolver="doi">
+
+                                    <div class="placard-footer">
+                                        <button type="button" class="btn btn-primary btn-xs placard-cancel">Cancel
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-primary btn-xs placard-cancel resolver-submit">
+                                            Resolve
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="fuelux" style="padding: 0px 5px 10px 15px;">
+                                <div data-initialize="placard" class="placard">
+                                    <div class="placard-popup" style="bottom: -34px;"></div>
+                                    <input style="font-size: 12px;" type="text" placeholder="Resolve PubMed ID"
+                                           class="form-control placard-field glass resolver-data"
+                                           data-resolver="pmid">
+
+                                    <div class="placard-footer">
+                                        <button type="button" class="btn btn-primary btn-xs placard-cancel">Cancel
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-primary btn-xs placard-cancel resolver-submit">
+                                            Resolve
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="data-record-add-li" data-add-li="loader">
+                    <div style="padding-top:15px;" id="doiLoader"></div>
+                </li>
+                <li class="dropdown">
+                    <a style="color:#000 !important;" href="#" class="dropdown-toggle" data-toggle="dropdown"
+                       role="button" aria-haspopup="true"
+                       aria-expanded="false">Profile <span class="caret"></span></a>
+                    <ul class="dropdown-menu profile-menu" style="min-width:150px !important;">
+                        <li>
+                            <a title="{{ profile.title }}"
+                               href="{% url 'copo:view_copo_profile' profile_id=profile_id %}">
+                                <div style="padding: 5px 5px 0px 0px;">Profile Home</div>
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                        <li data-component="datafile"><a href="{% url 'copo:copo_data' profile_id=profile_id %}">
+                            <div style="padding: 5px 5px 0px 0px;"><i
+                                    class="fa fa-database copo-icon-info copo-components-icons"></i> <span
+                                    class="icon_text">Datafiles</span></div>
+                        </a></li>
+                        <li data-component="sample"><a href="{% url 'copo:copo_samples' profile_id=profile_id %}">
+                            <div style="padding: 5px 5px 0px 0px;"><i
+                                    class="fa fa-filter copo-icon-success copo-components-icons"></i> <span
+                                    class="icon_text">Samples</span></div>
+                        </a></li>
+                        <li data-component="submission"><a
+                                href="{% url 'copo:copo_submissions' profile_id=profile_id %}">
+                            <div style="padding: 5px 5px 0px 0px;"><i
+                                    class="fa fa-envelope copo-icon-warning copo-components-icons"></i> <span
+                                    class="icon_text">Submissions</span></div>
+                        </a></li>
+                        <li data-component="publication">
+                            <a href="{% url 'copo:copo_publications' profile_id=profile_id %}">
+                                <div style="padding: 5px 5px 0px 0px;"><i
+                                        class="fa fa-paperclip copo-icon-primary copo-components-icons"></i> <span
+                                        class="icon_text">Publications</span></div>
+                            </a>
+                        </li>
+                        <li data-component="person"><a href="{% url 'copo:copo_people' profile_id=profile_id %}">
+                            <div style="padding: 5px 5px 0px 0px;"><i
+                                    class="fa fa-users copo-icon-default copo-components-icons"></i> <span
+                                    class="icon_text">People</span></div>
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>

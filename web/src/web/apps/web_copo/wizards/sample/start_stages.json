@@ -1,0 +1,82 @@
+{
+  "title": "General Sample Description - stages defined here apply to all description instances",
+  "description": "Definitions for elements that appear in different stages of a wizard targeted: 'ref', id of stage; 'title',  header used for the stage; items, actual form elements on the page; 'is_singular_stage', if all items must have same value for this stage",
+  "properties": [
+    {
+      "ref": "number_of_samples",
+      "title": "Number of Samples",
+      "message": "How many samples do you want to describe? You can describe multiple samples with a common set of attributes.",
+      "items": [
+        {
+          "id": "number_of_samples",
+          "help_tip": "Enter number of samples",
+          "label": "Number of Samples",
+          "hidden": "false",
+          "required": "true",
+          "control": "copo-item-count"
+        }
+      ]
+    },
+    {
+      "ref": "sample_type",
+      "title": "Sample Type",
+      "message": "How do want to describe your samples? Sample Type provides specifications to help capture sample metadata.",
+      "items": [
+        {
+          "id": "sample_type",
+          "help_tip": "Select sample type",
+          "label": "Sample Type",
+          "hidden": "false",
+          "required": "true",
+          "control": "copo-button-list",
+          "default_value": "bio",
+          "option_values": [
+            {
+              "value": "biosample",
+              "label": "BioSample",
+              "description": "BioSamples are <strong>repository agnostic</strong>, and are better suited for describing samples in a generic manner or in contexts where the target repository isn't known <i>a priori</i>."
+            },
+            {
+              "value": "isasample",
+              "label": "ISA Sample",
+              "description": "ISA samples are based on the ISA specification, and are better tailored for describing samples that will subsequently become part of data submissions to repositories such as <strong>ENA</strong> and <strong>Metabolights</strong>."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "sample_name",
+      "title": "Sample Name",
+      "message": "What is the name of your sample? The sample name will be used as a prefix for labelling your samples.",
+      "items": [
+        {
+          "type": "string",
+          "required": "true",
+          "ref": "Sample Name",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "name",
+          "show_in_table": true,
+          "unique": true,
+          "control": "text",
+          "versions": [
+            "name"
+          ],
+          "help_tip": "A Sample represents major outputs resulting from a protocol application other than the special case outputs of Extract or a Labeled Extract.",
+          "label": "Sample Name"
+        }
+      ]
+    },
+    {
+      "ref": "description_stages",
+      "is_stage_stub": true,
+      "callback": {
+        "function": "get_sample_type_stages",
+        "parameter": "sample_type"
+      }
+    }
+  ]
+}

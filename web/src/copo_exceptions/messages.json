@@ -1,0 +1,10 @@
+{
+  "title": "Exception Messages",
+  "description": "Defines context messages for exceptions.",
+  "properties": {
+    "101": {
+      "details": "Unable to resolve ISA configuration source from study type! Possible causes: 1. The supplied study type '{study_type!s}' might not be present in the study type list in lookup 2. The key 'config_source' is not set",
+      "message": "Unresolved configuration source!"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "title": "General Datafile Description - stages defined here apply to all description instances",
+  "description": "Definitions for elements that appear in different stages of a wizard for submission to different repositories. 'ref', id of stage; 'title',  header used for the stage; 'content', the function to call to generate stage html; items, actual form elements on the page; 'is_stage_stub', if the stage entry is a complete stage or a bootstrap; 'is_conditional_stage', displays a stage based on some condition being satisfied; 'is_singular_stage', if all items must have same value for this stage",
+  "properties": [
+    {
+      "ref": "target_repository",
+      "title": "Target Repo",
+      "content": "get_stage_html",
+      "is_singular_stage": true,
+      "message": "Select the target repository for which this description is intended.",
+      "items": [
+        {
+          "id": "deposition_context",
+          "help_tip": "Select the target repository from the drop-down",
+          "label": "Target Repository",
+          "hidden": "false",
+          "required": "true",
+          "control": "select",
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_repository_options",
+              "parameter": ""
+            }
+          },
+          "trigger": {
+            "type": "change",
+            "callback": {
+              "function": "target_repo_change",
+              "parameter": "{old_value!s},{new_value!s}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ref": "description_stages",
+      "is_stage_stub": true,
+      "callback": {
+        "function": "get_description_stages",
+        "parameter": ""
+      }
+    }
+  ]
+}

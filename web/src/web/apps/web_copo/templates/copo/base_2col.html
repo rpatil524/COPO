@@ -1,0 +1,24 @@
+{% extends 'copo/base.html' %}
+
+{% block content_area %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-8 col-md-8 col-lg-8 copo-main">
+                {% block browse_header_block %}
+                {% endblock %}
+                <div class="global-page-title">
+                    {% block page_tile %}
+                    {% endblock page_tile %}
+                </div>
+                {% block content %}
+                {% endblock content %}
+            </div>
+            <div class="col-sm-4 col-md-4 col-lg-4 copo-sidebar">
+                {% block help_section %}
+                {% endblock help_section %}
+            </div>
+        </div>
+    </div>
+{% endblock content_area%}
+
+

@@ -1,0 +1,39 @@
+{
+  "properties": [
+    {
+      "hidden": "false",
+      "deprecated": false,
+      "type": "string",
+      "ref": "",
+      "id": "copo.comment.name",
+      "show_in_table": true,
+      "show_in_form": true,
+      "control": "text",
+      "versions": [
+        "name"
+      ],
+      "label": "Title"
+    },
+    {
+      "hidden": "false",
+      "deprecated": false,
+      "type": "string",
+      "ref": "",
+      "id": "copo.comment.value",
+      "show_in_table": true,
+      "show_in_form": true,
+      "control": "textarea",
+      "versions": [
+        "value"
+      ],
+      "label": "Value"
+    }
+  ],
+  "description": "Mappings of attribute in the comment schema to COPO UI configuration.",
+  "configuration": {
+    "type": "json",
+    "provider": "isa",
+    "ref": "comment_schema"
+  },
+  "title": "Comment mappings"
+}

@@ -1,0 +1,160 @@
+{
+  "title": "Sample Description Wizard Messages",
+  "description": "Defines messages used in the sample description process. 'text' holds the actual message; 'text_class' as used here are ordinary Bootstrap classes: text-primary, text-info, text-warning, text-danger, which give additional flexibility for conveying different message kinds to the user; 'text_options' are oriented towards a more question-type message that would require the user to make a choice in response. messages used within the context of dynamically generated stages are also captured here.",
+  "properties": {
+    "initiate_message": {
+      "text": "<strong>1.)</strong> Select a file; <strong>2.)</strong> click the <strong>Describe</strong> button to initiate the wizard, <strong>COPO-WIZ</strong>; <strong>3.)</strong> follow the stages presented by the wizard to describe your data file",
+      "text_class": "text-default"
+    },
+    "select_files_message": {
+      "text": "Please select the file you want to describe!",
+      "text_class": "text-danger"
+    },
+    "no_destination_message": {
+      "text": "Unable to determine a deposition destination for the selected file bundle at this instance. Please select your target repository from the list provided.",
+      "text_class": "text-warning"
+    },
+    "destination_message": {
+      "text": "The suggested deposition destination, <strong>{destination!s}</strong>, closely matches the selected file types. Please select an alternative destination if the suggested one is unsuitable. ",
+      "text_class": "text-default"
+    },
+    "library_construction_message": {
+      "text": "Specify the origin of the material that may have been sequenced, and any treatments that the material might have undergone that affect the sequencing result.",
+      "text_class": "text-default"
+    },
+    "nucleic_acid_sequencing_message": {
+      "text": "Specify the sequencing technique used.",
+      "text_class": "text-default"
+    },
+    "review_message": {
+      "text": "You have reached the final stage of the wizard. Use the 'Prev' and 'Next' buttons to review your entries. Alternatively, the quick navigation buttons can be used to jump to a specific stage. <br/><br/>Click <strong>Finish!</strong> to wrap up the current description.",
+      "text_class": "text-default"
+    },
+    "confirm_initiate_submission": {
+      "text": "The description bundle has been validated and is deemed fit for submission. <br/><br/>Do you want to initiate submission of the bundle now?",
+      "text_class": "text-default"
+    },
+    "metadata_validation_failed": {
+      "text": "Bundle items exist with incomplete metadata, and may impact submission of the bundle.<br/><br/>Do you want to describe some more?",
+      "text_class": "text-default"
+    },
+    "empty_queue_message": {
+      "text": "No description targets! Select data files to add to the description batch.",
+      "text_class": "text-default"
+    },
+    "exit_wizard_message": {
+      "text": "You have opted to exit the wizard. Your current description will be saved, and you can carry on describing at a later time. <br/><br/>Are you sure you want to exit the wizard?",
+      "text_class": "text-default"
+    },
+    "confirm_bundling_action": {
+      "text": "The selected datafiles will be described as a bundle, and may potentially be submitted as a bundle to the same repository. <br/><br/>Do you want to go ahead with the description?",
+      "text_class": "text-default"
+    },
+    "inherit_metadata_message": {
+      "text": "Some of the selected datafiles are ahead of others, in terms of description metadata, but can be inherited from. <br/><br/>Do you want selected datafiles having fewer description metadata to inherit the following metadata?",
+      "text_class": "text-default"
+    },
+    "inherit_metadata_103_message": {
+      "text": "Some of the selected datafiles are ahead of items in the current description bundle, in terms of description metadata, and can be inherited from. <br/><br/>Do you want the current description bundle to inherit the following metadata? <br/><div style='color:red; margin-top:20px;'>Please note that this action might alter the wizard state, due to the upgrade in description metadata.</div>",
+      "text_class": "text-default"
+    },
+    "incompatible_metadata_message": {
+      "text": "The selected datafiles have incompatible description metadata, and may not be described as a bundle!",
+      "text_class": "text-default"
+    },
+    "discard_description_message": {
+      "text": "You have selected to discard description. Please note that all description metadata associated with bundle items will be permanently removed from the system. <br/><br/>Are you sure you want to discard description?",
+      "text_class": "text-default"
+    },
+    "delete_description_message": {
+      "text": "Are you sure you want to go ahead and delete description metadata for the selected files? <br/><div style='color:red; margin-top:20px;'>Please note that files currently being described will not be affected by this action.</div>",
+      "text_class": "text-default"
+    },
+    "stage_dependency_message": {
+      "text": "Please note that changing this value might impact certain stages in the description process! This might, in some cases, result in loss of previous entries. <br/><br/>Do you want to continue?",
+      "text_class": "text-default"
+    },
+    "empty_bundle_message": {
+      "text": "You are about to remove the last item in the description bundle. Please note that this action will cause the wizard to be cleared as well. Do you want to continue? ",
+      "text_class": "text-warning"
+    },
+    "no_metadata_bundle_items": {
+      "text": "There are items in the bundle with no assigned metadata for this description stage! What action do you want to take?",
+      "text_class": "text-warning",
+      "text_options": [
+        {
+          "label": "Apply current description to items with no metadata ",
+          "value": "apply"
+        },
+        {
+          "label": "Do not apply current description to items with no metadata",
+          "value": "donotapply"
+        }
+      ]
+    },
+    "no_metadata_selected_bundle_items": {
+      "text": "There are items in the bundle with no assigned metadata for this description stage! <br/><br/> Do you want to continue without describing the affected items?",
+      "text_class": "text-warning"
+    },
+    "metadata_selected_bundle_items": {
+      "text": "Part of the selected items in the bundle may have already been assigned metadata for the current description stage! What action do you want to take?",
+      "text_class": "text-warning",
+      "text_options": [
+        {
+          "label": "Overwrite metadata for affected items in the bundle",
+          "value": "overwrite"
+        },
+        {
+          "label": "Do not overwrite metadata for affected items in the bundle",
+          "value": "donotoverwrite"
+        }
+      ]
+    },
+    "metadata_bundle_items": {
+      "text": "Are you sure you want to overwrite existing metadata, with the new entry, for items in the description bundle?",
+      "text_class": "text-warning",
+      "text_options": [
+        {
+          "label": "Overwrite metadata for affected items in the bundle",
+          "value": "overwrite"
+        },
+        {
+          "label": "Do not overwrite metadata for affected items in the bundle",
+          "value": "donotoverwrite"
+        }
+      ]
+    },
+    "apply_to_all_message": {
+      "text": "Please be aware that any metadata supplied in this stage will apply to all items in the description bundle. Click <b>Next</b>, when done, to proceed.",
+      "text_class": "text-info"
+    },
+    "description_bundle_select_message": {
+      "text": "You have chosen 'to apply to selected'. Please be aware that any metadata supplied in this stage will apply only to selected items in the description bundle: <ol> <li>Select the items in the bundle for which this description applies</li> <li>Click the apply button to save your entries</li> <li>Repeat steps 1. and 2. for as many subsets of items in the description bundle as required</li> </ol> Click <b>Next</b>, when done, to proceed.",
+      "text_class": "text-info"
+    },
+    "singular_stage_message": {
+      "text": "Please be aware that all the items in the description bundle will be assigned the same metadata in this stage: the 'apply to all' button is disabled in this stage to emphasise this.  Click <b>Next</b>, when done, to proceed.",
+      "text_class": "text-info"
+    },
+    "unselected_bundle_items_message": {
+      "text": "Please select the items in the description bundle for which the current description metadata applies.",
+      "text_class": "text-warning"
+    },
+    "dismiss_alert_message": {
+      "text": "Dismiss this notification",
+      "text_class": "text-info"
+    },
+    "disable_alert_message": {
+      "text": "Disable notifications. Use the notification icon to display notifications",
+      "text_class": "text-info"
+    },
+    "enable_alert_message": {
+      "text": "Enable notifications",
+      "text_class": "text-info"
+    },
+    "singleton_item_alert_message": {
+      "text": "Please note that all controls associated with batch description are disabled, because there is only an item in the description bundle.",
+      "text_class": "text-info"
+    }
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "title": "Figshare Datafile Description",
+  "description": "Definitions for elements that appear in different stages of a wizard targeted at submissions to a repository. 'ref', id of stage; 'title',  header used for the stage; 'content', the function to call to generate stage html; items, actual form elements on the page; 'is_stage_stub', if the stage entry is a complete stage or a bootstrap; 'is_conditional_stage', displays a stage based on some condition being satisfied. A callback can be defined on conditional stages at the properties level in order to resolve the condition for the stage display.",
+  "properties": [
+    {
+      "ref": "attach_samples",
+      "title": "Samples",
+      "content": "get_stage_html",
+      "deposition_context": "figshare",
+      "message": "Select samples associated with this file from the list. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based. <br/>Click <strong>Next</strong>, when you are done, to carry on with your description.",
+      "items": [
+        {
+          "id": "study_samples",
+          "help_tip": "",
+          "label": "Samples",
+          "hidden": "false",
+          "control": "copo-multi-search",
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_samples_json",
+              "parameter": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ref": "type_category",
+      "title": "Description",
+      "content": "get_stage_html",
+      "deposition_context": "figshare",
+      "message": "Select the type of file you have uploaded to COPO.",
+      "items": [
+        {
+          "id": "type",
+          "help_tip": "Select the type of file you have uploaded.",
+          "label": "Article Type",
+          "hidden": "false",
+          "control": "select",
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_figshare_article_options",
+              "parameter": ""
+            }
+          }
+        },
+        {
+          "id": "categories",
+          "help_tip": "Select a relevant category.",
+          "label": "Categories",
+          "hidden": "false",
+          "control": "copo-multi-select",
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_figshare_category_options",
+              "parameter": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ref": "title_author_description",
+      "title": "Description",
+      "content": "get_stage_html",
+      "deposition_context": "figshare",
+      "message": "Give a Title to be used for this submission. This will be visible on the Internet.",
+      "items": [
+        {
+          "id": "title",
+          "help_tip": "Enter a Title",
+          "label": "Title",
+          "hidden": "false",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "author",
+          "help_tip": "Enter Authors",
+          "label": "Author/s",
+          "hidden": "false",
+          "control": "copo-select",
+          "default_value": ""
+        },
+        {
+          "id": "description",
+          "help_tip": "Enter a description which succinctly describes this file.",
+          "label": "Description",
+          "hidden": "false",
+          "control": "text",
+          "default_value": ""
+        }
+      ]
+    },
+    {
+      "ref": "tags",
+      "title": "Description",
+      "content": "get_stage_html",
+      "deposition_context": "figshare",
+      "message": "Enter keywords for your file. These will help others find your file on the Internet.",
+      "items": [
+        {
+          "id": "keywords",
+          "help_tip": "Enter keywords which represent the main subject of your file.",
+          "label": "Keywords",
+          "hidden": "false",
+          "control": "copo-select",
+          "default_value": ""
+        },
+        {
+          "id": "references",
+          "help_tip": "Enter keywords which represent the main subject of your file.",
+          "label": "Web References",
+          "hidden": "false",
+          "control": "copo-select",
+          "default_value": ""
+        },
+        {
+          "id": "funding",
+          "help_tip": "Give any grant number of funding authority relating to this file.",
+          "label": "Funding",
+          "hidden": "false",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "article_licenses",
+          "help_tip": "Select the license you want this file to be published under.",
+          "label": "License",
+          "hidden": "false",
+          "control": "select",
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_figshare_license_options",
+              "parameter": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ref": "figshare_publish",
+      "title": "Publish?",
+      "content": "get_stage_html",
+      "deposition_context": "figshare",
+      "message": "Should this file be published immediately?",
+      "items": [
+        {
+          "id": "should_publish",
+          "help_tip": "Select the license you want this file to be published under.",
+          "label": "Publish?",
+          "hidden": "false",
+          "control": "select",
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_figshare_publish_options",
+              "parameter": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ref": "oauth_authorisation",
+      "is_conditional_stage": true,
+      "title": "OAuth Authorisation",
+      "content": "get_stage_html",
+      "deposition_context": "figshare",
+      "message": "Click below to be grant COPO access to your Figshare account",
+      "callback": {
+        "function": "validate_figshare_token",
+        "parameter": ""
+      },
+      "items": [
+        {
+          "id": "oauth_authorisation",
+          "help_tip": "",
+          "label": "Figshare",
+          "hidden": "false",
+          "control": "oauth_required",
+          "additional_class": "",
+          "default_value": "",
+          "trigger": {
+            "type": "repo",
+            "callback": {
+              "function": "finish_oauth_authentication",
+              "parameter": "{new_value!s}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

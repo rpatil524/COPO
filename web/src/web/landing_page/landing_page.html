@@ -1,0 +1,334 @@
+{% load staticfiles %}
+<?xml version="1.0" encoding="UTF-8"?>
+<html>
+<head>
+    <link rel="stylesheet" href="{% static "copo/css/bootstrap/bootstrap.css" %}">
+    <style>
+        html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+        }
+
+        body {
+            width: 100%
+        }
+
+        #wrapper {
+            width: 1366px;
+            margin: 0 auto;
+        }
+
+        #banner {
+            background-image: url("{% static "copo/img/bg_header.png"%}");
+            background-size: 100%;
+            height: 400px;
+        }
+
+        .panel_white {
+            height: 300px;
+        }
+
+        .panel_light_grey {
+            height: 300px;
+            background-color: #f2f2f2;
+        }
+
+        .panel_blue {
+            height: 250px;
+            background-color: #34a99d;
+        }
+
+        .panel_dark_grey {
+            height: 200px;
+            background-color: #3e3e3e;
+        }
+
+        p.blocktext {
+            width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        p.blocktext img {
+            width: 600px;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: 'calibri';
+            color: white;
+            font-weight: 100;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #3b9a56;
+            font-family: 'calibri';
+            font-weight: 900;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            color: white;
+            font-family: 'calibri';
+            font-weight: 900;
+            font-size: 1.5em;
+            margin: 20px 0 5px 0;
+        }
+
+        a {
+            color: white;
+            font-family: 'calibri';
+            font-weight: 700;
+            font-size: 1em;
+            margin: 20px 0 5px 0;
+        }
+
+        h4 {
+            color: white;
+            font-family: 'calibri';
+            font-weight: 900;
+            font-size: 1.2em;
+            margin: 20px 0 5px 0;
+        }
+
+        .tagline {
+            color: white;
+            font-family: 'calibri';
+            font-weight: 100;
+            font-size: 1em;
+        }
+
+        #try_out {
+            margin-top: 20px;
+            width: 100px;
+            border: 2px solid white;
+            text-align: center;
+            border-radius: 25px;
+            padding: 5px;
+            color: white;
+            font-family: 'calibri';
+        }
+
+        .cont {
+            padding-top: 20px;
+            padding-left: 130px;
+        }
+
+        ul.main_ul {
+            font-family: 'calibri';
+            color: #919090;
+            font-size: 1.5em;
+            font-weight: 100;
+            padding-left: 10px;
+
+        }
+
+        ul.main_ul li {
+            margin-bottom: 10px;
+        }
+
+        .cont img {
+            height: 250px;
+        }
+
+        .form-center {
+            text-align: center;
+            margin-top: 25px;
+            margin-left: -110px
+        }
+
+        #email_text_input {
+            margin: 20px;
+            width: 400px;
+            border-radius: 20px;
+        }
+
+        #email_submit {
+            margin: 0;
+            width: 150px;
+            background-color: #34a99d;
+            border: 2px solid white;
+            color: white;
+            border-radius: 20px;
+            font-family: 'calibri';
+        }
+
+        .white-text {
+            color: white;
+            font-family: 'calibri';
+        }
+
+        .padding-20 {
+            padding-top: 20px;
+            padding-left: 20px;
+            margin-bottom: 20px
+        }
+
+        ul.bottom-ul {
+            list-style-type: none;
+
+        }
+
+        ul.bottom-ul li {
+            text-decoration: none;
+            color: #95a1a1;
+            font-size: 1em;
+            font-weight: 100;
+            /*margin-bottom:-3px;*/
+            padding-left: 0px;
+
+        }
+
+        ul.bottom-ul li a {
+            color: #95a1a1;
+        }
+
+
+    </style>
+</head>
+<body>
+<div id="wrapper">
+
+    <div id="banner">
+        <p class="blocktext">
+            <img src="{% static 'copo/img/copo_white.png' %}"/>
+        </p>
+        <h1>Describe. Deposit. Discover.</h1>
+        <!--
+        <p class="blocktext">
+                <div id="try_out" class="center-block">Github</div>
+                        <div id="docs" class="center-block">Docs</div>
+                </p>
+        -->    </div>
+
+    <div class="panel_white">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-lg-6 cont">
+                <h2>Desposit</h2>
+                <ul class="main_ul">
+                    <li>Seamless deposition to repositories</li>
+                    <li>Makes metadata labelling simple</li>
+                    <li>Compatibility with commonly used repositories</li>
+                </ul>
+            </div>
+            <div class="col-md-4 col-sm-4 col-lg-4 cont">
+
+                <img class="center-block" src="{% static "copo/img/cloud.png" %}"/>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="panel_light_grey">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-lg-6 cont">
+                <h2>Citations and Reproducibility</h2>
+                <ul class="main_ul">
+                    <li>Receive credit for more than just papers</li>
+                    <li>Profiles aggregate research objects such as data, source code, images, posters which can then be
+                        referenced
+                    </li>
+                    <li>Links to analysis platforms (iPlant / Galaxy) allow workflows to be rerun</li>
+                </ul>
+
+            </div>
+            <div class="col-md-4 col-sm-4 col-lg-4 cont">
+                <img class="center-block" src="{% static "copo/img/umbilical.png" %}"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel_white">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-lg-6 cont">
+                <h2>Linked Data</h2>
+                <ul class="main_ul">
+                    <li>Semantic meaning attached to objects</li>
+                    <li>Discoverabilty of research outputs by traversal of knowledge graphs</li>
+                    <li>Data mining techniques provide insight into the state of a discipline</li>
+                </ul>
+            </div>
+
+            <div class="col-md-4 col-sm-4 col-lg-4 cont">
+
+                <img class="center-block" src="{% static "copo/img/citation.png" %}"/>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="panel_blue">
+        <div class="row">
+            <div class="col-md-2 col-sm-2 col-lg-2 cont"></div>
+            <div class="col-md-4 col-sm-4 col-lg-4 cont">
+
+
+                <h3>COPO isn't quite ready yet, but we're looking for beta testers. Email us to receive updates: <a
+                        href="mailto:copo@tgac.ac.uk?subject=I'm intetested in COPO!">copo@tgac.ac.uk</a></h3>
+            </div>
+            <div class="col-md-6 col-sm-6 col-lg-6">
+                <img style="height: 80px; margin:30px 0 0 20px" class="center-block"
+                     src="{% static "copo/img/copo_white.png" %}"/>
+            </div>
+
+        </div>
+        <div class="row">
+            <!--
+            <form class="form-inline form-center">
+                <div class="form-group">
+                    <input id="email_text_input" type="text" class="form-control" id="exampleInputName2"
+                           placeholder="Your Work Email">
+                </div>
+
+                <button id="email_submit" type="submit" style="" class="btn btn-default">Submit</button>
+            </form>
+-->
+
+
+        </div>
+    </div>
+    <div class="panel_dark_grey">
+        <div class="row">
+            <div class="col-md-3 col-sm-3 col-lg-3  white-text padding-top"></div>
+            <div class="col-md-2 col-sm-2 col-lg-2  white-text padding-20">
+                <h4>About COPO</h4>
+                <ul class="bottom-ul">
+                    <li><a href="https://github.com/collaborative-open-plant-omics/COPO">Github</a></li>
+                    <li><a href="https://documentation.tgac.ac.uk/display/COPO/Overview">Documentation</a></li>
+                </ul>
+            </div>
+            <div class="col-md-2 col-sm-2 col-lg-2  white-text padding-20">
+                <h4>Contact</h4>
+                <ul class="bottom-ul">
+                    <li><a href="mailto:copo@tgac.ac.uk" target="_top">copo@tgac.ac.uk</a></li>
+                    <li>The Genome Analysis Centre</li>
+                    <li>Norwich</li>
+                    <li>Norfolk</li>
+                    <li>NR4 7UK</li>
+                    <li>United Kingdom</li>
+                </ul>
+            </div>
+            <div class="col-md-2 col-sm-2 col-lg-2  white-text padding-20">
+                <h4>About Us</h4>
+                <ul class="bottom-ul">
+                    <li><a href="http://www.tgac.ac.uk/">The Genome Analysis Centre</a></li>
+                    <li><a href="http://www.oerc.ox.ac.uk/">Oxford e-Research Centre</a></li>
+                    <li><a href="http://www2.warwick.ac.uk/">University of Warwick</a></li>
+                    <li><a href="http://www.ebi.ac.uk/">EMBL-EBI</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

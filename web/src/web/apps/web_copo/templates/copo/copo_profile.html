@@ -1,0 +1,183 @@
+{% extends 'copo/base_1col.html' %}
+
+{% load staticfiles %}
+{% load web_tags %}
+
+{% block stylesheet_block %}
+    <link rel="stylesheet" href="{% static 'copo/css/copo/color_button.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/study.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/profile_pricelist.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/css/bootstrap/bootstrap-dialog.css' %}">
+
+
+
+{% endblock %}
+
+
+{% block tagline_block %}{% endblock %}
+
+{% block page_tile %}
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12" style="padding-top: 10px;">{{ profile.title }}</div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12"
+             style="padding-top: 10px; font-size: 16px;">{{ profile.description }}</div>
+    </div>
+{% endblock page_tile %}
+
+{% block content %}
+
+    <!-- Hidden Fields Section -->
+    <input type="hidden" value="{{ p_id }}" name="profile_id" id="profile_id"/>
+    <input type="hidden" value="{% url 'copo:copo_publications' profile_id=p_id %}" name="publications_url"
+           id="publications_url"/>
+    <input type="hidden" value="{% url 'copo:copo_data' profile_id=p_id %}" name="data_url" id="data_url"/>
+    <input type="hidden" value="{% url 'copo:copo_samples' profile_id=p_id %}" name="samples_url" id="samples_url"/>
+    <input type="hidden" value="{% url 'copo:copo_submissions' profile_id=p_id %}" name="submissions_url"
+           id="submissions_url"/>
+    <input type="hidden" value="{% url 'copo:copo_people' profile_id=p_id %}" name="people_url" id="people_url"/>
+
+
+    <input type="hidden" id="update_counts_url" value="{% url 'copo:update_counts' %}"/>
+    <input type="hidden" id="get_source_count" value="{% url 'copo:get_source_count' %}"/>
+
+    <div class="wrapper">
+
+        <div class="pricing-table group">
+
+            <!-- DATA -->
+            <div class="block data fl">
+                <h2 class="title data_color">data</h2>
+                <!-- content -->
+                <div class="content data_color">
+                    <p class="price">
+                        <span></span>
+                    </p>
+                    <p class="hint">files in profile</p>
+                </div>
+                <!-- /content -->
+                <!-- features -->
+                <ul class="features" data-control="data">
+                    <li id="data_link"><span class="fa fa-eye fa-2x"></span>Inspect Data</li>
+                    {#					<li id="add_data_link" class="new_item"><span class="fa fa-plus-circle fa-2x"></span>New Data File</li>#}
+                </ul>
+                <!-- /features -->
+                <!-- footer -->
+                <div class="pt-footer data_color">
+                    <p>&nbsp</p>
+                </div>
+                <!-- /footer -->
+            </div>
+            <!-- /DATA-->
+
+            <!-- SAMPLES -->
+            <div class="block samples fl">
+                <h2 class="title samples_color">samples</h2>
+                <div class="content samples_color">
+                    <p class="price">
+                        <span></span>
+                    </p>
+                    <p class="hint">samples in profile</p>
+                </div>
+
+                <ul class="features" data-control="sample">
+                    <li id="sample_link"><span class="fa fa-eye fa-2x"></span>Inspect Samples</li>
+                    <li id="add_sample_link" class="index-form-call" data-component="sample"><span
+                            class="fa fa-plus-circle fa-2x"></span>Add Sample
+                    </li>
+                </ul>
+
+                <div class="pt-footer samples_color">
+                    <p>&nbsp</p>
+                </div>
+
+            </div>
+            <!-- /SAMPLES -->
+
+            <!-- SUBMISSIONS -->
+            <div class="block submissions fl">
+                <h2 class="title submissions_color">submissions</h2>
+
+                <div class="content submissions_color">
+                    <p class="price">
+                        <span></span>
+
+                    </p>
+                    <p class="hint">submissions in profile</p>
+                </div>
+
+                <ul class="features" data-control="submission">
+                    <li id="submission_link"><span class="fa fa-eye fa-2x"></span>Inspect Submissions</li>
+                    {#					<li id="add_submission_link" class="new_item"><span class="fa fa-plus-circle fa-2x"></span>New Submission</li>#}
+                </ul>
+
+                <div class="pt-footer submissions_color">
+                    <p>&nbsp</p>
+                </div>
+
+            </div>
+            <!-- /SUBMISSIONS -->
+
+            <!-- PUBLICATIONS -->
+            <div class="block publication fl">
+                <h2 class="title pubs_color">publications</h2>
+                <div class="content pubs_color">
+                    <p class="price">
+                        <span></span>
+
+                    </p>
+                    <p class="hint">publications in profile</p>
+                </div>
+
+                <ul class="features" data-control="publication">
+                    <li id="publication_link"><span class="fa fa-eye fa-2x"></span>Inspect Publications</li>
+                    <li id="add_publication_link" class="index-form-call" data-component="publication"><span
+                            class="fa fa-plus-circle fa-2x"></span>Add Publication
+                    </li>
+                </ul>
+
+                <div class="pt-footer pubs_color">
+                    <p>&nbsp</p>
+                </div>
+
+            </div>
+            <!-- /PUBLICATIONS -->
+
+            <!-- PEOPLE -->
+            <div class="block people fl">
+                <h2 class="title people_color">people</h2>
+                <div class="content people_color">
+                    <p class="price">
+                        <span></span>
+
+                    </p>
+                    <p class="hint">people in group</p>
+                </div>
+
+                <ul class="features" data-control="people">
+                    <li id="people_link"><span class="fa fa-eye fa-2x"></span>Inspect People</li>
+                    <li id="add_person_link" class="index-form-call" data-component="person"><span
+                            class="fa fa-plus-circle fa-2x"></span>Add Person
+                    </li>
+                </ul>
+
+                <div class="pt-footer people_color">
+                    <p>&nbsp</p>
+                </div>
+
+            </div>
+            <!-- /PEOPLE -->
+        </div>
+
+    </div>
+
+{% endblock %}
+
+
+{% block js_block %}
+    <script src="{% static "copo/js/copo_profile.js" %}"></script>
+    <script src="{% static "copo/js/generic_handlers.js" %}"></script>
+    <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
+{% endblock %}

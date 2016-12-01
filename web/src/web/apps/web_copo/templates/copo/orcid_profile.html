@@ -1,0 +1,103 @@
+{% extends 'copo/base_1col.html' %}
+
+{% load staticfiles %}
+{% load web_tags_orcid %}
+
+{% block stylesheet_block %}
+    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/orcid_profile.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+{% endblock %}
+
+
+{% block title_block %} Index {% endblock %}
+
+{% block tagline_block %}
+
+
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="centerish">
+        <span class="h3">
+             <img src="{% static 'copo/img/orcid.png' %}" style="height:50px">
+
+            <a href="{{ op.op.orcid_profile.orcid_identifier.uri }}">
+
+                {{ op.op.orcid_profile.orcid_identifier.uri }}
+            </a>
+        </span>
+    </div>
+    {% autoescape off %}
+        <div class="orcid_header">
+            Publications
+        </div>
+
+        {% for pub in op.op.orcid_profile.orcid_activities.orcid_works.orcid_work %}
+            <div class="orcid_entry">
+                <span class="h3">{{ pub.work_title.title.value }}<span class="small">{{ pub.work_title.subtitle.value|subtitle }}</span>
+                </span>
+
+                <span>{{ pub.journal_title.value|add_break }}</span>
+                <br/>
+            <span class="h3 small">{{ pub.publication_date.year.value }}-{{ pub.publication_date.month.value }}
+                | {{ pub.work_type|caps }}</span>
+
+                <div class="h3 small">
+                    {% for id in pub.work_external_identifiers.work_external_identifier %}
+                        {{ id.work_external_identifier_id.value|add_uri_break }}
+                    {% endfor %}
+                </div>
+                <br>
+            </div>
+
+        {% endfor %}
+    {% endautoescape %}
+    <div class="orcid_header">
+        Affiliations
+    </div>
+    {% for place in op.op.orcid_profile.orcid_activities.affiliations.affiliation %}
+        <div class="orcid_entry">
+            <div class="h3">
+                {{ place.organization.name }},
+                <small>{{ place.organization.address.city }}, {{ place.organization.address.country }} </small>
+            </div>
+            <div class="h3 small">
+                {{ place.role_title }}, ({{ place.department_name }})
+            </div>
+            <div class="h3 small">
+                {{ place.start_date.year.value }} - {{ place.start_date.month.value }} to
+                {{ place.end_date.year.value|date_present_year }}{{ place.end_date.month.value|date_present_month }}
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="orcid_header">
+        Funding
+    </div>
+    {% for fund in op.op.orcid_profile.orcid_activities.funding_list.funding %}
+        <div class="orcid_entry">
+            <div class="h3">
+                {{ fund.organization.name }},
+                <small>({{ fund.organization.address.city }}, {{ fund.organization.address.country }})</small>
+            </div>
+            <div class="h3 small">
+                {{ fund.start_date.year.value }} - {{ fund.start_date.month.value }} to
+                {{ fund.end_date.year.value|date_present_year }}{{ fund.end_date.month.value|date_present_month }}
+                | {{ fund.funding_type }}
+            </div>
+            <div class="h3 small">
+                {% for id in fund.funding_external_identifiers.funding_external_identifier %}
+                    {{ id.funding_external_identifier_type|caps }}: <strong>{{  id.funding_external_identifier_value }}</strong>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+    <br/><br/><br/>
+{% endblock %}
+
+
+{% block js_block %}
+{% endblock %}

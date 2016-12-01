@@ -1,0 +1,199 @@
+{% extends 'copo/base_1col.html' %}
+
+{% load staticfiles %}
+{% load web_tags %}
+
+{% block stylesheet_block %}
+    <link rel="stylesheet" href="{% static 'copo/css/copo/color_button.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/study.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/css/bootstrap/bootstrap-dialog.css' %}">
+
+{% endblock %}
+
+
+{% block title_block %} Study {% endblock %}
+
+{% block tagline_block %}{% endblock %}
+
+
+{% block browse_header_block %}
+
+    <div id="browse_header">
+        <span class="blue_icon">
+           <a><i class="fa fa-plus-circle" data-toggle="modal" data-target="#newStudyModal"></i></a>
+        </span>
+        <span class="blue_icon">
+            <a><i class="fa fa-pencil-square-o"></i></a>
+        </span>
+        <span class="blue_icon">
+            <a><i class="fa fa-trash-o"></i></a>
+        </span>
+
+        <div class="input-group input-group-sm">
+            <span class="input-group-addon">
+                <i class="fa fa-search"></i>
+            </span>
+            <input type="search" class="form-control" placeholder="Search">
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block content %}
+
+    <!-- here is the markup for the top table data pulled in from the study itself -->
+
+    <h2 class="h2">{{ profile_title }}</h2>
+    {{ profile_abstract }}
+    {% if collections %}
+        <hr/>
+        <h3>Collections</h3>
+        <table id="browse_table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for c in collections %}
+
+                <tr data-collection_id="{{ c|mongo_id }}">
+                    <td>
+                        <a href="{% url 'copo:view_collection' collection_head_id=c|mongo_id %}">{{ c.name }}</a>RACKOFF</td>
+
+                    <td>
+                        {{ c.type }}
+                    </td>
+                    <td class="text-center">
+
+                        <ul class="coolHandLuke vert-align">
+                            {% if not c.is_clean %}
+                                <li class="center-block" center-block><span class="red"> </span><a href="#">Submit to
+                                    Repo</a></li>
+                            {% else %}
+                                <li><span class="green"> </span><a
+                                        href="{% url 'copo:view_collection' collection_head_id=c|mongo_id %}">Inspect</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+
+                        <span class="col-lg-3">
+                            <span class="spinner vert-align pull-right">
+                            <img src="{% static "copo/img/flower.png" %}"/>
+                            </span>
+                        </span>
+
+                    </td>
+                </tr>
+
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <!-- subsequently we should loop and have some sort of collapsable table showing the existing work collections -->
+
+
+    <!-- then we have a button to add a new work collection and a submit to Repo button-->
+    <ul class="list-inline pull-right" id="bottom_button_group">
+        <li>
+            <button type="button" class="btn btn-primary btn-lg text-center" data-toggle="modal"
+                    data-target="#newCollectionModal">Add Collection
+            </button>
+        </li>
+    </ul>
+
+
+
+    <!-- here is the hidden modal which will be populated from js, will look at having a rest call to a python service to
+    query the forms xml for the type of data selected by the user -->
+
+    <!-- Modal -->
+    <div class="modal fade" id="newCollectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span
+                            aria-hidden="true">&times;</span><span
+                            class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">New Collection</h4>
+                </div>
+                <div class="modal-body">
+
+                    <form role="form" id="ena_study_form" action="{% url 'copo:new_collection' %}" method="post">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="profile_id" value="{{ profile_id }}">
+
+                        <div class="form-group">
+                            <label for="collection_name">Collection Name</label><br/>
+                            <input type="text" name="collection_name" id="collection_name"
+                                   class=" input-copo"
+                                   placeholder="Enter Name"/>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="collection_type">Collection Type</label>
+                            <select name="collection_type" id="collection_type" class="form-control">
+                                {% for coll in collection_types %}
+                                    <option value="{{ coll.value }}">{{ coll.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div id="study_type_div" class="form-group">
+                            <label for="study_type">Study Types
+                                <div style="display: inline-block;">
+                                    <a class="btn btn-xs btn-success study-type-add" href="#">
+                                        <i class="fa fa-plus-square-o fa-sm"></i> Add</a>
+                                </div>
+                            </label>
+
+                            <div id="study_types_lists_div">
+                                <div id="study_type_select_divs_0" style="white-space: nowrap; margin-bottom: 0.5em;">
+                                    <div style="display: inline-block;">
+                                        <select name="study_type_select_0" id="study_type_select_0"
+                                                class="form-control">
+                                            {% for stud in study_types %}
+                                                <option value="{{ stud.value }}">{{ stud.label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div style="display: inline-block;">
+                                        <input type="text" name="study_type_reference_0" id="study_type_reference_0"
+                                               class=" input-copo"
+                                               placeholder="Enter Study Reference"/>
+                                    </div>
+                                    <div style="display: inline-block;">
+                                        <a id="study_type_remove_0" name="study_type_remove_0"
+                                           class="btn btn-xs btn-danger study-type-remove" href="#">
+                                            <i class="fa fa-trash-o fa-sm"></i> Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary text-center">Submit</button>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block js_block %}
+    <script src="{% static 'copo/js/collection_functions.js' %}"></script>
+    <script src="{% static 'copo/js/profile.js' %}"></script>
+    <script src="{% static 'copo/js/bootstrap-dialog.js' %}"></script>
+{% endblock %}

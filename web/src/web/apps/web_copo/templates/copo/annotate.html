@@ -1,0 +1,39 @@
+{% extends 'copo/base.html' %}
+{% load staticfiles %}
+
+
+
+
+{% block stylesheet_block %}
+    <link href="{% static "copo/css/copo/annotator.min.css" %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css"/>
+{% endblock %}
+{% block js_block %}
+    <script type="text/javascript" src="{% static "copo/autocomplete.js-2.1.0/autocomplete.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/autocomplete_js/copo_autocomplete.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/js/generic_handlers.js" %}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="{% static "copo/js/annotator-full.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/js/annotate.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/js/papaparse.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/js/annotate_plugin.js" %}"></script>
+
+{% endblock %}
+
+
+{% block content %}
+
+    <!--<input type="text" data-autocomplete="/copo/ajax_search_ontology/" />-->
+
+    <input type="text" id="twat" />
+
+    <input type="file">
+
+    <table id="t1" class="compact cell-border order-column"></table>
+
+
+
+
+{% endblock %}
+
+</html>

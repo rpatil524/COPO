@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="django" name="Django">
+      <configuration>
+        <option name="rootFolder" value="$MODULE_DIR$" />
+        <option name="settingsModule" value="web/settings/all.py" />
+        <option name="manageScript" value="manage.py" />
+        <option name="environment" value="&lt;map&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;POSTGRES_USER&lt;/string&gt;&#10;    &lt;string&gt;copo_user&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;REDIS_HOST&lt;/string&gt;&#10;    &lt;string&gt;127.0.0.1&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;MONGO_HOST&lt;/string&gt;&#10;    &lt;string&gt;127.0.0.1&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;MONGO_DB&lt;/string&gt;&#10;    &lt;string&gt;copo_mongo&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;FIGSHARE_CLIENT_SECRET&lt;/string&gt;&#10;    &lt;string&gt;336b92a3ef55a657658282152feb38eee85c91880ed4f767d8287c855d5ee1c695f67c462be2e7f26b4d1b0b70c3b4986c569cb6c1ebe8131462c36c7268aa9b&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;POSTGRES_PASSWORD&lt;/string&gt;&#10;    &lt;string&gt;Apple123&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;POSTGRES_PORT&lt;/string&gt;&#10;    &lt;string&gt;5432&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;SECRET_KEY&lt;/string&gt;&#10;    &lt;string&gt;xyzabc123&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;POSTGRES_DB&lt;/string&gt;&#10;    &lt;string&gt;copo&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;FIGSHARE_CONSUMER_SECRET&lt;/string&gt;&#10;    &lt;string&gt;336b92a3ef55a657658282152feb38eee85c91880ed4f767d8287c855d5ee1c695f67c462be2e7f26b4d1b0b70c3b4986c569cb6c1ebe8131462c36c7268aa9b&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;FIGSHARE_CLIENT_ID&lt;/string&gt;&#10;    &lt;string&gt;978ec401ab6ad6c1d66f0b6cef3015d71a4734d7&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;REDIS_PORT&lt;/string&gt;&#10;    &lt;string&gt;6379&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;MONGO_PORT&lt;/string&gt;&#10;    &lt;string&gt;27017&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;POSTGRES_SERVICE&lt;/string&gt;&#10;    &lt;string&gt;127.0.0.1&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;&lt;/map&gt;" />
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="TemplatesService">
+    <option name="TEMPLATE_CONFIGURATION" value="Django" />
+    <option name="TEMPLATE_FOLDERS">
+      <list>
+        <option value="$MODULE_DIR$/api/return_templates" />
+      </list>
+    </option>
+  </component>
+  <component name="TestRunnerService">
+    <option name="projectConfiguration" value="Nosetests" />
+    <option name="PROJECT_TEST_RUNNER" value="Nosetests" />
+  </component>
+</module>
