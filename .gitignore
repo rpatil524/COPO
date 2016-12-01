@@ -89,7 +89,7 @@ ENV/
 # Rope project settings
 .ropeproject
 
-.idea/workspace.xml
+
 
 # add ignore for cached sass css files
 **sass.*.css
@@ -106,3 +106,4 @@ web/src/static/CACHE/css/**
 .idea/misc.xml
 mongo/mongodata
 *.DS_Store
+.idea/

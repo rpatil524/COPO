@@ -41,3 +41,18 @@ def verify_doc_type(doc):
         if data:
             return data[0]["data"]
     return data
+
+def change_mongo_id_format_to_standard(cursor):
+    # changes ids of records in a cursor to be 'id' instead of '_id'
+    l = cursor_to_list(cursor)
+    for r in l:
+        r['id'] = r.pop('_id')
+    return l
+
+def convert_text(data):
+    # change text to shortform :=: iri
+    l = list()
+    for r in data:
+        r['text'] = r['shortform'] + ' :-: ' + r['@id']
+        l.append(r)
+    return l

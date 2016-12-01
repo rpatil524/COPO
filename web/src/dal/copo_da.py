@@ -173,6 +173,18 @@ class Publication(DAComponent):
         super(Publication, self).__init__(profile_id, "publication")
 
 
+class Annotation(DAComponent):
+    def __init__(self, profile_id=None):
+        super(Annotation, self).__init__(profile_id, "annotation")
+
+    def get_annotations_for_page(self, document_name, request):
+        return self.get_collection_handle().find({
+            "uid": str(request.user.id),
+            "document_name": document_name,
+            "deleted": 'false'
+        })
+
+
 class Person(DAComponent):
     def __init__(self, profile_id=None):
         super(Person, self).__init__(profile_id, "person")
@@ -288,7 +300,6 @@ class Submission(DAComponent):
         )
         return doc['complete']
 
-
     def mark_submission_complete(self, sub_id):
         doc = self.get_collection_handle().update_one(
             {
@@ -296,11 +307,12 @@ class Submission(DAComponent):
             },
             {
                 "$set": {
-                    "complete" : "true",
+                    "complete": "true",
                     "completed_on": datetime.now()
                 }
             }
         )
+
 
 class DataFile(DAComponent):
     def __init__(self, profile_id=None):
