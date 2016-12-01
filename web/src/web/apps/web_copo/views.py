@@ -42,6 +42,8 @@ def login(request):
     }
     return render(request, 'copo/auth/login.html', context)
 
+def test_pdf(request):
+    return render(request, 'copo/annotate_document.html', {})
 
 def test(request):
     try:
