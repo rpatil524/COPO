@@ -16,7 +16,8 @@ from exceptions_and_logging.logger import Logtype, Loglvl
 from exceptions_and_logging.CopoRuntimeError import CopoRuntimeError
 from django.conf import settings
 from allauth.account.forms import LoginForm
-
+from dal.copo_da import Annotation
+from bson import json_util as j
 LOGGER = settings.LOGGER
 
 
@@ -43,7 +44,7 @@ def login(request):
     return render(request, 'copo/auth/login.html', context)
 
 def test_pdf(request):
-    return render(request, 'copo/annotate_document.html', {})
+    return render(request, 'copo/test_page.html', {})
 
 def test(request):
     try:
@@ -105,6 +106,14 @@ def copo_publications(request, profile_id):
     profile = Profile().get_record(profile_id)
 
     return render(request, 'copo/copo_publications.html', {'profile_id': profile_id, 'profile': profile})
+
+
+@login_required
+def copo_annotation(request, profile_id):
+    request.session["profile_id"] = profile_id
+    profile = Profile().get_record(profile_id)
+
+    return render(request, 'copo/copo_annotations.html', {'profile_id': profile_id, 'profile': profile})
 
 
 @login_required
@@ -267,4 +276,5 @@ def view_oauth_tokens(request):
 
 
 def annotate_data(request):
-    return render(request, 'annotate.html', {})
+    doc = Annotation().get_record(request.POST.get('target_id'))
+    return HttpResponse(j.dumps(doc))

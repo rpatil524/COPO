@@ -51,6 +51,7 @@ class ProfileInfo:
                         num_data="datafile",
                         num_sample="sample",
                         num_submission="submission",
+                        num_annotation="annotation"
                         )
 
         status = dict()
@@ -92,6 +93,7 @@ class DAComponent:
             source="copo.source",
             profile="copo.profile",
             submission="copo.submission",
+            annotation="copo.annotation",
             investigation="i_",
             study="s_",
             assay="a_",
@@ -179,12 +181,55 @@ class Annotation(DAComponent):
     def __init__(self, profile_id=None):
         super(Annotation, self).__init__(profile_id, "annotation")
 
-    def get_annotations_for_page(self, document_name, request):
-        return self.get_collection_handle().find({
-            "uid": str(request.user.id),
-            "document_name": document_name,
-            "deleted": 'false'
+    def get_annotations_for_page(self, document_id):
+        doc = self.get_collection_handle().find_one({
+            "_id": ObjectId(document_id)
         })
+        return doc['annotation']
+
+
+    def update_annotation(self, document_id, annotation_id, fields, delete = False):
+        # first remove element
+        self.get_collection_handle().update(
+            {
+                'annotation._id': ObjectId(annotation_id)
+            },
+            {
+                '$pull':
+                    {'annotation':
+                         {'_id': ObjectId(annotation_id)}
+                     }
+            }
+        )
+        if delete == False:
+            # now add new element
+            fields['_id'] = annotation_id
+            self.get_collection_handle().update(
+                {
+                    '_id': ObjectId(document_id)
+                },
+                {
+                    '$push':{'annotation': fields}
+                }
+            )
+            return fields
+        return ''
+
+    def add_to_annotation(self, id, fields):
+        fields['_id'] = ObjectId()
+        self.get_collection_handle().update(
+            {'_id': ObjectId(id)},
+            {'$push':
+                 {'annotation': fields}
+             }
+        )
+        return fields
+
+    def annotation_exists(self, doc_name, uid):
+        return self.get_collection_handle().find({'document_name': {'$regex': "^" + doc_name}}).count() > 0
+
+    def get_annotation_by_name(self, doc_name, uid):
+        return self.get_collection_handle().find_one({'document_name': {'$regex': "^" + doc_name}})
 
 
 class Person(DAComponent):

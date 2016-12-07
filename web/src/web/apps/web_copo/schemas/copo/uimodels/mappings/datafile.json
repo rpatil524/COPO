@@ -1,1 +1,232 @@
-{"properties": [{"type": "string", "required": "true", "ref": "", "hidden": "false", "deprecated": false, "default_value": "", "show_in_form": true, "id": "copo.datafile.name", "show_in_table": true, "control": "text", "versions": ["name"], "help_tip": "", "label": "Name"}, {"type": "string", "required": "true", "ref": "", "hidden": "true", "deprecated": false, "default_value": "", "show_in_form": false, "id": "copo.datafile.date_created", "show_in_table": true, "control": "datetime", "versions": ["date_created"], "help_tip": "", "label": "Added on"}, {"type": "string", "required": "true", "ref": "", "hidden": "false", "deprecated": false, "default_value": "Raw Data File", "show_in_form": false, "id": "copo.datafile.type", "show_in_table": false, "control": "text", "versions": ["type"], "help_tip": "", "label": "Type"}, {"type": "string", "required": "true", "ref": "", "hidden": "true", "deprecated": false, "default_value": "", "show_in_form": false, "id": "copo.datafile.profile_id", "show_in_table": false, "control": "text", "versions": ["profile_id"], "help_tip": "", "label": "Profile ID"}, {"type": "array", "required": "false", "ref": "", "hidden": "false", "deprecated": false, "default_value": "", "show_in_form": false, "id": "copo.datafile.comments", "show_in_table": false, "control": "copo-comment", "versions": ["comments"], "help_tip": "", "label": "Comment"}, {"type": "string", "required": "false", "ref": "", "hidden": "false", "deprecated": false, "default_value": "", "show_in_form": false, "id": "copo.datafile.file_id", "show_in_table": false, "control": "text", "versions": ["file_id"], "help_tip": "", "label": "File ID"}, {"type": "string", "required": "false", "ref": "", "hidden": "false", "deprecated": false, "default_value": "", "show_in_form": false, "id": "copo.datafile.file_type", "show_in_table": true, "control": "text", "versions": ["file_type"], "help_tip": "", "label": "Type"}, {"type": "string", "required": "false", "ref": "", "hidden": "false", "deprecated": false, "default_value": "", "show_in_form": false, "id": "copo.datafile.file_location", "show_in_table": false, "control": "text", "versions": ["file_location"], "help_tip": "", "label": "Location"}, {"type": "string", "required": "false", "ref": "", "hidden": "false", "deprecated": false, "default_value": "", "show_in_form": false, "id": "copo.datafile.file_size", "show_in_table": true, "control": "text", "versions": ["file_size"], "help_tip": "", "label": "Size"}, {"type": "string", "required": "false", "ref": "", "hidden": "false", "deprecated": false, "default_value": "", "show_in_form": false, "id": "copo.datafile.file_hash", "show_in_table": false, "control": "text", "versions": ["file_hash"], "help_tip": "", "label": "Hash"}, {"type": "object", "required": "false", "ref": "", "hidden": "false", "deprecated": false, "default_value": "", "show_in_form": false, "id": "copo.datafile.description", "show_in_table": false, "control": "datafile-description", "versions": ["description"], "help_tip": "", "label": "Description"}, {"type": "string", "required": "true", "ref": "", "hidden": "true", "deprecated": false, "default_value": "", "show_in_form": false, "id": "copo.datafile.deleted", "show_in_table": false, "control": "text", "versions": ["deleted"], "help_tip": "", "label": "Delete"}, {"type": "string", "required": "true", "ref": "", "hidden": "true", "deprecated": false, "default_value": "", "show_in_form": false, "id": "copo.datafile.date_modified", "show_in_table": false, "control": "datetime", "versions": ["date_modified"], "help_tip": "", "label": "Modified"}], "description": "Attributes mapping for data schema.", "configuration": {"type": "json", "provider": "isa", "ref": "data_schema"}, "title": "Datafile schema mappings"}
+{
+  "properties": [
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": true,
+      "id": "copo.datafile.name",
+      "show_in_table": true,
+      "control": "text",
+      "versions": [
+        "name"
+      ],
+      "help_tip": "",
+      "label": "Name"
+    },
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.datafile.date_created",
+      "show_in_table": true,
+      "control": "datetime",
+      "versions": [
+        "date_created"
+      ],
+      "help_tip": "",
+      "label": "Added on"
+    },
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "Raw Data File",
+      "show_in_form": false,
+      "id": "copo.datafile.type",
+      "show_in_table": false,
+      "control": "text",
+      "versions": [
+        "type"
+      ],
+      "help_tip": "",
+      "label": "Type"
+    },
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.datafile.profile_id",
+      "show_in_table": false,
+      "control": "text",
+      "versions": [
+        "profile_id"
+      ],
+      "help_tip": "",
+      "label": "Profile ID"
+    },
+    {
+      "type": "array",
+      "required": "false",
+      "ref": "",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.datafile.comments",
+      "show_in_table": false,
+      "control": "copo-comment",
+      "versions": [
+        "comments"
+      ],
+      "help_tip": "",
+      "label": "Comment"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.datafile.file_id",
+      "show_in_table": false,
+      "control": "text",
+      "versions": [
+        "file_id"
+      ],
+      "help_tip": "",
+      "label": "File ID"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.datafile.file_type",
+      "show_in_table": true,
+      "control": "text",
+      "versions": [
+        "file_type"
+      ],
+      "help_tip": "",
+      "label": "Type"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.datafile.file_location",
+      "show_in_table": false,
+      "control": "text",
+      "versions": [
+        "file_location"
+      ],
+      "help_tip": "",
+      "label": "Location"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.datafile.file_size",
+      "show_in_table": true,
+      "control": "text",
+      "versions": [
+        "file_size"
+      ],
+      "help_tip": "",
+      "label": "Size"
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.datafile.file_hash",
+      "show_in_table": false,
+      "control": "text",
+      "versions": [
+        "file_hash"
+      ],
+      "help_tip": "",
+      "label": "Hash"
+    },
+    {
+      "type": "object",
+      "required": "false",
+      "ref": "",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.datafile.description",
+      "show_in_table": false,
+      "control": "datafile-description",
+      "versions": [
+        "description"
+      ],
+      "help_tip": "",
+      "label": "Description"
+    },
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.datafile.deleted",
+      "show_in_table": false,
+      "control": "text",
+      "versions": [
+        "deleted"
+      ],
+      "help_tip": "",
+      "label": "Delete"
+    },
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.datafile.date_modified",
+      "show_in_table": false,
+      "control": "datetime",
+      "versions": [
+        "date_modified"
+      ],
+      "help_tip": "",
+      "label": "Modified"
+    }
+  ],
+  "description": "Attributes mapping for data schema.",
+  "configuration": {
+    "type": "json",
+    "provider": "isa",
+    "ref": "data_schema"
+  },
+  "title": "Datafile schema mappings"
+}

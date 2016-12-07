@@ -17,7 +17,8 @@ register = template.Library()
 table_id_dict = dict(publication="publication_table",
                      person="person_table",
                      sample="sample_table",
-                     datafile="datafile_table"
+                     datafile="datafile_table",
+                     annotation="annotation_table"
                      )
 
 
@@ -103,6 +104,7 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
                       sample=dict(label="Sample", clonable=True),
                       source=dict(label="Source", clonable=True),
                       profile=dict(label="Profile", clonable=False),
+                      annotation=dict(label="Annotation", clonable=False),
                       )
 
     form_value = component_dict
@@ -182,7 +184,8 @@ def generate_copo_table_data(profile_id=str(), component=str()):
                         datafile=dict(
                             row_btns=[button_templates['info_row'], button_templates['describe_row'],
                                       button_templates['delete_row']],
-                            global_btns=[button_templates['describe_global'], button_templates['undescribe_global']])
+                            global_btns=[button_templates['describe_global'], button_templates['undescribe_global']]),
+                        annotation=common_btn_dict
                         )
 
     # instantiate data access object

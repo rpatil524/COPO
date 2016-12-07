@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 import web.apps.web_copo.lookup.lookup as lkup
 from api.doi_metadata import DOI2Metadata
 import web.apps.web_copo.templatetags.html_tags as htags
-from dal.copo_da import Profile, Publication, Source, Person, Sample, Submission, DataFile, DAComponent
+from dal.copo_da import Profile, Publication, Source, Person, Sample, Submission, DataFile, DAComponent, Annotation
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.metadata_rater import MetadataRater
 
@@ -35,7 +35,8 @@ class BrokerDA:
             source=Source,
             profile=Profile,
             datafile=DataFile,
-            submission=Submission
+            submission=Submission,
+            annotation=Annotation
         )
 
         if da_dict.get(self.component):
@@ -142,11 +143,12 @@ class BrokerVisuals:
 
     def do_table_data(self):
         table_data_dict = dict(
+            annotation=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
             publication=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
             person=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
             datafile=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
             sample=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
-            profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_for_user()))
+            profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_for_user())),
         )
 
         # NB: in table_data_dict, use an empty dictionary as a parameter for listed functions that define zero arguments
@@ -229,4 +231,3 @@ class BrokerVisuals:
         )
 
         return self.context
-

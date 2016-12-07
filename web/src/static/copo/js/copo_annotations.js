@@ -1,11 +1,29 @@
+/**
+ * Created by fshaw on 06/12/2016.
+ */
 $(document).ready(function () {
+
+    //******************************Setup Annotator Specifics*************************//
+
+    $.cookie('document_id', 'undefined', {expires: 1, path: '/',});
+
+    $(document).data('annotator', true)
+
+    $(document).ajaxStart(function () {
+        $('#processing_div').show()
+    })
+    $(document).ajaxStop(function () {
+        $('#processing_div').hide()
+    })
+
 
     //******************************Event Handlers Block*************************//
     // get table data to display via the DataTables API
     var tableID = null; //rendered table handle
-    var component = "publication";
+    var component = "annotation";
     var copoFormsURL = "/copo/copo_forms/";
     var copoVisualsURL = "/copo/copo_visualize/";
+    var annotationURL = "/copo/get_annotation/"
 
     csrftoken = $.cookie('csrftoken');
 
@@ -21,7 +39,7 @@ $(document).ready(function () {
             do_render_table(data);
         },
         error: function () {
-            alert("Couldn't retrieve publication data!");
+            alert("Couldn't retrieve annotation data!");
         }
     });
 
@@ -104,16 +122,31 @@ $(document).ready(function () {
         if (ids.length > 0) {
             if (task == "edit") {
                 $.ajax({
-                    url: copoFormsURL,
+                    url: annotationURL,
                     type: "POST",
                     headers: {'X-CSRFToken': csrftoken},
+                    dataType: 'json',
                     data: {
                         'task': 'form',
                         'component': component,
                         'target_id': ids[0] //only allowing row action for edit, hence first record taken as target
                     },
-                    success: function (data) {
-                        json2HtmlForm(data);
+                    success: function (e) {
+                        $('#annotation_table_wrapper').hide()
+                        $('#annotation_content').show()
+                        var initAnnotator = false
+                        if (!$.trim($("#annotation_content").html())) {
+                            // if #annotation_content is empty
+                            initAnnotator = true
+                        }
+                        $('#annotation_content').html(e.html)
+                        $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
+                        $('#file_picker_modal').modal('hide')
+                        if (initAnnotator) {
+                            setup_annotator()
+                            setup_autocomplete()
+                        }
+
                     },
                     error: function () {
                         alert("Couldn't build publication form!");

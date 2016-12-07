@@ -1,6 +1,13 @@
 //**some re-usable functions across different modules
 var AnnotationEventAdded = false;
 $(document).ready(function () {
+
+    setup_autocomplete()
+    do_component_navbar($("#nav_component_name").val());
+
+});
+
+function setup_autocomplete(){
     var copoFormsURL = "/copo/copo_forms/";
 
     $(document).on('focus', 'input[id^="annotator-field"]', function (e) {
@@ -16,10 +23,7 @@ $(document).ready(function () {
     })
 
     auto_complete();
-
-    do_component_navbar($("#nav_component_name").val());
-
-});
+}
 
 
 function do_component_delete_confirmation(params) {
@@ -944,9 +948,9 @@ function get_components_properties() {
             addLi: ["simple"], //relevant add related li item for the component
             addLabel: "Add Annotation",
             iconClass: "fa fa-users copo-icon-default",
-            countsKey: "num_person",
-            actions: ["add"],
-            colorClass: "people_color"
+            countsKey: "num_annotation",
+            actions: ["inspect"],
+            colorClass: "annotations_color"
         }
     ];
 

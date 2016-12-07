@@ -5,6 +5,7 @@ $samples_color: #bfbb11;
 $submissions_color: #ffc200;
 $pubs_color: #e88801;
 $people_color: #c93c00;
+$annotations_color: #6871C9;
 
 .data_color {
   background-color: $data_color;
@@ -34,4 +35,9 @@ $people_color: #c93c00;
   background-color: $people_color;
   border-color: $people_color;
   //color: $people_color + 120;
+}
+
+.annotations_color{
+  background-color: $annotations_color;
+  border-color: $annotations_color;
 }

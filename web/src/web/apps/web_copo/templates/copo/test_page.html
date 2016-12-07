@@ -1,4 +1,4 @@
-{% extends 'copo/base.html' %}
+{% extends 'copo/base_1col.html' %}
 
 {% load staticfiles %}
 {% load web_tags %}
@@ -101,8 +101,8 @@
                         </div>
                         <div class="form-group">
                             <label for="study_abstract">Abstract</label>
-                        <textarea rows="6" class="form-control" name="study_abstract"
-                                  placeholder="Enter Abstract"></textarea>
+                            <textarea rows="6" class="form-control" name="study_abstract"
+                                      placeholder="Enter Abstract"></textarea>
                         </div>
 
                         <button type="submit" class="btn btn-default">Submit</button>
@@ -123,16 +123,14 @@
     {% csrf_token %}
 
 
-    <h1>
-        COPO Test Page
-    </h1>
+    <form>
 
-    <h2>Caleb Meyer your ghost is gone</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-        pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
-        laborum.</p>
+        <div id="file" name="abc"><input type="file"></div>
+        <div><input id="input" name="abc" type="input"></div>
+        <div><input id="input1" name="abc" type="input"></div>
+        <div><input id="input2" name="abc" type="input"></div>
+        <input type="submit" id="submit_button">
+    </form>
 
 
 
@@ -143,6 +141,27 @@
 {% block js_block %}
     <script type="text/javascript" src="{% static "copo/annotator-2.0.0-alpha.3/pkg/annotator.min.js" %}"></script>
     <script src="{% static 'copo/js/setup_annotator.js' %}"></script>
+
+    <script>
+
+        $(document).on('focus', '#input', function () {
+
+
+            $(document).on('click', '#submit_button', function (e) {
+
+                console.log(e.currentTarget)
+                $('#file').remove()
+                console.log(e.currentTarget)
+
+                $(input).each(function (item, val) {
+                    console.log(item + ' ' + val)
+                })
+                return false
+            })
+
+        })
+
+    </script>
 
 
 {% endblock %}
