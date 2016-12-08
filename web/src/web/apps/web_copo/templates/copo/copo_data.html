@@ -27,12 +27,6 @@
 {% endblock %}
 
 
-{% block title_block %} COPO Files {% endblock %}
-
-{% block tagline_block %}
-
-{% endblock %}
-
 {% block browse_header_block %}
     {% csrf_token %}
     <div hidden id="hidden_attrs">
@@ -57,7 +51,7 @@
                 <div class="dropdown">
                     <button class="btn btn-lg btn-default dropdown-toggle" type="button" id="helpCentreMenu"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i> Info Centre
+                        <i class="fa fa-info-circle" aria-hidden="true"></i> Information Panel
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="helpCentreMenu">
@@ -143,7 +137,7 @@
                               style="margin-right:40px">
                             {% csrf_token %}
                             <span id="upload_files_button"
-                                  class="btn btn-primary btn-xs fileinput-button">
+                                  class="btn btn-primary fileinput-button" style="background-image: none; border-color:transparent;">
                                     <span>Select files...</span>
                                         <input type="file" name="file"
                                                onchange="get_chunk_size(event)" multiple/>

@@ -26,8 +26,8 @@ def get_source_count(self):
 def search_ontology(request):
     term = request.GET['query']
     url = settings.ELASTIC_SEARCH_URL
-    q = json.dumps({"query":{"match_phrase_prefix":{"name": term}}})
-    #q = '{"query": { "multi_match": { "fields": ["name", "accession_id", "aspect", "definition"], "query": "' + term + '", "type": "phrase_prefix"}}}'
+    q = json.dumps({"query": {"match_phrase_prefix": {"name": term}}})
+    # q = '{"query": { "multi_match": { "fields": ["name", "accession_id", "aspect", "definition"], "query": "' + term + '", "type": "phrase_prefix"}}}'
     data = requests.post(url, q)
     return HttpResponse(data.text)
 
@@ -45,16 +45,23 @@ def search_ontology_ebi(request, ontology_names):
 
 
 def test_ontology(request):
-    x = {'a':'x', 'b':'y', 'c':'z'}
+    x = {'a': 'x', 'b': 'y', 'c': 'z'}
     return HttpResponse(encode(x))
 
 
 def get_upload_information(request):
     submission_id = request.GET.get('submission_id')
+
+    # tonietuk's intercept starts
+    if not submission_id:
+        data = {'found': False}
+        return HttpResponse(json.dumps(data))
+    # tonietuk's intercept ends
+
     # get submission collection and check status
     sub = Submission().get_record(submission_id)
     if sub:
-        if sub['complete'] == 'false':
+        if not sub['complete'] or sub['complete'] == 'false':
             rem = RemoteDataFile().get_by_sub_id(submission_id)
             if rem:
                 speeds = rem['transfer_rate'][-100:]
@@ -62,9 +69,11 @@ def get_upload_information(request):
                 data = {'speeds': speeds, 'complete': complete, 'finished': False, 'found': True}
                 return HttpResponse(json.dumps(data))
         else:
-            #elapsed = str(parser.parse(sub['completed_on']) - parser.parse(sub['commenced_on']))
-            #data = {'upload_time': str(elapsed), 'completed_on': sub['completed_on'], 'article_id': sub.get('article_id'), 'finished': True, 'found': True}
-            data = {'sub_id':str(sub['_id']), 'status': sub['status'], 'accessions': sub['accession'], 'repo': sub['repository'], 'completed_on': sub['completed_on'].strftime("%Y-%m-%d %H:%M:%S"), 'article_id': sub.get('article_id'), 'finished': True, 'found': True}
+            # elapsed = str(parser.parse(sub['completed_on']) - parser.parse(sub['commenced_on']))
+            # data = {'upload_time': str(elapsed), 'completed_on': sub['completed_on'], 'article_id': sub.get('article_id'), 'finished': True, 'found': True}
+            data = {'sub_id': str(sub['_id']), 'status': sub['status'], 'accessions': sub['accessions'],
+                    'repo': sub['repository'], 'completed_on': sub['completed_on'].strftime("%Y-%m-%d %H:%M:%S"),
+                    'article_id': sub.get('article_id'), 'finished': True, 'found': True}
             return HttpResponse(json.dumps(data))
 
     data = {'found': False}
@@ -75,7 +84,8 @@ def publish_figshare(request):
     sub_id = request.POST['submission_id']
     s = Submission().get_record(sub_id)
     resp = FigshareSubmit(sub_id).publish_article(s['accession'])
-    return HttpResponse(json.dumps({'status_code': resp.status_code, 'location': json.loads(resp.content.decode('utf8'))['location']}))
+    return HttpResponse(
+        json.dumps({'status_code': resp.status_code, 'location': json.loads(resp.content.decode('utf8'))['location']}))
 
 
 def get_tokens_for_user(request):

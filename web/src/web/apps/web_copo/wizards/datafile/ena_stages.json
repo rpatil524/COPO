@@ -54,7 +54,7 @@
           "default_value": "",
           "option_values": {
             "callback": {
-              "function": "get_samples_json",
+              "function": "get_isasamples_json",
               "parameter": ""
             }
           }

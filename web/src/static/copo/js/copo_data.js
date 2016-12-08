@@ -785,7 +785,7 @@ $(document).ready(function () {
         }
 
         //setup steps fast navigation
-        steps_fast_nav();
+        //steps_fast_nav();
     }
 
     function processing_request_dialog(message) {
@@ -978,7 +978,7 @@ $(document).ready(function () {
             });
 
             //setup fast nav for the stages
-            steps_fast_nav();
+            //steps_fast_nav();
 
 
         } else if (data.stage.stage) {

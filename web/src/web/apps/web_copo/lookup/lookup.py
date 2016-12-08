@@ -369,6 +369,18 @@ DROP_DOWNS = {
             'value': 'unknown',
             'label': 'Unknown'
         }
+    ],
+    "SAMPLE_TYPES": [
+        {
+            "value": "biosample",
+            "label": "Simple",
+            "description": "Simple samples are based on BioSamples. They are <strong>repository agnostic</strong>, and are better suited for describing samples in a generic manner or in contexts where the target repository isn't known <i>a priori</i>."
+        },
+        {
+            "value": "isasample",
+            "label": "Extended",
+            "description": "Extended samples are based on the Investigation, Study and Assay (ISA) specifications, and are better tailored for describing samples that will subsequently become part of data submissions to repositories such as <strong>ENA</strong> and <strong>Metabolights</strong>."
+        }
     ]
 }
 
@@ -547,8 +559,7 @@ WIZARD_FILES = {
     'ena': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages.json'),
     'figshare': os.path.join(RESOLVER['wizards_datafile'], 'figshare_stages.json'),
     'sample_start': os.path.join(RESOLVER['wizards_sample'], 'start_stages.json'),
-    'biosample': os.path.join(RESOLVER['wizards_sample'], 'biosample_stages.json'),
-    'isasample': os.path.join(RESOLVER['wizards_sample'], 'isasample_stages.json')
+    'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json')
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#

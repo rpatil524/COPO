@@ -27,7 +27,7 @@
       "text_class": "text-default"
     },
     "review_message": {
-      "text": "You have reached the final stage of the wizard. Use the 'Prev' and 'Next' buttons to review your entries. Alternatively, the quick navigation buttons can be used to jump to a specific stage. <br/><br/>Click <strong>Finish!</strong> to wrap up the current description.",
+      "text": "You have reached the final stage of the wizard. Use the 'Prev' and 'Next' buttons to review your entries.  <br/><br/>Click <strong>Finish!</strong> to wrap up the current description.",
       "text_class": "text-default"
     },
     "confirm_initiate_submission": {

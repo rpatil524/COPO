@@ -183,7 +183,7 @@ function json2HtmlForm(data) {
                 } else {
                     e.preventDefault();
 
-                    if (!global_form_validate(data.form)) {
+                    if (!global_form_validate(data.form.form_schema, htmlForm.find("form"))) {
                         return false;
                     }
 
@@ -400,11 +400,7 @@ function set_up_form_body_div(data) {
         {
             id: "copo_component_forms",
             class: "col-sm-12 col-md-12 col-lg-12"
-        }).append(htmlForm).append(htmlFormSource)).append($('<div/>',
-        {
-            id: "show_form_errors",
-            class: "col-sm-12 col-md-12 col-lg-12"
-        }));
+        }).append(htmlForm).append(htmlFormSource));
 
     //build main form
     build_form_body(data);
@@ -977,6 +973,86 @@ var dispatchFormControl = {
         });
     },
     do_copo_button_list_ctrl: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+
+        var btnGroup = $('<div/>',
+            {
+                class: "btn-group",
+                "data-toggle": "buttons"
+
+            });
+
+        var hiddenCtrl = $('<input/>',
+                {
+                    type: "hidden",
+                    name: formElem.id,
+                    id: formElem.id,
+                    value: formElem.option_values[0]
+                });
+
+
+        for (var i = 0; i < formElem.option_values.length; ++i) {
+            var option = formElem.option_values[i];
+
+            var lactive = "";
+            if (i == 0) {
+                lactive = " active";
+            }
+
+
+            var lbl = $('<label/>',
+                {
+                    class: "btn copo-active btn-lg btn-default " + lactive,
+                    "data-lbl": option.label,
+                    "data-desc": option.description,
+                    "data-value": option.value,
+                    mouseenter: function (evt) {
+                        $(this).popover({
+                            title: $(this).attr("data-lbl"),
+                            content: $(this).attr("data-desc"),
+                            container: 'body',
+                            trigger: 'hover',
+                            html: true,
+                            placement: 'right',
+                            template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
+                            '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
+                            '</h3><div class="popover-content"><p></p></div></div></div>'
+                        });
+
+                        $(this).popover("show");
+                    },
+                    click: function (evt) {
+                        hiddenCtrl.val($(this).attr("data-value"));
+                    }
+                });
+
+
+            var rdo = $('<input/>',
+                {
+                    type: "radio",
+                    name: ""
+                });
+
+            var spn = $('<span/>',
+                {
+                    html: option.label
+                });
+
+            lbl.append(rdo).append(spn);
+            btnGroup.append(lbl);
+        }
+
+        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append($('<div/>')).append(btnGroup).append(hiddenCtrl);
+
+        return form_div_ctrl()
+            .append(form_help_ctrl(formElem.help_tip))
+            .append(ctrlsDiv);
+    },
+    do_copo_button_list_ctrl_old: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>');
 
         var hiddenCtrl = $('<input/>',
@@ -1000,7 +1076,7 @@ var dispatchFormControl = {
             var option = formElem.option_values[i];
 
             var listGroupTitleHTML = '<h4 class="list-group-item-heading">' + option.label + '</h4>';
-            listGroupTitleHTML += '<p class="list-group-item-text" style="line-height: 1.5;">' + option.description + '</p>';
+            listGroupTitleHTML += '<p class="list-group-item-text" style="line-height: 1.7; font-size: 14px;">' + option.description + '</p>';
 
             var listDiv = $('<div/>',
                 {
@@ -1009,14 +1085,23 @@ var dispatchFormControl = {
 
             listGroup.append(listDiv);
 
+            var optionValueElem = $('<input/>',
+                {
+                    type: "hidden",
+                    class: "button-value-elem",
+                    name: option.label + "_value",
+                    value: option.value
+                })
+
             var btnSample = $('<a/>',
                 {
                     class: "list-group-item",
                     title: formElem.help_tip + " " + option.label,
+                    style: "border: 1px solid #cccccc;",
                     href: "#",
                     click: function (event) {
                         event.preventDefault();
-                        hiddenCtrl.val(option.value);
+                        hiddenCtrl.val($(this).parent().find(".button-value-elem").val());
 
                         $(this).closest(".copo-button-listDiv").siblings('.copo-button-listDiv').removeClass("copo-list-type-selected well well-sm");
                         $(this).closest(".copo-button-listDiv").addClass("copo-list-type-selected well well-sm").css("margin-bottom", "0px");
@@ -1024,7 +1109,7 @@ var dispatchFormControl = {
                 });
 
             btnSample.append(listGroupTitleHTML);
-            listDiv.append(btnSample);
+            listDiv.append(btnSample).append(optionValueElem);
 
             if (i == 0) {//remember to set this back to 0, for the first element to be selected by default
                 hiddenCtrl.val(option.value);
@@ -1037,8 +1122,10 @@ var dispatchFormControl = {
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv)
 
-    },
-    do_copo_item_count_ctrl: function (formElem, elemValue) {
+    }
+    ,
+    do_copo_item_slider_ctrl: function (formElem, elemValue) {
+
         var ctrlsDiv = $('<div/>',
             {
                 class: "range-slider-parent"
@@ -1087,7 +1174,6 @@ var dispatchFormControl = {
 
         countCtrlOutputDiv.append(countCtrlBtn);
 
-
         var countCtrlOutput = $('<span/>',
             {
                 class: "range-slider-output",
@@ -1101,6 +1187,46 @@ var dispatchFormControl = {
         ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append(countCtrlDiv);
         ctrlsDiv.append(countCtrlOutputDiv);
         ctrlsDiv.append(hiddenCtrl);
+
+        return form_div_ctrl()
+            .append(form_help_ctrl(formElem.help_tip))
+            .append(ctrlsDiv);
+    },
+    do_copo_item_count_ctrl: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        var errorHelpDiv = $('<div/>',
+            {
+                class: "help-block with-errors"
+            });
+
+
+        var counter_ctrl = $('<input/>',
+            {
+                type: "number",
+                min: 1,
+                class: "input-copo form-control",
+                id: formElem.id,
+                name: formElem.id,
+                value: 1,
+                keypress: function (evt) {
+                    var charCode = (evt.which) ? evt.which : event.keyCode
+
+                    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                        $(this).closest(ctrlsDiv).find(".help-block").html('<span style="color: #a94442;">Please enter a number!</span>');
+                        $(this).val(1);
+                        return false;
+                    } else {
+                        $(this).closest(ctrlsDiv).find(".help-block").html("");
+                        return true;
+                    }
+                }
+            });
+
+        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append(counter_ctrl).append(errorHelpDiv);
 
         return form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
@@ -1446,7 +1572,7 @@ function save_source_form(funcParams) {
         },
         success: function (data) {
 
-            var sampleSourceValues = []; //basically, this means the created source being set (or, only set one sample source)
+            var sampleSourceValues = []; //basically, this means only the last created source is set (or only set one sample source)
 
             if (data.last_record_id) {
                 sampleSourceValues.push(data.last_record_id);
@@ -1712,20 +1838,20 @@ function custom_validate(formObject) {
 }
 
 
-function global_form_validate(formJSON) {
+function global_form_validate(form_schema, formObject) {
     //this will only deal with required fields (for some custom controls) that were not previously validated
-    var custControls = ["copo-sample-source", "copo-select", "copo-multi-search", "copo-multi-select"];
+    var custControls = ["copo-sample-source", "copo-sample-source-2", "copo-select", "copo-multi-search", "copo-multi-select"];
     var allowSubmit = true;
 
     var form_values = Object();
-    htmlForm.find("form").find(":input").each(function () {
+    formObject.find(":input").each(function () {
         form_values[this.id] = $(this).val();
     });
 
     var violationList = Array();
 
-    for (var i = 0; i < formJSON.form_schema.length; ++i) {
-        var ctrlObject = formJSON.form_schema[i];
+    for (var i = 0; i < form_schema.length; ++i) {
+        var ctrlObject = form_schema[i];
 
         if (ctrlObject.hasOwnProperty("required") && (ctrlObject.required.toString() == "true")) {
             if (ctrlObject.hasOwnProperty("control") && $.inArray(ctrlObject.control, custControls) > -1) {
@@ -1735,6 +1861,13 @@ function global_form_validate(formJSON) {
             }
         }
     }
+
+    var formErrors = $('<div/>',
+        {
+            id: "show_form_errors",
+            style: "margin-top: 10px;",
+            class: "col-sm-12 col-md-12 col-lg-12 form-group"
+        });
 
     if (violationList.length > 0) {
         allowSubmit = false;
@@ -1746,7 +1879,7 @@ function global_form_validate(formJSON) {
         }
 
         //push error to UI
-        $("#show_form_errors").empty();
+        formObject.find("#show_form_errors").remove();
 
         var alertDiv = $('<div/>',
             {
@@ -1773,7 +1906,9 @@ function global_form_validate(formJSON) {
         });
         alertDiv.append(lDiv);
 
-        $("#show_form_errors").append(alertDiv);
+        formObject.append(formErrors);
+
+        formErrors.append(alertDiv);
 
         //automatically close the alert
         alertDiv.fadeTo(2500, 500).slideUp(1000, function () {

@@ -42,12 +42,12 @@ def sample_wiz(request):
     context = dict()
     request_action = request.POST.get("request_action", str())
 
-    description_targets = ast.literal_eval(request.POST.get("description_targets", "[]"))
-    description_bundle = ast.literal_eval(request.POST.get("description_bundle", "[]"))
+    generated_samples = ast.literal_eval(request.POST.get("generated_samples", "[]"))
 
     context = samp.BrokerRequests(context=context,
-                                  description_targets=description_targets,
-                                  description_bundle=description_bundle
+                                  generated_samples=generated_samples,
+                                  target_id=request.POST.get("target_id", str()),
+                                  sample_type=request.POST.get("sample_type", str()),
                                   ).post_context(request_action)
 
     out = jsonpickle.encode(context)
