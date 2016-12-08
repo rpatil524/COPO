@@ -748,7 +748,6 @@ th {
 
 /*end div box*/
 
-
 /*custom nav items*/
 .quick-component-create {
     margin-left: 10px;
@@ -852,7 +851,6 @@ th {
     color: rgba(51, 51, 51, 1);
 }
 
-
 .btn-custom2 {
     background: rgba(188, 204, 203, 1);
     border-color: rgba(230, 235, 234, 1);
@@ -931,6 +929,10 @@ th {
     color: #ffffff !important;
 }
 
+.copo-list-type-selected > a {
+    border: 1px solid transparent !important;
+}
+
 .sample-type-disable {
     opacity: 0.2 !important;
 }
@@ -961,6 +963,13 @@ th {
     background: rgba(235, 235, 235, 1);
     border-color: rgba(173, 173, 173, 1);
     color: rgba(51, 51, 51, 1);
+}
+
+.copo-active.active,
+.copo-active.active:hover {
+    background-color: #003366 !important;
+    text-shadow: none !important;
+    color: #ffffff;
 }
 
 /*end form state buttons*/
@@ -994,3 +1003,28 @@ th {
 }
 
 /*end copo-tab-nav*/
+
+/*copo-component-attributes*/
+.copo-component-attributes-outer {
+    padding: 5px;
+    /*border: 1px solid #b3cce6;*/
+    border-radius: 2px;
+    margin-bottom: 3px;
+}
+
+.copo-component-attributes-inner {
+    padding: 3px;
+    border: 1px solid #595959;
+    border-radius: 2px;
+    margin-right: 3px;
+}
+
+.copo-component-attributes-inner-0 {
+    background-color: #ADD8E6;
+    padding: 3px;
+    border: 1px solid #595959;
+    border-radius: 2px;
+    margin-right: 3px;
+}
+
+/*end copo-component attributes*/

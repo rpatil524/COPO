@@ -1,26 +1,57 @@
 var wizardMessages;
+var sampleComponentRecords;
 var wizardStages;
+var wizardStagesMain;
 var stagesFormValues = {};
+var validateSetter = {};
 var negotiatedStages = []; //holds info about stages resolved to be rendered
 var sampleHowtos = null;
 var currentIndx = 0;
 var generatedSamples = [];
 var tableID = null; //rendered table handle
 var stepIntercept = false; //flag indicates if activation of the last stage of the wizard has been intercepted
-var silenceAlert = false; //use to temporary suppress stage alerts
 var descriptionWizSummary = {}; //wizard summary stage content
 var tempWizStore = null; // for holding wizard-related data pending wizard load event
-var onGoingDescription = false; //informs wizard state refresh/exit
 
 $(document).ready(function () {
         //****************************** Event Handlers Block *************************//
 
         var component = "sample";
         var wizardURL = "/rest/sample_wiz/";
-        var copoFormsURL = "/copo/copo_forms/";
         var copoVisualsURL = "/copo/copo_visualize/";
 
         //test
+
+        $(document).on("mouseenter", ".selectize-dropdown-content .active", function () {
+            if ($(this).closest(".copo-multi-search").length) {
+                console.log($(this).attr("data-value"));
+
+                console.log($(this).closest(".copo-multi-search").parent().find(".copo-multi-values").attr("id"));
+            }
+        });
+
+        // $(document).on("mouseenter", ".selectize-control .selectize-dropdown-content div", function () {
+        //     console.log($(this).attr("data-value"));
+        // });
+
+        $(document).on("mouseenter", ".tata", function () {
+            var elem = $(this);
+
+            var pop = elem.popover({
+                title: "Weee",
+                content: "ehfhh",
+                container: 'body',
+                trigger: 'hover',
+                placement: 'right',
+                template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
+                '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
+                '</h3><div class="popover-content"><p></p></div></div></div>'
+            });
+
+            elem.popover("show");
+        });
+
+
         //end test
 
         //handle UID - upload inspect describe - tabs
@@ -47,12 +78,46 @@ $(document).ready(function () {
 
         //handle sample attributes assignment
         $(document).on("click", ".sample-assign-button", function () {
-            do_attributes_assignment($(this));
+
+            //...but first validate form
+            var stallAssignment = false;
+
+            $(document).find("form").each(function () {
+                var theForm = $(this);
+                if (theForm.find("#current_stage").length && theForm.find("#current_stage").val() == "sample_attributes") {
+
+                    theForm.trigger('submit');
+
+                    if (theForm.find("#bcopovalidator").val() == "false") {
+                        theForm.find("#bcopovalidator").val("true");
+
+                        stallAssignment = true;
+                    }
+
+                    return false;
+
+                }
+            });
+
+            if (stallAssignment) {
+                return false;
+            } else {
+                do_attributes_assignment($(this));
+            }
+
+
         });
 
         //handle sample attributes view
         $(document).on("click", ".sample-view-button", function () {
             get_row_attributes($(this));
+        });
+
+        //apply to all button
+        $(document).on("click", ".applyToAllButton", function (event) {
+            event.preventDefault();
+            //set attribute for all samples
+            do_attributes_assignment_all();
         });
 
         //handle keyboard strokes to advance through wizard
@@ -131,8 +196,10 @@ $(document).ready(function () {
             },
             success: function (data) {
                 sampleHowtos = data.wiz_howtos;
+                wizardStagesMain = data.wizard_stages;
                 wizardStages = data.wizard_stages;
                 wizardMessages = data.wiz_message;
+                sampleComponentRecords = data.component_records;
                 set_samples_how_tos();
                 set_wizard_summary();
 
@@ -140,21 +207,6 @@ $(document).ready(function () {
             error: function () {
                 alert("Couldn't retrieve wizard message!");
             }
-        });
-
-
-        //handle event for description batch
-        $('body').on('addtoqueue', function (event) {
-            //add item to batch
-            var batchTargets = [];
-            var option = {};
-
-            option["recordLabel"] = event.recordLabel;
-            option["recordID"] = event.recordID;
-            option["attributes"] = {};
-
-            batchTargets.push(option);
-            //add_to_batch(batchTargets, true); suspending this, as it becomes problematic for bundle validation
         });
 
 
@@ -198,6 +250,9 @@ $(document).ready(function () {
             //set up apply to all button
             set_up_apply_button();
 
+            //call to update generated samples
+            set_generated_samples();
+
 
             //set up / refresh form validator
             set_up_validator();
@@ -234,9 +289,6 @@ $(document).ready(function () {
             //first, make call to resolve the active stage data
             var stage_data = collate_stage_data();
 
-            //call to update generated samples
-            set_summary_data();
-
             do_post_stage_retrieval(stage_data);
 
             //if no data, just go ahead and retrieve stage
@@ -245,10 +297,21 @@ $(document).ready(function () {
 
         function stage_navigate(evt, data) {
 
+            //trigger form validation
+            if ($("#wizard_form_" + data.step).length) {
+                $('#wizard_form_' + data.step).trigger('submit');
+
+                if ($('#wizard_form_' + data.step).find("#bcopovalidator").val() == "false") {
+                    $('#wizard_form_' + data.step).find("#bcopovalidator").val("true");
+
+                    evt.preventDefault();
+                    return false;
+                }
+            }
+
             if (data.direction == 'next') {
                 var lastElementIndx = $('.steps li').last().index() + 1;
                 var activeElementIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
-
 
                 stepIntercept = false;
 
@@ -270,9 +333,31 @@ $(document).ready(function () {
                 var reviewElem = $('.steps li:last-child');
 
                 if (reviewElem.hasClass('active')) {
-                    //validate description for completeness; get submission decision; and, consequently, initiate submission
+                    evt.preventDefault();
+                    //send samples to be saved
 
-                    alert("last stage reached!!!");
+                    var dialogHandle = processing_request_dialog('<span class="loading">Generating Samples. Please wait...</span>');
+
+                    $.ajax({
+                        url: wizardURL,
+                        type: "POST",
+                        headers: {'X-CSRFToken': csrftoken},
+                        data: {
+                            'request_action': 'save_samples',
+                            'generated_samples': JSON.stringify(generatedSamples),
+                            'sample_type': get_stage_inputs_by_ref("sample_type")["sample_type"]
+                        },
+                        success: function (data) {
+                            //clear_wizard(); no point...if we are reloading the page
+                            window.location.reload();
+                            dialogHandle.close();
+                        },
+                        error: function () {
+                            alert("Couldn't save samples!");
+                        }
+                    });
+
+                    return false;
 
                 }
 
@@ -288,7 +373,7 @@ $(document).ready(function () {
             }
 
             //setup steps fast navigation
-            steps_fast_nav();
+            //steps_fast_nav();
         }
 
         function processing_request_dialog(message) {
@@ -314,10 +399,6 @@ $(document).ready(function () {
 
             return;
 
-        }
-
-        function isInArray(value, array) {
-            return array.indexOf(value) > -1;
         }
 
 
@@ -432,13 +513,58 @@ $(document).ready(function () {
         }
 
         function set_up_validator() {
-            var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index, which, in this context is the summary (final) stage
+            $(document).find("form").each(function () {
+                var theForm = $(this);
+                var formJSON = Object();
 
-            for (var i = 1; i < (activeStageIndx + 1); ++i) {
-                if ($("#wizard_form_" + i).length) {
-                    refresh_validator($("#wizard_form_" + i));
+                if (theForm.find("#current_stage").length) {
+
+                    var current_stage = theForm.find("#current_stage").val();
+
+                    for (var i = 0; i < negotiatedStages.length; ++i) {
+                        if (current_stage == negotiatedStages[i].ref) {
+                            formJSON = negotiatedStages[i].items;
+                            break;
+                        }
+                    }
+
+                    if (!validateSetter.hasOwnProperty(current_stage)) {
+
+                        refresh_validator($(this));
+
+                        var bvalidator = $('<input/>',
+                            {
+                                type: "hidden",
+                                id: "bcopovalidator",
+                                name: "bcopovalidator",
+                                value: "true"
+                            });
+
+                        //add validator flag
+                        theForm.append(bvalidator);
+
+
+                        theForm.validator().on('submit', function (e) {
+                            if (e.isDefaultPrevented()) {
+                                $(this).find("#bcopovalidator").val("false");
+                                return false;
+                            } else {
+                                e.preventDefault();
+                                $(this).find("#bcopovalidator").val("true");
+
+                                if (!global_form_validate(formJSON, theForm)) {
+                                    $(this).find("#bcopovalidator").val("false");
+                                    return false;
+                                }
+                            }
+                        });
+
+                        validateSetter[current_stage] = "1";
+                    }
+
                 }
-            }
+            });
+
         }
 
         var dispatchStageCallback = {
@@ -505,10 +631,36 @@ $(document).ready(function () {
             }
 
             if (stage.hasOwnProperty("ref")) {
+
                 stage.data = Object(); //no data needed
+
+                if (stage.ref == "sample_attributes") {
+                    var cloneRecord = get_clone_data();
+                    if (!$.isEmptyObject(cloneRecord)) {
+                        stage.data = cloneRecord;
+                    }
+                }
             }
 
             return stage;
+        }
+
+        function get_clone_data() {
+            var cloneRecordID = get_stage_inputs_by_ref("sample_clone");
+            cloneRecordID = cloneRecordID["sample_clone"];
+
+            var cloneRecord = Object();
+            var dataCopy = $.extend(true, Object(), sampleComponentRecords);
+
+            $.each(dataCopy, function (key, val) {
+                if (val._id == cloneRecordID) {
+                    cloneRecord = val;
+                    return false;
+                }
+            });
+
+            return cloneRecord;
+
         }
 
         function get_pane_content(stage_content, currentIndx, stage_message) {
@@ -613,17 +765,12 @@ $(document).ready(function () {
                     id: "wizard_form_" + currentIndx
                 });
 
+
             var formButton = $('<button/>',
                 {
                     style: "display:none;",
                     class: "btn btn-sm btn-primary applyToAllButton pull-right",
-                    html: "Apply to Generated Samples",
-                    click: function (event) {
-                        event.preventDefault();
-
-                        //set attribute for all samples
-                        do_attributes_assignment_all();
-                    }
+                    html: "Assign to Generated Samples"
                 });
 
             var buttonRowDiv = $('<div/>', {
@@ -663,14 +810,6 @@ $(document).ready(function () {
             $('#dataFileWizard').wizard('removeSteps', 1, currentIndx + 1);
             $('#dataFileWizard').hide();
 
-            //reset inDescription flag
-            $('.inDescription-flag').each(function () { //main datafile table
-                $(this).hide();
-            });
-
-            silenceAlert = false;
-
-
             //clear wizard buttons
             $('#wizard_steps_buttons').html('');
 
@@ -681,20 +820,50 @@ $(document).ready(function () {
             //hide discard button
             $('#remove_act').parent().hide();
 
+            //clear generated sample table
+            if ($.fn.dataTable.isDataTable('#generated_samples_table')) {
+                //if table instance already exists, then do refresh
+                var table = $('#generated_samples_table').DataTable();
+
+                table
+                    .clear()
+                    .draw();
+                table
+                    .rows
+                    .add([]);
+                table
+                    .columns
+                    .adjust()
+                    .draw();
+                table
+                    .search('')
+                    .columns()
+                    .search('')
+                    .draw();
+
+                //remove pane title
+                $("#generatedSamplesPara").html('');
+            }
+
+            //remove negotiated stages and samples data
+            negotiatedStages = [];
+            generatedSamples = [];
+
+            //switch info context
+            $('#copo-sample-tabs.nav-tabs a[href="#sampleListTips"]').tab('show');
+
             //switch from wizard panel
             tempWizStore = null;
 
-            if (onGoingDescription) {
-                $('#copo-datafile-tabs.nav-tabs a[href="#emptyTab"]').tab('show');
-            } else {
-                $('#copo-datafile-tabs.nav-tabs a[href="#fileListComponent"]').tab('show');
-            }
+            //switch to file list context
+            $('#copo-datafile-tabs.nav-tabs a[href="#fileListComponent"]').tab('show');
 
-            onGoingDescription = false;
-
-            //clear stage message on help centre
+            //clear on the fly help
             $("#on_the_fly_info").empty();
 
+            stagesFormValues = {};
+            validateSetter = {};
+            stepIntercept = false;
         }
 
         function reset_wizard() {//resets wizard without all the hassle of clear_wizard()
@@ -742,6 +911,9 @@ $(document).ready(function () {
         function add_new_samples() {
             var data = {"stage_ref": ""};
 
+            //refresh wizard stages
+            wizardStages = $.extend(true, Object(), wizardStagesMain);
+
             do_post_stage_retrieval(data);
         }
 
@@ -784,8 +956,23 @@ $(document).ready(function () {
                 var deleteParams = {component: component, target_ids: ids};
                 do_component_delete_confirmation(deleteParams);
 
-            } else if (task == "undescribe" && ids.length > 0) { //handles description metadata delete
-                do_undescribe_confirmation(ids);
+            } else if (task == "edit" && ids.length > 0) { //handles edit
+                $.ajax({
+                    url: copoFormsURL,
+                    type: "POST",
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: {
+                        'task': 'form',
+                        'component': component,
+                        'target_id': ids[0] //only allowing row action for edit, hence first record taken as target
+                    },
+                    success: function (data) {
+                        json2HtmlForm(data);
+                    },
+                    error: function () {
+                        alert("Couldn't build " + component + " form!");
+                    }
+                });
 
             }
             else if (task == "info" && ids.length > 0) {
@@ -800,133 +987,18 @@ $(document).ready(function () {
                     row.child(contentHtml).show();
 
                     $.ajax({
-                        url: copoVisualsURL,
+                        url: wizardURL,
                         type: "POST",
                         headers: {'X-CSRFToken': csrftoken},
                         data: {
-                            'task': 'description_summary',
-                            'component': "datafile",
+                            'request_action': 'attributes_display',
                             'target_id': ids[0]
                         },
                         success: function (data) {
-                            var descriptionDiv = $('<div></div>');
-
-                            for (var j = 0; j < data.description.length; ++j) {
-                                var Ddata = data.description[j];
-
-                                var i = 0; //need to change this to reflect stage index...
-
-                                var level1Div = $('<div/>', {
-                                    style: 'padding: 5px; border: 1px solid #ddd; border-radius:2px; margin-bottom:3px;'
-                                });
-
-                                var level2Anchor = $('<a/>', {
-                                    class: "review-to-stage",
-                                    "data-stage-indx": i,
-                                    "data-sel-target": ids[0],
-                                    style: "cursor: pointer; cursor: hand;",
-                                    html: Ddata.title
-                                });
-
-                                var level2Div = $('<div/>', {
-                                    style: 'padding-bottom: 5px;'
-                                }).append($('<span></span>').append(level2Anchor));
-
-                                level1Div.append(level2Div);
-
-                                for (var k = 0; k < Ddata.data.length; ++k) {
-                                    var Mdata = Ddata.data[k];
-
-                                    var mDataDiv = $('<div/>', {
-                                        style: 'padding-bottom: 5px;'
-                                    });
-
-                                    var mDataLabelSpan = $('<span/>', {
-                                        style: 'margin-right: 10px;',
-                                        html: Mdata.label + ":"
-                                    });
-
-                                    var displayedValue = "";
-
-                                    if (Object.prototype.toString.call(Mdata.data) === '[object Array]') {
-                                        Mdata.data.forEach(function (vv) {
-                                            displayedValue += "<div style='padding-left: 25px; padding-top: 3px;'>" + vv + "</div>";
-                                        });
-                                    } else if (Object.prototype.toString.call(Mdata.data) === '[object String]') {
-                                        displayedValue = String(Mdata.data);
-                                    }
-
-                                    var mDataDataSpan = $('<span/>', {
-                                        html: displayedValue
-                                    });
-
-                                    mDataDiv.append(mDataLabelSpan).append(mDataDataSpan);
-                                    level1Div.append(mDataDiv)
-                                }
-
-                                descriptionDiv.append(level1Div);
-                            }
-
-                            var descriptionHtml = "No description!";
-
-                            if (data.description.length) {
-                                descriptionHtml = descriptionDiv.html();
-                            }
-
-                            var descriptionInfoPanel = $('<div/>', {
-                                class: "panel panel-default",
-                                style: 'margin-top:1px;'
-                            });
-
-                            var headingRow = $('<div/>', {
-                                class: "row"
-                            });
-
-                            var headingRowTxt = $('<div/>', {
-                                class: "col-sm-11 col-md-11 col-lg-11",
-                                html: '<span style="font-weight: bold; margin-left: 5px;">Description Metadata</span>'
-                            });
-
-                            var metadataClass = 'itemMetadata-flag-ind poor';
-
-                            if (tr.find('.itemMetadata-flag').find('.meta-active').length) {
-                                metadataClass = tr.find('.itemMetadata-flag').find('.meta-active').attr("class");
-                            }
-
-                            var headingRowIconSpan = $('<span/>', {
-                                class: "pull-right " + metadataClass,
-                                style: "width: 15px; height: 15px; border: 1px solid #ddd;"
-                            });
-
-                            var headingRowIconDiv = $('<div/>', {
-                                class: "itemMetadata-flag",
-                                title: "Metadata Rating"
-                            }).append(headingRowIconSpan);
-
-                            var headingRowIcon = $('<div/>', {
-                                class: "col-sm-1 col-md-1 col-lg-1",
-                                style: "padding-left: 5px;"
-                            }).append(headingRowIconDiv);
-
-                            headingRow.append(headingRowTxt).append(headingRowIcon);
-
-                            var descriptionInfoPanelPanelHeading = $('<div/>', {
-                                class: "panel-heading",
-                                style: "background-image: none;"
-                            }).append(headingRow);
-
-                            var descriptionInfoPanelPanelBody = $('<div/>', {
-                                class: "panel-body",
-                                style: "overflow:scroll",
-                                html: descriptionHtml
-                            });
-
-                            descriptionInfoPanel.append(descriptionInfoPanelPanelHeading).append(descriptionInfoPanelPanelBody);
-
-                            row.child($('<div></div>').append(descriptionInfoPanel).html()).show();
+                            row.child(build_attributes_display(data).html()).show();
                         },
                         error: function () {
-                            alert("Couldn't retrieve description attributes!");
+                            alert("Couldn't retrieve sample attributes!");
                             return '';
                         }
                     });
@@ -934,6 +1006,69 @@ $(document).ready(function () {
             }
 
         } //end of func
+
+        function build_attributes_display(data) {
+            //build view
+            var attributesPanel = $('<div/>', {
+                class: "panel panel-copo-data panel-default",
+                style: "margin-top: 5px; font-size: 12px;"
+            });
+
+            var attributesPanelHeading = $('<div/>', {
+                class: "panel-heading",
+                style: "background-image: none;",
+                html: "<strong>Sample Attributes</strong>"
+            });
+
+            attributesPanel.append(attributesPanelHeading);
+
+
+            var attributesPanelBody = $('<div/>', {
+                class: "panel-body"
+            });
+
+            var notAssignedSpan = $('<span/>', {
+                class: "text-danger",
+                html: "Attributes not assigned!"
+            });
+
+            attributesPanelBody.append(notAssignedSpan);
+
+
+            if (data.hasOwnProperty("sample_attributes")) {
+                //clear panel for new information
+                attributesPanelBody.html('');
+
+                //get schema
+                var schema = data.sample_attributes.schema;
+
+                //get record
+                var record = data.sample_attributes.record;
+
+                for (var i = 0; i < schema.length; ++i) {
+                    var currentItem = schema[i];
+
+                    var itemLabel = $('<div/>', {
+                        html: currentItem.label,
+                        style: "font-size:12px; font-weight:bold"
+                    });
+
+                    var itemDiv = $('<div/>', {
+                        style: "padding: 5px; border: 1px solid #ddd; border-radius:2px; margin-bottom:3px;"
+                    }).append(itemLabel).append(get_item_value_2(currentItem, record));
+
+                    attributesPanelBody.append(itemDiv);
+
+                }
+            }
+
+
+            attributesPanel.append(attributesPanelBody);
+
+            var ctrlDiv = $('<div/>').append(attributesPanel);
+
+            return ctrlDiv;
+        }
 
 
         function setup_element_hint() {
@@ -1083,10 +1218,6 @@ $(document).ready(function () {
                             setTimeout(function () {
                                 //reset the wizard...
 
-                                //call to save
-                                var stage_data = collate_stage_data();
-                                //remember user's choice for alerts
-                                var silnAlert = silenceAlert;
                                 if (stage_data) {
                                     $.ajax({
                                         url: wizardURL,
@@ -1094,10 +1225,7 @@ $(document).ready(function () {
                                         headers: {'X-CSRFToken': csrftoken},
                                         data: stage_data,
                                         success: function (data) {
-                                            onGoingDescription = true;
                                             clear_wizard();
-                                            silenceAlert = silnAlert;
-                                            add_new_samples(batchTargets, true);
                                         },
                                         error: function () {
                                             alert("Couldn't save entries!");
@@ -1163,7 +1291,31 @@ $(document).ready(function () {
             };
         }
 
-        function set_summary_data() {
+        function set_generated_samples() {
+            //set or alter this only in the attributes stage
+
+            var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+
+            //get form elements for current stage
+            var form_values = Object();
+
+            var generateTable = false;
+
+            if ($('#wizard_form_' + activeStageIndx).length) {
+                $('#wizard_form_' + activeStageIndx).find(":input").each(function () {
+                    form_values[this.id] = $(this).val();
+                });
+
+                if (form_values.hasOwnProperty("current_stage") && form_values.current_stage == "sample_attributes") {
+                    generateTable = true;
+                }
+            }
+
+            if (!generateTable) {
+                return false;
+            }
+
+
             //check if sample name has been entered before proceeding with sample display
 
             var namePrefix = get_stage_inputs_by_ref("sample_name");
@@ -1178,8 +1330,6 @@ $(document).ready(function () {
             //show generated sample pane
             $('#copo-sample-tabs.nav-tabs a[href="#generatedSamples"]').tab('show');
 
-            //set up data source
-            var dtd = [];
 
             var requestedNumberOfSamples = get_stage_inputs_by_ref("number_of_samples");
 
@@ -1191,6 +1341,8 @@ $(document).ready(function () {
 
             requestedNumberOfSamples = parseInt(requestedNumberOfSamples);
 
+            //set up data source
+            var dtd = [];
 
             if (generatedSamples.length == 0) {
                 //no sample generated. auto generate samples based on description metadata
@@ -1246,13 +1398,7 @@ $(document).ready(function () {
                     dtd.push(option);
                 });
             } else if (requestedNumberOfSamples == generatedSamples.length) {
-                $.each(generatedSamples, function (key, val) {
-                    var option = {};
-                    option["rank"] = key + 1;
-                    option["name"] = val.name;
-                    option["attributes"] = val.attributes;
-                    dtd.push(option);
-                });
+                return false;
             }
 
             $("#generatedSamplesPara").html("Generated Samples");
@@ -1340,8 +1486,8 @@ $(document).ready(function () {
                                 var aLink = $('<button/>', {
                                     class: "btn btn-xs btn-info sample-view-button",
                                     "data-row-indx": meta.row,
-                                    title: "Click to view current attribute values",
-                                    html: "View"
+                                    title: "Click to view assigned values",
+                                    html: '<i class="fa fa-plus-circle"></i> '
                                 });
 
                                 var applyBtn = $('<button/>', {
@@ -1377,6 +1523,33 @@ $(document).ready(function () {
 
         function do_attributes_assignment_all() {
             //set attribute for all samples
+
+            var stallAssignment = false;
+
+
+            //...but first validate form
+            $(document).find("form").each(function () {
+                var theForm = $(this);
+                if (theForm.find("#current_stage").length && theForm.find("#current_stage").val() == "sample_attributes") {
+
+                    theForm.trigger('submit');
+
+                    if (theForm.find("#bcopovalidator").val() == "false") {
+                        theForm.find("#bcopovalidator").val("true");
+
+                        stallAssignment = true;
+                    }
+
+                    return false;
+
+                }
+            });
+
+            if (stallAssignment) {
+                return false;
+            }
+
+
             if ($.fn.dataTable.isDataTable('#generated_samples_table')) {
                 var table = $('#generated_samples_table').DataTable();
 
@@ -1408,6 +1581,20 @@ $(document).ready(function () {
 
             }
 
+            //after assignment, close row
+            var table = $('#generated_samples_table').DataTable();
+            var tr = elem.closest('tr');
+            var row = table.row(tr);
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child('');
+                row.child.hide();
+                tr.removeClass('shown');
+
+                elem.closest('tr').find(".sample-view-button").html('<i class="fa fa-plus-circle"></i> ');
+            }
+
             get_row_attributes(elem);
 
         }
@@ -1422,11 +1609,13 @@ $(document).ready(function () {
                 row.child('');
                 row.child.hide();
                 tr.removeClass('shown');
+
+                elem.closest('tr').find(".sample-view-button").html('<i class="fa fa-plus-circle"></i> ');
             }
             else {
                 //build view
                 var attributesPanel = $('<div/>', {
-                    class: "panel panel-copo-data panel-default",
+                    class: "panel panel-copo-data panel-primary",
                     style: "margin-top: 5px; font-size: 12px;"
                 });
 
@@ -1497,24 +1686,467 @@ $(document).ready(function () {
                 //add view
                 row.child(ctrlDiv.html()).show();
                 tr.addClass('shown');
+
+                elem.closest('tr').find(".sample-view-button").html('<i class="fa fa-minus-circle"></i> ');
             }
         }
 
-        function get_item_value(item, valuesObject) {
-            //sort out item value
-            var itemValue = "";
 
-            if (item.type == "string") {
-                //now get control and resolve value...
-                var itemValue = $('<div/>', {
-                    // for: currentItem.id,
-                    html: "here we go",
-                    style: "padding-top:5px;"
+        function get_item_value_2(item, record) {
+            //sort out item value
+            var itemValue = $('<div/>',
+                {
+                    class: "ctrlDIV"
                 });
+
+            var valObject = record[item.id];
+
+            if (item.type == "array") {
+                //group items based on similarity of suffix
+
+                for (var i = 0; i < valObject.length; ++i) {
+                    var objectHTML = dispatchViewControl[controlsViewMapping[item.control.toLowerCase()]](valObject[i], item);
+                    itemValue.append(objectHTML);
+                }
+
+            } else {
+                var objectHTML = dispatchViewControl[controlsViewMapping[item.control.toLowerCase()]](valObject, item);
+                itemValue.append(objectHTML);
             }
 
             return itemValue;
         }
+
+
+        function get_item_value(item, valuesObject) {
+            //sort out item value
+            var itemValue = $('<div/>',
+                {
+                    class: "ctrlDIV"
+                });
+
+            //get base of ids
+            var relevantList = Object();
+            var totalRelevant = 0;
+
+            $.each(valuesObject, function (key, val) {
+                if (key.split(".").slice(0)[0] == item.id) {
+                    ++totalRelevant;
+                    relevantList[key] = val;
+                }
+            });
+
+            if (item.type == "array") {
+                //group items based on similarity of suffix
+                var groupedList = [];
+
+                //get first element group (without suffix)var groupbyIndx = Object();
+                var groupbyIndx = Object();
+                $.each(relevantList, function (key, val) {
+                    if (isNaN(key.split("_").slice(-1)[0])) {
+                        groupbyIndx[key] = val;
+                    }
+                });
+
+                if (!($.isEmptyObject(groupbyIndx))) {
+                    groupedList.push(groupbyIndx);
+                }
+
+                //now get other groups
+                for (var i = 1; i < totalRelevant; ++i) {
+                    var groupbyIndx = Object();
+
+                    $.each(relevantList, function (key, val) {
+                        if (parseInt(key.split("_").slice(-1)[0]) == i) {
+                            groupbyIndx[key.split("_").slice(0)[0]] = val;
+                        }
+                    });
+
+                    if (!($.isEmptyObject(groupbyIndx))) {
+                        groupedList.push(groupbyIndx);
+                    }
+
+                }
+
+                for (var i = 0; i < groupedList.length; ++i) {
+                    var objectHTML = dispatchFormDataControl[controlsDataMapping[item.control.toLowerCase()]](groupedList[i], item);
+                    itemValue.append(objectHTML);
+                }
+
+            } else {
+                var objectHTML = dispatchFormDataControl[controlsDataMapping[item.control.toLowerCase()]](relevantList, item);
+                itemValue.append(objectHTML);
+            }
+
+            return itemValue;
+        }
+
+        var controlsViewMapping = {
+            "text": "do_text_ctrl",
+            "textarea": "do_textarea_ctrl",
+            "hidden": "do_hidden_ctrl",
+            "copo-select": "do_copo_select_ctrl",
+            "ontology term": "do_ontology_term_ctrl",
+            "select": "do_select_ctrl",
+            "copo-multi-search": "do_copo_multi_search_ctrl",
+            "copo-multi-select": "do_copo_multi_select_ctrl",
+            "copo-comment": "do_copo_comment_ctrl",
+            "copo-characteristics": "do_copo_characteristics_ctrl",
+            "copo-sample-source-2": "do_copo_sample_source_ctrl_2",
+            "oauth_required": "do_oauth_required",
+            "copo-button-list": "do_copo_button_list_ctrl",
+            "copo-item-count": "do_copo_item_count_ctrl"
+        };
+
+
+        var dispatchViewControl = {
+            do_text_ctrl: function (relevantObject, item) {
+                var ctrlsDiv = get_attributes_outer_div();
+
+                ctrlsDiv.append(get_attributes_inner_div_1().append(relevantObject));
+
+                return ctrlsDiv;
+            },
+            do_textarea_ctrl: function (relevantObject, item) {
+                var ctrlsDiv = get_attributes_outer_div();
+
+                ctrlsDiv.append(get_attributes_inner_div_1().append(relevantObject));
+
+                return ctrlsDiv;
+            },
+            do_copo_select_ctrl: function (relevantObject, item) {
+                return "";
+            },
+            do_select_ctrl: function (relevantObject, item) {
+                return "";
+            },
+            do_copo_multi_search_ctrl: function (relevantObject, item) {
+                return "";
+            },
+            do_copo_multi_select_ctrl: function (relevantObject, item) {
+                return "";
+            },
+            do_copo_sample_source_ctrl_2: function (relevantObject, item) {
+                var ctrlsDiv = get_attributes_outer_div();
+
+                try {
+                    var theValueObject = item.option_values;
+
+                    for (var j = 0; j < theValueObject.options.length; ++j) {
+                        if (relevantObject == theValueObject.options[j][theValueObject.value_field]) {
+                            ctrlsDiv.append(get_attributes_inner_div_1().append(theValueObject.options[j][theValueObject.label_field]));
+                        }
+                    }
+                }
+                catch (err) {
+                    console.log(err.name);
+                }
+
+
+                return ctrlsDiv;
+            },
+            do_copo_button_list_ctrl: function (relevantObject, item) {
+                return "";
+            },
+            do_copo_item_count_ctrl: function (relevantObject, item) {
+                return "";
+            },
+            do_copo_characteristics_ctrl: function (relevantObject, item) {
+                var characteristicsSchema = copoSchemas.characteristics_schema;
+
+                var ctrlsDiv = get_attributes_outer_div();
+
+                for (var i = 0; i < characteristicsSchema.length; ++i) {
+
+                    var currentItem = characteristicsSchema[i];
+
+                    if (!currentItem.hasOwnProperty("show_in_table") || !currentItem["show_in_table"]) {
+                        continue;
+                    }
+
+                    var scID = currentItem.id.split(".").slice(-1)[0];
+                    var subValObject = Object();
+
+                    if (relevantObject.hasOwnProperty(scID)) {
+                        subValObject = relevantObject[scID];
+                    }
+
+                    $.each(subValObject, function (key, val) {
+                        if (key == "annotationValue") {
+
+                            if (val == "") {
+                                val = "-"
+                            }
+
+                            if (i == 0) {
+                                ctrlsDiv.append(get_attributes_inner_div_1().append(val));
+                            } else {
+                                ctrlsDiv.append(get_attributes_inner_div().append(val));
+                            }
+                        }
+                    });
+
+                }
+
+                return ctrlsDiv;
+            },
+            do_copo_comment_ctrl: function (relevantObject, item) {
+                var commentSchema = copoSchemas.comment_schema;
+
+                var ctrlsDiv = get_attributes_outer_div();
+
+                for (var i = 0; i < commentSchema.length; ++i) {
+
+                    var currentItem = commentSchema[i];
+
+                    if (!currentItem.hasOwnProperty("show_in_table") || !currentItem["show_in_table"]) {
+                        continue;
+                    }
+
+                    var scID = currentItem.id.split(".").slice(-1)[0];
+                    var val = "";
+                    if (relevantObject.hasOwnProperty(scID)) {
+                        val = relevantObject[scID];
+
+                        if (val == "") {
+                            val = "-"
+                        }
+
+                        if (i == 0) {
+                            ctrlsDiv.append(get_attributes_inner_div_1().append(val));
+                        } else {
+                            ctrlsDiv.append(get_attributes_inner_div().append(val));
+                        }
+                    }
+
+                }
+
+                return ctrlsDiv;
+            },
+            do_ontology_term_ctrl: function (relevantObject, item) {
+                var ontologySchema = copoSchemas.ontology_schema;
+
+                var ctrlsDiv = get_attributes_outer_div();
+
+                for (var i = 0; i < ontologySchema.length; ++i) {
+
+                    var currentItem = ontologySchema[i];
+
+                    if (!currentItem.hasOwnProperty("show_in_table") || !currentItem["show_in_table"]) {
+                        continue;
+                    }
+
+                    var scID = currentItem.id.split(".").slice(-1)[0];
+                    var val = "";
+                    if (relevantObject.hasOwnProperty(scID)) {
+                        val = relevantObject[scID];
+
+                        if (val == "") {
+                            val = "-"
+                        }
+
+                        if (i == 0) {
+                            ctrlsDiv.append(get_attributes_inner_div_1().append(val));
+                        } else {
+                            ctrlsDiv.append(get_attributes_inner_div().append(val));
+                        }
+                    }
+
+                }
+
+                return ctrlsDiv;
+
+            }
+        };
+
+
+        var controlsDataMapping = {
+            "text": "do_text_ctrl",
+            "textarea": "do_textarea_ctrl",
+            "hidden": "do_hidden_ctrl",
+            "copo-select": "do_copo_select_ctrl",
+            "ontology term": "do_ontology_term_ctrl",
+            "select": "do_select_ctrl",
+            "copo-multi-search": "do_copo_multi_search_ctrl",
+            "copo-multi-select": "do_copo_multi_select_ctrl",
+            "copo-comment": "do_copo_comment_ctrl",
+            "copo-characteristics": "do_copo_characteristics_ctrl",
+            "copo-sample-source-2": "do_copo_sample_source_ctrl_2",
+            "oauth_required": "do_oauth_required",
+            "copo-button-list": "do_copo_button_list_ctrl",
+            "copo-item-count": "do_copo_item_count_ctrl"
+        };
+
+
+        var dispatchFormDataControl = {
+            do_text_ctrl: function (relevantObject, item) {
+                var ctrlsDiv = get_attributes_outer_div();
+
+                ctrlsDiv.append(get_attributes_inner_div_1().append(relevantObject[item.id]));
+
+                return ctrlsDiv;
+            },
+            do_textarea_ctrl: function (relevantObject, item) {
+                var ctrlsDiv = get_attributes_outer_div();
+
+                ctrlsDiv.append(get_attributes_inner_div_1().append(relevantObject[item.id]));
+
+                return ctrlsDiv;
+            },
+            do_copo_select_ctrl: function (relevantObject, item) {
+                return "";
+            },
+            do_select_ctrl: function (relevantObject, item) {
+                return "";
+            },
+            do_copo_multi_search_ctrl: function (relevantObject, item) {
+                return "";
+            },
+            do_copo_multi_select_ctrl: function (relevantObject, item) {
+                return "";
+            },
+            do_copo_sample_source_ctrl_2: function (relevantObject, item) {
+                var ctrlsDiv = get_attributes_outer_div();
+
+                try {
+                    var theValueObject = JSON.parse($("#" + item.id).parent().find(".elem-json").val());
+                    var theData = (relevantObject[item.id]).split(",");
+
+                    for (var i = 0; i < theData.length; ++i) {
+                        for (var j = 0; j < theValueObject.options.length; ++j) {
+                            if (theData[i] == theValueObject.options[j][theValueObject.value_field]) {
+                                ctrlsDiv.append(get_attributes_inner_div_1().append(theValueObject.options[j][theValueObject.label_field]));
+                            }
+                        }
+                    }
+                }
+                catch (err) {
+                    console.log(err.name);
+                }
+
+
+                return ctrlsDiv;
+            },
+            do_copo_button_list_ctrl: function (relevantObject, item) {
+                return "";
+            },
+            do_copo_item_count_ctrl: function (relevantObject, item) {
+                return "";
+            },
+            do_copo_characteristics_ctrl: function (relevantObject, item) {
+                var characteristicsSchema = copoSchemas.characteristics_schema;
+
+                var ctrlsDiv = get_attributes_outer_div();
+
+                for (var i = 0; i < characteristicsSchema.length; ++i) {
+
+                    var currentItem = characteristicsSchema[i];
+
+                    if (!currentItem.hasOwnProperty("show_in_form") || !currentItem["show_in_form"]) {
+                        continue;
+                    }
+
+                    if (currentItem.hasOwnProperty("hidden") && currentItem.hidden.toString() != "false") {
+                        continue;
+                    }
+
+                    var scID = currentItem.id.split(".").slice(-1)[0];
+                    $.each(relevantObject, function (key, val) {
+                        if (key.split('.')[1] == scID && key.split(".").slice(-1)[0] == "annotationValue") {
+
+                            if (val == "") {
+                                val = "-"
+                            }
+
+                            if (i == 0) {
+                                ctrlsDiv.append(get_attributes_inner_div_1().append(val));
+                            } else {
+                                ctrlsDiv.append(get_attributes_inner_div().append(val));
+                            }
+                        }
+                    });
+
+                }
+
+                return ctrlsDiv;
+            },
+            do_copo_comment_ctrl: function (relevantObject, item) {
+                var commentSchema = copoSchemas.comment_schema;
+
+                var ctrlsDiv = get_attributes_outer_div();
+
+                for (var i = 0; i < commentSchema.length; ++i) {
+
+                    var currentItem = commentSchema[i];
+
+                    if (!currentItem.hasOwnProperty("show_in_form") || !currentItem["show_in_form"]) {
+                        continue;
+                    }
+
+                    if (currentItem.hasOwnProperty("hidden") && currentItem.hidden.toString() != "false") {
+                        continue;
+                    }
+
+                    var scID = currentItem.id.split(".").slice(-1)[0];
+                    $.each(relevantObject, function (key, val) {
+                        if (key.split('.')[1] == scID) {
+
+                            if (val == "") {
+                                val = "-"
+                            }
+
+                            if (i == 0) {
+                                ctrlsDiv.append(get_attributes_inner_div_1().append(val));
+                            } else {
+                                ctrlsDiv.append(get_attributes_inner_div().append(val));
+                            }
+
+                        }
+                    });
+
+                }
+
+                return ctrlsDiv;
+            },
+            do_ontology_term_ctrl: function (relevantObject, item) {
+                var ontologySchema = copoSchemas.ontology_schema;
+
+                var ctrlsDiv = get_attributes_outer_div();
+
+                for (var i = 0; i < ontologySchema.length; ++i) {
+
+                    var currentItem = ontologySchema[i];
+
+                    if (!currentItem.hasOwnProperty("show_in_form") || !currentItem["show_in_form"]) {
+                        continue;
+                    }
+                    if (currentItem.hasOwnProperty("hidden") && currentItem.hidden.toString() != "false") {
+                        continue;
+                    }
+
+                    var scID = currentItem.id.split(".").slice(-1)[0];
+                    $.each(relevantObject, function (key, val) {
+                        if (key.split('.')[1] == scID) {
+
+                            if (val == "") {
+                                val = "-"
+                            }
+
+                            if (i == 0) {
+                                ctrlsDiv.append(get_attributes_inner_div_1().append(val));
+                            } else {
+                                ctrlsDiv.append(get_attributes_inner_div().append(val));
+                            }
+                        }
+                    });
+
+                }
+
+                return ctrlsDiv;
+
+            }
+        };
+
 
         function get_stage_inputs_by_ref(ref) {
             var form_values = Object();

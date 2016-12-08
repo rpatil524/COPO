@@ -15,6 +15,12 @@ def delegate_submission(request):
     if not sub_id:
         sub_id = request.GET.get('sub_id')
 
+    # tonietuk's intercept starts
+    if not sub_id:
+        return HttpResponse({'status': 0})
+    # tonietuk's intercept ends
+
+
     sub = Submission().get_record(sub_id)
 
     repo = sub['repository']

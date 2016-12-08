@@ -229,4 +229,3 @@ class BrokerVisuals:
         )
 
         return self.context
-

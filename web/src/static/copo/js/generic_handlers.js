@@ -546,6 +546,7 @@ function refresh_multisearch() {
                 }
             });
 
+
             var control = $funSelect[0].selectize;
             control.setValue(valueElem.val().split(",")); //set default value
         }
@@ -691,6 +692,45 @@ var auto_complete = function () {
     }
 
 }//end of function
+
+function isInArray(value, array) {
+    //checks if a value is in array
+    return array.indexOf(value) > -1;
+}
+
+function get_attributes_outer_div() {
+    //used in rendering table information
+
+    var ctrlsDiv = $('<div/>',
+        {
+            class: "copo-component-attributes-outer"
+        });
+
+    return ctrlsDiv.clone();
+}
+
+
+function get_attributes_inner_div() {
+    //used in rendering table information
+
+    var ctrlSpan = $('<span/>',
+        {
+            class: "copo-component-attributes-inner"
+        });
+
+    return ctrlSpan.clone();
+}
+
+function get_attributes_inner_div_1() {
+    //used in rendering table information
+
+    var ctrlSpan = $('<span/>',
+        {
+            class: "copo-component-attributes-inner-0"
+        });
+
+    return ctrlSpan.clone();
+}
 
 
 function get_data_list_panel(itemData, link) {

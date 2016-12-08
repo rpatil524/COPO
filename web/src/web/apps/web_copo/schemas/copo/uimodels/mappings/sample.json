@@ -16,7 +16,35 @@
         "name"
       ],
       "help_tip": "A Sample represents major outputs resulting from a protocol application other than the special case outputs of Extract or a Labeled Extract.",
-      "label": "Sample Name"
+      "label": "Sample Name",
+      "specifications": [
+        "isasample",
+        "biosample"
+      ]
+    },
+    {
+      "type": "string",
+      "required": "false",
+      "ref": "",
+      "ontology_names": [
+        "ncbitaxon"
+      ],
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": true,
+      "id": "copo.sample.organism",
+      "show_in_table": false,
+      "show_in_sub_table": true,
+      "control": "ontology term",
+      "versions": [
+        "organism"
+      ],
+      "help_tip": "A taxonomic information associated to the Source Biological material (e.g., species, genus, strain).",
+      "label": "Organism",
+      "specifications": [
+        "biosample"
+      ]
     },
     {
       "type": "array",
@@ -27,13 +55,39 @@
       "default_value": "",
       "show_in_form": true,
       "id": "copo.sample.characteristics",
-      "show_in_table": true,
+      "show_in_table": false,
+      "show_in_sub_table": true,
       "control": "copo-characteristics",
       "versions": [
         "characteristics"
       ],
       "help_tip": "Characteristics of the sample e.g., height, sex",
-      "label": "Sample Characteristics"
+      "label": "Sample Characteristics",
+      "specifications": [
+        "isasample",
+        "biosample"
+      ]
+    },
+    {
+      "type": "array",
+      "required": "false",
+      "ref": "",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": true,
+      "id": "copo.sample.comments",
+      "show_in_table": false,
+      "show_in_sub_table": true,
+      "control": "copo-comment",
+      "versions": [
+        "comments"
+      ],
+      "help_tip": "",
+      "label": "Sample Comments",
+      "specifications": [
+        "biosample"
+      ]
     },
     {
       "type": "array",
@@ -44,13 +98,17 @@
       "default_value": "",
       "show_in_form": true,
       "id": "copo.sample.factorValues",
-      "show_in_table": true,
+      "show_in_table": false,
+      "show_in_sub_table": true,
       "control": "copo-characteristics",
       "versions": [
         "factorValues"
       ],
       "help_tip": "Factors express treatments on the sample, e.g., compound, dose, duration",
-      "label": "Sample Factors"
+      "label": "Sample Factors",
+      "specifications": [
+        "isasample"
+      ]
     },
     {
       "type": "array",
@@ -61,7 +119,8 @@
       "default_value": "",
       "show_in_form": true,
       "id": "copo.sample.derivesFrom",
-      "show_in_table": true,
+      "show_in_table": false,
+      "show_in_sub_table": true,
       "option_values": {
         "callback": {
           "function": "generate_sources_json",
@@ -73,7 +132,33 @@
         "derivesFrom"
       ],
       "help_tip": "Source(s) from which this sample is derived",
-      "label": "Sample Source"
+      "label": "Sample Source",
+      "specifications": [
+        "isasample"
+      ]
+    },
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "option_values": {
+        "callback": {
+          "function": "get_sample_type_options",
+          "parameter": ""
+        }
+      },
+      "show_in_form": false,
+      "id": "copo.sample.sample_type",
+      "show_in_table": true,
+      "control": "select",
+      "versions": [
+        "sample_type"
+      ],
+      "help_tip": "",
+      "label": "Sample Type"
     },
     {
       "type": "string",
@@ -141,7 +226,7 @@
         "date_modified"
       ],
       "help_tip": "",
-      "label": "Modified"
+      "label": "Date Modified"
     }
   ],
   "description": "Mappings of attribute in the Sample schema to a UI configuration source.",

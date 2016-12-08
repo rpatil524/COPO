@@ -5,7 +5,7 @@
     {
       "ref": "number_of_samples",
       "title": "Number of Samples",
-      "message": "How many samples do you want to describe? You can describe multiple samples with a common set of attributes.",
+      "message": "How many samples do you want to describe? You can describe multiple samples having a common set of attributes.",
       "items": [
         {
           "id": "number_of_samples",
@@ -20,7 +20,7 @@
     {
       "ref": "sample_type",
       "title": "Sample Type",
-      "message": "How do want to describe your samples? Sample Type provides specifications to help capture sample metadata.",
+      "message": "How do want to describe your samples? Sample Type provides specifications for sample metadata.",
       "items": [
         {
           "id": "sample_type",
@@ -30,18 +30,36 @@
           "required": "true",
           "control": "copo-button-list",
           "default_value": "bio",
-          "option_values": [
-            {
-              "value": "biosample",
-              "label": "BioSample",
-              "description": "BioSamples are <strong>repository agnostic</strong>, and are better suited for describing samples in a generic manner or in contexts where the target repository isn't known <i>a priori</i>."
-            },
-            {
-              "value": "isasample",
-              "label": "ISA Sample",
-              "description": "ISA samples are based on the ISA specification, and are better tailored for describing samples that will subsequently become part of data submissions to repositories such as <strong>ENA</strong> and <strong>Metabolights</strong>."
+          "option_values": {
+            "callback": {
+              "function": "get_sample_type_options",
+              "parameter": ""
             }
-          ]
+          }
+        }
+      ]
+    },
+    {
+      "ref": "sample_clone",
+      "title": "Sample Clone",
+      "message": "Do you want to clone an existing sample? Sample cloning helps 'boostrap' the description process.",
+      "items": [
+        {
+          "id": "sample_clone",
+          "type": "string",
+          "help_tip": "",
+          "label": "Sample to clone",
+          "hidden": "false",
+          "required": "false",
+          "control": "copo-multi-search",
+          "data_maxItems": 1,
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_samples_json",
+              "parameter": ""
+            }
+          }
         }
       ]
     },

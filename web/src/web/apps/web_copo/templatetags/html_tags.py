@@ -1,6 +1,7 @@
 __author__ = 'tonietuk'
 
 import json
+import copy
 from uuid import uuid4
 from django import template
 from django.core.urlresolvers import reverse
@@ -100,15 +101,20 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
 
     label_dict = dict(publication=dict(label="Publication", clonable=False),
                       person=dict(label="Person", clonable=False),
-                      sample=dict(label="Sample", clonable=True),
+                      sample=dict(label="Sample", clonable=False),
                       source=dict(label="Source", clonable=True),
                       profile=dict(label="Profile", clonable=False),
                       )
 
-    form_value = component_dict
-    form_schema = list()
-
     da_object = DAComponent(component=component, profile_id=profile_id)
+
+    form_value = component_dict
+
+    # get record, if in edit mode
+    if target_id:
+        form_value = da_object.get_record(target_id)
+
+    form_schema = list()
 
     # get schema fields
     for f in da_object.get_schema().get("schema_dict"):
@@ -120,19 +126,16 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
             if "option_values" in f:
                 f["option_values"] = get_control_options(f)
 
+            # filter based on sample type
+            if component == "sample" and not filter_sample_type(form_value, f):
+                continue
+
             form_schema.append(f)
 
-    # get record, if in edit context...and set form title
-
-    if target_id:
-        form_value = da_object.get_record(target_id)
-
-    # get all records: used in the UI for 'cloning' purposes
-
     # get all records: used in the UI for 'cloning' and other purposes
-    component_records = list()
-    if label_dict.get(component, dict()).get("clonable", False):
-        component_records = generate_component_records(component, profile_id)
+    component_records = generate_component_records(component, profile_id)
+    # if label_dict.get(component, dict()).get("clonable", False):
+    #     component_records = generate_component_records(component, profile_id)
 
     return dict(component_name=component,
                 form_label=label_dict.get(component, dict()).get("label", str()),
@@ -143,6 +146,26 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
                 component_records=component_records,
                 clonable=label_dict.get(component, dict()).get("clonable", False),
                 )
+
+
+@register.filter("filter_sample_type")
+def filter_sample_type(form_value, elem):
+    # filters UI elements based on sample type
+
+    allowable = True
+    default_type = "biosample"
+    sample_types = list()
+
+    for s_t in d_utils.get_sample_type_options():
+        sample_types.append(s_t["value"])
+
+    if "sample_type" in form_value:
+        default_type = form_value["sample_type"]
+
+    if default_type not in elem.get("specifications", sample_types):
+        allowable = False
+
+    return allowable
 
 
 @register.filter("generate_component_record")
@@ -165,25 +188,6 @@ def generate_component_records(component=str(), profile_id=str()):
 @register.filter("generate_copo_table_data")
 def generate_copo_table_data(profile_id=str(), component=str()):
     # This method generates the 'json' for building an UI table
-
-    # define button
-    button_templates = d_utils.get_button_templates()
-
-    common_btn_dict = dict(row_btns=[button_templates['edit_row'], button_templates['delete_row']],
-                           global_btns=[button_templates['delete_global']])
-
-    buttons_dict = dict(publication=common_btn_dict,
-                        person=common_btn_dict,
-                        sample=dict(row_btns=[button_templates['info_row'], button_templates['edit_row'], button_templates['convert_row'], button_templates['delete_row']],
-                                    global_btns=[button_templates['add_new_samples_global'],
-                                                 button_templates['delete_global']]),
-                        source=common_btn_dict,
-                        profile=common_btn_dict,
-                        datafile=dict(
-                            row_btns=[button_templates['info_row'], button_templates['describe_row'],
-                                      button_templates['delete_row']],
-                            global_btns=[button_templates['describe_global'], button_templates['undescribe_global']])
-                        )
 
     # instantiate data access object
     da_object = DAComponent(profile_id, component)
@@ -210,6 +214,30 @@ def generate_copo_table_data(profile_id=str(), component=str()):
 
         row.append(str(rec["_id"]))  # last element in a row exposes the id of the record
         dataSet.append(row)
+
+    # define action buttons
+    button_templates = d_utils.get_button_templates()
+
+    common_btn_dict = dict(row_btns=[button_templates['edit_row'], button_templates['delete_row']],
+                           global_btns=[button_templates['delete_global']])
+
+    sample_info = copy.deepcopy(button_templates['info_row'])
+    sample_info["text"] = "Sample Attributes"
+
+    buttons_dict = dict(publication=common_btn_dict,
+                        person=common_btn_dict,
+                        sample=dict(row_btns=[sample_info, button_templates['edit_row'],
+                                               button_templates['delete_row']],
+                                    global_btns=[button_templates['add_new_samples_global'],
+                                                 button_templates['delete_global']]),
+                        source=common_btn_dict,
+                        profile=common_btn_dict,
+                        datafile=dict(
+                            row_btns=[button_templates['info_row'], button_templates['describe_row'],
+                                      button_templates['delete_row']],
+                            global_btns=[button_templates['describe_global'],
+                                         button_templates['undescribe_global']])
+                        )
 
     action_buttons = dict(row_btns=buttons_dict.get(component).get("row_btns"),
                           global_btns=buttons_dict.get(component).get("global_btns")

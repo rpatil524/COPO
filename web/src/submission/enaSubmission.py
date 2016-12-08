@@ -73,7 +73,9 @@ class EnaSubmit(object):
                             path2library=None, sub_id=None):
 
         # check submission status
-        if not Submission().isComplete(sub_id):
+        submission_status = Submission().isComplete(sub_id)
+
+        if not submission_status or submission_status == 'false':
 
             lg.log('Starting aspera transfer', level=Loglvl.INFO, type=Logtype.FILE)
 
@@ -163,7 +165,7 @@ class EnaSubmit(object):
                                         fields['estimated_completion'] = estimated_completion
                             RemoteDataFile().update_transfer(transfer_token, fields)
 
-                kwargs = dict(target_id=sub_id, completed_on=str(datetime.now()))
+                kwargs = dict(target_id=sub_id, completed_on=datetime.now())
                 Submission().save_record(dict(), **kwargs)
                 # close thread
                 thread.close()

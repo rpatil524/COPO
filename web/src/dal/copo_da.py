@@ -115,6 +115,7 @@ class DAComponent:
         if auto_fields:
             fields = DecoupleFormSubmission(auto_fields, self.get_schema().get("schema")).get_schema_fields_updated()
 
+        # should have target_id for updates and return empty string for inserts
         target_id = kwargs.pop("target_id", str())
 
         # set system fields
@@ -141,18 +142,25 @@ class DAComponent:
             if not target_id and f_id not in fields:
                 fields[f_id] = data_utils.default_jsontype(f.type)
 
-        if target_id:
-            self.get_collection_handle().update(
-                {"_id": ObjectId(target_id)},
-                {'$set': fields})
+        # if True, then the database action (to save/update) is never performed, but validated 'fields' is returned
+        validate_only = kwargs.pop("validate_only", False)
+
+        # prefer this testto save guard against all sorts of value the 'validate_only' can assume
+        if validate_only == True:
+            return fields
         else:
-            doc = self.get_collection_handle().insert(fields)
-            target_id = str(doc)
+            if target_id:
+                self.get_collection_handle().update(
+                    {"_id": ObjectId(target_id)},
+                    {'$set': fields})
+            else:
+                doc = self.get_collection_handle().insert(fields)
+                target_id = str(doc)
 
-        # return saved record
-        rec = self.get_record(target_id)
+            # return saved record
+            rec = self.get_record(target_id)
 
-        return rec
+            return rec
 
     def get_all_records(self, sort_by='_id', sort_direction=-1):
         doc = dict(deleted=data_utils.get_not_deleted_flag())
@@ -270,7 +278,7 @@ class Submission(DAComponent):
     def mark_figshare_article_published(self, article_id):
         return self.get_collection_handle().update_many(
             {
-                'accession': article_id
+                'accessions': article_id
             },
             {
                 "$set": {
@@ -280,14 +288,9 @@ class Submission(DAComponent):
         )
 
     def isComplete(self, sub_id):
-        doc = self.get_collection_handle().find_one
-        (
-            {
-                '_id': ObjectId(sub_id)
-            }
-        )
-        return doc['complete']
+        doc = self.get_collection_handle().find_one({"_id": ObjectId(sub_id)})
 
+        return doc.get("complete", False)
 
     def mark_submission_complete(self, sub_id):
         doc = self.get_collection_handle().update_one(
@@ -296,11 +299,12 @@ class Submission(DAComponent):
             },
             {
                 "$set": {
-                    "complete" : "true",
+                    "complete": "true",
                     "completed_on": datetime.now()
                 }
             }
         )
+
 
 class DataFile(DAComponent):
     def __init__(self, profile_id=None):

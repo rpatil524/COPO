@@ -129,6 +129,10 @@ def get_figshare_publish_options():
 
 
 def get_samples_json():
+    """
+    returns all samples in a profile (i.e isa and biosamples)
+    :return:
+    """
     from dal.copo_da import Sample
     profile_id = ThreadLocal.get_current_request().session['profile_id']
     samples = Sample(profile_id).get_all_records()
@@ -149,8 +153,42 @@ def get_samples_json():
             {
                 value_field: str(sd["_id"]),
                 label_field: sd["name"],
-                secondary_label_field[0]: sd["name"]
+                secondary_label_field[0]: sd["name"],
+                "sample_type": sd.get("sample_type", str())
             })
+
+    return elem_json
+
+
+def get_isasamples_json():
+    """
+    returns isa samples in a profile
+    :return:
+    """
+    from dal.copo_da import Sample
+    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    samples = Sample(profile_id).get_all_records()
+
+    value_field = str("id")
+    label_field = str("sample_name")
+    search_field = ["id", "sample_name"]
+    secondary_label_field = ["meta_sample_name"]
+
+    elem_json = dict(value_field=value_field,
+                     label_field=label_field,
+                     secondary_label_field=secondary_label_field,
+                     search_field=search_field,
+                     options=list())
+
+    for sd in samples:
+        if sd["sample_type"] == "isasample":
+            elem_json.get("options").append(
+                {
+                    value_field: str(sd["_id"]),
+                    label_field: sd["name"],
+                    secondary_label_field[0]: sd["name"],
+                    "sample_type": sd.get("sample_type", str())
+                })
 
     return elem_json
 
@@ -196,6 +234,10 @@ def generate_sources_json():
 
 def get_study_type_options():
     return lookup.DROP_DOWNS['STUDY_TYPES']
+
+
+def get_sample_type_options():
+    return lookup.DROP_DOWNS['SAMPLE_TYPES']
 
 
 def get_repository_options():
