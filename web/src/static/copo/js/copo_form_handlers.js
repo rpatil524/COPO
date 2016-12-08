@@ -48,22 +48,52 @@ $(document).ready(function () {
 
         var errorMsg = "Couldn't build " + component + " form!";
 
-        $.ajax({
-            url: copoFormsURL,
-            type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
-            data: {
-                'task': 'form',
-                'component': component
-            },
-            success: function (data) {
-                json2HtmlForm(data);
-                componentData = data;
-            },
-            error: function () {
-                alert(errorMsg);
-            }
-        });
+        if (component == 'annotation') {
+            $('#processing_div').hide()
+            $('#file_picker_modal').modal('show')
+            $("#form_submit_btn").on('click', function () {
+                var formData = new FormData();
+                formData.append('file', $('#InputFile')[0].files[0]);
+                var csrftoken = $.cookie('csrftoken');
+                var url = "/api/upload_annotation_file/"
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json'
+                }).done(function (e) {
+                    $('#annotation_table_wrapper').hide()
+                    $('#annotation_content').show()
+                    $('#annotation_content').html(e.html)
+
+                    $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
+                    setup_annotator()
+                    $('#file_picker_modal').modal('hide')
+                });
+            })
+        }
+        else {
+
+            $.ajax({
+                url: copoFormsURL,
+                type: "POST",
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    'task': 'form',
+                    'component': component
+                },
+                success: function (data) {
+                    json2HtmlForm(data);
+                    componentData = data;
+                },
+                error: function () {
+                    alert(errorMsg);
+                }
+            });
+        }
     });
 
 
@@ -959,12 +989,12 @@ var dispatchFormControl = {
             });
 
         var hiddenCtrl = $('<input/>',
-                {
-                    type: "hidden",
-                    name: formElem.id,
-                    id: formElem.id,
-                    value: formElem.option_values[0].value
-                });
+            {
+                type: "hidden",
+                name: formElem.id,
+                id: formElem.id,
+                value: formElem.option_values[0].value
+            });
 
 
         for (var i = 0; i < formElem.option_values.length; ++i) {

@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/COPO.iml" afterPath="$PROJECT_DIR$/.idea/COPO.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="" />
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -30,7 +25,7 @@
       <file leaf-file-name="copo_publication.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_publication.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1185">
+            <state relative-caret-position="855">
               <caret line="79" column="8" selection-start-line="79" selection-start-column="8" selection-end-line="79" selection-end-column="8" />
               <folding />
             </state>
@@ -47,23 +42,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="annotate_views.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/api/annotate_views.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="720">
-              <caret line="55" column="0" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#36#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="copo_da.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="34" column="20" selection-start-line="34" selection-start-column="20" selection-end-line="34" selection-end-column="20" />
+            <state relative-caret-position="1845">
+              <caret line="312" column="36" selection-start-line="312" selection-start-column="36" selection-end-line="312" selection-end-column="36" />
               <folding>
                 <element signature="e#49#78#0" expanded="true" />
               </folding>
@@ -74,9 +57,11 @@
       <file leaf-file-name="html_tags.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="154">
+            <state relative-caret-position="2985">
               <caret line="200" column="20" selection-start-line="200" selection-start-column="20" selection-end-line="200" selection-end-column="20" />
-              <folding />
+              <folding>
+                <marker date="1481213983000" expanded="false" signature="25:37" ph="import ..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -84,7 +69,7 @@
       <file leaf-file-name="broker_da.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/dal/broker_da.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2220">
+            <state relative-caret-position="2250">
               <caret line="157" column="0" selection-start-line="157" selection-start-column="0" selection-end-line="157" selection-end-column="0" />
               <folding />
             </state>
@@ -94,9 +79,17 @@
       <file leaf-file-name="copo_form_handlers.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1119">
-              <caret line="815" column="66" selection-start-line="815" selection-start-column="57" selection-end-line="815" selection-end-column="66" />
-              <folding />
+            <state relative-caret-position="907">
+              <caret line="104" column="27" selection-start-line="104" selection-start-column="27" selection-end-line="104" selection-end-column="27" />
+              <folding>
+                <marker date="1481213999000" expanded="true" signature="9525:9532" ph="×" />
+                <marker date="1481213999000" expanded="true" signature="9596:9614" ph="..." />
+                <marker date="1481213999000" expanded="true" signature="10317:10329" ph="..." />
+                <marker date="1481213999000" expanded="true" signature="33280:33314" ph="..." />
+                <marker date="1481213999000" expanded="true" signature="37814:37829" ph="..." />
+                <marker date="1481213999000" expanded="true" signature="59723:59730" ph="×" />
+                <marker date="1481213999000" expanded="true" signature="60257:60273" ph="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -106,7 +99,29 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="3930">
               <caret line="262" column="19" selection-start-line="262" selection-start-column="19" selection-end-line="262" selection-end-column="19" />
-              <folding />
+              <folding>
+                <marker date="1481213983000" expanded="true" signature="76112:76321" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="76209:76277" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="76406:76848" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="76726:76802" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="76916:78268" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="76948:77167" ph="{&quot;warning&quot;: &quot;fa fa-exclamation-circle copo-icon-warning&quot;...}" />
+                <marker date="1481213983000" expanded="true" signature="77297:77361" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="77405:77477" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="78310:82459" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="78345:78737" ph="[...]" />
+                <marker date="1481213983000" expanded="true" signature="78548:78723" ph="{&quot;htmlTableID&quot;: &quot;describe_howtos&quot;...}" />
+                <marker date="1481213983000" expanded="true" signature="78799:82449" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="78990:79232" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="79383:79553" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="80128:82292" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="80206:82272" ph="{&quot;data&quot;: dtd...}" />
+                <marker date="1481213983000" expanded="true" signature="80679:82137" ph="[...]" />
+                <marker date="1481213983000" expanded="true" signature="81039:81920" ph="{...}" />
+                <marker date="1481213983000" expanded="true" signature="81099:81350" ph="{&quot;data-toggle&quot;: &quot;collapse&quot;...}" />
+                <marker date="1481213983000" expanded="true" signature="81980:82111" ph="{&quot;data&quot;: &quot;content&quot;...}" />
+                <marker date="1481213983000" expanded="true" signature="82177:82250" ph="[...]" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -114,17 +129,9 @@
       <file leaf-file-name="generic_handlers.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
+            <state relative-caret-position="9345">
               <caret line="623" column="0" selection-start-line="623" selection-start-column="0" selection-end-line="623" selection-end-column="0" />
-              <folding>
-                <marker date="1481210385000" expanded="true" signature="4983:5003" ph="..." />
-                <marker date="1481210385000" expanded="true" signature="5341:5384" ph="..." />
-                <marker date="1481210385000" expanded="true" signature="5571:5577" ph=" " />
-                <marker date="1481210385000" expanded="true" signature="12394:12400" ph=" " />
-                <marker date="1481210385000" expanded="true" signature="23114:23162" ph="..." />
-                <marker date="1481210385000" expanded="true" signature="23176:23206" ph="..." />
-                <marker date="1481210385000" expanded="true" signature="23329:23342" ph="..." />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -157,7 +164,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="develop" />
       </map>
     </option>
   </component>
@@ -185,11 +192,11 @@
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_annotations.js" />
-        <option value="$PROJECT_DIR$/web/src/dal/copo_da.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" />
+        <option value="$PROJECT_DIR$/web/src/dal/copo_da.py" />
+        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
       </list>
     </option>
   </component>
@@ -200,9 +207,10 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="23" />
-    <option name="width" value="1440" />
-    <option name="height" value="830" />
+    <option name="x" value="-1920" />
+    <option name="y" value="-94" />
+    <option name="width" value="1920" />
+    <option name="height" value="1057" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -987,9 +995,9 @@
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
         <env name="DJANGO_SETTINGS_MODULE" value="web.settings.all" />
         <env name="ENV_FILE_PARSER" value="" />
-        <env name="PYTHONUNBUFFERED" value="1" />
         <env name="ENV_FILE_PATH" value="" />
         <env name="ENV_FILE_IS_ENABLED" value="false" />
       </envs>
@@ -1083,28 +1091,28 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="830" extended-state="6" />
-    <editor active="true" />
+    <frame x="-1920" y="-94" width="1920" height="1057" extended-state="6" />
+    <editor active="false" />
     <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26091588" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25181347" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39910814" sideWeight="0.5042598" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998884" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25822604" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25181347" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998884" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.52168024" sideWeight="0.49574015" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5212435" sideWeight="0.49574015" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Mongo Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998884" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -1428,26 +1436,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/api/annotate_views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="720">
-          <caret line="55" column="0" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#36#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="34" column="20" selection-start-line="34" selection-start-column="20" selection-end-line="34" selection-end-column="20" />
-          <folding>
-            <element signature="e#49#78#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1020">
@@ -1458,7 +1446,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/dal/broker_da.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2220">
+        <state relative-caret-position="2250">
           <caret line="157" column="0" selection-start-line="157" selection-start-column="0" selection-end-line="157" selection-end-column="0" />
           <folding />
         </state>
@@ -1468,7 +1456,29 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3930">
           <caret line="262" column="19" selection-start-line="262" selection-start-column="19" selection-end-line="262" selection-end-column="19" />
-          <folding />
+          <folding>
+            <marker date="1481213983000" expanded="true" signature="76112:76321" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="76209:76277" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="76406:76848" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="76726:76802" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="76916:78268" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="76948:77167" ph="{&quot;warning&quot;: &quot;fa fa-exclamation-circle copo-icon-warning&quot;...}" />
+            <marker date="1481213983000" expanded="true" signature="77297:77361" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="77405:77477" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="78310:82459" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="78345:78737" ph="[...]" />
+            <marker date="1481213983000" expanded="true" signature="78548:78723" ph="{&quot;htmlTableID&quot;: &quot;describe_howtos&quot;...}" />
+            <marker date="1481213983000" expanded="true" signature="78799:82449" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="78990:79232" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="79383:79553" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="80128:82292" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="80206:82272" ph="{&quot;data&quot;: dtd...}" />
+            <marker date="1481213983000" expanded="true" signature="80679:82137" ph="[...]" />
+            <marker date="1481213983000" expanded="true" signature="81039:81920" ph="{...}" />
+            <marker date="1481213983000" expanded="true" signature="81099:81350" ph="{&quot;data-toggle&quot;: &quot;collapse&quot;...}" />
+            <marker date="1481213983000" expanded="true" signature="81980:82111" ph="{&quot;data&quot;: &quot;content&quot;...}" />
+            <marker date="1481213983000" expanded="true" signature="82177:82250" ph="[...]" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1482,7 +1492,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_publication.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1185">
+        <state relative-caret-position="855">
           <caret line="79" column="8" selection-start-line="79" selection-start-column="8" selection-end-line="79" selection-end-column="8" />
           <folding />
         </state>
@@ -1490,33 +1500,55 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
+        <state relative-caret-position="9345">
           <caret line="623" column="0" selection-start-line="623" selection-start-column="0" selection-end-line="623" selection-end-column="0" />
-          <folding>
-            <marker date="1481210385000" expanded="true" signature="4983:5003" ph="..." />
-            <marker date="1481210385000" expanded="true" signature="5341:5384" ph="..." />
-            <marker date="1481210385000" expanded="true" signature="5571:5577" ph=" " />
-            <marker date="1481210385000" expanded="true" signature="12394:12400" ph=" " />
-            <marker date="1481210385000" expanded="true" signature="23114:23162" ph="..." />
-            <marker date="1481210385000" expanded="true" signature="23176:23206" ph="..." />
-            <marker date="1481210385000" expanded="true" signature="23329:23342" ph="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
+        <state relative-caret-position="2985">
           <caret line="200" column="20" selection-start-line="200" selection-start-column="20" selection-end-line="200" selection-end-column="20" />
-          <folding />
+          <folding>
+            <marker date="1481213983000" expanded="false" signature="25:37" ph="import ..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/api/annotate_views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="742">
+          <caret line="96" column="22" selection-start-line="96" selection-start-column="22" selection-end-line="96" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#36#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1845">
+          <caret line="312" column="36" selection-start-line="312" selection-start-column="36" selection-end-line="312" selection-end-column="36" />
+          <folding>
+            <element signature="e#49#78#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1119">
-          <caret line="815" column="66" selection-start-line="815" selection-start-column="57" selection-end-line="815" selection-end-column="66" />
-          <folding />
+        <state relative-caret-position="907">
+          <caret line="104" column="27" selection-start-line="104" selection-start-column="27" selection-end-line="104" selection-end-column="27" />
+          <folding>
+            <marker date="1481213999000" expanded="true" signature="9525:9532" ph="×" />
+            <marker date="1481213999000" expanded="true" signature="9596:9614" ph="..." />
+            <marker date="1481213999000" expanded="true" signature="10317:10329" ph="..." />
+            <marker date="1481213999000" expanded="true" signature="33280:33314" ph="..." />
+            <marker date="1481213999000" expanded="true" signature="37814:37829" ph="..." />
+            <marker date="1481213999000" expanded="true" signature="59723:59730" ph="×" />
+            <marker date="1481213999000" expanded="true" signature="60257:60273" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
