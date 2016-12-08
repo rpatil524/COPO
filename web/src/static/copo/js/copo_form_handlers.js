@@ -909,6 +909,8 @@ var dispatchFormControl = {
                         build_source_form(funcParams);
                         sourceBtnDiv.append(htmlFormSource);
                         sourceBtnDiv.collapse('show');
+
+                        refresh_tool_tips();
                     }
                 }
             });

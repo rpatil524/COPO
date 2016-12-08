@@ -464,6 +464,9 @@ $(document).ready(function () {
                     step: currentIndx
                 });
 
+                //refresh tooltips
+                auto_complete();
+
             } else {
                 if (stepIntercept) {
                     $('#dataFileWizard').wizard('selectedItem', {
