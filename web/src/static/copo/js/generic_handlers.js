@@ -21,7 +21,6 @@ function setup_autocomplete(){
         }
 
     })
-
     auto_complete();
 }
 

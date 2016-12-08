@@ -234,6 +234,7 @@ def generate_copo_table_data(profile_id=str(), component=str()):
                                                  button_templates['delete_global']]),
                         source=common_btn_dict,
                         profile=common_btn_dict,
+                        annotation=common_btn_dict,
                         datafile=dict(
                             row_btns=[button_templates['info_row'], button_templates['describe_row'],
                                       button_templates['delete_row']],

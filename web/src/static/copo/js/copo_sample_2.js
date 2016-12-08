@@ -34,24 +34,6 @@ $(document).ready(function () {
         //     console.log($(this).attr("data-value"));
         // });
 
-        $(document).on("mouseenter", ".tata", function () {
-            var elem = $(this);
-
-            var pop = elem.popover({
-                title: "Weee",
-                content: "ehfhh",
-                container: 'body',
-                trigger: 'hover',
-                placement: 'right',
-                template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
-                '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
-                '</h3><div class="popover-content"><p></p></div></div></div>'
-            });
-
-            elem.popover("show");
-        });
-
-
         //end test
 
         //handle UID - upload inspect describe - tabs
