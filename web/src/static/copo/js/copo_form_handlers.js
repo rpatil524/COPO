@@ -5,7 +5,7 @@
 var olsURL = ""; // url of ols lookup for ontology fields
 var copoSchemas = {};
 var copoFormsURL = "/copo/copo_forms/";
-var copoVisualsURL = "/copo/copo_visualize/";
+var copoVisualsURL = "/copo/copo_visualize/"; //visualise it
 var globalDataBuffer = {};
 var htmlForm = $('<div/>'); //global form div
 var htmlFormSource = $('<div/>'); // form div for source
