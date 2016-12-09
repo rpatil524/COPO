@@ -206,7 +206,8 @@ $(document).ready(function () {
                                 id: 'accessions-block'
                             });
 
-                            ac = data.accessions.split(',')
+                            //ac = data.accessions.split(',')
+                            ac = data.article_id.split(',')
                             $(ac).each(function (count, el) {
                                 var anc = jQuery('<a/>', {
                                     html: el + ' (Article ID)',

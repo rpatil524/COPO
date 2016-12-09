@@ -3,23 +3,6 @@
     {
       "type": "string",
       "required": "true",
-      "ref": "Investigation Person Last Name",
-      "hidden": "false",
-      "deprecated": false,
-      "default_value": "",
-      "show_in_form": true,
-      "id": "copo.person.lastName",
-      "show_in_table": true,
-      "control": "text",
-      "versions": [
-        "lastName"
-      ],
-      "help_tip": "",
-      "label": "Last Name"
-    },
-    {
-      "type": "string",
-      "required": "true",
       "ref": "Investigation Person First Name",
       "hidden": "false",
       "deprecated": false,
@@ -33,6 +16,23 @@
       ],
       "help_tip": "",
       "label": "First Name"
+    },
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "Investigation Person Last Name",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": true,
+      "id": "copo.person.lastName",
+      "show_in_table": true,
+      "control": "text",
+      "versions": [
+        "lastName"
+      ],
+      "help_tip": "",
+      "label": "Last Name"
     },
     {
       "type": "string",

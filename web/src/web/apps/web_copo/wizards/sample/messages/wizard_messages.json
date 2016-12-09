@@ -43,7 +43,7 @@
       "text_class": "text-default"
     },
     "exit_wizard_message": {
-      "text": "You have opted to exit the wizard. Your current description will be saved, and you can carry on describing at a later time. <br/><br/>Are you sure you want to exit the wizard?",
+      "text": "Are you sure you want to exit the wizard?",
       "text_class": "text-default"
     },
     "confirm_bundling_action": {

@@ -858,6 +858,7 @@ var dispatchFormControl = {
                         hide_source_form(funcParams);
                     } else {
                         show_source_form(funcParams);
+                        refresh_tool_tips();
                     }
                 }
             });
@@ -1012,6 +1013,7 @@ var dispatchFormControl = {
                     "data-lbl": option.label,
                     "data-desc": option.description,
                     "data-value": option.value,
+                    style: "color: #ccc;",
                     mouseenter: function (evt) {
                         $(this).popover({
                             title: $(this).attr("data-lbl"),

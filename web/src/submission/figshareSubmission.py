@@ -58,11 +58,15 @@ class FigshareSubmit(object):
             data['tags'] = sub.get('tags', dict()).get('keywords').split(',')
             data['references'] = sub.get('tags', dict()).get('references').split(',')
             for idx, x in enumerate(data['references']):
-                if (not x.startswith('http')) or (not x.startswith('https')):
-                    if (not x.startswith('www')):
-                        data['references'][idx] = 'http://www.' + x
-                    else:
-                        data['references'][idx] = 'http://' + x
+                if x != '':
+                    if (not x.startswith('http')) or (not x.startswith('https')):
+                        if (not x.startswith('www')):
+                            data['references'][idx] = 'http://www.' + x
+                        else:
+                            data['references'][idx] = 'http://' + x
+            if len(data['references']) == 1 and data['references'][0] == '':
+                #TODO - Be Better
+                data.pop('references')
             data['funding'] = sub.get('tags', dict()).get('funding')
             data['licenses'] = sub.get('tags', dict()).get('licenses')
             data['publish'] = sub.get('figshare_publish', dict()).get('should_publish')
@@ -73,7 +77,7 @@ class FigshareSubmit(object):
             endpoint = 'account/articles'
             resp = requests.post(self.BASE_URL.format(endpoint=endpoint), headers=self.HEADERS, data=json.dumps(data))
 
-            article_id = json.loads(resp.content.decode('utf8'))['locat`ion'].rsplit('/', 1)[1]
+            article_id = json.loads(resp.content.decode('utf8'))['location'].rsplit('/', 1)[1]
 
             # Get file info
             #with open(file_path, 'rb') as fin:
@@ -132,7 +136,7 @@ class FigshareSubmit(object):
                 resp = requests.get(self.BASE_URL.format(endpoint=endpoint), headers=self.HEADERS)
                 # save accessions to mongo profile record
                 s = Submission().get_record(sub_id)
-                s['accession'] = json.loads(resp.content.decode('utf8'))['figshare_url']
+                s['article_id'] = json.loads(resp.content.decode('utf8'))['figshare_url']
                 s['complete'] = True
                 s['status'] = 'published'
                 s['target_id'] = str(s.pop('_id'))
@@ -140,7 +144,7 @@ class FigshareSubmit(object):
             else:
                 # save accessions to mongo profile record
                 s = Submission().get_record(sub_id)
-                s['accession'] = article_id
+                s['article_id'] = article_id
                 s['complete'] = True
                 s['status'] = 'not published'
                 s['target_id'] = str(s.pop('_id'))

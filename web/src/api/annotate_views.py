@@ -6,6 +6,7 @@ from django.conf import settings
 import os
 import pexpect
 import datetime
+import uuid
 
 
 def post_annotations(request):
@@ -23,7 +24,6 @@ def post_annotations(request):
         ref = ''
     data['@id'] = ref
     data["shortform"] = short
-
 
     if 'quote' in data:
         quote = data.pop('quote')
@@ -51,7 +51,6 @@ def post_annotations(request):
     return HttpResponse(j.dumps(r))
 
 
-
 def search_all(request):
     document_id = request.COOKIES.get('document_id')
     print(document_id)
@@ -66,24 +65,25 @@ def search_all(request):
 
 
 def handle_upload(request):
-
     f = request.FILES['file']
     # TODO - this should be changed to a uuid
-    fname = os.path.join(settings.MEDIA_ROOT, f.name)
-    with open(fname, 'wb+') as destination:
+
+    file_name = os.path.splitext(f.name)[0]
+
+    save_name = os.path.join(settings.MEDIA_ROOT, str(uuid.uuid4()))
+    with open(save_name, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
 
-    cmd = 'pdftotext -htmlmeta ' + fname
+    cmd = 'pdftotext -htmlmeta ' + save_name
     resp = pexpect.run(cmd)
     # now open the resulting file, parse and send to frontend
-    file_name = os.path.splitext(fname)[0]
-    html_name = file_name + '.html'
-    with open(html_name) as p:
+    #file_name = os.path.splitext(fname)[0]
+    html_name = save_name + '.html'
+    with open(html_name, "r", encoding='utf-8', errors='ignore') as p:
         html = p.read()
     out = dict()
 
-    file_name = os.path.splitext(f.name)[0]
     if not Annotation().annotation_exists(file_name, str(request.user.id)):
         out['html'] = html
         out['document_name'] = file_name
@@ -96,8 +96,8 @@ def handle_upload(request):
     else:
         out = Annotation().get_annotation_by_name(file_name, request.user.id)
 
-
-
+    os.remove(save_name)
+    os.remove(html_name)
 
 
     return HttpResponse(j.dumps(out))

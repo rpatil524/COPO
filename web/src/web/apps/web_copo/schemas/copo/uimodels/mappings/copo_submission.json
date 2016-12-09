@@ -73,6 +73,24 @@
       "label": "Profile ID"
     },
     {
+      "description": "The article ID, applies to figshare submission",
+      "type": "string",
+      "required": "true",
+      "ref": "",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": true,
+      "id": "copo.submission.article_id",
+      "show_in_table": true,
+      "control": "text",
+      "versions": [
+        "article_id"
+      ],
+      "help_tip": "",
+      "label": "Article ID"
+    },
+    {
       "description": "The time the submission was initiated",
       "type": "string",
       "required": "true",

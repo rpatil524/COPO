@@ -616,7 +616,6 @@ function setup_formelement_hint(switchElem, inputElements) {
 
 
 var auto_complete = function () {
-    console.log('refresh autocomplete')
     AutoComplete({
         post: do_post,
         select: do_select,

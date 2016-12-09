@@ -969,7 +969,7 @@ th {
 .copo-active.active:hover {
     background-color: #003366 !important;
     text-shadow: none !important;
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
 /*end form state buttons*/
