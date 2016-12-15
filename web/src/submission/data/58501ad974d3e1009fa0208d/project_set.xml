@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<PROJECT_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/ENA.project.xsd">
+	<PROJECT alias="58501ad974d3e1009fa0208d" center_name="TGAC">
+		<TITLE>Bioversity International data on Agrobiodiversity</TITLE>
+		<DESCRIPTION/>
+		<SUBMISSION_PROJECT>
+			<SEQUENCING_PROJECT/>
+		</SUBMISSION_PROJECT>
+		<PROJECT_ATTRIBUTES>
+			<PROJECT_ATTRIBUTE>
+				<TAG>Submission Date</TAG>
+				<VALUE>2016-12-13T00:00:00+00:00</VALUE>
+			</PROJECT_ATTRIBUTE>
+			<PROJECT_ATTRIBUTE>
+				<TAG>Release Date</TAG>
+				<VALUE/>
+			</PROJECT_ATTRIBUTE>
+			<PROJECT_ATTRIBUTE>
+				<TAG>Study Accession</TAG>
+				<VALUE>58501ad974d3e1009fa0208d</VALUE>
+			</PROJECT_ATTRIBUTE>
+			<PROJECT_ATTRIBUTE>
+				<TAG>Study Contact</TAG>
+				<VALUE>Name: Marie Angelique Laporte
+                    e-mail: m.a.laporte@cgiar.org
+                    Affiliation: Bioversity International
+                    Role: Ontology developer
+                    </VALUE>
+			</PROJECT_ATTRIBUTE>
+			<PROJECT_ATTRIBUTE>
+				<TAG>Study Contact</TAG>
+				<VALUE>Name: Elizabeth Arnaud
+                    e-mail: e.arnaud@cgiar.org
+                    Affiliation: 
+                    Role: SRA Inform On Status
+                    SRA Inform On Error
+                    </VALUE>
+			</PROJECT_ATTRIBUTE>
+		</PROJECT_ATTRIBUTES>
+	</PROJECT>
+</PROJECT_SET>
+

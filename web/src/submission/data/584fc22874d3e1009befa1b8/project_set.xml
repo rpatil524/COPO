@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<PROJECT_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/ENA.project.xsd">
+	<PROJECT alias="584fc22874d3e1009befa1b8" center_name="TGAC">
+		<TITLE>From where thoust camst, there thou shalt begone</TITLE>
+		<DESCRIPTION/>
+		<SUBMISSION_PROJECT>
+			<SEQUENCING_PROJECT/>
+		</SUBMISSION_PROJECT>
+		<PROJECT_ATTRIBUTES>
+			<PROJECT_ATTRIBUTE>
+				<TAG>Submission Date</TAG>
+				<VALUE>2016-12-13T00:00:00+00:00</VALUE>
+			</PROJECT_ATTRIBUTE>
+			<PROJECT_ATTRIBUTE>
+				<TAG>Release Date</TAG>
+				<VALUE/>
+			</PROJECT_ATTRIBUTE>
+			<PROJECT_ATTRIBUTE>
+				<TAG>Study Accession</TAG>
+				<VALUE>584fc22874d3e1009befa1b8</VALUE>
+			</PROJECT_ATTRIBUTE>
+			<PROJECT_ATTRIBUTE>
+				<TAG>Study Contact</TAG>
+				<VALUE>Name: Anthony Etuk
+                    e-mail: a.etuk@earlham.ac.uk
+                    Affiliation: Earlham
+                    Role: software developer role
+                    </VALUE>
+			</PROJECT_ATTRIBUTE>
+			<PROJECT_ATTRIBUTE>
+				<TAG>Study Contact</TAG>
+				<VALUE>Name: Felix Shaw
+                    e-mail: felix.shaw@tgac.ac.uk
+                    Affiliation: 
+                    Role: SRA Inform On Status
+                    SRA Inform On Error
+                    </VALUE>
+			</PROJECT_ATTRIBUTE>
+			<PROJECT_ATTRIBUTE>
+				<TAG>Study Publication</TAG>
+				<VALUE>Title: The role of nutritional biomarkers in prediction and understanding the etiology of type 2 diabetes
+                     Authors: A. Abbasi
+                     Status: PubMed
+                     PUBMED ID: </VALUE>
+			</PROJECT_ATTRIBUTE>
+			<PROJECT_ATTRIBUTE>
+				<TAG>Study Publication</TAG>
+				<VALUE>Title: [Alterations in pharmacokinetics during toxicity tests (author's transl)].
+                     Authors: Hammer R,Jauch R,Koss FW
+                     Status: PubMed - indexed for MEDLINE
+                     PUBMED ID: 89849</VALUE>
+			</PROJECT_ATTRIBUTE>
+		</PROJECT_ATTRIBUTES>
+	</PROJECT>
+</PROJECT_SET>
+

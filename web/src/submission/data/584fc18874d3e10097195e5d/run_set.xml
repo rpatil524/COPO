@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.run.xsd">
+	<RUN alias="584fc18874d3e10097195e5d:assay:EXP1" broker_name="TGAC" center_name="TGAC">
+		<EXPERIMENT_REF refname="584fc18874d3e10097195e5d:generic_assay:a_584fc18874d3e10097195e5d:EXP1"/>
+		<DATA_BLOCK>
+			<FILES>
+				<FILE checksum="fb68deabce97ccc343c8846194e630d4" checksum_method="MD5" filename="584fc18874d3e10097195e5d/felix/small6.fastq.gz" filetype="fastq"/>
+			</FILES>
+		</DATA_BLOCK>
+	</RUN>
+</RUN_SET>
+
