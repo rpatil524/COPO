@@ -169,7 +169,7 @@ def copo_visualize(request):
 
 
 @login_required
-def copo_forms(request):
+def  copo_forms(request):
     context = dict()
     task = request.POST.get("task", str())
 

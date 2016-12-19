@@ -7,7 +7,7 @@ $(document).ready(function () {
 
 });
 
-function setup_autocomplete(){
+function setup_autocomplete() {
     var copoFormsURL = "/copo/copo_forms/";
 
     $(document).on('focus', 'input[id^="annotator-field"]', function (e) {
@@ -616,46 +616,49 @@ function setup_formelement_hint(switchElem, inputElements) {
 
 
 var auto_complete = function () {
+    /*
+     AutoComplete({
+     _Post: do_post,
+     _Select: do_select,
+     autoFocus: true
+     });
+     */
     AutoComplete({
-        post: do_post,
-        select: do_select,
-        autoFocus: true
-    });
+        EmptyMessage: "No Annotations Found",
+        Url: $("#elastic_search_ajax").val(),
+        _Select: do_select,
+        _Render: do_post,
+    }, '.ontology-field')
 
-    function do_select(input, item) {
-
+    function do_select(item) {
+        console.log('doing select')
         if ($(document).data('annotator')) {
 
-            item = $(item).closest('li');
+
             console.log('here')
             console.log($(item).data('term_accession'))
             $(input).val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
         }
         else {
-            item = $(item).closest('li');
-            $(input).val($(item).data('annotation_value'));
-            $(input).siblings("[id*='termSource']").val($(item).data('term_source'));
-            $(input).siblings("[id*='termAccession']").val($(item).data('term_accession'));
+
+            $(this.Input).val($(item).data('annotation_value'));
+            $(this.Input).siblings("[id*='termSource']").val($(item).data('term_source'));
+            $(this.Input).siblings("[id*='termAccession']").val($(item).data('term_accession'));
         }
 
-        return false;
     }
 
-    function do_post(result, response, custParams) {
+    function do_post(response) {
         response = JSON.parse(response);
+
         console.log("num_found " + response.response.numFound);
         var properties = Object.getOwnPropertyNames(response);
         //Try parse like JSON data
 
         var empty,
             length = response.length,
-            li = domCreate("li"),
-            ul = domCreate("ul");
-
-        //Reverse result if limit parameter is custom
-        if (custParams.limit < 0) {
-            properties.reverse();
-        }
+            li = document.createElement("li"),
+            ul = document.createElement("ul");
 
 
         for (var item in response.response.docs) {
@@ -672,14 +675,14 @@ var auto_complete = function () {
                 if (s == undefined) {
                     s = response.highlighting[doc.id].synonym
                 }
-                var desc;
+                var short_form;
                 if (doc.ontology_prefix == undefined) {
-                    desc = "Origin Unknown"
+                    short_form = "Origin Unknown"
                 }
                 else {
-                    desc = doc.ontology_prefix
+                    short_form = doc.ontology_prefix
                 }
-                li.innerHTML = '<span class="label label-info"><span title="' + desc + '" style="color:white; padding-top:3px; padding-bottom:3px"><img style="height:15px; margin-right:10px" src="/static/copo/img/ontology.png"/>' + doc.ontology_prefix + ':' + doc.label + ' ' + '</span>' + ' - ' + '<span style="color:#fcff5e">' + doc.obo_id + '</span></span>';
+                li.innerHTML = '<span class="label label-info"><span title="' + short_form + '" style="color:white; padding-top:3px; padding-bottom:3px"><img style="height:15px; margin-right:10px" src="/static/copo/img/ontology.png"/>' + doc.ontology_prefix + ':' + doc.label + ' ' + '</span>' + ' - ' + '<span style="color:#fcff5e">' + doc.obo_id + '</span></span>';
 
 
                 $(li).attr('data-id', doc.id);
@@ -691,28 +694,24 @@ var auto_complete = function () {
                 };
                 $(li).css(styles);
                 $(li).attr('data-term_accession', doc.iri);
-                $(li).attr('data-annotation_value', doc.label);
-                var s = doc.obo_id;
-                s = s.split(':')[0];
 
-                $(li).attr('data-term_source', s);
+                $(li).attr('data-annotation_value', doc.label);
+
+                $(li).attr('data-term_source', short_form);
                 //$(li).attr("data-autocomplete-value", response.highlighting[item].label_autosuggest[0].replace('<b>', '').replace('</b>', '') + ' - ' + item);
 
                 //console.log($(li).data('label'))
 
                 ul.appendChild(li);
-                li = domCreate("li");
+                li = document.createElement("li");
             }
             catch (err) {
                 console.log(err);
-                li = domCreate("li");
+                li = document.createElement("li");
             }
         }
-        if (result.hasChildNodes()) {
-            result.childNodes[0].remove();
-        }
-
-        result.appendChild(ul);
+        $(this.DOMResults).empty()
+        this.DOMResults.append(ul)
     }
 
 }//end of function

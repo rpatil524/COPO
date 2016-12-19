@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="{% static 'copo/rangeslider/rangeslider.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/copo/style.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/copo/menu.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/autocomplete_js/autocomplete.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.css' %}">
 
 
     <link rel="shortcut icon" href="{% static 'copo/img/COPO_icon.png' %}"/>
@@ -46,7 +46,7 @@
     <script src="{% static 'copo/js/jquery-2.1.4.min.js' %}"></script>
     <script src="{% static 'copo/js/jquery-ui.min.js' %}"></script>
     <!--<![endif]-->
-
+    <script src="{% static 'copo/autocomplete.js-2.1.0/autocomplete.js' %}"></script>
     <script src="{% static 'copo/js/jquery.cookie.js' %}"></script>
     <script src="{% static 'copo/js/serialize_form_json.js' %}"></script>
     <script src="{% static 'copo/js/bootstrap.js' %}"></script>
@@ -87,11 +87,10 @@
     <script src="{% static 'copo/datatables/js/dataTables.select.min.js' %}"></script>
     <script src="{% static 'copo/datatables/js/dataTables.buttons.min.js' %}"></script>
     <script src="{% static 'copo/datatables/js/buttons.bootstrap.min.js' %}"></script>
-    <script src="{% static 'copo/autocomplete_js/autocomplete.js' %}"></script>
     <script src="{% static 'copo/search_highlight/dataTables.searchHighlight.min.js' %}"></script>
     <script src="{% static 'copo/search_highlight/jquery.highlight.js' %}"></script>
 
-    <script src="{% static 'copo/autocomplete_js/autocomplete.js' %}"></script>
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -126,47 +125,47 @@
 
         });
 
-
-        AutoComplete({
-            post: do_post
-        });
-
-
-        function do_post(result, response, custParams) {
-            response = JSON.parse(response);
-            var properties = Object.getOwnPropertyNames(response);
-            //Try parse like JSON data
-
-            var empty,
-                    length = response.length,
-                    li = domCreate("li"),
-                    ul = domCreate("ul");
-            //Reverse result if limit parameter is custom
-            if (custParams.limit < 0) {
-                properties.reverse();
-            }
+        /*
+         AutoComplete({
+         post: do_post
+         });
 
 
-            for (var item in response.highlighting) {
-                try {
-                    li.innerHTML = response.highlighting[item].label_autosuggest[0];
+         function do_post(result, response, custParams) {
+         response = JSON.parse(response);
+         var properties = Object.getOwnPropertyNames(response);
+         //Try parse like JSON data
 
-                    $(li).attr("data-autocomplete-value", response.highlighting[item].label_autosuggest[0].replace('<b>', '').replace('</b>', '') + ' - ' + item);
+         var empty,
+         length = response.length,
+         li = domCreate("li"),
+         ul = domCreate("ul");
+         //Reverse result if limit parameter is custom
+         if (custParams.limit < 0) {
+         properties.reverse();
+         }
 
-                    ul.appendChild(li);
-                    li = domCreate("li");
-                }
-                catch (err) {
-                    console.log(err)
-                }
-            }
-            if (result.hasChildNodes()) {
-                result.childNodes[0].remove();
-            }
 
-            result.appendChild(ul);
-        }
+         for (var item in response.highlighting) {
+         try {
+         li.innerHTML = response.highlighting[item].label_autosuggest[0];
 
+         $(li).attr("data-autocomplete-value", response.highlighting[item].label_autosuggest[0].replace('<b>', '').replace('</b>', '') + ' - ' + item);
+
+         ul.appendChild(li);
+         li = domCreate("li");
+         }
+         catch (err) {
+         console.log(err)
+         }
+         }
+         if (result.hasChildNodes()) {
+         result.childNodes[0].remove();
+         }
+
+         result.appendChild(ul);
+         }
+         */
 
         function do_email_form() {
             var component = "";
@@ -310,47 +309,47 @@
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                     {% if user.is_authenticated %}
 
-                                <li>
-                                    <a href="{% url 'copo:view_orcid_profile' %}" role="menuitem" tabindex="-1">
-                                        <div class="custom-nav-items">
-                                            <i class="fa fa-eye" aria-hidden="true"></i>
-                                            <span class="icon_text">Orcid Profile</span>
-                                        </div>
-                                    </a>
-                                </li>
+                        <li>
+                            <a href="{% url 'copo:view_orcid_profile' %}" role="menuitem" tabindex="-1">
+                                <div class="custom-nav-items">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                    <span class="icon_text">Orcid Profile</span>
+                                </div>
+                            </a>
+                        </li>
 
-                                <li>
-                                    <a href="{% url 'copo:view_oauth_tokens' %}" role="menuitem" tabindex="-1">
-                                        <div class="custom-nav-items">
-                                            <i class="fa fa-cogs" aria-hidden="true"></i>
-                                            <span class="icon_text">View Tokens</span>
-                                        </div>
-                                    </a>
-                                </li>
+                        <li>
+                            <a href="{% url 'copo:view_oauth_tokens' %}" role="menuitem" tabindex="-1">
+                                <div class="custom-nav-items">
+                                    <i class="fa fa-cogs" aria-hidden="true"></i>
+                                    <span class="icon_text">View Tokens</span>
+                                </div>
+                            </a>
+                        </li>
 
-                                <li role="presentation"><a role="menuitem" tabindex="-1"
-                                                           href="/copo/logout/">
-                                    <div class="custom-nav-items">
-                                        <i class="fa fa-sign-out" aria-hidden="true"></i>
-                                        <span class="icon_text">Logout</span>
-                                    </div>
-                                </a>
-                                </li>
-                            {% else %}
-                                <li>
-                                    <a href="/copo/login/" role="menuitem" tabindex="-1">
-                                        <div class="custom-nav-items">
-                                            <i class="fa fa-sign-in" aria-hidden="true"></i>
-                                            <span class="icon_text">Login</span>
-                                        </div>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1"
+                                                   href="/copo/logout/">
+                            <div class="custom-nav-items">
+                                <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                <span class="icon_text">Logout</span>
+                            </div>
+                        </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="/copo/login/" role="menuitem" tabindex="-1">
+                                <div class="custom-nav-items">
+                                    <i class="fa fa-sign-in" aria-hidden="true"></i>
+                                    <span class="icon_text">Login</span>
+                                </div>
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
-            </div>
-        </div>
+            </li>
+        </ul>
+    </div>
+    </div>
     </div>
 </nav>
 
