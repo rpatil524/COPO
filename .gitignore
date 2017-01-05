@@ -104,3 +104,6 @@ web/src/static/CACHE/css/**
 mongo/mongodata
 *.DS_Store
 
+# add ignore for migrations
+0001_initial.py
+
