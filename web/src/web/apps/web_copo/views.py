@@ -158,7 +158,8 @@ def copo_visualize(request):
                      metadata_ratings=broker_visuals.do_metadata_ratings,
                      description_summary=broker_visuals.do_description_summary,
                      sources_json_component=broker_visuals.get_sources_json_component,
-                     un_describe=broker_visuals.do_un_describe
+                     un_describe=broker_visuals.do_un_describe,
+                     attributes_display=broker_visuals.do_attributes_display
                      )
 
     if task in task_dict:

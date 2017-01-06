@@ -23,8 +23,7 @@ class BrokerRequests:
     def get_request_dict(self):
         # request-to-action mapping
         request_dict = dict(sample_wizard_components=self.do_sample_wizard_components,
-                            save_samples=self.do_save_samples,
-                            attributes_display=self.do_attributes_display
+                            save_samples=self.do_save_samples
                             )
 
         return request_dict
@@ -44,10 +43,6 @@ class BrokerRequests:
         status = self.wizard_helper.save_samples(self.generated_samples, self.sample_type)
         return self.context
 
-    def do_attributes_display(self):
-        self.context['sample_attributes'] = self.wizard_helper.generate_attributes(self.target_id)
-
-        return self.context
 
     def do_sample_wizard_components(self):
         self.context['wiz_message'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["sample_wizard_messages"])[

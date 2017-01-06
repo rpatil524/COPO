@@ -7,7 +7,7 @@ $(document).ready(function () {
 
 });
 
-function setup_autocomplete(){
+function setup_autocomplete() {
     var copoFormsURL = "/copo/copo_forms/";
 
     $(document).on('focus', 'input[id^="annotator-field"]', function (e) {
@@ -946,7 +946,7 @@ function get_components_properties() {
             title: 'Samples',
             addLi: [],
             addLabel: "Add Sample",
-            iconClass: "fa fa-filter copo-icon-success",
+            iconClass: "fa fa-filter",
             countsKey: "num_sample",
             actions: ["inspect"],
             colorClass: "samples_color"
@@ -956,7 +956,7 @@ function get_components_properties() {
             title: 'Submissions',
             addLi: [],
             addLabel: "New Submission",
-            iconClass: "fa fa-envelope copo-icon-warning",
+            iconClass: "fa fa-envelope",
             countsKey: "num_submission",
             actions: ["inspect"],
             colorClass: "submissions_color"
@@ -966,7 +966,7 @@ function get_components_properties() {
             title: 'Publications',
             addLi: ["publication", "loader"], //add relevant li item for the component
             addLabel: "Add Publication",
-            iconClass: "fa fa-paperclip copo-icon-primary",
+            iconClass: "fa fa-paperclip",
             countsKey: "num_pub",
             actions: ["inspect", "add"],
             colorClass: "pubs_color"
@@ -976,7 +976,7 @@ function get_components_properties() {
             title: 'People',
             addLi: ["simple"], //relevant add related li item for the component
             addLabel: "Add Person",
-            iconClass: "fa fa-users copo-icon-default",
+            iconClass: "fa fa-users",
             countsKey: "num_person",
             actions: ["inspect", "add"],
             colorClass: "people_color"
@@ -986,7 +986,7 @@ function get_components_properties() {
             title: 'Annotations',
             addLi: ["simple"], //relevant add related li item for the component
             addLabel: "Add Annotation",
-            iconClass: "fa fa-users copo-icon-default",
+            iconClass: "fa fa-users",
             countsKey: "num_annotation",
             actions: ["inspect"],
             colorClass: "annotations_color"
@@ -996,10 +996,14 @@ function get_components_properties() {
     return componentProperties
 }
 
+//builds component-page navbar
 function do_component_navbar(component) {
     if (component == null) {
         return false;
     }
+
+    //build profile components navigation
+    do_profile_navigate($("#copo_components_navs").find(".profile-menu"));
 
     var componentProperties = get_components_properties();
 
@@ -1032,6 +1036,31 @@ function do_component_navbar(component) {
         //set profile menu
         $("#copo_components_navs").find(".profile-menu").find("[data-component='" + component + "']").addClass("disabled");
     }
+} //end of func
+
+//builds the quick navigation to components within a profile
+function do_profile_navigate(parentObject) {
+    var components = get_components_properties();
+
+    var liItems = $(".profile-components-nav-copy").clone();
+    parentObject.append(liItems.children(":nth-child(1)"));
+    parentObject.append(liItems.children(":nth-child(1)"));
+
+    var componentTemplate = liItems.children(":nth-child(1)");
+
+    for (var i = 0; i < components.length; ++i) {
+        var liClone = componentTemplate.clone();
+
+        liClone.attr("data-component", components[i].component);
+        liClone.find(" > a").attr("href", $("#" + components[i].component + "_url").val());
+        liClone.find(" > a > div > i")
+            .addClass(components[i].iconClass)
+            .addClass(components[i].colorClass+"_icon");
+        liClone.find(" > a > div > span.icon_text").html(components[i].title);
+
+        parentObject.append(liClone);
+    }
+
 } //end of func
 
 

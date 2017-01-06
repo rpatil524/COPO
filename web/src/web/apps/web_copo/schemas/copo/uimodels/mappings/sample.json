@@ -119,6 +119,7 @@
       "default_value": "",
       "show_in_form": true,
       "id": "copo.sample.derivesFrom",
+      "option_component": "source",
       "show_in_table": false,
       "show_in_sub_table": true,
       "option_values": {

@@ -41,6 +41,11 @@
     },
     {
       "ref": "sample_clone",
+      "is_conditional_stage": true,
+      "callback": {
+        "function": "display_sample_clone",
+        "parameter": "sample_clone"
+      },
       "title": "Sample Clone",
       "message": "Do you want to clone an existing sample? Sample cloning helps 'boostrap' the description process.",
       "items": [
@@ -52,6 +57,7 @@
           "hidden": "false",
           "required": "false",
           "control": "copo-multi-search",
+          "option_component": "sample",
           "data_maxItems": 1,
           "default_value": "",
           "option_values": {

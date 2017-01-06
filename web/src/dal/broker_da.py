@@ -231,3 +231,9 @@ class BrokerVisuals:
         )
 
         return self.context
+
+    def do_attributes_display(self):
+        target_id = self.param_dict.get("target_id", str())
+        self.context['sample_attributes'] = htags.generate_attributes(self.component, target_id)
+
+        return self.context

@@ -21,19 +21,29 @@ $(document).ready(function () {
         var copoVisualsURL = "/copo/copo_visualize/";
 
         //test
+
         //end test
+
+        //on the fly info element
+        var onTheFlyElem = $("#on_the_fly_info");
 
         //handle hover info for copo-select control types
 
-        $(document).on("mouseenter", ".selectize-dropdown-content .active", function () {
+        $(document).on("mouseenter", ".selectize-dropdown-content .active", function (event) {
             if ($(this).closest(".copo-multi-search").length) {
+                var recordId = $(this).attr("data-value"); // the id of the hovered-on option
+                var associatedComponent = ""; //form control the event is associated
 
-                if ($("#on_the_fly_info").length) {
-                    //$("#on_the_fly_info").append('<div class="text-default alert alert-warning help-centre-content">' + $(this).attr("data-value") + '</div>');
+                //get the associated component
+                var clss = $($(event.target)).closest(".input-copo").attr("class").split(" ");
+                $.each(clss, function (key, val) {
+                    var cssSplit = val.split("copo-component-control-");
+                    if (cssSplit.length > 1) {
+                        associatedComponent = cssSplit.slice(-1)[0];
+                    }
+                });
 
-                    // $("#on_the_fly_info").html($(this).attr("data-value")); //id
-                    // $("#on_the_fly_info").html($(this).closest(".copo-multi-search").parent().find(".copo-multi-values").attr("id")); //form element
-                }
+                resolve_element_view(recordId, associatedComponent);
             }
         });
 
@@ -309,19 +319,23 @@ $(document).ready(function () {
 
         function stage_navigate(evt, data) {
 
-            //trigger form validation
-            if ($("#wizard_form_" + data.step).length) {
-                $('#wizard_form_' + data.step).trigger('submit');
-
-                if ($('#wizard_form_' + data.step).find("#bcopovalidator").val() == "false") {
-                    $('#wizard_form_' + data.step).find("#bcopovalidator").val("true");
-
-                    evt.preventDefault();
-                    return false;
-                }
-            }
-
             if (data.direction == 'next') {
+                // empty info element
+                onTheFlyElem.empty();
+
+                //trigger form validation
+                if ($("#wizard_form_" + data.step).length) {
+                    $('#wizard_form_' + data.step).trigger('submit');
+
+                    if ($('#wizard_form_' + data.step).find("#bcopovalidator").val() == "false") {
+                        $('#wizard_form_' + data.step).find("#bcopovalidator").val("true");
+
+                        evt.preventDefault();
+                        return false;
+                    }
+                }
+
+
                 var lastElementIndx = $('.steps li').last().index() + 1;
                 var activeElementIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
 
@@ -591,6 +605,23 @@ $(document).ready(function () {
                 }
 
                 return stages;
+            },
+            display_sample_clone: function (param) {
+                //param is the stage
+                //NB: this function works under the assumption of the 'copo-multi-search' control
+                var displayStage = false;
+
+                $.each(wizardStages.start, function (key, val) {
+                    if (val.ref == "sample_clone") {
+                        for (var i = 0; i < val.items.length; ++i) {
+                            if (val.items[i].id == param && val.items[i].option_values.options.length > 0) {
+                                displayStage = true;
+                            }
+                        }
+                    }
+                });
+
+                return displayStage;
             }
         }; //end of dispatchStageCallback
 
@@ -634,8 +665,30 @@ $(document).ready(function () {
                                 });
                             }
 
-                            stage = negotiatedStages[currIndx + 1];
-                            negotiatedStages[currIndx + 1].activated = true;
+                            //verify next stage validity...again!
+                            if ((currIndx + 1) < negotiatedStages.length) {
+                                currIndx = currIndx + 1;
+                                stage = negotiatedStages[currIndx];
+                                negotiatedStages[currIndx].activated = true;
+                            } else {
+                                stage = Object(); //no stage to return
+                            }
+                        }
+
+                        //check for conditional stage
+                        if (stage.hasOwnProperty("is_conditional_stage") && stage.is_conditional_stage) {
+                            var flag = dispatchStageCallback[stage.callback.function](stage.callback.parameter);
+
+                            if (!flag) {
+                                //move one step forward
+                                if ((currIndx + 1) < negotiatedStages.length) {
+                                    currIndx = currIndx + 1;
+                                    stage = negotiatedStages[currIndx];
+                                    negotiatedStages[currIndx].activated = true;
+                                } else {
+                                    stage = Object(); //no stage to return
+                                }
+                            }
                         }
                     }
                 } else {
@@ -1005,11 +1058,12 @@ $(document).ready(function () {
                     row.child(contentHtml).show();
 
                     $.ajax({
-                        url: wizardURL,
+                        url: copoVisualsURL,
                         type: "POST",
                         headers: {'X-CSRFToken': csrftoken},
                         data: {
-                            'request_action': 'attributes_display',
+                            'task': 'attributes_display',
+                            'component': component,
                             'target_id': ids[0]
                         },
                         success: function (data) {
@@ -1024,6 +1078,36 @@ $(document).ready(function () {
             }
 
         } //end of func
+
+        function resolve_element_view(recordId, associatedComponent) {
+            //maps form element by id to component type e.g source, sample
+
+            if (associatedComponent == "") {
+                return false;
+            }
+
+            onTheFlyElem.append(tLoader);
+
+            $.ajax({
+                url: copoVisualsURL,
+                type: "POST",
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    'task': "attributes_display",
+                    'component': associatedComponent,
+                    'target_id': recordId
+                },
+                success: function (data) {
+                    onTheFlyElem.empty();
+                    onTheFlyElem.append(build_attributes_display(data));
+                },
+                error: function () {
+                    onTheFlyElem.empty();
+                    onTheFlyElem.append("Couldn't retrieve attributes!");
+                }
+            });
+        }
+
 
         function build_attributes_display(data) {
             //build view
@@ -1715,6 +1799,7 @@ $(document).ready(function () {
 
         function get_item_value_2(item, record) {
             //sort out item value
+
             var itemValue = $('<div/>',
                 {
                     class: "ctrlDIV"
@@ -1726,13 +1811,24 @@ $(document).ready(function () {
                 //group items based on similarity of suffix
 
                 for (var i = 0; i < valObject.length; ++i) {
-                    var objectHTML = dispatchViewControl[controlsViewMapping[item.control.toLowerCase()]](valObject[i], item);
-                    itemValue.append(objectHTML);
+
+                    try {
+                        var objectHTML = dispatchViewControl[controlsViewMapping[item.control.toLowerCase()]](valObject[i], item);
+                        itemValue.append(objectHTML);
+                    }
+                    catch (err) {
+                        console.log(err + item.control);
+                    }
                 }
 
             } else {
-                var objectHTML = dispatchViewControl[controlsViewMapping[item.control.toLowerCase()]](valObject, item);
-                itemValue.append(objectHTML);
+                try {
+                    var objectHTML = dispatchViewControl[controlsViewMapping[item.control.toLowerCase()]](valObject, item);
+                    itemValue.append(objectHTML);
+                }
+                catch (err) {
+                    console.log(err + item.control);
+                }
             }
 
             return itemValue;
@@ -1836,10 +1932,10 @@ $(document).ready(function () {
                 return ctrlsDiv;
             },
             do_copo_select_ctrl: function (relevantObject, item) {
-                return "";
+                return Object();
             },
             do_select_ctrl: function (relevantObject, item) {
-                return "";
+                return Object();
             },
             do_copo_multi_search_ctrl: function (relevantObject, item) {
                 return "";

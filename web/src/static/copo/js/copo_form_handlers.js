@@ -1759,9 +1759,15 @@ function get_multi_search_span(formElem, ctrlsDiv) {
             value: JSON.stringify(formElem.option_values)
         });
 
+    var quickViewClass = ""; //will be passed along on hovering an option to inform the display of option details.
+
+    if (formElem.hasOwnProperty("option_component")) {
+        quickViewClass = formElem.option_component;
+    }
+
     var selectCtrl = $('<select/>',
         {
-            class: "input-copo copo-multi-search",
+            class: "input-copo copo-multi-search " + " copo-component-control-" + quickViewClass,
             placeholder: "Select " + formElem.label + "...",
             multiple: "multiple"
         });

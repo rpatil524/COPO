@@ -23,7 +23,8 @@
       "help_tip": "Used to provide UI help tip for this property or control",
       "default_value": "Provides a default value the this property or control",
       "unique": "A boolean true enforces the UI control to be validated as unique within the context of a profile",
-      "email": "A boolean true enforces the UI control to be validated as an email"
+      "email": "A boolean true enforces the UI control to be validated as an email",
+      "option_component": "Applies to multi-search controls, to inform the UI quick view event what component to base the quick view on"
     }
   ]
 }

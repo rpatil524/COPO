@@ -291,6 +291,63 @@ def generate_copo_profiles_data(profiles=list()):
 
     return data_set
 
+@register.filter("generate_attributes")
+def generate_attributes(component, target_id):
+    da_object = DAComponent(component=component)
+
+    sample_attributes = dict()
+    record = da_object.get_record(target_id)
+    sample_attributes["record"] = record
+    table_schema = list()
+
+    sample_types = list()
+
+    for s_t in d_utils.get_sample_type_options():
+        sample_types.append(s_t["value"])
+
+    sample_type = str()
+
+    if "sample_type" in record:
+        sample_type = record["sample_type"]
+
+    for f in da_object.get_schema().get("schema_dict"):
+        # get relevant attributes based on sample type
+        if f.get("show_in_sub_table", False) and sample_type in f.get("specifications", sample_types):
+            # if required, resolve data source for select-type controls,
+            # i.e., if a callback is defined on the 'option_values' field
+            if "option_values" in f:
+                f["option_values"] = get_control_options(f)
+
+            # change sample-source control to wizard-compliant version
+            if f.get("control", str()) == "copo-sample-source":
+                f["control"] = "copo-sample-source-2"
+
+            # get short-form id
+            f["id"] = f["id"].split(".")[-1]
+
+            # might not need to include name
+            if f["id"] == "name":
+                continue
+
+                # handle datetime
+                # if f.get("control", str()) == "datetime":
+                #     f["control"] = "text"
+
+                # data = None
+                # data = record[f["id"]]
+                # if data:
+                #     data = data.strftime('%d %b, %Y, %H:%M:%S')
+
+
+                # if sample_attributes["record"][f["id"]]:
+                #     sample_attributes["record"][f["id"]] = sample_attributes["record"][f["id"]].strftime(
+                #         '%d %b, %Y, %H:%M:%S')
+
+            table_schema.append(f)
+
+    sample_attributes["schema"] = table_schema
+
+    return sample_attributes
 
 def resolve_control_output(data_dict, elem):
     resolved_value = str()

@@ -1,3 +1,39 @@
+<div hidden id="hidden_attrs">
+    <!-- hidden attributes  -->
+    <input type="hidden" id="view_copo_profile_url" value="{% url 'copo:view_copo_profile' profile_id=profile_id %}"/>
+
+    <input type="hidden" value="{% url 'copo:copo_publications' profile_id=profile_id %}" name="publication_url"
+           id="publication_url"/>
+    <input type="hidden" value="{% url 'copo:copo_data' profile_id=profile_id %}" name="datafile_url"
+           id="datafile_url"/>
+    <input type="hidden" value="{% url 'copo:copo_samples' profile_id=profile_id %}" name="sample_url"
+           id="sample_url"/>
+    <input type="hidden" value="{% url 'copo:copo_submissions' profile_id=profile_id %}" name="submission_url"
+           id="submission_url"/>
+    <input type="hidden" value="{% url 'copo:copo_people' profile_id=profile_id %}" name="person_url" id="person_url"/>
+    <input type="hidden" value="{% url 'copo:copo_annotation' profile_id=profile_id %}" name="annotation_url"
+           id="annotation_url"/>
+</div>
+
+<div class="profile-components-nav-copy" style="display: none;">
+    <!-- template for within-profile components navigation -->
+    <li>
+        <a title="{{ profile.title }}"
+           href="{% url 'copo:view_copo_profile' profile_id=profile_id %}">
+            <div style="padding: 5px 5px 0px 0px;">Profile Home</div>
+        </a>
+    </li>
+    <li role="separator" class="divider"></li>
+    <li data-component="">
+        <a href="">
+            <div style="padding: 5px 5px 0px 0px;">
+                <i class="copo-components-icons"></i>
+                <span class="icon_text"></span>
+            </div>
+        </a>
+    </li>
+</div>
+
 <nav class="navbar" id="copo_components_navs">
     <div class="container-fluid">
         <div class="navbar-header">
@@ -76,46 +112,11 @@
                     <div style="padding-top:15px;" id="doiLoader"></div>
                 </li>
                 <li class="dropdown">
-                    <a style="color:#000 !important;" href="#" class="dropdown-toggle" data-toggle="dropdown"
+                    <a style="color: rgba(38, 77, 115, 0.99) !important; font-size: 15px !important; font-weight: 500;" href="#"
+                       class="dropdown-toggle" data-toggle="dropdown"
                        role="button" aria-haspopup="true"
-                       aria-expanded="false">Profile <span class="caret"></span></a>
-                    <ul class="dropdown-menu profile-menu" style="min-width:150px !important;">
-                        <li>
-                            <a title="{{ profile.title }}"
-                               href="{% url 'copo:view_copo_profile' profile_id=profile_id %}">
-                                <div style="padding: 5px 5px 0px 0px;">Profile Home</div>
-                            </a>
-                        </li>
-                        <li role="separator" class="divider"></li>
-                        <li data-component="datafile"><a href="{% url 'copo:copo_data' profile_id=profile_id %}">
-                            <div style="padding: 5px 5px 0px 0px;"><i
-                                    class="fa fa-database copo-icon-info copo-components-icons"></i> <span
-                                    class="icon_text">Datafiles</span></div>
-                        </a></li>
-                        <li data-component="sample"><a href="{% url 'copo:copo_samples' profile_id=profile_id %}">
-                            <div style="padding: 5px 5px 0px 0px;"><i
-                                    class="fa fa-filter copo-icon-success copo-components-icons"></i> <span
-                                    class="icon_text">Samples</span></div>
-                        </a></li>
-                        <li data-component="submission"><a
-                                href="{% url 'copo:copo_submissions' profile_id=profile_id %}">
-                            <div style="padding: 5px 5px 0px 0px;"><i
-                                    class="fa fa-envelope copo-icon-warning copo-components-icons"></i> <span
-                                    class="icon_text">Submissions</span></div>
-                        </a></li>
-                        <li data-component="publication">
-                            <a href="{% url 'copo:copo_publications' profile_id=profile_id %}">
-                                <div style="padding: 5px 5px 0px 0px;"><i
-                                        class="fa fa-paperclip copo-icon-primary copo-components-icons"></i> <span
-                                        class="icon_text">Publications</span></div>
-                            </a>
-                        </li>
-                        <li data-component="person"><a href="{% url 'copo:copo_people' profile_id=profile_id %}">
-                            <div style="padding: 5px 5px 0px 0px;"><i
-                                    class="fa fa-users copo-icon-default copo-components-icons"></i> <span
-                                    class="icon_text">People</span></div>
-                        </a></li>
-                    </ul>
+                       aria-expanded="false"><i class="fa fa-link" aria-hidden="true" style="margin-right: 5px;"></i>Profile links&hellip; <span class="caret"></span></a>
+                    <ul class="dropdown-menu profile-menu" style="min-width:150px !important;"></ul>
                 </li>
             </ul>
 
