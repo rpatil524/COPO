@@ -1,11 +1,12 @@
 server {
 
     listen *:80;
-    listen 443 ssl;
+    # listen 443 ssl;
     server_name "";
     charset utf-8;
-    ssl_certificate copo-project_org_chain.crt;
-    ssl_certificate_key copo-project.key;
+    # ssl_certificate copo-project_org_chain.crt;
+    # ssl_certificate_key copo-project.key;
+    client_max_body_size 1000M;
 
     location /static {
        	autoindex on;

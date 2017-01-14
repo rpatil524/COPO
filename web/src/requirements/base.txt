@@ -18,6 +18,7 @@ django-redis-sessions==0.5.6
 django-tools==0.31.0
 djangorestframework==3.5.3
 docutils==0.12
+gunicorn
 isatools==0.3.4
 iso8601==0.1.11
 isodate==0.5.4
