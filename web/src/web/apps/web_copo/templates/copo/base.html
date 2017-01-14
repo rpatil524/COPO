@@ -79,12 +79,15 @@
     <link rel="stylesheet" href="{% static 'copo/datatables/css/dataTables.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/datatables/css/select.dataTables.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/datatables/css/keyTable.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/datatables/css/keyTable.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/search_highlight/dataTables.searchHighlight.css' %}">
 
     <script src="{% static 'copo/datatables/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'copo/datatables/js/dataTables.bootstrap.min.js' %}"></script>
     <script src="{% static 'copo/datatables/js/dataTables.select.min.js' %}"></script>
+    <script src="{% static 'copo/datatables/js/dataTables.keyTable.min.js' %}"></script>
     <script src="{% static 'copo/datatables/js/dataTables.buttons.min.js' %}"></script>
     <script src="{% static 'copo/datatables/js/buttons.bootstrap.min.js' %}"></script>
     <script src="{% static 'copo/autocomplete_js/autocomplete.js' %}"></script>
@@ -310,47 +313,47 @@
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                     {% if user.is_authenticated %}
 
-                                <li>
-                                    <a href="{% url 'copo:view_orcid_profile' %}" role="menuitem" tabindex="-1">
-                                        <div class="custom-nav-items">
-                                            <i class="fa fa-eye" aria-hidden="true"></i>
-                                            <span class="icon_text">Orcid Profile</span>
-                                        </div>
-                                    </a>
-                                </li>
+                        <li>
+                            <a href="{% url 'copo:view_orcid_profile' %}" role="menuitem" tabindex="-1">
+                                <div class="custom-nav-items">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                    <span class="icon_text">Orcid Profile</span>
+                                </div>
+                            </a>
+                        </li>
 
-                                <li>
-                                    <a href="{% url 'copo:view_oauth_tokens' %}" role="menuitem" tabindex="-1">
-                                        <div class="custom-nav-items">
-                                            <i class="fa fa-cogs" aria-hidden="true"></i>
-                                            <span class="icon_text">View Tokens</span>
-                                        </div>
-                                    </a>
-                                </li>
+                        <li>
+                            <a href="{% url 'copo:view_oauth_tokens' %}" role="menuitem" tabindex="-1">
+                                <div class="custom-nav-items">
+                                    <i class="fa fa-cogs" aria-hidden="true"></i>
+                                    <span class="icon_text">View Tokens</span>
+                                </div>
+                            </a>
+                        </li>
 
-                                <li role="presentation"><a role="menuitem" tabindex="-1"
-                                                           href="/copo/logout/">
-                                    <div class="custom-nav-items">
-                                        <i class="fa fa-sign-out" aria-hidden="true"></i>
-                                        <span class="icon_text">Logout</span>
-                                    </div>
-                                </a>
-                                </li>
-                            {% else %}
-                                <li>
-                                    <a href="/copo/login/" role="menuitem" tabindex="-1">
-                                        <div class="custom-nav-items">
-                                            <i class="fa fa-sign-in" aria-hidden="true"></i>
-                                            <span class="icon_text">Login</span>
-                                        </div>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1"
+                                                   href="/copo/logout/">
+                            <div class="custom-nav-items">
+                                <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                <span class="icon_text">Logout</span>
+                            </div>
+                        </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="/copo/login/" role="menuitem" tabindex="-1">
+                                <div class="custom-nav-items">
+                                    <i class="fa fa-sign-in" aria-hidden="true"></i>
+                                    <span class="icon_text">Login</span>
+                                </div>
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
-            </div>
-        </div>
+            </li>
+        </ul>
+    </div>
+    </div>
     </div>
 </nav>
 

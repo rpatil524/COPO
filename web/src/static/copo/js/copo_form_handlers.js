@@ -997,6 +997,13 @@ var dispatchFormControl = {
                 value: formElem.option_values[0].value
             });
 
+        var selectedDiv = $('<div/>',
+            {
+                style: "margin-top: 15px; color: rgba(38, 77, 115, 0.99);"
+            });
+
+        var selectedText = "Selected option for '"+formElem.label+"': ";
+
 
         for (var i = 0; i < formElem.option_values.length; ++i) {
             var option = formElem.option_values[i];
@@ -1004,16 +1011,17 @@ var dispatchFormControl = {
             var lactive = "";
             if (i == 0) {
                 lactive = " active";
+                selectedDiv.html(selectedText+option.label);
             }
 
 
-            var lbl = $('<label/>',
+            var lbl = $('<a/>',
                 {
-                    class: "btn copo-active btn-lg btn-default " + lactive,
+                    class: "btn btn-lg btn-custom4 " + lactive,
                     "data-lbl": option.label,
                     "data-desc": option.description,
                     "data-value": option.value,
-                    style: "color: #ccc;",
+                    style: "color: rgba(38, 77, 115, 0.99);",
                     mouseenter: function (evt) {
                         $(this).popover({
                             title: $(this).attr("data-lbl"),
@@ -1031,6 +1039,7 @@ var dispatchFormControl = {
                     },
                     click: function (evt) {
                         hiddenCtrl.val($(this).attr("data-value"));
+                        selectedDiv.html(selectedText+$(this).attr("data-lbl"));
                     }
                 });
 
@@ -1050,7 +1059,7 @@ var dispatchFormControl = {
             btnGroup.append(lbl);
         }
 
-        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append($('<div/>')).append(btnGroup).append(hiddenCtrl);
+        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append($('<div/>')).append(btnGroup).append(hiddenCtrl).append(selectedDiv);
 
         return form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))

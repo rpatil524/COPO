@@ -986,7 +986,7 @@ function get_components_properties() {
             title: 'Annotations',
             addLi: ["simple"], //relevant add related li item for the component
             addLabel: "Add Annotation",
-            iconClass: "fa fa-users",
+            iconClass: "fa fa-pencil",
             countsKey: "num_annotation",
             actions: ["inspect"],
             colorClass: "annotations_color"
@@ -1003,7 +1003,7 @@ function do_component_navbar(component) {
     }
 
     //build profile components navigation
-    do_profile_navigate($("#copo_components_navs").find(".profile-menu"));
+    do_profile_navigate($("#copo_components_navs").find(".profile-links"));
 
     var componentProperties = get_components_properties();
 
@@ -1034,7 +1034,9 @@ function do_component_navbar(component) {
         }
 
         //set profile menu
-        $("#copo_components_navs").find(".profile-menu").find("[data-component='" + component + "']").addClass("disabled");
+        $("#copo_components_navs").find(".profile-links").find("[data-component='" + component + "']").addClass("active");
+
+        refresh_tool_tips();
     }
 } //end of func
 
@@ -1042,23 +1044,23 @@ function do_component_navbar(component) {
 function do_profile_navigate(parentObject) {
     var components = get_components_properties();
 
-    var liItems = $(".profile-components-nav-copy").clone();
-    parentObject.append(liItems.children(":nth-child(1)"));
-    parentObject.append(liItems.children(":nth-child(1)"));
-
-    var componentTemplate = liItems.children(":nth-child(1)");
-
     for (var i = 0; i < components.length; ++i) {
-        var liClone = componentTemplate.clone();
+        var aElem = $('<a/>',
+            {
+                "data-component": components[i].component,
+                class: "btn btn-custom4",
+                title: components[i].title,
+                "data-toggle": "tooltip",
+                href: $("#" + components[i].component + "_url").val()
+            });
 
-        liClone.attr("data-component", components[i].component);
-        liClone.find(" > a").attr("href", $("#" + components[i].component + "_url").val());
-        liClone.find(" > a > div > i")
-            .addClass(components[i].iconClass)
-            .addClass(components[i].colorClass+"_icon");
-        liClone.find(" > a > div > span.icon_text").html(components[i].title);
+        var iElem = $('<i/>',
+            {
+                class: "copo-components-icons " + components[i].iconClass + " " + components[i].colorClass + "_icon",
+            });
 
-        parentObject.append(liClone);
+        aElem.append(iElem);
+        parentObject.append(aElem);
     }
 
 } //end of func

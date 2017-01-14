@@ -941,7 +941,6 @@ $(document).ready(function () {
         }
 
 
-
         if (($('#dataFileWizard').is(":visible"))) {
             do_post_stage_retrieval2(data);
         } else {
@@ -2559,6 +2558,9 @@ $(document).ready(function () {
                 columnDefs: colDefs,
                 //scrollY: "200px",
                 scrollCollapse: true,
+                keys: {
+                    blurable: false
+                },
                 select: {
                     style: 'multi'
                 },
@@ -2570,6 +2572,24 @@ $(document).ready(function () {
                 .nodes()
                 .each(function (value) {
                     $(this).addClass(' btn-sm');
+                });
+
+            //add click event on cells
+            table
+            // .on('key-focus', function (e, datatable, cell) {
+            //     alert(cell.data());
+            // })
+                .on('key', function (e, datatable, key, cell, originalEvent) {
+                    if (key == 13) {//trap enter key for editing a cell
+                        // alert('<div>Key press: ' + key + ' for cell <i>' + cell.data() + '</i></div>');
+                        var node = cell.node();
+                        $(node).html($('<textarea class="form-control new-element" placeholder="Try to input multiple lines here..."></textarea>'));
+                        $(node).find(".new-element").focus();
+                    }
+                })
+                .on('key-blur', function (e, datatable, cell) {
+                    var node = cell.node();
+                    $(node).html($(node).find(".new-element").val());
                 });
 
             $(table.buttons().container()).insertBefore(filterDivObject);

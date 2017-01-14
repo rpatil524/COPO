@@ -15,23 +15,15 @@
            id="annotation_url"/>
 </div>
 
-<div class="profile-components-nav-copy" style="display: none;">
-    <!-- template for within-profile components navigation -->
-    <li>
-        <a title="{{ profile.title }}"
-           href="{% url 'copo:view_copo_profile' profile_id=profile_id %}">
-            <div style="padding: 5px 5px 0px 0px;">Profile Home</div>
-        </a>
-    </li>
-    <li role="separator" class="divider"></li>
-    <li data-component="">
-        <a href="">
-            <div style="padding: 5px 5px 0px 0px;">
-                <i class="copo-components-icons"></i>
-                <span class="icon_text"></span>
-            </div>
-        </a>
-    </li>
+<div style="display: none;" class="cell-edit-panel">
+    <div class="panel panel-default cell-dynamic-element">
+        <div class="panel-body"></div>
+        <div class="panel-footer">
+            <button type="button" class="btn btn-primary btn-xs cell-apply cell-apply-current">Apply to current</button>
+            <button type="button" class="btn btn-primary btn-xs cell-apply cell-apply-selected">Apply to selected</button>
+            <button type="button" class="btn btn-primary btn-xs cell-apply cell-apply-all">Apply to all</button>
+        </div>
+    </div>
 </div>
 
 <nav class="navbar" id="copo_components_navs">
@@ -111,14 +103,25 @@
                 <li class="data-record-add-li" data-add-li="loader">
                     <div style="padding-top:15px;" id="doiLoader"></div>
                 </li>
-                <li class="dropdown">
-                    <a style="color: rgba(38, 77, 115, 0.99) !important; font-size: 15px !important; font-weight: 500;" href="#"
-                       class="dropdown-toggle" data-toggle="dropdown"
-                       role="button" aria-haspopup="true"
-                       aria-expanded="false"><i class="fa fa-link" aria-hidden="true" style="margin-right: 5px;"></i>Profile links&hellip; <span class="caret"></span></a>
-                    <ul class="dropdown-menu profile-menu" style="min-width:150px !important;"></ul>
-                </li>
             </ul>
+
+            <ul class="nav navbar-nav navbar-right collapse navbar-collapse" style="margin-right: -40px;">
+                <li>
+                    <div style="margin-top: 25px; margin-right: 15px; color: rgba(38, 77, 115, 0.99);">Profile links
+                    </div>
+                </li>
+                <li>
+                    <div class="btn-group">
+                        <a title="Profile Home" data-toggle="tooltip" class="btn btn-custom4"
+                           href="{% url 'copo:view_copo_profile' profile_id=profile_id %}">
+                            <i class="fa fa-external-link" style="color: #0f0f0f;"></i>
+                        </a>
+                    </div>
+                    <div class="btn-group profile-links" style="padding-bottom: 15px; padding-top: 15px;"></div>
+                </li>
+
+            </ul>
+
 
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->

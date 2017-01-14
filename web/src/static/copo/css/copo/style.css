@@ -894,6 +894,33 @@ th {
     color: rgba(51, 51, 51, 1);
 }
 
+.btn-custom4 {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(235, 235, 235, 1);
+    color: rgba(255, 255, 255, 1);
+    font-size: 14px;
+    border-radius: 4px;
+    border-width: 1px;
+}
+
+.btn-custom4:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(235, 235, 235, 1);
+    color: rgba(255, 255, 255, 1);
+}
+
+.btn-custom4:active, .btn-custom4:focus {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(235, 235, 235, 1);
+    color: rgba(255, 255, 255, 1);
+}
+
+.btn.btn-custom4:active, .btn.btn-custom4.active {
+    background-image: none;
+    box-shadow: 0 3px 5px rgba(83, 140, 198, 0.5) inset;
+    outline: 0 none;
+}
+
 /*end custom buttons*/
 
 /*sidebar*/
@@ -932,38 +959,6 @@ th {
 
 .copo-list-type-selected > a {
     border: 1px solid transparent !important;
-}
-
-.sample-type-disable {
-    opacity: 0.2 !important;
-}
-
-.sample-type {
-    border-radius: 0 !important;
-    margin-right: 3px;
-    border-color: transparent !important;
-    font-size: 16px !important;
-}
-
-.btn-sample-types {
-    background: rgba(161, 168, 34, 1);
-    border-color: rgba(204, 204, 204, 1);
-    color: rgba(255, 255, 255, 1);
-    font-size: 14px;
-    border-radius: 4px;
-    border-width: 1px;
-}
-
-.btn-sample-types:hover {
-    background: rgba(235, 235, 235, 1);
-    border-color: rgba(173, 173, 173, 1);
-    color: rgba(51, 51, 51, 1);
-}
-
-.btn-sample-types:active, .btn-sample-types:focus {
-    background: rgba(235, 235, 235, 1);
-    border-color: rgba(173, 173, 173, 1);
-    color: rgba(51, 51, 51, 1);
 }
 
 .copo-active.active,
@@ -1029,3 +1024,13 @@ th {
 }
 
 /*end copo-component attributes*/
+
+/*datatable focus*/
+
+table.dataTable td.focus {
+    outline: 1px solid #cccddd !important;
+    outline-offset: -3px;
+    background-color: #f8e6e6 !important;
+}
+
+/*end datatable focus*/

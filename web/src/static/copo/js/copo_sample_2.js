@@ -12,6 +12,7 @@ var tableID = null; //rendered table handle
 var stepIntercept = false; //flag indicates if activation of the last stage of the wizard has been intercepted
 var descriptionWizSummary = {}; //wizard summary stage content
 var tempWizStore = null; // for holding wizard-related data pending wizard load event
+var initialSampleAttributes = {}; //holds initial attributes shared by all samples before editing
 
 $(document).ready(function () {
         //****************************** Event Handlers Block *************************//
@@ -47,7 +48,7 @@ $(document).ready(function () {
             }
         });
 
-        //handle UID - upload inspect describe - tabs
+        //handle inspect, describe - tabs
         $('#copo-datafile-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
             var componentSelected = $(event.target).attr("data-component"); // active tab
 
@@ -76,14 +77,8 @@ $(document).ready(function () {
 
             var componentSelected = $(this).attr("data-component");
 
-            if (componentSelected == "generatedSamples") {
-                $("#generatedSamplesDiv").css("display", "block");
-                $("#helptipsDiv").css("display", "none");
-            } else {
-                $("#generatedSamplesDiv").css("display", "none");
-                $("#helptipsDiv").css("display", "block");
-                set_samples_how_tos(componentSelected);
-            }
+            $("#helptipsDiv").css("display", "block");
+            set_samples_how_tos(componentSelected);
 
         });
 
@@ -93,57 +88,13 @@ $(document).ready(function () {
             $(this).parents(".popover").popover('destroy');
         });
 
-
-        //sample attributes flags
-        var assignedFlag = '<i class="fa fa-thumbs-up copo-icon-success" title="attributes assigned" aria-hidden="true"></i>';
-        var unassignedFlag = '<i class="fa fa-thumbs-down copo-icon-danger" title="no attributes" aria-hidden="true"></i>';
-
-        //handle sample attributes assignment
-        $(document).on("click", ".sample-assign-button", function () {
-
-            //...but first validate form
-            var stallAssignment = false;
-
-            $(document).find("form").each(function () {
-                var theForm = $(this);
-                if (theForm.find("#current_stage").length && theForm.find("#current_stage").val() == "sample_attributes") {
-
-                    theForm.trigger('submit');
-
-                    if (theForm.find("#bcopovalidator").val() == "false") {
-                        theForm.find("#bcopovalidator").val("true");
-
-                        stallAssignment = true;
-                    }
-
-                    return false;
-
-                }
-            });
-
-            if (stallAssignment) {
-                return false;
-            } else {
-                do_attributes_assignment($(this));
-            }
-
-
-        });
-
         //handle sample attributes view
         $(document).on("click", ".sample-view-button", function () {
             get_row_attributes($(this));
         });
 
-        //apply to all button
-        $(document).on("click", ".applyToAllButton", function (event) {
-            event.preventDefault();
-            //set attribute for all samples
-            do_attributes_assignment_all();
-        });
 
         //handle keyboard strokes to advance through wizard
-
         //check if the control has focus
         $('#dataFileWizard').on('keypress', function (event, data) {
 
@@ -268,14 +219,6 @@ $(document).ready(function () {
         });
 
         $('#dataFileWizard').on('changed.fu.wizard', function (evt, data) {
-
-            //set up apply to all button
-            set_up_apply_button();
-
-            //call to update generated samples
-            set_generated_samples();
-
-
             //set up / refresh form validator
             set_up_validator();
         });
@@ -353,6 +296,11 @@ $(document).ready(function () {
                     form_values[this.id] = $(this).val();
                 });
 
+                //trigger event for setting initial sample attributes
+                if (form_values.hasOwnProperty("current_stage") && form_values["current_stage"] == "sample_attributes") {
+                    initialSampleAttributes = form_values;
+                }
+
                 var auto_fields = JSON.stringify(form_values);
 
                 //trap review stage here, which, in essence, provides a signal to wrap up the wizard
@@ -376,7 +324,6 @@ $(document).ready(function () {
                         success: function (data) {
                             //clear_wizard(); no point...if we are reloading the page
                             window.location.reload();
-                            dialogHandle.close();
                         },
                         error: function () {
                             alert("Couldn't save samples!");
@@ -460,6 +407,9 @@ $(document).ready(function () {
             var elem = $('.steps li:last-child');
 
             if (elem.hasClass('active')) {
+                //call to set description summary data
+
+                set_generated_samples();
                 elem.show();
             } else {
                 elem.hide();
@@ -524,22 +474,6 @@ $(document).ready(function () {
 
         } //end of func
 
-        function set_up_apply_button() {
-            var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
-
-            //get form elements for current stage
-            var form_values = Object();
-
-            if ($('#wizard_form_' + activeStageIndx).length) {
-                $('#wizard_form_' + activeStageIndx).find(":input").each(function () {
-                    form_values[this.id] = $(this).val();
-                });
-
-                if (form_values.hasOwnProperty("current_stage") && form_values.current_stage == "sample_attributes") {
-                    $('#wizard_form_' + activeStageIndx).find(".applyToAllButton").css("display", "block");
-                }
-            }
-        }
 
         function set_up_validator() {
             $(document).find("form").each(function () {
@@ -607,19 +541,31 @@ $(document).ready(function () {
                 return stages;
             },
             display_sample_clone: function (param) {
-                //param is the stage
-                //NB: this function works under the assumption of the 'copo-multi-search' control
+                //param is confirmation of sample clone
+                //function decides whether to display the clone stage given user's choice or
+                // the existence (lack of i.e) candidate samples
                 var displayStage = false;
 
-                $.each(wizardStages.start, function (key, val) {
-                    if (val.ref == "sample_clone") {
-                        for (var i = 0; i < val.items.length; ++i) {
-                            if (val.items[i].id == param && val.items[i].option_values.options.length > 0) {
-                                displayStage = true;
-                            }
-                        }
+                if (stagesFormValues.hasOwnProperty(param)) {
+                    displayStage = stagesFormValues[param][param];
+
+                    if (displayStage == "yes") {
+                        displayStage = true;
+                    } else {
+                        displayStage = false;
                     }
-                });
+                }
+
+                return displayStage;
+            },
+            confirm_sample_clone: function (param) {
+                //function decides if sample-clone-confirmation stage should be displayed or not
+                //this is based on the presence of samples in the profile
+
+                var displayStage = false;
+                if (sampleComponentRecords.length > 0) {
+                    displayStage = true;
+                }
 
                 return displayStage;
             }
@@ -833,14 +779,6 @@ $(document).ready(function () {
                     id: "wizard_form_" + currentIndx
                 });
 
-
-            var formButton = $('<button/>',
-                {
-                    style: "display:none;",
-                    class: "btn btn-sm btn-primary applyToAllButton pull-right",
-                    html: "Assign to Generated Samples"
-                });
-
             var buttonRowDiv = $('<div/>', {
                 class: "row"
             });
@@ -849,7 +787,6 @@ $(document).ready(function () {
                 class: "col-sm-12 col-md-12 col-lg-12"
             });
 
-            buttonColDiv.append(formButton);
 
             buttonRowDiv.append(buttonColDiv)
 
@@ -908,9 +845,6 @@ $(document).ready(function () {
                     .columns()
                     .search('')
                     .draw();
-
-                //remove pane title
-                $("#generatedSamplesPara").html('');
             }
 
             //remove negotiated stages and samples data
@@ -1389,35 +1323,13 @@ $(document).ready(function () {
                 pane: '<div class="alert alert-default">' +
                 '<div style="line-height: 150%;" class="' + wizardMessages.review_message.text_class + '">' +
                 wizardMessages.review_message.text + '</div>' +
-                '<div style="margin-top: 10px; max-width: 100%; overflow-x: auto;">'
+                '<div style="margin-top: 10px; max-width: 100%; overflow-x: auto;">' +
+                '<table id="generated_samples_table" class="table table-striped table-bordered order-column hover copo-datatable copo-table-header" width="100%"></table>' +
+                '</div></div>'
             };
         }
 
         function set_generated_samples() {
-            //set or alter this only in the attributes stage
-
-            var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
-
-            //get form elements for current stage
-            var form_values = Object();
-
-            var generateTable = false;
-
-            if ($('#wizard_form_' + activeStageIndx).length) {
-                $('#wizard_form_' + activeStageIndx).find(":input").each(function () {
-                    form_values[this.id] = $(this).val();
-                });
-
-                if (form_values.hasOwnProperty("current_stage") && form_values.current_stage == "sample_attributes") {
-                    generateTable = true;
-                }
-            }
-
-            if (!generateTable) {
-                return false;
-            }
-
-
             //check if sample name has been entered before proceeding with sample display
 
             var namePrefix = get_stage_inputs_by_ref("sample_name");
@@ -1428,13 +1340,6 @@ $(document).ready(function () {
             } else {
                 namePrefix = namePrefix["name"];
             }
-
-            //show generated sample pane
-            $("#copoSampleHelp").find(".component-help").removeClass("disabled");
-            $("#copoSampleHelp").find(".component-help[data-component='generatedSamples']").addClass("disabled");
-            $("#generatedSamplesDiv").css("display", "block");
-            $("#helptipsDiv").css("display", "none");
-
 
             var requestedNumberOfSamples = get_stage_inputs_by_ref("number_of_samples");
 
@@ -1458,7 +1363,7 @@ $(document).ready(function () {
                 for (var i = 0; i < newNames.length; ++i) {
                     var option = {};
                     option["name"] = newNames[i];
-                    option["attributes"] = Object();
+                    option["attributes"] = initialSampleAttributes;
                     generatedSamples.push(option);
                 }
 
@@ -1467,6 +1372,7 @@ $(document).ready(function () {
                     option["rank"] = key + 1;
                     option["name"] = val.name;
                     option["attributes"] = val.attributes;
+                    set_dynamic_attributes(option);
                     dtd.push(option);
                 });
             } else if (requestedNumberOfSamples > generatedSamples.length) {
@@ -1475,7 +1381,7 @@ $(document).ready(function () {
                 for (var i = 0; i < newNames.length; ++i) {
                     var option = {};
                     option["name"] = newNames[i];
-                    option["attributes"] = Object();
+                    option["attributes"] = initialSampleAttributes;
                     generatedSamples.push(option);
                 }
 
@@ -1484,6 +1390,7 @@ $(document).ready(function () {
                     option["rank"] = key + 1;
                     option["name"] = val.name;
                     option["attributes"] = val.attributes;
+                    set_dynamic_attributes(option);
                     dtd.push(option);
                 });
             } else if (requestedNumberOfSamples < generatedSamples.length) {
@@ -1500,13 +1407,12 @@ $(document).ready(function () {
                     option["rank"] = key + 1;
                     option["name"] = val.name;
                     option["attributes"] = val.attributes;
+                    set_dynamic_attributes(option);
                     dtd.push(option);
                 });
             } else if (requestedNumberOfSamples == generatedSamples.length) {
                 return false;
             }
-
-            $("#generatedSamplesPara").html("Generated Samples");
 
 
             //set data
@@ -1535,173 +1441,179 @@ $(document).ready(function () {
                     .search('')
                     .draw();
             } else {
+                //first set static columns...
+                var setColumns = [
+                    {
+                        "data": "rank",
+                        "visible": false
+                    },
+                    {
+                        "data": "name",
+                        "title": "Sample Name"
+                    },
+                    {
+                        "data": "attributes",
+                        "visible": false
+                    }
+                ]
+
+                //set the dynamic columns, which are based on user's input
+                setColumns = setColumns.concat(set_dynamic_columns());
+
+
                 table = $('#generated_samples_table').DataTable({
                     data: dtd,
                     "dom": '<"top"if>rt<"bottom"lp><"clear">',
-                    searchHighlight: true,
+                    select: {
+                        style: 'multi'
+                    },
                     language: {
                         "info": " _START_ to _END_ of _TOTAL_ samples",
-                        "lengthMenu": "_MENU_ samples",
+                        "lengthMenu": "Show _MENU_ samples",
                     },
                     order: [[0, "asc"]],
-                    columns: [
-                        {
-                            "data": "rank",
-                            "visible": false
-                        },
-                        {
-                            "data": null,
-                            "title": "Tips",
-                            "render": function (data, type, row, meta) {
-                                var ctrlDiv = $('<div/>',
-                                    {
-                                        class: "row sample-attributes-row"
-                                    });
-
-                                //set attributes flag
-                                var toBeassigned;
-
-                                if ($.isEmptyObject(data.attributes)) {
-                                    toBeassigned = unassignedFlag
-                                }
-
-                                var flagDiv = $('<div/>',
-                                    {
-                                        class: "col-sm-1 col-md-1 col-lg-1"
-                                    }).append($('<span/>',
-                                    {
-                                        class: "sample-assign-flag"
-                                    }).append(toBeassigned));
-
-                                var nameDiv = $('<div/>',
-                                    {
-                                        class: "col-sm-7 col-md-7 col-lg-7"
-                                    }).append($('<span/>',
-                                    {
-                                        html: data.name
-                                    }));
-
-                                var buttonDiv = $('<div/>',
-                                    {
-                                        class: "col-sm-4 col-md-4 col-lg-4"
-                                    });
-
-                                ctrlDiv.append(flagDiv).append(nameDiv).append(buttonDiv);
-
-                                var aLink = $('<button/>', {
-                                    class: "btn btn-xs btn-info sample-view-button",
-                                    "data-row-indx": meta.row,
-                                    title: "Click to view assigned values",
-                                    html: '<i class="fa fa-plus-circle"></i> '
-                                });
-
-                                var applyBtn = $('<button/>', {
-                                    class: "btn btn-xs btn-primary sample-assign-button",
-                                    style: "margin-right: 10px;",
-                                    "data-row-indx": meta.row,
-                                    id: "#generatedsample" + meta.row,
-                                    title: "Click to assign attribute values",
-                                    html: "Assign"
-                                });
-
-                                buttonDiv.append(applyBtn).append(aLink);
-
-
-                                return $('<div></div>').append(ctrlDiv).html();
-
-                            }
-                        },
-                        {
-                            "data": "attributes",
-                            "visible": false
-                        }
-                    ],
+                    columns: setColumns,
                     "columnDefs": [
                         {"orderData": 0,}
-                    ]
+                    ],
+                    keys: {
+                        //columns: ':not(:first-child)',
+                        keys: [9, 13, 37, 39, 38, 40],
+                        blurable: false
+                    },
                 });
 
-                $('#generated_samples_table tr:eq(0) th:eq(0)').text(" Generated Samples");
+                table
+                // .on('key-focus', function (e, datatable, cell) {
+                //     alert(cell.data());
+                // })
+                    .on('key', function (e, datatable, key, cell, originalEvent) {
+                        if (key == 13) {//trap enter key for editing a cell
+
+                            //bypass static cells edit; these are the first 3 cells in a row
+                            if (cell.index().column < 3) {
+                                return false;
+                            }
+
+                            var rowData = datatable.row(cell.index().row).data();
+                            // console.log(rowData);
+                            // console.log(cell.data());
+                            var node = cell.node();
+
+                            if ($(node).find(".cell-dynamic-element").length) {
+                                return false;
+                            }
+
+                            table.keys.disable();
+
+                            var formElem = cell.data();
+                            var control = formElem.control;
+                            if (formElem.hidden == "true") {
+                                control = "hidden";
+                            }
+                            var elemValue = null;
+
+                            var htmlCtrl = dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue);
+                            htmlCtrl.find("label").remove();
+
+                            var cellEditPanel = $(".cell-edit-panel").clone().css("display", "block").find(".panel");
+                            cellEditPanel.find(".panel-body").append(htmlCtrl);
+
+                            $(node)
+                                .html('')
+                                .append(cellEditPanel)
+                                .find(".input-copo").focus();
+
+                            cellEditPanel.find(".cell-apply").keypress(function (evt) {
+                                if (evt.which == 13) {
+                                    //add call to save here...
+                                    table.keys.enable();
+                                }
+                            });
+
+                            cellEditPanel.find(".cell-apply").click(function () {
+                                //add call to save here...
+                                table.keys.enable();
+                            });
+
+                            refresh_tool_tips();
+                        }
+                    })
+                    .on('key-blur', function (e, datatable, cell) {
+                        //get row data
+                        var rowData = datatable.row(cell.index().row).data();
+                        var node = cell.node();
+                        if ($(node).find(".cell-dynamic-element").length) {
+                            $(node).html('fixing your value soon!');
+                        }
+                    });
             }
 
         }//end of func
 
-        function do_attributes_assignment_all() {
-            //set attribute for all samples
-
-            var stallAssignment = false;
+        function set_dynamic_columns() {
+            var setColumns = [];
 
 
-            //...but first validate form
-            $(document).find("form").each(function () {
-                var theForm = $(this);
-                if (theForm.find("#current_stage").length && theForm.find("#current_stage").val() == "sample_attributes") {
-
-                    theForm.trigger('submit');
-
-                    if (theForm.find("#bcopovalidator").val() == "false") {
-                        theForm.find("#bcopovalidator").val("true");
-
-                        stallAssignment = true;
-                    }
-
-                    return false;
-
+            //get attributes schema used in building the sample_attributes form
+            var sampleAttributes = Object();
+            for (var i = 0; i < negotiatedStages.length; ++i) {
+                if (negotiatedStages[i].ref == "sample_attributes") {
+                    sampleAttributes = negotiatedStages[i];
+                    break;
                 }
-            });
-
-            if (stallAssignment) {
-                return false;
             }
 
+            if (!$.isEmptyObject(sampleAttributes)) {
+                for (var i = 0; i < sampleAttributes.items.length; ++i) {
+                    var currentItem = sampleAttributes.items[i];
+                    if (currentItem.hasOwnProperty("show_in_form") && currentItem["show_in_form"]) {
+                        if (currentItem.hasOwnProperty("hidden") && currentItem.hidden.toString() == "false") {
 
-            if ($.fn.dataTable.isDataTable('#generated_samples_table')) {
-                var table = $('#generated_samples_table').DataTable();
-
-                table.rows().iterator('row', function (context, index) {
-                    do_attributes_assignment($(this.row(index).node()).find(".sample-assign-button"));
-                });
+                            if (currentItem.type == "array") {
+                                ;
+                            } else {
+                                var col = {
+                                    "data": currentItem.id,
+                                    "title": currentItem.label,
+                                    "render": function (data, type, row, meta) {
+                                        return $('<div></div>').append(get_item_value(data, row.attributes)).html();
+                                    }
+                                }
+                                setColumns.push(col);
+                            }//end item not array
+                        }
+                    }
+                }
             }
+
+            return setColumns;
         }
 
-        function do_attributes_assignment(elem) {
-            //get attributes and assign
-            //this will only be possible if the active stage is one with the attributes
-
-            var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step;
-
-            if ($('#wizard_form_' + activeStageIndx).length) {
-                var form_values = Object();
-
-                $('#wizard_form_' + activeStageIndx).find(":input").each(function () {
-                    form_values[this.id] = $(this).val();
-                });
-
-                if (form_values.hasOwnProperty("current_stage") && form_values["current_stage"] == "sample_attributes") {
-                    generatedSamples[parseInt(elem.attr("data-row-indx"))].attributes = form_values;
-
-                    //set flag
-                    elem.closest(".sample-attributes-row").find(".sample-assign-flag").html(assignedFlag);
+        function set_dynamic_attributes(option) {
+            //get attributes schema used in building the sample_attributes form
+            var sampleAttributes = Object();
+            for (var i = 0; i < negotiatedStages.length; ++i) {
+                if (negotiatedStages[i].ref == "sample_attributes") {
+                    sampleAttributes = negotiatedStages[i];
+                    break;
                 }
-
             }
 
-            //after assignment, close row
-            var table = $('#generated_samples_table').DataTable();
-            var tr = elem.closest('tr');
-            var row = table.row(tr);
-
-            if (row.child.isShown()) {
-                // This row is already open - close it
-                row.child('');
-                row.child.hide();
-                tr.removeClass('shown');
-
-                elem.closest('tr').find(".sample-view-button").html('<i class="fa fa-plus-circle"></i> ');
+            if (!$.isEmptyObject(sampleAttributes)) {
+                for (var i = 0; i < sampleAttributes.items.length; ++i) {
+                    var currentItem = sampleAttributes.items[i];
+                    if (currentItem.hasOwnProperty("show_in_form") && currentItem["show_in_form"]) {
+                        if (currentItem.hasOwnProperty("hidden") && currentItem.hidden.toString() == "false") {
+                            if (currentItem.type == "array") {
+                                ;
+                            } else {
+                                option[currentItem.id] = currentItem;
+                            }
+                        }
+                    }
+                }
             }
-
-            get_row_attributes(elem);
-
         }
 
         function get_row_attributes(elem) {
