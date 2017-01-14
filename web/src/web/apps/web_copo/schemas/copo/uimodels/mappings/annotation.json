@@ -44,12 +44,30 @@
       "deprecated": false,
       "default_value": "",
       "show_in_form": false,
-      "id": "copo.annotation.html",
+      "id": "copo.annotation.raw",
       "show_in_table": false,
       "unique": true,
       "control": "text",
       "versions": [
-        "html"
+        "raw"
+      ],
+      "help_tip": "",
+      "label": ""
+    },
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "",
+      "hidden": "false",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
+      "id": "copo.annotation.type",
+      "show_in_table": false,
+      "unique": true,
+      "control": "text",
+      "versions": [
+        "type"
       ],
       "help_tip": "",
       "label": ""

@@ -15,6 +15,7 @@ from dal.copo_da import ProfileInfo, RemoteDataFile, Submission
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
+from pandas import read_excel
 
 
 def get_source_count(self):
@@ -99,3 +100,7 @@ def delete_token(request):
     tok_id = request.POST['token_id']
     resp = Figshare().delete_token(tok_id)
     return HttpResponse(json_util.dumps({'resp': resp.acknowledged}))
+
+def get_excel_data(request):
+    x = read_excel('/Users/fshaw/Dropbox/Shawtuk/dev/snps/test/test_data/ExampleSNPTable_small.xlsx', sheetname=0)
+    return HttpResponse(json.dumps(x.values.tolist()))

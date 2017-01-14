@@ -13,9 +13,11 @@ function setup_autocomplete() {
     $(document).on('focus', 'input[id^="annotator-field"]', function (e) {
         t = e.currentTarget
         $('.annotator-listing').find('ul').empty()
+        $(t).addClass('ontology-field')
 
         if (!AnnotationEventAdded) {
             $(t).attr('data-autocomplete', '/copo/ajax_search_ontology/999/')
+
             auto_complete();
             AnnotationEventAdded = true;
         }
@@ -616,13 +618,8 @@ function setup_formelement_hint(switchElem, inputElements) {
 
 
 var auto_complete = function () {
-    /*
-     AutoComplete({
-     _Post: do_post,
-     _Select: do_select,
-     autoFocus: true
-     });
-     */
+    // remove all previous autocomplete divs
+    $('.autocomplete').remove()
     AutoComplete({
         EmptyMessage: "No Annotations Found",
         Url: $("#elastic_search_ajax").val(),
@@ -632,15 +629,14 @@ var auto_complete = function () {
 
     function do_select(item) {
         console.log('doing select')
-        if ($(document).data('annotator')) {
-
-
-            console.log('here')
-            console.log($(item).data('term_accession'))
-            $(input).val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
+        if ($(document).data('annotator_type') == 'txt') {
+            $('#annotator-field-0').val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
+        }
+        else if ($(document).data('annotator_type') == 'ss') {
+            // this function defined in copo_annotations.js
+            append_to_annotation_list(item)
         }
         else {
-
             $(this.Input).val($(item).data('annotation_value'));
             $(this.Input).siblings("[id*='termSource']").val($(item).data('term_source'));
             $(this.Input).siblings("[id*='termAccession']").val($(item).data('term_accession'));

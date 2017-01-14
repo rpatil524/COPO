@@ -69,35 +69,41 @@ def handle_upload(request):
     # TODO - this should be changed to a uuid
 
     file_name = os.path.splitext(f.name)[0]
+    file_type = request.POST['file_type']
 
-    save_name = os.path.join(settings.MEDIA_ROOT, str(uuid.uuid4()))
-    with open(save_name, 'wb+') as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
+    if file_type == "Spreadsheet":
 
-    cmd = 'pdftotext -htmlmeta ' + save_name
-    resp = pexpect.run(cmd)
-    # now open the resulting file, parse and send to frontend
-    #file_name = os.path.splitext(fname)[0]
-    html_name = save_name + '.html'
-    with open(html_name, "r", encoding='utf-8', errors='ignore') as p:
-        html = p.read()
-    out = dict()
+        print(f)
+    elif file_type == "PDF Document":
+        save_name = os.path.join(settings.MEDIA_ROOT, str(uuid.uuid4()))
+        with open(save_name, 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
 
-    if not Annotation().annotation_exists(file_name, str(request.user.id)):
-        out['html'] = html
-        out['document_name'] = file_name
-        out['profile_id'] = request.session['profile_id']
-        out['deleted'] = '0'
-        out['date_created'] = datetime.datetime.now()
-        out['uid'] = str(request.user.id)
-        out = Annotation(request.session['profile_id']).save_record({}, **out)
+        cmd = 'pdftotext -htmlmeta ' + save_name
+        resp = pexpect.run(cmd)
+        # now open the resulting file, parse and send to frontend
+        #file_name = os.path.splitext(fname)[0]
+        html_name = save_name + '.html'
+        with open(html_name, "r", encoding='utf-8', errors='ignore') as p:
+            html = p.read()
+        out = dict()
 
-    else:
-        out = Annotation().get_annotation_by_name(file_name, request.user.id)
+        if not Annotation().annotation_exists(file_name, str(request.user.id)):
+            out['raw'] = html
+            out['type'] = file_type
+            out['document_name'] = file_name
+            out['profile_id'] = request.session['profile_id']
+            out['deleted'] = '0'
+            out['date_created'] = datetime.datetime.now()
+            out['uid'] = str(request.user.id)
+            out = Annotation(request.session['profile_id']).save_record({}, **out)
 
-    os.remove(save_name)
-    os.remove(html_name)
+        else:
+            out = Annotation().get_annotation_by_name(file_name, request.user.id)
+
+        os.remove(save_name)
+        os.remove(html_name)
 
 
     return HttpResponse(j.dumps(out))

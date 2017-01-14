@@ -54,6 +54,7 @@ $(document).ready(function () {
             $("#form_submit_btn").on('click', function () {
                 var formData = new FormData();
                 formData.append('file', $('#InputFile')[0].files[0]);
+                formData.append('file_type', $('#file_type').val())
                 var csrftoken = $.cookie('csrftoken');
                 var url = "/api/upload_annotation_file/"
                 $.ajax({
