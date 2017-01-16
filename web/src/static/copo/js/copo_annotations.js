@@ -210,32 +210,27 @@ function setup_annotator(element) {
 }
 
 function load_ss_data(e) {
-    e.preventDefault()
-    var data
-    $(document).data('annotator_type', 'ss')
-    $.get('/rest/get_excel_data/', {})
-        .done(function (d) {
-            data = JSON.parse(d)
-            e.preventDefault();
-            $('#annotation_content').empty()
-            $('#annotation_content').removeAttr("style");
 
-            $('#file_picker_modal').modal('hide');
 
-            $('#annotation_table_wrapper').hide();
+    var data = jsone.raw
+    $('#annotation_content').empty()
+    $('#annotation_content').removeAttr("style");
 
-            var element = document.getElementById('annotation_content');
+    $('#file_picker_modal').modal('hide');
 
-            hot = new Handsontable(element, {
-                data: data,
-                rowHeaders: false,
-                colHeaders: false,
-                dropdownMenu: true,
-                afterOnCellMouseDown: _columnHeaderClickHandler,
-                afterSelection: _afterSelection,
-            });
-            $(document).data('hot', hot)
-        })
+    $('#annotation_table_wrapper').hide();
+
+    var element = document.getElementById('annotation_content');
+
+    hot = new Handsontable(element, {
+        data: data,
+        rowHeaders: false,
+        colHeaders: false,
+        dropdownMenu: true,
+        afterOnCellMouseDown: _columnHeaderClickHandler,
+        afterSelection: _afterSelection,
+    });
+    $(document).data('hot', hot)
 }
 
 function _columnHeaderClickHandler(changes, sources) {

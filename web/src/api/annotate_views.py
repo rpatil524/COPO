@@ -7,6 +7,8 @@ import os
 import pexpect
 import datetime
 import uuid
+from pandas import read_excel, read_csv
+import json
 
 
 def post_annotations(request):
@@ -72,8 +74,10 @@ def handle_upload(request):
     file_type = request.POST['file_type']
 
     if file_type == "Spreadsheet":
+        # load spreadsheet data and return to backend
+        s = read_excel(f)
+        raw = json.dumps(s.values.tolist())
 
-        print(f)
     elif file_type == "PDF Document":
         save_name = os.path.join(settings.MEDIA_ROOT, str(uuid.uuid4()))
         with open(save_name, 'wb+') as destination:
@@ -83,27 +87,29 @@ def handle_upload(request):
         cmd = 'pdftotext -htmlmeta ' + save_name
         resp = pexpect.run(cmd)
         # now open the resulting file, parse and send to frontend
-        #file_name = os.path.splitext(fname)[0]
+        # file_name = os.path.splitext(fname)[0]
         html_name = save_name + '.html'
         with open(html_name, "r", encoding='utf-8', errors='ignore') as p:
-            html = p.read()
-        out = dict()
+            raw = p.read()
+    out = dict()
 
-        if not Annotation().annotation_exists(file_name, str(request.user.id)):
-            out['raw'] = html
-            out['type'] = file_type
-            out['document_name'] = file_name
-            out['profile_id'] = request.session['profile_id']
-            out['deleted'] = '0'
-            out['date_created'] = datetime.datetime.now()
-            out['uid'] = str(request.user.id)
-            out = Annotation(request.session['profile_id']).save_record({}, **out)
+    if not Annotation().annotation_exists(file_name, str(request.user.id)):
+        out['raw'] = raw
+        out['type'] = file_type
+        out['document_name'] = file_name
+        out['profile_id'] = request.session['profile_id']
+        out['deleted'] = '0'
+        out['date_created'] = datetime.datetime.now()
+        out['uid'] = str(request.user.id)
+        out = Annotation(request.session['profile_id']).save_record({}, **out)
 
-        else:
-            out = Annotation().get_annotation_by_name(file_name, request.user.id)
+    else:
+        out = Annotation().get_annotation_by_name(file_name, request.user.id)
 
+    try:
         os.remove(save_name)
         os.remove(html_name)
-
+    except:
+        pass
 
     return HttpResponse(j.dumps(out))

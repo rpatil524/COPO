@@ -54,7 +54,7 @@ $(document).ready(function () {
             $("#form_submit_btn").on('click', function () {
                 var formData = new FormData();
                 formData.append('file', $('#InputFile')[0].files[0]);
-                formData.append('file_type', $('#file_type').val())
+                formData.append('file_type', $('#file_type_dropdown').val())
                 var csrftoken = $.cookie('csrftoken');
                 var url = "/api/upload_annotation_file/"
                 $.ajax({
@@ -68,9 +68,14 @@ $(document).ready(function () {
                 }).done(function (e) {
                     $('#annotation_table_wrapper').hide()
                     $('#annotation_content').show()
-                    $('#annotation_content').html(e.html)
 
-                    $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
+                    if(e.type == 'PDF File') {
+                        $('#annotation_content').html(e.html)
+                    }
+                    else if (e.type == 'Spreadsheet') {
+                        load_ss_data(e)
+                    }
+
                     setup_annotator()
                     $('#file_picker_modal').modal('hide')
                 });
