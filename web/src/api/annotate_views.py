@@ -110,6 +110,6 @@ def handle_upload(request):
         os.remove(save_name)
         os.remove(html_name)
     except:
-        pass
+        print('cannot find temp file to delete.....no worries')
 
     return HttpResponse(j.dumps(out))

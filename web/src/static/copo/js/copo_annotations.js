@@ -145,19 +145,28 @@ $(document).ready(function () {
                     },
                     success: function (e) {
                         $('#annotation_table_wrapper').hide();
-                        $('#annotation_content').show();
-                        var initAnnotator = false;
-                        if (!$.trim($("#annotation_content").html())) {
-                            // if #annotation_content is empty
-                            initAnnotator = true
+
+                        if (e.type == 'Spreadsheet') {
+                            load_ss_data(e)
                         }
-                        $('#annotation_content').html(e.html);
+                        else {
+                            $('#annotation_content').show();
+                            var initAnnotator = false;
+                            if (!$.trim($("#annotation_content").html())) {
+                                // if #annotation_content is empty
+                                initAnnotator = true
+                            }
+                            $('#annotation_content').html(e.raw);
+                            if (initAnnotator) {
+                                setup_annotator();
+                                setup_autocomplete();
+                            }
+                        }
+
+
                         $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
                         $('#file_picker_modal').modal('hide');
-                        if (initAnnotator) {
-                            setup_annotator();
-                            setup_autocomplete();
-                        }
+
 
                     },
                     error: function () {
@@ -212,7 +221,7 @@ function setup_annotator(element) {
 function load_ss_data(e) {
 
 
-    var data = jsone.raw
+    var data = JSON.parse(e.raw)
     $('#annotation_content').empty()
     $('#annotation_content').removeAttr("style");
 
