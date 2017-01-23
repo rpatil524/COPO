@@ -145,20 +145,14 @@ $(document).ready(function () {
                     },
                     success: function (e) {
                         $('#annotation_table_wrapper').hide();
-                        $('#annotation_content').show();
-                        var initAnnotator = false;
-                        if (!$.trim($("#annotation_content").html())) {
-                            // if #annotation_content is empty
-                            initAnnotator = true
-                        }
-                        $('#annotation_content').html(e.html);
-                        $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
-                        $('#file_picker_modal').modal('hide');
-                        if (initAnnotator) {
-                            setup_annotator();
-                            setup_autocomplete();
-                        }
 
+                        if (e.type == 'Spreadsheet') {
+                            load_ss_data(e)
+                        }
+                        else {
+                            load_txt_data(e)
+                        }
+                        $('#file_picker_modal').modal('hide');
                     },
                     error: function () {
                         alert("Couldn't build publication form!");
@@ -209,33 +203,45 @@ function setup_annotator(element) {
     $(this).data('annotator', true)
 }
 
+
+function load_txt_data(e) {
+    $('#annotation_content').show();
+    var initAnnotator = false;
+    if (!$.trim($("#annotation_content").html())) {
+        // if #annotation_content is empty
+        initAnnotator = true
+    }
+    $('#annotation_content').html(e.raw);
+    if (initAnnotator) {
+        setup_annotator();
+        setup_autocomplete();
+    }
+    $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
+}
+
 function load_ss_data(e) {
-    e.preventDefault()
-    var data
-    $(document).data('annotator_type', 'ss')
-    $.get('/rest/get_excel_data/', {})
-        .done(function (d) {
-            data = JSON.parse(d)
-            e.preventDefault();
-            $('#annotation_content').empty()
-            $('#annotation_content').removeAttr("style");
 
-            $('#file_picker_modal').modal('hide');
 
-            $('#annotation_table_wrapper').hide();
+    var data = JSON.parse(e.raw)
+    $('#annotation_content').empty()
+    $('#annotation_content').removeAttr("style");
 
-            var element = document.getElementById('annotation_content');
+    $('#file_picker_modal').modal('hide');
 
-            hot = new Handsontable(element, {
-                data: data,
-                rowHeaders: false,
-                colHeaders: false,
-                dropdownMenu: true,
-                afterOnCellMouseDown: _columnHeaderClickHandler,
-                afterSelection: _afterSelection,
-            });
-            $(document).data('hot', hot)
-        })
+    $('#annotation_table_wrapper').hide();
+
+    var element = document.getElementById('annotation_content');
+
+    hot = new Handsontable(element, {
+        data: data,
+        rowHeaders: false,
+        colHeaders: false,
+        dropdownMenu: true,
+        afterOnCellMouseDown: _columnHeaderClickHandler,
+        afterSelection: _afterSelection,
+    });
+    $(document).data('hot', hot)
+    $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
 }
 
 function _columnHeaderClickHandler(changes, sources) {

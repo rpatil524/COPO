@@ -63,14 +63,14 @@
       "default_value": "",
       "show_in_form": false,
       "id": "copo.annotation.type",
-      "show_in_table": false,
+      "show_in_table": true,
       "unique": true,
       "control": "text",
       "versions": [
         "type"
       ],
       "help_tip": "",
-      "label": ""
+      "label": "Document Type"
     },
     {
       "type": "array",
