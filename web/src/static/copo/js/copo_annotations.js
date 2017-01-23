@@ -150,24 +150,9 @@ $(document).ready(function () {
                             load_ss_data(e)
                         }
                         else {
-                            $('#annotation_content').show();
-                            var initAnnotator = false;
-                            if (!$.trim($("#annotation_content").html())) {
-                                // if #annotation_content is empty
-                                initAnnotator = true
-                            }
-                            $('#annotation_content').html(e.raw);
-                            if (initAnnotator) {
-                                setup_annotator();
-                                setup_autocomplete();
-                            }
+                            load_txt_data(e)
                         }
-
-
-                        $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
                         $('#file_picker_modal').modal('hide');
-
-
                     },
                     error: function () {
                         alert("Couldn't build publication form!");
@@ -218,6 +203,22 @@ function setup_annotator(element) {
     $(this).data('annotator', true)
 }
 
+
+function load_txt_data(e) {
+    $('#annotation_content').show();
+    var initAnnotator = false;
+    if (!$.trim($("#annotation_content").html())) {
+        // if #annotation_content is empty
+        initAnnotator = true
+    }
+    $('#annotation_content').html(e.raw);
+    if (initAnnotator) {
+        setup_annotator();
+        setup_autocomplete();
+    }
+    $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
+}
+
 function load_ss_data(e) {
 
 
@@ -240,6 +241,7 @@ function load_ss_data(e) {
         afterSelection: _afterSelection,
     });
     $(document).data('hot', hot)
+    $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
 }
 
 function _columnHeaderClickHandler(changes, sources) {

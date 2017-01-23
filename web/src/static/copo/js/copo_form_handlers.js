@@ -69,8 +69,8 @@ $(document).ready(function () {
                     $('#annotation_table_wrapper').hide()
                     $('#annotation_content').show()
 
-                    if(e.type == 'PDF File') {
-                        $('#annotation_content').html(e.html)
+                    if(e.type == 'PDF Document') {
+                        load_txt_data(e)
                     }
                     else if (e.type == 'Spreadsheet') {
                         load_ss_data(e)
