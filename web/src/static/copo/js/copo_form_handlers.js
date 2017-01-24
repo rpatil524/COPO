@@ -126,7 +126,8 @@ var controlsMapping = {
     "copo-sample-source-2": "do_copo_sample_source_ctrl_2",
     "oauth_required": "do_oauth_required",
     "copo-button-list": "do_copo_button_list_ctrl",
-    "copo-item-count": "do_copo_item_count_ctrl"
+    "copo-item-count": "do_copo_item_count_ctrl",
+    "date-picker": "do_date_picker_ctrl"
 };
 
 function json2HtmlForm(data) {
@@ -539,6 +540,28 @@ function set_validation_markers(formElem, ctrl) {
 
 //form controls
 var dispatchFormControl = {
+    do_date_picker_ctrl: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        var txt = $('<input/>',
+            {
+                type: "text",
+                class: "input-copo form-control date-picker",
+                id: formElem.id,
+                name: formElem.id
+            });
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, txt);
+
+        ctrlsDiv.append(txt);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
     do_text_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {

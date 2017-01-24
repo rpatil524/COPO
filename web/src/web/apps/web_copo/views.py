@@ -52,7 +52,7 @@ def test(request):
     except CopoRuntimeError as l:
         return render(request, 'copo/error_page.html', {'message': str(l)})
 
-    return HttpResponse("HELLO")
+    return render(request, 'copo/test_page.html')
 
 
 def test_submission(request):

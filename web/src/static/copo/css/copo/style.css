@@ -1028,3 +1028,7 @@ th {
 }
 
 /*end copo-component attributes*/
+
+.datepicker-days th{
+    background-color: transparent;
+}

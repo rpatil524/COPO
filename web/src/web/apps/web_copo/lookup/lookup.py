@@ -362,6 +362,10 @@ DROP_DOWNS = {
             'label': 'Figshare'
         },
         {
+            'value': 'miappe',
+            'label': 'MIAPPE Compliant'
+        },
+        {
             'value': 'MetaboLights',
             'label': 'MetaboLights'
         },
@@ -558,6 +562,7 @@ WIZARD_FILES = {
     'start': os.path.join(RESOLVER['wizards_datafile'], 'start_stages.json'),
     'ena': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages.json'),
     'figshare': os.path.join(RESOLVER['wizards_datafile'], 'figshare_stages.json'),
+    'miappe': os.path.join(RESOLVER['wizards_datafile'], 'miappe_stages.json'),
     'sample_start': os.path.join(RESOLVER['wizards_sample'], 'start_stages.json'),
     'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json')
 }

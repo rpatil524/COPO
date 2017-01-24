@@ -5,6 +5,8 @@ $(document).ready(function () {
     setup_autocomplete()
     do_component_navbar($("#nav_component_name").val());
 
+
+
 });
 
 function setup_autocomplete() {
@@ -402,9 +404,13 @@ function refresh_tool_tips() {
     refresh_multisearch();
     refresh_range_slider();
     auto_complete();
-
+    setup_datepicker();
 
 } //end of func
+
+function setup_datepicker(){
+    $('.date-picker').datepicker({})
+}
 
 function refresh_validator(formObject) {
     formObject.validator('update');

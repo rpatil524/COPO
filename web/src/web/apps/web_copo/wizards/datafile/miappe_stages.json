@@ -1,0 +1,70 @@
+{
+  "title": "MIAPPE Experiment (Minimum Information About Plant Phenotyping Experiments)",
+  "description": "Configuration for MIAPPE Phenotyping experiments",
+  "properties": [
+    {
+      "ref": "attach_samples",
+      "title": "Sample",
+      "content": "get_stage_html",
+      "deposition_context": "ena",
+      "message": "Select and associate a sample to files in the bundle. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",
+      "items": [
+        {
+          "id": "study_samples",
+          "type": "string",
+          "help_tip": "",
+          "label": "Sample",
+          "hidden": "false",
+          "required": "true",
+          "control": "copo-multi-search",
+          "data_maxItems": 1,
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_isasamples_json",
+              "parameter": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ref": "study",
+      "title": "Experiment Details",
+      "content": "get_stage_html",
+      "is_singular_stage": true,
+      "deposition_context": "dataverse",
+      "message": "Select the study type under which the datafiles were created. The study type presents a controlled vocabulary for expressing the overall purpose of the study.",
+      "items": [
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "ontology_names": [
+            "ncbitaxon"
+          ],
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.source.organism",
+          "show_in_table": true,
+          "control": "date-picker",
+          "versions": [
+            "organism"
+          ],
+          "help_tip": "A taxonomic information associated to the Source Biological material (e.g., species, genus, strain).",
+          "label": "Organism"
+        }
+      ]
+    },
+    {
+      "ref": "protocol_refs",
+      "is_stage_stub": true,
+      "callback": {
+        "function": "get_dynamic_elements_ena",
+        "parameter": "{stub_ref!s}"
+      }
+    }
+  ]
+}
