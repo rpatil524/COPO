@@ -51,7 +51,8 @@ class BrokerDA:
             ontology_schema=d_utils.get_copo_schema("ontology_annotation"),
             comment_schema=d_utils.get_copo_schema("comment"),
             characteristics_schema=d_utils.get_copo_schema("material_attribute_value"),
-            source_schema=d_utils.get_copo_schema("source")
+            source_schema=d_utils.get_copo_schema("source"),
+            duration_schema=d_utils.get_copo_schema("duration")
         )
 
         self.context["copo_schemas"] = copo_schemas

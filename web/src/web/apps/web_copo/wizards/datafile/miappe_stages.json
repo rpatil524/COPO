@@ -29,7 +29,7 @@
       ]
     },
     {
-      "ref": "study",
+      "ref": "",
       "title": "Experiment Details",
       "content": "get_stage_html",
       "is_singular_stage": true,
@@ -41,20 +41,58 @@
           "required": "false",
           "ref": "",
           "ontology_names": [
-            "ncbitaxon"
           ],
           "hidden": "false",
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "copo.source.organism",
+          "id": "copo.miappe.start_date",
           "show_in_table": true,
           "control": "date-picker",
           "versions": [
-            "organism"
+            "start_date"
           ],
-          "help_tip": "A taxonomic information associated to the Source Biological material (e.g., species, genus, strain).",
-          "label": "Organism"
+          "help_tip": "The Date this experiment commenced",
+          "label": "Start Date"
+        },
+         {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "ontology_names": [
+          ],
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.duration",
+          "show_in_table": true,
+          "control": "copo-duration",
+          "versions": [
+            "duration"
+          ],
+          "help_tip": "How many long the experiment lasted",
+          "label": "Experiment Duration"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "ontology_names": [
+            "gaz"
+          ],
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.location",
+          "show_in_table": true,
+          "control": "ontology term",
+          "versions": [
+            "location"
+          ],
+          "help_tip": "Where was this experiment performed",
+          "label": "Geographic Location"
         }
       ]
     },

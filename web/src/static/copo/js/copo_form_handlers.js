@@ -69,7 +69,7 @@ $(document).ready(function () {
                     $('#annotation_table_wrapper').hide()
                     $('#annotation_content').show()
 
-                    if(e.type == 'PDF Document') {
+                    if (e.type == 'PDF Document') {
                         load_txt_data(e)
                     }
                     else if (e.type == 'Spreadsheet') {
@@ -113,6 +113,7 @@ $(document).ready(function () {
 //map controls to rendering functions
 var controlsMapping = {
     "text": "do_text_ctrl",
+    "text_small": "do_small_text_ctrl",
     "textarea": "do_textarea_ctrl",
     "hidden": "do_hidden_ctrl",
     "copo-select": "do_copo_select_ctrl",
@@ -127,7 +128,9 @@ var controlsMapping = {
     "oauth_required": "do_oauth_required",
     "copo-button-list": "do_copo_button_list_ctrl",
     "copo-item-count": "do_copo_item_count_ctrl",
-    "date-picker": "do_date_picker_ctrl"
+    "date-picker": "do_date_picker_ctrl",
+    "copo-duration": "do_copo_duration_ctrl"
+
 };
 
 function json2HtmlForm(data) {
@@ -540,6 +543,7 @@ function set_validation_markers(formElem, ctrl) {
 
 //form controls
 var dispatchFormControl = {
+
     do_date_picker_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -573,7 +577,31 @@ var dispatchFormControl = {
                 type: "text",
                 class: "input-copo form-control",
                 id: formElem.id,
-                name: formElem.id
+                name: formElem.id,
+                placeholder: formElem.placeholder
+            });
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, txt);
+
+        ctrlsDiv.append(txt);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
+    do_small_text_ctrl: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        var txt = $('<input/>',
+            {
+                type: "text",
+                class: "input-copo form-control width100",
+                id: formElem.id,
+                name: formElem.id,
+                placeholder: formElem.placeholder
             });
 
         //set validation markers
@@ -640,6 +668,48 @@ var dispatchFormControl = {
         }
 
         ctrlsDiv.append(selectCtrl);
+
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
+    do_copo_duration_ctrl: function (formElem, elemValue) {
+
+        var durationSchema = copoSchemas.duration_schema;
+
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        for (var i = 0; i < durationSchema.length; ++i) {
+            var mg = "margin-left:5px;";
+            if (i == 0) {
+                mg = '';
+            }
+            var fv = formElem.id + "." + durationSchema[i].id.split(".").slice(-1)[0];
+
+
+            var sp = $('<span/>',
+                {
+                    style: "display: inline-block; " + mg
+                });
+
+            //get ontology ctrl
+            var durationCtrlObject = get_basic_span(sp, durationSchema[i]);
+
+
+            durationCtrlObject.find(":input").each(function () {
+                if (this.id) {
+                    this.id = fv + "." + this.id;
+                }
+
+                //set placeholder text
+                if ($(this).hasClass("ontology-field")) {
+                    $(this).attr("placeholder", durationSchema[i].label.toLowerCase());
+                }
+            });
+
+            ctrlsDiv.append(durationCtrlObject);
+        }
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
@@ -1733,6 +1803,20 @@ function source_clone_ctrl(funcParams) {
     });
 
 
+}
+
+
+function get_basic_span(sp, formElem) {
+    //var durationSchema = copoSchemas.duration_schema;
+    var fv = formElem.id.split(".").slice(-1)[0];
+    sp.append($('<input/>',
+        {
+            type: "text",
+            placeholder: formElem.placeholder,
+            id: fv,
+            name: fv
+        }));
+    return sp
 }
 
 function get_ontology_span(ontologySpan, formElem) {

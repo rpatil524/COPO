@@ -1032,3 +1032,8 @@ th {
 .datepicker-days th{
     background-color: transparent;
 }
+
+input.date-picker{
+    width: 200px;
+}
+

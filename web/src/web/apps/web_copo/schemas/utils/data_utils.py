@@ -315,7 +315,8 @@ def get_isa_schema(component):
         process_parameter_value=json_to_pytype(os.path.join(pth, 'process_parameter_value_schema.json')).get(
             "properties", dict()),
         ontology_source_reference=json_to_pytype(os.path.join(pth, 'ontology_source_reference_schema.json')).get(
-            "properties", dict())
+            "properties", dict()),
+
     )
 
     return schema_dict.get(component, dict())
@@ -359,7 +360,8 @@ def get_copo_schema(component, as_object=False):
         source=schema_base.get("source").get("fields", list()),
         ontology_annotation=schema_base.get("ontology_annotation").get("fields", list()),
         comment=schema_base.get("comment").get("fields", list()),
-        material_attribute_value=schema_base.get("material_attribute_value").get("fields", list())
+        material_attribute_value=schema_base.get("material_attribute_value").get("fields", list()),
+        duration=schema_base.get("duration").get("fields", list()),
     )
 
     schema = schema_dict.get(component, list())

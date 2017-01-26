@@ -38,7 +38,8 @@ def search_ontology_ebi(request, ontology_names):
     if ontology_names == "999":
         ontology_names = str()
 
-    ontologies = ol.ONTOLOGY_LKUPS['ontologies_to_search']
+    #ontologies = ol.ONTOLOGY_LKUPS['ontologies_to_search']
+    ontologies = ontology_names
     fields = ol.ONTOLOGY_LKUPS['fields_to_search']
     query = ol.ONTOLOGY_LKUPS['ebi_ols_autocomplete'].format(**locals())
     data = requests.get(query).text

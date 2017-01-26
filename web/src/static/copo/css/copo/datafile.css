@@ -410,5 +410,8 @@ ol {
     text-shadow: none;
     box-shadow: none;
 }
+.width100{
+    width: 100px
+}
 
 /*end help centre*/

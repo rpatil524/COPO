@@ -394,7 +394,7 @@ function do_render_table(data) {
 
 
 function refresh_tool_tips() {
-    $("[data-toggle='tooltip']").tooltip();
+    $("[data-toggle='tooltip']").   tooltip();
     $("[data-toggle='popover']").popover();
 
 
@@ -409,7 +409,9 @@ function refresh_tool_tips() {
 } //end of func
 
 function setup_datepicker(){
-    $('.date-picker').datepicker({})
+    $('.date-picker').datepicker({
+        format: "dd/mm/yyyy"
+    })
 }
 
 function refresh_validator(formObject) {
