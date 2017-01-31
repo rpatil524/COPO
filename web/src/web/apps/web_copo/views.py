@@ -18,6 +18,7 @@ from django.conf import settings
 from allauth.account.forms import LoginForm
 from dal.copo_da import Annotation
 from bson import json_util as j
+
 LOGGER = settings.LOGGER
 
 
@@ -43,8 +44,10 @@ def login(request):
     }
     return render(request, 'copo/auth/login.html', context)
 
+
 def test_pdf(request):
     return render(request, 'copo/test_page.html', {})
+
 
 def test(request):
     try:
@@ -159,7 +162,8 @@ def copo_visualize(request):
                      description_summary=broker_visuals.do_description_summary,
                      sources_json_component=broker_visuals.get_sources_json_component,
                      un_describe=broker_visuals.do_un_describe,
-                     attributes_display=broker_visuals.do_attributes_display
+                     attributes_display=broker_visuals.do_attributes_display,
+                     single_source_json=broker_visuals.get_single_source_json,
                      )
 
     if task in task_dict:
@@ -271,9 +275,9 @@ def register_to_irods(request):
     out = jsonpickle.encode(return_structure)
     return HttpResponse(out, content_type='json')
 
+
 def view_oauth_tokens(request):
     return render(request, 'copo/copo_tokens.html', {})
-
 
 
 def annotate_data(request):

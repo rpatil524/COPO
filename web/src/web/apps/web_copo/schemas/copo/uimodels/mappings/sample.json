@@ -3,7 +3,7 @@
     {
       "type": "string",
       "required": "true",
-      "ref": "Sample Name",
+      "ref": "Name",
       "hidden": "false",
       "deprecated": false,
       "default_value": "",
@@ -62,7 +62,7 @@
         "characteristics"
       ],
       "help_tip": "Characteristics of the sample e.g., height, sex",
-      "label": "Sample Characteristics",
+      "label": "Characteristics",
       "specifications": [
         "isasample",
         "biosample"
@@ -84,7 +84,7 @@
         "comments"
       ],
       "help_tip": "",
-      "label": "Sample Comments",
+      "label": "Comments",
       "specifications": [
         "biosample"
       ]
@@ -105,7 +105,7 @@
         "factorValues"
       ],
       "help_tip": "Factors express treatments on the sample, e.g., compound, dose, duration",
-      "label": "Sample Factors",
+      "label": "Factors",
       "specifications": [
         "isasample"
       ]
@@ -133,7 +133,7 @@
         "derivesFrom"
       ],
       "help_tip": "Source(s) from which this sample is derived",
-      "label": "Sample Source",
+      "label": "Source",
       "specifications": [
         "isasample"
       ]

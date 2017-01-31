@@ -229,7 +229,7 @@ def generate_copo_table_data(profile_id=str(), component=str()):
     buttons_dict = dict(publication=common_btn_dict,
                         person=common_btn_dict,
                         sample=dict(row_btns=[sample_info, button_templates['edit_row'],
-                                               button_templates['delete_row']],
+                                              button_templates['delete_row']],
                                     global_btns=[button_templates['add_new_samples_global'],
                                                  button_templates['delete_global']]),
                         source=common_btn_dict,
@@ -291,6 +291,7 @@ def generate_copo_profiles_data(profiles=list()):
 
     return data_set
 
+
 @register.filter("generate_attributes")
 def generate_attributes(component, target_id):
     da_object = DAComponent(component=component)
@@ -329,25 +330,12 @@ def generate_attributes(component, target_id):
             if f["id"] == "name":
                 continue
 
-                # handle datetime
-                # if f.get("control", str()) == "datetime":
-                #     f["control"] = "text"
-
-                # data = None
-                # data = record[f["id"]]
-                # if data:
-                #     data = data.strftime('%d %b, %Y, %H:%M:%S')
-
-
-                # if sample_attributes["record"][f["id"]]:
-                #     sample_attributes["record"][f["id"]] = sample_attributes["record"][f["id"]].strftime(
-                #         '%d %b, %Y, %H:%M:%S')
-
             table_schema.append(f)
 
     sample_attributes["schema"] = table_schema
 
     return sample_attributes
+
 
 def resolve_control_output(data_dict, elem):
     resolved_value = str()
@@ -368,20 +356,9 @@ def resolve_control_output(data_dict, elem):
 
 
 def get_resolver(data, elem):
-    func_map = dict(
-        resolve_copo_sample_source_data=resolve_copo_sample_source_data,
-        resolve_copo_characteristics_data=resolve_copo_characteristics_data,
-        resolve_copo_comment_data=resolve_copo_comment_data,
-        resolve_copo_multi_select_data=resolve_copo_multi_select_data,
-        resolve_copo_multi_search_data=resolve_copo_multi_search_data,
-        resolve_select_data=resolve_select_data,
-        resolve_ontology_term_data=resolve_ontology_term_data,
-        resolve_copo_select_data=resolve_copo_select_data,
-        resolve_datetime_data=resolve_datetime_data,
-        resolve_description_data=resolve_description_data
-    )
     resolver_list = [
         dict(control="copo-sample-source", resolver="resolve_copo_sample_source_data"),
+        dict(control="copo-sample-source-2", resolver="resolve_copo_sample_source_data"),
         dict(control="copo-characteristics", resolver="resolve_copo_characteristics_data"),
         dict(control="copo-comment", resolver="resolve_copo_comment_data"),
         dict(control="copo-multi-select", resolver="resolve_copo_multi_select_data"),
@@ -395,7 +372,7 @@ def get_resolver(data, elem):
 
     resolver = [x for x in resolver_list if x['control'] == elem["control"].lower()]
     if resolver:
-        resolver = func_map[resolver[0]["resolver"]](data, elem)
+        resolver = globals()[resolver[0]["resolver"]](data, elem)
     else:
         resolver = resolve_default_data(data)
 
@@ -462,7 +439,7 @@ def resolve_copo_characteristics_data(data, elem):
         if f.get("show_in_table", True):
             a = dict()
             if f["id"].split(".")[-1] in data:
-                a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
+                a[f["id"].split(".")[-1]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
                 resolved_data.append(a)
 
     return resolved_data

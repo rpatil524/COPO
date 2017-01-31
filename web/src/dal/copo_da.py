@@ -149,7 +149,7 @@ class DAComponent:
         # if True, then the database action (to save/update) is never performed, but validated 'fields' is returned
         validate_only = kwargs.pop("validate_only", False)
 
-        # prefer this testto save guard against all sorts of value the 'validate_only' can assume
+        # use the equality (==) test to save-guard against all sorts of value the 'validate_only' can assume
         if validate_only == True:
             return fields
         else:

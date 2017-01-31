@@ -192,6 +192,11 @@ class BrokerVisuals:
         self.context["option_values"] = d_utils.generate_sources_json()
         return self.context
 
+    def get_single_source_json(self):
+        target_id = self.param_dict.get("target_id", str())
+        self.context["option_values"] = d_utils.generate_sources_json(target_id)
+        return self.context
+
     def get_sources_json_last_record_id(self):
         record_object = self.param_dict.get("record_object", dict())
 

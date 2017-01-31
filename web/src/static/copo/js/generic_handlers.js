@@ -390,6 +390,8 @@ function do_render_table(data) {
 
 
 function refresh_tool_tips() {
+    var objectStore = Object(); //holds returned object after initialization
+
     $("[data-toggle='tooltip']").tooltip();
     $("[data-toggle='popover']").popover();
 
@@ -397,10 +399,14 @@ function refresh_tool_tips() {
     apply_color();
     refresh_selectbox();
     refresh_multiselectbox();
-    refresh_multisearch();
+
+    var copoMultiSearch = refresh_multisearch();
+    objectStore["copoMultiSearch"] = copoMultiSearch;
+
     refresh_range_slider();
     auto_complete();
 
+    return objectStore;
 
 } //end of func
 
@@ -509,6 +515,8 @@ function refresh_multiselectbox() {
 
 
 function refresh_multisearch() {
+    var theControl = null;
+
     $('.copo-multi-search').each(function () {
         var elem = $(this);
 
@@ -564,9 +572,13 @@ function refresh_multisearch() {
 
             var control = $funSelect[0].selectize;
             control.setValue(valueElem.val().split(",")); //set default value
+
+            theControl = control;
         }
 
     });
+
+    return theControl;
 }
 
 //set up tool tips; a medium for transmitting info about form elements
@@ -1048,7 +1060,7 @@ function do_profile_navigate(parentObject) {
         var aElem = $('<a/>',
             {
                 "data-component": components[i].component,
-                class: "btn btn-custom4",
+                class: "btn btn-primary",
                 title: components[i].title,
                 "data-toggle": "tooltip",
                 href: $("#" + components[i].component + "_url").val()
@@ -1056,7 +1068,7 @@ function do_profile_navigate(parentObject) {
 
         var iElem = $('<i/>',
             {
-                class: "copo-components-icons " + components[i].iconClass + " " + components[i].colorClass + "_icon",
+                class: "copo-components-icons " + components[i].iconClass + " " ,
             });
 
         aElem.append(iElem);

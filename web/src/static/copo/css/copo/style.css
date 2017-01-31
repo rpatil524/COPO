@@ -917,7 +917,7 @@ th {
 
 .btn.btn-custom4:active, .btn.btn-custom4.active {
     background-image: none;
-    box-shadow: 0 3px 5px rgba(83, 140, 198, 0.5) inset;
+    /*box-shadow: 0 3px 5px rgba(83, 140, 198, 0.5) inset;*/
     outline: 0 none;
 }
 
@@ -1028,9 +1028,7 @@ th {
 /*datatable focus*/
 
 table.dataTable td.focus {
-    outline: 1px solid #cccddd !important;
-    outline-offset: -3px;
-    background-color: #f8e6e6 !important;
+    outline: 4px solid rgba(179, 0, 0, 0.6) !important;
 }
 
 /*end datatable focus*/

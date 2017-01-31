@@ -684,7 +684,7 @@ var dispatchFormControl = {
                     {
                         class: "form-control",
                         rows: 2,
-                        cols: 35,
+                        cols: 30,
                         placeholder: commentSchema[i].label.toLowerCase(),
                         id: formElem.id + '.' + fv,
                         name: formElem.id + '.' + fv
@@ -1002,7 +1002,7 @@ var dispatchFormControl = {
                 style: "margin-top: 15px; color: rgba(38, 77, 115, 0.99);"
             });
 
-        var selectedText = "Selected option for '"+formElem.label+"': ";
+        var selectedText = "Selected option: ";
 
 
         for (var i = 0; i < formElem.option_values.length; ++i) {
@@ -1011,17 +1011,17 @@ var dispatchFormControl = {
             var lactive = "";
             if (i == 0) {
                 lactive = " active";
-                selectedDiv.html(selectedText+option.label);
+                selectedDiv.html(selectedText + option.label);
             }
 
 
             var lbl = $('<a/>',
                 {
-                    class: "btn btn-lg btn-custom4 " + lactive,
+                    class: "btn btn-primary " + lactive,
                     "data-lbl": option.label,
                     "data-desc": option.description,
                     "data-value": option.value,
-                    style: "color: rgba(38, 77, 115, 0.99);",
+                    style: "color: #ffffff;",
                     mouseenter: function (evt) {
                         $(this).popover({
                             title: $(this).attr("data-lbl"),
@@ -1039,7 +1039,7 @@ var dispatchFormControl = {
                     },
                     click: function (evt) {
                         hiddenCtrl.val($(this).attr("data-value"));
-                        selectedDiv.html(selectedText+$(this).attr("data-lbl"));
+                        selectedDiv.html(selectedText + $(this).attr("data-lbl"));
                     }
                 });
 
@@ -1226,7 +1226,7 @@ var dispatchFormControl = {
                 name: formElem.id,
                 value: 1,
                 keypress: function (evt) {
-                    var charCode = (evt.which) ? evt.which : event.keyCode
+                    var charCode = (evt.which) ? evt.which : evt.keyCode
 
                     if (charCode > 31 && (charCode < 48 || charCode > 57)) {
                         $(this).closest(ctrlsDiv).find(".help-block").html('<span style="color: #a94442;">Please enter a number!</span>');

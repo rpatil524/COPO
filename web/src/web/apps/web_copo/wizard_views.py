@@ -43,11 +43,16 @@ def sample_wiz(request):
     request_action = request.POST.get("request_action", str())
 
     generated_samples = ast.literal_eval(request.POST.get("generated_samples", "[]"))
+    target_rows = ast.literal_eval(request.POST.get("target_rows", "[]"))
 
     context = samp.BrokerRequests(context=context,
                                   generated_samples=generated_samples,
+                                  target_rows=target_rows,
                                   target_id=request.POST.get("target_id", str()),
                                   sample_type=request.POST.get("sample_type", str()),
+                                  auto_fields=request.POST.get("auto_fields", dict()),
+                                  number_to_generate=request.POST.get("number_to_generate", str()),
+                                  column_reference=request.POST.get("column_reference", str()),
                                   ).post_context(request_action)
 
     out = jsonpickle.encode(context)

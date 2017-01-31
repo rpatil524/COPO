@@ -39,12 +39,12 @@
             {
               "value": "yes",
               "label": "Yes",
-              "description": "Select this option if you intend to clone an existing sample."
+              "description": "Select this option if you intend to clone an existing sample"
             },
             {
               "value": "no",
               "label": "No",
-              "description": "Select this option to bypass sample cloning."
+              "description": "Select if you do not wish to clone a sample"
             }
           ]
         }

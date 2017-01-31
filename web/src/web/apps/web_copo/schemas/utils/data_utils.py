@@ -193,10 +193,16 @@ def get_isasamples_json():
     return elem_json
 
 
-def generate_sources_json():
+def generate_sources_json(source_id=None):
     from dal.copo_da import Source
     profile_id = ThreadLocal.get_current_request().session['profile_id']
-    sources = Source(profile_id).get_all_records()
+
+    if source_id:
+        sources = list()
+        sources.append(Source().get_record(source_id))
+    else:
+        sources = Source(profile_id).get_all_records()
+
     schema = Source().get_schema().get("schema_dict")
 
     value_field = str("id")

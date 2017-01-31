@@ -3,6 +3,7 @@ var sampleComponentRecords;
 var wizardStages;
 var wizardStagesMain;
 var stagesFormValues = {};
+var formEditableElements = {};
 var validateSetter = {};
 var negotiatedStages = []; //holds info about stages resolved to be rendered
 var sampleHowtos = null;
@@ -13,6 +14,8 @@ var stepIntercept = false; //flag indicates if activation of the last stage of t
 var descriptionWizSummary = {}; //wizard summary stage content
 var tempWizStore = null; // for holding wizard-related data pending wizard load event
 var initialSampleAttributes = {}; //holds initial attributes shared by all samples before editing
+var dataTableDataSource = []; // the data-source used for sample table generation
+var dataTableTriggerSave = false; //flag for determining the state of datatables keys state
 
 $(document).ready(function () {
         //****************************** Event Handlers Block *************************//
@@ -22,7 +25,6 @@ $(document).ready(function () {
         var copoVisualsURL = "/copo/copo_visualize/";
 
         //test
-
         //end test
 
         //on the fly info element
@@ -47,6 +49,7 @@ $(document).ready(function () {
                 resolve_element_view(recordId, associatedComponent);
             }
         });
+
 
         //handle inspect, describe - tabs
         $('#copo-datafile-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
@@ -79,7 +82,6 @@ $(document).ready(function () {
 
             $("#helptipsDiv").css("display", "block");
             set_samples_how_tos(componentSelected);
-
         });
 
 
@@ -87,35 +89,6 @@ $(document).ready(function () {
         $(document).on("click", ".popover .copo-close", function () {
             $(this).parents(".popover").popover('destroy');
         });
-
-        //handle sample attributes view
-        $(document).on("click", ".sample-view-button", function () {
-            get_row_attributes($(this));
-        });
-
-
-        //handle keyboard strokes to advance through wizard
-        //check if the control has focus
-        $('#dataFileWizard').on('keypress', function (event, data) {
-
-            if (event.keyCode == 13) {
-                event.preventDefault();
-                //here do the stage advance call
-            }
-            else if (event.keyCode == 39) {
-                var d = {'step': $('#dataFileWizard').data('fu.wizard').currentStep, 'direction': 'next'};
-                //d.step = $('#dataFileWizard').data('fu.wizard').currentStep
-                //d.direction = 'next'
-                $('#dataFileWizard').trigger('actionclicked.fu.wizard', d)
-            }
-            else if (event.keyCode == 37) {
-                var d = {'step': $('#dataFileWizard').data('fu.wizard').currentStep, 'direction': 'previous'};
-                //d.step = $('#dataFileWizard').data('fu.wizard').currentStep
-                //d.direction = 'next'
-                $('#dataFileWizard').trigger('actionclicked.fu.wizard', d)
-            }
-        });
-
 
         // get table data to display via the DataTables API
         var loaderObject = $('<div>',
@@ -151,7 +124,7 @@ $(document).ready(function () {
         $(document).on("click", ".review-to-stage", function (event) {
             event.preventDefault();
 
-            $('#dataFileWizard').wizard('selectedItem', {
+            $('#sampleWizard').wizard('selectedItem', {
                 step: $(this).attr("data-stage-indx")
             });
         });
@@ -211,21 +184,21 @@ $(document).ready(function () {
 
 
         //handle event for clicking an previously visited step, intercept here to save entries
-        $('#dataFileWizard').on('stepclicked.fu.wizard', function (evt, data) {
+        $('#sampleWizard').on('stepclicked.fu.wizard', function (evt, data) {
             evt.preventDefault();
 
             // get the proposed or intended state for which action is intercepted
             before_step_back(data.step);
         });
 
-        $('#dataFileWizard').on('changed.fu.wizard', function (evt, data) {
+        $('#sampleWizard').on('changed.fu.wizard', function (evt, data) {
             //set up / refresh form validator
             set_up_validator();
         });
 
 
         //handle events for step change
-        $('#dataFileWizard').on('actionclicked.fu.wizard', function (evt, data) {
+        $('#sampleWizard').on('actionclicked.fu.wizard', function (evt, data) {
             $(self).data('step', data.step);
 
             stage_navigate(evt, data);
@@ -280,7 +253,7 @@ $(document).ready(function () {
 
 
                 var lastElementIndx = $('.steps li').last().index() + 1;
-                var activeElementIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+                var activeElementIndx = $('#sampleWizard').wizard('selectedItem').step; //active stage index
 
                 stepIntercept = false;
 
@@ -308,18 +281,22 @@ $(document).ready(function () {
 
                 if (reviewElem.hasClass('active')) {
                     evt.preventDefault();
-                    //send samples to be saved
+                    //finalise
 
                     var dialogHandle = processing_request_dialog('<span class="loading">Generating Samples. Please wait...</span>');
+
+                    var generated_samples = [];
+                    for (var i = 0; i < dataTableDataSource.length; ++i) {
+                        generated_samples.push(dataTableDataSource[i].attributes._id);
+                    }
 
                     $.ajax({
                         url: wizardURL,
                         type: "POST",
                         headers: {'X-CSRFToken': csrftoken},
                         data: {
-                            'request_action': 'save_samples',
-                            'generated_samples': JSON.stringify(generatedSamples),
-                            'sample_type': get_stage_inputs_by_ref("sample_type")["sample_type"]
+                            'request_action': 'finalise_description',
+                            'generated_samples': JSON.stringify(generated_samples)
                         },
                         success: function (data) {
                             //clear_wizard(); no point...if we are reloading the page
@@ -366,7 +343,7 @@ $(document).ready(function () {
 
         //trigger save action before navigating back a stage
         function before_step_back(proposedState) {
-            $('#dataFileWizard').wizard('selectedItem', {
+            $('#sampleWizard').wizard('selectedItem', {
                 step: proposedState
             });
 
@@ -378,7 +355,7 @@ $(document).ready(function () {
         function do_post_stage_retrieval2(data) {
             if (!data.stage_ref) {//this should indicate call to display first stage of the wizard
                 if (currentIndx > 0) {
-                    if (($('#dataFileWizard').is(":visible"))) {
+                    if (($('#sampleWizard').is(":visible"))) {
                         reset_wizard();
                     }
                 } else {
@@ -389,10 +366,10 @@ $(document).ready(function () {
             }
 
             // wizard 'staging' process
-            if (!($('#dataFileWizard').is(":visible"))) {
+            if (!($('#sampleWizard').is(":visible"))) {
 
 
-                $('#dataFileWizard').show();
+                $('#sampleWizard').show();
 
                 $('.steps li:last-child').hide(); //hide the last (static) stage of the wizard
 
@@ -425,7 +402,7 @@ $(document).ready(function () {
         function do_post_stage_retrieval(data) {
             //update items with data
 
-            if (($('#dataFileWizard').is(":visible"))) {
+            if (($('#sampleWizard').is(":visible"))) {
                 do_post_stage_retrieval2(data);
             } else {
                 //store data pending tab shown
@@ -445,7 +422,7 @@ $(document).ready(function () {
 
             if (stage.hasOwnProperty("ref")) {
 
-                $('#dataFileWizard').wizard('addSteps', currentIndx, [
+                $('#sampleWizard').wizard('addSteps', currentIndx, [
                     {
                         badge: ' ',
                         label: '<span class=wiz-title>' + stage.title + '</span>',
@@ -454,7 +431,7 @@ $(document).ready(function () {
                 ]);
 
                 //give focus to the added step
-                $('#dataFileWizard').wizard('selectedItem', {
+                $('#sampleWizard').wizard('selectedItem', {
                     step: currentIndx
                 });
 
@@ -463,8 +440,8 @@ $(document).ready(function () {
 
             } else {
                 if (stepIntercept) {
-                    $('#dataFileWizard').wizard('selectedItem', {
-                        step: $('#dataFileWizard').wizard('selectedItem').step + 1
+                    $('#sampleWizard').wizard('selectedItem', {
+                        step: $('#sampleWizard').wizard('selectedItem').step + 1
                     });
                 }
             }
@@ -678,73 +655,7 @@ $(document).ready(function () {
         }
 
         function get_pane_content(stage_content, currentIndx, stage_message) {
-            var stageHTML = $('<div/>', {
-                id: "stage-controls-div-" + currentIndx
-            });
-
-            //'apply to all', alert trigger controls, and description context message
-
-            var panelGroup = $('<div/>', {
-                class: "panel-group wizard-message-panel",
-                id: "alert_placeholder_" + currentIndx
-            });
-
-            //stageHTML.append(panelGroup);
-
-            var panelPrimary = $('<div/>', {
-                class: "panel panel-primary",
-                style: "border: 2px solid #3278b4;"
-            });
-
-            var panelHeading = $('<div/>', {
-                class: "panel-heading",
-                style: "background-image: none; padding: 5px 15px;"
-            });
-
-            var headerRow = $('<div/>', {
-                class: "row"
-            });
-
-            var spanMessage = $('<span/>', {
-                html: "<strong>Apply this description to all items in the description bundle?</strong>"
-            });
-
-            var spanInput = $('<span/>', {
-                style: "font-weight: bold; margin-left: 5px;",
-                html: '<input type="checkbox" name="apply-scope-chk-' + currentIndx + '" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">'
-            });
-
-            var leftColumn = $('<div/>', {
-                class: "col-sm-11 col-md-11 col-lg-11"
-            });
-
-            leftColumn.append(spanMessage).append(spanInput);
-
-            var rightColumn = $('<div/>', {
-                class: "col-sm-1 col-md-1 col-lg-1",
-                html: '<a data-toggle="collapse" href="#collapseAlert" title="Toggle display" class="fa fa-bell pull-right control-message-trigger" style="text-decoration: none; color: white; font-weight: 800;"></a>'
-            });
-
-            headerRow.append(leftColumn).append(rightColumn);
-            panelHeading.append(headerRow);
-
-            var panelCollapse = $('<div/>', {
-                class: "panel-collapse collapse message-pane-collapse",
-                id: "collapseAlert"
-            });
-
-            var panelBody = $('<div/>', {
-                class: "panel-body wizard-control-message",
-            });
-
-            var panelFooter = $('<div/>', {
-                class: "panel-footer"
-            });
-
-            panelCollapse.append(panelBody).append(panelFooter);
-            panelPrimary.append(panelHeading).append(panelCollapse);
-            panelGroup.append(panelPrimary);
-
+            var stageHTML = $('<div/>');
 
             //form controls
             var formPanel = $('<div/>', {
@@ -779,19 +690,7 @@ $(document).ready(function () {
                     id: "wizard_form_" + currentIndx
                 });
 
-            var buttonRowDiv = $('<div/>', {
-                class: "row"
-            });
-
-            var buttonColDiv = $('<div/>', {
-                class: "col-sm-12 col-md-12 col-lg-12"
-            });
-
-
-            buttonRowDiv.append(buttonColDiv)
-
-            formCtrl.append(stage_content).append(buttonRowDiv);
-
+            formCtrl.append(stage_content);
 
             formDiv.append(formCtrl);
 
@@ -799,10 +698,10 @@ $(document).ready(function () {
         }
 
         function initiate_wizard() {
-            $('#dataFileWizard').wizard();
+            $('#sampleWizard').wizard();
 
             //add review step, then other steps
-            $('#dataFileWizard').wizard('addSteps', -1, [
+            $('#sampleWizard').wizard('addSteps', -1, [
                 descriptionWizSummary
             ]);
         }
@@ -812,8 +711,8 @@ $(document).ready(function () {
             //todo: need to decide what to save here before quitting the wizard
 
             //decommission wizard
-            $('#dataFileWizard').wizard('removeSteps', 1, currentIndx + 1);
-            $('#dataFileWizard').hide();
+            $('#sampleWizard').wizard('removeSteps', 1, currentIndx + 1);
+            $('#sampleWizard').hide();
 
             //clear wizard buttons
             $('#wizard_steps_buttons').html('');
@@ -872,13 +771,13 @@ $(document).ready(function () {
         }
 
         function reset_wizard() {//resets wizard without all the hassle of clear_wizard()
-            $('#dataFileWizard').wizard('removeSteps', 1, currentIndx + 1);
+            $('#sampleWizard').wizard('removeSteps', 1, currentIndx + 1);
 
             //clear wizard buttons
             $('#wizard_steps_buttons').html('');
 
             //add review step, then other steps
-            $('#dataFileWizard').wizard('addSteps', -1, [
+            $('#sampleWizard').wizard('addSteps', -1, [
                 descriptionWizSummary
             ]);
 
@@ -887,7 +786,7 @@ $(document).ready(function () {
 
         function collate_stage_data() {
             //get active stage
-            var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+            var activeStageIndx = $('#sampleWizard').wizard('selectedItem').step; //active stage index
 
             if (activeStageIndx == -1) {
                 return false;
@@ -1152,7 +1051,7 @@ $(document).ready(function () {
                         class: "btn btn-default copo-wiz-button",
                         title: $(li).find('.wiz-title').html(),
                         click: function () {
-                            $('#dataFileWizard').wizard('selectedItem', {
+                            $('#sampleWizard').wizard('selectedItem', {
                                 step: idx + 1
                             });
                             var elems = $('.copo-wiz-button');
@@ -1322,106 +1221,34 @@ $(document).ready(function () {
                 label: '<span class=wiz-title>Review</span>',
                 pane: '<div class="alert alert-default">' +
                 '<div style="line-height: 150%;" class="' + wizardMessages.review_message.text_class + '">' +
-                wizardMessages.review_message.text + '</div>' +
+                wizardMessages.review_message.text + '</div><div id="summary_stage_loader"></div>' +
                 '<div style="margin-top: 10px; max-width: 100%; overflow-x: auto;">' +
                 '<table id="generated_samples_table" class="table table-striped table-bordered order-column hover copo-datatable copo-table-header" width="100%"></table>' +
                 '</div></div>'
             };
         }
 
-        function set_generated_samples() {
-            //check if sample name has been entered before proceeding with sample display
+        function do_generated_samples_display(data) {
+            //builds generated sample display
 
-            var namePrefix = get_stage_inputs_by_ref("sample_name");
+            generatedSamples = data.generated_samples.generated_samples;
+            formEditableElements = data.generated_samples.form_elements;
 
-
-            if ($.isEmptyObject(namePrefix)) {
-                return false;
-            } else {
-                namePrefix = namePrefix["name"];
-            }
-
-            var requestedNumberOfSamples = get_stage_inputs_by_ref("number_of_samples");
-
-            if ($.isEmptyObject(requestedNumberOfSamples)) {
-                requestedNumberOfSamples = 0;
-            } else {
-                requestedNumberOfSamples = requestedNumberOfSamples["number_of_samples"];
-            }
-
-            requestedNumberOfSamples = parseInt(requestedNumberOfSamples);
+            //generate table columns
+            var sampleTableColumns = generate_sample_table_columns();
 
             //set up data source
-            var dtd = [];
+            dataTableDataSource = generate_sample_table_data_source();
 
-            if (generatedSamples.length == 0) {
-                //no sample generated. auto generate samples based on description metadata
-
-                var newNames = generate_sample_names(1, requestedNumberOfSamples, namePrefix);
-
-
-                for (var i = 0; i < newNames.length; ++i) {
-                    var option = {};
-                    option["name"] = newNames[i];
-                    option["attributes"] = initialSampleAttributes;
-                    generatedSamples.push(option);
-                }
-
-                $.each(generatedSamples, function (key, val) {
-                    var option = {};
-                    option["rank"] = key + 1;
-                    option["name"] = val.name;
-                    option["attributes"] = val.attributes;
-                    set_dynamic_attributes(option);
-                    dtd.push(option);
-                });
-            } else if (requestedNumberOfSamples > generatedSamples.length) {
-                var newNames = generate_sample_names((generatedSamples.length + 1), (requestedNumberOfSamples - generatedSamples.length ), namePrefix);
-
-                for (var i = 0; i < newNames.length; ++i) {
-                    var option = {};
-                    option["name"] = newNames[i];
-                    option["attributes"] = initialSampleAttributes;
-                    generatedSamples.push(option);
-                }
-
-                $.each(generatedSamples, function (key, val) {
-                    var option = {};
-                    option["rank"] = key + 1;
-                    option["name"] = val.name;
-                    option["attributes"] = val.attributes;
-                    set_dynamic_attributes(option);
-                    dtd.push(option);
-                });
-            } else if (requestedNumberOfSamples < generatedSamples.length) {
-                var tempGenerated = [];
-                for (var i = 0; i < requestedNumberOfSamples; ++i) {
-                    tempGenerated.push(generatedSamples[i]);
-
-                }
-
-                generatedSamples = tempGenerated;
-
-                $.each(generatedSamples, function (key, val) {
-                    var option = {};
-                    option["rank"] = key + 1;
-                    option["name"] = val.name;
-                    option["attributes"] = val.attributes;
-                    set_dynamic_attributes(option);
-                    dtd.push(option);
-                });
-            } else if (requestedNumberOfSamples == generatedSamples.length) {
-                return false;
-            }
-
-
-            //set data
+            //remove loader
+            $("#summary_stage_loader").html('');
 
             var table = null;
             if ($.fn.dataTable.isDataTable('#generated_samples_table')) {
                 //if table instance already exists, then do refresh
                 table = $('#generated_samples_table').DataTable();
             }
+
 
             if (table) {
                 //clear old, set new data
@@ -1430,7 +1257,7 @@ $(document).ready(function () {
                     .draw();
                 table
                     .rows
-                    .add(dtd);
+                    .add(dataTableDataSource);
                 table
                     .columns
                     .adjust()
@@ -1438,273 +1265,419 @@ $(document).ready(function () {
                 table
                     .search('')
                     .columns()
-                    .search('')
                     .draw();
             } else {
-                //first set static columns...
-                var setColumns = [
-                    {
-                        "data": "rank",
-                        "visible": false
-                    },
-                    {
-                        "data": "name",
-                        "title": "Sample Name"
-                    },
-                    {
-                        "data": "attributes",
-                        "visible": false
-                    }
-                ]
-
-                //set the dynamic columns, which are based on user's input
-                setColumns = setColumns.concat(set_dynamic_columns());
-
-
                 table = $('#generated_samples_table').DataTable({
-                    data: dtd,
-                    "dom": '<"top"if>rt<"bottom"lp><"clear">',
+                    data: dataTableDataSource,
+                    "dom": '<"top"if>rt<"bottom"p><"clear">',
                     select: {
                         style: 'multi'
                     },
                     language: {
                         "info": " _START_ to _END_ of _TOTAL_ samples",
-                        "lengthMenu": "Show _MENU_ samples",
                     },
                     order: [[0, "asc"]],
-                    columns: setColumns,
+                    columns: sampleTableColumns,
                     "columnDefs": [
                         {"orderData": 0,}
                     ],
                     keys: {
                         //columns: ':not(:first-child)',
+                        focus: ':eq(2)', // cell that will receive focus when the table is initialised, set to the first editable cell defined
                         keys: [9, 13, 37, 39, 38, 40],
                         blurable: false
                     },
+                    scrollX: true,
+                    scroller: true,
+                    scrollY: 300,
                 });
 
                 table
-                // .on('key-focus', function (e, datatable, cell) {
-                //     alert(cell.data());
-                // })
                     .on('key', function (e, datatable, key, cell, originalEvent) {
                         if (key == 13) {//trap enter key for editing a cell
-
-                            //bypass static cells edit; these are the first 3 cells in a row
-                            if (cell.index().column < 3) {
-                                return false;
-                            }
-
-                            var rowData = datatable.row(cell.index().row).data();
-                            // console.log(rowData);
-                            // console.log(cell.data());
                             var node = cell.node();
 
-                            if ($(node).find(".cell-dynamic-element").length) {
+                            //bypass non-editable cells or ones that are currently being edited
+                            if (!$(node).hasClass('copo-editable-cell')) {
                                 return false;
                             }
 
                             table.keys.disable();
+                            dataTableTriggerSave = false;
+                            $(node).addClass('cell-currently-engaged'); //cell locked for edit, unlock with the TAB key
 
-                            var formElem = cell.data();
+                            //get spec for the cell form element
+                            var formElem = formEditableElements[cell.data()];
                             var control = formElem.control;
-                            if (formElem.hidden == "true") {
-                                control = "hidden";
-                            }
-                            var elemValue = null;
+
+                            //get element value
+                            var elemValue = table.row(cell.index().row).data().attributes[cell.data()];
 
                             var htmlCtrl = dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue);
                             htmlCtrl.find("label").remove();
 
-                            var cellEditPanel = $(".cell-edit-panel").clone().css("display", "block").find(".panel");
-                            cellEditPanel.find(".panel-body").append(htmlCtrl);
+                            //create cell edit panel
+                            var cellEditPanel = get_cell_edit_panel();
+
+                            //set cell edit data
+                            cellEditPanel.find(".panel-body").append(htmlCtrl); //attach form control
+                            cellEditPanel.find(".panel-footer").append(set_dynamic_cell_data()); //attach action buttons
 
                             $(node)
                                 .html('')
                                 .append(cellEditPanel)
                                 .find(".input-copo").focus();
 
-                            cellEditPanel.find(".cell-apply").keypress(function (evt) {
-                                if (evt.which == 13) {
-                                    //add call to save here...
-                                    table.keys.enable();
-                                }
-                            });
+
+                            //build cell edit function parameter object
+                            var cellParams = Object();
+                            cellParams["datatable"] = datatable;
+                            cellParams["cell"] = cell;
+                            cellParams["action"] = "current";
 
                             cellEditPanel.find(".cell-apply").click(function () {
-                                //add call to save here...
-                                table.keys.enable();
+                                cellParams["action"] = $(this).attr("data-action");
+                                cellParams["selectedRows"] = table.rows('.selected').indexes();
+                                cellParams["allRows"] = table.rows().indexes();
+                                cellEditPanel.find(".cell-apply").popover('destroy');
+
+                                var form_values = Object();
+                                cellEditPanel.find(":input").each(function () {
+                                    form_values[this.id] = $(this).val();
+                                });
+                                cellParams["form_values"] = form_values;
+
+                                set_cell_dynamic(cellParams);
                             });
 
-                            refresh_tool_tips();
-                        }
-                    })
-                    .on('key-blur', function (e, datatable, cell) {
-                        //get row data
-                        var rowData = datatable.row(cell.index().row).data();
-                        var node = cell.node();
-                        if ($(node).find(".cell-dynamic-element").length) {
-                            $(node).html('fixing your value soon!');
+                            var returnedObject = refresh_tool_tips();
+                            if (returnedObject.hasOwnProperty("copoMultiSearch")) {
+                                if (returnedObject.copoMultiSearch) {
+                                    returnedObject.copoMultiSearch.focus();
+                                }
+
+                            }
                         }
                     });
+
+                //also, use ENTER key to signal end of cell update...
+                $(document).on("keyup", function (e) {
+                    var code = (e.keyCode ? e.keyCode : e.which);
+                    if (code == 13 && table && !dataTableTriggerSave) {
+                        dataTableTriggerSave = true; //first time is to build control, only react at the second time
+                        return false;
+                    } else if (code == 13 && table && dataTableTriggerSave) {
+                        var cells = table.cells('.cell-currently-engaged');
+
+                        if (cells) {
+                            var cell = cells[0];
+                            var targetCell = table.cell(cell[0].row, cell[0].column);
+                            var node = targetCell.node();
+                            $(node).find(".cell-apply").popover('destroy');
+
+                            var cellParams = Object();
+                            cellParams["datatable"] = table;
+                            cellParams["cell"] = targetCell;
+                            cellParams["action"] = "current";
+
+                            var form_values = Object();
+                            $(node).find(":input").each(function () {
+                                form_values[this.id] = $(this).val();
+                            });
+                            cellParams["form_values"] = form_values;
+
+                            set_cell_dynamic(cellParams);
+                        }
+
+                    }
+                });
             }
+        }
+
+        function set_generated_samples() {
+            var tLoader = loaderObject.clone();
+            $("#summary_stage_loader").append(tLoader);
+
+            //save generate requested number of samples
+            var generatedSamples = [];
+
+            var namePrefix = get_stage_inputs_by_ref("sample_name");
+            if ($.isEmptyObject(namePrefix)) {
+                namePrefix = "no_name";
+            } else {
+                namePrefix = namePrefix["name"];
+            }
+
+            var option = {};
+            option["name"] = namePrefix;
+            option["attributes"] = initialSampleAttributes;
+            generatedSamples.push(option);
+
+            var requestedNumberOfSamples = get_stage_inputs_by_ref("number_of_samples");
+
+            if ($.isEmptyObject(requestedNumberOfSamples)) {
+                requestedNumberOfSamples = 1;
+            } else {
+                requestedNumberOfSamples = parseInt(requestedNumberOfSamples["number_of_samples"]);
+            }
+
+            $.ajax({
+                url: wizardURL,
+                type: "POST",
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    'request_action': 'save_temp_samples',
+                    'generated_samples': JSON.stringify(generatedSamples),
+                    'sample_type': get_stage_inputs_by_ref("sample_type")["sample_type"],
+                    'number_to_generate': requestedNumberOfSamples
+                },
+                success: function (data) {
+                    do_generated_samples_display(data);
+                },
+                error: function () {
+                    alert("Couldn't generate requested samples!");
+                }
+            });
 
         }//end of func
 
-        function set_dynamic_columns() {
-            var setColumns = [];
+        function generate_sample_table_columns() {
+            //generates sample table column, beginning with static columns
 
+            var sampleTableColumns = [
+                {title: "Rank", data: 'rank', visible: false, name: "rank"},
+                {title: "Attributes", data: 'attributes', visible: false, name: "attributes"},
+            ];
 
-            //get attributes schema used in building the sample_attributes form
-            var sampleAttributes = Object();
-            for (var i = 0; i < negotiatedStages.length; ++i) {
-                if (negotiatedStages[i].ref == "sample_attributes") {
-                    sampleAttributes = negotiatedStages[i];
-                    break;
-                }
-            }
+            //now, set the dynamic columns
 
-            if (!$.isEmptyObject(sampleAttributes)) {
-                for (var i = 0; i < sampleAttributes.items.length; ++i) {
-                    var currentItem = sampleAttributes.items[i];
-                    if (currentItem.hasOwnProperty("show_in_form") && currentItem["show_in_form"]) {
-                        if (currentItem.hasOwnProperty("hidden") && currentItem.hidden.toString() == "false") {
+            // get a reference sample entry in generated sample to use as basis for generating dynamic columns
+            var referenceRecord = generatedSamples[0]._recordMeta;
 
-                            if (currentItem.type == "array") {
-                                ;
-                            } else {
-                                var col = {
-                                    "data": currentItem.id,
-                                    "title": currentItem.label,
-                                    "render": function (data, type, row, meta) {
-                                        return $('<div></div>').append(get_item_value(data, row.attributes)).html();
-                                    }
-                                }
-                                setColumns.push(col);
-                            }//end item not array
+            for (var i = 0; i < referenceRecord.length; ++i) {
+                var col = referenceRecord[i];
+                var dynamicCol = Object();
+
+                dynamicCol["title"] = col.title;
+                dynamicCol["data"] = col.derived_id;
+                dynamicCol["render"] = function (data, type, row, meta) {
+                    var displaYData = '';
+                    var sampleCols = row.attributes._recordMeta;
+
+                    for (var j = 0; j < sampleCols.length; ++j) {
+                        if (sampleCols[j].derived_id == data) {
+                            displaYData = sampleCols[j].data;
                         }
                     }
+
+                    return displaYData;
                 }
+
+                dynamicCol["className"] = "copo-editable-cell"; // column editable flag
+
+                sampleTableColumns.push(dynamicCol);
             }
 
-            return setColumns;
+            return sampleTableColumns;
         }
 
-        function set_dynamic_attributes(option) {
-            //get attributes schema used in building the sample_attributes form
-            var sampleAttributes = Object();
-            for (var i = 0; i < negotiatedStages.length; ++i) {
-                if (negotiatedStages[i].ref == "sample_attributes") {
-                    sampleAttributes = negotiatedStages[i];
-                    break;
+        function generate_sample_table_data_source() {
+            //generates sample data source
+            var sampleTableDataSource = [];
+
+            for (var i = 0; i < generatedSamples.length; ++i) {
+
+                var sample = generatedSamples[i];
+                var option = Object();
+
+                option["rank"] = i + 1;
+                option["attributes"] = sample;
+
+                //set dynamic
+                var sampleCols = sample._recordMeta;
+
+                for (var j = 0; j < sampleCols.length; ++j) {
+                    option[sampleCols[j].derived_id] = sampleCols[j].derived_id;
                 }
+
+                sampleTableDataSource.push(option);
             }
 
-            if (!$.isEmptyObject(sampleAttributes)) {
-                for (var i = 0; i < sampleAttributes.items.length; ++i) {
-                    var currentItem = sampleAttributes.items[i];
-                    if (currentItem.hasOwnProperty("show_in_form") && currentItem["show_in_form"]) {
-                        if (currentItem.hasOwnProperty("hidden") && currentItem.hidden.toString() == "false") {
-                            if (currentItem.type == "array") {
-                                ;
-                            } else {
-                                option[currentItem.id] = currentItem;
-                            }
-                        }
-                    }
-                }
-            }
+            return sampleTableDataSource;
         }
 
-        function get_row_attributes(elem) {
-            var table = $('#generated_samples_table').DataTable();
-            var tr = elem.closest('tr');
-            var row = table.row(tr);
+        function set_dynamic_cell_data() {
+            var parentObject = $('<div/>');
 
-            if (row.child.isShown()) {
-                // This row is already open - close it
-                row.child('');
-                row.child.hide();
-                tr.removeClass('shown');
+            var components = [
+                {
+                    title: "Apply to current",
+                    action: "current",
+                    description: "Click to apply this update to current cell.",
+                    className: "btn btn-success btn-xs",
+                    style: "margin-right: 2px;"
+                },
+                {
+                    title: "Apply to selected",
+                    action: "selected",
+                    description: "Click to apply this update to selected records. Do remember to highlight the records for which you intend to apply the update.",
+                    className: "btn btn-success btn-xs",
+                    style: "margin-right: 2px;"
+                },
+                {
+                    title: "Apply to all",
+                    action: "all",
+                    description: "Click to apply this update to all records.",
+                    className: "btn btn-success btn-xs",
+                    style: "margin-right: 2px;"
+                },
+                {
+                    title: "Cancel",
+                    action: "cancel",
+                    description: "Click to cancel the update.",
+                    className: "btn btn-warning btn-xs pull-right",
+                    style: ""
+                }
+            ];
 
-                elem.closest('tr').find(".sample-view-button").html('<i class="fa fa-plus-circle"></i> ');
+            for (var i = 0; i < components.length; ++i) {
+                var option = components[i];
+
+                var elem = $('<button/>',
+                    {
+                        class: "cell-apply " + option.className,
+                        style: "border-radius:0; background-image:none; " + option.style,
+                        type: "button",
+                        html: option.title,
+                        "data-title": option.title,
+                        "data-desc": option.description,
+                        "data-action": option.action,
+                        mouseenter: function (evt) {
+                            $(this).popover({
+                                title: $(this).attr("data-title"),
+                                content: $(this).attr("data-desc"),
+                                container: 'body',
+                                trigger: 'hover',
+                                html: true,
+                                placement: 'right',
+                                template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
+                                '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
+                                '</h3><div class="popover-content"><p></p></div></div></div>'
+                            });
+
+                            $(this).popover("show");
+                        }
+                    });
+
+                parentObject.append(elem);
             }
-            else {
-                //build view
-                var attributesPanel = $('<div/>', {
-                    class: "panel panel-copo-data panel-primary",
-                    style: "margin-top: 5px; font-size: 12px;"
-                });
 
-                var attributesPanelHeading = $('<div/>', {
-                    class: "panel-heading",
-                    style: "background-image: none;",
-                    html: "Sample Attributes"
-                });
+            return parentObject;
+        }
 
-                attributesPanel.append(attributesPanelHeading);
+        function get_cell_edit_panel() {
+            var attributesPanel = $('<div/>', {
+                class: "panel panel-default",
+                style: "min-width:450px;"
+            });
+
+            var attributesPanelBody = $('<div/>', {
+                class: "panel-body"
+            });
+
+            var attributesPanelFooter = $('<div/>', {
+                class: "panel-footer",
+                style: "background-color: rgba(245, 245, 245, 0.4);"
+            });
+
+            attributesPanel.append(attributesPanelBody).append(attributesPanelFooter);
+
+            return attributesPanel;
+        }
+
+        function set_cell_dynamic(cellParams) {
+            var datatable = cellParams.datatable;
+            var cell = cellParams.cell;
+            var action = cellParams.action;
+            var form_values = cellParams.form_values;
+
+            var auto_fields = JSON.stringify(form_values);
+
+            //re-enable keys
+            datatable.keys.enable();
+            dataTableTriggerSave = false;
+
+            //deselect previously selected rows
+            datatable.rows('.selected').deselect();
 
 
-                var attributesPanelBody = $('<div/>', {
-                    class: "panel-body"
-                });
+            //remove cell's edit status
+            var node = cell.node();
+            $(node).removeClass('cell-currently-engaged'); //unlock cell
 
-                var notAssignedSpan = $('<span/>', {
-                    class: "text-danger",
-                    html: "Attributes not assigned!"
-                });
+            var rowIndx = cell.index().row;
 
-                attributesPanelBody.append(notAssignedSpan);
+            //perform action
+            if (action == "cancel") {
+                datatable
+                    .row(rowIndx)
+                    .invalidate()
+                    .draw();
+            } else {
+                // get all target rows
+                var targetRows = [];
 
-                //get values
-                var stageValueObject = generatedSamples[parseInt(elem.attr("data-row-indx"))].attributes;
+                targetRows.push({rowID: rowIndx, recordID: dataTableDataSource[rowIndx].attributes._id});
 
-                //get stage
-                var targetStage = Object();
-                for (var i = 0; i < negotiatedStages.length; ++i) {
-                    if (negotiatedStages[i].ref == "sample_attributes") {
-                        targetStage = negotiatedStages[i];
-                        break;
-                    }
+                //get action
+                var actionRows = [];
+                if (action == "selected" && cellParams.hasOwnProperty("selectedRows")) {
+                    actionRows = cellParams.selectedRows;
+                } else if (action == "all" && cellParams.hasOwnProperty("allRows")) {
+                    actionRows = cellParams.allRows;
                 }
 
-                if (!($.isEmptyObject(stageValueObject) || $.isEmptyObject(targetStage))) {
-                    //clear panel for new information
-                    attributesPanelBody.html('');
+                for (var i = 0; i < actionRows.length; ++i) {
+                    rowIndx = actionRows[i];
+                    targetRows.push({rowID: rowIndx, recordID: dataTableDataSource[rowIndx].attributes._id});
+                }
 
-                    for (var i = 0; i < targetStage.items.length; ++i) {
-                        var currentItem = targetStage.items[i];
-                        if (currentItem.hasOwnProperty("show_in_form") && currentItem["show_in_form"]) {
-                            if (currentItem.hasOwnProperty("hidden") && currentItem.hidden.toString() == "false") {
+                $.ajax({
+                    url: wizardURL,
+                    type: "POST",
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: {
+                        'request_action': 'sample_cell_update',
+                        'target_rows': JSON.stringify(targetRows),
+                        'column_reference': cell.data(),
+                        'sample_type': get_stage_inputs_by_ref("sample_type")["sample_type"],
+                        'auto_fields': auto_fields
+                    },
+                    success: function (data) {
+                        var updatedSamples = data.updated_samples.generated_samples;
+                        formEditableElements = data.updated_samples.form_elements; //refresh form elements
 
-                                var itemLabel = $('<div/>', {
-                                    // for: currentItem.id,
-                                    html: currentItem.label,
-                                    style: "font-size:12px; font-weight:bold"
-                                });
+                        //set updated and refresh display
+                        for (var i = 0; i < updatedSamples.length; ++i) {
+                            if (updatedSamples[i].hasOwnProperty("_cell_id")) {
+                                dataTableDataSource[updatedSamples[i]._cell_id].attributes = updatedSamples[i];
 
-                                var itemDiv = $('<div/>', {
-                                    style: "padding: 5px; border: 1px solid #ddd; border-radius:2px; margin-bottom:3px;"
-                                }).append(itemLabel).append(get_item_value(currentItem, stageValueObject));
-
-                                attributesPanelBody.append(itemDiv);
-
+                                datatable
+                                    .row(updatedSamples[i]._cell_id)
+                                    .invalidate()
+                                    .draw();
                             }
                         }
+
+                        //set focus on next row
+                        datatable.cell(cell.index().row + 1, cell.index().column).focus();
+
+                    },
+                    error: function () {
+                        alert("Couldn't update record!");
                     }
-                }
+                });
 
-
-                attributesPanel.append(attributesPanelBody);
-
-                var ctrlDiv = $('<div/>').append(attributesPanel);
-
-
-                //add view
-                row.child(ctrlDiv.html()).show();
-                tr.addClass('shown');
-
-                elem.closest('tr').find(".sample-view-button").html('<i class="fa fa-minus-circle"></i> ');
             }
         }
 
@@ -1746,69 +1719,6 @@ $(document).ready(function () {
             return itemValue;
         }
 
-
-        function get_item_value(item, valuesObject) {
-            //sort out item value
-            var itemValue = $('<div/>',
-                {
-                    class: "ctrlDIV"
-                });
-
-            //get base of ids
-            var relevantList = Object();
-            var totalRelevant = 0;
-
-            $.each(valuesObject, function (key, val) {
-                if (key.split(".").slice(0)[0] == item.id) {
-                    ++totalRelevant;
-                    relevantList[key] = val;
-                }
-            });
-
-            if (item.type == "array") {
-                //group items based on similarity of suffix
-                var groupedList = [];
-
-                //get first element group (without suffix)var groupbyIndx = Object();
-                var groupbyIndx = Object();
-                $.each(relevantList, function (key, val) {
-                    if (isNaN(key.split("_").slice(-1)[0])) {
-                        groupbyIndx[key] = val;
-                    }
-                });
-
-                if (!($.isEmptyObject(groupbyIndx))) {
-                    groupedList.push(groupbyIndx);
-                }
-
-                //now get other groups
-                for (var i = 1; i < totalRelevant; ++i) {
-                    var groupbyIndx = Object();
-
-                    $.each(relevantList, function (key, val) {
-                        if (parseInt(key.split("_").slice(-1)[0]) == i) {
-                            groupbyIndx[key.split("_").slice(0)[0]] = val;
-                        }
-                    });
-
-                    if (!($.isEmptyObject(groupbyIndx))) {
-                        groupedList.push(groupbyIndx);
-                    }
-
-                }
-
-                for (var i = 0; i < groupedList.length; ++i) {
-                    var objectHTML = dispatchFormDataControl[controlsDataMapping[item.control.toLowerCase()]](groupedList[i], item);
-                    itemValue.append(objectHTML);
-                }
-
-            } else {
-                var objectHTML = dispatchFormDataControl[controlsDataMapping[item.control.toLowerCase()]](relevantList, item);
-                itemValue.append(objectHTML);
-            }
-
-            return itemValue;
-        }
 
         var controlsViewMapping = {
             "text": "do_text_ctrl",
@@ -1988,195 +1898,6 @@ $(document).ready(function () {
             }
         };
 
-
-        var controlsDataMapping = {
-            "text": "do_text_ctrl",
-            "textarea": "do_textarea_ctrl",
-            "hidden": "do_hidden_ctrl",
-            "copo-select": "do_copo_select_ctrl",
-            "ontology term": "do_ontology_term_ctrl",
-            "select": "do_select_ctrl",
-            "copo-multi-search": "do_copo_multi_search_ctrl",
-            "copo-multi-select": "do_copo_multi_select_ctrl",
-            "copo-comment": "do_copo_comment_ctrl",
-            "copo-characteristics": "do_copo_characteristics_ctrl",
-            "copo-sample-source-2": "do_copo_sample_source_ctrl_2",
-            "oauth_required": "do_oauth_required",
-            "copo-button-list": "do_copo_button_list_ctrl",
-            "copo-item-count": "do_copo_item_count_ctrl"
-        };
-
-
-        var dispatchFormDataControl = {
-            do_text_ctrl: function (relevantObject, item) {
-                var ctrlsDiv = get_attributes_outer_div();
-
-                ctrlsDiv.append(get_attributes_inner_div_1().append(relevantObject[item.id]));
-
-                return ctrlsDiv;
-            },
-            do_textarea_ctrl: function (relevantObject, item) {
-                var ctrlsDiv = get_attributes_outer_div();
-
-                ctrlsDiv.append(get_attributes_inner_div_1().append(relevantObject[item.id]));
-
-                return ctrlsDiv;
-            },
-            do_copo_select_ctrl: function (relevantObject, item) {
-                return "";
-            },
-            do_select_ctrl: function (relevantObject, item) {
-                return "";
-            },
-            do_copo_multi_search_ctrl: function (relevantObject, item) {
-                return "";
-            },
-            do_copo_multi_select_ctrl: function (relevantObject, item) {
-                return "";
-            },
-            do_copo_sample_source_ctrl_2: function (relevantObject, item) {
-                var ctrlsDiv = get_attributes_outer_div();
-
-                try {
-                    var theValueObject = JSON.parse($("#" + item.id).parent().find(".elem-json").val());
-                    var theData = (relevantObject[item.id]).split(",");
-
-                    for (var i = 0; i < theData.length; ++i) {
-                        for (var j = 0; j < theValueObject.options.length; ++j) {
-                            if (theData[i] == theValueObject.options[j][theValueObject.value_field]) {
-                                ctrlsDiv.append(get_attributes_inner_div_1().append(theValueObject.options[j][theValueObject.label_field]));
-                            }
-                        }
-                    }
-                }
-                catch (err) {
-                    console.log(err.name);
-                }
-
-
-                return ctrlsDiv;
-            },
-            do_copo_button_list_ctrl: function (relevantObject, item) {
-                return "";
-            },
-            do_copo_item_count_ctrl: function (relevantObject, item) {
-                return "";
-            },
-            do_copo_characteristics_ctrl: function (relevantObject, item) {
-                var characteristicsSchema = copoSchemas.characteristics_schema;
-
-                var ctrlsDiv = get_attributes_outer_div();
-
-                for (var i = 0; i < characteristicsSchema.length; ++i) {
-
-                    var currentItem = characteristicsSchema[i];
-
-                    if (!currentItem.hasOwnProperty("show_in_form") || !currentItem["show_in_form"]) {
-                        continue;
-                    }
-
-                    if (currentItem.hasOwnProperty("hidden") && currentItem.hidden.toString() != "false") {
-                        continue;
-                    }
-
-                    var scID = currentItem.id.split(".").slice(-1)[0];
-                    $.each(relevantObject, function (key, val) {
-                        if (key.split('.')[1] == scID && key.split(".").slice(-1)[0] == "annotationValue") {
-
-                            if (val == "") {
-                                val = "-"
-                            }
-
-                            if (i == 0) {
-                                ctrlsDiv.append(get_attributes_inner_div_1().append(val));
-                            } else {
-                                ctrlsDiv.append(get_attributes_inner_div().append(val));
-                            }
-                        }
-                    });
-
-                }
-
-                return ctrlsDiv;
-            },
-            do_copo_comment_ctrl: function (relevantObject, item) {
-                var commentSchema = copoSchemas.comment_schema;
-
-                var ctrlsDiv = get_attributes_outer_div();
-
-                for (var i = 0; i < commentSchema.length; ++i) {
-
-                    var currentItem = commentSchema[i];
-
-                    if (!currentItem.hasOwnProperty("show_in_form") || !currentItem["show_in_form"]) {
-                        continue;
-                    }
-
-                    if (currentItem.hasOwnProperty("hidden") && currentItem.hidden.toString() != "false") {
-                        continue;
-                    }
-
-                    var scID = currentItem.id.split(".").slice(-1)[0];
-                    $.each(relevantObject, function (key, val) {
-                        if (key.split('.')[1] == scID) {
-
-                            if (val == "") {
-                                val = "-"
-                            }
-
-                            if (i == 0) {
-                                ctrlsDiv.append(get_attributes_inner_div_1().append(val));
-                            } else {
-                                ctrlsDiv.append(get_attributes_inner_div().append(val));
-                            }
-
-                        }
-                    });
-
-                }
-
-                return ctrlsDiv;
-            },
-            do_ontology_term_ctrl: function (relevantObject, item) {
-                var ontologySchema = copoSchemas.ontology_schema;
-
-                var ctrlsDiv = get_attributes_outer_div();
-
-                for (var i = 0; i < ontologySchema.length; ++i) {
-
-                    var currentItem = ontologySchema[i];
-
-                    if (!currentItem.hasOwnProperty("show_in_form") || !currentItem["show_in_form"]) {
-                        continue;
-                    }
-                    if (currentItem.hasOwnProperty("hidden") && currentItem.hidden.toString() != "false") {
-                        continue;
-                    }
-
-                    var scID = currentItem.id.split(".").slice(-1)[0];
-                    $.each(relevantObject, function (key, val) {
-                        if (key.split('.')[1] == scID) {
-
-                            if (val == "") {
-                                val = "-"
-                            }
-
-                            if (i == 0) {
-                                ctrlsDiv.append(get_attributes_inner_div_1().append(val));
-                            } else {
-                                ctrlsDiv.append(get_attributes_inner_div().append(val));
-                            }
-                        }
-                    });
-
-                }
-
-                return ctrlsDiv;
-
-            }
-        };
-
-
         function get_stage_inputs_by_ref(ref) {
             var form_values = Object();
 
@@ -2186,22 +1907,6 @@ $(document).ready(function () {
 
             return form_values;
 
-        }
-
-
-        function generate_sample_names(startIndx, number_to_generate, namePrefix) {
-            var generatedNames = [];
-
-            var combinedName = namePrefix + "_" + Math.round(new Date().getTime() / 1000);
-
-            startIndx = parseInt(startIndx);
-            number_to_generate = parseInt(number_to_generate);
-
-            for (var i = startIndx; i < (number_to_generate + startIndx); ++i) {
-                generatedNames.push(combinedName + "_" + i);
-            }
-
-            return generatedNames;
         }
 
 
