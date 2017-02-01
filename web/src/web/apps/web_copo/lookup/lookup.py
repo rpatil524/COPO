@@ -385,6 +385,28 @@ DROP_DOWNS = {
             "label": "Extended",
             "description": "Extended samples are based on the Investigation, Study and Assay (ISA) specifications, and are better tailored for describing samples that will subsequently become part of data submissions to repositories such as <strong>ENA</strong> and <strong>Metabolights</strong>."
         }
+    ],
+    "GROWTH_AREAS": [
+        {
+            "value": "growth chamber, GC",
+            "label": "Growth Chamber"
+        },
+        {
+            "value": "greenhouse, GH",
+            "label": "Greenhouse"
+        },
+        {
+            "label": "Open Top Chamber",
+            "value": "open top chamber, OTC"
+        },
+        {
+            "value": "experimental garden",
+            "label": "Experimental Earden"
+        },
+        {
+            "label": "Experimental Field",
+            "value": "experimental field"
+        }
     ]
 }
 
@@ -424,7 +446,8 @@ VOCAB = {
             "value": "person"
         },
 
-    }
+    },
+
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#

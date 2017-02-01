@@ -52,7 +52,8 @@ class BrokerDA:
             comment_schema=d_utils.get_copo_schema("comment"),
             characteristics_schema=d_utils.get_copo_schema("material_attribute_value"),
             source_schema=d_utils.get_copo_schema("source"),
-            duration_schema=d_utils.get_copo_schema("duration")
+            duration_schema=d_utils.get_copo_schema("duration"),
+            greenhouse_rooting_schema=d_utils.get_copo_schema("miappe_rooting_greenhouse")
         )
 
         self.context["copo_schemas"] = copo_schemas

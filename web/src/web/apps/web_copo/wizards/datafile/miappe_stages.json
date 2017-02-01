@@ -4,9 +4,9 @@
   "properties": [
     {
       "ref": "attach_samples",
-      "title": "Sample",
+      "title": "Attach Samples",
       "content": "get_stage_html",
-      "deposition_context": "ena",
+      "deposition_context": "miappe",
       "message": "Select and associate a sample to files in the bundle. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",
       "items": [
         {
@@ -29,7 +29,7 @@
       ]
     },
     {
-      "ref": "",
+      "ref": "experiment_details",
       "title": "Experiment Details",
       "content": "get_stage_html",
       "is_singular_stage": true,
@@ -55,7 +55,7 @@
           "help_tip": "The Date this experiment commenced",
           "label": "Start Date"
         },
-         {
+        {
           "type": "string",
           "required": "false",
           "ref": "",
@@ -97,12 +97,459 @@
       ]
     },
     {
-      "ref": "protocol_refs",
-      "is_stage_stub": true,
-      "callback": {
-        "function": "get_dynamic_elements_ena",
-        "parameter": "{stub_ref!s}"
-      }
+      "ref": "environmental_factors",
+      "title": "Environmental Factors",
+      "content": "get_stage_html",
+      "deposition_context": "dataverse",
+      "message": "Select and associate a sample to files in the bundle. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",
+      "items": [
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.growth_facility",
+          "show_in_table": true,
+          "option_values": {
+            "callback": {
+              "function": "get_growth_area_options",
+              "parameter": ""
+            }
+          },
+          "control": "growth_conditions_select",
+          "versions": [
+            "growth_facility"
+          ],
+          "help_tip": "",
+          "label": "Growth Facility"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.day_humidity",
+          "show_in_table": true,
+          "control": "text-percent",
+          "versions": [
+            "day_humidity"
+          ],
+          "help_tip": "",
+          "label": "Average VPDair during the light period (kPa) or Average humidity during the light period (%)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.night_humidity",
+          "show_in_table": true,
+          "control": "text-percent",
+          "versions": [
+            "night_humidity"
+          ],
+          "help_tip": "",
+          "label": "Average VPDair during the night (kPa) or Average humidity during the night (%)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.average_daily_integrated_PPFD",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "average_daily_integrated_PPFD"
+          ],
+          "help_tip": "",
+          "label": "Average daily integrated PPFD measured at plant or canopy level (mol m–2 day–1)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.average_length_of_the_light_period",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "average_length_of_the_light_period"
+          ],
+          "help_tip": "",
+          "label": "Average length of the light period (h)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.light_intensity",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "light_intensity"
+          ],
+          "help_tip": "",
+          "label": "Light intensity in Growth Chamber (µmol m–2 s –1)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.range_in_peak_light_intensity",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "range_in_peak_light_intensity"
+          ],
+          "help_tip": "",
+          "label": "Range in peak light intensity in Growth Chamber (µmol m–2 s –1)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.fraction_of_outside_light_intercepted_by_growth_facility",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "fraction_of_outside_light_intercepted_by_growth_facility"
+          ],
+          "help_tip": "",
+          "label": "Fraction of outside light intercepted by growth facility components and surrounding structures (Greenhouse or Open Top Chamber)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.average_day_temperature",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "average_day_temperature"
+          ],
+          "help_tip": "",
+          "label": "Average day temperature"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.average_night_temperature",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "average_night_temperature"
+          ],
+          "help_tip": "",
+          "label": "Average night temperature"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.temp_change",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "temp_change"
+          ],
+          "help_tip": "",
+          "label": "Temperature change over the course of experiment"
+        }
+      ]
+    },
+    {
+      "ref": "rooting_conditions",
+      "title": "Rooting Conditions",
+      "content": "get_stage_html",
+      "deposition_context": "dataverse",
+      "message": "Select and associate a sample to files in the bundle. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",
+      "items": [
+        {
+          "id": "copo.miappe.growth_area",
+          "help_tip": "Select the type of growth area from the dropdown.",
+          "label": "Grown in",
+          "hidden": "false",
+          "required": "true",
+          "control": "select",
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_growth_areas_options",
+              "parameter": ""
+            }
+          },
+          "trigger": {
+            "type": "change",
+            "callback": {
+              "function": "target_repo_change",
+              "parameter": "{old_value!s},{new_value!s}"
+            }
+          }
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.rooting_medium",
+          "show_in_table": true,
+          "control": "select",
+          "option_values": [
+            "aeroponics",
+            "hydroponics (water-based)",
+            "hydroponics (solid media based)",
+            "soil (sand)",
+            "soil (peat)",
+            "soil (clay)",
+            "soil (mixed)"
+          ],
+          "versions": [
+            "rooting_medium"
+          ],
+          "help_tip": "",
+          "label": "Rooting medium"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.container_type",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "container_type"
+          ],
+          "help_tip": "",
+          "label": "Greenhouse Container Type"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.container_volume",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "container_volume"
+          ],
+          "help_tip": "",
+          "label": "Greenhouse Container Volume (L)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.other_dimensions",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "other_dimensions"
+          ],
+          "help_tip": "",
+          "label": "Greenhouse Other Dimensions"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.number_of_plants_per_container",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "number_of_plants_per_container"
+          ],
+          "help_tip": "",
+          "label": "Number of Plants per Greenhouse container"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.field_plot_size",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "field_plot_size"
+          ],
+          "help_tip": "",
+          "label": "Field Plot size"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.sowing_density",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "sowing_density"
+          ],
+          "help_tip": "",
+          "label": "Field Sowing Density"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.pH",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "pH"
+          ],
+          "help_tip": "",
+          "label": "pH"
+        }
+      ]
+    },
+    {
+      "ref": "nutrients",
+      "title": "Nutrients",
+      "content": "get_stage_html",
+      "deposition_context": "dataverse",
+      "message": "Select and associate a sample to files in the bundle. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",
+      "items": [
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.hydroponics_composition",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "hydroponics_composition"
+          ],
+          "help_tip": "",
+          "label": "Hydroponics Composition"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.extractable_n_content",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "extractable_n_content"
+          ],
+          "help_tip": "",
+          "label": "Extractable N content per unit ground area before fertiliser added"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.type_of_fertilizer",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "type_of_fertilizer"
+          ],
+          "help_tip": "",
+          "label": "Type of fertiliser added per container or m2"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.amount_of_fertilizer",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "amount_of_fertilizer"
+          ],
+          "help_tip": "",
+          "label": "Amount of fertiliser added per container or m2"
+        }
+      ]
     }
   ]
 }

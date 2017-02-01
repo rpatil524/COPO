@@ -129,7 +129,9 @@ var controlsMapping = {
     "copo-button-list": "do_copo_button_list_ctrl",
     "copo-item-count": "do_copo_item_count_ctrl",
     "date-picker": "do_date_picker_ctrl",
-    "copo-duration": "do_copo_duration_ctrl"
+    "copo-duration": "do_copo_duration_ctrl",
+    "text-percent": "do_percent_text_box",
+    "growth_conditions_select": "do_growth_conditions_select"
 
 };
 
@@ -544,6 +546,25 @@ function set_validation_markers(formElem, ctrl) {
 //form controls
 var dispatchFormControl = {
 
+    do_percent_text_box: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV input-group"
+            });
+        var span = $('<span/>',
+            {
+                class: "input-group-addon"
+            })
+        $(span).html('%')
+        var input = $('<input/>',
+            {
+                class: "form-control",
+                placeholder: formElem.placeholder
+            })
+        ctrlsDiv.append(input)
+        ctrlsDiv.append(span)
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
     do_date_picker_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -636,6 +657,83 @@ var dispatchFormControl = {
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
+    do_growth_conditions_select: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        //build select
+        var selectCtrl = $('<select/>',
+            {
+                class: "form-control input-copo",
+                id: formElem.id,
+                name: formElem.id
+            });
+
+        if (formElem.option_values) {
+            for (var i = 0; i < formElem.option_values.length; ++i) {
+                var option = formElem.option_values[i];
+                var lbl = "";
+                var vl = "";
+                if (typeof option === "string") {
+                    lbl = option;
+                    vl = option;
+                } else if (typeof option === "object") {
+                    lbl = option.label;
+                    vl = option.value;
+                }
+
+                $('<option value="' + vl + '">' + lbl + '</option>').appendTo(selectCtrl);
+            }
+        }
+        var gh_div = $('<div/>',
+            {
+                id: 'gh_controls'
+            })
+
+        var greenhouseSchema = copoSchemas.greenhouse_rooting_schema;
+
+        for (var i = 0; i < greenhouseSchema.length; ++i) {
+            var mg = "margin-left:5px;";
+            if (i == 0) {
+                mg = '';
+            }
+            var fv = formElem.id;
+            var sp = $('<div/>',
+                {
+                    class: "form-group copo-form-group"
+                });
+
+            //get ontology ctrl
+            var greenhouseCtrlInput = get_basic_input(undefined, greenhouseSchema[i]);
+            var greenhouseCtrlLabel = get_basic_label(undefined, greenhouseSchema[i])
+
+
+
+            $(greenhouseCtrlInput).find(":input").each(function () {
+                if (this.id) {
+                    this.id = fv + "." + this.id;
+                }
+
+                //set placeholder text
+                if ($(this).hasClass("ontology-field")) {
+                    $(this).attr("placeholder", greenhouseSchema[i].label.toLowerCase());
+                }
+            });
+            $(sp).append(greenhouseCtrlLabel)
+            $(sp).append(greenhouseCtrlInput)
+            $(gh_div).append(sp)
+            //$(sp).append(greenhouseCtrlInput)
+            //$(gh_div).append(sp)
+        }
+
+        ctrlsDiv.append(selectCtrl)
+        ctrlsDiv.append(gh_div);
+
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    }
+    ,
     do_select_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -670,7 +768,8 @@ var dispatchFormControl = {
         ctrlsDiv.append(selectCtrl);
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    },
+    }
+    ,
     do_copo_duration_ctrl: function (formElem, elemValue) {
 
         var durationSchema = copoSchemas.duration_schema;
@@ -694,7 +793,7 @@ var dispatchFormControl = {
                 });
 
             //get ontology ctrl
-            var durationCtrlObject = get_basic_span(sp, durationSchema[i]);
+            var durationCtrlObject = get_basic_input(sp, durationSchema[i]);
 
 
             durationCtrlObject.find(":input").each(function () {
@@ -712,7 +811,8 @@ var dispatchFormControl = {
         }
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    },
+    }
+    ,
     do_copo_characteristics_ctrl: function (formElem, elemValue) {
         var characteristicsSchema = copoSchemas.characteristics_schema;
 
@@ -761,7 +861,8 @@ var dispatchFormControl = {
         }
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    },
+    }
+    ,
     do_copo_comment_ctrl: function (formElem, elemValue) {
         var commentSchema = copoSchemas.comment_schema;
 
@@ -808,7 +909,8 @@ var dispatchFormControl = {
         }
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    },
+    }
+    ,
     do_ontology_term_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -837,7 +939,8 @@ var dispatchFormControl = {
         ctrlsDiv.append(ontologyCtrlObject);
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    },
+    }
+    ,
     do_copo_multi_select_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -881,7 +984,8 @@ var dispatchFormControl = {
         ctrlsDiv.append(selectCtrl).append(hiddenValuesCtrl);
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    },
+    }
+    ,
     do_copo_multi_search_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -891,7 +995,8 @@ var dispatchFormControl = {
         ctrlsDiv = get_multi_search_span(formElem, ctrlsDiv);
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    },
+    }
+    ,
     do_copo_select_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -915,7 +1020,8 @@ var dispatchFormControl = {
 
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    },
+    }
+    ,
     do_copo_sample_source_ctrl: function (formElem, elemValue) {
 
         var ctrlsDiv = $('<div/>',
@@ -977,7 +1083,8 @@ var dispatchFormControl = {
             .append(ctrlsWithValuesDiv)
             .append(form_help_ctrl(formElem.help_tip))
             .append(addbtnDivRow)
-    },
+    }
+    ,
     do_copo_sample_source_ctrl_2: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -1054,7 +1161,8 @@ var dispatchFormControl = {
             .append(form_help_ctrl(formElem.help_tip))
             .append(sourceCtrlDiv)
 
-    },
+    }
+    ,
     do_hidden_ctrl: function (formElem, elemValue) {
 
         var hiddenCtrl = $('<input/>',
@@ -1067,13 +1175,15 @@ var dispatchFormControl = {
 
         return hiddenCtrl;
 
-    },
+    }
+    ,
     do_oauth_required: function () {
         return $('<a/>', {
             href: "/rest/forward_to_figshare/",
             html: "Grant COPO access to your Figshare account"
         });
-    },
+    }
+    ,
     do_copo_button_list_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -1154,7 +1264,8 @@ var dispatchFormControl = {
         return form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
-    },
+    }
+    ,
     do_copo_button_list_ctrl_old: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>');
 
@@ -1294,7 +1405,8 @@ var dispatchFormControl = {
         return form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
-    },
+    }
+    ,
     do_copo_item_count_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -1806,17 +1918,31 @@ function source_clone_ctrl(funcParams) {
 }
 
 
-function get_basic_span(sp, formElem) {
-    //var durationSchema = copoSchemas.duration_schema;
+function get_basic_input(sp, formElem) {
     var fv = formElem.id.split(".").slice(-1)[0];
-    sp.append($('<input/>',
+
+    var input = ($('<input/>',
         {
             type: "text",
             placeholder: formElem.placeholder,
             id: fv,
-            name: fv
+            name: fv,
+            class: 'form-control'
         }));
-    return sp
+    if(sp){
+        $(sp).append(input)
+        return sp
+    }
+    return input
+}
+
+function get_basic_label(sp, formElem) {
+    var fv = formElem.id.split(".").slice(-1)[0];
+    var label = $('<label/>',
+        {
+            for: fv
+        }).html(formElem.label)
+    return label
 }
 
 function get_ontology_span(ontologySpan, formElem) {
@@ -1824,15 +1950,12 @@ function get_ontology_span(ontologySpan, formElem) {
 
     for (var i = 0; i < ontologySchema.length; ++i) {
         var fv = ontologySchema[i].id.split(".").slice(-1)[0];
-
         if (ontologySchema[i].hidden == "false") {
-
             //set restricted ontologies
             var localolsURL = olsURL;
             if (formElem.ontology_names && formElem.ontology_names.length) {
                 localolsURL = olsURL.replace("999", formElem.ontology_names.join(","));
             }
-
             ontologySpan.append('<input autocomplete="off" data-autocomplete="' + localolsURL + '" class="input-copo form-control ontology-field" type="text" id="' + fv + '" name="' + fv + '" />');
 
         } else {

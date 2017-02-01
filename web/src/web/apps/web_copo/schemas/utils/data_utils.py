@@ -243,6 +243,9 @@ def get_sample_type_options():
 def get_repository_options():
     return lookup.DROP_DOWNS['REPOSITORIES']
 
+def get_growth_area_options():
+    return lookup.DROP_DOWNS['GROWTH_AREAS']
+
 
 def get_copo_id():
     # todo: remove this and uncomment the below try block!!!
@@ -362,6 +365,7 @@ def get_copo_schema(component, as_object=False):
         comment=schema_base.get("comment").get("fields", list()),
         material_attribute_value=schema_base.get("material_attribute_value").get("fields", list()),
         duration=schema_base.get("duration").get("fields", list()),
+        miappe_rooting_greenhouse=schema_base.get('rooting').get("fields", list())
     )
 
     schema = schema_dict.get(component, list())
