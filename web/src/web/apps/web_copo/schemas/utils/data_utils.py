@@ -235,16 +235,23 @@ def generate_sources_json():
 def get_study_type_options():
     return lookup.DROP_DOWNS['STUDY_TYPES']
 
-
 def get_sample_type_options():
     return lookup.DROP_DOWNS['SAMPLE_TYPES']
-
 
 def get_repository_options():
     return lookup.DROP_DOWNS['REPOSITORIES']
 
 def get_growth_area_options():
     return lookup.DROP_DOWNS['GROWTH_AREAS']
+
+def get_rooting_medium_options():
+    return lookup.DROP_DOWNS['ROOTING_MEDIUM']
+
+def get_nutrient_control_options():
+    return lookup.DROP_DOWNS['GROWTH_NUTRIENTS']
+
+def get_watering_control_options():
+    return lookup.DROP_DOWNS['WATERING_OPTIONS']
 
 
 def get_copo_id():
@@ -365,7 +372,13 @@ def get_copo_schema(component, as_object=False):
         comment=schema_base.get("comment").get("fields", list()),
         material_attribute_value=schema_base.get("material_attribute_value").get("fields", list()),
         duration=schema_base.get("duration").get("fields", list()),
-        miappe_rooting_greenhouse=schema_base.get('rooting').get("fields", list())
+        # these need to change to call json file reader rather than look in mongo
+        miappe_rooting_greenhouse=schema_base.get('rooting').get('greenhouse').get("fields", list()),
+        miappe_rooting_field=schema_base.get('rooting').get('field').get("fields", list()),
+        hydroponics=schema_base.get('miappe').get('nutrients').get('hydroponics').get('fields', list()),
+        soil=schema_base.get('miappe').get('nutrients').get('soil').get('fields', list()),
+        phentotypic_variables=schema_base.get("miappe").get("phenotypic_variables").get("fields", list()),
+        environment_variables=schema_base.get("miappe").get("environment_variables").get("fields", list())
     )
 
     schema = schema_dict.get(component, list())

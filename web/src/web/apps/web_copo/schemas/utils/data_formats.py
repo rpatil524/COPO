@@ -3,7 +3,7 @@ __author__ = 'etuka'
 import os
 import re
 import json
-
+from django.conf import settings
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 
@@ -234,6 +234,10 @@ class DataFormats:
     def get_mapping_files(self):
         files = []
         for file in os.listdir(self.path_to_mappings):
+            if os.path.isdir(os.path.join(self.path_to_mappings, file)):
+                for subfile in os.listdir(os.path.join(self.path_to_mappings, file)):
+                    if subfile.endswith(".json"):
+                        files.append(os.path.join(file, subfile))
             if file.endswith(".json"):
                 files.append(file)
 

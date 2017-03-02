@@ -427,6 +427,7 @@ class WizardHelper:
             self.handle_save_triggers(old_stage_data, data, stage)
 
             # update attribute, given data
+            # TODO - CHECK WITH TONI IF THIS IS NEEDED
             self.update_datafile_attributes({'ref': stage["ref"], 'data': data})
 
         # get batch attributes
@@ -464,6 +465,28 @@ class WizardHelper:
         description['attributes'] = dict()
 
         self.update_description(description)
+
+    def growth_facility_change(self, args):
+        args = args.split(",")
+        # args: item_id, old_value, new_value, stage_ref
+
+        if args[1] == args[2] or not args[1] or not args[2]:  # no change in growth facility
+            return False
+
+        item_id = args[0]
+        value = args[2]
+        stage_ref = args[3]
+        dd_list = [x for x in lkup.DROP_DOWNS['GROWTH_AREAS'] if x['value'] == value]
+        if dd_list:
+            dd_dict = dd_list[0]
+            if 'schema' in dd_dict:
+                schema_name = dd_dict['schema']
+                extra_schema = d_utils.get_copo_schema(schema_name)
+                DataFile().add_fields_to_datafile_stage(target_ids=self.targets_datafiles, fields=extra_schema,
+                                                        target_stage_ref=stage_ref)
+
+    def get_nutrient_controls(self):
+        pass
 
     def study_type_change(self, args):
         args = args.split(",")
@@ -821,6 +844,7 @@ class WizardHelper:
         return stage
 
     def handle_save_triggers(self, old_data, new_data, stage):
+        stage_ref = stage["ref"]
         for sti in stage.get("items", list()):
             item_id = sti['id']  # placeholder parameter
 

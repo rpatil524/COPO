@@ -131,8 +131,8 @@ var controlsMapping = {
     "date-picker": "do_date_picker_ctrl",
     "copo-duration": "do_copo_duration_ctrl",
     "text-percent": "do_percent_text_box",
-    "growth_conditions_select": "do_growth_conditions_select"
-
+    "growth_conditions_select": "do_growth_conditions_select",
+    "ontology_triplet_control": "do_ontology_triplet_control"
 };
 
 function json2HtmlForm(data) {
@@ -279,8 +279,8 @@ function build_form_body(data) {
     for (var i = 0; i < formJSON.form_schema.length; ++i) {
 
         var formElem = formJSON.form_schema[i];
+        var control = formElem.control
 
-        var control = formElem.control;
         var elemValue = null;
 
         if (formValue) {
@@ -657,83 +657,6 @@ var dispatchFormControl = {
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
-    do_growth_conditions_select: function (formElem, elemValue) {
-        var ctrlsDiv = $('<div/>',
-            {
-                class: "ctrlDIV"
-            });
-
-        //build select
-        var selectCtrl = $('<select/>',
-            {
-                class: "form-control input-copo",
-                id: formElem.id,
-                name: formElem.id
-            });
-
-        if (formElem.option_values) {
-            for (var i = 0; i < formElem.option_values.length; ++i) {
-                var option = formElem.option_values[i];
-                var lbl = "";
-                var vl = "";
-                if (typeof option === "string") {
-                    lbl = option;
-                    vl = option;
-                } else if (typeof option === "object") {
-                    lbl = option.label;
-                    vl = option.value;
-                }
-
-                $('<option value="' + vl + '">' + lbl + '</option>').appendTo(selectCtrl);
-            }
-        }
-        var gh_div = $('<div/>',
-            {
-                id: 'gh_controls'
-            })
-
-        var greenhouseSchema = copoSchemas.greenhouse_rooting_schema;
-
-        for (var i = 0; i < greenhouseSchema.length; ++i) {
-            var mg = "margin-left:5px;";
-            if (i == 0) {
-                mg = '';
-            }
-            var fv = formElem.id;
-            var sp = $('<div/>',
-                {
-                    class: "form-group copo-form-group"
-                });
-
-            //get ontology ctrl
-            var greenhouseCtrlInput = get_basic_input(undefined, greenhouseSchema[i]);
-            var greenhouseCtrlLabel = get_basic_label(undefined, greenhouseSchema[i])
-
-
-
-            $(greenhouseCtrlInput).find(":input").each(function () {
-                if (this.id) {
-                    this.id = fv + "." + this.id;
-                }
-
-                //set placeholder text
-                if ($(this).hasClass("ontology-field")) {
-                    $(this).attr("placeholder", greenhouseSchema[i].label.toLowerCase());
-                }
-            });
-            $(sp).append(greenhouseCtrlLabel)
-            $(sp).append(greenhouseCtrlInput)
-            $(gh_div).append(sp)
-            //$(sp).append(greenhouseCtrlInput)
-            //$(gh_div).append(sp)
-        }
-
-        ctrlsDiv.append(selectCtrl)
-        ctrlsDiv.append(gh_div);
-
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    }
-    ,
     do_select_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -764,12 +687,9 @@ var dispatchFormControl = {
                 $('<option value="' + vl + '">' + lbl + '</option>').appendTo(selectCtrl);
             }
         }
-
         ctrlsDiv.append(selectCtrl);
-
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    }
-    ,
+    },
     do_copo_duration_ctrl: function (formElem, elemValue) {
 
         var durationSchema = copoSchemas.duration_schema;
@@ -811,31 +731,39 @@ var dispatchFormControl = {
         }
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    }
-    ,
-    do_copo_characteristics_ctrl: function (formElem, elemValue) {
-        var characteristicsSchema = copoSchemas.characteristics_schema;
+    },
+    do_copo_characteristics_ctrl: function (formElem, elemValue, schemaType) {
+
+        // depending on whether the global variable
+        if(schemaType == undefined){
+            // in this case load the default schema
+            var workingSchema = copoSchemas.characteristics_schema;
+        }
+        else{
+            // else load the supplied schema
+            var workingSchema = copoSchemas[schemaType];
+        }
 
         var ctrlsDiv = $('<div/>',
             {
                 class: "ctrlDIV"
             });
 
-        for (var i = 0; i < characteristicsSchema.length; ++i) {
+        for (var i = 0; i < workingSchema.length; ++i) {
             var mg = "margin-left:5px;";
             if (i == 0) {
                 mg = '';
             }
-            var fv = formElem.id + "." + characteristicsSchema[i].id.split(".").slice(-1)[0];
+            var fv = formElem.id + "." + workingSchema[i].id.split(".").slice(-1)[0];
 
-            if (characteristicsSchema[i].hidden == "false") {
+            if (workingSchema[i].hidden == "false") {
                 var sp = $('<span/>',
                     {
                         style: "display: inline-block; " + mg
                     });
 
                 //get ontology ctrl
-                var ontologyCtrlObject = get_ontology_span(sp, characteristicsSchema[i]);
+                var ontologyCtrlObject = get_ontology_span(sp, workingSchema[i]);
 
                 ontologyCtrlObject.find(":input").each(function () {
                     if (this.id) {
@@ -844,7 +772,7 @@ var dispatchFormControl = {
 
                     //set placeholder text
                     if ($(this).hasClass("ontology-field")) {
-                        $(this).attr("placeholder", characteristicsSchema[i].label.toLowerCase());
+                        $(this).attr("placeholder", workingSchema[i].label.toLowerCase());
                     }
                 });
 
@@ -861,8 +789,7 @@ var dispatchFormControl = {
         }
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    }
-    ,
+    },
     do_copo_comment_ctrl: function (formElem, elemValue) {
         var commentSchema = copoSchemas.comment_schema;
 
@@ -909,8 +836,7 @@ var dispatchFormControl = {
         }
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    }
-    ,
+    },
     do_ontology_term_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -1679,6 +1605,10 @@ function build_source_form(funcParams) {
     //generate controls given component schema
     for (var i = 0; i < sourceSchema.length; ++i) {
         var sourceFormElem = sourceSchema[i];
+
+
+
+
         var control = sourceFormElem.control;
         var elemValue = null;
 
@@ -1929,7 +1859,7 @@ function get_basic_input(sp, formElem) {
             name: fv,
             class: 'form-control'
         }));
-    if(sp){
+    if (sp) {
         $(sp).append(input)
         return sp
     }
@@ -1947,7 +1877,7 @@ function get_basic_label(sp, formElem) {
 
 function get_ontology_span(ontologySpan, formElem) {
     var ontologySchema = copoSchemas.ontology_schema;
-
+    console.log(formElem)
     for (var i = 0; i < ontologySchema.length; ++i) {
         var fv = ontologySchema[i].id.split(".").slice(-1)[0];
         if (ontologySchema[i].hidden == "false") {
@@ -1956,7 +1886,7 @@ function get_ontology_span(ontologySpan, formElem) {
             if (formElem.ontology_names && formElem.ontology_names.length) {
                 localolsURL = olsURL.replace("999", formElem.ontology_names.join(","));
             }
-            ontologySpan.append('<input autocomplete="off" data-autocomplete="' + localolsURL + '" class="input-copo form-control ontology-field" type="text" id="' + fv + '" name="' + fv + '" />');
+            ontologySpan.append('<input placeholder="' + formElem.placeholder + '" autocomplete="off" data-autocomplete="' + localolsURL + '" class="input-copo form-control ontology-field" type="text" id="' + fv + '" name="' + fv + '" />');
 
         } else {
             ontologySpan.append($('<input/>',
@@ -2158,6 +2088,7 @@ function global_form_validate(form_schema, formObject) {
 
     return allowSubmit
 }
+
 
 function save_form(formJSON) {
     var task = "save";

@@ -1194,7 +1194,7 @@ $(document).ready(function () {
                 //any triggers?
                 if (formElem.trigger) {
                     try {
-                        dispatchEventHandler[formElem.trigger.callback.function](formElem);
+                        dispatchSampleEventHandler[formElem.trigger.callback.function](formElem);
                     }
                     catch (err) {
                     }
@@ -1264,7 +1264,7 @@ $(document).ready(function () {
         }
 
 
-        var dispatchEventHandler = {
+        var dispatchSampleEventHandler = {
             study_type_change: function (formElem) {
                 var previousValue = null;
 

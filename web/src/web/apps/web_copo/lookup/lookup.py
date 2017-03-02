@@ -388,24 +388,84 @@ DROP_DOWNS = {
     ],
     "GROWTH_AREAS": [
         {
-            "value": "growth chamber, GC",
+            "value": "growth_chamber_GC",
             "label": "Growth Chamber"
         },
         {
-            "value": "greenhouse, GH",
-            "label": "Greenhouse"
+            "value": "greenhouse_rooting",
+            "label": "Greenhouse",
+            "schema": "miappe_rooting_greenhouse"
         },
         {
-            "label": "Open Top Chamber",
+            "label": "Open_Top_Chamber",
             "value": "open top chamber, OTC"
         },
         {
-            "value": "experimental garden",
-            "label": "Experimental Earden"
+            "value": "experimental_garden",
+            "label": "Experimental Garden"
         },
         {
-            "label": "Experimental Field",
-            "value": "experimental field"
+            "label": "Experimental_Field",
+            "value": "field_rooting",
+            "schema": "miappe_rooting_field"
+        }
+    ],
+    "ROOTING_MEDIUM": [
+        {
+            "value": "aeroponics",
+            "label": "Aeroponics"
+        },
+        {
+            "value": "hydroponics_water_based",
+            "label": "Hydroponics (water based)"
+        },
+        {
+            "value": "hydroponics_solid-media_based",
+            "label": "Hydroponics (solid-media based)"
+        },
+        {
+            "value": "soil_sand",
+            "label": "Soil (sandy)"
+        },
+        {
+            "value": "soil_peat",
+            "label": "Soil (peat)"
+        },
+        {
+            "value": "soil_clay",
+            "label": "Soil (clay)"
+        },
+        {
+            "value": "soil_mixed",
+            "label": "Soil (mixed)"
+        },
+        {
+            "value": "other",
+            "label": "Other"
+        }
+    ],
+    "GROWTH_NUTRIENTS": [
+        {
+            "value": "hydroponics",
+            "label": "Hydroponics"
+        },
+        {
+            "value": "soil",
+            "label": "Soil"
+        }
+    ],
+    "WATERING_OPTIONS": [
+        {
+            "value": "top",
+            "label": "Top"
+        },
+        {
+            "value": "bottom",
+            "label": "Bottom"
+        },
+        {
+            "value": "drip",
+            "label": "Drip"
         }
     ]
 }

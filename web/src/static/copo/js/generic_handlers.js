@@ -11,7 +11,6 @@ $(document).ready(function () {
 
 function setup_autocomplete() {
     var copoFormsURL = "/copo/copo_forms/";
-
     $(document).on('focus', 'input[id^="annotator-field"]', function (e) {
         t = e.currentTarget
         $('.annotator-listing').find('ul').empty()
@@ -633,6 +632,7 @@ var auto_complete = function () {
         Url: $("#elastic_search_ajax").val(),
         _Select: do_select,
         _Render: do_post,
+        _Position: do_position,
     }, '.ontology-field')
 
     function do_select(item) {
@@ -651,6 +651,11 @@ var auto_complete = function () {
         }
 
     }
+
+    function do_position(a,b,c){
+
+    }
+
 
     function do_post(response) {
         response = JSON.parse(response);

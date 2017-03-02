@@ -11,6 +11,7 @@ var descriptionWizSummary = {}; //wizard summary stage content
 var tempWizStore = null; // for holding wizard-related data pending wizard load event
 var onGoingDescription = false; //informs wizard state refresh/exit
 
+
 $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
 
@@ -939,7 +940,6 @@ $(document).ready(function () {
         if (data.targets_data) {
             refresh_targets_data(data.targets_data);
         }
-
 
 
         if (($('#dataFileWizard').is(":visible"))) {
@@ -2000,7 +2000,17 @@ $(document).ready(function () {
         //build form elements
         for (var i = 0; i < stage.items.length; ++i) {
             var formElem = stage.items[i];
+
             var control = formElem.control;
+
+            var schema_type = 'default'
+
+            if ('build_from_schema' in formElem) {
+                schema_type = formElem.build_from_schema
+            }
+
+
+            var control_param;
 
             var elemValue = null;
 
@@ -2023,7 +2033,8 @@ $(document).ready(function () {
             }
 
             try {
-                formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
+
+                formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue, schema_type));
             }
             catch (err) {
                 console.log(control.toLowerCase());
@@ -2033,6 +2044,7 @@ $(document).ready(function () {
 
             //any triggers?
             if (formElem.trigger) {
+
                 try {
                     dispatchEventHandler[formElem.trigger.callback.function](formElem);
                 }
@@ -2108,22 +2120,18 @@ $(document).ready(function () {
                 }
             ]
         });
-
         dialog_display(dialog, messageTitle, wizardMessages.stage_dependency_message.text, "warning");
-
     }
 
 
     var dispatchEventHandler = {
         study_type_change: function (formElem) {
             var previousValue = null;
-
             $(document)
                 .off("focus", "#" + formElem.id)
                 .on("focus", "#" + formElem.id, function () {
                     previousValue = this.value;
                 });
-
             $(document)
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
@@ -2132,20 +2140,136 @@ $(document).ready(function () {
         },
         target_repo_change: function (formElem) {
             var previousValue = null;
-
             $(document)
                 .off("focus", "#" + formElem.id)
                 .on("focus", "#" + formElem.id, function () {
                     previousValue = this.value;
                 });
-
             $(document)
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
                     element_value_change(formElem, previousValue, "Target Repo Change");
                 });
+        },
+        growth_facility_change: function (formElem) {
+            var previousValue = null;
+            $(document)
+                .off("focus", "#" + formElem.id)
+                .on("focus", "#" + formElem.id, function () {
+                    previousValue = this.value;
+                });
+            $(document)
+                .off(formElem.trigger.type, "#" + formElem.id)
+                .on(formElem.trigger.type, "#" + formElem.id, function () {
+                    do_growth_facility_change(this.value, formElem);
+
+                });
+        },
+        get_nutrient_controls: function (formElem) {
+            var previousValue = null;
+            $(document)
+                .off("focus", "#" + formElem.id)
+                .on("focus", "#" + formElem.id, function () {
+                    previousValue = this.value;
+                });
+            $(document)
+                .off(formElem.trigger.type, "#" + formElem.id)
+                .on(formElem.trigger.type, "#" + formElem.id, function () {
+                    do_get_nutrient_controls(this.value, formElem);
+
+                });
         }
     };
+
+    function do_get_nutrient_controls(theValue, triggerElem) {
+        if (!copoSchemas.hasOwnProperty(theValue + "_schema")) {
+            var parentForm = $("#" + triggerElem.id).closest("form");
+            if (parentForm.find(".test_trigger").length) { //this is a dynamic <div> I just made up, see def down
+                parentForm.find(".test_trigger").remove();
+            }
+            return false;
+        }
+        var targetSchema = copoSchemas[theValue + "_schema"];
+        //get parent form
+        var parentForm = $("#" + triggerElem.id).closest("form");
+        if (parentForm.find(".test_trigger").length) { //this is a dynamic <div> I just made up, see def down
+            parentForm.find(".test_trigger").remove();
+        }
+        var formDiv = do_append_controls_loop(targetSchema)
+        formDiv.insertAfter($("#" + triggerElem.id).closest(".copo-form-group"));
+        setup_element_hint();
+        refresh_tool_tips();
+    }
+
+
+    function do_growth_facility_change(theValue, triggerElem) {
+        if (!copoSchemas.hasOwnProperty(theValue + "_schema")) {
+            var parentForm = $("#" + triggerElem.id).closest("form");
+            if (parentForm.find(".test_trigger").length) { //this is a dynamic <div> I just made up, see def down
+                parentForm.find(".test_trigger").remove();
+            }
+            return false;
+        }
+        var targetSchema = copoSchemas[theValue + "_schema"];
+        //get parent form
+        var parentForm = $("#" + triggerElem.id).closest("form");
+        if (parentForm.find(".test_trigger").length) { //this is a dynamic <div> I just made up, see def down
+            parentForm.find(".test_trigger").remove();
+        }
+        var formDiv = do_append_controls_loop(targetSchema)
+        formDiv.insertAfter($("#" + triggerElem.id).closest(".copo-form-group"));
+        setup_element_hint();
+        refresh_tool_tips();
+    }
+
+
+    function do_append_controls_loop(targetSchema) {
+        // function to loop through elements on a schema, create a control for each one and add it to a div, then return the div
+        var formValue = null; // this could potentially be gotten from the triggerElem
+        var formDiv = $('<div/>',
+            {
+                class: "test_trigger form-group copo-form-group"
+            });
+
+        for (var i = 0; i < targetSchema.length; ++i) {
+            var formElem = targetSchema[i];
+            formElem["id"] = formElem.id.split(".").slice(-1)[0];
+            var control = formElem.control;
+            var elemValue = null;
+            if (formValue) {
+                if (formValue[formElem.id]) {
+                    elemValue = formValue[formElem.id];
+                    if (!elemValue) {
+                        if (formElem.default_value) {
+                            elemValue = formElem.default_value;
+                        } else {
+                            elemValue = "";
+                        }
+                    }
+                }
+            }
+            if (formElem.hidden == "true") {
+                control = "hidden";
+            }
+            try {
+                formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
+            }
+            catch (err) {
+                console.log(control.toLowerCase());
+                formDiv.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + formElem.label + '): Cannot resolve form control!</div>');
+                console.log(err);
+            }
+            //any triggers?
+            if (formElem.trigger) {
+                try {
+                    dispatchEventHandler[formElem.trigger.callback.function](formElem);
+                }
+                catch (err) {
+                }
+            }
+        }
+        return formDiv
+    }
 
 
     function set_wizard_summary() {

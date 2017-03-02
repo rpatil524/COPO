@@ -195,8 +195,7 @@ class Annotation(DAComponent):
         })
         return doc['annotation']
 
-
-    def update_annotation(self, document_id, annotation_id, fields, delete = False):
+    def update_annotation(self, document_id, annotation_id, fields, delete=False):
         # first remove element
         self.get_collection_handle().update(
             {
@@ -217,7 +216,7 @@ class Annotation(DAComponent):
                     '_id': ObjectId(document_id)
                 },
                 {
-                    '$push':{'annotation': fields}
+                    '$push': {'annotation': fields}
                 }
             )
             return fields
@@ -366,8 +365,11 @@ class Submission(DAComponent):
 
 
 class DataFile(DAComponent):
+
+
     def __init__(self, profile_id=None):
         super(DataFile, self).__init__(profile_id, "datafile")
+
 
     def get_by_file_id(self, file_id=None):
         docs = None
@@ -377,9 +379,11 @@ class DataFile(DAComponent):
 
         return docs
 
+
     def get_relational_record_for_id(self, datafile_id):
         chunked_upload = ChunkedUpload.objects.get(id=int(datafile_id))
         return chunked_upload
+
 
     def get_record_property(self, datafile_id=str(), elem=str()):
         """
@@ -404,6 +408,22 @@ class DataFile(DAComponent):
         )
 
         return property_dict.get(elem, str())
+
+
+    def add_fields_to_datafile_stage(self, target_ids, fields, target_stage_ref):
+
+        for target_id in target_ids:
+            # for each file in target_ids retrieve the datafile object
+            df = self.get_record(target_id)
+            # get the stage using list comprehension and add new fields
+            for idx, stage in enumerate(df['description']['stages']):
+                if 'ref' in stage and stage['ref'] == target_stage_ref:
+                    for field in fields:
+                        df['description']['stages'][idx]['items'].append(field)
+
+            # now update datafile record
+            self.get_collection_handle().update({'_id': ObjectId(target_id)},
+                                                {'$set': {'description.stages': df['description']['stages']}})
 
 
 class Profile(DAComponent):

@@ -174,6 +174,7 @@ function refresh_tool_tips() {
         });
 
     });
+    $(".autocomplete").removeAttr('style');
 }
 
 

@@ -53,7 +53,12 @@ class BrokerDA:
             characteristics_schema=d_utils.get_copo_schema("material_attribute_value"),
             source_schema=d_utils.get_copo_schema("source"),
             duration_schema=d_utils.get_copo_schema("duration"),
-            greenhouse_rooting_schema=d_utils.get_copo_schema("miappe_rooting_greenhouse")
+            greenhouse_rooting_schema=d_utils.get_copo_schema("miappe_rooting_greenhouse"),
+            field_rooting_schema=d_utils.get_copo_schema("miappe_rooting_field"),
+            hydroponics_schema=d_utils.get_copo_schema("hydroponics"),
+            soil_schema=d_utils.get_copo_schema("soil"),
+            phenotypic_variables_schema=d_utils.get_copo_schema("phentotypic_variables"),
+            environment_variables_schema=d_utils.get_copo_schema("environment_variables")
         )
 
         self.context["copo_schemas"] = copo_schemas

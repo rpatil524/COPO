@@ -1037,6 +1037,10 @@ input.date-picker{
     width: 200px;
 }
 
-#gh_controls{
+#gh_controls, #field_controls{
     margin-top: 15px;
+}
+
+.autocomplete{
+    z-index: 10;
 }

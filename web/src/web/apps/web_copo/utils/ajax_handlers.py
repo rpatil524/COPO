@@ -28,7 +28,6 @@ def search_ontology(request):
     term = request.GET['query']
     url = settings.ELASTIC_SEARCH_URL
     q = json.dumps({"query": {"match_phrase_prefix": {"name": term}}})
-    # q = '{"query": { "multi_match": { "fields": ["name", "accession_id", "aspect", "definition"], "query": "' + term + '", "type": "phrase_prefix"}}}'
     data = requests.post(url, q)
     return HttpResponse(data.text)
 
@@ -38,11 +37,11 @@ def search_ontology_ebi(request, ontology_names):
     if ontology_names == "999":
         ontology_names = str()
 
-    #ontologies = ol.ONTOLOGY_LKUPS['ontologies_to_search']
     ontologies = ontology_names
     fields = ol.ONTOLOGY_LKUPS['fields_to_search']
     query = ol.ONTOLOGY_LKUPS['ebi_ols_autocomplete'].format(**locals())
-    data = requests.get(query).text
+    print(query)
+    data = requests.get(query, timeout=1).text
     return HttpResponse(data)
 
 
