@@ -397,7 +397,8 @@ def control_to_schema_name(control):
     object_list = [
         dict(control="copo-characteristics", schema="material_attribute_value"),
         dict(control="ontology term", schema="ontology_annotation"),
-        dict(control="copo-comment", schema="comment")
+        dict(control="copo-comment", schema="comment"),
+        dict(control="copo-duration", schema="duration")
     ]
 
     object_type_control = [x for x in object_list if x['control'] == control.lower()]
