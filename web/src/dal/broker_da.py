@@ -51,7 +51,6 @@ class BrokerDA:
             ontology_schema=d_utils.get_copo_schema("ontology_annotation"),
             comment_schema=d_utils.get_copo_schema("comment"),
             characteristics_schema=d_utils.get_copo_schema("material_attribute_value"),
-            source_schema=d_utils.get_copo_schema("source")
         )
 
         self.context["copo_schemas"] = copo_schemas
@@ -63,12 +62,14 @@ class BrokerDA:
 
         record_object = self.da_object.save_record(self.auto_fields, **kwargs)
 
-        # process visualisation context
+        # process visualisation context,
+
+        # set extra parameters which will be passed along to the visualize object
         self.broker_visuals.set_extra_params(dict(record_object=record_object))
 
+        # build dictionary of executable tasks/functions
         visualize_dict = dict(profiles_counts=self.broker_visuals.do_profiles_counts,
-                              sources_json=self.broker_visuals.get_sources_json,
-                              sources_json_and_last_record_id=self.broker_visuals.get_sources_json_last_record_id,
+                              created_component_json=self.broker_visuals.get_created_component_json,
                               last_record=self.broker_visuals.get_last_record,
                               get_profile_count=self.broker_visuals.get_profile_count
                               )
@@ -102,6 +103,15 @@ class BrokerDA:
         self.context["form"]["visualize"] = self.param_dict.get("visualize")
         return self.context
 
+    def do_form_and_component_records(self):
+        # generates form, and in addition returns records of the form component, this could, for instance, be
+        # used for cloning of a record
+
+        self.context = self.do_form()
+        self.context["component_records"] = htags.generate_component_records(self.component, self.profile_id)
+
+        return self.context
+
     def do_doi(self):
         id_handle = self.param_dict.get("id_handle")
         id_type = self.param_dict.get("id_type")
@@ -126,6 +136,11 @@ class BrokerDA:
         user = User.objects.get(pk=int(user_id))
         user.email = user_email
         user.save()
+
+        return self.context
+
+    def do_component_record(self):
+        self.context["component_record"] = self.da_object.get_record(self.param_dict.get("target_id"))
 
         return self.context
 
@@ -188,26 +203,19 @@ class BrokerVisuals:
         self.context["profile_count"] = True
         return self.context
 
-    def get_sources_json(self):
-        self.context["option_values"] = d_utils.generate_sources_json()
-        return self.context
-
-    def get_single_source_json(self):
-        target_id = self.param_dict.get("target_id", str())
-        self.context["option_values"] = d_utils.generate_sources_json(target_id)
-        return self.context
-
-    def get_sources_json_last_record_id(self):
+    def get_created_component_json(self):
         record_object = self.param_dict.get("record_object", dict())
 
-        self.context = self.get_sources_json()
-        self.context["last_record_id"] = str(record_object.get("_id", str()))
-        return self.context
+        target_id = str(record_object.get("_id", str()))
+        option_values = dict()
 
-    def get_sources_json_component(self):
-        self.context["option_values"] = d_utils.generate_sources_json()
-        self.context["component_records"] = htags.generate_component_records(self.component, self.profile_id)
+        if self.component == "source":
+            option_values = d_utils.generate_sources_json(target_id)
+        elif self.component == "sample":
+            option_values = d_utils.get_samples_json(target_id)
 
+        self.context["option_values"] = option_values
+        self.context["created_record_id"] = str(record_object.get("_id", str()))
         return self.context
 
     def get_last_record(self):
@@ -239,6 +247,12 @@ class BrokerVisuals:
 
     def do_attributes_display(self):
         target_id = self.param_dict.get("target_id", str())
-        self.context['sample_attributes'] = htags.generate_attributes(self.component, target_id)
+        self.context['component_attributes'] = htags.generate_attributes(self.component, target_id)
+        self.context['component_label'] = htags.get_labels().get(self.component, dict()).get("label", str())
+
+        return self.context
+
+    def get_component_help_messages(self):
+        self.context['help_messages'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS['HELP_MESSAGES'][self.component])
 
         return self.context

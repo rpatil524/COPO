@@ -27,10 +27,12 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{% static 'copo/css/font-awesome/css/font-awesome.min.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/css/awesome/css/awesome-bootstrap-checkbox.css' %}">
+    {#    <link rel="stylesheet" href="{% static 'copo/css/awesome/css/awesome-bootstrap-checkbox.css' %}">#}
 
-    <!-- Selectize Components -->
-    <link rel="stylesheet" href="{% static 'copo/css/selectize/selectize.css' %}">
+    <!-- Selectize -->
+    {#    <link rel="stylesheet" href="{% static 'copo/css/selectize/selectize.css' %}">#}
+{#    <link rel="stylesheet" href="{% static 'copo/selectize/selectize.css' %}">#}
+    <link rel="stylesheet" href="{% static 'copo/selectize/selectize.bootstrap3.css' %}">
 
     <!-- Google Fonts -->
     <link href='http://fonts.googleapis.com/css?family=Quattrocento+Sans' rel='stylesheet' type='text/css'>
@@ -52,7 +54,8 @@
     <script src="{% static 'copo/js/bootstrap.js' %}"></script>
     <script src="{% static 'copo/js/bootstrap-dialog.js' %}"></script>
     <script src="{% static 'copo/js/dropdowns-enhancement.js' %}"></script>
-    <script src="{% static 'copo/js/selectize.js' %}"></script>
+    <script src="{% static 'copo/selectize/standalone/selectize.min.js' %}"></script>
+    {#    <script src="{% static 'copo/js/selectize.js' %}"></script>#}
     <script src="{% static 'copo/bootstrap_switch/js/bootstrap-switch.js' %}"></script>
     <script src="{% static 'copo/fuelux/js/fuelux.js' %}"></script>
     <script src="{% static 'copo/validator1000hz/validator.min.js' %}"></script>
@@ -141,9 +144,9 @@
             //Try parse like JSON data
 
             var empty,
-                    length = response.length,
-                    li = domCreate("li"),
-                    ul = domCreate("ul");
+                length = response.length,
+                li = domCreate("li"),
+                ul = domCreate("ul");
             //Reverse result if limit parameter is custom
             if (custParams.limit < 0) {
                 properties.reverse();

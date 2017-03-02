@@ -5,6 +5,7 @@
 {% load html_tags %}
 
 {% block stylesheet_block %}
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_wizard.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/copo/sample_2.css' %}">
 {% endblock %}
 
@@ -39,33 +40,14 @@
                         <i class="fa fa-info-circle" aria-hidden="true"></i> Information Panel
                         <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="helpCentreMenu">
-                        <li class="component-help" data-component="generalHelpTips">
-                            <a href="#">
-                                <div style="padding: 5px 5px 0px 0px;">General Tips</div>
-                            </a>
-                        </li>
-                        <li role="separator" class="divider"></li>
-                        <li class="component-help" data-component="fileListComponent"><a
-                                href="#">
-                            <div style="padding: 5px 5px 0px 0px;"><i
-                                    class="fa fa-file copo-components-icons"></i>
-                                <span class="icon_text">Inspect Tips</span></div>
-                        </a></li>
-                        <li class="component-help" data-component="descriptionWizardComponent">
-                            <a href="#">
-                                <div style="padding: 5px 5px 0px 0px;"><i
-                                        class="fa fa-tags copo-components-icons"></i>
-                                    <span class="icon_text">Description Tips</span></div>
-                            </a>
-                        </li>
+                    <ul class="dropdown-menu componentHelpList" aria-labelledby="helpCentreMenu">
                     </ul>
                 </div>
             </div>
             <div class="panel-body">
-                <div id="on_the_fly_info"></div>
+                <div id="copo_instant_info"></div>
                 <div id="helptipsDiv" style="display: block;">
-                    <table id="datafile_howtos"
+                    <table id="sample_help_table"
                            class="table table-striped table-bordered order-column hover copo-datatable copo-table-header"
                            width="100%">
                     </table>
@@ -83,7 +65,7 @@
 
     <div class="row">
         <div class="col-sm-12 col-md-12 col-lg-12" style="padding-right: 0px !important;">
-            <ul id="copo-datafile-tabs" class="nav nav-tabs copo-tab-navs">
+            <ul id="sample-display-tabs" class="nav nav-tabs copo-tab-navs">
                 <li class="active"><a data-toggle="tab" href="#fileListComponent" data-component="fileListComponent">
                     <span class="copo-data-panel-title">
                         <i class="fa fa-file"></i>
@@ -123,8 +105,7 @@
 
                         <div class="fuelux" style="margin-bottom: 5px;">
                             <div class="wizard" data-initialize="wizard" id="sampleWizard"
-                                 style="display: none;"
-                                 tabindex="0">
+                                 style="display: none;">
                                 <div class="steps-container">
                                     <ul class="steps">
 
@@ -148,7 +129,7 @@
                         <div class="col-md-8" style="display: none;">
                             <button data-toggle="tooltip" title="Exit Description "
                                     id="remove_act"
-                                    class="btn btn-sm btn-warning" type="button">Exit Wizard
+                                    class="btn btn-danger" type="button">Exit Sample Description
                             </button>
                         </div>
                     </div>

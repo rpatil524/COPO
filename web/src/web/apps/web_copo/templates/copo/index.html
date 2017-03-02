@@ -4,7 +4,6 @@
 {% load web_tags %}
 
 {% block stylesheet_block %}
-    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
     <link rel="stylesheet" href="{% static 'copo/css/copo/index.css' %}">
 
 {% endblock %}
@@ -107,7 +106,7 @@
                             <span class="profile-title" style="font-size: 16px; color: #4c49a0;"></span>
                         </a>
                     </div>
-                    <div class="panel-body profile-description" style="max-height: 100px; overflow-y: auto;"></div>
+                    <div class="panel-body profile-description" style="max-height: 100px; overflow-y: scroll;"></div>
                     <div class="panel-footer profile-date"></div>
                 </div>
             </div>

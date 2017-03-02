@@ -2,13 +2,14 @@
   "title": "Sample Description Wizard Messages",
   "description": "Defines messages used in the sample description process. 'text' holds the actual message; 'text_class' as used here are ordinary Bootstrap classes: text-primary, text-info, text-warning, text-danger, which give additional flexibility for conveying different message kinds to the user; 'text_options' are oriented towards a more question-type message that would require the user to make a choice in response. messages used within the context of dynamically generated stages are also captured here.",
   "properties": {
-    "initiate_message": {
-      "text": "<strong>1.)</strong> Select a file; <strong>2.)</strong> click the <strong>Describe</strong> button to initiate the wizard, <strong>COPO-WIZ</strong>; <strong>3.)</strong> follow the stages presented by the wizard to describe your data file",
+    "save_cell_message": {
+      "text": "Wrap up action interrupted due to an active cell edit! Please Save or Cancel active cell edit and retry",
       "text_class": "text-default"
     },
-    "select_files_message": {
-      "text": "Please select the file you want to describe!",
-      "text_class": "text-danger"
+    "confirm_initial_sample_generation": {
+      "title": "Confirm Sample Generation",
+      "text": "The specified number of samples will now be generated using the sample attributes you've entered. <br/><br/>Click <strong>Continue</strong> if you are happy to go ahead and generate the samples. <br/>Note: In the next stage, you will be able to modify attribute values for individual samples. <br/>Click <strong>Review</strong> to modify the attributes entries you've so far made.",
+      "text_class": "text-default"
     },
     "no_destination_message": {
       "text": "Unable to determine a deposition destination for the selected file bundle at this instance. Please select your target repository from the list provided.",
@@ -27,7 +28,7 @@
       "text_class": "text-default"
     },
     "review_message": {
-      "text": "You have reached the final stage of the wizard. Use the 'Prev' and 'Next' buttons to review your entries. <br/><br/>Click <strong>Finish!</strong> to wrap up the current description.",
+      "text": "In this stage, you will be able modify specific attribute values for your samples. To modify an attribute value, highlight the required cell and press the 'Enter' key. When done modifying the value in a cell, press the 'Enter' key again to save your changes. <br/><br/>Click <strong>Finish!</strong> when you are done with your changes to terminate the description session.",
       "text_class": "text-default"
     },
     "confirm_initiate_submission": {
@@ -43,6 +44,7 @@
       "text_class": "text-default"
     },
     "exit_wizard_message": {
+      "title": "Confirm Wizard Exit",
       "text": "Are you sure you want to exit the wizard?",
       "text_class": "text-default"
     },

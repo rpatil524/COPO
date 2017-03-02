@@ -128,38 +128,6 @@ def get_figshare_publish_options():
     return lookup.DROP_DOWNS['YES_NO']
 
 
-def get_samples_json():
-    """
-    returns all samples in a profile (i.e isa and biosamples)
-    :return:
-    """
-    from dal.copo_da import Sample
-    profile_id = ThreadLocal.get_current_request().session['profile_id']
-    samples = Sample(profile_id).get_all_records()
-
-    value_field = str("id")
-    label_field = str("sample_name")
-    search_field = ["id", "sample_name"]
-    secondary_label_field = ["meta_sample_name"]
-
-    elem_json = dict(value_field=value_field,
-                     label_field=label_field,
-                     secondary_label_field=secondary_label_field,
-                     search_field=search_field,
-                     options=list())
-
-    for sd in samples:
-        elem_json.get("options").append(
-            {
-                value_field: str(sd["_id"]),
-                label_field: sd["name"],
-                secondary_label_field[0]: sd["name"],
-                "sample_type": sd.get("sample_type", str())
-            })
-
-    return elem_json
-
-
 def get_isasamples_json():
     """
     returns isa samples in a profile
@@ -193,13 +161,13 @@ def get_isasamples_json():
     return elem_json
 
 
-def generate_sources_json(source_id=None):
+def generate_sources_json(target_id=None):
     from dal.copo_da import Source
     profile_id = ThreadLocal.get_current_request().session['profile_id']
 
-    if source_id:
+    if target_id:
         sources = list()
-        sources.append(Source().get_record(source_id))
+        sources.append(Source().get_record(target_id))
     else:
         sources = Source(profile_id).get_all_records()
 
@@ -208,7 +176,7 @@ def generate_sources_json(source_id=None):
     value_field = str("id")
     label_field = str("source_name")
     search_field = ["id", "source_name"]
-    secondary_label_field = ["meta_source_name", "source_organism"]
+    secondary_label_field = ["meta_source_name"]
     component_records = dict()
 
     elem_json = dict(value_field=value_field,
@@ -223,17 +191,45 @@ def generate_sources_json(source_id=None):
             {
                 value_field: str(src["_id"]),
                 label_field: src["name"],
-                secondary_label_field[0]: "Source Name: " + src["name"],
-                secondary_label_field[1]: "Organism: " + src["organism"]["annotationValue"]
+                secondary_label_field[0]: src["name"]
             })
 
-        rec_dict = dict(_id=str(src["_id"]))
-        for f in schema:
-            if f.get("show_in_form", True):
-                key_split = f["id"].split(".")[-1]
-                rec_dict[key_split] = src.get(key_split, default_jsontype(f["type"]))
+    return elem_json
 
-        elem_json.get("component_records")[str(src["_id"])] = rec_dict
+
+def get_samples_json(target_id=None):
+    """
+    returns all samples in a profile (i.e isa and biosamples)
+    :return:
+    """
+    from dal.copo_da import Sample
+    profile_id = ThreadLocal.get_current_request().session['profile_id']
+
+    if target_id:
+        samples = list()
+        samples.append(Sample().get_record(target_id))
+    else:
+        samples = Sample(profile_id).get_all_records()
+
+    value_field = str("id")
+    label_field = str("sample_name")
+    search_field = ["id", "sample_name"]
+    secondary_label_field = ["meta_sample_name"]
+
+    elem_json = dict(value_field=value_field,
+                     label_field=label_field,
+                     secondary_label_field=secondary_label_field,
+                     search_field=search_field,
+                     options=list())
+
+    for sd in samples:
+        elem_json.get("options").append(
+            {
+                value_field: str(sd["_id"]),
+                label_field: sd["name"],
+                secondary_label_field[0]: sd["name"],
+                "sample_type": sd.get("sample_type", str())
+            })
 
     return elem_json
 
@@ -354,6 +350,12 @@ def get_ena_remote_path(submission_token):
 
 
 def get_copo_schema(component, as_object=False):
+    """
+    retrieves the designated schema
+    :param component: this is a key, at least should be, in the schema_dict
+    :param as_object: specifies is the resolved schema is served as an object (using . notation) or as a dictionary
+    :return: the resolved schema as a list, or an empty list if one couldn't be resolved
+    """
     from dal.copo_base_da import DataSchemas
     schema_base = DataSchemas("COPO").get_ui_template().get("copo")
 

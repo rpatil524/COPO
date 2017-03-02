@@ -98,15 +98,9 @@ def get_control_options(f):
 
 @register.filter("generate_copo_form")
 def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), message_dict=dict(), profile_id=str()):
-    # message_dict templates are defined in the lookup dictionary, "MESSAGES_LKUPS"
+    # message_dict templates are defined in the lookup dictionary: "MESSAGES_LKUPS"
 
-    label_dict = dict(publication=dict(label="Publication", clonable=False),
-                      person=dict(label="Person", clonable=False),
-                      sample=dict(label="Sample", clonable=False),
-                      source=dict(label="Source", clonable=True),
-                      profile=dict(label="Profile", clonable=False),
-                      annotation=dict(label="Annotation", clonable=False),
-                      )
+    label_dict = get_labels()
 
     da_object = DAComponent(component=component, profile_id=profile_id)
 
@@ -124,9 +118,15 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
 
             # if required, resolve data source for select-type controls,
             # i.e., if a callback is defined on the 'option_values' field
-
             if "option_values" in f:
                 f["option_values"] = get_control_options(f)
+
+            # resolve values for unique items...
+            # if a list of unique items is provided with the schema, use it, else dynamically
+            # generate unique items based on the component records
+            if "unique" in f and not f.get("unique_items", list()):
+                f["unique_items"] = generate_unique_items(component=component, profile_id=profile_id,
+                                                          elem_id=f["id"].split(".")[-1], record_id=target_id)
 
             # filter based on sample type
             if component == "sample" and not filter_sample_type(form_value, f):
@@ -135,7 +135,8 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
             form_schema.append(f)
 
     # get all records: used in the UI for 'cloning' and other purposes
-    component_records = generate_component_records(component, profile_id)
+    # component_records = generate_component_records(component, profile_id)
+    component_records = list()
     # if label_dict.get(component, dict()).get("clonable", False):
     #     component_records = generate_component_records(component, profile_id)
 
@@ -148,6 +149,19 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
                 component_records=component_records,
                 clonable=label_dict.get(component, dict()).get("clonable", False),
                 )
+
+
+@register.filter("get_labels")
+def get_labels():
+    label_dict = dict(publication=dict(label="Publication", clonable=False),
+                      person=dict(label="Person", clonable=False),
+                      sample=dict(label="Sample", clonable=False),
+                      source=dict(label="Source", clonable=True),
+                      profile=dict(label="Profile", clonable=False),
+                      annotation=dict(label="Annotation", clonable=False),
+                      )
+
+    return label_dict
 
 
 @register.filter("filter_sample_type")
@@ -171,18 +185,31 @@ def filter_sample_type(form_value, elem):
 
 
 @register.filter("generate_component_record")
-def generate_component_records(component=str(), profile_id=str()):
+def generate_component_records(component=str(), profile_id=str(), label_key=str()):
+    da_object = DAComponent(component=component, profile_id=profile_id)
+    component_records = list()
+    schema = da_object.get_schema().get("schema_dict")
+
+    # if label_key is not provided, we will assume the first element in the schema to be the label_key
+
+    if not label_key:
+        label_key = schema[0]["id"].split(".")[-1]
+
+    for record in da_object.get_all_records():
+        option = dict(value=str(record["_id"]), label=record[label_key])
+        component_records.append(option)
+
+    return component_records
+
+
+@register.filter("generate_unique_items")
+def generate_unique_items(component=str(), profile_id=str(), elem_id=str(), record_id=str()):
     da_object = DAComponent(component=component, profile_id=profile_id)
     component_records = list()
 
     for record in da_object.get_all_records():
-        rec_dict = dict(_id=str(record["_id"]))
-        for f in da_object.get_schema().get("schema_dict"):
-            if f.get("show_in_form", True):
-                key_split = f["id"].split(".")[-1]
-                rec_dict[key_split] = record.get(key_split, d_utils.default_jsontype(f.get("type", str())))
-
-        component_records.append(rec_dict)
+        if elem_id in record and not str(record["_id"]) == record_id:
+            component_records.append(record[elem_id])
 
     return component_records
 
@@ -200,9 +227,12 @@ def generate_copo_table_data(profile_id=str(), component=str()):
     columns = list()
     dataSet = list()
 
+    displayable_fields = list()
+
     # headers
     for f in da_object.get_schema().get("schema_dict"):
         if f.get("show_in_table", True):
+            displayable_fields.append(f)
             columns.append(dict(title=f["label"]))
 
     columns.append(dict(title=str()))  # extra 'blank' header for record actions column
@@ -210,9 +240,8 @@ def generate_copo_table_data(profile_id=str(), component=str()):
     # data
     for rec in records:
         row = list()
-        for f in da_object.get_schema().get("schema_dict"):
-            if f.get("show_in_table", True):
-                row.append(resolve_control_output(rec, f))
+        for df in displayable_fields:
+            row.append(resolve_control_output(rec, df))
 
         row.append(str(rec["_id"]))  # last element in a row exposes the id of the record
         dataSet.append(row)
@@ -295,46 +324,65 @@ def generate_copo_profiles_data(profiles=list()):
 @register.filter("generate_attributes")
 def generate_attributes(component, target_id):
     da_object = DAComponent(component=component)
+    schema = da_object.get_schema().get("schema_dict")
 
-    sample_attributes = dict()
+    columns = list()
     record = da_object.get_record(target_id)
-    sample_attributes["record"] = record
-    table_schema = list()
 
-    sample_types = list()
+    filter_attributes = dict(component=component)  # holds parameters for filtering out display columns
 
-    for s_t in d_utils.get_sample_type_options():
-        sample_types.append(s_t["value"])
+    if component == "sample":  # sample decides what to show based on sample type
+        sample_types = list()
 
-    sample_type = str()
+        for s_t in d_utils.get_sample_type_options():
+            sample_types.append(s_t["value"])
 
-    if "sample_type" in record:
-        sample_type = record["sample_type"]
+        sample_type = record.get("sample_type", str())
+        filter_attributes["sample_types"] = sample_types
+        filter_attributes["sample_type"] = sample_type
 
-    for f in da_object.get_schema().get("schema_dict"):
-        # get relevant attributes based on sample type
-        if f.get("show_in_sub_table", False) and sample_type in f.get("specifications", sample_types):
+    for f in schema:
+        # get relevant attributes based on filter
+        filter_attributes["elem"] = f
+
+        if attribute_filter(filter_attributes):
+
+            # get short-form id
+            f["id"] = f["id"].split(".")[-1]
+            col = dict(title=f["label"], id=f["id"], control=f["control"])
+
             # if required, resolve data source for select-type controls,
             # i.e., if a callback is defined on the 'option_values' field
             if "option_values" in f:
                 f["option_values"] = get_control_options(f)
 
-            # change sample-source control to wizard-compliant version
-            if f.get("control", str()) == "copo-sample-source":
-                f["control"] = "copo-sample-source-2"
+            col["data"] = resolve_control_output(record, f)
 
-            # get short-form id
-            f["id"] = f["id"].split(".")[-1]
+            columns.append(col)
 
-            # might not need to include name
-            if f["id"] == "name":
-                continue
+    return columns
 
-            table_schema.append(f)
 
-    sample_attributes["schema"] = table_schema
+def attribute_filter(filter_attributes):
+    """
+    filters attribute for display
+    :param filter_attributes:
+    :return:
+    """
+    clear_attribute = True
 
-    return sample_attributes
+    elem = filter_attributes["elem"]
+    component = filter_attributes["component"]
+
+    if not elem.get("show_as_attribute", False):
+        return False
+
+    # do component-specific test here
+    if component == "sample":
+        if filter_attributes["sample_type"] not in elem.get("specifications", filter_attributes["sample_types"]):
+            return False
+
+    return clear_attribute
 
 
 def resolve_control_output(data_dict, elem):
@@ -357,8 +405,6 @@ def resolve_control_output(data_dict, elem):
 
 def get_resolver(data, elem):
     resolver_list = [
-        dict(control="copo-sample-source", resolver="resolve_copo_sample_source_data"),
-        dict(control="copo-sample-source-2", resolver="resolve_copo_sample_source_data"),
         dict(control="copo-characteristics", resolver="resolve_copo_characteristics_data"),
         dict(control="copo-comment", resolver="resolve_copo_comment_data"),
         dict(control="copo-multi-select", resolver="resolve_copo_multi_select_data"),
@@ -414,22 +460,6 @@ def resolve_description_data(data, elem):
     return resolved_value
 
 
-def resolve_copo_sample_source_data(data, elem):
-    option_values = None
-    resolved_value = str()
-    if "option_values" in elem:
-        option_values = get_control_options(elem)
-
-    if option_values and data:
-        value_field = option_values.get("value_field", str())
-        label_field = option_values.get("label_field", str())
-        for option in option_values["options"]:
-            if option.get(value_field, str()) == data:
-                resolved_value = option.get(label_field, str())
-
-    return resolved_value
-
-
 def resolve_copo_characteristics_data(data, elem):
     schema = DataSchemas("COPO").get_ui_template().get("copo").get("material_attribute_value").get("fields")
 
@@ -452,8 +482,10 @@ def resolve_copo_comment_data(data, elem):
 
     for f in schema:
         if f.get("show_in_table", True):
+            a = dict()
             if f["id"].split(".")[-1] in data:
-                resolved_data.append(data[f["id"].split(".")[-1]])
+                a[f["id"].split(".")[-1]] = data[f["id"].split(".")[-1]]
+                resolved_data.append(a)
 
     if not resolved_data:
         resolved_data = str()
@@ -490,6 +522,9 @@ def resolve_copo_multi_search_data(data, elem):
     resolved_value = list()
 
     option_values = None
+
+    if isinstance(data, list):
+        data = ','.join(map(str, data))
 
     if "option_values" in elem:
         option_values = get_control_options(elem)

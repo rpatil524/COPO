@@ -320,7 +320,7 @@ class WizardHelper:
         self.description_token = str(
             Description(self.profile_id).create_description(batch_stages, batch_attributes)['_id'])
 
-        if batch_stages:  # load all previously executed stages
+        if batch_stages:  # load all previously activated stages
             process['process_name'] = 'stages'
             process['process_data'] = self.get_stages_display()
         else:

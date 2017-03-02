@@ -7,6 +7,9 @@ $(document).ready(function () {
 
 });
 
+
+var selectizeObjects = Object(); //stores reference to selectize objects initialised on the page
+
 function setup_autocomplete() {
     var copoFormsURL = "/copo/copo_forms/";
 
@@ -390,8 +393,6 @@ function do_render_table(data) {
 
 
 function refresh_tool_tips() {
-    var objectStore = Object(); //holds returned object after initialization
-
     $("[data-toggle='tooltip']").tooltip();
     $("[data-toggle='popover']").popover();
 
@@ -399,14 +400,10 @@ function refresh_tool_tips() {
     apply_color();
     refresh_selectbox();
     refresh_multiselectbox();
-
-    var copoMultiSearch = refresh_multisearch();
-    objectStore["copoMultiSearch"] = copoMultiSearch;
+    refresh_multisearch();
 
     refresh_range_slider();
     auto_complete();
-
-    return objectStore;
 
 } //end of func
 
@@ -501,7 +498,7 @@ function refresh_multiselectbox() {
                         valueElem.val("");
                     }
                 },
-                dropdownParent: 'body',
+                //dropdownParent: 'body',
                 maxItems: maxTems,
                 plugins: ['remove_button']
             });
@@ -515,8 +512,6 @@ function refresh_multiselectbox() {
 
 
 function refresh_multisearch() {
-    var theControl = null;
-
     $('.copo-multi-search').each(function () {
         var elem = $(this);
 
@@ -538,9 +533,10 @@ function refresh_multisearch() {
                         valueElem.val("");
                     }
                 },
-                dropdownParent: 'body',
+                // dropdownParent: 'body',
                 maxItems: maxTems,
-                persist: false,
+                persist: true,
+                create: true,
                 plugins: ['remove_button'],
                 valueField: elemSpecs.value_field,
                 labelField: elemSpecs.label_field,
@@ -550,14 +546,14 @@ function refresh_multisearch() {
                     item: function (item, escape) {
                         return '<div>' +
                             (item[elemSpecs.label_field] ? '<span>'
-                            + escape(item[elemSpecs.label_field]) + '</span>' : '') +
+                                + escape(item[elemSpecs.label_field]) + '</span>' : '') +
                             '</div>';
                     },
                     option: function (item, escape) {
                         var label = ''; // item[elemSpecs.label_field];
                         var caption = '<div>';
                         for (var i = 0; i < elemSpecs.secondary_label_field.length; ++i) {
-                            caption += '<div class="text-success">' + item[elemSpecs.secondary_label_field[i]] + '</div>';
+                            caption += '<div class="text-primary">' + item[elemSpecs.secondary_label_field[i]] + '</div>';
                         }
                         caption += "</div>";
 
@@ -573,12 +569,11 @@ function refresh_multisearch() {
             var control = $funSelect[0].selectize;
             control.setValue(valueElem.val().split(",")); //set default value
 
-            theControl = control;
+            //retain reference to control for any future reference
+            selectizeObjects[valueElem.attr("id")] = control;
         }
 
     });
-
-    return theControl;
 }
 
 //set up tool tips; a medium for transmitting info about form elements
@@ -605,11 +600,10 @@ function setup_formelement_hint(switchElem, inputElements) {
 
                 $('.popover').popover('destroy'); //hide any shown popovers
 
-
                 var pop = elem.popover({
                     title: title,
                     content: content,
-                    container: 'body',
+                    // container: 'body',
                     template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
                     '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
                     '</h3><div class="popover-content"><p></p></div></div></div>'
@@ -940,6 +934,133 @@ function get_data_item_collapse(link, itemData, itemCount) {
     return ctrlDiv.html();
 }
 
+function do_string_display(data) {
+    return get_attributes_outer_div().append(get_attributes_inner_div_1().html(data));
+}
+
+function do_array_display(data) {
+    var ctrlDiv = $('<div/>');
+
+    for (var i = 0; i < data.length; ++i) {
+        if (Object.prototype.toString.call(data[i][0]) === '[object Object]') {
+            var divElement = get_attributes_outer_div();
+            for (var j = 0; j < data[i].length; ++j) {
+                if (j == 0) {
+                    //get all keys, our target is always the first key,
+                    // since 'data' is formatted in such a manner to produce objects of one and only one element
+                    var dKeys = Object.keys(data[i][j])
+                    divElement.append(get_attributes_inner_div_1().html(data[i][j][dKeys[0]]));
+                } else {
+                    var dKeys = Object.keys(data[i][j])
+                    // if (data[i][j][dKeys[0]] == '') {
+                    //     continue; //don't display entries without a value
+                    // }
+                    divElement.append(get_attributes_inner_div().html(data[i][j][dKeys[0]]));
+                }
+            }
+
+            ctrlDiv.append(divElement);
+        } else if (Object.prototype.toString.call(data[i][0]) === '[object String]') {
+            ctrlDiv.append(get_attributes_outer_div().append(data[i]));
+        }
+    }
+
+    return ctrlDiv
+}
+
+function do_object_display(data) {
+    var ctrlDiv = $('<div/>');
+
+    $.each(subValObject, function (key, val) {
+        var divElement = get_attributes_outer_div();
+        var keyDisplay = get_attributes_inner_div_1().html(key);
+        var valueDisplay = get_attributes_inner_div().html(val);
+
+        divElement.append(keyDisplay).append(valueDisplay);
+        ctrlDiv.append(divElement);
+    });
+
+    return ctrlDiv
+
+}
+
+function format_display_data(displayData) {
+    //function builds a display displayData
+    // based on type, a different handle is passed the responsibility of display
+    if (Object.prototype.toString.call(displayData) === '[object String]') {
+        return do_string_display(displayData);
+    } else if (Object.prototype.toString.call(displayData) === '[object Array]') {
+        return do_array_display(displayData);
+    } else if (Object.prototype.toString.call(displayData) === '[object Object]') {
+        return do_object_display(displayData);
+    } else {
+        return displayData
+    }
+}
+
+function build_attributes_display(data) {
+    //build view
+    var componentLabel = '';
+    var componentAttributes = [];
+
+    if (data.hasOwnProperty("component_label")) {
+        componentLabel = data.component_label;
+    }
+
+    if (data.hasOwnProperty("component_attributes")) {
+        componentAttributes = data.component_attributes;
+    }
+
+    var attributesPanel = $('<div/>', {
+        class: "panel panel-copo-data panel-default",
+        style: "margin-top: 5px; font-size: 12px;"
+    });
+
+    var attributesPanelHeading = $('<div/>', {
+        class: "panel-heading",
+        style: "background-image: none; font-weight: 600;",
+        html: componentLabel + " Attributes"
+    });
+
+    attributesPanel.append(attributesPanelHeading);
+
+
+    var attributesPanelBody = $('<div/>', {
+        class: "panel-body"
+    });
+
+    var notAssignedSpan = $('<span/>', {
+        class: "text-danger",
+        html: "Attributes not assigned!"
+    });
+
+    attributesPanelBody.append(notAssignedSpan);
+
+
+    if (componentAttributes.length > 0) {
+        notAssignedSpan.remove();
+
+        for (var i = 0; i < componentAttributes.length; ++i) {
+            var currentItem = componentAttributes[i];
+
+            var itemLabel = $('<div/>', {
+                html: currentItem.title,
+                style: "font-size:12px; font-weight:bold"
+            });
+
+            var itemDiv = $('<div/>', {
+                style: "padding: 5px; border: 1px solid #ddd; border-radius:2px; margin-bottom:3px;"
+            }).append(itemLabel).append(format_display_data(currentItem.data));
+
+            attributesPanelBody.append(itemDiv);
+        }
+    }
+
+    attributesPanel.append(attributesPanelBody);
+
+    return $('<div/>').append(attributesPanel);
+}
+
 function get_components_properties() {
     var componentProperties = [
         {
@@ -1068,7 +1189,7 @@ function do_profile_navigate(parentObject) {
 
         var iElem = $('<i/>',
             {
-                class: "copo-components-icons " + components[i].iconClass + " " ,
+                class: "copo-components-icons " + components[i].iconClass + " ",
             });
 
         aElem.append(iElem);
@@ -1076,6 +1197,171 @@ function do_profile_navigate(parentObject) {
     }
 
 } //end of func
+
+function get_spinner_image() {
+    var loaderObject = $('<div>',
+        {
+            style: 'text-align: center',
+            html: "<span class='fa fa-spinner fa-pulse fa-3x'></span>"
+        });
+
+    return loaderObject.clone();
+}
+
+function build_help_pane_menu(helpObject, parentObject) {
+    $.each(helpObject, function (key, val) {
+        var liElem = $('<li/>',
+            {
+                class: "component-help",
+                "data-component": key
+            });
+
+        var aElem = $('<a/>',
+            {
+                href: "#"
+            });
+
+        var divElem = $('<div/>',
+            {
+                style: "padding: 5px 5px 0px 0px;",
+                html: val.title
+            });
+
+        aElem.append(divElem);
+
+        liElem.append(aElem);
+
+        parentObject.append(liElem);
+    });
+}
+
+function set_component_help(helpEntryKey, tableID, helpJSON) {
+    if (!helpJSON.hasOwnProperty(helpEntryKey)) {
+        helpEntryKey = Object.keys(helpJSON)[0];
+    }
+
+    var dataSet = []; //sampleHowtos[component].properties;
+
+    $.each(helpJSON[helpEntryKey].properties, function (key, val) {
+        var option = {};
+        option["rank"] = key + 1;
+        option["title"] = val.title;
+        option["content"] = val.content;
+        dataSet.push(option);
+    });
+
+
+    //set data
+    var table = null;
+
+    if ($.fn.dataTable.isDataTable('#' + tableID)) {
+        //if table instance already exists, then do refresh
+        table = $('#' + tableID).DataTable();
+    }
+
+    if (table) {
+        //clear old, set new data
+        table
+            .clear()
+            .draw();
+        table
+            .rows
+            .add(dataSet);
+        table
+            .columns
+            .adjust()
+            .draw();
+        table
+            .search('')
+            .columns()
+            .search('')
+            .draw();
+    } else {
+        table = $('#' + tableID).DataTable({
+            data: dataSet,
+            searchHighlight: true,
+            "lengthChange": false,
+            order: [[0, "asc"]],
+            language: {
+                "info": " _START_ to _END_ of _TOTAL_ help tips",
+                "lengthMenu": "_MENU_ tips",
+            },
+            columns: [
+                {
+                    "data": "rank",
+                    "visible": false
+                },
+                {
+                    "data": null,
+                    "title": "Tips",
+                    "render": function (data, type, row, meta) {
+                        var aLink = $('<a/>', {
+                            "data-toggle": "collapse",
+                            href: "#helpcentretips" + meta.row,
+                            html: data.title
+                        });
+
+                        var aDiv = $('<div/>', {
+                            "class": "collapse help-centre-content",
+                            id: "helpcentretips" + meta.row,
+                            html: data.content,
+                            style: "background-color: #fff; margin-top: 10px; border-radius: 4px;"
+                        });
+                        return $('<div></div>').append(aLink).append(aDiv).html();
+                    }
+                },
+                {
+                    "data": "content",
+                    "visible": false
+                }
+            ],
+            "columnDefs": [
+                {"orderData": 0,}
+            ]
+        });
+    }
+
+    $('#' + tableID + ' tr:eq(0) th:eq(0)').text(helpJSON[helpEntryKey].title);
+}
+
+function dialog_display(dialog, dTitle, dMessage, dType) {
+    var dTypeObject = {
+        "warning": "fa fa-exclamation-circle copo-icon-warning",
+        "danger": "fa fa-times-circle copo-icon-danger",
+        "info": "fa fa-exclamation-circle copo-icon-info"
+    };
+
+    var dTypeClass = "fa fa-exclamation-circle copo-icon-default";
+
+    if (dTypeObject.hasOwnProperty(dType)) {
+        dTypeClass = dTypeObject[dType];
+    }
+
+    var iconElement = $('<div/>', {
+        class: dTypeClass + " wizard-alert-icon"
+    });
+
+
+    var messageDiv = $('<div/>', {
+        html: dMessage
+    });
+
+
+    var $dialogContent = $('<div></div>');
+    $dialogContent.append($('<div/>').append(iconElement));
+    $dialogContent.append('<div class="copo-custom-modal-message">' + messageDiv.html() + '</div>');
+    dialog.realize();
+    dialog.setClosable(false);
+    dialog.setSize(BootstrapDialog.SIZE_NORMAL);
+    dialog.getModalHeader().hide();
+    dialog.setTitle(dTitle);
+    dialog.setMessage($dialogContent);
+    dialog.getModalBody().prepend('<div class="copo-custom-modal-title">' + dialog.getTitle() + '</div>');
+    dialog.getModalBody().addClass('copo-custom-modal-body');
+    //dialog.getModalContent().css('border', '4px solid rgba(255, 255, 255, 0.3)');
+    dialog.open();
+}
+
 
 
 

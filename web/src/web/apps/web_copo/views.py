@@ -160,17 +160,16 @@ def copo_visualize(request):
                      wizard_messages=broker_visuals.do_wizard_messages,
                      metadata_ratings=broker_visuals.do_metadata_ratings,
                      description_summary=broker_visuals.do_description_summary,
-                     sources_json_component=broker_visuals.get_sources_json_component,
                      un_describe=broker_visuals.do_un_describe,
                      attributes_display=broker_visuals.do_attributes_display,
-                     single_source_json=broker_visuals.get_single_source_json,
+                     help_messages=broker_visuals.get_component_help_messages,
                      )
 
     if task in task_dict:
         context = task_dict[task]()
 
     out = jsonpickle.encode(context)
-    return HttpResponse(out, content_type='json')
+    return HttpResponse(out, content_type='application/json')
 
 
 @login_required
@@ -203,9 +202,11 @@ def copo_forms(request):
                      edit=broker_da.do_save_edit,
                      delete=broker_da.do_delete,
                      form=broker_da.do_form,
+                     form_and_component_records=broker_da.do_form_and_component_records,
                      doi=broker_da.do_doi,
                      initiate_submission=broker_da.do_initiate_submission,
-                     user_email=broker_da.do_user_email
+                     user_email=broker_da.do_user_email,
+                     component_record=broker_da.do_component_record,
                      )
 
     if task in task_dict:
@@ -213,7 +214,7 @@ def copo_forms(request):
 
     out = jsonpickle.encode(context)
 
-    return HttpResponse(out, content_type='json')
+    return HttpResponse(out, content_type='application/json')
 
 
 @login_required

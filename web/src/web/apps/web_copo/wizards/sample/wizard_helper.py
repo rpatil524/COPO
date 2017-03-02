@@ -1,18 +1,17 @@
 __author__ = 'etuka'
 
 import copy
+import random
+import string
 import pandas as pd
 from bson import ObjectId
 from dal.copo_da import Sample
 from dal import cursor_to_list
-from dal.mongo_util import get_collection_ref
 import web.apps.web_copo.lookup.lookup as lkup
 from django_tools.middlewares import ThreadLocal
 import web.apps.web_copo.templatetags.html_tags as htags
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
-
-temp_collection_handle = get_collection_ref('TemporaryCollection')
 
 
 class WizardHelper:
@@ -53,10 +52,6 @@ class WizardHelper:
                     if "option_values" in f:
                         f["option_values"] = htags.get_control_options(f)
 
-                    # change sample-source control to wizard-compliant version
-                    if f.get("control", str()) == "copo-sample-source":
-                        f["control"] = "copo-sample-source-2"
-
                     # get short-form id
                     f["id"] = f["id"].split(".")[-1]
 
@@ -74,36 +69,14 @@ class WizardHelper:
 
         return wizard_stages
 
-    def finalise_sample_description(self, generated_samples):
-        object_ids = list()
-        for g_s in generated_samples:
-            object_ids.append(ObjectId(g_s))
-
-        samples = cursor_to_list(temp_collection_handle.find({"_id": {"$in": object_ids}}))
-        df = pd.DataFrame(samples)
-        df.drop('_id', axis=1)
-        df = df.to_dict('records')
-
+    def save_initial_samples(self, generated_samples, sample_type, initial_sample_attributes):
         bulk = Sample().get_collection_handle().initialize_unordered_bulk_op()
-        for rec in df:
-            bulk.find({"name": rec["name"]}).upsert().replace_one(rec)
 
-        feedback = bulk.execute()
-
-        # now delete from temp or...maybe we work on the main sample table from the onset?
-
-        return True
-
-    def save_temp_samples(self, generated_samples, sample_type, number_to_generate):
-        bulk = temp_collection_handle.initialize_unordered_bulk_op()
-
-        sample = generated_samples[0]
+        # form record template, for first item in generated_sample
         auto_fields = dict()
-        auto_fields[Sample().get_qualified_field("name")] = sample["name"]
+        auto_fields[Sample().get_qualified_field("name")] = generated_samples[0]
         auto_fields[Sample().get_qualified_field("sample_type")] = sample_type
-
-        # set qualified path for attributes
-        for k, v in sample["attributes"].items():
+        for k, v in initial_sample_attributes.items():
             if k:
                 auto_fields[Sample().get_qualified_field(k)] = v
 
@@ -113,13 +86,10 @@ class WizardHelper:
 
         record = Sample(profile_id=self.profile_id).save_record(auto_fields, **kwargs)
 
-        number_to_generate = int(number_to_generate)
-        generated_name_list = list()
-        for indx in range(1, number_to_generate + 1):
+        # use template record to generate other records, modifying only the name attribute
+        for name in generated_samples:
             new_record = copy.deepcopy(record)
-            new_name = new_record["name"] + "_" + str(indx)
-            generated_name_list.append(new_name)
-            new_record["name"] = new_name
+            new_record["name"] = name
 
             bulk.find({"name": new_record["name"]}).upsert().replace_one(new_record)
 
@@ -129,17 +99,39 @@ class WizardHelper:
         if 'upserted' in feedback:
             feedback = feedback['upserted']
 
-        generated_samples = list()
+        generated_sample_records = list()
 
-        if isinstance(feedback, list) and len(feedback) == number_to_generate:
+        if isinstance(feedback, list) and len(feedback) == len(generated_samples):
             generated_samples_id = [p.get("_id") for p in feedback if "_id" in p]
-            generated_samples = cursor_to_list(temp_collection_handle.find({"_id": {"$in": generated_samples_id}}))
+            generated_sample_records = cursor_to_list(
+                Sample().get_collection_handle().find({"_id": {"$in": generated_samples_id}}))
 
-        return self.resolve_samples_display(generated_samples, sample_type)
+        return self.resolve_samples_display(generated_sample_records, sample_type)
+
+    def sample_name_schema(self):
+        """
+        function return sample name schema with unique items
+        :return: name schema
+        """
+
+        # get sample name element from the sample schema
+        name_schema_template_list = [x for x in self.schema if x["id"].split(".")[-1] == "name"]
+
+        sample_name_schema = dict()
+        if name_schema_template_list:
+            sample_name_schema = name_schema_template_list[0]
+            sample_name_schema["batch"] = "true"  # allows unique test to extend to siblings
+            sample_name_schema["batchuniquename"] = "assigned_sample"
+
+            # get all sample names for unique test
+            unique_names = htags.generate_unique_items(component="sample", profile_id=self.profile_id, elem_id="name",
+                                                       record_id=str())
+            sample_name_schema["unique_items"] = unique_names
+
+        return sample_name_schema
 
     def resolve_object_arrays_column(sefl, columns):
-        # object_array_controls = ["copo-characteristics", "copo-comment"]
-        object_array_controls = ["copo-comment"]
+        object_array_controls = ["copo-characteristics", "copo-comment"]
 
         gap_elements = list()
 
@@ -148,16 +140,16 @@ class WizardHelper:
                 gap_dict = dict(parent_element=col, derived_elements=list())
 
                 for indx, cd in enumerate(col["data"]):
-                    if col["control"] == "copo-comment":
-                        new_column = dict(
-                            actual_id=col["actual_id"],
-                            derived_id=col["actual_id"] + "_" + str(indx),
-                            control=col["control"], indx=indx
-                        )
-                        new_column["title"] = col["title"] + " [" + cd[0] + "]"
-                        new_column["data"] = cd[1]
+                    new_column = dict(
+                        actual_id=col["actual_id"],
+                        derived_id=col["actual_id"] + "_" + str(indx),
+                        control=col["control"], indx=indx,
+                        title=col["title"] + " [" + list(cd[0].values())[0] + "]",
+                        data=list(cd[1].values())[0],
+                        meta=list(cd[1].keys())[0]
+                    )
 
-                        gap_dict.get("derived_elements").append(new_column)
+                    gap_dict.get("derived_elements").append(new_column)
 
                 gap_elements.append(gap_dict)
 
@@ -168,42 +160,32 @@ class WizardHelper:
 
     def resolve_samples_display(self, generated_samples, sample_type):
         # resolve display metadata for samples
-        columns = list()
         combined_meta = list()
         form_elements = dict()  # form element specifications
         df = list()
 
         if len(generated_samples) > 0:
-            # get columns
+            rec = generated_samples[0]
+            # get columns, and corresponding data using a representative candidate
             for f in self.schema:
                 if self.truth_test_1(f, sample_type):
 
                     # get short-form id
                     f["id"] = f["id"].split(".")[-1]
 
-                    columns.append(dict(title=f["label"], actual_id=f["id"], derived_id=f["id"], control=f["control"]))
+                    col = dict(title=f["label"], actual_id=f["id"], derived_id=f["id"], control=f["control"])
 
                     # resolve element control for form generation
                     if "option_values" in f:
                         f["option_values"] = htags.get_control_options(f)
 
-                    # change sample-source control to wizard-compliant version
-                    if f.get("control", str()) == "copo-sample-source":
-                        f["control"] = "copo-sample-source-2"
-
                     form_elements[f["id"]] = f
 
-            # get corresponding data; use a representative candidate
-            for rec in [generated_samples[0]]:
-                for f in self.schema:
-                    if self.truth_test_1(f, sample_type):
-                        resolved_data = htags.resolve_control_output(rec, f)
-                        for col in columns:
-                            if col["actual_id"] == f["id"].split(".")[-1]:
-                                col["data"] = resolved_data
-                                combined_meta.append(col)
+                    col["data"] = htags.resolve_control_output(rec, f)
 
-            # resolve object arrays: e.g. of these are characteristics, comment'
+                    combined_meta.append(col)
+
+            # resolve object arrays for display in separate columns: e.g. of these are characteristics, comment'
             self.resolve_object_arrays_column(combined_meta)
 
             # now apply metadata to all generated samples
@@ -228,15 +210,19 @@ class WizardHelper:
 
         return combined_data
 
-    def sample_cell_update(self, target_rows, column_reference, auto_fields, sample_type):
+    def sample_cell_update(self, target_rows, auto_fields, update_metadata):
         """
         function saves an update made to a sample cell
         :param target_rows:
-        :param column_reference:
         :param auto_fields:
-        :param sample_type:
+        :param update_metadata:
         :return:
         """
+
+        column_reference = update_metadata.get("column_reference", str())  # element key, the update target
+        sample_type = update_metadata.get("sample_type", str())  # the sample type
+        update_element_indx = update_metadata.get("update_element_indx", str())  # if a list element type, the index
+        update_meta = update_metadata.get("update_meta", str())  # present if a composite element is being updated
 
         # get schema spec for the target element
         elem_spec = [f for f in self.schema if f["id"].split(".")[-1] == column_reference]
@@ -252,17 +238,33 @@ class WizardHelper:
                 partial_schema).fields).get_schema_fields_updated()
 
             # update sample records
-            bulk = temp_collection_handle.initialize_unordered_bulk_op()
-            for t_r in target_rows:
-                bulk.find({'_id': ObjectId(t_r["recordID"])}).update(
-                    {'$set': {column_reference: resolved_data[column_reference]}})
+            bulk = Sample().get_collection_handle().initialize_unordered_bulk_op()
+
+            if update_element_indx != "":
+                update_element_indx = int(update_element_indx)
+                # do positional element update
+                object_list = list()
+                for t_r in target_rows:
+                    object_list.append(ObjectId(t_r["recordID"]))
+
+                update_candidates = cursor_to_list(Sample().get_collection_handle().find({"_id": {"$in": object_list}}))
+                for u_c in update_candidates:  # set element based on index
+                    amendable_entity = u_c[column_reference]
+                    if isinstance(amendable_entity, list):
+                        amendable_entity[update_element_indx:update_element_indx + 1] = resolved_data[column_reference][
+                                                                                        :]
+                    bulk.find({'_id': u_c["_id"]}).update({'$set': {column_reference: amendable_entity}})
+            else:
+                for t_r in target_rows:
+                    bulk.find({'_id': ObjectId(t_r["recordID"])}).update(
+                        {'$set': {column_reference: resolved_data[column_reference]}})
             bulk.execute()
 
         update_list = list()
         for t_r in target_rows:
             update_list.append(ObjectId(t_r["recordID"]))
 
-        updated_samples = cursor_to_list(temp_collection_handle.find({"_id": {"$in": update_list}}))
+        updated_samples = cursor_to_list(Sample().get_collection_handle().find({"_id": {"$in": update_list}}))
 
         for t_r in target_rows:
             for u_s in updated_samples:

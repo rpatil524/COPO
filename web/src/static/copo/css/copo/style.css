@@ -185,7 +185,6 @@ div[class^="col-"], div[class*=" col-"] {
     color: #fff;
     background: transparent;
     margin-top: 13px;
-    cursor: hand;
     cursor: pointer;
     height: 30px;
     float: left;
@@ -213,7 +212,6 @@ div[class^="col-"], div[class*=" col-"] {
     position: absolute;
     right: 0px;
     cursor: pointer;
-    cursor: hand;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
@@ -230,7 +228,6 @@ div[class^="col-"], div[class*=" col-"] {
     right: 375px;
     margin-top: 2px;
     cursor: pointer;
-    cursor: hand;
 }
 
 .copo-search-bar {
@@ -1002,9 +999,7 @@ th {
 
 /*copo-component-attributes*/
 .copo-component-attributes-outer {
-    padding: 5px;
-    /*border: 1px solid #b3cce6;*/
-    border-radius: 2px;
+    padding: 5px 0px;
     margin-bottom: 3px;
 }
 
@@ -1032,3 +1027,14 @@ table.dataTable td.focus {
 }
 
 /*end datatable focus*/
+
+/*selectize overrides*/
+.selectize-dropdown-content {
+    background-color: #ffffff !important;
+}
+
+.selectize-dropdown {
+    z-index: 9999 !important;
+}
+
+/*end selectize overrrides*/

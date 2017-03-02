@@ -577,15 +577,19 @@ ONTOLOGY_LKUPS = {
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
 # path to different message configurations across the system
 MESSAGES_LKUPS = {
+    'HELP_MESSAGES': {
+        'datafile': os.path.join(RESOLVER['wizards_datafile'], 'messages', 'wizard_messages.json'),
+        'sample': os.path.join(RESOLVER['lookup'], 'help_messages', 'sample_help.json'),
+    },
     'datafile_wizard': os.path.join(RESOLVER['wizards_datafile'], 'messages', 'wizard_messages.json'),
-    'datafile_wizard_howto': os.path.join(RESOLVER['wizards_datafile'], 'messages', 'how_to.json'),
     'sample_wizard_messages': os.path.join(RESOLVER['wizards_sample'], 'messages', 'wizard_messages.json'),
-    'sample_wizard_howto': os.path.join(RESOLVER['wizards_sample'], 'messages', 'how_to.json'),
     'lookup_messages': os.path.join(RESOLVER['lookup'], 'messages.json'),
     'message_templates': os.path.join(RESOLVER['lookup'], 'message_templates.json'),
     'button_templates': os.path.join(RESOLVER['lookup'], 'button_templates.json'),
     'exception_messages': os.path.join(RESOLVER['copo_exceptions'], 'messages.json')
 }
+
+# help messages
 
 # path to rating templates for rating description metadata
 METADATA_RATING_TEMPLATE_LKUPS = {

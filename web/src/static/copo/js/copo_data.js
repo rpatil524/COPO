@@ -51,30 +51,6 @@ $(document).ready(function () {
         $(this).parents(".popover").popover('destroy');
     });
 
-    //handle keyboard strokes to advance through wizard
-
-    //check if the control has focus
-    $('#dataFileWizard').on('keypress', function (event, data) {
-
-        if (event.keyCode == 13) {
-            event.preventDefault();
-            //here do the stage advance call
-        }
-        else if (event.keyCode == 39) {
-            var d = {'step': $('#dataFileWizard').data('fu.wizard').currentStep, 'direction': 'next'};
-            //d.step = $('#dataFileWizard').data('fu.wizard').currentStep
-            //d.direction = 'next'
-            $('#dataFileWizard').trigger('actionclicked.fu.wizard', d)
-        }
-        else if (event.keyCode == 37) {
-            var d = {'step': $('#dataFileWizard').data('fu.wizard').currentStep, 'direction': 'previous'};
-            //d.step = $('#dataFileWizard').data('fu.wizard').currentStep
-            //d.direction = 'next'
-            $('#dataFileWizard').trigger('actionclicked.fu.wizard', d)
-        }
-    });
-
-
     // get table data to display via the DataTables API
     var loaderObject = $('<div>',
         {
@@ -1245,7 +1221,10 @@ $(document).ready(function () {
             step: proposedState
         });
 
-        return;
+        //stop execution
+        if (1 == 1) {
+            return false;
+        }
 
 
         var stage_data = collate_stage_data();
@@ -1925,7 +1904,7 @@ $(document).ready(function () {
                 var pop = elem.popover({
                     title: title,
                     content: content,
-                    container: 'body',
+                    //container: 'body',
                     trigger: 'hover',
                     placement: 'right',
                     template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
@@ -2003,17 +1982,16 @@ $(document).ready(function () {
 
             var elemValue = null;
 
+            //set default values
+            if (formElem.default_value) {
+                elemValue = formElem.default_value;
+            } else {
+                elemValue = "";
+            }
+
             if (formValue) {
                 if (formValue[formElem.id]) {
                     elemValue = formValue[formElem.id];
-
-                    if (!elemValue) {
-                        if (formElem.default_value) {
-                            elemValue = formElem.default_value;
-                        } else {
-                            elemValue = "";
-                        }
-                    }
                 }
             }
 
@@ -2112,7 +2090,6 @@ $(document).ready(function () {
 
     }
 
-
     var dispatchEventHandler = {
         study_type_change: function (formElem) {
             var previousValue = null;
@@ -2145,7 +2122,6 @@ $(document).ready(function () {
                 });
         }
     };
-
 
     function set_wizard_summary() {
         descriptionWizSummary = {
@@ -3205,40 +3181,6 @@ $(document).ready(function () {
 
         elem.find(".collapse").collapse('show');
     }
-
-    function dialog_display(dialog, dTitle, dMessage, dType) {
-        var dTypeObject = {
-            "warning": "fa fa-exclamation-circle copo-icon-warning",
-            "danger": "fa fa-times-circle copo-icon-danger",
-            "info": "fa fa-exclamation-circle copo-icon-info"
-        };
-
-        var dTypeClass = "fa fa-exclamation-circle copo-icon-default";
-
-        if (dTypeObject.hasOwnProperty(dType)) {
-            dTypeClass = dTypeObject[dType];
-        }
-
-        var iconElement = $('<div/>', {
-            class: dTypeClass + " wizard-alert-icon"
-        });
-
-
-        var $dialogContent = $('<div></div>');
-        $dialogContent.append($('<div/>').append(iconElement));
-        $dialogContent.append('<div class="copo-custom-modal-message">' + dMessage + '</div>');
-        dialog.realize();
-        dialog.setClosable(false);
-        dialog.setSize(BootstrapDialog.SIZE_NORMAL);
-        dialog.getModalHeader().hide();
-        dialog.setTitle(dTitle);
-        dialog.setMessage($dialogContent);
-        dialog.getModalBody().prepend('<div class="copo-custom-modal-title">' + dialog.getTitle() + '</div>');
-        dialog.getModalBody().addClass('copo-custom-modal-body');
-        //dialog.getModalContent().css('border', '4px solid rgba(255, 255, 255, 0.3)');
-        dialog.open();
-    }
-
 
     function set_datafiles_howtos(component) {
         if (!datafilesHowtos.hasOwnProperty(component)) {

@@ -35,7 +35,7 @@ def data_wiz(request):
 
     out = jsonpickle.encode(context)
 
-    return HttpResponse(out, content_type='json')
+    return HttpResponse(out, content_type='application/json')
 
 
 def sample_wiz(request):
@@ -51,13 +51,16 @@ def sample_wiz(request):
                                   target_id=request.POST.get("target_id", str()),
                                   sample_type=request.POST.get("sample_type", str()),
                                   auto_fields=request.POST.get("auto_fields", dict()),
+                                  initial_sample_attributes=request.POST.get("initial_sample_attributes", dict()),
+                                  update_metadata=request.POST.get("update_metadata", dict()),
                                   number_to_generate=request.POST.get("number_to_generate", str()),
                                   column_reference=request.POST.get("column_reference", str()),
+                                  bundle_name=request.POST.get("bundle_name", str()),
                                   ).post_context(request_action)
 
     out = jsonpickle.encode(context)
 
-    return HttpResponse(out, content_type='json')
+    return HttpResponse(out, content_type='application/json')
 
 
 def forward_to_figshare(request):

@@ -11,12 +11,13 @@
       "id": "copo.sample.name",
       "show_in_table": true,
       "unique": true,
+      "unique_items": [],
       "control": "text",
       "versions": [
         "name"
       ],
       "help_tip": "A Sample represents major outputs resulting from a protocol application other than the special case outputs of Extract or a Labeled Extract.",
-      "label": "Sample Name",
+      "label": "Name",
       "specifications": [
         "isasample",
         "biosample"
@@ -35,7 +36,7 @@
       "show_in_form": true,
       "id": "copo.sample.organism",
       "show_in_table": false,
-      "show_in_sub_table": true,
+      "show_as_attribute": true,
       "control": "ontology term",
       "versions": [
         "organism"
@@ -56,7 +57,7 @@
       "show_in_form": true,
       "id": "copo.sample.characteristics",
       "show_in_table": false,
-      "show_in_sub_table": true,
+      "show_as_attribute": true,
       "control": "copo-characteristics",
       "versions": [
         "characteristics"
@@ -78,7 +79,7 @@
       "show_in_form": true,
       "id": "copo.sample.comments",
       "show_in_table": false,
-      "show_in_sub_table": true,
+      "show_as_attribute": true,
       "control": "copo-comment",
       "versions": [
         "comments"
@@ -99,7 +100,7 @@
       "show_in_form": true,
       "id": "copo.sample.factorValues",
       "show_in_table": false,
-      "show_in_sub_table": true,
+      "show_as_attribute": true,
       "control": "copo-characteristics",
       "versions": [
         "factorValues"
@@ -111,7 +112,7 @@
       ]
     },
     {
-      "type": "array",
+      "type": "string",
       "required": "true",
       "ref": "",
       "hidden": "false",
@@ -119,20 +120,22 @@
       "default_value": "",
       "show_in_form": true,
       "id": "copo.sample.derivesFrom",
-      "option_component": "source",
       "show_in_table": false,
-      "show_in_sub_table": true,
+      "show_as_attribute": true,
+      "control": "copo-multi-search",
+      "show_create_button": true,
+      "option_component": "source",
+      "data_maxItems": 1,
       "option_values": {
         "callback": {
           "function": "generate_sources_json",
           "parameter": ""
         }
       },
-      "control": "copo-sample-source",
       "versions": [
         "derivesFrom"
       ],
-      "help_tip": "Source(s) from which this sample is derived",
+      "help_tip": "Source from which this sample is derived",
       "label": "Source",
       "specifications": [
         "isasample"
