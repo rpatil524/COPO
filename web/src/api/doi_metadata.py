@@ -199,9 +199,9 @@ class DOI2Metadata:
                     if isinstance(val, list) and f.type == "string":
                         val = ','.join(str(e) for e in val)  # account for numbers
                     if isinstance(val, str) and f.type == "object":
-                        object_type_control = d_utils.control_to_schema_name(f.control.lower())
+                        object_type_control = d_utils.object_type_control_map().get(f.control.lower(), str())
                         if object_type_control == "ontology_annotation":
-                            object_schema = d_utils.get_isa_schema(object_type_control)
+                            object_schema = d_utils.get_db_json_schema(object_type_control)
                             value_dict = dict(annotationValue=val
                                               )
                             for k in object_schema:

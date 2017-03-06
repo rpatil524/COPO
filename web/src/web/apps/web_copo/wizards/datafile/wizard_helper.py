@@ -153,15 +153,23 @@ class WizardHelper:
 
     def get_stage_display(self, stage):
         """
-        function dispatches the call to render a stage
+        function resolve UI components for stage
         :param stage: is the dictionary that captures the stage metadata
-        :return: is the rendered stage in its html 're-incarnation'
+        :return: stage, with UI-ready components set
         """
 
         if "data" not in stage:
             stage['data'] = self.get_stage_data(stage['ref'])
 
-        getattr(WizardHelper, stage['content'])(self, stage)
+        # resolve other html components
+
+        if "items" in stage:
+            for st in stage['items']:
+
+                # resolve option_values for select-type controls,
+                if "option_values" in st:
+                    st["option_values"] = htags.get_control_options(st)
+
         stage_dict = dict(stage=stage)
 
         return stage_dict
@@ -262,7 +270,7 @@ class WizardHelper:
             description = self.get_datafile_description()
             description['attributes'][stage_description['ref']] = stage_description['data']
 
-            # soft validation...only allow stage attribute entry, if there is an actual value assigned
+            # soft validation...only allow stage attribute entry if there is an actual value assigned
             save_stage = False
             for k, v in stage_description['data'].items():
                 if isinstance(v, str) and v:
@@ -424,10 +432,13 @@ class WizardHelper:
             old_stage_data = self.get_stage_data(stage['ref']) or dict()
 
             # call to handle triggers defined on items
-            self.handle_save_triggers(old_stage_data, data, stage)
+            triggers_kwargs = dict(old_data=old_stage_data,
+                                   new_data=data,
+                                   stage=stage)
+            self.handle_save_triggers(**triggers_kwargs)
 
-            # update attribute, given data
-            # TODO - CHECK WITH TONI IF THIS IS NEEDED
+            # update attribute given data. Note: this does not actually commit to the db yet.
+            # a bulk commit of all description target's attributes to the db is done at a later stage
             self.update_datafile_attributes({'ref': stage["ref"], 'data': data})
 
         # get batch attributes
@@ -794,7 +805,6 @@ class WizardHelper:
                 stage_dict = dict(title=title,
                                   ref=ref,
                                   message=message,
-                                  content=str("get_stage_html"),
                                   dependent_on=str("study_type"),
                                   stub_ref=stub_ref,
                                   items=list()
@@ -818,24 +828,6 @@ class WizardHelper:
         else:
             return True
 
-    def get_stage_html(self, stage):
-        stage_items = stage['items']
-
-        html_tag = list()
-
-        if stage_items:
-            for st in stage_items:
-
-                # if required, resolve data source for select-type controls,
-                # i.e., if a callback is defined on the 'option_values' field
-
-                if "option_values" in st:
-                    st["option_values"] = htags.get_control_options(st)
-
-                html_tag.append(st)
-
-        return html_tag
-
     def set_items_type(self, stage):
         for item in stage.get("items", list()):
             if not item.get("type"):
@@ -843,8 +835,12 @@ class WizardHelper:
 
         return stage
 
-    def handle_save_triggers(self, old_data, new_data, stage):
-        stage_ref = stage["ref"]
+    def handle_save_triggers(self, **kwargs):
+        stage = kwargs.pop("stage", dict())
+        old_data = kwargs.pop("old_data", dict())
+        new_data = kwargs.pop("new_data", dict())
+
+        stage_ref = stage.get("ref", str())
         for sti in stage.get("items", list()):
             item_id = sti['id']  # placeholder parameter
 

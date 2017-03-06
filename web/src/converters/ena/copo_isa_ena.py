@@ -21,7 +21,7 @@ class Investigation:
     def get_schema(self):
         component = "investigation"
 
-        properties = d_utils.get_isa_schema(component)
+        properties = d_utils.get_db_json_schema(component)
 
         if properties:
             for k in properties:
@@ -64,7 +64,7 @@ class Investigation:
         records.append(self.copo_isa_records.get("technology_type"))
 
         target_record_list = list()
-        target_object_keys = set(d_utils.get_isa_schema("ontology_annotation").keys())
+        target_object_keys = set(d_utils.get_db_json_schema("ontology_annotation").keys())
 
         for record in records:
             target_record_list = ISAHelpers().get_object_instances(record, target_record_list, target_object_keys)
@@ -112,7 +112,7 @@ class Study:
         component = "study"
 
         schemas = list()
-        properties = d_utils.get_isa_schema(component)
+        properties = d_utils.get_db_json_schema(component)
 
         if properties:
             for k in properties:
@@ -149,7 +149,7 @@ class Study:
                           )
         component = "ontology_annotation"
 
-        isa_schema = d_utils.get_isa_schema(component)
+        isa_schema = d_utils.get_db_json_schema(component)
         for k in isa_schema:
             isa_schema = ISAHelpers().resolve_schema_key(isa_schema, k, component, value_dict)
 
@@ -171,13 +171,13 @@ class Study:
             for pv in pr.get("parameterValues", list()):
                 pv = htags.trim_parameter_value_label(pv).lower()
 
-                ontology_schema = d_utils.get_isa_schema("ontology_annotation")
+                ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
                 for k in ontology_schema:
                     ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, k, "ontology_annotation",
                                                                       dict(annotationValue=pv))
 
                 pv_dict = dict(parameterName=ontology_schema)
-                pp_schema = d_utils.get_isa_schema("protocol_parameter")
+                pp_schema = d_utils.get_db_json_schema("protocol_parameter")
 
                 for k in pp_schema:
                     if k == "@id":
@@ -197,15 +197,15 @@ class Study:
                 seq_instruments = copo_isa_records["seq_instruments"]
 
                 for si in seq_instruments:
-                    ontology_schema = d_utils.get_isa_schema("ontology_annotation")
+                    ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
                     for k in ontology_schema:
                         ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, k,
                                                                           "ontology_annotation",
                                                                           dict(annotationValue="DNA sequencer"))
 
                     # get components properties
-                    component_schema = d_utils.get_isa_schema("protocol").get("components", dict()).get("items",
-                                                                                                        dict()).get(
+                    component_schema = d_utils.get_db_json_schema("protocol").get("components", dict()).get("items",
+                                                                                                            dict()).get(
                         "properties", dict())
                     components_value_dict = dict(componentName=si,
                                                  componentType=ontology_schema)
@@ -217,7 +217,7 @@ class Study:
                     components.append(component_schema)
 
             # protocolType
-            ontology_schema = d_utils.get_isa_schema("ontology_annotation")
+            ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
             for k in ontology_schema:
                 ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, k,
                                                                   "ontology_annotation",
@@ -232,7 +232,7 @@ class Study:
                 protocolType=protocol_type
             )
 
-            protocol_schema = d_utils.get_isa_schema("protocol")
+            protocol_schema = d_utils.get_db_json_schema("protocol")
             for k in protocol_schema:
                 if k == "@id":
                     protocol_schema[k] = ISAHelpers().get_id_field("protocol", dict(
@@ -283,7 +283,7 @@ class Study:
                 outputs=[{"@id": sample["@id"]}]
             )
 
-            process_schema = d_utils.get_isa_schema("process")
+            process_schema = d_utils.get_db_json_schema("process")
             for k in process_schema:
                 if k == "@id":
                     process_schema[k] = ISAHelpers().get_id_field("process", dict(
@@ -309,7 +309,7 @@ class Study:
                     cat_dict = fv.get("category", dict())
                     annotation_value = cat_dict.get("annotationValue", str())
                     if annotation_value and annotation_value.lower() not in seen_list:
-                        ontology_schema = d_utils.get_isa_schema("ontology_annotation")
+                        ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
                         for k in ontology_schema:
                             ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, k,
                                                                               "ontology_annotation",
@@ -318,7 +318,7 @@ class Study:
                             factorName=annotation_value,
                             factorType=ontology_schema)
 
-                        factor_schema = d_utils.get_isa_schema("factor")
+                        factor_schema = d_utils.get_db_json_schema("factor")
                         for k in factor_schema:
                             if k == "@id":
                                 factor_schema[k] = ISAHelpers().get_id_field("factor",
@@ -345,7 +345,7 @@ class Study:
             for rec in copo_isa_records.get(component):
                 # get organism
                 if "organism" in rec and "organism" not in seen_list:
-                    ontology_schema = d_utils.get_isa_schema("ontology_annotation")
+                    ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
                     for k in ontology_schema:
                         ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, k,
                                                                           "ontology_annotation",
@@ -353,7 +353,7 @@ class Study:
 
                     value_dict = dict(characteristicType=ontology_schema)
 
-                    material_attribute_schema = d_utils.get_isa_schema("material_attribute")
+                    material_attribute_schema = d_utils.get_db_json_schema("material_attribute")
                     for k in material_attribute_schema:
                         if k == "@id":
                             material_attribute_schema[k] = ISAHelpers().get_id_field("characteristic_category", dict(
@@ -368,14 +368,14 @@ class Study:
                     cat_dict = ch.get("category", dict())
                     annotation_value = cat_dict.get("annotationValue", str())
                     if annotation_value and annotation_value.lower() not in seen_list:
-                        ontology_schema = d_utils.get_isa_schema("ontology_annotation")
+                        ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
                         for k in ontology_schema:
                             ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, k,
                                                                               "ontology_annotation",
                                                                               cat_dict)
                         value_dict = dict(characteristicType=ontology_schema)
 
-                        material_attribute_schema = d_utils.get_isa_schema("material_attribute")
+                        material_attribute_schema = d_utils.get_db_json_schema("material_attribute")
                         for k in material_attribute_schema:
                             if k == "@id":
                                 material_attribute_schema[k] = ISAHelpers().get_id_field("characteristic_category",
@@ -419,7 +419,7 @@ class Study:
                         unit_cat = ch.get("unit", dict())
                         annotation_value = unit_cat.get("annotationValue", str())
                         if annotation_value != "" and annotation_value.lower() not in seen_list:
-                            ontology_schema = d_utils.get_isa_schema("ontology_annotation")
+                            ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
                             for k in ontology_schema:
                                 if k == "@id":
                                     ontology_schema[k] = ISAHelpers().get_id_field("unit",
@@ -470,7 +470,7 @@ class Assay:
         component = "assay"
 
         schemas = list()
-        properties = d_utils.get_isa_schema(component)
+        properties = d_utils.get_db_json_schema(component)
 
         if properties:
             for k in properties:
@@ -603,7 +603,7 @@ class Assay:
 
                 # set export
                 if revised_name in ["nucleic_acid_sequencing", "library_construction"]:
-                    comment_schema = d_utils.get_isa_schema("comment")
+                    comment_schema = d_utils.get_db_json_schema("comment")
                     for k in comment_schema:
                         comment_schema = ISAHelpers().resolve_schema_key(comment_schema, k,
                                                                          "comment",
@@ -651,7 +651,7 @@ class Assay:
                                             )
 
                         if isinstance(pv_value, dict):
-                            ontology_schema = d_utils.get_isa_schema("ontology_annotation")
+                            ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
                             for k in ontology_schema:
                                 ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, k,
                                                                                   "ontology_annotation",
@@ -664,7 +664,7 @@ class Assay:
                             value=pv_value
                         )
 
-                        pp_schema = d_utils.get_isa_schema("process_parameter_value")
+                        pp_schema = d_utils.get_db_json_schema("process_parameter_value")
 
                         for k in pp_schema:
                             pp_schema[k] = pv_dict.get(k,
@@ -695,7 +695,7 @@ class Assay:
                 )
 
                 # get process schema
-                process_schema = d_utils.get_isa_schema("process")
+                process_schema = d_utils.get_db_json_schema("process")
                 for k in process_schema:
                     if k == "@id":
                         process_schema[k] = ISAHelpers().get_id_field("process", dict(
@@ -844,7 +844,7 @@ class ISAHelpers:
                 if value_dict:
                     component = "ontology_annotation"
 
-                    isa_schema = d_utils.get_isa_schema(component)
+                    isa_schema = d_utils.get_db_json_schema(component)
                     for k in isa_schema:
                         isa_schema = ISAHelpers().resolve_schema_key(isa_schema, k, component, value_dict)
 
@@ -878,7 +878,7 @@ class ISAHelpers:
             if value_dict:
                 component = "ontology_annotation"
 
-                isa_schema = d_utils.get_isa_schema(component)
+                isa_schema = d_utils.get_db_json_schema(component)
                 for k in isa_schema:
                     isa_schema = ISAHelpers().resolve_schema_key(isa_schema, k, component, value_dict)
 
@@ -981,12 +981,12 @@ class ISAHelpers:
         isa_records = list()
 
         for rec in records:
-            isa_schema = d_utils.get_isa_schema(component)
+            isa_schema = d_utils.get_db_json_schema(component)
 
             # handle organism property in source
             if component == "source":
                 # get organism and add to characteristics
-                ontology_schema = d_utils.get_isa_schema("ontology_annotation")
+                ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
                 for onto in ontology_schema:
                     ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, onto,
                                                                       "ontology_annotation",
@@ -995,7 +995,7 @@ class ISAHelpers:
                 # conform to the ontology schema
                 value_dict = dict(category=ontology_schema, value=rec.get("organism", dict()))
 
-                material_attribute_schema = d_utils.get_isa_schema("material_attribute_value")
+                material_attribute_schema = d_utils.get_db_json_schema("material_attribute_value")
                 for onto in material_attribute_schema:
                     material_attribute_schema = ISAHelpers().resolve_schema_key(material_attribute_schema, onto,
                                                                                 "material_attribute_value",
@@ -1140,7 +1140,7 @@ class ISAHelpers:
         """
 
         copo_schema = d_utils.get_copo_schema(component)
-        isa_schema = d_utils.get_isa_schema(component)
+        isa_schema = d_utils.get_db_json_schema(component)
         default_value = self.get_schema_key_type(isa_schema.get(schema_field, dict()))
         resolved_value = default_value
 
@@ -1155,18 +1155,18 @@ class ISAHelpers:
 
                     # handle object type fields e.g., ontology term, comment
                     if resolved_value:
-                        object_type_control = d_utils.control_to_schema_name(f["control"].lower())
+                        object_type_control = d_utils.object_type_control_map().get(f["control"].lower(), str())
                         if object_type_control:
                             if f["type"] == "array":
                                 for indx, val_dict in enumerate(resolved_value):
-                                    isa_schema_2 = d_utils.get_isa_schema(object_type_control)
+                                    isa_schema_2 = d_utils.get_db_json_schema(object_type_control)
                                     for k_2 in isa_schema_2:
                                         isa_schema_2 = ISAHelpers().resolve_schema_key(isa_schema_2, k_2,
                                                                                        object_type_control,
                                                                                        val_dict)
                                     resolved_value[indx] = isa_schema_2
                             else:
-                                isa_schema = d_utils.get_isa_schema(object_type_control)
+                                isa_schema = d_utils.get_db_json_schema(object_type_control)
                                 for k in isa_schema:
                                     isa_schema = ISAHelpers().resolve_schema_key(isa_schema, k,
                                                                                  object_type_control,
@@ -1199,7 +1199,7 @@ class ISAHelpers:
             file=base_url + x
         )
 
-        osr_schema = d_utils.get_isa_schema(component)
+        osr_schema = d_utils.get_db_json_schema(component)
         for k in osr_schema:
             if k == "@id":
                 osr_schema[k] = ISAHelpers().get_id_field(component, dict(
@@ -1214,7 +1214,7 @@ class ISAHelpers:
 
         material_name = "extract-" + x
 
-        other_material_properties = d_utils.get_isa_schema("material")
+        other_material_properties = d_utils.get_db_json_schema("material")
 
         material_type = other_material_properties.get("type", dict()).get("enum", list())
         if isinstance(material_type, list) and len(material_type) > 0:
@@ -1240,7 +1240,7 @@ class ISAHelpers:
 
     def refactor_datafiles(self, datafile):
         # set export flag
-        comment_schema = d_utils.get_isa_schema("comment")
+        comment_schema = d_utils.get_db_json_schema("comment")
         for k in comment_schema:
             comment_schema = ISAHelpers().resolve_schema_key(comment_schema, k,
                                                              "comment",

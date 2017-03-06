@@ -123,6 +123,8 @@ var controlsMapping = {
     "copo-multi-select": "do_copo_multi_select_ctrl",
     "copo-comment": "do_copo_comment_ctrl",
     "copo-characteristics": "do_copo_characteristics_ctrl",
+    "copo-env-characteristics": "do_copo_characteristics_ctrl",
+    "copo-phenotypic-characteristics": "do_copo_characteristics_ctrl",
     "copo-sample-source": "do_copo_sample_source_ctrl",
     "copo-sample-source-2": "do_copo_sample_source_ctrl_2",
     "oauth_required": "do_oauth_required",
@@ -692,7 +694,7 @@ var dispatchFormControl = {
     },
     do_copo_duration_ctrl: function (formElem, elemValue) {
 
-        var durationSchema = copoSchemas.duration_schema;
+        var durationSchema = copoSchemas[formElem.control];
 
         var ctrlsDiv = $('<div/>',
             {
@@ -717,8 +719,15 @@ var dispatchFormControl = {
 
 
             durationCtrlObject.find(":input").each(function () {
+                //toni's comment
+                // if (this.id) {
+                //     this.id = fv + "." + this.id;
+                // }
+
+                //end toni's comment
+
                 if (this.id) {
-                    this.id = fv + "." + this.id;
+                    this.id = fv;
                 }
 
                 //set placeholder text
@@ -732,17 +741,9 @@ var dispatchFormControl = {
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
-    do_copo_characteristics_ctrl: function (formElem, elemValue, schemaType) {
+    do_copo_characteristics_ctrl: function (formElem, elemValue) {
 
-        // depending on whether the global variable
-        if(schemaType == undefined){
-            // in this case load the default schema
-            var workingSchema = copoSchemas.characteristics_schema;
-        }
-        else{
-            // else load the supplied schema
-            var workingSchema = copoSchemas[schemaType];
-        }
+        var workingSchema = copoSchemas[formElem.control];
 
         var ctrlsDiv = $('<div/>',
             {
@@ -791,7 +792,7 @@ var dispatchFormControl = {
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
     do_copo_comment_ctrl: function (formElem, elemValue) {
-        var commentSchema = copoSchemas.comment_schema;
+        var commentSchema = copoSchemas[formElem.control];
 
         var ctrlsDiv = $('<div/>',
             {
@@ -1592,7 +1593,7 @@ function build_source_form(funcParams) {
     newSourcePanel.append(newSourcePanelHeading).append(newSourcePanelBody);
 
     //form control
-    var sourceSchema = copoSchemas.source_schema;
+    var sourceSchema = copoSchemas[formElem.control];
 
     var formCtrl = $('<form/>',
         {
@@ -1605,8 +1606,6 @@ function build_source_form(funcParams) {
     //generate controls given component schema
     for (var i = 0; i < sourceSchema.length; ++i) {
         var sourceFormElem = sourceSchema[i];
-
-
 
 
         var control = sourceFormElem.control;
@@ -1763,7 +1762,7 @@ function show_source_form(funcParams) {
 function source_clone_ctrl(funcParams) {
     var component = "source";
     var formElem = funcParams.formElem;
-    var sourceSchema = copoSchemas.source_schema;
+    var sourceSchema = copoSchemas[formElem.control];
     var csrftoken = $.cookie('csrftoken');
 
     //do clone only if there are 'clonables'
@@ -1876,8 +1875,8 @@ function get_basic_label(sp, formElem) {
 }
 
 function get_ontology_span(ontologySpan, formElem) {
-    var ontologySchema = copoSchemas.ontology_schema;
-    console.log(formElem)
+    var ontologySchema = copoSchemas[formElem.control];
+
     for (var i = 0; i < ontologySchema.length; ++i) {
         var fv = ontologySchema[i].id.split(".").slice(-1)[0];
         if (ontologySchema[i].hidden == "false") {
@@ -1886,7 +1885,7 @@ function get_ontology_span(ontologySpan, formElem) {
             if (formElem.ontology_names && formElem.ontology_names.length) {
                 localolsURL = olsURL.replace("999", formElem.ontology_names.join(","));
             }
-            ontologySpan.append('<input placeholder="' + formElem.placeholder + '" autocomplete="off" data-autocomplete="' + localolsURL + '" class="input-copo form-control ontology-field" type="text" id="' + fv + '" name="' + fv + '" />');
+            ontologySpan.append('<input autocomplete="off" data-autocomplete="' + localolsURL + '" class="input-copo form-control ontology-field" type="text" id="' + fv + '" name="' + fv + '" />');
 
         } else {
             ontologySpan.append($('<input/>',

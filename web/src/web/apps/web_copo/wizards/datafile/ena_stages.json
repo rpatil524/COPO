@@ -5,9 +5,7 @@
     {
       "ref": "study_type",
       "title": "Study Type",
-      "content": "get_stage_html",
       "is_singular_stage": true,
-      "deposition_context": "ena",
       "message": "Select the study type under which the datafiles were created. The study type presents a controlled vocabulary for expressing the overall purpose of the study.",
       "items": [
         {
@@ -38,8 +36,6 @@
     {
       "ref": "attach_samples",
       "title": "Sample",
-      "content": "get_stage_html",
-      "deposition_context": "ena",
       "message": "Select and associate a sample to files in the bundle. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",
       "items": [
         {

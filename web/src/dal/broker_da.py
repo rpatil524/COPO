@@ -46,20 +46,15 @@ class BrokerDA:
         for k, v in extra_param.items():
             self.param_dict[k] = v
 
-    def do_copo_schemas(self):
-        copo_schemas = dict(
-            ontology_schema=d_utils.get_copo_schema("ontology_annotation"),
-            comment_schema=d_utils.get_copo_schema("comment"),
-            characteristics_schema=d_utils.get_copo_schema("material_attribute_value"),
-            source_schema=d_utils.get_copo_schema("source"),
-            duration_schema=d_utils.get_copo_schema("duration"),
-            greenhouse_rooting_schema=d_utils.get_copo_schema("miappe_rooting_greenhouse"),
-            field_rooting_schema=d_utils.get_copo_schema("miappe_rooting_field"),
-            hydroponics_schema=d_utils.get_copo_schema("hydroponics"),
-            soil_schema=d_utils.get_copo_schema("soil"),
-            phenotypic_variables_schema=d_utils.get_copo_schema("phentotypic_variables"),
-            environment_variables_schema=d_utils.get_copo_schema("environment_variables")
-        )
+    def do_form_control_schemas(self):
+        """
+        function returns object type control schemas used in building form controls
+        :return:
+        """
+
+        copo_schemas = dict()
+        for k,v in d_utils.object_type_control_map().items():
+            copo_schemas[k] = d_utils.get_copo_schema(v)
 
         self.context["copo_schemas"] = copo_schemas
         return self.context

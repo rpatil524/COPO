@@ -193,7 +193,7 @@ def copo_forms(request):
                          user_email=request.POST.get("user_email", str())
                          )
 
-    task_dict = dict(resources=broker_da.do_copo_schemas,
+    task_dict = dict(resources=broker_da.do_form_control_schemas,
                      save=broker_da.do_save_edit,
                      edit=broker_da.do_save_edit,
                      delete=broker_da.do_delete,

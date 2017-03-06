@@ -2003,15 +2003,6 @@ $(document).ready(function () {
 
             var control = formElem.control;
 
-            var schema_type = 'default'
-
-            if ('build_from_schema' in formElem) {
-                schema_type = formElem.build_from_schema
-            }
-
-
-            var control_param;
-
             var elemValue = null;
 
             if (formValue) {
@@ -2034,7 +2025,7 @@ $(document).ready(function () {
 
             try {
 
-                formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue, schema_type));
+                formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
             }
             catch (err) {
                 console.log(control.toLowerCase());

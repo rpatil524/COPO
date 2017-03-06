@@ -235,20 +235,26 @@ def generate_sources_json():
 def get_study_type_options():
     return lookup.DROP_DOWNS['STUDY_TYPES']
 
+
 def get_sample_type_options():
     return lookup.DROP_DOWNS['SAMPLE_TYPES']
+
 
 def get_repository_options():
     return lookup.DROP_DOWNS['REPOSITORIES']
 
+
 def get_growth_area_options():
     return lookup.DROP_DOWNS['GROWTH_AREAS']
+
 
 def get_rooting_medium_options():
     return lookup.DROP_DOWNS['ROOTING_MEDIUM']
 
+
 def get_nutrient_control_options():
     return lookup.DROP_DOWNS['GROWTH_NUTRIENTS']
+
 
 def get_watering_control_options():
     return lookup.DROP_DOWNS['WATERING_OPTIONS']
@@ -296,35 +302,44 @@ def get_button_templates():
     return json_to_pytype(lookup.MESSAGES_LKUPS["button_templates"])["templates"]
 
 
-def get_isa_schema(component):
-    pth = RESOLVER['schemas_copo']
+def get_db_json_schema(component):
+    """
+    function returns a JSON schema configuration given a component.
+    Note: these are db models schemas, different from
+    UI schemas, that provide the configuration that COPO UI schemas map to.
+    :param component:
+    :return:
+    """
+    isa_path = RESOLVER['isa_json_db_models']
+
+    # set other paths accordingly depending on where the actual files reside
 
     schema_dict = dict(
-        publication=json_to_pytype(os.path.join(pth, 'publication_schema.json')).get("properties", dict()),
-        person=json_to_pytype(os.path.join(pth, 'person_schema.json')).get("properties", dict()),
-        datafile=json_to_pytype(os.path.join(pth, 'data_schema.json')).get("properties", dict()),
-        sample=json_to_pytype(os.path.join(pth, 'sample_schema.json')).get("properties", dict()),
-        source=json_to_pytype(os.path.join(pth, 'source_schema.json')).get("properties", dict()),
-        material=json_to_pytype(os.path.join(pth, 'material_schema.json')).get("properties", dict()),
-        comment=json_to_pytype(os.path.join(pth, 'comment_schema.json')).get("properties", dict()),
-        material_attribute_value=json_to_pytype(os.path.join(pth, 'material_attribute_value_schema.json')).get(
+        publication=json_to_pytype(os.path.join(isa_path, 'publication_schema.json')).get("properties", dict()),
+        person=json_to_pytype(os.path.join(isa_path, 'person_schema.json')).get("properties", dict()),
+        datafile=json_to_pytype(os.path.join(isa_path, 'data_schema.json')).get("properties", dict()),
+        sample=json_to_pytype(os.path.join(isa_path, 'sample_schema.json')).get("properties", dict()),
+        source=json_to_pytype(os.path.join(isa_path, 'source_schema.json')).get("properties", dict()),
+        material=json_to_pytype(os.path.join(isa_path, 'material_schema.json')).get("properties", dict()),
+        comment=json_to_pytype(os.path.join(isa_path, 'comment_schema.json')).get("properties", dict()),
+        material_attribute_value=json_to_pytype(os.path.join(isa_path, 'material_attribute_value_schema.json')).get(
             "properties", dict()),
-        material_attribute=json_to_pytype(os.path.join(pth, 'material_attribute_schema.json')).get("properties",
-                                                                                                   dict()),
-        investigation=json_to_pytype(os.path.join(pth, 'investigation_schema.json')).get("properties", dict()),
-        ontology_annotation=json_to_pytype(os.path.join(pth, 'ontology_annotation_schema.json')).get("properties",
-                                                                                                     dict()),
-        study=json_to_pytype(os.path.join(pth, 'study_schema.json')).get("properties", dict()),
-        assay=json_to_pytype(os.path.join(pth, 'assay_schema.json')).get("properties", dict()),
-        protocol=json_to_pytype(os.path.join(pth, 'protocol_schema.json')).get("properties", dict()),
-        protocol_parameter=json_to_pytype(os.path.join(pth, 'protocol_parameter_schema.json')).get("properties",
-                                                                                                   dict()),
-        factor=json_to_pytype(os.path.join(pth, 'factor_schema.json')).get("properties", dict()),
-        factor_value=json_to_pytype(os.path.join(pth, 'factor_value_schema.json')).get("properties", dict()),
-        process=json_to_pytype(os.path.join(pth, 'process_schema.json')).get("properties", dict()),
-        process_parameter_value=json_to_pytype(os.path.join(pth, 'process_parameter_value_schema.json')).get(
+        material_attribute=json_to_pytype(os.path.join(isa_path, 'material_attribute_schema.json')).get("properties",
+                                                                                                        dict()),
+        investigation=json_to_pytype(os.path.join(isa_path, 'investigation_schema.json')).get("properties", dict()),
+        ontology_annotation=json_to_pytype(os.path.join(isa_path, 'ontology_annotation_schema.json')).get("properties",
+                                                                                                          dict()),
+        study=json_to_pytype(os.path.join(isa_path, 'study_schema.json')).get("properties", dict()),
+        assay=json_to_pytype(os.path.join(isa_path, 'assay_schema.json')).get("properties", dict()),
+        protocol=json_to_pytype(os.path.join(isa_path, 'protocol_schema.json')).get("properties", dict()),
+        protocol_parameter=json_to_pytype(os.path.join(isa_path, 'protocol_parameter_schema.json')).get("properties",
+                                                                                                        dict()),
+        factor=json_to_pytype(os.path.join(isa_path, 'factor_schema.json')).get("properties", dict()),
+        factor_value=json_to_pytype(os.path.join(isa_path, 'factor_value_schema.json')).get("properties", dict()),
+        process=json_to_pytype(os.path.join(isa_path, 'process_schema.json')).get("properties", dict()),
+        process_parameter_value=json_to_pytype(os.path.join(isa_path, 'process_parameter_value_schema.json')).get(
             "properties", dict()),
-        ontology_source_reference=json_to_pytype(os.path.join(pth, 'ontology_source_reference_schema.json')).get(
+        ontology_source_reference=json_to_pytype(os.path.join(isa_path, 'ontology_source_reference_schema.json')).get(
             "properties", dict()),
 
     )
@@ -333,7 +348,7 @@ def get_isa_schema(component):
 
 
 def get_isa_schema_xml(file_name):
-    pth = RESOLVER['schemas_xml_copo']
+    pth = RESOLVER['isa_xml_db_models']
 
     output_dict = dict(status=str(), content=str())
 
@@ -359,6 +374,13 @@ def get_ena_remote_path(submission_token):
 
 
 def get_copo_schema(component, as_object=False):
+    """
+    function retrieves a required schema from the DB.
+    :param component: a key in the schema_dict to be retrieved
+    :param as_object: True allows elements of the schema to be accessed as an object, using the '.' notation. False
+            for the traditional python dictionary access
+    :return:
+    """
     from dal.copo_base_da import DataSchemas
     schema_base = DataSchemas("COPO").get_ui_template().get("copo")
 
@@ -372,9 +394,8 @@ def get_copo_schema(component, as_object=False):
         comment=schema_base.get("comment").get("fields", list()),
         material_attribute_value=schema_base.get("material_attribute_value").get("fields", list()),
         duration=schema_base.get("duration").get("fields", list()),
-        # these need to change to call json file reader rather than look in mongo
-        miappe_rooting_greenhouse=schema_base.get('rooting').get('greenhouse').get("fields", list()),
-        miappe_rooting_field=schema_base.get('rooting').get('field').get("fields", list()),
+        miappe_rooting_greenhouse=schema_base.get('miappe').get('rooting').get('greenhouse').get("fields", list()),
+        miappe_rooting_field=schema_base.get('miappe').get('rooting').get('field').get("fields", list()),
         hydroponics=schema_base.get('miappe').get('nutrients').get('hydroponics').get('fields', list()),
         soil=schema_base.get('miappe').get('nutrients').get('soil').get('fields', list()),
         phentotypic_variables=schema_base.get("miappe").get("phenotypic_variables").get("fields", list()),
@@ -389,24 +410,21 @@ def get_copo_schema(component, as_object=False):
     return schema
 
 
-def control_to_schema_name(control):
-    # given a control - e.g., "ontology term" return the schema name,
-    # which can then be used to resolved to a schema object
+def object_type_control_map():
+    """
+    function keeps a mapping of object type controls to schema names
+    so, technically, all object type controls, to be made available as a service, should be registered here!
+    :return:
+    """
+    control_dict = dict()
+    control_dict["copo-characteristics"] = "material_attribute_value"
+    control_dict["ontology term"] = "ontology_annotation"
+    control_dict["copo-comment"] = "comment"
+    control_dict["copo-duration"] = "duration"
+    control_dict["copo-environmental-characteristics"] = "environment_variables"
+    control_dict["copo-phenotypic-characteristics"] = "phenotypic_variables"
 
-    schema_name = str()
-    object_list = [
-        dict(control="copo-characteristics", schema="material_attribute_value"),
-        dict(control="ontology term", schema="ontology_annotation"),
-        dict(control="copo-comment", schema="comment"),
-        dict(control="copo-duration", schema="duration")
-    ]
-
-    object_type_control = [x for x in object_list if x['control'] == control.lower()]
-
-    if object_type_control:
-        schema_name = object_type_control[0]["schema"]
-
-    return schema_name
+    return control_dict
 
 
 def default_jsontype(type):
@@ -443,7 +461,7 @@ class DecoupleFormSubmission:
                 # handle array types
                 value_list = list()
 
-                object_type_control = control_to_schema_name(f.control.lower())
+                object_type_control = object_type_control_map().get(f.control.lower(), str())
 
                 if object_type_control:
                     # handle object type controls e.g., ontology term, comment
@@ -494,7 +512,7 @@ class DecoupleFormSubmission:
                     if self.object_has_value:
 
                         # sanitise schema
-                        target_schema = get_isa_schema(object_type_control)
+                        target_schema = get_db_json_schema(object_type_control)
                         for kx in target_schema:
                             target_schema = ISAHelpers().resolve_schema_key(target_schema, kx, object_type_control,
                                                                             primary_data)
@@ -545,12 +563,14 @@ class DecoupleFormSubmission:
                             self.has_value(primary_data)
 
                             if self.object_has_value:
-                                # sanitise schema
-                                target_schema = get_isa_schema(object_type_control)
-                                for kx in target_schema:
-                                    target_schema = ISAHelpers().resolve_schema_key(target_schema, kx,
-                                                                                    object_type_control,
-                                                                                    primary_data)
+                                # sanitise schema: make it compliant with schema provider's specifications
+                                target_schema = get_db_json_schema(object_type_control)
+
+                                if target_schema:
+                                    for kx in target_schema:
+                                        target_schema = ISAHelpers().resolve_schema_key(target_schema, kx,
+                                                                                        object_type_control,
+                                                                                        primary_data)
 
                                 value_list.append(target_schema)
 
@@ -573,7 +593,7 @@ class DecoupleFormSubmission:
                         auto_dict[f.id.split(".")[-1]] = value_list
             else:
                 # handle non-array types
-                object_type_control = control_to_schema_name(f.control.lower())
+                object_type_control = object_type_control_map().get(f.control.lower(), str())
 
                 if object_type_control:
                     # handle object type controls e.g., ontology term, comment
@@ -621,13 +641,15 @@ class DecoupleFormSubmission:
                         if self.object_has_value:
                             auto_dict[f.id.split(".")[-1]] = primary_data
 
-                    # sanitise schema
-                    target_schema = get_isa_schema(object_type_control)
-                    for kx in target_schema:
-                        target_schema = ISAHelpers().resolve_schema_key(target_schema, kx, object_type_control,
-                                                                        primary_data)
+                    # sanitise schema: make it compliant with schema provider's specifications
+                    target_schema = get_db_json_schema(object_type_control)
 
-                    auto_dict[f.id.split(".")[-1]] = target_schema
+                    if target_schema:
+                        for kx in target_schema:
+                            target_schema = ISAHelpers().resolve_schema_key(target_schema, kx, object_type_control,
+                                                                            primary_data)
+
+                        auto_dict[f.id.split(".")[-1]] = target_schema
 
 
                 else:
@@ -641,7 +663,7 @@ class DecoupleFormSubmission:
     def decouple_object(self, comp_key, decoupled_list, field):
         base_key = comp_key
 
-        object_type_control = control_to_schema_name(field.control.lower())
+        object_type_control = object_type_control_map().get(field.control.lower(), str())
 
         if object_type_control:  # handle object type controls e.g., ontology term, comment
             object_fields = get_copo_schema(object_type_control, True)

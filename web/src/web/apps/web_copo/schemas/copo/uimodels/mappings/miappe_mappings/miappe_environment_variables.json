@@ -67,8 +67,8 @@
   "description": "",
   "configuration": {
     "type": "json",
-    "provider": "isa",
-    "ref": "miappe_environment_variable_schema"
+    "provider": "copo",
+    "ref": ""
   },
   "title": "Miappe Environment Variable Mappings"
 }

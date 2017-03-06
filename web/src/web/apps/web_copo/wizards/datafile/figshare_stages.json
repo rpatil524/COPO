@@ -5,8 +5,6 @@
     {
       "ref": "attach_samples",
       "title": "Samples",
-      "content": "get_stage_html",
-      "deposition_context": "figshare",
       "message": "Select samples associated with this file from the list. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based. <br/>Click <strong>Next</strong>, when you are done, to carry on with your description.",
       "items": [
         {
@@ -28,8 +26,6 @@
     {
       "ref": "type_category",
       "title": "Description",
-      "content": "get_stage_html",
-      "deposition_context": "figshare",
       "message": "Select the type of file you have uploaded to COPO.",
       "items": [
         {
@@ -65,8 +61,6 @@
     {
       "ref": "title_author_description",
       "title": "Description",
-      "content": "get_stage_html",
-      "deposition_context": "figshare",
       "message": "Give a Title to be used for this submission. This will be visible on the Internet.",
       "items": [
         {
@@ -98,8 +92,6 @@
     {
       "ref": "tags",
       "title": "Description",
-      "content": "get_stage_html",
-      "deposition_context": "figshare",
       "message": "Enter keywords for your file. These will help others find your file on the Internet.",
       "items": [
         {
@@ -145,8 +137,6 @@
     {
       "ref": "figshare_publish",
       "title": "Publish?",
-      "content": "get_stage_html",
-      "deposition_context": "figshare",
       "message": "Should this file be published immediately?",
       "items": [
         {
@@ -169,8 +159,6 @@
       "ref": "oauth_authorisation",
       "is_conditional_stage": true,
       "title": "OAuth Authorisation",
-      "content": "get_stage_html",
-      "deposition_context": "figshare",
       "message": "Click below to be grant COPO access to your Figshare account",
       "callback": {
         "function": "validate_figshare_token",

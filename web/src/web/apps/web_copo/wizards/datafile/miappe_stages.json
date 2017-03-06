@@ -5,8 +5,6 @@
     {
       "ref": "attach_samples",
       "title": "Attach Samples",
-      "content": "get_stage_html",
-      "deposition_context": "miappe",
       "message": "",
       "items": [
         {
@@ -31,9 +29,7 @@
     {
       "ref": "experiment_details",
       "title": "Experiment Details",
-      "content": "get_stage_html",
       "is_singular_stage": true,
-      "deposition_context": "dataverse",
       "message": "",
       "items": [
         {
@@ -99,8 +95,6 @@
     {
       "ref": "environmental_factors",
       "title": "Environmental Factors",
-      "content": "get_stage_html",
-      "deposition_context": "dataverse",
       "message": "",
       "items": [
         {
@@ -178,8 +172,6 @@
     {
       "ref": "aerial_conditions",
       "title": "Aerial Conditions",
-      "content": "get_stage_html",
-      "deposition_context": "dataverse",
       "message": "",
       "items": [
         {
@@ -357,8 +349,6 @@
     {
       "ref": "nutrients",
       "title": "Nutrients",
-      "content": "get_stage_html",
-      "deposition_context": "dataverse",
       "message": "",
       "items": [
         {
@@ -396,8 +386,6 @@
     {
       "ref": "watering",
       "title": "Watering",
-      "content": "get_stage_html",
-      "deposition_context": "dataverse",
       "message": "",
       "items": [
         {
@@ -462,8 +450,6 @@
     {
       "ref": "observed_variables",
       "title": "Observed Variables",
-      "content": "get_stage_html",
-      "deposition_context": "dataverse",
       "message": "",
       "items": [
         {
@@ -476,8 +462,7 @@
           "show_in_form": true,
           "id": "copo.miappe.phenotypic_variables",
           "show_in_table": false,
-          "build_from_schema": "phenotypic_variables_schema",
-          "control": "copo-characteristics",
+          "control": "copo-phenotypic-characteristics",
           "versions": [
             "phenotypic_variables"
           ],
@@ -494,8 +479,7 @@
           "show_in_form": true,
           "id": "copo.miappe.environmental_variables",
           "show_in_table": false,
-          "build_from_schema": "environment_variables_schema",
-          "control": "copo-characteristics",
+          "control": "copo-environmental-characteristics",
           "versions": [
             "environmental_variables"
           ],
