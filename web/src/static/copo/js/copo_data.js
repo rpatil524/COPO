@@ -2000,22 +2000,21 @@ $(document).ready(function () {
         //build form elements
         for (var i = 0; i < stage.items.length; ++i) {
             var formElem = stage.items[i];
-
             var control = formElem.control;
 
             var elemValue = null;
 
-            if (formValue) {
-                if (formValue[formElem.id]) {
-                    elemValue = formValue[formElem.id];
+            //set default values
+            if (formElem.default_value) {
+                elemValue = formElem.default_value;
+            } else {
+                elemValue = "";
+            }
 
-                    if (!elemValue) {
-                        if (formElem.default_value) {
-                            elemValue = formElem.default_value;
-                        } else {
-                            elemValue = "";
-                        }
-                    }
+            if (formValue) {
+                var elem = formElem.id.split(".").slice(-1)[0];
+                if (formValue[elem]) {
+                    elemValue = formValue[elem];
                 }
             }
 
@@ -2024,7 +2023,6 @@ $(document).ready(function () {
             }
 
             try {
-
                 formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
             }
             catch (err) {
@@ -2035,7 +2033,6 @@ $(document).ready(function () {
 
             //any triggers?
             if (formElem.trigger) {
-
                 try {
                     dispatchEventHandler[formElem.trigger.callback.function](formElem);
                 }
@@ -2111,7 +2108,17 @@ $(document).ready(function () {
                 }
             ]
         });
-        dialog_display(dialog, messageTitle, wizardMessages.stage_dependency_message.text, "warning");
+
+        var triggerMessage = '';
+
+        try {
+            triggerMessage = formElem.trigger.message;
+        }
+        catch (err) {
+            ;
+        }
+
+        dialog_display(dialog, messageTitle, triggerMessage, "warning");
     }
 
 
@@ -2152,8 +2159,7 @@ $(document).ready(function () {
             $(document)
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
-                    do_growth_facility_change(this.value, formElem);
-
+                    element_value_change(formElem, previousValue, "Growth Facility Change");
                 });
         },
         get_nutrient_controls: function (formElem) {
@@ -2167,101 +2173,9 @@ $(document).ready(function () {
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
                     do_get_nutrient_controls(this.value, formElem);
-
                 });
         }
     };
-
-    function do_get_nutrient_controls(theValue, triggerElem) {
-        if (!copoSchemas.hasOwnProperty(theValue + "_schema")) {
-            var parentForm = $("#" + triggerElem.id).closest("form");
-            if (parentForm.find(".test_trigger").length) { //this is a dynamic <div> I just made up, see def down
-                parentForm.find(".test_trigger").remove();
-            }
-            return false;
-        }
-        var targetSchema = copoSchemas[theValue + "_schema"];
-        //get parent form
-        var parentForm = $("#" + triggerElem.id).closest("form");
-        if (parentForm.find(".test_trigger").length) { //this is a dynamic <div> I just made up, see def down
-            parentForm.find(".test_trigger").remove();
-        }
-        var formDiv = do_append_controls_loop(targetSchema)
-        formDiv.insertAfter($("#" + triggerElem.id).closest(".copo-form-group"));
-        setup_element_hint();
-        refresh_tool_tips();
-    }
-
-
-    function do_growth_facility_change(theValue, triggerElem) {
-        if (!copoSchemas.hasOwnProperty(theValue + "_schema")) {
-            var parentForm = $("#" + triggerElem.id).closest("form");
-            if (parentForm.find(".test_trigger").length) { //this is a dynamic <div> I just made up, see def down
-                parentForm.find(".test_trigger").remove();
-            }
-            return false;
-        }
-        var targetSchema = copoSchemas[theValue + "_schema"];
-        //get parent form
-        var parentForm = $("#" + triggerElem.id).closest("form");
-        if (parentForm.find(".test_trigger").length) { //this is a dynamic <div> I just made up, see def down
-            parentForm.find(".test_trigger").remove();
-        }
-        var formDiv = do_append_controls_loop(targetSchema)
-        formDiv.insertAfter($("#" + triggerElem.id).closest(".copo-form-group"));
-        setup_element_hint();
-        refresh_tool_tips();
-    }
-
-
-    function do_append_controls_loop(targetSchema) {
-        // function to loop through elements on a schema, create a control for each one and add it to a div, then return the div
-        var formValue = null; // this could potentially be gotten from the triggerElem
-        var formDiv = $('<div/>',
-            {
-                class: "test_trigger form-group copo-form-group"
-            });
-
-        for (var i = 0; i < targetSchema.length; ++i) {
-            var formElem = targetSchema[i];
-            formElem["id"] = formElem.id.split(".").slice(-1)[0];
-            var control = formElem.control;
-            var elemValue = null;
-            if (formValue) {
-                if (formValue[formElem.id]) {
-                    elemValue = formValue[formElem.id];
-                    if (!elemValue) {
-                        if (formElem.default_value) {
-                            elemValue = formElem.default_value;
-                        } else {
-                            elemValue = "";
-                        }
-                    }
-                }
-            }
-            if (formElem.hidden == "true") {
-                control = "hidden";
-            }
-            try {
-                formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
-            }
-            catch (err) {
-                console.log(control.toLowerCase());
-                formDiv.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + formElem.label + '): Cannot resolve form control!</div>');
-                console.log(err);
-            }
-            //any triggers?
-            if (formElem.trigger) {
-                try {
-                    dispatchEventHandler[formElem.trigger.callback.function](formElem);
-                }
-                catch (err) {
-                }
-            }
-        }
-        return formDiv
-    }
-
 
     function set_wizard_summary() {
         descriptionWizSummary = {

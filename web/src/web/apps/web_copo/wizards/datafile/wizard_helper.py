@@ -204,6 +204,18 @@ class WizardHelper:
 
         return display
 
+    def fire_on_create_triggers(self, stage):
+        """
+        functions fires defined triggers, where requested, to set initial values/controls.
+        NB:this should only be needed the first time the stage is activated for display, as the display agent (UI)
+        takes care of firing the trigger after display
+        :param elem: stage dictionary
+        :return:
+        """
+        stage_ref = stage.get("ref", str())
+        for sti in stage.get("items", list()):
+            item_id = sti['id']  # placeholder parameter
+
     def get_stages_display(self):
         """
         function displays all previously activated stages
@@ -396,6 +408,9 @@ class WizardHelper:
                     self.activate_stage(elem)
                     stage_dict = self.get_stage_display(elem)
 
+                    # any fire_on_create trigger?
+                    self.fire_on_create_triggers(elem)
+
         return stage_dict
 
     def save_stage_data(self, auto_fields):
@@ -481,20 +496,51 @@ class WizardHelper:
         args = args.split(",")
         # args: item_id, old_value, new_value, stage_ref
 
-        if args[1] == args[2] or not args[1] or not args[2]:  # no change in growth facility
+        if args[1] == args[2] or not args[2]:  # no change in growth facility
             return False
 
-        item_id = args[0]
-        value = args[2]
-        stage_ref = args[3]
-        dd_list = [x for x in lkup.DROP_DOWNS['GROWTH_AREAS'] if x['value'] == value]
-        if dd_list:
-            dd_dict = dd_list[0]
-            if 'schema' in dd_dict:
-                schema_name = dd_dict['schema']
-                extra_schema = d_utils.get_copo_schema(schema_name)
-                DataFile().add_fields_to_datafile_stage(target_ids=self.targets_datafiles, fields=extra_schema,
-                                                        target_stage_ref=stage_ref)
+        item_id = args[0]  # item that originated the trigger
+        new_value = args[2]  # new value set on form that led to firing the trigger
+        stage_ref = args[3]  # reference of the stage
+
+        # get stage schema of interest given the stage reference, stage_ref
+        stage = dict()
+        stages = [x for x in self.get_datafile_stages() if x['ref'] == stage_ref]
+        if stages:
+            stage = stages[0]
+
+        # remove potentially obsolete items from the stage items list
+        for g_a in lkup.DROP_DOWNS['GROWTH_AREAS']:
+            if "schema" in g_a:
+                target_schema = d_utils.get_copo_schema(g_a['schema'])
+                for f in target_schema:
+                    preserveditems = [item for item in stage.get("items", list()) if
+                                      not item["id"].split(".")[-1] == f["id"].split(".")[-1]]
+                    stage["items"] = preserveditems
+
+        # now get the required schema name if any
+        growth_areas = [x for x in lkup.DROP_DOWNS['GROWTH_AREAS'] if
+                        x['value'] == new_value and x.get("schema", str())]
+
+        if not growth_areas:  # no associated schema, nothing to do!
+            return
+        else:
+            # resolve actual schema to be inserted given the schema name or reference
+            insert_schema = d_utils.get_copo_schema(growth_areas[0]['schema'])
+
+            # get the index of the reference item (trigger originator) from the stage dictionary,
+            # and use this to inform the insertion of the new items.
+            # it is assumed that the new items will be inserted just after the trigger originator.
+            # feel free, however, to change the position (index) accordingly to reflect
+            # what is required on the rendering agent
+            item_indx = [indx for indx, item in enumerate(stage.get("items", list())) if
+                         item["id"].split(".")[-1] == item_id.split(".")[-1]]
+            if item_indx:
+                insert_indx = item_indx[0]
+                stage["items"][insert_indx + 1:insert_indx + 1] = insert_schema[:]
+
+                # and finally...a little stage housekeeping...and we are done!!
+                self.set_items_type(stage)
 
     def get_nutrient_controls(self):
         pass
@@ -832,6 +878,9 @@ class WizardHelper:
         for item in stage.get("items", list()):
             if not item.get("type"):
                 item["type"] = "string"
+
+            # also get id in the desired order
+            item["id"] = item["id"].split(".")[-1]
 
         return stage
 

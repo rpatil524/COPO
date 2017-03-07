@@ -138,6 +138,8 @@
           },
           "trigger": {
             "type": "change",
+            "fire_on_display": true,
+            "message": "Changing Growth Facility might alter or introduce new fields to the stage. <br/><br/>Do you want to continue?",
             "callback": {
               "function": "growth_facility_change",
               "parameter": "{item_id!s},{old_value!s},{new_value!s},{stage_ref!s}"
@@ -375,9 +377,10 @@
           "label": "Nutrient Type",
           "trigger": {
             "type": "change",
+            "message": "Changing Nutrient Type might alter or introduce new fields to the stage. <br/><br/>Do you want to continue?",
             "callback": {
               "function": "get_nutrient_controls",
-              "parameter": ""
+              "parameter": "{item_id!s},{old_value!s},{new_value!s},{stage_ref!s}"
             }
           }
         }

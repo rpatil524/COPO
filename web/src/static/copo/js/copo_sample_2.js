@@ -1216,56 +1216,9 @@ $(document).ready(function () {
             return formDiv;
         }
 
-        function element_value_change(formElem, elemValue, messageTitle) {
-            var dialog = new BootstrapDialog({
-                buttons: [
-                    {
-                        label: 'Cancel',
-                        cssClass: 'btn-default',
-                        action: function (dialogRef) {
-                            //set back to previous value
-                            $("#" + formElem.id).val(elemValue);
-
-                            dialogRef.close();
-                        }
-                    },
-                    {
-                        label: 'Continue',
-                        cssClass: 'btn-primary',
-                        action: function (dialogRef) {
-                            setTimeout(function () {
-                                //reset the wizard...
-
-                                if (stage_data) {
-                                    $.ajax({
-                                        url: wizardURL,
-                                        type: "POST",
-                                        headers: {'X-CSRFToken': csrftoken},
-                                        data: stage_data,
-                                        success: function (data) {
-                                            clear_wizard();
-                                        },
-                                        error: function () {
-                                            alert("Couldn't save entries!");
-                                        }
-                                    });
-                                }
-
-                            }, 1000);
-
-                            dialogRef.close();
-                        }
-                    }
-                ]
-            });
-
-            dialog_display(dialog, messageTitle, wizardMessages.stage_dependency_message.text, "warning");
-
-        }
-
 
         var dispatchSampleEventHandler = {
-            study_type_change: function (formElem) {
+            sample_change: function (formElem) {
                 var previousValue = null;
 
                 $(document)
@@ -1277,22 +1230,7 @@ $(document).ready(function () {
                 $(document)
                     .off(formElem.trigger.type, "#" + formElem.id)
                     .on(formElem.trigger.type, "#" + formElem.id, function () {
-                        element_value_change(formElem, previousValue, "Study Type Change");
-                    });
-            },
-            target_repo_change: function (formElem) {
-                var previousValue = null;
-
-                $(document)
-                    .off("focus", "#" + formElem.id)
-                    .on("focus", "#" + formElem.id, function () {
-                        previousValue = this.value;
-                    });
-
-                $(document)
-                    .off(formElem.trigger.type, "#" + formElem.id)
-                    .on(formElem.trigger.type, "#" + formElem.id, function () {
-                        element_value_change(formElem, previousValue, "Target Repo Change");
+                        ;
                     });
             }
         };

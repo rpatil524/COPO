@@ -352,14 +352,14 @@ DROP_DOWNS = {
             'value': 'miappe',
             'label': 'MIAPPE Compliant'
         },
-        {
-            'value': 'MetaboLights',
-            'label': 'MetaboLights'
-        },
-        {
-            'value': 'unknown',
-            'label': 'Unknown'
-        }
+        # {
+        #     'value': 'MetaboLights',
+        #     'label': 'MetaboLights'
+        # },
+        # {
+        #     'value': 'unknown',
+        #     'label': 'Unknown'
+        # }
     ],
     "SAMPLE_TYPES": [
         {
