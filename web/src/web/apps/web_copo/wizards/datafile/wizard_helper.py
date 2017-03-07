@@ -187,16 +187,22 @@ class WizardHelper:
 
         display = True
 
+        # define a parameter dictionary and collect any required parameter value here...
+        # or elsewhere before before the actual call to the callback function
+        param_dict = dict()
+        param_dict["display"] = display
+
         # any restrictions imposed?
         if self.is_conditional_stage(elem):
             call_back_function = elem.get("callback", dict()).get("function", str())
             call_back_parameter = elem.get("callback", dict()).get("parameter", str())
 
             if call_back_function:
-                if call_back_parameter:
-                    display = getattr(WizardHelper, call_back_function)(self, call_back_parameter.format(**locals()))
-                else:
-                    display = getattr(WizardHelper, call_back_function)(self)
+                args = d_utils.get_args_from_parameter(call_back_parameter, param_dict)
+                try:
+                    getattr(WizardHelper, call_back_function)(self, *args)
+                except:
+                    pass
 
         # stage_stub are non-displayable
         if self.is_stage_stub(elem):
@@ -358,15 +364,21 @@ class WizardHelper:
 
         stub_ref = elem['ref']
         new_stages = list()
+
+        # define a parameter dictionary and collect any required parameter value here...
+        # or elsewhere before before the actual call to the callback function
+        param_dict = dict()
+        param_dict["stub_ref"] = stub_ref
+
         if self.is_stage_stub(elem):
             call_back_function = elem.get("callback", dict()).get("function", str())
             call_back_parameter = elem.get("callback", dict()).get("parameter", str())
 
-            if call_back_function:
-                if call_back_parameter:
-                    new_stages = getattr(WizardHelper, call_back_function)(self, call_back_parameter.format(**locals()))
-                else:
-                    new_stages = getattr(WizardHelper, call_back_function)(self)
+            args = d_utils.get_args_from_parameter(call_back_parameter, param_dict)
+            try:
+                getattr(WizardHelper, call_back_function)(self, *args)
+            except:
+                pass
 
         return new_stages
 
@@ -472,11 +484,16 @@ class WizardHelper:
 
         return True
 
-    def target_repo_change(self, args):
-        args = args.split(",")
-        # args: item_id, old_value, new_value
+    def target_repo_change(self, old_value, new_value):
+        """
+        function checks if the target repository value has changed and clears up the description metadata accordingly
 
-        if args[0] == args[1] or not args[0] or not args[1]:  # no change in target repository
+        :param old_value: value before the trigger was fired
+        :param new_value: new target repository value giving rise to the trigger
+        :return:
+        """
+
+        if old_value == new_value or not old_value or not new_value:  # no change in target repository
             return False
 
         # reset batch stages
@@ -492,16 +509,15 @@ class WizardHelper:
 
         self.update_description(description)
 
-    def growth_facility_change(self, args):
-        args = args.split(",")
-        # args: item_id, old_value, new_value, stage_ref
+    def growth_facility_change(self, item_id, new_value, stage_ref):
+        """
 
-        if args[1] == args[2] or not args[2]:  # no change in growth facility
-            return False
-
-        item_id = args[0]  # item that originated the trigger
-        new_value = args[2]  # new value set on form that led to firing the trigger
-        stage_ref = args[3]  # reference of the stage
+        :param item_id: item or control that originated the trigger
+        :param old_value: the item value before the trigger was fired
+        :param new_value: the new value that led to the trigger
+        :param stage_ref: reference to the stage
+        :return:
+        """
 
         # get stage schema of interest given the stage reference, stage_ref
         stage = dict()
@@ -539,20 +555,24 @@ class WizardHelper:
                 insert_indx = item_indx[0]
                 stage["items"][insert_indx + 1:insert_indx + 1] = insert_schema[:]
 
-                # and finally...a little stage housekeeping...and we are done!!
+                # and finally...a little stage housekeeping...and we are good!
                 self.set_items_type(stage)
 
     def get_nutrient_controls(self):
         pass
 
-    def study_type_change(self, args):
-        args = args.split(",")
-        # args: item_id, old_value, new_value
+    def study_type_change(self, item_id, old_value, new_value):
+        """
+        function reacts to a change in the study type (ENA repo-specific), and alters the stages accordingly
+        :param item_id: the item giving rise to the trigger
+        :param old_value:
+        :param new_value:
+        :return:
+        """
 
-        if args[1] == args[2] or not args[1] or not args[2]:  # no change in target repository
+        if old_value == new_value or not old_value or not new_value:  # no change in target repository
             return False
 
-        item_id = args[0]
         description = self.get_datafile_description()
 
         # now let's deal with changes pertaining to specific items
@@ -811,17 +831,12 @@ class WizardHelper:
 
         return description_mismatch
 
-    def get_dynamic_elements_ena(self, args):
+    def get_dynamic_elements_ena(self, stub_ref):
         """
         function generates dynamic stages for ENA based on the study type
-        :param args:
+        :param stub_ref: the reference of the stub stage
         :return:
         """
-
-        args = args.split(",")
-        # args: stub_ref
-
-        stub_ref = args[0]
 
         study_type = self.get_batch_attributes()["study_type"][0]
         if not study_type:
@@ -884,30 +899,39 @@ class WizardHelper:
 
         return stage
 
-    def handle_save_triggers(self, **kwargs):
-        stage = kwargs.pop("stage", dict())
-        old_data = kwargs.pop("old_data", dict())
-        new_data = kwargs.pop("new_data", dict())
+    def handle_save_triggers(self, **param_dict):
+        """
+        takes care of dispatching calls to trigger functions
+        :param param_dict:
+        :return:
+        """
+        stage = param_dict.pop("stage", dict())
+        old_data = param_dict.pop("old_data", dict())
+        new_data = param_dict.pop("new_data", dict())
 
         stage_ref = stage.get("ref", str())
+
+        param_dict["stage_ref"] = stage_ref
+
         for sti in stage.get("items", list()):
-            item_id = sti['id']  # placeholder parameter
+            param_dict["item_id"] = sti['id']  # placeholder parameter
 
             trigger_elem = sti.get("trigger", dict())
             if trigger_elem:
-                new_value = new_data[sti['id']]  # placeholder parameters
-                old_value = str()
+                param_dict["new_value"] = new_data[sti['id']]  # placeholder parameters
+                param_dict["old_value"] = str()  # placeholder parameters
                 if old_data.get(sti['id'], str()):
-                    old_value = old_data[sti['id']]
+                    param_dict["old_value"] = old_data[sti['id']]
 
+                # get callback function
                 call_back_function = trigger_elem.get("callback", dict()).get("function", str())
-                call_back_parameter = trigger_elem.get("callback", dict()).get("parameter", str())
 
-                if call_back_function:
-                    if call_back_parameter:
-                        new_stages = getattr(WizardHelper, call_back_function)(self,
-                                                                               call_back_parameter.format(**locals()))
-                    else:
-                        new_stages = getattr(WizardHelper, call_back_function)(self)
+                # get callback parameters and sort out callback function arguments
+                call_back_parameter = trigger_elem.get("callback", dict()).get("parameter", str())
+                args = d_utils.get_args_from_parameter(call_back_parameter, param_dict)
+                try:
+                    getattr(WizardHelper, call_back_function)(self, *args)
+                except:
+                    pass
 
         return

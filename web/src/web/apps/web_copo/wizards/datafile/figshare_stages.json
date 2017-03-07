@@ -175,9 +175,10 @@
           "default_value": "",
           "trigger": {
             "type": "repo",
+            "message": "",
             "callback": {
               "function": "finish_oauth_authentication",
-              "parameter": "{new_value!s}"
+              "parameter": "new_value"
             }
           }
         }

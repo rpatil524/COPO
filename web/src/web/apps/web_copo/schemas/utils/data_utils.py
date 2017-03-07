@@ -440,6 +440,22 @@ def default_jsontype(type):
     return d_type
 
 
+def get_args_from_parameter(parameter, param_value_dict):
+    """
+    given a comma seprated parameter string, function returns an argument tuple
+    :param parameter:
+    :param param_value_dict:
+    :return:
+    """
+
+    parameter = parameter.split(",")
+    parameter = [x.strip() for x in parameter]  # remove unwanted whitespaces
+    args = [param_value_dict[p] for p in parameter if p in param_value_dict]
+    args = tuple(args)
+
+    return args
+
+
 class DecoupleFormSubmission:
     def __init__(self, auto_fields, schema):
         """
