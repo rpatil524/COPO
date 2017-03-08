@@ -9,7 +9,7 @@ from dal import cursor_to_list
 import web.apps.web_copo.lookup.lookup as lookup
 import web.apps.web_copo.templatetags.html_tags as htags
 from web.apps.web_copo.schemas.utils import data_utils as d_utils
-from dal.copo_da import Submission, DataFile, DAComponent, Person
+from dal.copo_da import Submission, DataFile, DAComponent, Person, Sample
 
 
 class Investigation:
@@ -728,9 +728,16 @@ class ISAHelpers:
         Person(profile_id=profile_id).create_sra_person()
         copo_records["person"] = DAComponent(profile_id=profile_id, component="person").get_all_records()
 
-        # sample
+        # datafile and samples, sources, study_type and seq_instruments
+        df_ids_list = DAComponent(component="submission").get_record(submission_token).get("bundle", list())
+
+        # sample... contingent on datafiles
+        attach_samples = [DataFile().get_record_property(element, "attach_samples") for element in df_ids_list]
+        attach_samples = list(set(attach_samples))
+        object_list = [ObjectId(sample_id) for sample_id in attach_samples]
+
         copo_records["sample"] = list()
-        samples = DAComponent(profile_id=profile_id, component="sample").get_all_records()
+        samples = cursor_to_list(Sample().get_collection_handle().find({"_id": {"$in": object_list}}))
         if samples:
             df = pd.DataFrame(samples)
             df["name"] = df["name"].apply(self.rename_it, args=("sample",))
@@ -751,9 +758,6 @@ class ISAHelpers:
             df = pd.DataFrame(sources)
             df["name"] = df["name"].apply(self.rename_it, args=("source",))
             copo_records["source"] = df.to_dict('records')
-
-        # datafile and study_type and seq_instruments
-        df_ids_list = DAComponent(component="submission").get_record(submission_token).get("bundle", list())
 
         # study_type
         copo_records["study_type"] = self.get_study_type(df_ids_list)
@@ -1133,6 +1137,9 @@ class ISAHelpers:
 
     def resolve_schema_key(self, schema_dict=dict(), schema_field=str(), component=str(), record=dict()):
         """
+        function resolve schema attributes, making sure the provided record conforms to the specification of the schema
+        NB: this function assumes the schema_dict is JSON Schema compliant
+        :param schema_dict: schema 'properties' that informs the record resolution. must be JSON Schema compliant!
         :param schema_field: field to be resolved to
         :param component: e.g., publication, source, sample
         :param record: associated record to component

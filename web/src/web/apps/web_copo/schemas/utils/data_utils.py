@@ -305,14 +305,15 @@ def get_button_templates():
 def get_db_json_schema(component):
     """
     function returns a JSON schema configuration given a component.
-    Note: these are db models schemas, different from
-    UI schemas, that provide the configuration that COPO UI schemas map to.
+    Note: these are db models schemas, necessarily conforming to the JSON Schema specification and different from
+    UI schemas, which provide the configuration that COPO UI schemas map to.
     :param component:
     :return:
     """
+
     isa_path = RESOLVER['isa_json_db_models']
 
-    # set other paths accordingly depending on where the actual files reside
+    # ...set other paths accordingly depending on where the actual files reside or, conceptually, the schema provider
 
     schema_dict = dict(
         publication=json_to_pytype(os.path.join(isa_path, 'publication_schema.json')).get("properties", dict()),
@@ -398,7 +399,7 @@ def get_copo_schema(component, as_object=False):
         miappe_rooting_field=schema_base.get('miappe').get('rooting').get('field').get("fields", list()),
         hydroponics=schema_base.get('miappe').get('nutrients').get('hydroponics').get('fields', list()),
         soil=schema_base.get('miappe').get('nutrients').get('soil').get('fields', list()),
-        phentotypic_variables=schema_base.get("miappe").get("phenotypic_variables").get("fields", list()),
+        phenotypic_variables=schema_base.get("miappe").get("phenotypic_variables").get("fields", list()),
         environment_variables=schema_base.get("miappe").get("environment_variables").get("fields", list())
     )
 
@@ -527,13 +528,15 @@ class DecoupleFormSubmission:
 
                     if self.object_has_value:
 
-                        # sanitise schema
+                        # sanitise schema: make it compliant with schema provider's specifications
                         target_schema = get_db_json_schema(object_type_control)
-                        for kx in target_schema:
-                            target_schema = ISAHelpers().resolve_schema_key(target_schema, kx, object_type_control,
-                                                                            primary_data)
-
-                        value_list.append(target_schema)
+                        if target_schema:
+                            for kx in target_schema:
+                                target_schema = ISAHelpers().resolve_schema_key(target_schema, kx, object_type_control,
+                                                                                primary_data)
+                            value_list.append(target_schema)
+                        else:
+                            value_list.append(primary_data)
 
                     # sort secondary data
                     if secondary_data_list:
@@ -587,8 +590,9 @@ class DecoupleFormSubmission:
                                         target_schema = ISAHelpers().resolve_schema_key(target_schema, kx,
                                                                                         object_type_control,
                                                                                         primary_data)
-
-                                value_list.append(target_schema)
+                                    value_list.append(target_schema)
+                                else:
+                                    value_list.append(primary_data)
 
                     auto_dict[f.id.split(".")[-1]] = value_list
                 else:
@@ -664,8 +668,9 @@ class DecoupleFormSubmission:
                         for kx in target_schema:
                             target_schema = ISAHelpers().resolve_schema_key(target_schema, kx, object_type_control,
                                                                             primary_data)
-
                         auto_dict[f.id.split(".")[-1]] = target_schema
+                    else:
+                        auto_dict[f.id.split(".")[-1]] = primary_data
 
 
                 else:

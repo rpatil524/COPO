@@ -375,13 +375,13 @@ DROP_DOWNS = {
     ],
     "GROWTH_AREAS": [
         {
-            "value": "growth_chamber_GC",
-            "label": "Growth Chamber"
-        },
-        {
             "value": "greenhouse_rooting",
             "label": "Greenhouse",
             "schema": "miappe_rooting_greenhouse"
+        },
+        {
+            "value": "growth_chamber_GC",
+            "label": "Growth Chamber"
         },
         {
             "label": "Open_Top_Chamber",
@@ -434,11 +434,13 @@ DROP_DOWNS = {
     "GROWTH_NUTRIENTS": [
         {
             "value": "hydroponics",
-            "label": "Hydroponics"
+            "label": "Hydroponics",
+            "schema": "hydroponics"
         },
         {
             "value": "soil",
-            "label": "Soil"
+            "label": "Soil",
+            "schema": "soil"
         }
     ],
     "WATERING_OPTIONS": [

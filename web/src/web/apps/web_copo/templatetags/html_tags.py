@@ -320,6 +320,8 @@ def get_resolver(data, elem):
     func_map = dict()
     func_map["copo-sample-source"] = resolve_copo_sample_source_data
     func_map["copo-characteristics"] = resolve_copo_characteristics_data
+    func_map["copo-environmental-characteristics"] = resolve_environmental_characteristics_data
+    func_map["copo-phenotypic-characteristics"] = resolve_phenotypic_characteristics_data
     func_map["copo-comment"] = resolve_copo_comment_data
     func_map["copo-multi-select"] = resolve_copo_multi_select_data
     func_map["copo-multi-search"] = resolve_copo_multi_search_data
@@ -363,9 +365,19 @@ def resolve_description_data(data, elem):
                 item_id = item_id.split(".")[-1]
                 item_dict = dict(label=item.get("label", str()), data=str())
 
+                resolved_value_sub = str()
                 if item_id in stage_data:
-                    # use item control and determine how to retrieve item data
-                    item_dict["data"] = get_resolver(stage_data[item_id], item)
+                    # resolve array data types
+                    if item.get("type", str()) == "array":
+                        resolved_value_sub = list()
+                        data = stage_data[item_id]
+                        for d in data:
+                            resolved_value_sub.append(get_resolver(d, item))
+                    else:
+                        # non-array types
+                        resolved_value_sub = get_resolver(stage_data[item_id], item)
+
+                    item_dict["data"] = resolved_value_sub
 
                 stage_dict.get("data").append(item_dict)
 
@@ -403,6 +415,36 @@ def resolve_copo_characteristics_data(data, elem):
                 resolved_data.append(a)
 
     return resolved_data
+
+
+def resolve_environmental_characteristics_data(data, elem):
+    schema = d_utils.get_copo_schema("environment_variables")
+
+    resolved_data = list()
+
+    for f in schema:
+        if f.get("show_in_table", True):
+            a = dict()
+            if f["id"].split(".")[-1] in data:
+                a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
+                resolved_data.append(a)
+
+    return str(resolved_data) # turn this casting off after merge
+
+
+def resolve_phenotypic_characteristics_data(data, elem):
+    schema = d_utils.get_copo_schema("phenotypic_variables")
+
+    resolved_data = list()
+
+    for f in schema:
+        if f.get("show_in_table", True):
+            a = dict()
+            if f["id"].split(".")[-1] in data:
+                a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
+                resolved_data.append(a)
+
+    return str(resolved_data) # turn this casting off after merge
 
 
 def resolve_copo_comment_data(data, elem):

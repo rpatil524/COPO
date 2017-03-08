@@ -123,7 +123,7 @@ var controlsMapping = {
     "copo-multi-select": "do_copo_multi_select_ctrl",
     "copo-comment": "do_copo_comment_ctrl",
     "copo-characteristics": "do_copo_characteristics_ctrl",
-    "copo-env-characteristics": "do_copo_characteristics_ctrl",
+    "copo-environmental-characteristics": "do_copo_characteristics_ctrl",
     "copo-phenotypic-characteristics": "do_copo_characteristics_ctrl",
     "copo-sample-source": "do_copo_sample_source_ctrl",
     "copo-sample-source-2": "do_copo_sample_source_ctrl_2",
@@ -560,8 +560,11 @@ var dispatchFormControl = {
         $(span).html('%')
         var input = $('<input/>',
             {
-                class: "form-control",
-                placeholder: formElem.placeholder
+                type: "text",
+                class: "input-copo form-control",
+                id: formElem.id,
+                name: formElem.id,
+
             })
         ctrlsDiv.append(input)
         ctrlsDiv.append(span)
@@ -601,7 +604,6 @@ var dispatchFormControl = {
                 class: "input-copo form-control",
                 id: formElem.id,
                 name: formElem.id,
-                placeholder: formElem.placeholder
             });
 
         //set validation markers
@@ -624,7 +626,6 @@ var dispatchFormControl = {
                 class: "input-copo form-control width100",
                 id: formElem.id,
                 name: formElem.id,
-                placeholder: formElem.placeholder
             });
 
         //set validation markers

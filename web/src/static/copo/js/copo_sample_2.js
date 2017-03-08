@@ -1883,7 +1883,7 @@ $(document).ready(function () {
                 return ctrlsDiv;
             },
             do_ontology_term_ctrl: function (relevantObject, item) {
-                var ontologySchema = copoSchemas.ontology_schema;
+                var ontologySchema = [];// copoSchemas.ontology_schema;
 
                 var ctrlsDiv = get_attributes_outer_div();
 

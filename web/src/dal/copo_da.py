@@ -400,6 +400,7 @@ class DataFile(DAComponent):
 
         property_dict = dict(
             target_repository=description_attributes.get("target_repository", dict()).get("deposition_context", str()),
+            attach_samples=description_attributes.get("attach_samples", dict()).get("study_samples", str()),
             sequencing_instrument=description_attributes.get("nucleic_acid_sequencing", dict()).get(
                 "sequencing_instrument", str()),
             study_type=description_attributes.get("study_type", dict()).get("study_type", str()),
