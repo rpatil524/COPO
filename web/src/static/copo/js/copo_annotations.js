@@ -27,6 +27,9 @@ $(document).ready(function () {
         $('#file_type_dropdown').val($(this).text())
         $('#file_type_dropdown_label').html($(this).text());
     });
+    $(document).on('click', '#save_ss_annotation', function () {
+        save_annotation()
+    })
 
 
     //******************************Event Handlers Block*************************//
@@ -119,6 +122,7 @@ $(document).ready(function () {
 
         if (taskTarget == 'row') {
             ids = [elem.attr('data-record-id')];
+            console.log(elem.target)
         } else if (taskTarget == 'rows') {
             //get reference to table, and retrieve selected rows
             if ($.fn.dataTable.isDataTable('#' + tableID)) {
@@ -147,15 +151,17 @@ $(document).ready(function () {
                         $('#annotation_table_wrapper').hide();
 
                         if (e.type == 'Spreadsheet') {
+                            $(document).data('annotator_type', 'ss')
                             load_ss_data(e)
                         }
                         else {
+                            $(document).data('annotator_type', 'txt')
                             load_txt_data(e)
                         }
                         $('#file_picker_modal').modal('hide');
                     },
                     error: function () {
-                        alert("Couldn't build publication form!");
+                        alert("Error loading table data");
                     }
                 });
             } else if (task == "delete") { //handles delete, allows multiple row delete
@@ -234,31 +240,44 @@ function load_ss_data(e) {
 
     hot = new Handsontable(element, {
         data: data,
+        readOnly: true,
         rowHeaders: false,
         colHeaders: false,
         dropdownMenu: true,
+        //afterInit: _afterInit,
+        beforeOnCellMouseDown: _beforeOnCellMouseDown,
         afterOnCellMouseDown: _columnHeaderClickHandler,
+        //currentColClassName: 'currentColClass',
         afterSelection: _afterSelection,
+
     });
     $(document).data('hot', hot)
     $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
 }
 
-function _columnHeaderClickHandler(changes, sources) {
-    if (sources.row == 0) {
-        show_controls()
-        var hot = $(document).data('hot')
-        var d = hot.getDataAtCell(sources.row, sources.col)
-        $('#selected_column_name').html(d)
+
+function _beforeOnCellMouseDown(event, coords, element) {
+    if (coords.col == 0) {
+        event.stopImmediatePropagation();
     }
+}
+
+function _columnHeaderClickHandler(changes, sources) {
+    show_controls()
+    var hot = $(document).data('hot')
+    var d = hot.getDataAtCell(0, sources.col)
+    $('#selected_column_name').html(d)
 }
 
 function _afterSelection(row, col, row2, col2) {
     // color column
-    cell = hot.getCell(row, col)
-    $('.table-header-highlighted').removeClass('table-header-highlighted')
-    $(cell).addClass('table-header-highlighted')
+    $(document).data('selected_col', col)
+    cell = hot.getCell(0, col)
+    $('.currentColClass').removeClass('currentColClass')
+    $(cell).addClass('currentHeaderClass')
+    $('#annotation_content .htCore tr > td:nth-child(' + (parseInt(col) + 1) + ')').addClass('currentColClass')
 
+    cell = hot.getCell(row, col)
 }
 
 function append_to_annotation_list(item) {
@@ -271,7 +290,9 @@ function append_to_annotation_list(item) {
     $(cell).data('termSource', term_source);
     $(cell).data('termAccession', term_accession);
 
-    // add colouring to cell to show it has been labelled
+    // add colouring to column to show it has been labelled
+    var col = $(document).data('selected_col')
+    $('.ht_core tr:nth-child(col) > td').css('background-color', 'red')
     $(cell).addClass('table-header-labeled');
 
     // add div to panel showing annotation
@@ -289,6 +310,15 @@ function append_to_annotation_list(item) {
     $(tr).data('attached_cell', cell)
     $('#annotations_table tbody').append(tr)
 }
+
+
+function save_annotation() {
+    console.log($(cell).data('annotation_value'))
+    console.log($(cell).data('termSource'))
+    console.log($(cell).data('termAccession'))
+
+}
+
 
 function delete_from_annotations_table(e) {
     var tr = $(e.currentTarget).closest('tr')
@@ -309,6 +339,7 @@ function mouseenter_annotation(e) {
     }
     $(e.currentTarget).addClass('annotation_mouseover')
 }
+
 function mouseleave_annotation(e) {
     var cell = $(e.currentTarget).data('attached_cell')
     try {

@@ -1,5 +1,11 @@
 #annotation_content {
     overflow-x: scroll;
+    width: 98%
+}
+
+#annotation_list{
+    margin-top: 25px;
+    padding-top: 15px
 }
 
 td.column-highlighted {
@@ -41,3 +47,22 @@ td.table-header-labeled {
     background-color: rgba(123, 187, 232, 1);
     color: white;
 }
+
+.currentColClass{
+    background-color: #f2f2f2 !important;
+}
+
+.current{
+
+}
+
+.currentHeaderClass{
+    background-color: #4478ba !important;
+    color: white !important;
+}
+
+#save_ss_annotation{
+    margin: 5px 10px 5px 0;
+}
+
+

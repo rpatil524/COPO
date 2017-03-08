@@ -79,6 +79,20 @@
     <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/search_highlight/dataTables.searchHighlight.css' %}">
 
+
+    <!-- PAGE LEVEL STYLES -->
+    {% block stylesheet_block %}{% endblock %}
+
+    <!-- SASS styles -->
+    {% compress css %}
+        <link rel="stylesheet" type="text/scss" href="{% static 'copo/css/copo/colors/sass.scss' %}"/>
+    {% endcompress %}
+
+
+
+
+
+
     <script src="{% static 'copo/datatables/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'copo/datatables/js/dataTables.bootstrap.min.js' %}"></script>
     <script src="{% static 'copo/datatables/js/dataTables.select.min.js' %}"></script>
@@ -119,48 +133,6 @@
 
 
         });
-
-        /*
-         AutoComplete({
-         post: do_post
-         });
-
-
-         function do_post(result, response, custParams) {
-         response = JSON.parse(response);
-         var properties = Object.getOwnPropertyNames(response);
-         //Try parse like JSON data
-
-         var empty,
-         length = response.length,
-         li = domCreate("li"),
-         ul = domCreate("ul");
-         //Reverse result if limit parameter is custom
-         if (custParams.limit < 0) {
-         properties.reverse();
-         }
-
-
-         for (var item in response.highlighting) {
-         try {
-         li.innerHTML = response.highlighting[item].label_autosuggest[0];
-
-         $(li).attr("data-autocomplete-value", response.highlighting[item].label_autosuggest[0].replace('<b>', '').replace('</b>', '') + ' - ' + item);
-
-         ul.appendChild(li);
-         li = domCreate("li");
-         }
-         catch (err) {
-         console.log(err)
-         }
-         }
-         if (result.hasChildNodes()) {
-         result.childNodes[0].remove();
-         }
-
-         result.appendChild(ul);
-         }
-         */
 
         function do_email_form() {
             var component = "";
@@ -228,12 +200,9 @@
 
     </script>
 
-    {# The stylesheetblock should always come last, so that inheriting template's styles take precedence over global styles. #}
-    {% block stylesheet_block %}{% endblock %}
-    {% compress css %}
-        <link rel="stylesheet" type="text/scss" href="{% static 'copo/css/copo/colors/sass.scss' %}"/>
-    {% endcompress %}
 </head>
+
+
 
 <body>
 

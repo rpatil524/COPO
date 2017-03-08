@@ -10,10 +10,8 @@
           xmlns="http://www.w3.org/1999/html">
     <link rel="stylesheet" href="{% static 'copo/handsontable/handsontable.full.css' %}"
           xmlns="http://www.w3.org/1999/html">
-
     <link rel="stylesheet" href="{% static 'copo/css/copo/datafile.css' %}" xmlns="http://www.w3.org/1999/html">
     <link rel="stylesheet" href="{% static 'copo/css/copo/copo_annotations.css' %}" xmlns="http://www.w3.org/1999/html">
-
 {% endblock %}
 
 
@@ -79,7 +77,8 @@
                             </small>
                             <div style="margin-top: 10px" class="dropdown" id="file_type_dropdown">
 
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" id="file_type_button">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+                                        id="file_type_button">
                                     File Type
                                     <span class="caret"></span></button>
                                 <ul class="dropdown-menu">
@@ -149,11 +148,20 @@
                     <h3 class="h3">Selected Column:&nbsp <span class="label label-primary" id="selected_column_name">None Selected</span>
                     </h3>
                     <input type="text" class="form-control ontology-field form-control-file" id="an-column"
-                           aria-describedby="fileHelp" data-autocomplete="/copo/ajax_search_ontology/999/">
-                </div>
-                <div id="annotation_list">
-                    <hr/>
+                           aria-describedby="fileHelp" data-autocomplete="/copo/ajax_search_ontology/999/"/>
 
+                    <a id="save_ss_annotation" class="btn btn-sm btn-default pull-right p-3">
+
+                        Save
+                    </a>
+
+                </div>
+
+
+
+                <div id="annotation_list">
+
+                    <hr/>
                     Current Annotations
                     <table id="annotations_table">
                         <thead>
