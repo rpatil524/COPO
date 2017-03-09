@@ -376,9 +376,9 @@ def get_ena_remote_path(submission_token):
 
 def get_copo_schema(component, as_object=False):
     """
-    function retrieves a required schema from the DB.
+    function retrieves a required UI schema from the DB.
     :param component: a key in the schema_dict to be retrieved
-    :param as_object: True allows elements of the schema to be accessed as an object, using the '.' notation. False
+    :param as_object: True returns the schema as an object whose element can be accessed using the '.' notation. False
             for the traditional python dictionary access
     :return:
     """
