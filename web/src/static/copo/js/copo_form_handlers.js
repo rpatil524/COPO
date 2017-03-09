@@ -106,7 +106,6 @@ $(document).ready(function () {
 //map controls to rendering functions
 var controlsMapping = {
     "text": "do_text_ctrl",
-    "text_addon": "do_text_addon_ctrl",
     "textarea": "do_textarea_ctrl",
     "hidden": "do_hidden_ctrl",
     "copo-select": "do_copo_select_ctrl",
@@ -605,47 +604,14 @@ function set_validation_markers(formElem, ctrl) {
 
 //form controls
 var dispatchFormControl = {
-    do_text_addon_ctrl: function (formElem, elemValue) {
-        var ctrlsDiv = $('<div/>',
-            {
-                class: "ctrlDIV"
-            });
-
-        var inputGroupDiv = $('<div/>',
-            {
-                class: "input-group"
-            });
-
-        var txt = $('<input/>',
-            {
-                type: "text",
-                class: "input-copo form-control copo-text-control",
-                id: formElem.id,
-                name: formElem.id
-            });
-
-        var inputGroupSpan = $('<span/>',
-            {
-                class: "input-group-addon",
-                html: formElem.add_on_label
-            });
-
-        inputGroupDiv.append(inputGroupSpan).append(txt);
-
-        //set validation markers
-        var vM = set_validation_markers(formElem, txt);
-
-        ctrlsDiv.append(inputGroupDiv);
-        ctrlsDiv.append(vM.errorHelpDiv);
-
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    },
     do_text_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
                 class: "ctrlDIV"
             });
 
+        var metaDiv = $('<div/>');
+
         var txt = $('<input/>',
             {
                 type: "text",
@@ -657,7 +623,31 @@ var dispatchFormControl = {
         //set validation markers
         var vM = set_validation_markers(formElem, txt);
 
-        ctrlsDiv.append(txt);
+        // set control metadata
+
+        if (formElem.control_meta.hasOwnProperty("input_group_addon")) {
+            metaDiv = $('<div/>',
+                {
+                    class: "input-group"
+                });
+
+            var inputGroupSpan = $('<span/>',
+                {
+                    class: "input-group-addon",
+                    html: formElem.control_meta.input_group_addon_label
+                });
+
+            if (formElem.control_meta.input_group_addon == "right") {
+                metaDiv.append(txt).append(inputGroupSpan);
+            } else {
+                metaDiv.append(inputGroupSpan).append(txt);
+            }
+
+        } else {
+            metaDiv.append(txt);
+        }
+
+        ctrlsDiv.append(metaDiv);
         ctrlsDiv.append(vM.errorHelpDiv);
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);

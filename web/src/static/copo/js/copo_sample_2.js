@@ -587,8 +587,10 @@ $(document).ready(function () {
                 var schemaCopy = $.extend(true, Object(), sampleSchema);
                 schemaCopy.id = "assigned_sample_" + i.toString();
                 schemaCopy.default_value = bundleName + "_" + i.toString();
-                schemaCopy.control = "text_addon";
-                schemaCopy.add_on_label = i.toString();
+                schemaCopy.control = "text";
+                schemaCopy.control_meta = Object();
+                schemaCopy.control_meta.input_group_addon = "right";
+                schemaCopy.control_meta.input_group_addon_label = i.toString();
                 schemaCopy.label = '';
                 schemaCopy.help_tip = "Assigned name. Please modify as required to capture your specific sample name."
 

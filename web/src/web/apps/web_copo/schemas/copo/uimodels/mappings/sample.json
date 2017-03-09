@@ -1,243 +1,254 @@
 {
+  "description": "Mappings of attribute in the Sample schema to a UI configuration source.",
+  "configuration": {
+    "ref": "sample_schema",
+    "type": "json",
+    "provider": "isa"
+  },
   "properties": [
     {
-      "type": "string",
-      "required": "true",
-      "ref": "Name",
-      "hidden": "false",
-      "deprecated": false,
-      "default_value": "",
-      "show_in_form": true,
-      "id": "copo.sample.name",
-      "show_in_table": true,
-      "unique": true,
-      "unique_items": [],
-      "control": "text",
-      "versions": [
-        "name"
-      ],
-      "help_tip": "A Sample represents major outputs resulting from a protocol application other than the special case outputs of Extract or a Labeled Extract.",
       "label": "Name",
+      "show_in_table": true,
+      "default_value": "",
+      "unique": true,
+      "id": "copo.sample.name",
+      "deprecated": false,
+      "help_tip": "A Sample represents major outputs resulting from a protocol application other than the special case outputs of Extract or a Labeled Extract.",
+      "control_meta": {},
+      "control": "text",
       "specifications": [
         "isasample",
         "biosample"
-      ]
+      ],
+      "required": "true",
+      "versions": [
+        "name"
+      ],
+      "ref": "Name",
+      "show_in_form": true,
+      "type": "string",
+      "unique_items": [],
+      "hidden": "false"
     },
     {
-      "type": "string",
-      "required": "false",
-      "ref": "",
-      "ontology_names": [
-        "ncbitaxon"
-      ],
-      "hidden": "false",
-      "deprecated": false,
-      "default_value": "",
-      "show_in_form": true,
-      "id": "copo.sample.organism",
-      "show_in_table": false,
-      "show_as_attribute": true,
-      "control": "ontology term",
+      "label": "Organism",
       "versions": [
         "organism"
       ],
-      "help_tip": "A taxonomic information associated to the Source Biological material (e.g., species, genus, strain).",
-      "label": "Organism",
-      "specifications": [
-        "biosample"
-      ]
-    },
-    {
-      "type": "array",
-      "required": "false",
-      "ref": "",
-      "hidden": "false",
-      "deprecated": false,
-      "default_value": "",
-      "show_in_form": true,
-      "id": "copo.sample.characteristics",
       "show_in_table": false,
       "show_as_attribute": true,
+      "default_value": "",
+      "specifications": [
+        "biosample"
+      ],
+      "id": "copo.sample.organism",
+      "deprecated": false,
+      "help_tip": "A taxonomic information associated to the Source Biological material (e.g., species, genus, strain).",
+      "control_meta": {},
+      "control": "ontology term",
+      "ontology_names": [
+        "ncbitaxon"
+      ],
+      "ref": "",
+      "show_in_form": true,
+      "type": "string",
+      "required": "false",
+      "hidden": "false"
+    },
+    {
+      "label": "Characteristics",
+      "show_in_table": false,
+      "show_as_attribute": true,
+      "default_value": "",
+      "specifications": [
+        "isasample",
+        "biosample"
+      ],
+      "id": "copo.sample.characteristics",
+      "deprecated": false,
+      "help_tip": "Characteristics of the sample e.g., height, sex",
+      "control_meta": {},
       "control": "copo-characteristics",
       "versions": [
         "characteristics"
       ],
-      "help_tip": "Characteristics of the sample e.g., height, sex",
-      "label": "Characteristics",
-      "specifications": [
-        "isasample",
-        "biosample"
-      ]
-    },
-    {
+      "ref": "",
+      "show_in_form": true,
       "type": "array",
       "required": "false",
-      "ref": "",
-      "hidden": "false",
-      "deprecated": false,
-      "default_value": "",
-      "show_in_form": true,
-      "id": "copo.sample.comments",
+      "hidden": "false"
+    },
+    {
+      "label": "Comments",
       "show_in_table": false,
       "show_as_attribute": true,
+      "default_value": "",
+      "specifications": [
+        "biosample"
+      ],
+      "id": "copo.sample.comments",
+      "deprecated": false,
+      "help_tip": "",
+      "control_meta": {},
       "control": "copo-comment",
       "versions": [
         "comments"
       ],
-      "help_tip": "",
-      "label": "Comments",
-      "specifications": [
-        "biosample"
-      ]
-    },
-    {
+      "ref": "",
+      "show_in_form": true,
       "type": "array",
       "required": "false",
-      "ref": "",
-      "hidden": "false",
-      "deprecated": false,
-      "default_value": "",
-      "show_in_form": true,
-      "id": "copo.sample.factorValues",
+      "hidden": "false"
+    },
+    {
+      "label": "Factors",
       "show_in_table": false,
       "show_as_attribute": true,
+      "default_value": "",
+      "specifications": [
+        "isasample"
+      ],
+      "id": "copo.sample.factorValues",
+      "deprecated": false,
+      "help_tip": "Factors express treatments on the sample, e.g., compound, dose, duration",
+      "control_meta": {},
       "control": "copo-characteristics",
       "versions": [
         "factorValues"
       ],
-      "help_tip": "Factors express treatments on the sample, e.g., compound, dose, duration",
-      "label": "Factors",
-      "specifications": [
-        "isasample"
-      ]
+      "ref": "",
+      "show_in_form": true,
+      "type": "array",
+      "required": "false",
+      "hidden": "false"
     },
     {
-      "type": "string",
-      "required": "true",
-      "ref": "",
-      "hidden": "false",
-      "deprecated": false,
-      "default_value": "",
-      "show_in_form": true,
-      "id": "copo.sample.derivesFrom",
+      "help_tip": "Source from which this sample is derived",
+      "label": "Source",
       "show_in_table": false,
       "show_as_attribute": true,
-      "control": "copo-multi-search",
-      "show_create_button": true,
-      "option_component": "source",
-      "data_maxItems": 1,
       "option_values": {
         "callback": {
-          "function": "generate_sources_json",
-          "parameter": ""
+          "parameter": "",
+          "function": "generate_sources_json"
         }
       },
+      "default_value": "",
+      "data_maxItems": 1,
+      "id": "copo.sample.derivesFrom",
+      "deprecated": false,
+      "show_create_button": true,
+      "control_meta": {},
+      "control": "copo-multi-search",
+      "specifications": [
+        "isasample"
+      ],
+      "option_component": "source",
       "versions": [
         "derivesFrom"
       ],
-      "help_tip": "Source from which this sample is derived",
-      "label": "Source",
-      "specifications": [
-        "isasample"
-      ]
-    },
-    {
+      "ref": "",
+      "show_in_form": true,
       "type": "string",
       "required": "true",
-      "ref": "",
-      "hidden": "true",
-      "deprecated": false,
-      "default_value": "",
+      "hidden": "false"
+    },
+    {
+      "label": "Sample Type",
+      "show_in_table": true,
       "option_values": {
         "callback": {
-          "function": "get_sample_type_options",
-          "parameter": ""
+          "parameter": "",
+          "function": "get_sample_type_options"
         }
       },
-      "show_in_form": false,
+      "default_value": "",
       "id": "copo.sample.sample_type",
-      "show_in_table": true,
+      "deprecated": false,
+      "help_tip": "",
+      "control_meta": {},
       "control": "select",
       "versions": [
         "sample_type"
       ],
-      "help_tip": "",
-      "label": "Sample Type"
-    },
-    {
+      "ref": "",
+      "show_in_form": false,
       "type": "string",
       "required": "true",
-      "ref": "",
-      "hidden": "true",
-      "deprecated": false,
-      "default_value": "",
-      "show_in_form": false,
-      "id": "copo.sample.date_created",
+      "hidden": "true"
+    },
+    {
+      "label": "Created",
       "show_in_table": false,
+      "default_value": "",
+      "id": "copo.sample.date_created",
+      "deprecated": false,
+      "help_tip": "",
+      "control_meta": {},
       "control": "datetime",
+      "show_in_form": false,
+      "ref": "",
       "versions": [
         "date_created"
       ],
-      "help_tip": "",
-      "label": "Created"
-    },
-    {
       "type": "string",
       "required": "true",
-      "ref": "",
-      "hidden": "true",
-      "deprecated": false,
-      "default_value": "",
-      "show_in_form": false,
-      "id": "copo.sample.profile_id",
+      "hidden": "true"
+    },
+    {
+      "label": "Profile ID",
       "show_in_table": false,
+      "default_value": "",
+      "id": "copo.sample.profile_id",
+      "deprecated": false,
+      "help_tip": "",
+      "control_meta": {},
       "control": "text",
+      "show_in_form": false,
+      "ref": "",
       "versions": [
         "profile_id"
       ],
-      "help_tip": "",
-      "label": "Profile ID"
-    },
-    {
       "type": "string",
       "required": "true",
-      "ref": "",
-      "hidden": "true",
-      "deprecated": false,
-      "default_value": "",
-      "show_in_form": false,
-      "id": "copo.sample.deleted",
+      "hidden": "true"
+    },
+    {
+      "label": "Delete",
       "show_in_table": false,
+      "default_value": "",
+      "id": "copo.sample.deleted",
+      "deprecated": false,
+      "help_tip": "",
+      "control_meta": {},
       "control": "text",
+      "show_in_form": false,
+      "ref": "",
       "versions": [
         "deleted"
       ],
-      "help_tip": "",
-      "label": "Delete"
-    },
-    {
       "type": "string",
       "required": "true",
-      "ref": "",
-      "hidden": "true",
-      "deprecated": false,
-      "default_value": "",
-      "show_in_form": false,
-      "id": "copo.sample.date_modified",
+      "hidden": "true"
+    },
+    {
+      "label": "Date Modified",
       "show_in_table": true,
+      "default_value": "",
+      "id": "copo.sample.date_modified",
+      "deprecated": false,
+      "help_tip": "",
+      "control_meta": {},
       "control": "datetime",
+      "show_in_form": false,
+      "ref": "",
       "versions": [
         "date_modified"
       ],
-      "help_tip": "",
-      "label": "Date Modified"
+      "type": "string",
+      "required": "true",
+      "hidden": "true"
     }
   ],
-  "description": "Mappings of attribute in the Sample schema to a UI configuration source.",
-  "configuration": {
-    "type": "json",
-    "provider": "isa",
-    "ref": "sample_schema"
-  },
   "title": "Sample schema mappings"
 }

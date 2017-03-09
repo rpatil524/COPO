@@ -35,13 +35,14 @@ class DataFormats:
             self.generated_controls = new_list
             # set some default fields
             self.set_type()
+            self.set_control_meta()
             self.set_deprecation()
             self.set_versioning()
             self.set_form_display()
             self.set_table_display()
             self.set_ontologies()
 
-            # self.update_original_resource()
+            self.update_original_resource()
             self.refactor_deprecated_controls()
 
             out_dict = self.objectify()
@@ -185,6 +186,11 @@ class DataFormats:
         for elem_dict in self.generated_controls:
             if not elem_dict.get("type"):
                 elem_dict["type"] = "string"
+
+    def set_control_meta(self):
+        for elem_dict in self.generated_controls:
+            if not elem_dict.get("control_meta"):
+                elem_dict["control_meta"] = dict()
 
     def set_versioning(self):
         for elem_dict in self.generated_controls:
