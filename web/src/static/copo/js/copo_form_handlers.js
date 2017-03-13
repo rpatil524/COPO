@@ -52,6 +52,7 @@ $(document).ready(function () {
             $("#form_submit_btn").on('click', function () {
                 var formData = new FormData();
                 formData.append('file', $('#InputFile')[0].files[0]);
+                formData.append('file_type', $('#file_type_dropdown').val())
                 var csrftoken = $.cookie('csrftoken');
                 var url = "/api/upload_annotation_file/"
                 $.ajax({
@@ -65,9 +66,14 @@ $(document).ready(function () {
                 }).done(function (e) {
                     $('#annotation_table_wrapper').hide()
                     $('#annotation_content').show()
-                    $('#annotation_content').html(e.html)
 
-                    $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
+                    if (e.type == 'PDF Document') {
+                        load_txt_data(e)
+                    }
+                    else if (e.type == 'Spreadsheet') {
+                        load_ss_data(e)
+                    }
+
                     setup_annotator()
                     $('#file_picker_modal').modal('hide')
                 });
@@ -105,6 +111,7 @@ $(document).ready(function () {
 //map controls to rendering functions
 var controlsMapping = {
     "text": "do_text_ctrl",
+    "text_small": "do_small_text_ctrl",
     "textarea": "do_textarea_ctrl",
     "hidden": "do_hidden_ctrl",
     "copo-select": "do_copo_select_ctrl",
@@ -114,9 +121,18 @@ var controlsMapping = {
     "copo-multi-select": "do_copo_multi_select_ctrl",
     "copo-comment": "do_copo_comment_ctrl",
     "copo-characteristics": "do_copo_characteristics_ctrl",
+    "copo-environmental-characteristics": "do_copo_characteristics_ctrl",
+    "copo-phenotypic-characteristics": "do_copo_characteristics_ctrl",
+    "copo-sample-source": "do_copo_sample_source_ctrl",
+    "copo-sample-source-2": "do_copo_sample_source_ctrl_2",
     "oauth_required": "do_oauth_required",
     "copo-button-list": "do_copo_button_list_ctrl",
     "copo-item-count": "do_copo_item_count_ctrl",
+    "date-picker": "do_date_picker_ctrl",
+    "copo-duration": "do_copo_duration_ctrl",
+    "text-percent": "do_percent_text_box",
+    "growth_conditions_select": "do_growth_conditions_select",
+    "ontology_triplet_control": "do_ontology_triplet_control"
 };
 
 function json2HtmlForm(data) {
@@ -223,8 +239,8 @@ function build_form_body(data) {
     for (var i = 0; i < formJSON.form_schema.length; ++i) {
 
         var formElem = formJSON.form_schema[i];
+        var control = formElem.control
 
-        var control = formElem.control;
         var elemValue = null;
 
         if (formValue) {
@@ -512,6 +528,51 @@ function set_validation_markers(formElem, ctrl) {
 
 //form controls
 var dispatchFormControl = {
+
+    do_percent_text_box: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV input-group"
+            });
+        var span = $('<span/>',
+            {
+                class: "input-group-addon"
+            })
+        $(span).html('%')
+        var input = $('<input/>',
+            {
+                type: "text",
+                class: "input-copo form-control",
+                id: formElem.id,
+                name: formElem.id,
+
+            })
+        ctrlsDiv.append(input)
+        ctrlsDiv.append(span)
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
+    do_date_picker_ctrl: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        var txt = $('<input/>',
+            {
+                type: "text",
+                class: "input-copo form-control date-picker",
+                id: formElem.id,
+                name: formElem.id
+            });
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, txt);
+
+        ctrlsDiv.append(txt);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
     do_text_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -570,6 +631,28 @@ var dispatchFormControl = {
         }
 
         ctrlsDiv.append(metaDiv);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
+    do_small_text_ctrl: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        var txt = $('<input/>',
+            {
+                type: "text",
+                class: "input-copo form-control width100",
+                id: formElem.id,
+                name: formElem.id,
+            });
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, txt);
+
+        ctrlsDiv.append(txt);
         ctrlsDiv.append(vM.errorHelpDiv);
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
@@ -633,22 +716,72 @@ var dispatchFormControl = {
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
-    do_copo_characteristics_ctrl: function (formElem, elemValue) {
-        var characteristicsSchema = copoSchemas.characteristics_schema;
+    do_copo_duration_ctrl: function (formElem, elemValue) {
+
+        var durationSchema = copoSchemas[formElem.control];
 
         var ctrlsDiv = $('<div/>',
             {
                 class: "ctrlDIV"
             });
 
-        for (var i = 0; i < characteristicsSchema.length; ++i) {
+        for (var i = 0; i < durationSchema.length; ++i) {
             var mg = "margin-left:5px;";
             if (i == 0) {
                 mg = '';
             }
-            var fv = formElem.id + "." + characteristicsSchema[i].id.split(".").slice(-1)[0];
+            var fv = formElem.id + "." + durationSchema[i].id.split(".").slice(-1)[0];
 
-            if (characteristicsSchema[i].hidden == "false") {
+
+            var sp = $('<span/>',
+                {
+                    style: "display: inline-block; " + mg
+                });
+
+            //get ontology ctrl
+            var durationCtrlObject = get_basic_input(sp, durationSchema[i]);
+
+
+            durationCtrlObject.find(":input").each(function () {
+                //toni's comment
+                // if (this.id) {
+                //     this.id = fv + "." + this.id;
+                // }
+
+                //end toni's comment
+
+                if (this.id) {
+                    this.id = fv;
+                }
+
+                //set placeholder text
+                if ($(this).hasClass("ontology-field")) {
+                    $(this).attr("placeholder", durationSchema[i].label.toLowerCase());
+                }
+            });
+
+            ctrlsDiv.append(durationCtrlObject);
+        }
+
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
+    do_copo_characteristics_ctrl: function (formElem, elemValue) {
+
+        var workingSchema = copoSchemas[formElem.control];
+
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        for (var i = 0; i < workingSchema.length; ++i) {
+            var mg = "margin-left:5px;";
+            if (i == 0) {
+                mg = '';
+            }
+            var fv = formElem.id + "." + workingSchema[i].id.split(".").slice(-1)[0];
+
+            if (workingSchema[i].hidden == "false") {
 
                 var dionly = "display: inline-block; ";
 
@@ -657,7 +790,7 @@ var dispatchFormControl = {
                     //control that would have ordinarily been displayed on the UI. Its use does not in any way
                     // replace, or serve the purpose of, the html 'hidden' property defined on 'formElem'
 
-                    if (characteristicsSchema[i].id.split(".").slice(-1)[0] != formElem["_displayOnlyThis"]) {
+                    if (workingSchema[i].id.split(".").slice(-1)[0] != formElem["_displayOnlyThis"]) {
                         dionly = "display: none; ";
                     }
                 }
@@ -668,7 +801,7 @@ var dispatchFormControl = {
                     });
 
                 //get ontology ctrl
-                var ontologyCtrlObject = get_ontology_span(sp, characteristicsSchema[i]);
+                var ontologyCtrlObject = get_ontology_span(sp, workingSchema[i]);
 
                 ontologyCtrlObject.find(":input").each(function () {
                     if (this.id) {
@@ -677,7 +810,7 @@ var dispatchFormControl = {
 
                     //set placeholder text
                     if ($(this).hasClass("ontology-field")) {
-                        $(this).attr("placeholder", characteristicsSchema[i].label);
+                        $(this).attr("placeholder", workingSchema[i].label);
                     }
 
                 });
@@ -697,7 +830,7 @@ var dispatchFormControl = {
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
     do_copo_comment_ctrl: function (formElem, elemValue) {
-        var commentSchema = copoSchemas.comment_schema;
+        var commentSchema = copoSchemas[formElem.control];
 
         var ctrlsDiv = $('<div/>',
             {
@@ -1609,19 +1742,16 @@ function resolve_ctrl_values_aux_1(ctrlObjectID, formElem, elemValue) {
 }
 
 function get_ontology_span(ontologySpan, formElem) {
-    var ontologySchema = copoSchemas.ontology_schema;
+    var ontologySchema = copoSchemas[formElem.control];
 
     for (var i = 0; i < ontologySchema.length; ++i) {
         var fv = ontologySchema[i].id.split(".").slice(-1)[0];
-
         if (ontologySchema[i].hidden == "false") {
-
             //set restricted ontologies
             var localolsURL = olsURL;
             if (formElem.ontology_names && formElem.ontology_names.length) {
                 localolsURL = olsURL.replace("999", formElem.ontology_names.join(","));
             }
-
             ontologySpan.append('<input autocomplete="off" data-autocomplete="' + localolsURL + '" class="input-copo form-control ontology-field" type="text" id="' + fv + '" name="' + fv + '" />');
 
         } else {

@@ -27,4 +27,5 @@ urlpatterns = [
     url(r'^test_submission/', views.test_submission, name='test_ena_submission'),
     url(r'^resume_chunked/', rest.resume_chunked, name='resume_chunked'),
     url(r'^get_partial_uploads/', rest.get_partial_uploads, name='get_partial_uploads'),
+    url(r'^get_excel_data/', ajax.get_excel_data, name='get_excel_data'),
 ]

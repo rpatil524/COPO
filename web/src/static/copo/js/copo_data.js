@@ -10,6 +10,8 @@ var silenceAlert = false; //use to temporary suppress stage alerts
 var descriptionWizSummary = {}; //wizard summary stage content
 var tempWizStore = null; // for holding wizard-related data pending wizard load event
 var onGoingDescription = false; //informs wizard state refresh/exit
+var setStageIndx = null; //moves the wizard to stage index specified
+
 
 $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
@@ -952,6 +954,16 @@ $(document).ready(function () {
                 step: currentIndx - 1
             });
 
+            //move wizard's focus to stage; usually called upon by a refresh action (e.g., value change)
+            if (setStageIndx) {
+
+                $('#dataFileWizard').wizard('selectedItem', {
+                    step: setStageIndx
+                });
+
+                setStageIndx = null;
+            }
+
             //setup fast nav for the stages
             //steps_fast_nav();
 
@@ -1125,8 +1137,6 @@ $(document).ready(function () {
 
     //functions clears the wizard and either exits or loads next item in batch
     function clear_wizard() {
-        //todo: need to decide what to save here before quitting the wizard
-
         //decommission wizard
         $('#dataFileWizard').wizard('removeSteps', 1, currentIndx + 1);
         $('#dataFileWizard').hide();
@@ -1141,6 +1151,8 @@ $(document).ready(function () {
         });
 
         silenceAlert = false;
+
+        $('.popover').popover('destroy'); //hide any shown popovers
 
 
         //clear wizard buttons
@@ -1316,7 +1328,7 @@ $(document).ready(function () {
         // but also, can the items be bundled together (e.g., going to same repo)?
         // what of inheriting metadata from already existing bundle items?
 
-        // one can also silence (i.e add to batch = true) if you are only refreshing the wizard without necessarily
+        // one can also 'silence' if you are only refreshing the wizard without necessarily
         // altering items in the bundle. if silence = false, then all validation steps will be performed/enforced
         // before engaging the description bundle
 
@@ -1371,6 +1383,7 @@ $(document).ready(function () {
                                 refresh_targets_data(data.validatation_results.extra_information.candidates_data);
                                 do_post_stage_retrieval(data);
                                 refresh_batch_display();
+
                             } else {
                                 var dialog = new BootstrapDialog({
                                     buttons: [
@@ -1990,8 +2003,9 @@ $(document).ready(function () {
             }
 
             if (formValue) {
-                if (formValue[formElem.id]) {
-                    elemValue = formValue[formElem.id];
+                var elem = formElem.id.split(".").slice(-1)[0];
+                if (formValue[elem]) {
+                    elemValue = formValue[elem];
                 }
             }
 
@@ -2070,6 +2084,7 @@ $(document).ready(function () {
                                         onGoingDescription = true;
                                         clear_wizard();
                                         silenceAlert = silnAlert;
+                                        setStageIndx = $('#dataFileWizard').wizard('selectedItem').step;
                                         add_to_batch(batchTargets, true);
                                     },
                                     error: function () {
@@ -2086,39 +2101,69 @@ $(document).ready(function () {
             ]
         });
 
-        dialog_display(dialog, messageTitle, wizardMessages.stage_dependency_message.text, "warning");
+        var triggerMessage = '';
 
+        try {
+            triggerMessage = formElem.trigger.message;
+        }
+        catch (err) {
+            ;
+        }
+
+        dialog_display(dialog, messageTitle, triggerMessage, "warning");
     }
 
     var dispatchEventHandler = {
         study_type_change: function (formElem) {
             var previousValue = null;
-
             $(document)
                 .off("focus", "#" + formElem.id)
                 .on("focus", "#" + formElem.id, function () {
                     previousValue = this.value;
                 });
-
             $(document)
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
-                    element_value_change(formElem, previousValue, "Study Type Change");
+                    element_value_change(formElem, previousValue, formElem.label + " Change");
                 });
         },
         target_repo_change: function (formElem) {
             var previousValue = null;
-
             $(document)
                 .off("focus", "#" + formElem.id)
                 .on("focus", "#" + formElem.id, function () {
                     previousValue = this.value;
                 });
-
             $(document)
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
-                    element_value_change(formElem, previousValue, "Target Repo Change");
+                    element_value_change(formElem, previousValue, formElem.label + " Change");
+                });
+        },
+        growth_facility_change: function (formElem) {
+            var previousValue = null;
+            $(document)
+                .off("focus", "#" + formElem.id)
+                .on("focus", "#" + formElem.id, function () {
+                    previousValue = this.value;
+                });
+            $(document)
+                .off(formElem.trigger.type, "#" + formElem.id)
+                .on(formElem.trigger.type, "#" + formElem.id, function () {
+                    element_value_change(formElem, previousValue, formElem.label + " Change");
+                });
+        },
+        get_nutrient_controls: function (formElem) {
+            var previousValue = null;
+            $(document)
+                .off("focus", "#" + formElem.id)
+                .on("focus", "#" + formElem.id, function () {
+                    previousValue = this.value;
+                });
+            $(document)
+                .off(formElem.trigger.type, "#" + formElem.id)
+                .on(formElem.trigger.type, "#" + formElem.id, function () {
+                    element_value_change(formElem, previousValue, formElem.label + " Change");
                 });
         }
     };
@@ -2534,9 +2579,6 @@ $(document).ready(function () {
                 columnDefs: colDefs,
                 //scrollY: "200px",
                 scrollCollapse: true,
-                keys: {
-                    blurable: false
-                },
                 select: {
                     style: 'multi'
                 },
@@ -2548,24 +2590,6 @@ $(document).ready(function () {
                 .nodes()
                 .each(function (value) {
                     $(this).addClass(' btn-sm');
-                });
-
-            //add click event on cells
-            table
-            // .on('key-focus', function (e, datatable, cell) {
-            //     alert(cell.data());
-            // })
-                .on('key', function (e, datatable, key, cell, originalEvent) {
-                    if (key == 13) {//trap enter key for editing a cell
-                        // alert('<div>Key press: ' + key + ' for cell <i>' + cell.data() + '</i></div>');
-                        var node = cell.node();
-                        $(node).html($('<textarea class="form-control new-element" placeholder="Try to input multiple lines here..."></textarea>'));
-                        $(node).find(".new-element").focus();
-                    }
-                })
-                .on('key-blur', function (e, datatable, cell) {
-                    var node = cell.node();
-                    $(node).html($(node).find(".new-element").val());
                 });
 
             $(table.buttons().container()).insertBefore(filterDivObject);

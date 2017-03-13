@@ -20,7 +20,6 @@
     <link rel="stylesheet" href="{% static 'copo/rangeslider/rangeslider.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/copo/style.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/copo/menu.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/autocomplete_js/autocomplete.css' %}">
 
 
     <link rel="shortcut icon" href="{% static 'copo/img/COPO_icon.png' %}"/>
@@ -36,9 +35,6 @@
 
     <!-- Google Fonts -->
     <link href='http://fonts.googleapis.com/css?family=Quattrocento+Sans' rel='stylesheet' type='text/css'>
-    <!-- Additional stylesheets -->
-    {#    <link rel="stylesheet" href="{% static 'copo/css/copo/smart_table.css' %}">#}
-    {% block stylesheet_block %}{% endblock %}
 
 
     <!--[if lt IE 9]>
@@ -48,7 +44,7 @@
     <script src="{% static 'copo/js/jquery-2.1.4.min.js' %}"></script>
     <script src="{% static 'copo/js/jquery-ui.min.js' %}"></script>
     <!--<![endif]-->
-
+    <script src="{% static 'copo/autocomplete.js-2.1.0/autocomplete.js' %}"></script>
     <script src="{% static 'copo/js/jquery.cookie.js' %}"></script>
     <script src="{% static 'copo/js/serialize_form_json.js' %}"></script>
     <script src="{% static 'copo/js/bootstrap.js' %}"></script>
@@ -86,6 +82,7 @@
     <link rel="stylesheet" href="{% static 'copo/datatables/css/keyTable.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/search_highlight/dataTables.searchHighlight.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.css' %}">
 
     <script src="{% static 'copo/datatables/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'copo/datatables/js/dataTables.bootstrap.min.js' %}"></script>
@@ -93,20 +90,18 @@
     <script src="{% static 'copo/datatables/js/dataTables.keyTable.min.js' %}"></script>
     <script src="{% static 'copo/datatables/js/dataTables.buttons.min.js' %}"></script>
     <script src="{% static 'copo/datatables/js/buttons.bootstrap.min.js' %}"></script>
-    <script src="{% static 'copo/autocomplete_js/autocomplete.js' %}"></script>
     <script src="{% static 'copo/search_highlight/dataTables.searchHighlight.min.js' %}"></script>
     <script src="{% static 'copo/search_highlight/jquery.highlight.js' %}"></script>
+    <script src="{% static 'copo/bootstrap-datepicker-1.6.4-dist/js/bootstrap-datepicker.min.js' %}"></script>
 
-    <script src="{% static 'copo/autocomplete_js/autocomplete.js' %}"></script>
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-    {% compress css %}
-        <link rel="stylesheet" type="text/scss" href="{% static 'copo/css/copo/colors/sass.scss' %}"/>
-    {% endcompress %}
+
 
     <script>
 
@@ -131,47 +126,6 @@
 
 
         });
-
-
-        AutoComplete({
-            post: do_post
-        });
-
-
-        function do_post(result, response, custParams) {
-            response = JSON.parse(response);
-            var properties = Object.getOwnPropertyNames(response);
-            //Try parse like JSON data
-
-            var empty,
-                length = response.length,
-                li = domCreate("li"),
-                ul = domCreate("ul");
-            //Reverse result if limit parameter is custom
-            if (custParams.limit < 0) {
-                properties.reverse();
-            }
-
-
-            for (var item in response.highlighting) {
-                try {
-                    li.innerHTML = response.highlighting[item].label_autosuggest[0];
-
-                    $(li).attr("data-autocomplete-value", response.highlighting[item].label_autosuggest[0].replace('<b>', '').replace('</b>', '') + ' - ' + item);
-
-                    ul.appendChild(li);
-                    li = domCreate("li");
-                }
-                catch (err) {
-                    console.log(err)
-                }
-            }
-            if (result.hasChildNodes()) {
-                result.childNodes[0].remove();
-            }
-
-            result.appendChild(ul);
-        }
 
 
         function do_email_form() {
@@ -240,6 +194,11 @@
 
     </script>
 
+    {# The stylesheetblock should always come last, so that inheriting template's styles take precedence over global styles. #}
+    {% block stylesheet_block %}{% endblock %}
+    {% compress css %}
+        <link rel="stylesheet" type="text/scss" href="{% static 'copo/css/copo/colors/sass.scss' %}"/>
+    {% endcompress %}
 </head>
 
 <body>

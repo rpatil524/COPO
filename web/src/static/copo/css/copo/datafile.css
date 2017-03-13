@@ -196,5 +196,8 @@ div.shown span.summary-details-control:before {
     text-shadow: none;
     box-shadow: none;
 }
+.width100{
+    width: 100px
+}
 
 /*end help centre*/

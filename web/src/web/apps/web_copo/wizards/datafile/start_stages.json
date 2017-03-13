@@ -25,9 +25,10 @@
           },
           "trigger": {
             "type": "change",
+            "message": "Changing the Target Repo might impact certain stages in the description process! This might, in some cases, result in loss of previous entries. <br/><br/>Do you want to continue?",
             "callback": {
               "function": "target_repo_change",
-              "parameter": "{old_value!s},{new_value!s}"
+              "parameter": "old_value,new_value"
             }
           }
         }

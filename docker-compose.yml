@@ -14,7 +14,7 @@ web:
   env_file: .env
   environment:
     DEBUG: 'true'
-  command: bash -c "python manage.py migrate && python /copo/setup/copo_social.py && /usr/local/bin/gunicorn web.wsgi:application -w 2 -b :8000"
+  command: bash -c "python manage.py makemigrations rest && python manage.py makemigrations chunked_upload && python manage.py makemigrations && python manage.py migrate && python /copo/setup/copo_social.py && /usr/local/bin/gunicorn web.wsgi:application -w 4 -t 1000 -b :8000"
 
 nginx:
   container_name: copo-nginx
@@ -56,4 +56,3 @@ postgres:
   env_file: .env
   # volumes:
   #   - ./postgres/postgresdata:/var/lib/postgresql/data
-

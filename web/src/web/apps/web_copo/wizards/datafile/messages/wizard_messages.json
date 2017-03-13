@@ -51,7 +51,7 @@
       "text_class": "text-default"
     },
     "inherit_metadata_message": {
-      "text": "Some of the selected datafiles are ahead of others, in terms of description metadata, but can be inherited from. <br/><br/>Do you want selected datafiles having fewer description metadata to inherit the following metadata?",
+      "text": "Some of the selected datafiles are better described than others. <br/><br/>Do you want selected datafiles with less metadata to inherit the following metadata?",
       "text_class": "text-default"
     },
     "inherit_metadata_103_message": {

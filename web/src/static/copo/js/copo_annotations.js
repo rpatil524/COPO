@@ -7,14 +7,26 @@ $(document).ready(function () {
 
     $.cookie('document_id', 'undefined', {expires: 1, path: '/',});
 
-    $(document).data('annotator', true)
+    $(document).data('annotator_type', 'txt')
 
     $(document).ajaxStart(function () {
-        $('#processing_div').show()
-    })
+        $('.processing_div').show()
+    });
     $(document).ajaxStop(function () {
-        $('#processing_div').hide()
-    })
+        $('.processing_div').hide()
+    });
+
+    $('#handson').on('click', load_ss_data);
+
+    $(document).on('click', '#tips_button', show_help)
+    $(document).on('click', '#annotate_button', show_controls)
+    $(document).on('click', '.fa-minus-square', delete_from_annotations_table)
+    $(document).on('mouseenter', '#annotations_table tbody tr', mouseenter_annotation)
+        .on('mouseleave', '#annotations_table tbody tr', mouseleave_annotation)
+    $(document).on('click', '.dropdown-menu li a', function () {
+        $('#file_type_dropdown').val($(this).text())
+        $('#file_type_dropdown_label').html($(this).text());
+    });
 
 
     //******************************Event Handlers Block*************************//
@@ -23,7 +35,7 @@ $(document).ready(function () {
     var component = "annotation";
     var copoFormsURL = "/copo/copo_forms/";
     var copoVisualsURL = "/copo/copo_visualize/";
-    var annotationURL = "/copo/get_annotation/"
+    var annotationURL = "/copo/get_annotation/";
 
     csrftoken = $.cookie('csrftoken');
 
@@ -132,21 +144,15 @@ $(document).ready(function () {
                         'target_id': ids[0] //only allowing row action for edit, hence first record taken as target
                     },
                     success: function (e) {
-                        $('#annotation_table_wrapper').hide()
-                        $('#annotation_content').show()
-                        var initAnnotator = false
-                        if (!$.trim($("#annotation_content").html())) {
-                            // if #annotation_content is empty
-                            initAnnotator = true
-                        }
-                        $('#annotation_content').html(e.html)
-                        $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
-                        $('#file_picker_modal').modal('hide')
-                        if (initAnnotator) {
-                            setup_annotator()
-                            setup_autocomplete()
-                        }
+                        $('#annotation_table_wrapper').hide();
 
+                        if (e.type == 'Spreadsheet') {
+                            load_ss_data(e)
+                        }
+                        else {
+                            load_txt_data(e)
+                        }
+                        $('#file_picker_modal').modal('hide');
                     },
                     error: function () {
                         alert("Couldn't build publication form!");
@@ -159,26 +165,157 @@ $(document).ready(function () {
         }
     }
 
-})//end document ready
+})// end document ready
+
+// global variable for selected cell
+cell;
+
+function show_help() {
+    $('#annotation_panel').hide()
+    $('#help_tips').show()
+}
+
+function show_controls() {
+    $('#help_tips').hide()
+    $('#annotation_panel').show()
+}
 
 function setup_annotator(element) {
-    // setup cookie to store uri for annotation
-
 
     // setup csrf token and annotator plugins
     var csrftoken = $.cookie('csrftoken');
     var app = new annotator.App();
-    app.include(annotator.ui.main)
+
+    app.include(annotator.ui.main);
     app.include(annotator.storage.http, {
         prefix: 'http://127.0.0.1:8000/api',
         headers: {
             'X-CSRFToken': csrftoken,
         },
     });
+
     app.start().then(function () {
-        app.annotations.load();
+        //app.annotations.load();
+
     });
 
     // attach data parameter stating that this page is using annotator, therefore what autocomplete should do
     $(this).data('annotator', true)
+}
+
+
+function load_txt_data(e) {
+    $('#annotation_content').show();
+    var initAnnotator = false;
+    if (!$.trim($("#annotation_content").html())) {
+        // if #annotation_content is empty
+        initAnnotator = true
+    }
+    $('#annotation_content').html(e.raw);
+    if (initAnnotator) {
+        setup_annotator();
+        setup_autocomplete();
+    }
+    $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
+}
+
+function load_ss_data(e) {
+
+
+    var data = JSON.parse(e.raw)
+    $('#annotation_content').empty()
+    $('#annotation_content').removeAttr("style");
+
+    $('#file_picker_modal').modal('hide');
+
+    $('#annotation_table_wrapper').hide();
+
+    var element = document.getElementById('annotation_content');
+
+    hot = new Handsontable(element, {
+        data: data,
+        rowHeaders: false,
+        colHeaders: false,
+        dropdownMenu: true,
+        afterOnCellMouseDown: _columnHeaderClickHandler,
+        afterSelection: _afterSelection,
+    });
+    $(document).data('hot', hot)
+    $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
+}
+
+function _columnHeaderClickHandler(changes, sources) {
+    if (sources.row == 0) {
+        show_controls()
+        var hot = $(document).data('hot')
+        var d = hot.getDataAtCell(sources.row, sources.col)
+        $('#selected_column_name').html(d)
+    }
+}
+
+function _afterSelection(row, col, row2, col2) {
+    // color column
+    cell = hot.getCell(row, col)
+    $('.table-header-highlighted').removeClass('table-header-highlighted')
+    $(cell).addClass('table-header-highlighted')
+
+}
+
+function append_to_annotation_list(item) {
+    $('#annotator-field-0').val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
+    // we are dealing with a spreadsheet so need to add ref to cell data item
+    var annotation_value = $(item).data('annotation_value');
+    var term_source = $(item).data('term_source');
+    var term_accession = $(item).data('term_accession');
+    $(cell).data('annotation_value', annotation_value);
+    $(cell).data('termSource', term_source);
+    $(cell).data('termAccession', term_accession);
+
+    // add colouring to cell to show it has been labelled
+    $(cell).addClass('table-header-labeled');
+
+    // add div to panel showing annotation
+    var tr = $("<tr>");
+
+    var t_value = $("<td>");
+    t_value.append(annotation_value);
+    var t_source = $("<td>");
+    t_source.append(term_source);
+    var t_accession = $("<td>");
+    t_accession.append(term_accession);
+    var t_delete = $("<td>")
+    t_delete.append('<i class="fa fa-minus-square" aria-hidden="true"></i>')
+    $(tr).append(t_value).append(t_source).append(t_accession).append(t_delete)
+    $(tr).data('attached_cell', cell)
+    $('#annotations_table tbody').append(tr)
+}
+
+function delete_from_annotations_table(e) {
+    var tr = $(e.currentTarget).closest('tr')
+    var cell = $(tr).data('attached_cell')
+    $(cell).removeClass('table-header-labeled')
+    $(cell).css({'background-color': '', 'color': ''})
+    tr.remove()
+}
+
+function mouseenter_annotation(e) {
+    // get attached cell
+    var cell = $(e.currentTarget).data('attached_cell')
+    try {
+        $(cell).css({'background-color': 'rgba(123, 187, 232, 1)', 'color': 'white'})
+    }
+    catch (err) {
+        console.log('cannot add mouseover class to cell')
+    }
+    $(e.currentTarget).addClass('annotation_mouseover')
+}
+function mouseleave_annotation(e) {
+    var cell = $(e.currentTarget).data('attached_cell')
+    try {
+        $(cell).css({'background-color': '', 'color': ''})
+    }
+    catch (err) {
+        console.log('cannot remove mouseover class from cell')
+    }
+    $(e.currentTarget).removeClass('annotation_mouseover')
 }

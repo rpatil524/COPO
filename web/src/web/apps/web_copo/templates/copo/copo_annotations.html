@@ -1,4 +1,4 @@
-{% extends 'copo/base_1col.html' %}
+{% extends 'copo/base_2col.html' %}
 
 {% load staticfiles %}
 {% load web_tags %}
@@ -6,7 +6,14 @@
 
 {% block stylesheet_block %}
     <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
-    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_autocomplete.css' %}" xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_autocomplete.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/handsontable/handsontable.full.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+
+    <link rel="stylesheet" href="{% static 'copo/css/copo/datafile.css' %}" xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_annotations.css' %}" xmlns="http://www.w3.org/1999/html">
+
 {% endblock %}
 
 
@@ -38,10 +45,18 @@
            cellspacing="0" width="100%">
     </table>
 
-    <div class="row text-center">
-        <div id="annotation_content" class="col-lg-12 col-md-12 col-sm-12"/>
+    <div class="row">
+        <div id="annotation_content"/>
     </div>
 
+    <div class="row">
+        <div id="annotation_ss" class="col-lg-12 col-md-12 col-sm-12"/>
+    </div>
+
+
+
+
+    <!-- modal to pick file to annotate -->
     <div id="file_picker_modal" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -62,10 +77,24 @@
                             <small id="fileHelp" class="form-text text-muted">Please select the file you would like to
                                 annotate.
                             </small>
-                            <div class="pull-right" id="processing_div"> Processing... <img height="64px"
-                                                                                            style="margin-top: -40px"
-                                                                                            src="{% static "copo/img/freeman.gif" %}"/>
+                            <div style="margin-top: 10px" class="dropdown" id="file_type_dropdown">
+
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" id="file_type_button">
+                                    File Type
+                                    <span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">Spreadsheet</a></li>
+                                    <li><a href="#">PDF Document</a></li>
+                                </ul>
+                                <label for="file_type_dropdown" id="file_type_dropdown_label">No File Selected</label>
                             </div>
+
+                            <input type="hidden" id="file_type" name="file_type"/>
+                            <div class="pull-right processing_div"> Processing... <img height="64px"
+                                                                                       style="margin-top: -40px"
+                                                                                       src="{% static "copo/img/freeman.gif" %}"/>
+                            </div>
+
                         </div>
                     </form>
 
@@ -79,20 +108,99 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+
 {% endblock %}
 
+{% block help_section %}
+    <div id="copoAnnotationHelp">
+        <div class="panel panel-default" style="border-radius: 0px;">
+            <div class="panel-heading" style="padding: 0px 0px;">
+                <div class="dropdown">
+                    <button class="btn btn-lg btn-default dropdown-toggle" type="button" id="helpCentreMenu"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i> Information Panel
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="helpCentreMenu">
+                        <li class="component-help" data-component="generalHelpTips">
+                            <a href="#">
+                                <div id="tips_button" style="padding: 5px 5px 0px 0px;">General Tips</div>
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                        <li class="component-help" data-component="annotation"><a
+                                href="#">
+                            <div id="annotate_button" style="padding: 5px 5px 0px 0px;"><i
+                                    class="fa fa-upload copo-components-icons"></i>
+                                <span class="icon_text">Annotate</span></div>
+                        </a></li>
+
+                    </ul>
+                </div>
+            </div>
+            <div class="panel-body">
+                <!-- Add content for help tips here -->
+                <div id="help_tips" hidden>
+                    Some Generic help will go here instructing users how to go about annotating a document.
+                </div>
+                <!-- controls for annotation of column headings go here -->
+                <div id="annotation_panel">
+                    Type in the box below to see possible ontological descriptors for the column selected.
+                    <h3 class="h3">Selected Column:&nbsp <span class="label label-primary" id="selected_column_name">None Selected</span>
+                    </h3>
+                    <input type="text" class="form-control ontology-field form-control-file" id="an-column"
+                           aria-describedby="fileHelp" data-autocomplete="/copo/ajax_search_ontology/999/">
+                </div>
+                <div id="annotation_list">
+                    <hr/>
+
+                    Current Annotations
+                    <table id="annotations_table">
+                        <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Annotation</th>
+                            <th>Ontology</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>rs1800497</td>
+                            <td>Human</td>
+                            <td>idomal</td>
+                            <td><i class="fa fa-minus-square" aria-hidden="true"></i></td>
+                        </tr>
+                        <tr>
+                            <td>rs987765</td>
+                            <td>Coooo</td>
+                            <td>Poooooo</td>
+                            <td><i class="fa fa-minus-square" aria-hidden="true"></i></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
 
 {% block js_block %}
 
     <script>
 
 
-
     </script>
-    <script type="text/javascript" src="{% static "copo/annotator-2.0.0-alpha.3/pkg/annotator.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/annotator-2.0.0-alpha.3/pkg/annotator.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/annotator-2.0.0-alpha.3/pkg/annotator.document.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/js/annotator_extension.js" %}"></script>
     <script type="text/javascript" src="{% static 'copo/js/generic_handlers.js' %}"></script>
     <script type="text/javascript" src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
     <script type="text/javascript" src="{% static 'copo/js/setup_annotator.js' %}"></script>
     <script type="text/javascript" src="{% static 'copo/js/copo_annotations.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'copo/handsontable/handsontable.full.js' %}"></script>
 
 {% endblock %}

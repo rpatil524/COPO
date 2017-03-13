@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     locales \
     python-pip \
-    rubygems
+    rubygems \
+    poppler-utils
 
 RUN gem install sass
 

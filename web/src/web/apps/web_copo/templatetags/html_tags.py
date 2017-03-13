@@ -70,9 +70,9 @@ def generate_ui_labels(field_id):
 
 
 def get_control_options(f):
-    # option values are typically defined as a list of option,
-    # or in some special cases (e.g., 'copo-multi-search'),
-    # as JSON (dictionary). However, the options could also be resolved or generated dynamically
+    # option values are typically defined as a list,
+    # or in some cases (e.g., 'copo-multi-search'),
+    # as a dictionary. However, option values could also be resolved or generated dynamically
     # using callbacks. Callbacks, essentially, define functions that resolve options data
 
     option_values = list()
@@ -404,25 +404,34 @@ def resolve_control_output(data_dict, elem):
 
 
 def get_resolver(data, elem):
-    resolver_list = [
-        dict(control="copo-characteristics", resolver="resolve_copo_characteristics_data"),
-        dict(control="copo-comment", resolver="resolve_copo_comment_data"),
-        dict(control="copo-multi-select", resolver="resolve_copo_multi_select_data"),
-        dict(control="copo-multi-search", resolver="resolve_copo_multi_search_data"),
-        dict(control="select", resolver="resolve_select_data"),
-        dict(control="ontology term", resolver="resolve_ontology_term_data"),
-        dict(control="copo-select", resolver="resolve_copo_select_data"),
-        dict(control="datetime", resolver="resolve_datetime_data"),
-        dict(control="datafile-description", resolver="resolve_description_data")
-    ]
+    """
+    function resolves data for UI display, by mapping control to a resolver function
+    :param data:
+    :param elem:
+    :return:
+    """
+    func_map = dict()
+    func_map["copo-sample-source"] = resolve_copo_sample_source_data
+    func_map["copo-characteristics"] = resolve_copo_characteristics_data
+    func_map["copo-environmental-characteristics"] = resolve_environmental_characteristics_data
+    func_map["copo-phenotypic-characteristics"] = resolve_phenotypic_characteristics_data
+    func_map["copo-comment"] = resolve_copo_comment_data
+    func_map["copo-multi-select"] = resolve_copo_multi_select_data
+    func_map["copo-multi-search"] = resolve_copo_multi_search_data
+    func_map["select"] = resolve_select_data
+    func_map["ontology term"] = resolve_ontology_term_data
+    func_map["copo-select"] = resolve_copo_select_data
+    func_map["datetime"] = resolve_datetime_data
+    func_map["datafile-description"] = resolve_description_data
+    func_map["date-picker"] = resolve_datepicker_data
+    func_map["copo-duration"] = resolve_copo_duration_data
 
-    resolver = [x for x in resolver_list if x['control'] == elem["control"].lower()]
-    if resolver:
-        resolver = globals()[resolver[0]["resolver"]](data, elem)
+    if elem["control"].lower() in func_map:
+        resolved_data = func_map[elem["control"].lower()](data, elem)
     else:
-        resolver = resolve_default_data(data)
+        resolved_data = resolve_default_data(data)
 
-    return resolver
+    return resolved_data
 
 
 def resolve_description_data(data, elem):
@@ -444,14 +453,24 @@ def resolve_description_data(data, elem):
             )
 
             # drill down to stage items
-
             for item in stage.get("items", list()):
                 item_id = item.get("id", str())
+                item_id = item_id.split(".")[-1]
                 item_dict = dict(label=item.get("label", str()), data=str())
 
+                resolved_value_sub = str()
                 if item_id in stage_data:
-                    # use item control and determine how to retrieve item data
-                    item_dict["data"] = get_resolver(stage_data[item_id], item)
+                    # resolve array data types
+                    if item.get("type", str()) == "array":
+                        resolved_value_sub = list()
+                        data = stage_data[item_id]
+                        for d in data:
+                            resolved_value_sub.append(get_resolver(d, item))
+                    else:
+                        # non-array types
+                        resolved_value_sub = get_resolver(stage_data[item_id], item)
+
+                    item_dict["data"] = resolved_value_sub
 
                 stage_dict.get("data").append(item_dict)
 
@@ -461,7 +480,7 @@ def resolve_description_data(data, elem):
 
 
 def resolve_copo_characteristics_data(data, elem):
-    schema = DataSchemas("COPO").get_ui_template().get("copo").get("material_attribute_value").get("fields")
+    schema = d_utils.get_copo_schema("material_attribute_value")
 
     resolved_data = list()
 
@@ -475,8 +494,38 @@ def resolve_copo_characteristics_data(data, elem):
     return resolved_data
 
 
+def resolve_environmental_characteristics_data(data, elem):
+    schema = d_utils.get_copo_schema("environment_variables")
+
+    resolved_data = list()
+
+    for f in schema:
+        if f.get("show_in_table", True):
+            a = dict()
+            if f["id"].split(".")[-1] in data:
+                a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
+                resolved_data.append(a)
+
+    return str(resolved_data) # turn this casting off after merge
+
+
+def resolve_phenotypic_characteristics_data(data, elem):
+    schema = d_utils.get_copo_schema("phenotypic_variables")
+
+    resolved_data = list()
+
+    for f in schema:
+        if f.get("show_in_table", True):
+            a = dict()
+            if f["id"].split(".")[-1] in data:
+                a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
+                resolved_data.append(a)
+
+    return str(resolved_data) # turn this casting off after merge
+
+
 def resolve_copo_comment_data(data, elem):
-    schema = DataSchemas("COPO").get_ui_template().get("copo").get("comment").get("fields")
+    schema = d_utils.get_copo_schema("comment")
 
     resolved_data = list()
 
@@ -584,6 +633,28 @@ def resolve_datetime_data(data, elem):
     if data:
         resolved_value = data.strftime('%d %b, %Y, %H:%M:%S')
     return resolved_value
+
+
+def resolve_datepicker_data(data, elem):
+    resolved_value = str()
+    if data:
+        resolved_value = data
+    return resolved_value
+
+
+def resolve_copo_duration_data(data, elem):
+    schema = d_utils.get_copo_schema("duration")
+
+    resolved_data = list()
+
+    for f in schema:
+        if f.get("show_in_table", True):
+            # a = dict()
+            if f["id"].split(".")[-1] in data:
+                # a[f["label"]] = data[f["id"].split(".")[-1]]
+                resolved_data.append(f["label"] + ": " + data[f["id"].split(".")[-1]])
+
+    return resolved_data
 
 
 def resolve_default_data(data):

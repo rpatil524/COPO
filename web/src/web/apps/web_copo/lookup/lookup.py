@@ -6,17 +6,15 @@ from .resolver import RESOLVER
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
 # DB_TEMPLATES dictionary provides paths to database templates
 DB_TEMPLATES = {
-    "ENA": os.path.join(RESOLVER['schemas_ena'], 'isa_ena_model.json'),
     'COPO_COLLECTION_HEAD_FILE': os.path.join(RESOLVER['schemas_copo'], 'collection_head_model.json'),
     'REMOTE_FILE_COLLECTION': os.path.join(RESOLVER['schemas_copo'], 'aspera_db_model.json'),
-    'PERSON': os.path.join(RESOLVER['schemas_copo'], 'person_schema.json'),
-    'PUBLICATION': os.path.join(RESOLVER['schemas_copo'], 'publication_schema.json'),
-    'SAMPLE': os.path.join(RESOLVER['schemas_copo'], 'sample_schema.json'),
-    'DATA': os.path.join(RESOLVER['schemas_copo'], 'data_schema.json'),
-    'SUBMISSION': os.path.join(RESOLVER['schemas_copo'], 'copo_submission.json'),
-    'ONTOLOGY_ANNOTATION': os.path.join(RESOLVER['schemas_copo'], 'ontology_annotation_schema.json'),
-    'COMMENT': os.path.join(RESOLVER['schemas_copo'], 'comment_schema.json'),
-    'COPO_PROFILE': os.path.join(RESOLVER['schemas_copo'], 'copo_profile.json')
+    'PERSON': os.path.join(RESOLVER['isa_json_db_models'], 'person_schema.json'),
+    'PUBLICATION': os.path.join(RESOLVER['isa_json_db_models'], 'publication_schema.json'),
+    'SAMPLE': os.path.join(RESOLVER['isa_json_db_models'], 'sample_schema.json'),
+    'DATA': os.path.join(RESOLVER['isa_json_db_models'], 'data_schema.json'),
+    'SUBMISSION': os.path.join(RESOLVER['isa_json_db_models'], 'copo_submission.json'),
+    'ONTOLOGY_ANNOTATION': os.path.join(RESOLVER['isa_json_db_models'], 'ontology_annotation_schema.json'),
+    'COMMENT': os.path.join(RESOLVER['isa_json_db_models'], 'comment_schema.json'),
 }
 
 # SRA_SETTINGS PATHS
@@ -42,20 +40,9 @@ API_ERRORS = {
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
-# CONFIG_FILES dictionary holds paths to UI templates
-# Fields assigned here overrides those reported elsewhere
-# Every dictionary entry must have the "id" and "ref" keys defined:
-# "id", to uniquely identify the element; "ref", to map to some config (e.g., the ISA model)
-# Other keys may be added (e.g., "label") to override those defined elsewhere
 
-# Order matters! i.e., the order of listed dictionary items (within each list)
-# pipes through to the ordering of elements in the UI
-
-# The path to the files holding the configs are defined below:
-CONFIG_FILES = {
-    'ENA_MAPPINGS': os.path.join(RESOLVER['uimodels_ena'], 'mappings'),
-    'COPO_MAPPINGS': os.path.join(RESOLVER['uimodels_copo'], 'mappings')
-}
+# path to UI mapping schemas:
+UI_CONFIG_MAPPINGS = os.path.join(RESOLVER['uimodels_copo'], 'mappings')
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
 # X_FILES dictionary holds paths other (non-categorised) schemas
@@ -362,13 +349,17 @@ DROP_DOWNS = {
             'label': 'Figshare'
         },
         {
-            'value': 'MetaboLights',
-            'label': 'MetaboLights'
+            'value': 'miappe',
+            'label': 'MIAPPE Compliant'
         },
-        {
-            'value': 'unknown',
-            'label': 'Unknown'
-        }
+        # {
+        #     'value': 'MetaboLights',
+        #     'label': 'MetaboLights'
+        # },
+        # {
+        #     'value': 'unknown',
+        #     'label': 'Unknown'
+        # }
     ],
     "SAMPLE_TYPES": [
         {
@@ -380,6 +371,90 @@ DROP_DOWNS = {
             "value": "isasample",
             "label": "Extended",
             "description": "Extended samples are based on the Investigation, Study and Assay (ISA) specifications, and are better tailored for describing samples that will subsequently become part of data submissions to repositories such as <strong>ENA</strong> and <strong>Metabolights</strong>."
+        }
+    ],
+    "GROWTH_AREAS": [
+        {
+            "value": "greenhouse_rooting",
+            "label": "Greenhouse",
+            "schema": "miappe_rooting_greenhouse"
+        },
+        {
+            "value": "growth_chamber_GC",
+            "label": "Growth Chamber"
+        },
+        {
+            "label": "Open_Top_Chamber",
+            "value": "open top chamber, OTC"
+        },
+        {
+            "value": "experimental_garden",
+            "label": "Experimental Garden"
+        },
+        {
+            "label": "Experimental_Field",
+            "value": "field_rooting",
+            "schema": "miappe_rooting_field"
+        }
+    ],
+    "ROOTING_MEDIUM": [
+        {
+            "value": "aeroponics",
+            "label": "Aeroponics"
+        },
+        {
+            "value": "hydroponics_water_based",
+            "label": "Hydroponics (water based)"
+        },
+        {
+            "value": "hydroponics_solid-media_based",
+            "label": "Hydroponics (solid-media based)"
+        },
+        {
+            "value": "soil_sand",
+            "label": "Soil (sandy)"
+        },
+        {
+            "value": "soil_peat",
+            "label": "Soil (peat)"
+        },
+        {
+            "value": "soil_clay",
+            "label": "Soil (clay)"
+        },
+        {
+            "value": "soil_mixed",
+            "label": "Soil (mixed)"
+        },
+        {
+            "value": "other",
+            "label": "Other"
+        }
+    ],
+    "GROWTH_NUTRIENTS": [
+        {
+            "value": "hydroponics",
+            "label": "Hydroponics",
+            "schema": "hydroponics"
+        },
+        {
+            "value": "soil",
+            "label": "Soil",
+            "schema": "soil"
+        }
+    ],
+    "WATERING_OPTIONS": [
+        {
+            "value": "top",
+            "label": "Top"
+        },
+        {
+            "value": "bottom",
+            "label": "Bottom"
+        },
+        {
+            "value": "drip",
+            "label": "Drip"
         }
     ]
 }
@@ -420,7 +495,8 @@ VOCAB = {
             "value": "person"
         },
 
-    }
+    },
+
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
@@ -558,6 +634,7 @@ WIZARD_FILES = {
     'start': os.path.join(RESOLVER['wizards_datafile'], 'start_stages.json'),
     'ena': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages.json'),
     'figshare': os.path.join(RESOLVER['wizards_datafile'], 'figshare_stages.json'),
+    'miappe': os.path.join(RESOLVER['wizards_datafile'], 'miappe_stages.json'),
     'sample_start': os.path.join(RESOLVER['wizards_sample'], 'start_stages.json'),
     'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json')
 }
@@ -603,7 +680,7 @@ FIGSHARE_API_URLS = {
     'authorization_token': 'https://api.figshare.com/v2/token'
 }
 
-# THIS IS DEPRECATED!!! SEE data_utils.get_isa_schema()
+# THIS IS DEPRECATED!!! SEE data_utils.get_db_json_schema()
 ISA_SCHEMAS = {
     'investigation_schema': '/schemas/copo/dbmodels/investigation_schema.json',
     'publication_schema': '/schemas/copo/dbmodels/publication_schema.json',

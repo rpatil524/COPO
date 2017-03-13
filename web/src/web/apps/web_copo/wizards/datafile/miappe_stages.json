@@ -1,0 +1,496 @@
+{
+  "title": "MIAPPE Experiment (Minimum Information About Plant Phenotyping Experiments)",
+  "description": "Configuration for MIAPPE Phenotyping experiments",
+  "properties": [
+    {
+      "ref": "attach_samples",
+      "title": "Attach Samples",
+      "message": "",
+      "items": [
+        {
+          "id": "study_samples",
+          "type": "string",
+          "help_tip": "",
+          "label": "Sample",
+          "hidden": "false",
+          "required": "true",
+          "control": "copo-multi-search",
+          "data_maxItems": 1,
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_isasamples_json",
+              "parameter": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ref": "experiment_details",
+      "title": "Experiment Details",
+      "is_singular_stage": true,
+      "message": "",
+      "items": [
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "ontology_names": [
+          ],
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.start_date",
+          "show_in_table": true,
+          "control": "date-picker",
+          "versions": [
+            "start_date"
+          ],
+          "help_tip": "The Date this experiment commenced",
+          "label": "Start Date"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "ontology_names": [
+          ],
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.duration",
+          "show_in_table": true,
+          "control": "copo-duration",
+          "versions": [
+            "duration"
+          ],
+          "help_tip": "How many long the experiment lasted",
+          "label": "Experiment Duration"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "ontology_names": [
+            "gaz"
+          ],
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.location",
+          "show_in_table": true,
+          "control": "ontology term",
+          "versions": [
+            "location"
+          ],
+          "help_tip": "Where was this experiment performed",
+          "label": "Geographic Location"
+        }
+      ]
+    },
+    {
+      "ref": "environmental_factors",
+      "title": "Environmental Factors",
+      "message": "",
+      "items": [
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "rooting_medium",
+          "show_in_table": true,
+          "option_values": {
+            "callback": {
+              "function": "get_rooting_medium_options",
+              "parameter": ""
+            }
+          },
+          "control": "select",
+          "versions": [
+            "rooting_medium"
+          ],
+          "help_tip": "",
+          "label": "Rooting Medium"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "growth_facility",
+          "show_in_table": true,
+          "option_values": {
+            "callback": {
+              "function": "get_growth_area_options",
+              "parameter": ""
+            }
+          },
+          "trigger": {
+            "type": "change",
+            "fire_on_create": true,
+            "message": "Changing Growth Facility might alter or introduce new fields to the stage. <br/><br/>Do you want to continue?",
+            "callback": {
+              "function": "growth_facility_change",
+              "parameter": "item_id,new_value,stage"
+            }
+          },
+          "control": "select",
+          "versions": [
+            "growth_facility"
+          ],
+          "help_tip": "",
+          "label": "Growth Facility"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "pH",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "pH"
+          ],
+          "help_tip": "",
+          "label": "pH"
+        }
+      ]
+    },
+    {
+      "ref": "aerial_conditions",
+      "title": "Aerial Conditions",
+      "message": "",
+      "items": [
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "day_humidity",
+          "show_in_table": true,
+          "control": "text-percent",
+          "versions": [
+            "day_humidity"
+          ],
+          "help_tip": "",
+          "label": "Average VPDair during the light period (kPa) or Average humidity during the light period (%)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "night_humidity",
+          "show_in_table": true,
+          "control": "text-percent",
+          "versions": [
+            "night_humidity"
+          ],
+          "help_tip": "",
+          "label": "Average VPDair during the night (kPa) or Average humidity during the night (%)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.average_daily_integrated_PPFD",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "average_daily_integrated_PPFD"
+          ],
+          "help_tip": "",
+          "label": "Average daily integrated PPFD measured at plant or canopy level (mol m–2 day–1)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.average_length_of_the_light_period",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "average_length_of_the_light_period"
+          ],
+          "help_tip": "",
+          "label": "Average length of the light period (h)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.light_intensity",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "light_intensity"
+          ],
+          "help_tip": "",
+          "label": "Light intensity in Growth Chamber (µmol m–2 s –1)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.range_in_peak_light_intensity",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "range_in_peak_light_intensity"
+          ],
+          "help_tip": "",
+          "label": "Range in peak light intensity in Growth Chamber (µmol m–2 s –1)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.fraction_of_outside_light_intercepted_by_growth_facility",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "fraction_of_outside_light_intercepted_by_growth_facility"
+          ],
+          "help_tip": "",
+          "label": "Fraction of outside light intercepted by growth facility components and surrounding structures (Greenhouse or Open Top Chamber)"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.average_day_temperature",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "average_day_temperature"
+          ],
+          "help_tip": "",
+          "label": "Average day temperature"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.average_night_temperature",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "average_night_temperature"
+          ],
+          "help_tip": "",
+          "label": "Average night temperature"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.temp_change",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "temp_change"
+          ],
+          "help_tip": "",
+          "label": "Temperature change over the course of experiment"
+        }
+      ]
+    },
+    {
+      "ref": "nutrients",
+      "title": "Nutrients",
+      "message": "",
+      "items": [
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "nutrient_type",
+          "show_in_table": true,
+          "option_values": {
+            "callback": {
+              "function": "get_nutrient_control_options",
+              "parameter": ""
+            }
+          },
+          "control": "select",
+          "versions": [
+            ""
+          ],
+          "help_tip": "",
+          "label": "Nutrient Type",
+          "trigger": {
+            "type": "change",
+            "fire_on_create": true,
+            "message": "Changing Nutrient Type might alter or introduce new fields to the stage. <br/><br/>Do you want to continue?",
+            "callback": {
+              "function": "get_nutrient_controls",
+              "parameter": "item_id,new_value,stage"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ref": "watering",
+      "title": "Watering",
+      "message": "",
+      "items": [
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "option_values": {
+            "callback": {
+              "function": "get_watering_control_options",
+              "parameter": ""
+            }
+          },
+          "id": "copo.miappe.irrigation_type",
+          "show_in_table": true,
+          "control": "select",
+          "versions": [
+            "irrigation_type"
+          ],
+          "help_tip": "",
+          "label": "Irrigation Type"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.volume_of_water_added_per_container_or_m2",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "volume_of_water_added_per_container_or_m2"
+          ],
+          "help_tip": "",
+          "label": "Volume (L) of water added per container or m2"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.frequency_of_watering",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "frequency_of_watering"
+          ],
+          "help_tip": "",
+          "label": "Frequency of Watering"
+        }
+      ]
+    },
+    {
+      "ref": "observed_variables",
+      "title": "Observed Variables",
+      "message": "",
+      "items": [
+        {
+          "type": "array",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.phenotypic_variables",
+          "show_in_table": false,
+          "control": "copo-phenotypic-characteristics",
+          "versions": [
+            "phenotypic_variables"
+          ],
+          "help_tip": "Phenotypic variable characteristics of the experiment",
+          "label": "Phenotypic Variables"
+        },
+        {
+          "type": "array",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "copo.miappe.environmental_variables",
+          "show_in_table": false,
+          "control": "copo-environmental-characteristics",
+          "versions": [
+            "environmental_variables"
+          ],
+          "help_tip": "Environmental variable characteristics of the experiment",
+          "label": "Environmental Variables"
+        }
+      ]
+    }
+  ]
+}

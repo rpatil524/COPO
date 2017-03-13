@@ -1046,5 +1046,20 @@ table.dataTable td.focus {
     /*padding: 5px;*/
     border-radius: 4px
 }
-
 /*end form control focus*/
+
+.datepicker-days th{
+    background-color: transparent;
+}
+
+input.date-picker{
+    width: 200px;
+}
+
+#gh_controls, #field_controls{
+    margin-top: 15px;
+}
+
+.autocomplete{
+    z-index: 10;
+}

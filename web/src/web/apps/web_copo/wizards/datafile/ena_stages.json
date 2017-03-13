@@ -5,9 +5,7 @@
     {
       "ref": "study_type",
       "title": "Study Type",
-      "content": "get_stage_html",
       "is_singular_stage": true,
-      "deposition_context": "ena",
       "message": "Select the study type under which the datafiles were created. The study type presents a controlled vocabulary for expressing the overall purpose of the study.",
       "items": [
         {
@@ -27,9 +25,10 @@
           },
           "trigger": {
             "type": "change",
+            "message": "Changing the Study Type might impact certain stages in the description process! This might, in some cases, result in loss of previous entries. <br/><br/>Do you want to continue?",
             "callback": {
               "function": "study_type_change",
-              "parameter": "{item_id!s},{old_value!s},{new_value!s}"
+              "parameter": "item_id,old_value,new_value"
             }
           }
         }
@@ -38,8 +37,6 @@
     {
       "ref": "attach_samples",
       "title": "Sample",
-      "content": "get_stage_html",
-      "deposition_context": "ena",
       "message": "Select and associate a sample to files in the bundle. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",
       "items": [
         {
@@ -66,7 +63,7 @@
       "is_stage_stub": true,
       "callback": {
         "function": "get_dynamic_elements_ena",
-        "parameter": "{stub_ref!s}"
+        "parameter": "stub_ref"
       }
     }
   ]

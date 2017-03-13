@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+<RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.run.xsd">
+	<RUN alias="5850051274d3e1009da14912:assay:EXP1" broker_name="TGAC" center_name="TGAC">
+		<EXPERIMENT_REF refname="5850051274d3e1009da14912:generic_assay:a_5850051274d3e1009da14912:EXP1"/>
+		<DATA_BLOCK>
+			<FILES>
+				<FILE checksum="20347b4637361d108176adfe55225765" checksum_method="MD5" filename="5850051274d3e1009da14912/felix/small1_test.fastq.gz" filetype="fastq"/>
+			</FILES>
+		</DATA_BLOCK>
+	</RUN>
+	<RUN alias="5850051274d3e1009da14912:assay:EXP2" broker_name="TGAC" center_name="TGAC">
+		<EXPERIMENT_REF refname="5850051274d3e1009da14912:generic_assay:a_5850051274d3e1009da14912:EXP2"/>
+		<DATA_BLOCK>
+			<FILES>
+				<FILE checksum="5567350d3628ba4ab7ba89a15ac179ba" checksum_method="MD5" filename="5850051274d3e1009da14912/felix/small6_test.fastq.gz" filetype="fastq"/>
+			</FILES>
+		</DATA_BLOCK>
+	</RUN>
+	<RUN alias="5850051274d3e1009da14912:assay:EXP3" broker_name="TGAC" center_name="TGAC">
+		<EXPERIMENT_REF refname="5850051274d3e1009da14912:generic_assay:a_5850051274d3e1009da14912:EXP3"/>
+		<DATA_BLOCK>
+			<FILES>
+				<FILE checksum="0fb243e99b4b172ae9bf59f6b373e8c0" checksum_method="MD5" filename="5850051274d3e1009da14912/felix/small4_test.fastq.gz" filetype="fastq"/>
+			</FILES>
+		</DATA_BLOCK>
+	</RUN>
+	<RUN alias="5850051274d3e1009da14912:assay:EXP4" broker_name="TGAC" center_name="TGAC">
+		<EXPERIMENT_REF refname="5850051274d3e1009da14912:generic_assay:a_5850051274d3e1009da14912:EXP4"/>
+		<DATA_BLOCK>
+			<FILES>
+				<FILE checksum="37f011fab2d689cb0255c86d7b29247b" checksum_method="MD5" filename="5850051274d3e1009da14912/felix/small3_test.fastq.gz" filetype="fastq"/>
+			</FILES>
+		</DATA_BLOCK>
+	</RUN>
+	<RUN alias="5850051274d3e1009da14912:assay:EXP5" broker_name="TGAC" center_name="TGAC">
+		<EXPERIMENT_REF refname="5850051274d3e1009da14912:generic_assay:a_5850051274d3e1009da14912:EXP5"/>
+		<DATA_BLOCK>
+			<FILES>
+				<FILE checksum="e7b60cc285ad48818d34dbdb9ab0a2c5" checksum_method="MD5" filename="5850051274d3e1009da14912/felix/small2_test.fastq.gz" filetype="fastq"/>
+			</FILES>
+		</DATA_BLOCK>
+	</RUN>
+	<RUN alias="5850051274d3e1009da14912:assay:EXP6" broker_name="TGAC" center_name="TGAC">
+		<EXPERIMENT_REF refname="5850051274d3e1009da14912:generic_assay:a_5850051274d3e1009da14912:EXP6"/>
+		<DATA_BLOCK>
+			<FILES>
+				<FILE checksum="0588e7b7e5d7bdf2bd76d6447661eea8" checksum_method="MD5" filename="5850051274d3e1009da14912/felix/small5_test.fastq.gz" filetype="fastq"/>
+			</FILES>
+		</DATA_BLOCK>
+	</RUN>
+	<RUN alias="5850051274d3e1009da14912:assay:EXP7" broker_name="TGAC" center_name="TGAC">
+		<EXPERIMENT_REF refname="5850051274d3e1009da14912:generic_assay:a_5850051274d3e1009da14912:EXP7"/>
+		<DATA_BLOCK>
+			<FILES>
+				<FILE checksum="cbc51398778d3d2e59a2377e753f7cc0" checksum_method="MD5" filename="5850051274d3e1009da14912/felix/small7_test.fastq.gz" filetype="fastq"/>
+			</FILES>
+		</DATA_BLOCK>
+	</RUN>
+	<RUN alias="5850051274d3e1009da14912:assay:EXP8" broker_name="TGAC" center_name="TGAC">
+		<EXPERIMENT_REF refname="5850051274d3e1009da14912:generic_assay:a_5850051274d3e1009da14912:EXP8"/>
+		<DATA_BLOCK>
+			<FILES>
+				<FILE checksum="65365bb156976cd0e970f3c9974b7640" checksum_method="MD5" filename="5850051274d3e1009da14912/felix/small8_test.fastq.gz" filetype="fastq"/>
+			</FILES>
+		</DATA_BLOCK>
+	</RUN>
+</RUN_SET>
+

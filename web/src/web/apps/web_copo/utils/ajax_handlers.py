@@ -15,6 +15,7 @@ from dal.copo_da import ProfileInfo, RemoteDataFile, Submission
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
+from pandas import read_excel
 
 
 def get_source_count(self):
@@ -27,7 +28,6 @@ def search_ontology(request):
     term = request.GET['query']
     url = settings.ELASTIC_SEARCH_URL
     q = json.dumps({"query": {"match_phrase_prefix": {"name": term}}})
-    # q = '{"query": { "multi_match": { "fields": ["name", "accession_id", "aspect", "definition"], "query": "' + term + '", "type": "phrase_prefix"}}}'
     data = requests.post(url, q)
     return HttpResponse(data.text)
 
@@ -37,10 +37,11 @@ def search_ontology_ebi(request, ontology_names):
     if ontology_names == "999":
         ontology_names = str()
 
-    ontologies = ol.ONTOLOGY_LKUPS['ontologies_to_search']
+    ontologies = ontology_names
     fields = ol.ONTOLOGY_LKUPS['fields_to_search']
     query = ol.ONTOLOGY_LKUPS['ebi_ols_autocomplete'].format(**locals())
-    data = requests.get(query).text
+    print(query)
+    data = requests.get(query, timeout=1).text
     return HttpResponse(data)
 
 
@@ -99,3 +100,7 @@ def delete_token(request):
     tok_id = request.POST['token_id']
     resp = Figshare().delete_token(tok_id)
     return HttpResponse(json_util.dumps({'resp': resp.acknowledged}))
+
+def get_excel_data(request):
+    x = read_excel('/Users/fshaw/Dropbox/Shawtuk/dev/snps/test/test_data/ExampleSNPTable_small.xlsx', sheetname=0)
+    return HttpResponse(json.dumps(x.values.tolist()))

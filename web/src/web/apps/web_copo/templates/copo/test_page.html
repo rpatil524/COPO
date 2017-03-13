@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
 
     <link rel="stylesheet" type="text/css" href="{% static "copo/annotator-2.0.0-alpha.3/css/annotator.min.css" %} "/>
+
+
 {% endblock %}
 
 
@@ -47,75 +49,6 @@
 
 {% block browse_header_block %}
 
-    <style>
-        .carousel-inner > .item > img {
-            margin: 0 auto;
-        }
-
-        #carousel_wrapper {
-            display: block;
-            margin: 0 auto;
-        }
-    </style>
-
-
-    <div id="browse_header">
-        <span class="blue_icon">
-           <a><i class="fa fa-plus-circle" data-toggle="modal" data-target="#newStudyModal"></i></a>
-        </span>
-        <span class="blue_icon">
-            <a><i class="fa fa-pencil-square-o"></i></a>
-        </span>
-        <span class="blue_icon">
-            <a><i class="fa fa-trash-o"></i></a>
-        </span>
-
-        <div class="input-group input-group-sm">
-            <span class="input-group-addon">
-                <i class="fa fa-search"></i>
-            </span>
-            <input type="search" class="form-control" placeholder="Search">
-        </div>
-    </div>
-
-
-    <!-- Modal -->
-    <div class="modal fade" id="newStudyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span
-                            aria-hidden="true">&times;</span><span
-                            class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="myModalLabel">New Profile</h4>
-                </div>
-                <div class="modal-body">
-
-                    <form role="form" action="/copo/new_profile/" method="post">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="study_title">Title</label>
-                            <input type="text" class="form-control" name="study_title"
-                                   placeholder="Enter Collection Name">
-                        </div>
-                        <div class="form-group">
-                            <label for="study_abstract">Abstract</label>
-                            <textarea rows="6" class="form-control" name="study_abstract"
-                                      placeholder="Enter Abstract"></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-default">Submit</button>
-                    </form>
-
-                </div>
-                <div class="modal-footer">
-
-                </div>
-            </div>
-        </div>
-    </div>
-
 
 {% endblock %}
 
@@ -123,17 +56,22 @@
     {% csrf_token %}
 
 
-    <form>
 
-        <div id="file" name="abc"><input type="file"></div>
-        <div><input id="input" name="abc" type="input"></div>
-        <div><input id="input1" name="abc" type="input"></div>
-        <div><input id="input2" name="abc" type="input"></div>
-        <input type="submit" id="submit_button">
-    </form>
+
+    <input type="text" id="datepicker">
 
 
 
+    <div class="form-inline">
+
+        <input type="text" class="duration-control form-control" id="" placeholder="Years">
+        <input type="text" class="duration-control form-control" id="" placeholder="Months">
+        <input type="text" class="duration-control form-control" id="" placeholder="Days">
+
+    </div>
+
+
+    <div id="mdiv"></div>
 
 {% endblock %}
 
@@ -144,22 +82,22 @@
 
     <script>
 
-        $(document).on('focus', '#input', function () {
+        $(document).ready(function () {
+            $('#datepicker').datepicker({})
 
 
-            $(document).on('click', '#submit_button', function (e) {
+            var txt = $('<input/>',
+                {
+                    type: "text",
+                    class: "input-copo form-control",
+                    id: "akjl",
+                    name: "akil",
+                    placeholder: 'jdhsjkahdkja'
+                });
 
-                console.log(e.currentTarget)
-                $('#file').remove()
-                console.log(e.currentTarget)
-
-                $(input).each(function (item, val) {
-                    console.log(item + ' ' + val)
-                })
-                return false
-            })
-
+            $('#mdiv').append(txt)
         })
+
 
     </script>
 
