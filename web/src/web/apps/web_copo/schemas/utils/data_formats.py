@@ -42,7 +42,7 @@ class DataFormats:
             self.set_table_display()
             self.set_ontologies()
 
-            self.update_original_resource()
+            # self.update_original_resource()
             self.refactor_deprecated_controls()
 
             out_dict = self.objectify()

@@ -8,7 +8,6 @@ var copoFormsURL = "/copo/copo_forms/";
 var copoVisualsURL = "/copo/copo_visualize/";
 var globalDataBuffer = {};
 var htmlForm = $('<div/>'); //global form div
-var componentRecords = Object(); //components records...used for validation
 var formMode = "add";
 var componentData = null;
 
@@ -121,21 +120,6 @@ var controlsMapping = {
 };
 
 function json2HtmlForm(data) {
-    var dataCopy = $.extend(true, Object(), data.form.component_records);
-
-    //remove record with target_id from this list...to enable unique validation in edit mode
-    var delKey = null;
-    $.each(dataCopy, function (key, val) {
-        if (val._id == data.form.target_id) {
-            delKey = key;
-            return false;
-        }
-
-    });
-
-    delete dataCopy[delKey];
-    componentRecords[data.form.component_name] = dataCopy;
-
 
     //tidy up before closing the modal
     var doTidyClose = {
@@ -185,9 +169,6 @@ function json2HtmlForm(data) {
             });
 
             refresh_form_aux_controls();
-
-            setup_formelement_hint($('input[name="helptips-chk"]'), htmlForm.find("form").find(":input"));
-
         },
         buttons: [
             {
@@ -367,7 +348,7 @@ function get_form_title(data) {
 function get_help_ctrl() {
     var helpCtrl = $('<div/>',
         {
-            html: '<span style="padding:6px;">Help tips</span><input type="checkbox" name="helptips-chk">',
+            html: '<span style="padding:6px;">Help tips</span><input class="copo-help-chk" type="checkbox" name="helptips-chk">',
             class: "tips-switch-form-div form-group pull-right"
         });
 
@@ -387,22 +368,23 @@ function set_up_help_ctrl(ctrlName) {
     $('input[name="' + ctrlName + '"]').on('switchChange.bootstrapSwitch', function (event, state) {
         if (!state) {
             //remove all dangling popovers
-            $('.popover').popover('destroy');
+            $('.popover').remove();
         }
     });
+
 }
 
 function set_up_form_help_div(data) {
     var ctrlDiv = $('<div/>',
         {
-            class: "row",
+            class: "row helpDivRow",
             style: "margin-bottom:20px;"
         });
 
     var cloneCol = $('<div/>',
         {
             class: "col-sm-7 col-md-7 col-lg-7"
-        }).append(set_up_clone_ctrl(data));
+        });
 
     var helpCtrl = $('<div/>',
         {
@@ -461,80 +443,6 @@ function build_clone_control(component_records, component_label) {
     return form_div_ctrl().append(ctrlsDiv)
 }
 
-function set_up_clone_ctrl(data) {
-    var ctrlsDiv = $('<div/>',
-        {
-            style: "padding:1px; margin-bottom:-15px;"
-        });
-
-    var form_values = Object();
-
-
-    //build hidden fields to hold selected options, and supply control data
-    var hiddenValuesCtrl = $('<input/>',
-        {
-            type: "hidden",
-            class: "copo-multi-values",
-            "data-maxItems": 1, //makes this a single select box, instead of the default multiple
-            change: function (event) {
-                event.preventDefault();
-
-                data.form.form_value = form_values[$(this).val()];
-
-                build_form_body(data);
-
-                refresh_form_aux_controls();
-
-                setup_formelement_hint($('input[name="helptips-chk"]'), htmlForm.find("form").find(":input"));
-
-            }
-        });
-
-    //build select
-    var selectCtrl = $('<select/>',
-        {
-            class: "input-copo copo-multi-select",
-            placeholder: "Clone a " + data.form.form_label + " record...",
-        });
-
-    var showCloneCtrl = false;
-
-    var min = 10000;
-    var max = 99999;
-
-    if (data.form.component_records.length > 0 && data.form.clonable) {
-        showCloneCtrl = true;
-
-        //construct options
-        var labelElem = data.form.form_schema[0].id.split(".").slice(-1)[0];
-
-        $('<option value=""></option>').appendTo(selectCtrl);
-
-        for (var i = 0; i < data.form.component_records.length; ++i) {
-            var option = data.form.component_records[i];
-            var lbl = option[labelElem];
-            var vl = option["_id"];
-
-            //generate unique characters to append to label elem
-            var rand_postfix = (Math.floor(Math.random() * (max - min + 1)) + min).toString();
-            option[labelElem] = option[labelElem] + "_CLONED_" + rand_postfix;
-
-            form_values[vl] = option;
-
-            $('<option value="' + vl + '">' + lbl + '</option>').appendTo(selectCtrl);
-        }
-    }
-
-    ctrlsDiv.append(selectCtrl).append(hiddenValuesCtrl);
-
-    var cloneCtrl = form_div_ctrl().append(ctrlsDiv);
-
-    if (!showCloneCtrl) {
-        cloneCtrl = '';
-    }
-
-    return cloneCtrl;
-}
 
 function refresh_form_aux_controls() {
     //refresh controls
@@ -623,28 +531,42 @@ var dispatchFormControl = {
         //set validation markers
         var vM = set_validation_markers(formElem, txt);
 
+        metaDiv.append(txt);
+
+
         // set control metadata
+        if (formElem.hasOwnProperty("control_meta")) {
+            var control_meta = formElem.control_meta;
 
-        if (formElem.control_meta.hasOwnProperty("input_group_addon")) {
-            metaDiv = $('<div/>',
-                {
-                    class: "input-group"
-                });
+            if (control_meta.hasOwnProperty("input_group_addon")) {
+                //get addon label
+                var input_group_addon_label = '';
 
-            var inputGroupSpan = $('<span/>',
-                {
-                    class: "input-group-addon",
-                    html: formElem.control_meta.input_group_addon_label
-                });
+                try {
+                    var input_group_addon_label = control_meta.input_group_addon_label;
+                } catch (err) {
+                    ;
+                }
 
-            if (formElem.control_meta.input_group_addon == "right") {
-                metaDiv.append(txt).append(inputGroupSpan);
-            } else {
-                metaDiv.append(inputGroupSpan).append(txt);
+                //redefine metaDiv
+                metaDiv = $('<div/>',
+                    {
+                        class: "input-group"
+                    });
+
+                var inputGroupSpan = $('<span/>',
+                    {
+                        class: "input-group-addon",
+                        html: input_group_addon_label
+                    });
+
+                if (control_meta.input_group_addon == "right") {
+                    metaDiv.append(txt).append(inputGroupSpan);
+                } else {
+                    metaDiv.append(inputGroupSpan).append(txt);
+                }
             }
 
-        } else {
-            metaDiv.append(txt);
         }
 
         ctrlsDiv.append(metaDiv);
@@ -731,7 +653,7 @@ var dispatchFormControl = {
                 var dionly = "display: inline-block; ";
 
                 if (formElem.hasOwnProperty("_displayOnlyThis")) {
-                    //note: _displayOnlyThis is a soft mechanism for hiding some parts of a composite
+                    //note: _displayOnlyThis is a mechanism for hiding some parts of a composite
                     //control that would have ordinarily been displayed on the UI. Its use does not in any way
                     // replace, or serve the purpose of, the html 'hidden' property defined on 'formElem'
 
@@ -755,8 +677,9 @@ var dispatchFormControl = {
 
                     //set placeholder text
                     if ($(this).hasClass("ontology-field")) {
-                        $(this).attr("placeholder", characteristicsSchema[i].label.toLowerCase());
+                        $(this).attr("placeholder", characteristicsSchema[i].label);
                     }
+
                 });
 
                 ctrlsDiv.append(ontologyCtrlObject);
@@ -1270,15 +1193,23 @@ function create_attachable_component(formElem) {
             "data-toggle": "validator",
         });
 
+    var formBodyDiv = $('<div/>',
+        {
+            class: "row"
+        }).append($('<div/>',
+        {
+            class: "col-sm-12 col-md-12 col-lg-12"
+        }).append(formCtrl));
+
     var helpCtrl = $('<div/>',
         {
-            html: '<span style="padding:6px;">Help tips</span><input type="checkbox" name="helptips-chk-sub">',
+            html: '<span style="padding:6px;">Help tips</span><input class="copo-help-chk" type="checkbox" name="helptips-chk-sub">',
             class: "tips-switch-form-div form-group pull-right"
         });
 
     var helpDivRow = $('<div/>',
         {
-            class: "row",
+            class: "row helpDivRow",
             style: "margin-bottom:20px;"
         });
 
@@ -1380,7 +1311,6 @@ function create_attachable_component(formElem) {
 
             //set up help tips
             set_up_help_ctrl("helptips-chk-sub");
-            setup_formelement_hint($('input[name="helptips-chk-sub"]'), formCtrl.find(":input"));
         },
         buttons: [
             {
@@ -1406,7 +1336,7 @@ function create_attachable_component(formElem) {
     var formLoader = get_spinner_image();
 
     $dialogContent.append(formLoader);
-    $dialogContent.append(helpDivRow).append(formCtrl);
+    $dialogContent.append(helpDivRow).append(formBodyDiv);
     dialog.realize();
     dialog.setMessage($dialogContent);
     dialog.open();
@@ -1487,7 +1417,8 @@ function form_help_ctrl(tip) {
 function form_div_ctrl() {
     return $('<div/>',
         {
-            class: "form-group copo-form-group"
+            class: "form-group copo-form-group",
+            tabindex: -1
         });
 }
 

@@ -120,7 +120,7 @@
           "id": "name",
           "show_in_table": true,
           "control": "text",
-          "help_tip": "A Sample represents major outputs resulting from a protocol application other than the special case outputs of Extract or a Labeled Extract.",
+          "help_tip": "A bundle name is the base part from which individual sample names may be derived.",
           "label": "Bundle Name"
         }
       ]

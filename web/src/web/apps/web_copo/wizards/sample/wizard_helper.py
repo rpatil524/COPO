@@ -120,7 +120,11 @@ class WizardHelper:
         sample_name_schema = dict()
         if name_schema_template_list:
             sample_name_schema = name_schema_template_list[0]
+            sample_name_schema["help_tip"] = "Modify as required to reflect your specific sample name."
+            sample_name_schema["label"] = str()
+            sample_name_schema["control_meta"]["input_group_addon"] = "left"
             sample_name_schema["batch"] = "true"  # allows unique test to extend to siblings
+            sample_name_schema["batchuniquename"] = "assigned_sample"
             sample_name_schema["batchuniquename"] = "assigned_sample"
 
             # get all sample names for unique test
@@ -131,27 +135,52 @@ class WizardHelper:
         return sample_name_schema
 
     def resolve_object_arrays_column(sefl, columns):
+        """
+        function deconstructs object type controls into discrete items for tabular rendering and editing
+        :param columns:
+        :return:
+        """
         object_array_controls = ["copo-characteristics", "copo-comment"]
 
         gap_elements = list()
 
-        for col in columns:
-            if col["control"] in object_array_controls:
-                gap_dict = dict(parent_element=col, derived_elements=list())
+        for col in [cl for cl in columns if cl["control"] in object_array_controls]:
+            gap_dict = dict(parent_element=col, derived_elements=list())
 
-                for indx, cd in enumerate(col["data"]):
+            derived_id_count = 0
+
+            for indx, cd in enumerate(col["data"]):
+                derived_id_count += 1
+                new_column = dict(
+                    actual_id=col["actual_id"],
+                    derived_id=col["actual_id"] + "_" + str(derived_id_count),
+                    control=col["control"],
+                    indx=indx,
+                    title=col["title"] + " [" + list(cd[0].values())[0] + "]",
+                    data=list(cd[1].values())[0],
+                    meta=list(cd[1].keys())[0]
+                )
+
+                gap_dict.get("derived_elements").append(new_column)
+
+                # get other elements
+                for cd_ext in list(cd[2:]):
+                    derived_id_count += 1
+                    cd_ext_val = list(cd_ext.values())[0]
+                    cd_ext_title = list(cd_ext.keys())[0]
                     new_column = dict(
                         actual_id=col["actual_id"],
-                        derived_id=col["actual_id"] + "_" + str(indx),
-                        control=col["control"], indx=indx,
-                        title=col["title"] + " [" + list(cd[0].values())[0] + "]",
-                        data=list(cd[1].values())[0],
-                        meta=list(cd[1].keys())[0]
+                        derived_id=col["actual_id"] + "_" + str(derived_id_count),
+                        control=col["control"],
+                        indx=indx,
+                        title=cd_ext_title,
+                        data=cd_ext_val,
+                        meta=cd_ext_title
                     )
 
                     gap_dict.get("derived_elements").append(new_column)
 
-                gap_elements.append(gap_dict)
+            gap_elements.append(gap_dict)
 
         for gp in gap_elements:
             slot_indx = columns.index(gp["parent_element"])
@@ -166,7 +195,7 @@ class WizardHelper:
 
         if len(generated_samples) > 0:
             rec = generated_samples[0]
-            # get columns, and corresponding data using a representative candidate
+            # get columns, and corresponding data using the representative candidate record, rec
             for f in self.schema:
                 if self.truth_test_1(f, sample_type):
 
@@ -185,7 +214,7 @@ class WizardHelper:
 
                     combined_meta.append(col)
 
-            # resolve object arrays for display in separate columns: e.g. of these are characteristics, comment'
+            # resolve object arrays for display in separate columns: e.g. of these are characteristics, comments'
             self.resolve_object_arrays_column(combined_meta)
 
             # now apply metadata to all generated samples
@@ -219,7 +248,7 @@ class WizardHelper:
         :return:
         """
 
-        column_reference = update_metadata.get("column_reference", str())  # element key, the update target
+        column_reference = update_metadata.get("column_reference", str())  # element key; the update target
         sample_type = update_metadata.get("sample_type", str())  # the sample type
         update_element_indx = update_metadata.get("update_element_indx", str())  # if a list element type, the index
         update_meta = update_metadata.get("update_meta", str())  # present if a composite element is being updated

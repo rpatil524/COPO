@@ -1,7 +1,6 @@
 var wizardMessages;
 var samplesGenerated = false; //flag to indicate if samples have been generated
 var wizardStages;
-var wizardStagesMain;
 var stagesFormValues = {};
 var formEditableElements = {};
 var validateSetter = {};
@@ -20,6 +19,7 @@ var dataTableTriggerSave = false; //flag for determining the state of datatables
 $(document).ready(function () {
         //****************************** Event Handlers Block *************************//
 
+        //page global variables
         var csrftoken = $.cookie('csrftoken');
         var component = "sample";
         var wizardURL = "/rest/sample_wiz/";
@@ -28,10 +28,6 @@ $(document).ready(function () {
 
 
         //test
-        // $(document).on("keyup", ".copo-text-control", function () {
-        //     var value = $(this).val();
-        //     console.log(value);
-        // });
         //end test
 
         //on the fly info element
@@ -84,6 +80,14 @@ $(document).ready(function () {
             $(this).addClass("disabled");
 
             set_component_help($(this).attr("data-component"), sampleHelpTable, sampleHowtos);
+        });
+
+        //handle add sample button
+        $('#wizard_fire_button').on('click', function (event) {
+            $(this).closest("div").hide();
+            var target_button_action = "new_samples"
+            $(document).find(".copo-dt[data-record-action='" + target_button_action + "']").addClass("disabled");
+            add_new_samples();
         });
 
 
@@ -141,27 +145,6 @@ $(document).ready(function () {
 
 
         //******************************* wizard events *******************************//
-
-        // retrieve wizard messages
-        $.ajax({
-            url: wizardURL,
-            type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
-            data: {
-                'request_action': 'sample_wizard_components'
-            },
-            success: function (data) {
-                wizardStagesMain = data.wizard_stages;
-                wizardStages = data.wizard_stages;
-                wizardMessages = data.wiz_message;
-                set_wizard_summary();
-
-            },
-            error: function () {
-                alert("Couldn't retrieve wizard components!");
-            }
-        });
-
 
         //handle event for exiting current description...
         $('#remove_act').on('click', function (event) {
@@ -419,7 +402,7 @@ $(document).ready(function () {
         function do_post_stage_retrieval(data) {
             //update items with data
 
-            if (($('#sampleWizard').is(":visible"))) {
+            if (($('#sampleWizard').is(":visible")) || $('#sample-display-tabs.nav-tabs .active').text().trim() == "Describe") {
                 do_post_stage_retrieval2(data);
             } else {
                 //store data pending tab shown
@@ -587,12 +570,7 @@ $(document).ready(function () {
                 var schemaCopy = $.extend(true, Object(), sampleSchema);
                 schemaCopy.id = "assigned_sample_" + i.toString();
                 schemaCopy.default_value = bundleName + "_" + i.toString();
-                schemaCopy.control = "text";
-                schemaCopy.control_meta = Object();
-                schemaCopy.control_meta.input_group_addon = "right";
                 schemaCopy.control_meta.input_group_addon_label = i.toString();
-                schemaCopy.label = '';
-                schemaCopy.help_tip = "Assigned name. Please modify as required to capture your specific sample name."
 
                 generatedSampleNames.push(schemaCopy);
             }
@@ -824,75 +802,8 @@ $(document).ready(function () {
             ]);
         }
 
-        //functions clears the wizard and either exits or loads next item in batch
-        function clear_wizard() {
-            //todo: need to decide what to save here before quitting the wizard
-
-            //decommission wizard
+        function reset_wizard() {//resets wizard
             $('#sampleWizard').wizard('removeSteps', 1, currentIndx + 1);
-            $('#sampleWizard').hide();
-
-            //clear wizard buttons
-            $('#wizard_steps_buttons').html('');
-
-
-            //reset index
-            currentIndx = 0;
-
-            //hide discard button
-            $('#remove_act').parent().hide();
-
-            //clear generated sample table
-            if ($.fn.dataTable.isDataTable('#generated_samples_table')) {
-                //if table instance already exists, then do refresh
-                var table = $('#generated_samples_table').DataTable();
-
-                table
-                    .clear()
-                    .draw();
-                table
-                    .rows
-                    .add([]);
-                table
-                    .columns
-                    .adjust()
-                    .draw();
-                table
-                    .search('')
-                    .columns()
-                    .search('')
-                    .draw();
-            }
-
-            //remove negotiated stages and samples data
-            negotiatedStages = [];
-            generatedSamples = [];
-
-            //switch info context
-            $("#copoSampleHelp").find(".component-help").removeClass("disabled");
-            $("#copoSampleHelp").find(".component-help[data-component='fileListComponent']").addClass("disabled");
-            $("#generatedSamplesDiv").css("display", "none");
-            $("#helptipsDiv").css("display", "block");
-
-            //switch from wizard panel
-            tempWizStore = null;
-
-            //switch to file list context
-            $('#copo-datafile-tabs.nav-tabs a[href="#fileListComponent"]').tab('show');
-
-            //clear on the fly help
-            $("#on_the_fly_info").html('');
-
-            stagesFormValues = {};
-            validateSetter = {};
-            stepIntercept = false;
-        }
-
-        function reset_wizard() {//resets wizard without all the hassle of clear_wizard()
-            $('#sampleWizard').wizard('removeSteps', 1, currentIndx + 1);
-
-            //clear wizard buttons
-            $('#wizard_steps_buttons').html('');
 
             //add review step, then other steps
             $('#sampleWizard').wizard('addSteps', -1, [
@@ -931,12 +842,28 @@ $(document).ready(function () {
 
 
         function add_new_samples() {
-            var data = {"stage_ref": ""};
+            //set in motion the wizard process...
 
-            //refresh wizard stages
-            wizardStages = $.extend(true, Object(), wizardStagesMain);
+            // retrieve wizard messages
+            $.ajax({
+                url: wizardURL,
+                type: "POST",
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    'request_action': 'sample_wizard_components'
+                },
+                success: function (data) {
+                    wizardStages = data.wizard_stages;
+                    wizardMessages = data.wiz_message;
+                    set_wizard_summary();
 
-            do_post_stage_retrieval(data);
+                    //load stages
+                    do_post_stage_retrieval({"stage_ref": ""});
+                },
+                error: function () {
+                    alert("Couldn't retrieve wizard components!");
+                }
+            });
         }
 
 
@@ -971,7 +898,9 @@ $(document).ready(function () {
 
             //handle button action
             if (task == "new_samples") {//event for creating new sample(s)
-
+                //disable the add buttons
+                elem.addClass("disabled");
+                $("#wizard_fire_button").closest("div").hide();
                 add_new_samples();
 
             } else if (task == "delete" && ids.length > 0) { //handles delete, allows multiple row delete
@@ -1193,10 +1122,10 @@ $(document).ready(function () {
             formEditableElements = data.generated_samples.form_elements;
 
             //generate table columns
-            var sampleTableColumns = generate_sample_table_columns();
+            var sampleTableColumns = generate_sample_table_columns(generatedSamples);
 
             //set up data source
-            dataTableDataSource = generate_sample_table_data_source();
+            dataTableDataSource = generate_sample_table_data_source(generatedSamples);
 
             //remove loader
             $("#summary_stage_loader").html('');
@@ -1361,7 +1290,7 @@ $(document).ready(function () {
                     });
 
                 //also, use ENTER key to signal end of cell update...
-                $(document).on("keyup", function (e) {
+                table.on("keyup", function (e) {
                     var code = (e.keyCode ? e.keyCode : e.which);
                     if (code == 13 && table && !dataTableTriggerSave) {
                         dataTableTriggerSave = true; //first time is to build control, only react at the second time
@@ -1433,8 +1362,10 @@ $(document).ready(function () {
 
         }//end of func
 
-        function generate_sample_table_columns() {
+        function generate_sample_table_columns(generatedSamples) {
             //generates sample table column, beginning with static columns
+
+            console.log(generatedSamples[0]._recordMeta)
 
             var sampleTableColumns = [
                 {title: "S/N", data: 'rank', visible: true, name: "rank"},
@@ -1443,7 +1374,7 @@ $(document).ready(function () {
 
             //now, set the dynamic columns
 
-            // get a reference sample entry in generated sample to use as basis for generating dynamic columns
+            // get a reference record in generated samples to use as basis for generating dynamic columns
             var referenceRecord = generatedSamples[0]._recordMeta;
 
             for (var i = 0; i < referenceRecord.length; ++i) {
@@ -1459,6 +1390,7 @@ $(document).ready(function () {
                     for (var j = 0; j < sampleCols.length; ++j) {
                         if (sampleCols[j].derived_id == data) {
                             displaYData = sampleCols[j].data;
+                            break;
                         }
                     }
 
@@ -1473,7 +1405,7 @@ $(document).ready(function () {
             return sampleTableColumns;
         }
 
-        function generate_sample_table_data_source() {
+        function generate_sample_table_data_source(generatedSamples) {
             //generates sample data source
             var sampleTableDataSource = [];
 
@@ -1591,21 +1523,8 @@ $(document).ready(function () {
             var datatable = cellParams.datatable;
             var cell = cellParams.cell;
             var action = cellParams.action;
-            var form_values = cellParams.form_values;
 
-            var auto_fields = JSON.stringify(form_values);
-
-            //re-enable keys
-            datatable.keys.enable();
-            dataTableTriggerSave = false;
-
-            //deselect previously selected rows
-            datatable.rows('.selected').deselect();
-
-
-            //remove cell's edit status
             var node = cell.node();
-            $(node).removeClass('cell-currently-engaged'); //unlock cell
 
             $(node).html(get_spinner_image());
 
@@ -1613,17 +1532,30 @@ $(document).ready(function () {
 
             //perform action
             if (action == "cancel") {
+                //re-enable keys
+                datatable.keys.enable();
+                dataTableTriggerSave = false;
+
+                //remove cell's edit status
+                $(node).removeClass('cell-currently-engaged'); //unlock cell
+
+                //deselect previously selected rows
+                datatable.rows('.selected').deselect();
+
                 datatable
                     .row(rowIndx)
                     .invalidate()
                     .draw();
             } else {
+                //get form values
+                var form_values = cellParams.form_values;
+
                 // get all target rows
                 var targetRows = [];
 
                 targetRows.push({rowID: rowIndx, recordID: dataTableDataSource[rowIndx].attributes._id});
 
-                //get action
+                //get drilled-down save action
                 var actionRows = [];
                 if (action == "selected" && cellParams.hasOwnProperty("selectedRows")) {
                     actionRows = cellParams.selectedRows;
@@ -1636,7 +1568,7 @@ $(document).ready(function () {
                     targetRows.push({rowID: rowIndx, recordID: dataTableDataSource[rowIndx].attributes._id});
                 }
 
-                //build metadata object to help inform how data would be properly saved
+                //define metadata object and gather relevant information for save action
                 var update_metadata = Object();
 
                 //get cell's derived id
@@ -1666,11 +1598,22 @@ $(document).ready(function () {
                         'request_action': 'sample_cell_update',
                         'target_rows': JSON.stringify(targetRows),
                         'update_metadata': update_metadata,
-                        'auto_fields': auto_fields
+                        'auto_fields': JSON.stringify(form_values)
                     },
                     success: function (data) {
                         var updatedSamples = data.updated_samples.generated_samples;
                         formEditableElements = data.updated_samples.form_elements; //refresh form elements
+
+
+                        //re-enable keys
+                        datatable.keys.enable();
+                        dataTableTriggerSave = false;
+
+                        //remove cell's edit status
+                        $(node).removeClass('cell-currently-engaged'); //unlock cell
+
+                        //deselect previously selected rows
+                        datatable.rows('.selected').deselect();
 
                         //set updated and refresh display
                         for (var i = 0; i < updatedSamples.length; ++i) {

@@ -1,6 +1,8 @@
 //**some re-usable functions across different modules
 var AnnotationEventAdded = false;
 $(document).ready(function () {
+    //set up helptips events
+    do_help_tips_event();
 
     setup_autocomplete()
     do_component_navbar($("#nav_component_name").val());
@@ -536,7 +538,7 @@ function refresh_multisearch() {
                 // dropdownParent: 'body',
                 maxItems: maxTems,
                 persist: true,
-                create: true,
+                create: false,
                 plugins: ['remove_button'],
                 valueField: elemSpecs.value_field,
                 labelField: elemSpecs.label_field,
@@ -575,50 +577,6 @@ function refresh_multisearch() {
 
     });
 }
-
-//set up tool tips; a medium for transmitting info about form elements
-function setup_formelement_hint(switchElem, inputElements) {
-    // $('.popover').popover('destroy');
-
-    inputElements.focus(function () {
-        var elem = $(this).closest(".copo-form-group");
-        var state = true;
-        if (elem.length) {
-            try {
-                state = switchElem.bootstrapSwitch('state');
-            }
-            catch (err) {
-                ;
-            }
-
-            if (state) {
-                var title = elem.find("label").html();
-                var content = "";
-                if (elem.find(".form-input-help").length) {
-                    content = (elem.find(".form-input-help").html());
-                }
-
-                $('.popover').popover('destroy'); //hide any shown popovers
-
-                var pop = elem.popover({
-                    title: title,
-                    content: content,
-                    // container: 'body',
-                    template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
-                    '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
-                    '</h3><div class="popover-content"><p></p></div></div></div>'
-                });
-
-                pop.popover('show');
-            } else {
-                elem.popover('destroy');
-                // $('.popover').popover('destroy');
-            }
-        }
-
-    });
-
-}//end of function
 
 
 var auto_complete = function () {
@@ -1196,6 +1154,65 @@ function do_profile_navigate(parentObject) {
         parentObject.append(aElem);
     }
 
+} //end of func
+
+function do_help_tips_event() {
+    //helptips events
+    $(document).on('mouseover', '.copo-form-group', function () {
+        //look for an helptip checkbox and use this, if it exists, to inform display of tooltip
+
+        var toolTipCtrl = $(this).closest("form").closest(".row").siblings(".helpDivRow").find(".copo-help-chk");
+        var showTip = true;
+
+        if (toolTipCtrl.length) {
+            //helptip check control present,
+            //has it been initialised?
+            if ($(this).closest("form").closest(".row").siblings(".helpDivRow").find(".bootstrap-switch-container").length) {
+                var state = toolTipCtrl.bootstrapSwitch('state');
+                if (!state) {
+                    showTip = false;
+                }
+            }
+        }
+
+        if (!showTip) {
+            $(this).popover('destroy');
+            $('.popover').remove();
+            return false;
+        }
+
+
+        $(this).addClass("copo-form-control-focus");
+
+        var elem = $(this);
+
+        var title = elem.find("label").html();
+        var content = "";
+        if (elem.find(".form-input-help").length) {
+            content = (elem.find(".form-input-help").html());
+        }
+
+        $('.popover').remove();
+
+        var pop = elem.popover({
+            title: title,
+            content: content,
+            //container: 'body',
+            template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
+            '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
+            '</h3><div class="popover-content"><p></p></div></div></div>'
+        });
+
+        pop.popover('show');
+
+
+    });
+
+    $(document).on('mouseout', '.copo-form-group', function () {
+        $(this).removeClass("copo-form-control-focus");
+
+        $('.popover').remove();
+    });
 } //end of func
 
 function get_spinner_image() {
