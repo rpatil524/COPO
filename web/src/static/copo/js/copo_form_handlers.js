@@ -66,6 +66,8 @@ $(document).ready(function () {
                     contentType: false,
                     dataType: 'json'
                 }).done(function (e) {
+                    // add mongo id to document data
+                    $(document).data('mongo_id', e._id)
                     $('#annotation_table_wrapper').hide()
                     $('#annotation_content').show()
 

@@ -195,8 +195,7 @@ class Annotation(DAComponent):
         })
         return doc['annotation']
 
-
-    def update_annotation(self, document_id, annotation_id, fields, delete = False):
+    def update_annotation(self, document_id, annotation_id, fields, delete=False):
         # first remove element
         self.get_collection_handle().update(
             {
@@ -217,7 +216,7 @@ class Annotation(DAComponent):
                     '_id': ObjectId(document_id)
                 },
                 {
-                    '$push':{'annotation': fields}
+                    '$push': {'annotation': fields}
                 }
             )
             return fields
@@ -228,7 +227,7 @@ class Annotation(DAComponent):
         self.get_collection_handle().update(
             {'_id': ObjectId(id)},
             {'$push':
-                 {'annotation': fields}
+                 {'annotation': fields }
              }
         )
         return fields

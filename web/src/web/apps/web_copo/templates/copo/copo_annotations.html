@@ -108,6 +108,9 @@
     </div><!-- /.modal -->
 
 
+
+
+
 {% endblock %}
 
 {% block help_section %}
@@ -147,13 +150,12 @@
                     Type in the box below to see possible ontological descriptors for the column selected.
                     <h3 class="h3">Selected Column:&nbsp <span class="label label-primary" id="selected_column_name">None Selected</span>
                     </h3>
+                    <div class="ajax_loading_div pull-right">
+                        <img src="{% static 'copo/img/preload.gif' %}" class="ajax_loading_img"/> Saving ...
+                    </div>
                     <input type="text" class="form-control ontology-field form-control-file" id="an-column"
                            aria-describedby="fileHelp" data-autocomplete="/copo/ajax_search_ontology/999/"/>
 
-                    <a id="save_ss_annotation" class="btn btn-sm btn-default pull-right p-3">
-
-                        Save
-                    </a>
 
                 </div>
 
@@ -169,22 +171,12 @@
                             <th>Column</th>
                             <th>Annotation</th>
                             <th>Ontology</th>
+                            <th>Reference</th>
                             <th></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>rs1800497</td>
-                            <td>Human</td>
-                            <td>idomal</td>
-                            <td><i class="fa fa-minus-square" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>rs987765</td>
-                            <td>Coooo</td>
-                            <td>Poooooo</td>
-                            <td><i class="fa fa-minus-square" aria-hidden="true"></i></td>
-                        </tr>
+
                         </tbody>
                     </table>
 

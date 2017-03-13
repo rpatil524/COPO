@@ -113,3 +113,15 @@ def handle_upload(request):
         print('cannot find temp file to delete.....no worries')
 
     return HttpResponse(j.dumps(out))
+
+def save_ss_annotation(request):
+    document_id = request.POST.get('document_id')
+    column_header = request.POST.get('column_header')
+    annotation_value = request.POST.get('annotation_value')
+    term_source = request.POST.get('term_source')
+    term_accession = request.POST.get('term_accession')
+
+    fields = {'column_header': column_header, 'annotation_value': annotation_value, 'term_source': term_source, 'term_accession': term_accession}
+    Annotation().add_to_annotation(id=document_id, fields=fields)
+
+    return HttpResponse(document_id)

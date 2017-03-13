@@ -52,8 +52,10 @@ td.table-header-labeled {
     background-color: #f2f2f2 !important;
 }
 
-.current{
-
+.labelledColumnClass{
+    background-color: #ecf9ec !important;
+    color: #FF4EA4 !important;
+    font-weight: lighter;
 }
 
 .currentHeaderClass{
@@ -65,4 +67,21 @@ td.table-header-labeled {
     margin: 5px 10px 5px 0;
 }
 
+.delete_annotation{
+    cursor: pointer
+}
 
+.panel-body{
+    padding: 10px !important;
+}
+
+.ajax_loading_div{
+    width: 150px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.ajax_loading_img{
+    width: 44px;
+    margin-right: 20px
+}

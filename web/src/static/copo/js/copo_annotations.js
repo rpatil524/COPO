@@ -20,16 +20,18 @@ $(document).ready(function () {
 
     $(document).on('click', '#tips_button', show_help)
     $(document).on('click', '#annotate_button', show_controls)
-    $(document).on('click', '.fa-minus-square', delete_from_annotations_table)
+    $(document).on('click', '.fa-minus-square', delete_annotation)
     $(document).on('mouseenter', '#annotations_table tbody tr', mouseenter_annotation)
         .on('mouseleave', '#annotations_table tbody tr', mouseleave_annotation)
     $(document).on('click', '.dropdown-menu li a', function () {
         $('#file_type_dropdown').val($(this).text())
         $('#file_type_dropdown_label').html($(this).text());
     });
-    $(document).on('click', '#save_ss_annotation', function () {
-        save_annotation()
+    $(document).on('click', '.delete_annotation', function () {
+        delete_annotation()
     })
+
+    $('.ajax_loading_div').css('visibility', 'hidden')
 
 
     //******************************Event Handlers Block*************************//
@@ -59,45 +61,45 @@ $(document).ready(function () {
     });
 
 
-    //event handler for resolving doi and pubmed
-    $('.resolver-submit').on('click', function (event) {
-        var elem = $($(event.target)).parent().parent().find(".resolver-data");
+    /*//event handler for resolving doi and pubmed
+     $('.resolver-submit').on('click', function (event) {
+     var elem = $($(event.target)).parent().parent().find(".resolver-data");
 
-        var idHandle = elem.val();
+     var idHandle = elem.val();
 
-        idHandle = idHandle.replace(/^\s+|\s+$/g, '');
+     idHandle = idHandle.replace(/^\s+|\s+$/g, '');
 
-        if (idHandle.length == 0) {
-            return false;
-        }
+     if (idHandle.length == 0) {
+     return false;
+     }
 
-        $("#doiLoader").html("<div style='text-align: center'><i class='fa fa-spinner fa-pulse fa-2x'></i></div>");
+     $("#doiLoader").html("<div style='text-align: center'><i class='fa fa-spinner fa-pulse fa-2x'></i></div>");
 
-        var idType = elem.attr("data-resolver");
+     var idType = elem.attr("data-resolver");
 
-        //reset input field to placeholder
-        elem.val("");
+     //reset input field to placeholder
+     elem.val("");
 
-        $.ajax({
-            url: copoFormsURL,
-            type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
-            data: {
-                'task': 'doi',
-                'component': component,
-                'id_handle': idHandle,
-                'id_type': idType
-            },
-            success: function (data) {
-                json2HtmlForm(data);
-                $("#doiLoader").html("");
-            },
-            error: function () {
-                $("#doiLoader").html("");
-                alert("Couldn't resolve resource handle!");
-            }
-        });
-    });
+     $.ajax({
+     url: copoFormsURL,
+     type: "POST",
+     headers: {'X-CSRFToken': csrftoken},
+     data: {
+     'task': 'doi',
+     'component': component,
+     'id_handle': idHandle,
+     'id_type': idType
+     },
+     success: function (data) {
+     json2HtmlForm(data);
+     $("#doiLoader").html("");
+     },
+     error: function () {
+     $("#doiLoader").html("");
+     alert("Couldn't resolve resource handle!");
+     }
+     });
+     });*/
 
     // handle/attach events to table buttons
     $('body').on('addbuttonevents', function (event) {
@@ -122,7 +124,7 @@ $(document).ready(function () {
 
         if (taskTarget == 'row') {
             ids = [elem.attr('data-record-id')];
-            console.log(elem.target)
+
         } else if (taskTarget == 'rows') {
             //get reference to table, and retrieve selected rows
             if ($.fn.dataTable.isDataTable('#' + tableID)) {
@@ -137,7 +139,7 @@ $(document).ready(function () {
         //handle button actions
         if (ids.length > 0) {
             if (task == "edit") {
-                $.ajax({
+                var request = $.ajax({
                     url: annotationURL,
                     type: "POST",
                     headers: {'X-CSRFToken': csrftoken},
@@ -146,23 +148,24 @@ $(document).ready(function () {
                         'task': 'form',
                         'component': component,
                         'target_id': ids[0] //only allowing row action for edit, hence first record taken as target
-                    },
-                    success: function (e) {
-                        $('#annotation_table_wrapper').hide();
-
-                        if (e.type == 'Spreadsheet') {
-                            $(document).data('annotator_type', 'ss')
-                            load_ss_data(e)
-                        }
-                        else {
-                            $(document).data('annotator_type', 'txt')
-                            load_txt_data(e)
-                        }
-                        $('#file_picker_modal').modal('hide');
-                    },
-                    error: function () {
-                        alert("Error loading table data");
                     }
+                })
+                request.done(function (e) {
+                    $(document).data('mongo_id', e._id.$oid)
+                    $('#annotation_table_wrapper').hide();
+
+                    if (e.type == 'Spreadsheet') {
+                        $(document).data('annotator_type', 'ss')
+                        load_ss_data(e)
+                    }
+                    else {
+                        $(document).data('annotator_type', 'txt')
+                        load_txt_data(e)
+                    }
+                    $('#file_picker_modal').modal('hide');
+                });
+                request.fail(function (jqXHR, textStatus) {
+                    alert("Request failed: " + textStatus);
                 });
             } else if (task == "delete") { //handles delete, allows multiple row delete
                 var deleteParams = {component: component, target_ids: ids};
@@ -176,15 +179,18 @@ $(document).ready(function () {
 // global variable for selected cell
 cell;
 
+
 function show_help() {
     $('#annotation_panel').hide()
     $('#help_tips').show()
 }
 
+
 function show_controls() {
     $('#help_tips').hide()
     $('#annotation_panel').show()
 }
+
 
 function setup_annotator(element) {
 
@@ -225,8 +231,8 @@ function load_txt_data(e) {
     $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
 }
 
-function load_ss_data(e) {
 
+function load_ss_data(e) {
 
     var data = JSON.parse(e.raw)
     $('#annotation_content').empty()
@@ -253,6 +259,15 @@ function load_ss_data(e) {
     });
     $(document).data('hot', hot)
     $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
+
+    // clear annotations table and populate with annotations
+    var doc_id = $(document).data('mongo_id')
+    $.get('/api/search/', {'document_id': doc_id}, $.noop(), 'json')
+        .done(function (d) {
+            $(d.rows).each(function (idx, element) {
+                add_line_to_annotation_table(element)
+            })
+        })
 }
 
 
@@ -262,6 +277,7 @@ function _beforeOnCellMouseDown(event, coords, element) {
     }
 }
 
+
 function _columnHeaderClickHandler(changes, sources) {
     show_controls()
     var hot = $(document).data('hot')
@@ -269,64 +285,120 @@ function _columnHeaderClickHandler(changes, sources) {
     $('#selected_column_name').html(d)
 }
 
+
 function _afterSelection(row, col, row2, col2) {
     // color column
     $(document).data('selected_col', col)
     cell = hot.getCell(0, col)
     $('.currentColClass').removeClass('currentColClass')
+    $('.currentHeaderClass').removeClass('currentHeaderClass')
     $(cell).addClass('currentHeaderClass')
     $('#annotation_content .htCore tr > td:nth-child(' + (parseInt(col) + 1) + ')').addClass('currentColClass')
 
     cell = hot.getCell(row, col)
 }
 
+
 function append_to_annotation_list(item) {
+    if ($('.selected_column_name').html() == 'None Selected') {
+        return false
+    }
+    $('.ajax_loading_div').css('visibility', 'visible')
     $('#annotator-field-0').val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
+
     // we are dealing with a spreadsheet so need to add ref to cell data item
     var annotation_value = $(item).data('annotation_value');
     var term_source = $(item).data('term_source');
     var term_accession = $(item).data('term_accession');
-    $(cell).data('annotation_value', annotation_value);
-    $(cell).data('termSource', term_source);
-    $(cell).data('termAccession', term_accession);
+    var column_header = $('#selected_column_name').html()
+
 
     // add colouring to column to show it has been labelled
     var col = $(document).data('selected_col')
-    $('.ht_core tr:nth-child(col) > td').css('background-color', 'red')
-    $(cell).addClass('table-header-labeled');
+    $('.currentColClass').removeClass('currentColClass')
+    $('.currentHeaderClass').removeClass('currentHeaderClass')
+    var count = "" + (parseInt(col) + 1)
+    $('#annotation_content .htCore tr > td:nth-child(' + count + ')').addClass('labelledColumnClass');
 
-    // add div to panel showing annotation
+
+    // send request to backend to save annotation
+    var csrftoken = $.cookie('csrftoken');
+    var document_id = $(document).data('mongo_id')
+
+    $.ajax({
+        url: '/rest/save_ss_annotation',
+        type: 'post',
+        headers: {
+            'X-CSRFToken': csrftoken,
+        },
+        data: {
+            'document_id': document_id,
+            'column_header': column_header,
+            'annotation_value': annotation_value,
+            'term_source': term_source,
+            'term_accession': term_accession
+        }
+    }).done(function (d) {
+        var line_data = {
+            'annotation_value': annotation_value,
+            'term_source': term_source,
+            'term_accession': term_accession,
+            'column_header': column_header
+        }
+        // add div to panel showing annotation
+        add_line_to_annotation_table(line_data)
+    })
+}
+
+function add_line_to_annotation_table(line_data) {
     var tr = $("<tr>");
-
-    var t_value = $("<td>");
-    t_value.append(annotation_value);
+    var t_header_name = $("<td>");
+    t_header_name.append(line_data.column_header);
+    var t_annotation_value = $("<td>");
+    t_annotation_value.append(line_data.annotation_value);
     var t_source = $("<td>");
-    t_source.append(term_source);
-    var t_accession = $("<td>");
-    t_accession.append(term_accession);
-    var t_delete = $("<td>")
+    t_source.append(line_data.term_source);
+    var t_reference = $("<td>");
+    t_reference.append(line_data.term_accession);
+    var t_delete = $("<td>", {
+        "class": "delete_annotation"
+    })
     t_delete.append('<i class="fa fa-minus-square" aria-hidden="true"></i>')
-    $(tr).append(t_value).append(t_source).append(t_accession).append(t_delete)
-    $(tr).data('attached_cell', cell)
+    $(tr).append(t_header_name).append(t_annotation_value).append(t_source).append(t_reference).append(t_delete)
+
+    if (typeof cell !== 'undefined') {
+        $(tr).data('attached_cell', cell)
+    }
+    else {
+        //iterate through table columns to find correct cell to attach
+        var c;
+        for (var i = 0; i < hot.countCols(); i++) {
+            c = hot.getDataAtCell(0, i);
+            if (c == line_data.column_header) {
+                console.log('found cell')
+                $(tr).data('attached_cell', hot.getCell(0, i))
+            }
+        }
+    }
+
+
     $('#annotations_table tbody').append(tr)
+    $('.ajax_loading_div').css('visibility', 'hidden')
 }
 
 
-function save_annotation() {
-    console.log($(cell).data('annotation_value'))
-    console.log($(cell).data('termSource'))
-    console.log($(cell).data('termAccession'))
-
-}
-
-
-function delete_from_annotations_table(e) {
+function delete_annotation(e) {
     var tr = $(e.currentTarget).closest('tr')
     var cell = $(tr).data('attached_cell')
+    var hot = $(document).data('hot')
+    var col = parseInt(hot.getCoords(cell).col + 1)
+
+    $('#annotation_content .htCore tr > td:nth-child(' + col + ')').removeClass('labelledColumnClass');
     $(cell).removeClass('table-header-labeled')
     $(cell).css({'background-color': '', 'color': ''})
     tr.remove()
 }
+
 
 function mouseenter_annotation(e) {
     // get attached cell
@@ -340,6 +412,7 @@ function mouseenter_annotation(e) {
     $(e.currentTarget).addClass('annotation_mouseover')
 }
 
+
 function mouseleave_annotation(e) {
     var cell = $(e.currentTarget).data('attached_cell')
     try {
@@ -350,3 +423,5 @@ function mouseleave_annotation(e) {
     }
     $(e.currentTarget).removeClass('annotation_mouseover')
 }
+
+
