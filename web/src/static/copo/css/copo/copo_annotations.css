@@ -44,7 +44,7 @@ td.table-header-labeled {
 }
 
 .annotation_mouseover {
-    background-color: rgba(123, 187, 232, 1);
+    background-color: #8cd98c !important;
     color: white;
 }
 
@@ -54,8 +54,13 @@ td.table-header-labeled {
 
 .labelledColumnClass{
     background-color: #ecf9ec !important;
-    color: #FF4EA4 !important;
-    font-weight: lighter;
+    color: dimgrey !important;
+    font-weight: bolder;
+}
+
+.highlightedColumnClass{
+    background-color: #8cd98c !important;
+    color: white !important;
 }
 
 .currentHeaderClass{

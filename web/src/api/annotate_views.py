@@ -31,15 +31,7 @@ def post_annotations(request):
         quote = data.pop('quote')
         data['text'] = quote
 
-    if request.method == "DELETE":
-        # DELETE ANNOTATION
-        annotation_id = data.pop('id')
-        r = Annotation().update_annotation(document_id, annotation_id, {}, True)
-        response = HttpResponse('')
-        response.content = ''
-        response.status_code = 204
-        return response
-    elif 'id' in data:
+    if 'id' in data:
         # EDIT ANNOTATION
         annotation_id = data.pop('id')
         r = Annotation().update_annotation(document_id, annotation_id, data)
@@ -122,6 +114,20 @@ def save_ss_annotation(request):
     term_accession = request.POST.get('term_accession')
 
     fields = {'column_header': column_header, 'annotation_value': annotation_value, 'term_source': term_source, 'term_accession': term_accession}
-    Annotation().add_to_annotation(id=document_id, fields=fields)
+    annotation_id = Annotation().add_to_annotation(id=document_id, fields=fields)
 
-    return HttpResponse(document_id)
+    return HttpResponse(annotation_id)
+
+def delete_ss_annotation(request):
+    # DELETE ANNOTATION
+    annotation_id = request.POST.get('annotation_id')
+    document_id = request.POST.get('document_id')
+    r = Annotation().update_annotation(document_id, annotation_id, {}, True)
+    out = dict()
+    if r == '':
+        out['deleted'] = True
+
+    else:
+        out['deleted'] = False
+
+    return HttpResponse(json.dumps(out))
