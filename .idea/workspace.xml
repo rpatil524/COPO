@@ -3,12 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/api/annotate_views.py" afterPath="$PROJECT_DIR$/web/src/api/annotate_views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/dal/copo_da.py" afterPath="$PROJECT_DIR$/web/src/dal/copo_da.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/css/copo/copo_annotations.css" afterPath="$PROJECT_DIR$/web/src/static/copo/css/copo/copo_annotations.css" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_annotations.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_annotations.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/rest_urls.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/rest_urls.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -122,8 +117,8 @@
       <file leaf-file-name="copo_annotations.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_annotations.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="237" column="0" lean-forward="true" selection-start-line="237" selection-start-column="0" selection-end-line="237" selection-end-column="0" />
+            <state relative-caret-position="451">
+              <caret line="390" column="0" lean-forward="true" selection-start-line="390" selection-start-column="0" selection-end-line="390" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -1265,7 +1260,14 @@
       <option name="project" value="LOCAL" />
       <updated>1489424776372</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="replacing of labels now possible">
+      <created>1489597251928</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1489597251928</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1370,7 +1372,8 @@
     <MESSAGE value="update autocomplete to latest version and implement necesary changes" />
     <MESSAGE value="loading of spreadsheets from selected file working" />
     <MESSAGE value="make saving of annotations and reloading with cell referencing work" />
-    <option name="LAST_COMMIT_MESSAGE" value="make saving of annotations and reloading with cell referencing work" />
+    <MESSAGE value="replacing of labels now possible" />
+    <option name="LAST_COMMIT_MESSAGE" value="replacing of labels now possible" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1780,8 +1783,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_annotations.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="237" column="0" lean-forward="true" selection-start-line="237" selection-start-column="0" selection-end-line="237" selection-end-column="0" />
+        <state relative-caret-position="451">
+          <caret line="390" column="0" lean-forward="true" selection-start-line="390" selection-start-column="0" selection-end-line="390" selection-end-column="0" />
           <folding />
         </state>
       </provider>

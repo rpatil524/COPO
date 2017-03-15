@@ -151,6 +151,8 @@ function setup_annotator(element) {
 
 
 function load_txt_data(e) {
+    // load data from pdf
+
     $('#annotation_content').show();
     var initAnnotator = false;
     if (!$.trim($("#annotation_content").html())) {
@@ -167,6 +169,7 @@ function load_txt_data(e) {
 
 
 function load_ss_data(e) {
+    // load data from spreadsheet and initialise handsontable into global variable 'hot'
     var data = JSON.parse(e.raw)
     $('#annotation_content').empty()
     $('#annotation_content').removeAttr("style");
@@ -198,12 +201,14 @@ function load_ss_data(e) {
 }
 
 function _beforeOnCellMouseDown(event, coords, element) {
+    // prevent clicks in the leftmost column doing anything
     if (coords.col == 0) {
         event.stopImmediatePropagation();
     }
 }
 
 function _columnHeaderClickHandler(changes, sources) {
+    // set the selected column
     show_controls()
     var hot = $(document).data('hot')
     var d = hot.getDataAtCell(0, sources.col)
@@ -222,6 +227,7 @@ function _afterSelection(row, col, row2, col2) {
 }
 
 function append_to_annotation_list(item) {
+    // this function is called from generic_handlers.js and is fired when an annotation from OLS is selected
     var selected_column_text = $('#selected_column_name').html()
     if (selected_column_text == 'None Selected') {
         return false
@@ -275,6 +281,7 @@ function append_to_annotation_list(item) {
 }
 
 function add_line_to_annotation_table(line_data) {
+    // this function updates the list of annotation on the page
     var tr = $("<tr>");
     var t_header_name = $("<td>");
     t_header_name.append(line_data.column_header);
@@ -293,7 +300,7 @@ function add_line_to_annotation_table(line_data) {
         $(tr).data('attached_cell', cell)
     }
     else {
-        //iterate through table columns to find correct cell to attach
+        //iterate through table columns to find correct cell to mouseover matching colors to column
         var c;
         for (var i = 0; i < hot.countCols(); i++) {
             c = hot.getDataAtCell(0, i);
@@ -311,6 +318,7 @@ function add_line_to_annotation_table(line_data) {
 
 
 function delete_annotation(e, replacement) {
+    // function called when delete button is clicked on annotation list
     var tr;
     if ('currentTarget' in e){
         tr = $(e.currentTarget).closest('tr')
@@ -336,10 +344,12 @@ function delete_annotation(e, replacement) {
     }).done(function (d) {
         if (d.deleted = true) {
             if (typeof replacement == 'undefined') {
+                // if the annotation was simply deleted then change the column highlighting back to default state
                 $('#annotation_content .htCore tr > td:nth-child(' + col + ')').removeClass('highlightedColumnClass').removeClass('labelledColumnClass');
                 $(cell).removeClass('table-header-labeled')
                 $(cell).css({'background-color': '', 'color': ''})
             }
+            // if the deleteion was a delete and replace, leave colouring the same, just delete the row from the annotation list
             tr.remove()
         }
         else {
@@ -349,6 +359,8 @@ function delete_annotation(e, replacement) {
 }
 
 
+
+//these two functions deal with hover colour matching so the user knows which column an annotation refers to
 function mouseenter_annotation(e) {
     // get attached cell
     var cell = $(e.currentTarget).data('attached_cell')
@@ -362,8 +374,6 @@ function mouseenter_annotation(e) {
     }
     $(e.currentTarget).addClass('annotation_mouseover')
 }
-
-
 function mouseleave_annotation(e) {
     var cell = $(e.currentTarget).data('attached_cell')
     var col_idx = hot.getCoords(cell).col
