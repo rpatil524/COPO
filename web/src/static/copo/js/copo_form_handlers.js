@@ -520,6 +520,14 @@ function set_validation_markers(formElem, ctrl) {
         errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
     }
 
+    //characteristic marker
+    if (formElem.hasOwnProperty("unit") && (formElem.unit.toString() == "true")) {
+        ctrl.attr("data-unit", "unit");
+        ctrl.attr('data-unit-error', "A value is required");
+
+        errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
+    }
+
     validationMarkers['errorHelpDiv'] = errorHelpDiv;
     validationMarkers['ctrl'] = ctrl;
 
@@ -718,7 +726,7 @@ var dispatchFormControl = {
     },
     do_copo_duration_ctrl: function (formElem, elemValue) {
 
-        var durationSchema = copoSchemas[formElem.control];
+        var durationSchema = copoSchemas[formElem.control.toLowerCase()];
 
         var ctrlsDiv = $('<div/>',
             {
@@ -766,8 +774,7 @@ var dispatchFormControl = {
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
     do_copo_characteristics_ctrl: function (formElem, elemValue) {
-
-        var workingSchema = copoSchemas[formElem.control];
+        var workingSchema = copoSchemas[formElem.control.toLowerCase()];
 
         var ctrlsDiv = $('<div/>',
             {
@@ -811,6 +818,15 @@ var dispatchFormControl = {
                     //set placeholder text
                     if ($(this).hasClass("ontology-field")) {
                         $(this).attr("placeholder", workingSchema[i].label);
+
+                        //gather validation information
+                        if (workingSchema[i].hasOwnProperty("validation_target") && (workingSchema[i].validation_target.toString() == "true")) {
+                            $(this).addClass("copo-validation-target");
+                        }
+
+                        if (workingSchema[i].hasOwnProperty("validation_source") && (workingSchema[i].validation_source.toString() == "true")) {
+                            $(this).addClass("copo-validation-source");
+                        }
                     }
 
                 });
@@ -827,10 +843,26 @@ var dispatchFormControl = {
             }
         }
 
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        var returnComponent = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+
+
+        //validation markers
+        // formElem["unit"] = "true";
+        // returnComponent.find(".ctrlDIV").each(function () {
+        //     if ($(this).find(".copo-validation-source").length && $(this).find(".copo-validation-target").length) {
+        //         var valTargetId = $(this).find(".copo-validation-target").first().attr("id");
+        //         var valSource = $(this).find(".copo-validation-source").first();
+        //         valSource.attr("data-val-target", valTargetId);
+        //
+        //         var vM = set_validation_markers(formElem, valSource);
+        //         $(this).append(vM.errorHelpDiv);
+        //     }
+        // });
+
+        return returnComponent
     },
     do_copo_comment_ctrl: function (formElem, elemValue) {
-        var commentSchema = copoSchemas[formElem.control];
+        var commentSchema = copoSchemas[formElem.control.toLowerCase()];
 
         var ctrlsDiv = $('<div/>',
             {
@@ -1550,6 +1582,7 @@ function form_help_ctrl(tip) {
 function form_div_ctrl() {
     return $('<div/>',
         {
+            style: "padding-bottom:5px;",
             class: "form-group copo-form-group",
             tabindex: -1
         });
@@ -1741,8 +1774,35 @@ function resolve_ctrl_values_aux_1(ctrlObjectID, formElem, elemValue) {
     return embedValue;
 }
 
+function get_basic_input(sp, formElem) {
+    var fv = formElem.id.split(".").slice(-1)[0];
+
+    var input = ($('<input/>',
+        {
+            type: "text",
+            placeholder: formElem.placeholder,
+            id: fv,
+            name: fv,
+            class: 'form-control'
+        }));
+    if (sp) {
+        $(sp).append(input)
+        return sp
+    }
+    return input
+}
+
+function get_basic_label(sp, formElem) {
+    var fv = formElem.id.split(".").slice(-1)[0];
+    var label = $('<label/>',
+        {
+            for: fv
+        }).html(formElem.label)
+    return label
+}
+
 function get_ontology_span(ontologySpan, formElem) {
-    var ontologySchema = copoSchemas[formElem.control];
+    var ontologySchema = copoSchemas[formElem.control.toLowerCase()];
 
     for (var i = 0; i < ontologySchema.length; ++i) {
         var fv = ontologySchema[i].id.split(".").slice(-1)[0];
@@ -1900,6 +1960,21 @@ function custom_validate(formObject) {
                 var newValue = $el.val().trim();
 
                 var oKFlag = re.test(newValue);
+
+                if (!oKFlag) {
+                    return "Not valid!";
+                }
+            },
+            unit: function ($el) {
+                //validates for copo-characteristics special case
+                var newValue = $el.val().trim();
+
+                console.log(newValue);
+
+                var oKFlag = (1==2);
+                // if(!newValue) {
+                //    oKFlag = false;
+                // }
 
                 if (!oKFlag) {
                     return "Not valid!";

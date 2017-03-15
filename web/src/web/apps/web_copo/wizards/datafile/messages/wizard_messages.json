@@ -133,7 +133,7 @@
       "text_class": "text-info"
     },
     "singular_stage_message": {
-      "text": "Please be aware that all the items in the description bundle will be assigned the same metadata in this stage: the 'apply to all' button is disabled in this stage to emphasise this.  Click <b>Next</b>, when done, to proceed.",
+      "text": "Please be aware that all the items in the description bundle will be assigned the same metadata in this stage.  Click <b>Next</b>, when done, to proceed.",
       "text_class": "text-info"
     },
     "unselected_bundle_items_message": {

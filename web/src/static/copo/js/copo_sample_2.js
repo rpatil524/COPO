@@ -33,7 +33,8 @@ $(document).ready(function () {
         //on the fly info element
         var onTheFlyElem = $("#copo_instant_info");
 
-        var sampleHelpTable = "sample_help_table"; //help pane table handle
+        //help table
+        var pageHelpTable = "sample_help_table"; //help pane table handle
 
         //handle hover info for copo-select control types
 
@@ -62,10 +63,10 @@ $(document).ready(function () {
         $('#sample-display-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
             var componentSelected = $(event.target).attr("data-component"); // active tab
 
-            $("#copoSampleHelp").find(".component-help").removeClass("disabled");
-            $("#copoSampleHelp").find(".component-help[data-component='" + componentSelected + "']").addClass("disabled");
+            $("#sampleHelpSection").find(".component-help").removeClass("disabled");
+            $("#sampleHelpSection").find(".component-help[data-component='" + componentSelected + "']").addClass("disabled");
 
-            set_component_help($(this).attr("data-component"), sampleHelpTable, sampleHowtos);
+            set_component_help($(this).attr("data-component"), pageHelpTable, sampleHowtos);
 
             //check for temp data
             if (componentSelected == "descriptionWizardComponent" && tempWizStore) {
@@ -79,7 +80,7 @@ $(document).ready(function () {
             $(this).closest("ul").find(".component-help").removeClass("disabled");
             $(this).addClass("disabled");
 
-            set_component_help($(this).attr("data-component"), sampleHelpTable, sampleHowtos);
+            set_component_help($(this).attr("data-component"), pageHelpTable, sampleHowtos);
         });
 
         //handle add sample button
@@ -134,8 +135,8 @@ $(document).ready(function () {
             },
             success: function (data) {
                 sampleHowtos = data.help_messages;
-                build_help_pane_menu(sampleHowtos, $("#copoSampleHelp").find(".componentHelpList"));
-                set_component_help('', sampleHelpTable, sampleHowtos);
+                build_help_pane_menu(sampleHowtos, $("#sampleHelpSection").find(".componentHelpList"));
+                set_component_help('', pageHelpTable, sampleHowtos);
                 helpLoader.remove();
             },
             error: function () {

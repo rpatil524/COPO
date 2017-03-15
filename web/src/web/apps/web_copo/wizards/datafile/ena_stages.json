@@ -47,6 +47,7 @@
           "hidden": "false",
           "required": "true",
           "control": "copo-multi-search",
+          "option_component": "sample",
           "data_maxItems": 1,
           "default_value": "",
           "option_values": {

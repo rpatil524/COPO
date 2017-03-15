@@ -13,6 +13,7 @@
           "label": "Samples",
           "hidden": "false",
           "control": "copo-multi-search",
+          "option_component": "sample",
           "default_value": "",
           "option_values": {
             "callback": {

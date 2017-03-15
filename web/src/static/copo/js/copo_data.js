@@ -1,5 +1,5 @@
 var wizardMessages;
-var datafilesHowtos = null;
+var datafileHowtos = null;
 var currentIndx = 0;
 var descriptionBundle = [];
 var descriptionToken = null;
@@ -16,6 +16,7 @@ var setStageIndx = null; //moves the wizard to stage index specified
 $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
 
+    var csrftoken = $.cookie('csrftoken');
     var component = "datafile";
     var wizardURL = "/rest/data_wiz/";
     var copoFormsURL = "/copo/copo_forms/";
@@ -24,63 +25,64 @@ $(document).ready(function () {
     //test
     //end test
 
+
+    //on the fly info element
+    var onTheFlyElem = $("#copo_instant_info");
+
+    //help table
+    var pageHelpTable = "datafile_help_table"; //help pane table handle
+
+    //handle hover info for copo-select control types
+
+    $(document).on("mouseenter", ".selectize-dropdown-content .active", function (event) {
+        if ($(this).closest(".copo-multi-search").length) {
+            var recordId = $(this).attr("data-value"); // the id of the hovered-on option
+            var associatedComponent = ""; //the form control with which the event is associated
+
+            //get the associated component
+            var clss = $($(event.target)).closest(".input-copo").attr("class").split(" ");
+            $.each(clss, function (key, val) {
+                var cssSplit = val.split("copo-component-control-");
+                if (cssSplit.length > 1) {
+                    associatedComponent = cssSplit.slice(-1)[0];
+
+                    resolve_element_view(recordId, associatedComponent, $($(event.target)).closest(".input-copo"));
+                    return false;
+                }
+            });
+
+        }
+    });
+
     //handle UID - upload inspect describe - tabs
     $('#copo-datafile-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
-        var x = $(event.target).attr("data-component"); // active tab
-        set_datafiles_howtos(x);
+        var componentSelected = $(event.target).attr("data-component"); // active tab
+
+
+        $("#datafileDataHelp").find(".component-help").removeClass("disabled");
+        $("#datafileDataHelp").find(".component-help[data-component='" + componentSelected + "']").addClass("disabled");
+
+        set_component_help($(this).attr("data-component"), pageHelpTable, datafileHowtos);
 
         //check for temp data
-        if (x == "descriptionWizardComponent" && tempWizStore) {
+        if (componentSelected == "descriptionWizardComponent" && tempWizStore) {
             do_post_stage_retrieval2(tempWizStore);
             tempWizStore = null;
         }
     });
 
-    //handle help context
-    $("#copoDataHelp").find(".component-help").on("click", function (event) {
-        event.preventDefault();
-
-        $("#copoDataHelp").find(".component-help").removeClass("disabled");
-
+    //set help context
+    $(document).on("click", ".component-help", function () {
+        $(this).closest("ul").find(".component-help").removeClass("disabled");
         $(this).addClass("disabled");
 
-        set_datafiles_howtos($(this).attr("data-component"));
+        set_component_help($(this).attr("data-component"), pageHelpTable, datafileHowtos);
     });
 
 
     //handle popover close button
     $(document).on("click", ".popover .copo-close", function () {
         $(this).parents(".popover").popover('destroy');
-    });
-
-    // get table data to display via the DataTables API
-    var loaderObject = $('<div>',
-        {
-            style: 'text-align: center',
-            html: "<span class='fa fa-spinner fa-pulse fa-3x'></span>"
-        });
-
-
-    var tLoader = loaderObject.clone();
-    $("#data_all_data").append(tLoader);
-
-    csrftoken = $.cookie('csrftoken');
-
-    $.ajax({
-        url: copoVisualsURL,
-        type: "POST",
-        headers: {'X-CSRFToken': csrftoken},
-        data: {
-            'task': 'table_data',
-            'component': component
-        },
-        success: function (data) {
-            do_render_table(data);
-            tLoader.remove();
-        },
-        error: function () {
-            alert("Couldn't retrieve data files!");
-        }
     });
 
     //review-to-stage
@@ -154,6 +156,60 @@ $(document).ready(function () {
 
     });
 
+    // get table data to display via the DataTables API
+    var loaderObject = $('<div>',
+        {
+            style: 'text-align: center',
+            html: "<span class='fa fa-spinner fa-pulse fa-3x'></span>"
+        });
+
+
+    // get table data to display via the DataTables API
+    var tLoader = loaderObject.clone();
+    $("#data_all_data").append(tLoader);
+
+    $.ajax({
+        url: copoVisualsURL,
+        type: "POST",
+        headers: {'X-CSRFToken': csrftoken},
+        data: {
+            'task': 'table_data',
+            'component': component
+        },
+        success: function (data) {
+            do_render_table(data);
+            tLoader.remove();
+        },
+        error: function () {
+            alert("Couldn't retrieve datafiles!");
+        }
+    });
+
+    //call for help...
+
+    //loader image for help pane
+    var helpLoader = get_spinner_image();
+    $("#helptipsDiv").append(helpLoader);
+
+    $.ajax({
+        url: copoVisualsURL,
+        type: "POST",
+        headers: {'X-CSRFToken': csrftoken},
+        data: {
+            'task': 'help_messages',
+            'component': component
+        },
+        success: function (data) {
+            datafileHowtos = data.help_messages;
+            build_help_pane_menu(datafileHowtos, $("#datafileDataHelp").find(".componentHelpList"));
+            set_component_help('', pageHelpTable, datafileHowtos);
+            helpLoader.remove();
+        },
+        error: function () {
+            alert("Couldn't retrieve page help!");
+        }
+    });
+
 
     //******************************* wizard events *******************************//
 
@@ -168,8 +224,6 @@ $(document).ready(function () {
         },
         success: function (data) {
             wizardMessages = data.wiz_message;
-            datafilesHowtos = data.wiz_howtos;
-            set_datafiles_howtos("generalHelpTips");
             set_wizard_summary();
         },
         error: function () {
@@ -1177,7 +1231,7 @@ $(document).ready(function () {
         onGoingDescription = false;
 
         //clear stage message on help centre
-        $("#on_the_fly_info").empty();
+        onTheFlyElem.empty();
 
     }
 
@@ -1900,6 +1954,36 @@ $(document).ready(function () {
     } //end of func
 
 
+    function resolve_element_view(recordId, associatedComponent, eventTarget) {
+        //maps form element by id to component type e.g source, sample
+
+        if (associatedComponent == "") {
+            return false;
+        }
+
+        onTheFlyElem.append(get_spinner_image());
+
+        $.ajax({
+            url: copoVisualsURL,
+            type: "POST",
+            headers: {'X-CSRFToken': csrftoken},
+            data: {
+                'task': "attributes_display",
+                'component': associatedComponent,
+                'target_id': recordId
+            },
+            success: function (data) {
+                var gAttrib = build_attributes_display(data)
+                onTheFlyElem.html(gAttrib);
+            },
+            error: function () {
+                onTheFlyElem.html('');
+                onTheFlyElem.append("Couldn't retrieve attributes!");
+            }
+        });
+    }
+
+
     function setup_element_hint() {
         $(":input").focus(function () {
             var elem = $(this).closest(".copo-form-group");
@@ -2433,7 +2517,7 @@ $(document).ready(function () {
         var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
 
         //clear stage message
-        $("#on_the_fly_info").empty();
+        onTheFlyElem.empty();
 
         //get last stage index
         var lastElementIndx = $('.steps li').last().index() + 1;
@@ -2451,7 +2535,33 @@ $(document).ready(function () {
 
         //set stage message
         if (stage_objects && stage_objects[activeStageIndx].hasOwnProperty("message")) {
-            $("#on_the_fly_info").append('<div class="text-default alert alert-warning help-centre-content">' + stage_objects[activeStageIndx].message + '</div>');
+            onTheFlyElem.empty();
+
+            if (stage_objects[activeStageIndx].message) {
+                var attributesPanel = $('<div/>', {
+                    class: "panel panel-info",
+                    style: "margin-top: 5px; font-size: 12px;"
+                });
+
+                var attributesPanelHeading = $('<div/>', {
+                    class: "panel-heading",
+                    style: "background-image: none; font-weight: 600;",
+                    html: " Stage Message [" + stage_objects[activeStageIndx].title + "]"
+                });
+
+                attributesPanel.append(attributesPanelHeading);
+
+
+                var attributesPanelBody = $('<div/>', {
+                    class: "panel-body"
+                });
+
+                attributesPanelBody.append('<span style="line-height: 1.5;">' + stage_objects[activeStageIndx].message + '</span>');
+
+                attributesPanel.append(attributesPanelBody);
+
+                onTheFlyElem.append(attributesPanel);
+            }
         }
 
         //set up data source
@@ -3204,96 +3314,6 @@ $(document).ready(function () {
         }
 
         elem.find(".collapse").collapse('show');
-    }
-
-    function set_datafiles_howtos(component) {
-        if (!datafilesHowtos.hasOwnProperty(component)) {
-            component = "generalHelpTips"; //general help tips
-        }
-
-
-        var dataSet = []; //sampleHowtos[component].properties;
-
-        $.each(datafilesHowtos[component].properties, function (key, val) {
-            var option = {};
-            option["rank"] = key + 1;
-            option["title"] = val.title;
-            option["content"] = val.content;
-            dataSet.push(option);
-        });
-
-
-        //set data
-        var table = null;
-
-        if ($.fn.dataTable.isDataTable('#datafile_howtos')) {
-            //if table instance already exists, then do refresh
-            table = $('#datafile_howtos').DataTable();
-        }
-
-        if (table) {
-            //clear old, set new data
-            table
-                .clear()
-                .draw();
-            table
-                .rows
-                .add(dataSet);
-            table
-                .columns
-                .adjust()
-                .draw();
-            table
-                .search('')
-                .columns()
-                .search('')
-                .draw();
-        } else {
-            table = $('#datafile_howtos').DataTable({
-                data: dataSet,
-                searchHighlight: true,
-                "lengthChange": false,
-                order: [[0, "asc"]],
-                language: {
-                    "info": " _START_ to _END_ of _TOTAL_ help tips",
-                    "lengthMenu": "_MENU_ tips",
-                },
-                columns: [
-                    {
-                        "data": "rank",
-                        "visible": false
-                    },
-                    {
-                        "data": null,
-                        "title": "Tips",
-                        "render": function (data, type, row, meta) {
-                            var aLink = $('<a/>', {
-                                "data-toggle": "collapse",
-                                href: "#helpcentretips" + meta.row,
-                                html: data.title
-                            });
-
-                            var aDiv = $('<div/>', {
-                                "class": "collapse help-centre-content",
-                                id: "helpcentretips" + meta.row,
-                                html: data.content,
-                                style: "background-color: #fff; margin-top: 10px; border-radius: 4px;"
-                            });
-                            return $('<div></div>').append(aLink).append(aDiv).html();
-                        }
-                    },
-                    {
-                        "data": "content",
-                        "visible": false
-                    }
-                ],
-                "columnDefs": [
-                    {"orderData": 0,}
-                ]
-            });
-        }
-
-        $('#datafile_howtos tr:eq(0) th:eq(0)').text(datafilesHowtos[component].title + " Tips");
     }
 
 })//end document ready

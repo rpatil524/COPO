@@ -375,13 +375,13 @@ DROP_DOWNS = {
     ],
     "GROWTH_AREAS": [
         {
+            "value": "growth_chamber_GC",
+            "label": "Growth Chamber"
+        },
+        {
             "value": "greenhouse_rooting",
             "label": "Greenhouse",
             "schema": "miappe_rooting_greenhouse"
-        },
-        {
-            "value": "growth_chamber_GC",
-            "label": "Growth Chamber"
         },
         {
             "label": "Open_Top_Chamber",
@@ -655,7 +655,7 @@ ONTOLOGY_LKUPS = {
 # path to different message configurations across the system
 MESSAGES_LKUPS = {
     'HELP_MESSAGES': {
-        'datafile': os.path.join(RESOLVER['wizards_datafile'], 'messages', 'wizard_messages.json'),
+        'datafile': os.path.join(RESOLVER['lookup'], 'help_messages', 'datafile_help.json'),
         'sample': os.path.join(RESOLVER['lookup'], 'help_messages', 'sample_help.json'),
     },
     'datafile_wizard': os.path.join(RESOLVER['wizards_datafile'], 'messages', 'wizard_messages.json'),

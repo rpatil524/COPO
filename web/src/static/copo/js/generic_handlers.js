@@ -980,7 +980,7 @@ function build_attributes_display(data) {
     }
 
     var attributesPanel = $('<div/>', {
-        class: "panel panel-copo-data panel-default",
+        class: "panel panel-info",
         style: "margin-top: 5px; font-size: 12px;"
     });
 
@@ -1267,7 +1267,7 @@ function set_component_help(helpEntryKey, tableID, helpJSON) {
         helpEntryKey = Object.keys(helpJSON)[0];
     }
 
-    var dataSet = []; //sampleHowtos[component].properties;
+    var dataSet = []; //datafileHowtos[component].properties;
 
     $.each(helpJSON[helpEntryKey].properties, function (key, val) {
         var option = {};

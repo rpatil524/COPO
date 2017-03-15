@@ -3,8 +3,6 @@ __date__ = '21 Nov 2016'
 
 import ast
 import web.apps.web_copo.lookup.lookup as lkup
-from django_tools.middlewares import ThreadLocal
-import web.apps.web_copo.templatetags.html_tags as htags
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 import web.apps.web_copo.wizards.sample.wizard_helper as wizh
 

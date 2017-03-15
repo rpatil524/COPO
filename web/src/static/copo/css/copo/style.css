@@ -1042,8 +1042,8 @@ table.dataTable td.focus {
 
 /*form control focus*/
 .copo-form-control-focus {
-    background-color: rgba(220, 233, 239, 0.5);
-    /*padding: 5px;*/
+    background-color: rgba(220, 233, 239, 0.2);
+    /*padding-bottom: 5px;*/
     border-radius: 4px
 }
 /*end form control focus*/

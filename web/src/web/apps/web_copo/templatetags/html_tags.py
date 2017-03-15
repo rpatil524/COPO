@@ -134,31 +134,24 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
 
             form_schema.append(f)
 
-    # get all records: used in the UI for 'cloning' and other purposes
-    # component_records = generate_component_records(component, profile_id)
-    component_records = list()
-    # if label_dict.get(component, dict()).get("clonable", False):
-    #     component_records = generate_component_records(component, profile_id)
-
     return dict(component_name=component,
                 form_label=label_dict.get(component, dict()).get("label", str()),
                 form_value=form_value,
                 target_id=target_id,
                 form_schema=form_schema,
                 form_message=message_dict,
-                component_records=component_records,
-                clonable=label_dict.get(component, dict()).get("clonable", False),
                 )
 
 
 @register.filter("get_labels")
 def get_labels():
-    label_dict = dict(publication=dict(label="Publication", clonable=False),
-                      person=dict(label="Person", clonable=False),
-                      sample=dict(label="Sample", clonable=False),
-                      source=dict(label="Source", clonable=True),
-                      profile=dict(label="Profile", clonable=False),
-                      annotation=dict(label="Annotation", clonable=False),
+    label_dict = dict(publication=dict(label="Publication"),
+                      person=dict(label="Person"),
+                      sample=dict(label="Sample"),
+                      source=dict(label="Source"),
+                      profile=dict(label="Profile"),
+                      annotation=dict(label="Annotation"),
+                      datafile=dict(label="Datafile"),
                       )
 
     return label_dict
@@ -411,7 +404,6 @@ def get_resolver(data, elem):
     :return:
     """
     func_map = dict()
-    func_map["copo-sample-source"] = resolve_copo_sample_source_data
     func_map["copo-characteristics"] = resolve_copo_characteristics_data
     func_map["copo-environmental-characteristics"] = resolve_environmental_characteristics_data
     func_map["copo-phenotypic-characteristics"] = resolve_phenotypic_characteristics_data
