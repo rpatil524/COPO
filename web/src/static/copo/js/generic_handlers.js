@@ -8,7 +8,6 @@ $(document).ready(function () {
     do_component_navbar($("#nav_component_name").val());
 
 
-
 });
 
 
@@ -414,7 +413,7 @@ function refresh_tool_tips() {
 
 } //end of func
 
-function setup_datepicker(){
+function setup_datepicker() {
     $('.date-picker').datepicker({
         format: "dd/mm/yyyy"
     })
@@ -602,7 +601,6 @@ var auto_complete = function () {
     }, '.ontology-field')
 
     function do_select(item) {
-        console.log('doing select')
         if ($(document).data('annotator_type') == 'txt') {
             $('#annotator-field-0').val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
         }
@@ -618,7 +616,7 @@ var auto_complete = function () {
 
     }
 
-    function do_position(a,b,c){
+    function do_position(a, b, c) {
 
     }
 
@@ -916,14 +914,15 @@ function do_array_display(data) {
                 if (j == 0) {
                     //get all keys, our target is always the first key,
                     // since 'data' is formatted in such a manner to produce objects of one and only one element
-                    var dKeys = Object.keys(data[i][j])
-                    divElement.append(get_attributes_inner_div_1().html(data[i][j][dKeys[0]]));
+                    var dKeys = Object.keys(data[i][j]);
+                    console.log(dKeys);
+                    divElement.append(get_attributes_inner_div_1().html("<span style='font-weight: bold;'>" + dKeys[0] + "</span>: " + data[i][j][dKeys[0]]));
                 } else {
-                    var dKeys = Object.keys(data[i][j])
+                    var dKeys = Object.keys(data[i][j]);
                     // if (data[i][j][dKeys[0]] == '') {
                     //     continue; //don't display entries without a value
                     // }
-                    divElement.append(get_attributes_inner_div().html(data[i][j][dKeys[0]]));
+                    divElement.append(get_attributes_inner_div().html("<span style='font-weight: bold'>" + dKeys[0] + "</span>: " + data[i][j][dKeys[0]]));
                 }
             }
 

@@ -2101,9 +2101,7 @@ $(document).ready(function () {
                 formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
             }
             catch (err) {
-                console.log(control.toLowerCase());
                 formDiv.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + formElem.label + '): Cannot resolve form control!</div>');
-                console.log(err);
             }
 
             //any triggers?

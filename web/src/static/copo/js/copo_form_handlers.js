@@ -123,8 +123,6 @@ var controlsMapping = {
     "copo-characteristics": "do_copo_characteristics_ctrl",
     "copo-environmental-characteristics": "do_copo_characteristics_ctrl",
     "copo-phenotypic-characteristics": "do_copo_characteristics_ctrl",
-    "copo-sample-source": "do_copo_sample_source_ctrl",
-    "copo-sample-source-2": "do_copo_sample_source_ctrl_2",
     "oauth_required": "do_oauth_required",
     "copo-button-list": "do_copo_button_list_ctrl",
     "copo-item-count": "do_copo_item_count_ctrl",
@@ -521,9 +519,9 @@ function set_validation_markers(formElem, ctrl) {
     }
 
     //characteristic marker
-    if (formElem.hasOwnProperty("unit") && (formElem.unit.toString() == "true")) {
-        ctrl.attr("data-unit", "unit");
-        ctrl.attr('data-unit-error', "A value is required");
+    if (formElem.hasOwnProperty("characteristics") && (formElem.characteristics.toString() == "true")) {
+        ctrl.attr("data-characteristics", "characteristics");
+        ctrl.attr('data-characteristics-error', "Invalid value state!");
 
         errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
     }
@@ -778,34 +776,28 @@ var dispatchFormControl = {
 
         var ctrlsDiv = $('<div/>',
             {
-                class: "ctrlDIV"
+                class: "ctrlDIV form-inline row"
             });
 
         for (var i = 0; i < workingSchema.length; ++i) {
-            var mg = "margin-left:5px;";
-            if (i == 0) {
-                mg = '';
-            }
             var fv = formElem.id + "." + workingSchema[i].id.split(".").slice(-1)[0];
 
             if (workingSchema[i].hidden == "false") {
 
-                var dionly = "display: inline-block; ";
+                var sp = $('<div/>',
+                    {
+                        class: "form-group col-sm-4"
+                    });
 
-                if (formElem.hasOwnProperty("_displayOnlyThis")) {
+                if (formElem.hasOwnProperty("_displayOnlyThis") && (workingSchema[i].id.split(".").slice(-1)[0] != formElem["_displayOnlyThis"])) {
                     //note: _displayOnlyThis is a mechanism for hiding some parts of a composite
                     //control that would have ordinarily been displayed on the UI. Its use does not in any way
                     // replace, or serve the purpose of, the html 'hidden' property defined on 'formElem'
 
-                    if (workingSchema[i].id.split(".").slice(-1)[0] != formElem["_displayOnlyThis"]) {
-                        dionly = "display: none; ";
-                    }
-                }
-
-                var sp = $('<span/>',
-                    {
-                        style: dionly + mg
+                    sp.attr({
+                        style: "display: none; "
                     });
+                }
 
                 //get ontology ctrl
                 var ontologyCtrlObject = get_ontology_span(sp, workingSchema[i]);
@@ -828,10 +820,17 @@ var dispatchFormControl = {
                             $(this).addClass("copo-validation-source");
                         }
                     }
-
                 });
 
                 ctrlsDiv.append(ontologyCtrlObject);
+
+                //set validation markers for various special cases
+                if (ctrlsDiv.find(".copo-validation-source").length && ctrlsDiv.find(".copo-validation-target").length) {
+                    formElem["characteristics"] = "true";
+                    var validationSource = ctrlsDiv.find(".copo-validation-source").first();
+                    var vM = set_validation_markers(formElem, validationSource);
+                    ctrlsDiv.find(".form-group").append(vM.errorHelpDiv);
+                }
 
             } else {
                 ctrlsDiv.append($('<input/>',
@@ -843,66 +842,44 @@ var dispatchFormControl = {
             }
         }
 
-        var returnComponent = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-
-
-        //validation markers
-        // formElem["unit"] = "true";
-        // returnComponent.find(".ctrlDIV").each(function () {
-        //     if ($(this).find(".copo-validation-source").length && $(this).find(".copo-validation-target").length) {
-        //         var valTargetId = $(this).find(".copo-validation-target").first().attr("id");
-        //         var valSource = $(this).find(".copo-validation-source").first();
-        //         valSource.attr("data-val-target", valTargetId);
-        //
-        //         var vM = set_validation_markers(formElem, valSource);
-        //         $(this).append(vM.errorHelpDiv);
-        //     }
-        // });
-
-        return returnComponent
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
     do_copo_comment_ctrl: function (formElem, elemValue) {
         var commentSchema = copoSchemas[formElem.control.toLowerCase()];
 
         var ctrlsDiv = $('<div/>',
             {
-                class: "ctrlDIV"
+                class: "ctrlDIV form-inline row"
             });
 
         for (var i = 0; i < commentSchema.length; ++i) {
-            var mg = "margin-left:5px;";
-            if (i == 0) {
-                mg = '';
-            }
-
             var fv = commentSchema[i].id.split(".").slice(-1)[0];
 
             if (commentSchema[i].hidden == "false") {
+                var sp = $('<div/>',
+                    {
+                        class: "form-group col-sm-6"
+                    });
+
+                if (formElem.hasOwnProperty("_displayOnlyThis") && (fv != formElem["_displayOnlyThis"])) {
+                    //note: _displayOnlyThis is a mechanism for hiding some parts of a composite
+                    //control that would have ordinarily been displayed on the UI. Its use does not in any way
+                    // replace, or serve the purpose of, the html 'hidden' property defined on 'formElem'
+
+                    sp.attr({
+                        style: "display: none; "
+                    });
+                }
+
+
                 var txt = $('<textarea/>',
                     {
                         class: "form-control copo-comment-control",
                         rows: 2,
-                        cols: 30,
+                        cols: 35,
                         placeholder: commentSchema[i].label.toLowerCase(),
                         id: formElem.id + '.' + fv,
                         name: formElem.id + '.' + fv
-                    });
-
-                var dionly = "display: inline-block; ";
-
-                if (formElem.hasOwnProperty("_displayOnlyThis")) {
-                    //note: _displayOnlyThis is a soft mechanism for hiding some parts of a composite
-                    //control that would have ordinarily been displayed on the UI. Its use does not in any way
-                    // replace or serve the purpose of the html 'hidden' property defined on 'formElem'
-
-                    if (fv != formElem["_displayOnlyThis"]) {
-                        dionly = "display: none; ";
-                    }
-                }
-
-                var sp = $('<span/>',
-                    {
-                        style: dionly + mg
                     });
 
                 sp.append(txt);
@@ -1621,6 +1598,7 @@ function do_array_ctrls(ctrlsDiv, counter, formElem) {
                 get_element_clone(ctrlsDiv, counter).insertBefore(addbtnDiv);
 
                 //refresh controls
+                refresh_validator($(this).closest("form"));
                 refresh_tool_tips();
             }
         });
@@ -1664,7 +1642,6 @@ function get_element_clone(ctrlsDiv, counter) {
         });
 
     delDiv.append(delBtn);
-
     cloneDiv.append(ctrlClone).append(delDiv);
 
     return cloneDiv
@@ -1924,7 +1901,7 @@ function custom_validate(formObject) {
             },
             batch: function ($el) {
                 //validates for batch unique fields, where the test focuses on siblings of the target element
-                //with a common family name
+                //having a common family name
 
                 var uniqueArray = [];
 
@@ -1965,16 +1942,30 @@ function custom_validate(formObject) {
                     return "Not valid!";
                 }
             },
-            unit: function ($el) {
-                //validates for copo-characteristics special case
-                var newValue = $el.val().trim();
+            characteristics: function ($el) {
+                //validates for copo-characteristics specific case: using value to validate unit
+                var validationSource = $el;
 
-                console.log(newValue);
+                var oKFlag = true;
 
-                var oKFlag = (1==2);
-                // if(!newValue) {
-                //    oKFlag = false;
-                // }
+                //get validation target
+                var validationTarget = $el.closest(".ctrlDIV").find(".copo-validation-target").first();
+
+                if (validationSource.val().trim().toLowerCase() != "") {
+
+                    //is the validation source value numeric?
+                    if ($.isNumeric(validationSource.val().trim().toLowerCase())) {
+                        if (validationTarget.val().trim().toLowerCase() == "") {
+                            validationSource.attr("data-characteristics-error", "Please assign a value for "+ validationTarget.attr("placeholder") + "!");
+                            oKFlag = false;
+                        }
+                    } else {
+                        if (validationTarget.val().trim().toLowerCase() != "") {
+                            validationSource.attr("data-characteristics-error",  validationTarget.attr("placeholder") + " should be blank!");
+                            oKFlag = false;
+                        }
+                    }
+                }
 
                 if (!oKFlag) {
                     return "Not valid!";

@@ -1040,8 +1040,9 @@ $(document).ready(function () {
                 }
 
                 if (formValue) {
-                    if (formValue[formElem.id]) {
-                        elemValue = formValue[formElem.id];
+                    var elem = formElem.id.split(".").slice(-1)[0];
+                    if (formValue[elem]) {
+                        elemValue = formValue[elem];
                     }
                 }
 
@@ -1053,9 +1054,7 @@ $(document).ready(function () {
                     formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
                 }
                 catch (err) {
-                    console.log(control.toLowerCase());
                     formDiv.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + formElem.label + '): Cannot resolve form control!</div>');
-                    console.log(err);
                 }
 
                 //any triggers?
