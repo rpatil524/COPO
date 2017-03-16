@@ -23,6 +23,7 @@ $(document).ready(function () {
         $('#file_type_dropdown').val($(this).text())
         $('#file_type_dropdown_label').html($(this).text());
     });
+    $(document).on('click', '#annotations_table tbody tr', select_from_annotation_list)
     $(document).on('click', '.delete_annotation', delete_annotation)
     $('.ajax_loading_div').css('visibility', 'hidden')
 
@@ -152,7 +153,6 @@ function setup_annotator(element) {
 
 function load_txt_data(e) {
     // load data from pdf
-
     $('#annotation_content').show();
     var initAnnotator = false;
     if (!$.trim($("#annotation_content").html())) {
@@ -182,10 +182,7 @@ function load_ss_data(e) {
         rowHeaders: false,
         colHeaders: false,
         dropdownMenu: true,
-        //afterInit: _afterInit,
         beforeOnCellMouseDown: _beforeOnCellMouseDown,
-        afterOnCellMouseDown: _columnHeaderClickHandler,
-        //currentColClassName: 'currentColClass',
         afterSelection: _afterSelection,
     });
     $(document).data('hot', hot)
@@ -207,13 +204,6 @@ function _beforeOnCellMouseDown(event, coords, element) {
     }
 }
 
-function _columnHeaderClickHandler(changes, sources) {
-    // set the selected column
-    show_controls()
-    var hot = $(document).data('hot')
-    var d = hot.getDataAtCell(0, sources.col)
-    $('#selected_column_name').html(d)
-}
 
 function _afterSelection(row, col, row2, col2) {
     // color column
@@ -224,6 +214,20 @@ function _afterSelection(row, col, row2, col2) {
     $(cell).addClass('currentHeaderClass')
     $('#annotation_content .htCore tr > td:nth-child(' + (parseInt(col) + 1) + ')').addClass('currentColClass')
     cell = hot.getCell(row, col)
+    var d = hot.getDataAtCell(0, col)
+    $('#selected_column_name').html(d)
+}
+
+function select_from_annotation_list(e) {
+    var t = e.currentTarget
+    var c_h_text = $(t).find('.column_header_cell').html()
+    $('#selected_column_name').html(c_h_text)
+    cell = $(t).data('attached_cell')
+    var coords = hot.getCoords(cell)
+    var col = coords[0]
+    $(document).data('selected_col', col)
+    $('.currentHeaderClass').removeClass('currentHeaderClass')
+    $(cell).addClass('currentHeaderClass')
 }
 
 function append_to_annotation_list(item) {
@@ -232,7 +236,6 @@ function append_to_annotation_list(item) {
     if (selected_column_text == 'None Selected') {
         return false
     }
-
     // check if there is already a label with selectedColumnText
     $('#annotations_table tbody tr').each(function (idx, element) {
         var column_header = $(element).data('column_header')
@@ -241,7 +244,6 @@ function append_to_annotation_list(item) {
             delete_annotation($(element), true)
         }
     })
-
     $('.ajax_loading_div').css('visibility', 'visible')
     $('#annotator-field-0').val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
     // we are dealing with a spreadsheet so need to add ref to cell data item
@@ -284,7 +286,7 @@ function add_line_to_annotation_table(line_data) {
     // this function updates the list of annotation on the page
     var tr = $("<tr>");
     var t_header_name = $("<td>");
-    t_header_name.append(line_data.column_header);
+    t_header_name.append(line_data.column_header).addClass('column_header_cell');
     var t_annotation_value = $("<td>");
     t_annotation_value.append(line_data.annotation_value);
     var t_source = $("<td>");
@@ -297,6 +299,8 @@ function add_line_to_annotation_table(line_data) {
     t_delete.append('<i class="fa fa-minus-square" aria-hidden="true"></i>')
     $(tr).append(t_header_name).append(t_annotation_value).append(t_source).append(t_reference).append(t_delete)
     if (typeof cell !== 'undefined') {
+        var coords = hot.getCoords(cell)
+        cell = hot.getCell(0, coords.col)
         $(tr).data('attached_cell', cell)
     }
     else {
@@ -345,10 +349,12 @@ function delete_annotation(e, replacement) {
         if (d.deleted = true) {
             if (typeof replacement == 'undefined') {
                 // if the annotation was simply deleted then change the column highlighting back to default state
+
                 $('#annotation_content .htCore tr > td:nth-child(' + col + ')').removeClass('highlightedColumnClass').removeClass('labelledColumnClass');
                 $(cell).removeClass('table-header-labeled')
                 $(cell).css({'background-color': '', 'color': ''})
             }
+
             // if the deleteion was a delete and replace, leave colouring the same, just delete the row from the annotation list
             tr.remove()
         }
@@ -357,8 +363,6 @@ function delete_annotation(e, replacement) {
         }
     })
 }
-
-
 
 //these two functions deal with hover colour matching so the user knows which column an annotation refers to
 function mouseenter_annotation(e) {
