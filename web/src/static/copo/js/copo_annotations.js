@@ -4,7 +4,8 @@
 $(document).ready(function () {
 
     //******************************Setup Annotator Specifics*************************//
-
+    hide_controls()
+    show_help()
     $.cookie('document_id', 'undefined', {expires: 1, path: '/',});
     $(document).data('annotator_type', 'txt')
     $(document).ajaxStart(function () {
@@ -98,10 +99,12 @@ $(document).ready(function () {
 
                     if (e.type == 'Spreadsheet') {
                         $(document).data('annotator_type', 'ss')
+                        show_controls()
                         load_ss_data(e)
                     }
                     else {
                         $(document).data('annotator_type', 'txt')
+
                         load_txt_data(e)
                     }
                     $('#file_picker_modal').modal('hide');
@@ -121,13 +124,30 @@ $(document).ready(function () {
 cell;
 
 function show_help() {
-    $('#annotation_panel').hide()
+
     $('#help_tips').show()
 }
 
 function show_controls() {
     $('#help_tips').hide()
     $('#annotation_panel').show()
+    $('#annotation_list').show()
+    auto_complete();
+}
+
+function show_annotation_list(){
+    $('#help_tips').hide()
+    $('#annotation_list').show()
+}
+
+function hide_controls() {
+    $('#annotation_panel').hide()
+    $('#help_tips').hide()
+    $('#annotation_list').hide()
+}
+
+function remove_ss_controls(){
+    $('#annotation_panel').hide()
 }
 
 function setup_annotator(element) {
@@ -143,7 +163,7 @@ function setup_annotator(element) {
         },
     });
     app.start().then(function () {
-        //app.annotations.load();
+        app.annotations.load();
 
     });
     // attach data parameter stating that this page is using annotator, therefore what autocomplete should do

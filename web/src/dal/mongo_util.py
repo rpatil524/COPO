@@ -53,7 +53,7 @@ def convert_text(data):
     # change text to shortform :=: iri
     l = list()
     for r in data:
-        if 'shortform' in r:
-            r['text'] = r['shortform'] + ' :-: ' + r['@id']
+        if 'annotation_value' in r:
+            r['text'] = r['annotation_value'] + ' :-: ' + r['term_accession']
         l.append(r)
     return l

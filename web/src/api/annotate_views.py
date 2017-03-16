@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 import bson.json_util as j
+from bson import ObjectId
 from dal.copo_da import Annotation
 from dal.mongo_util import change_mongo_id_format_to_standard, convert_text
 from django.conf import settings
@@ -24,8 +25,9 @@ def post_annotations(request):
         ref = str.strip(tmp[1])
     else:
         ref = ''
-    data['@id'] = ref
-    data["shortform"] = short
+    data['term_accession'] = ref
+    data["annotation_value"] = short
+    data["term_source"] = 'xxx'
 
     if 'quote' in data:
         quote = data.pop('quote')
@@ -40,14 +42,13 @@ def post_annotations(request):
         r = Annotation().add_to_annotation(document_id, data)
 
     r['id'] = r.pop('_id')
-    r['text'] = r['shortform'] + ' :-: ' + r['@id']
+    r['text'] = r['shortform'] + ' :-: ' + r['term_accession']
 
     return HttpResponse(j.dumps(r))
 
 
 def search_all(request):
-    document_id = request.COOKIES.get('document_id')
-    print(document_id)
+    document_id = ObjectId(request.COOKIES.get('document_id'))
     data = Annotation().get_annotations_for_page(document_id)
     data = change_mongo_id_format_to_standard(data)
     data = convert_text(data)
@@ -114,7 +115,7 @@ def save_ss_annotation(request):
     term_accession = request.POST.get('term_accession')
 
     fields = {'column_header': column_header, 'annotation_value': annotation_value, 'term_source': term_source, 'term_accession': term_accession}
-    annotation_id = Annotation().add_to_annotation(id=document_id, fields=fields)
+    annotation_id = Annotation().add_to_annotation(id=document_id, fields=fields)['_id']
 
     return HttpResponse(annotation_id)
 

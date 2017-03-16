@@ -230,7 +230,7 @@ class Annotation(DAComponent):
                  {'annotation': fields }
              }
         )
-        return fields['_id']
+        return fields
 
     def annotation_exists(self, doc_name, uid):
         return self.get_collection_handle().find({'document_name': {'$regex': "^" + doc_name}}).count() > 0
