@@ -2,6 +2,9 @@
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+SCHEMA_DIR = os.path.join(BASE_DIR, 'web', 'apps', 'web_cop', 'schemas')
+
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/

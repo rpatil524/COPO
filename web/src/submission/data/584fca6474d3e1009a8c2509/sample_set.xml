@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<SAMPLE_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.sample.xsd">
+	<SAMPLE alias="584fca6474d3e1009a8c2509:sample:dd_1481623427_2" broker_name="TGAC" center_name="TGAC">
+		<TITLE>584fca6474d3e1009a8c2509:sample:dd_1481623427_2</TITLE>
+		<SAMPLE_NAME>
+			<TAXON_ID>9598</TAXON_ID>
+			<SCIENTIFIC_NAME>Pan troglodytes</SCIENTIFIC_NAME>
+		</SAMPLE_NAME>
+		<SAMPLE_ATTRIBUTES>
+			<SAMPLE_ATTRIBUTE>
+				<TAG>Source Name</TAG>
+				<VALUE>src-1</VALUE>
+			</SAMPLE_ATTRIBUTE>
+			<SAMPLE_ATTRIBUTE>
+				<TAG>habitat</TAG>
+				<VALUE>Quinault Rain Forest</VALUE>
+			</SAMPLE_ATTRIBUTE>
+			<SAMPLE_ATTRIBUTE>
+				<TAG>Age</TAG>
+				<VALUE>12.0</VALUE>
+				<UNITS>year</UNITS>
+			</SAMPLE_ATTRIBUTE>
+		</SAMPLE_ATTRIBUTES>
+	</SAMPLE>
+</SAMPLE_SET>
+

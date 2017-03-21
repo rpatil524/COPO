@@ -8,8 +8,6 @@ var copoFormsURL = "/copo/copo_forms/";
 var copoVisualsURL = "/copo/copo_visualize/";
 var globalDataBuffer = {};
 var htmlForm = $('<div/>'); //global form div
-var htmlFormSource = $('<div/>'); // form div for source
-var componentRecords = Object(); //components records...used for validation
 var formMode = "add";
 var componentData = null;
 
@@ -48,22 +46,58 @@ $(document).ready(function () {
 
         var errorMsg = "Couldn't build " + component + " form!";
 
-        $.ajax({
-            url: copoFormsURL,
-            type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
-            data: {
-                'task': 'form',
-                'component': component
-            },
-            success: function (data) {
-                json2HtmlForm(data);
-                componentData = data;
-            },
-            error: function () {
-                alert(errorMsg);
-            }
-        });
+        if (component == 'annotation') {
+            $('#processing_div').hide()
+            $('#file_picker_modal').modal('show')
+            $("#form_submit_btn").on('click', function () {
+                var formData = new FormData();
+                formData.append('file', $('#InputFile')[0].files[0]);
+                formData.append('file_type', $('#file_type_dropdown').val())
+                var csrftoken = $.cookie('csrftoken');
+                var url = "/api/upload_annotation_file/"
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json'
+                }).done(function (e) {
+                    $('#annotation_table_wrapper').hide()
+                    $('#annotation_content').show()
+
+                    if (e.type == 'PDF Document') {
+                        load_txt_data(e)
+                    }
+                    else if (e.type == 'Spreadsheet') {
+                        load_ss_data(e)
+                    }
+
+                    setup_annotator()
+                    $('#file_picker_modal').modal('hide')
+                });
+            })
+        }
+        else {
+
+            $.ajax({
+                url: copoFormsURL,
+                type: "POST",
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    'task': 'form',
+                    'component': component
+                },
+                success: function (data) {
+                    json2HtmlForm(data);
+                    componentData = data;
+                },
+                error: function () {
+                    alert(errorMsg);
+                }
+            });
+        }
     });
 
 
@@ -77,6 +111,7 @@ $(document).ready(function () {
 //map controls to rendering functions
 var controlsMapping = {
     "text": "do_text_ctrl",
+    "text_small": "do_small_text_ctrl",
     "textarea": "do_textarea_ctrl",
     "hidden": "do_hidden_ctrl",
     "copo-select": "do_copo_select_ctrl",
@@ -86,36 +121,25 @@ var controlsMapping = {
     "copo-multi-select": "do_copo_multi_select_ctrl",
     "copo-comment": "do_copo_comment_ctrl",
     "copo-characteristics": "do_copo_characteristics_ctrl",
-    "copo-sample-source": "do_copo_sample_source_ctrl",
-    "copo-sample-source-2": "do_copo_sample_source_ctrl_2",
+    "copo-environmental-characteristics": "do_copo_characteristics_ctrl",
+    "copo-phenotypic-characteristics": "do_copo_characteristics_ctrl",
     "oauth_required": "do_oauth_required",
     "copo-button-list": "do_copo_button_list_ctrl",
-    "copo-item-count": "do_copo_item_count_ctrl"
+    "copo-item-count": "do_copo_item_count_ctrl",
+    "date-picker": "do_date_picker_ctrl",
+    "copo-duration": "do_copo_duration_ctrl",
+    "text-percent": "do_percent_text_box",
+    "growth_conditions_select": "do_growth_conditions_select",
+    "ontology_triplet_control": "do_ontology_triplet_control"
 };
 
 function json2HtmlForm(data) {
-    var dataCopy = $.extend(true, Object(), data.form.component_records);
-
-    //remove record with target_id from this list...to enable unique validation in edit mode
-    var delKey = null;
-    $.each(dataCopy, function (key, val) {
-        if (val._id == data.form.target_id) {
-            delKey = key;
-            return false;
-        }
-
-    });
-
-    delete dataCopy[delKey];
-    componentRecords[data.form.component_name] = dataCopy;
-
 
     //tidy up before closing the modal
     var doTidyClose = {
         closeIt: function (dialogRef) {
             $('.popover').popover('destroy'); //hide any shown popovers
             htmlForm.empty(); //clear form
-            htmlFormSource.empty(); //clear form
             dialogRef.close();
         }
     };
@@ -128,6 +152,7 @@ function json2HtmlForm(data) {
         },
         closable: false,
         animate: true,
+        draggable: true,
         onhide: function (dialogRef) {
             //remove all dangling popovers
             $('.popover').popover('destroy');
@@ -148,14 +173,9 @@ function json2HtmlForm(data) {
             //validate on submit event
             htmlForm.find("form").validator().on('submit', function (e) {
                 if (e.isDefaultPrevented()) {
-                    reset_custom_fields_validate();
                     return false;
                 } else {
                     e.preventDefault();
-
-                    if (!global_form_validate(data.form)) {
-                        return false;
-                    }
 
                     save_form(data.form);
                     dialogRef.close();
@@ -163,9 +183,6 @@ function json2HtmlForm(data) {
             });
 
             refresh_form_aux_controls();
-
-            setup_formelement_hint($('input[name="helptips-chk"]'), htmlForm.find("form").find(":input"));
-
         },
         buttons: [
             {
@@ -201,23 +218,6 @@ function json2HtmlForm(data) {
 
 } //end of json2HTMLForm
 
-function reset_custom_fields_validate() {
-    $('.copo-select').each(function () {
-        if (this.id) {
-            $(this).css("display", "none");
-        }
-    });
-}
-
-function make_custom_fields_validate() {
-    $('.copo-select').each(function () {
-        if (this.id && $(this).val().trim() == "") {
-            $(this).removeAttr("style");
-            $(this).focus();
-        }
-    });
-}
-
 function build_form_body(data) {
     var formJSON = data.form;
     var formValue = formJSON.form_value;
@@ -237,14 +237,20 @@ function build_form_body(data) {
     for (var i = 0; i < formJSON.form_schema.length; ++i) {
 
         var formElem = formJSON.form_schema[i];
+        var control = formElem.control
 
-        var control = formElem.control;
         var elemValue = null;
 
         if (formValue) {
             var elem = formElem.id.split(".").slice(-1)[0];
             if (formValue[elem]) {
                 elemValue = formValue[elem];
+            }
+        } else {
+            if (formElem.default_value) {
+                elemValue = formElem.default_value;
+            } else {
+                elemValue = "";
             }
         }
 
@@ -263,6 +269,45 @@ function build_form_body(data) {
 
     return htmlForm.append(formCtrl);
 
+}
+
+function generate_form_controls(formSchema, formValue) {
+    var layoutDiv = $('<div/>');
+
+    for (var i = 0; i < formSchema.length; ++i) {
+
+        var FormElem = formSchema[i];
+
+        var control = FormElem.control;
+        var elemValue = null;
+
+        if (formValue) {
+            var elem = FormElem.id.split(".").slice(-1)[0];
+            if (formValue[elem]) {
+                elemValue = formValue[elem];
+            }
+        } else {
+            if (FormElem.default_value) {
+                elemValue = FormElem.default_value;
+            } else {
+                elemValue = "";
+            }
+        }
+
+        if (FormElem.hidden == "true") {
+            control = "hidden";
+        }
+
+        try {
+            layoutDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](FormElem, elemValue));
+        }
+        catch (err) {
+            console.log(err);
+            layoutDiv.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + FormElem.label + '): Cannot resolve form control!</div>');
+        }
+    }
+
+    return layoutDiv
 }
 
 
@@ -317,42 +362,43 @@ function get_form_title(data) {
 function get_help_ctrl() {
     var helpCtrl = $('<div/>',
         {
-            html: '<span style="padding:6px;">Help tips</span><input type="checkbox" name="helptips-chk">',
+            html: '<span style="padding:6px;">Help tips</span><input class="copo-help-chk" type="checkbox" name="helptips-chk">',
             class: "tips-switch-form-div form-group pull-right"
         });
 
     return helpCtrl;
 }
 
-function set_up_help_ctrl() {
+function set_up_help_ctrl(ctrlName) {
 
     // now set up switch button to support the tool tips
-    $("[name='helptips-chk']").bootstrapSwitch(
+    $("[name='" + ctrlName + "']").bootstrapSwitch(
         {
             size: "mini",
             onColor: "primary",
             state: true
         });
 
-    $('input[name="helptips-chk"]').on('switchChange.bootstrapSwitch', function (event, state) {
+    $('input[name="' + ctrlName + '"]').on('switchChange.bootstrapSwitch', function (event, state) {
         if (!state) {
             //remove all dangling popovers
-            $('.popover').popover('destroy');
+            $('.popover').remove();
         }
     });
+
 }
 
 function set_up_form_help_div(data) {
     var ctrlDiv = $('<div/>',
         {
-            class: "row",
+            class: "row helpDivRow",
             style: "margin-bottom:20px;"
         });
 
     var cloneCol = $('<div/>',
         {
             class: "col-sm-7 col-md-7 col-lg-7"
-        }).append(set_up_clone_ctrl(data));
+        });
 
     var helpCtrl = $('<div/>',
         {
@@ -370,11 +416,7 @@ function set_up_form_body_div(data) {
         {
             id: "copo_component_forms",
             class: "col-sm-12 col-md-12 col-lg-12"
-        }).append(htmlForm).append(htmlFormSource)).append($('<div/>',
-        {
-            id: "show_form_errors",
-            class: "col-sm-12 col-md-12 col-lg-12"
-        }));
+        }).append(htmlForm));
 
     //build main form
     build_form_body(data);
@@ -382,91 +424,49 @@ function set_up_form_body_div(data) {
     return formBodyDiv;
 }
 
-function set_up_clone_ctrl(data) {
+function build_clone_control(component_records, component_label) {
     var ctrlsDiv = $('<div/>',
         {
             style: "padding:1px; margin-bottom:-15px;"
         });
 
-    var form_values = Object();
-
-
     //build hidden fields to hold selected options, and supply control data
     var hiddenValuesCtrl = $('<input/>',
         {
             type: "hidden",
-            class: "copo-multi-values",
-            "data-maxItems": 1, //makes this a single select box, instead of the default multiple
-            change: function (event) {
-                event.preventDefault();
-
-                data.form.form_value = form_values[$(this).val()];
-
-                build_form_body(data);
-
-                refresh_form_aux_controls();
-
-                setup_formelement_hint($('input[name="helptips-chk"]'), htmlForm.find("form").find(":input"));
-
-            }
+            class: "copo-multi-values copo-clone-control",
+            "data-maxItems": 1, //makes this a single select box instead of the default multiple
         });
 
     //build select
     var selectCtrl = $('<select/>',
         {
             class: "input-copo copo-multi-select",
-            placeholder: "Clone a " + data.form.form_label + " record...",
+            placeholder: "Clone a " + component_label + " record...",
         });
 
-    var showCloneCtrl = false;
+    $('<option value=""></option>').appendTo(selectCtrl);
 
-    var min = 10000;
-    var max = 99999;
-
-    if (data.form.component_records.length > 0 && data.form.clonable) {
-        showCloneCtrl = true;
-
-        //construct options
-        var labelElem = data.form.form_schema[0].id.split(".").slice(-1)[0];
-
-        $('<option value=""></option>').appendTo(selectCtrl);
-
-        for (var i = 0; i < data.form.component_records.length; ++i) {
-            var option = data.form.component_records[i];
-            var lbl = option[labelElem];
-            var vl = option["_id"];
-
-            //generate unique characters to append to label elem
-            var rand_postfix = (Math.floor(Math.random() * (max - min + 1)) + min).toString();
-            option[labelElem] = option[labelElem] + "_CLONED_" + rand_postfix;
-
-            form_values[vl] = option;
-
-            $('<option value="' + vl + '">' + lbl + '</option>').appendTo(selectCtrl);
-        }
+    for (var i = 0; i < component_records.length; ++i) {
+        var option = component_records[i];
+        $('<option value="' + option.value + '">' + option.label + '</option>').appendTo(selectCtrl);
     }
 
     ctrlsDiv.append(selectCtrl).append(hiddenValuesCtrl);
 
-    var cloneCtrl = form_div_ctrl().append(ctrlsDiv);
-
-    if (!showCloneCtrl) {
-        cloneCtrl = '';
-    }
-
-    return cloneCtrl;
+    return form_div_ctrl().append(ctrlsDiv)
 }
+
 
 function refresh_form_aux_controls() {
     //refresh controls
     refresh_tool_tips();
 
     //set up help tips
-    set_up_help_ctrl();
+    set_up_help_ctrl("helptips-chk");
 
     //refresh form validator
     refresh_validator(htmlForm.find("form"));
-    refresh_validator(htmlFormSource.find("form"));
 }
 
 function set_validation_markers(formElem, ctrl) {
@@ -476,25 +476,52 @@ function set_validation_markers(formElem, ctrl) {
     var errorHelpDiv = "";
 
     //required marker
-    if (formElem.hasOwnProperty("required") && (formElem.required.toString() == "true")) {
+    if (formElem.hasOwnProperty("required") && (formElem.required.toString().toLowerCase() == "true")) {
         ctrl.attr("required", true);
-        ctrl.attr("data-error", "The " + formElem.label + " is required!");
+        ctrl.attr("data-error", "The " + formElem.label + " value is required!");
 
         errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
     }
 
     //unique marker...
-    if (formElem.hasOwnProperty("unique") && (formElem.unique.toString() == "true")) {
+    if (formElem.hasOwnProperty("unique") && (formElem.unique.toString().toLowerCase() == "true")) {
+        var uniqueArray = [];
+
+        if (formElem.hasOwnProperty("unique_items")) {
+            uniqueArray = formElem.unique_items;
+        }
+
+        uniqueArray = JSON.stringify(uniqueArray);
+
         ctrl.attr("data-unique", "unique");
+        ctrl.attr("data-unique-array", uniqueArray);
         ctrl.attr('data-unique-error', "The " + formElem.label + " value already exists!");
 
         errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
     }
 
+
+    //batch unique marker...allows unique test for siblings of the same kind on the form
+    if (formElem.hasOwnProperty("batch") && (formElem.batch.toString().toLowerCase() == "true")) {
+        ctrl.attr("data-batch", "batch");
+        ctrl.attr("data-family-name", formElem.batchuniquename);
+        ctrl.attr('data-batch-error', "The " + formElem.label + " value has already been assigned!");
+
+        errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
+    }
+
     //email marker...
-    if (formElem.hasOwnProperty("email") && (formElem.email.toString() == "true")) {
+    if (formElem.hasOwnProperty("email") && (formElem.email.toString().toLowerCase() == "true")) {
         ctrl.attr("data-email", "email");
         ctrl.attr('data-email-error', "Please enter a valid value for the " + formElem.label);
+
+        errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
+    }
+
+    //characteristic marker
+    if (formElem.hasOwnProperty("characteristics") && (formElem.characteristics.toString().toLowerCase() == "true")) {
+        ctrl.attr("data-characteristics", "characteristics");
+        ctrl.attr('data-characteristics-error', "Invalid value state!");
 
         errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
     }
@@ -507,7 +534,30 @@ function set_validation_markers(formElem, ctrl) {
 
 //form controls
 var dispatchFormControl = {
-    do_text_ctrl: function (formElem, elemValue) {
+
+    do_percent_text_box: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV input-group"
+            });
+        var span = $('<span/>',
+            {
+                class: "input-group-addon"
+            })
+        $(span).html('%')
+        var input = $('<input/>',
+            {
+                type: "text",
+                class: "input-copo form-control",
+                id: formElem.id,
+                name: formElem.id,
+
+            })
+        ctrlsDiv.append(input)
+        ctrlsDiv.append(span)
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
+    do_date_picker_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
                 class: "ctrlDIV"
@@ -516,9 +566,93 @@ var dispatchFormControl = {
         var txt = $('<input/>',
             {
                 type: "text",
-                class: "input-copo form-control",
+                class: "input-copo form-control date-picker",
                 id: formElem.id,
                 name: formElem.id
+            });
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, txt);
+
+        ctrlsDiv.append(txt);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
+    do_text_ctrl: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        var metaDiv = $('<div/>');
+
+        var txt = $('<input/>',
+            {
+                type: "text",
+                class: "input-copo form-control copo-text-control",
+                id: formElem.id,
+                name: formElem.id
+            });
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, txt);
+
+        metaDiv.append(txt);
+
+
+        // set control metadata
+        if (formElem.hasOwnProperty("control_meta")) {
+            var control_meta = formElem.control_meta;
+
+            if (control_meta.hasOwnProperty("input_group_addon")) {
+                //get addon label
+                var input_group_addon_label = '';
+
+                try {
+                    var input_group_addon_label = control_meta.input_group_addon_label;
+                } catch (err) {
+                    ;
+                }
+
+                //redefine metaDiv
+                metaDiv = $('<div/>',
+                    {
+                        class: "input-group"
+                    });
+
+                var inputGroupSpan = $('<span/>',
+                    {
+                        class: "input-group-addon",
+                        html: input_group_addon_label
+                    });
+
+                if (control_meta.input_group_addon == "right") {
+                    metaDiv.append(txt).append(inputGroupSpan);
+                } else {
+                    metaDiv.append(inputGroupSpan).append(txt);
+                }
+            }
+
+        }
+
+        ctrlsDiv.append(metaDiv);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
+    do_small_text_ctrl: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        var txt = $('<input/>',
+            {
+                type: "text",
+                class: "input-copo form-control width100",
+                id: formElem.id,
+                name: formElem.id,
             });
 
         //set validation markers
@@ -538,7 +672,7 @@ var dispatchFormControl = {
 
         var txt = $('<textarea/>',
             {
-                class: "form-control",
+                class: "form-control copo-textarea-control",
                 rows: 4,
                 cols: 40,
                 id: formElem.id,
@@ -562,7 +696,7 @@ var dispatchFormControl = {
         //build select
         var selectCtrl = $('<select/>',
             {
-                class: "form-control input-copo",
+                class: "form-control input-copo copo-select-control",
                 id: formElem.id,
                 name: formElem.id
             });
@@ -588,29 +722,85 @@ var dispatchFormControl = {
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
-    do_copo_characteristics_ctrl: function (formElem, elemValue) {
-        var characteristicsSchema = copoSchemas.characteristics_schema;
+    do_copo_duration_ctrl: function (formElem, elemValue) {
+
+        var durationSchema = copoSchemas[formElem.control.toLowerCase()];
 
         var ctrlsDiv = $('<div/>',
             {
                 class: "ctrlDIV"
             });
 
-        for (var i = 0; i < characteristicsSchema.length; ++i) {
+        for (var i = 0; i < durationSchema.length; ++i) {
             var mg = "margin-left:5px;";
             if (i == 0) {
                 mg = '';
             }
-            var fv = formElem.id + "." + characteristicsSchema[i].id.split(".").slice(-1)[0];
+            var fv = formElem.id + "." + durationSchema[i].id.split(".").slice(-1)[0];
 
-            if (characteristicsSchema[i].hidden == "false") {
-                var sp = $('<span/>',
+
+            var sp = $('<span/>',
+                {
+                    style: "display: inline-block; " + mg
+                });
+
+            //get ontology ctrl
+            var durationCtrlObject = get_basic_input(sp, durationSchema[i]);
+
+
+            durationCtrlObject.find(":input").each(function () {
+                //toni's comment
+                // if (this.id) {
+                //     this.id = fv + "." + this.id;
+                // }
+
+                //end toni's comment
+
+                if (this.id) {
+                    this.id = fv;
+                }
+
+                //set placeholder text
+                if ($(this).hasClass("ontology-field")) {
+                    $(this).attr("placeholder", durationSchema[i].label.toLowerCase());
+                }
+            });
+
+            ctrlsDiv.append(durationCtrlObject);
+        }
+
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
+    do_copo_characteristics_ctrl: function (formElem, elemValue) {
+        var workingSchema = copoSchemas[formElem.control.toLowerCase()];
+
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV form-inline row"
+            });
+
+        for (var i = 0; i < workingSchema.length; ++i) {
+            var fv = formElem.id + "." + workingSchema[i].id.split(".").slice(-1)[0];
+
+            if (workingSchema[i].hidden == "false") {
+
+                var sp = $('<div/>',
                     {
-                        style: "display: inline-block; " + mg
+                        class: "form-group col-sm-4"
                     });
 
+                if (formElem.hasOwnProperty("_displayOnlyThis") && (workingSchema[i].id.split(".").slice(-1)[0] != formElem["_displayOnlyThis"])) {
+                    //note: _displayOnlyThis is a mechanism for hiding some parts of a composite
+                    //control that would have ordinarily been displayed on the UI. Its use does not in any way
+                    // replace, or serve the purpose of, the html 'hidden' property defined on 'formElem'
+
+                    sp.attr({
+                        style: "display: none; "
+                    });
+                }
+
                 //get ontology ctrl
-                var ontologyCtrlObject = get_ontology_span(sp, characteristicsSchema[i]);
+                var ontologyCtrlObject = get_ontology_span(sp, workingSchema[i]);
 
                 ontologyCtrlObject.find(":input").each(function () {
                     if (this.id) {
@@ -619,11 +809,28 @@ var dispatchFormControl = {
 
                     //set placeholder text
                     if ($(this).hasClass("ontology-field")) {
-                        $(this).attr("placeholder", characteristicsSchema[i].label.toLowerCase());
+                        $(this).attr("placeholder", workingSchema[i].label);
+
+                        //gather validation information
+                        if (workingSchema[i].hasOwnProperty("validation_target") && (workingSchema[i].validation_target.toString() == "true")) {
+                            $(this).addClass("copo-validation-target");
+                        }
+
+                        if (workingSchema[i].hasOwnProperty("validation_source") && (workingSchema[i].validation_source.toString() == "true")) {
+                            $(this).addClass("copo-validation-source");
+                        }
                     }
                 });
 
                 ctrlsDiv.append(ontologyCtrlObject);
+
+                //set validation markers for various special cases
+                if (ctrlsDiv.find(".copo-validation-source").length && ctrlsDiv.find(".copo-validation-target").length) {
+                    formElem["characteristics"] = "true";
+                    var validationSource = ctrlsDiv.find(".copo-validation-source").first();
+                    var vM = set_validation_markers(formElem, validationSource);
+                    ctrlsDiv.find(".form-group").append(vM.errorHelpDiv);
+                }
 
             } else {
                 ctrlsDiv.append($('<input/>',
@@ -638,35 +845,41 @@ var dispatchFormControl = {
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
     do_copo_comment_ctrl: function (formElem, elemValue) {
-        var commentSchema = copoSchemas.comment_schema;
+        var commentSchema = copoSchemas[formElem.control.toLowerCase()];
 
         var ctrlsDiv = $('<div/>',
             {
-                class: "ctrlDIV"
+                class: "ctrlDIV form-inline row"
             });
 
         for (var i = 0; i < commentSchema.length; ++i) {
-            var mg = "margin-left:5px;";
-            if (i == 0) {
-                mg = '';
-            }
-
             var fv = commentSchema[i].id.split(".").slice(-1)[0];
 
             if (commentSchema[i].hidden == "false") {
+                var sp = $('<div/>',
+                    {
+                        class: "form-group col-sm-6"
+                    });
+
+                if (formElem.hasOwnProperty("_displayOnlyThis") && (fv != formElem["_displayOnlyThis"])) {
+                    //note: _displayOnlyThis is a mechanism for hiding some parts of a composite
+                    //control that would have ordinarily been displayed on the UI. Its use does not in any way
+                    // replace, or serve the purpose of, the html 'hidden' property defined on 'formElem'
+
+                    sp.attr({
+                        style: "display: none; "
+                    });
+                }
+
+
                 var txt = $('<textarea/>',
                     {
-                        class: "form-control",
+                        class: "form-control copo-comment-control",
                         rows: 2,
                         cols: 35,
                         placeholder: commentSchema[i].label.toLowerCase(),
                         id: formElem.id + '.' + fv,
                         name: formElem.id + '.' + fv
-                    });
-
-                var sp = $('<span/>',
-                    {
-                        style: "display: inline-block; " + mg
                     });
 
                 sp.append(txt);
@@ -733,7 +946,8 @@ var dispatchFormControl = {
             {
                 class: "input-copo copo-multi-select",
                 placeholder: "Select " + formElem.label + "...",
-                multiple: "multiple"
+                multiple: "multiple",
+                "data-validate": true,
             });
 
         if (formElem.option_values) {
@@ -755,6 +969,10 @@ var dispatchFormControl = {
 
         ctrlsDiv.append(selectCtrl).append(hiddenValuesCtrl);
 
+        //set validation markers
+        var vM = set_validation_markers(formElem, selectCtrl);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
     do_copo_multi_search_ctrl: function (formElem, elemValue) {
@@ -765,7 +983,37 @@ var dispatchFormControl = {
 
         ctrlsDiv = get_multi_search_span(formElem, ctrlsDiv);
 
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+
+        //if required, attach create button that will enable elements of this kind to be created and assigned
+        if (formElem.hasOwnProperty("show_create_button") && (formElem.show_create_button.toString() == "true")) {
+            var addBtn = $('<button/>',
+                {
+                    style: "border-radius:0;",
+                    class: "btn btn-xs btn-primary copo-component-control",
+                    "data-component": formElem.option_component,
+                    "data-element-id": formElem.id,
+                    html: '<i class="fa fa-plus-circle"></i> Create & Assign ' + formElem.label,
+                    click: function (event) {
+                        event.preventDefault();
+                        create_attachable_component(formElem);
+                    },
+                });
+
+            var addbtnDiv = $('<div/>',
+                {
+                    class: "col-sm-12 col-md-12 col-lg-12"
+                }).append(addBtn);
+
+            var addbtnDivRow = $('<div/>',
+                {
+                    class: "row btn-row",
+                }).append(addbtnDiv);
+
+            returnDiv.append(addbtnDivRow);
+        }
+
+        return returnDiv;
     },
     do_copo_select_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
@@ -780,6 +1028,7 @@ var dispatchFormControl = {
                 class: "copo-select input-copo",
                 id: formElem.id,
                 name: formElem.id,
+                "data-validate": true,
             });
 
         //set validation markers
@@ -790,142 +1039,6 @@ var dispatchFormControl = {
 
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    },
-    do_copo_sample_source_ctrl: function (formElem, elemValue) {
-
-        var ctrlsDiv = $('<div/>',
-            {
-                class: "ctrlDIV"
-            });
-
-        formElem["data_maxItems"] = 1; //enforces single item selection rather than the default multiple
-
-        ctrlsDiv = get_multi_search_span(formElem, ctrlsDiv);
-
-        if (Object.prototype.toString.call(elemValue) === '[object Array]' && elemValue.length > 1) {
-            elemValue = elemValue.toString();
-        }
-
-
-        //resolve control values
-        var ctrlObjects = resolve_ctrl_values(ctrlsDiv.clone(), 0, formElem, elemValue);
-        var ctrlsWithValuesDiv = ctrlObjects.ctrlsWithValuesDiv;
-
-        $("#global_form_save_btn").prop('disabled', false); //make sure outer save button is enabled by default
-
-        var addBtn = $('<button/>',
-            {
-                style: "border-radius:0;",
-                class: "btn btn-xs btn-primary create-sample-source-btn",
-                html: '<i class="fa fa-plus-circle"></i> Create & Assign New Source',
-                click: function (event) {
-                    event.preventDefault();
-
-                    var funcParams = Object();
-                    funcParams['formElem'] = formElem;
-                    funcParams['formValue'] = null;
-                    funcParams['buttonObject'] = $(this);
-                    funcParams['ctrlsDiv'] = ctrlsDiv;
-                    funcParams['ctrlsWithValuesDiv'] = ctrlsWithValuesDiv;
-
-                    if (htmlFormSource.find("form").length) {
-                        hide_source_form(funcParams);
-                    } else {
-                        show_source_form(funcParams);
-                    }
-                }
-            });
-
-        var addbtnDiv = $('<div/>',
-            {
-                class: "col-sm-12 col-md-12 col-lg-12"
-            }).append(addBtn);
-
-        var addbtnDivRow = $('<div/>',
-            {
-                class: "row",
-            }).append(addbtnDiv);
-
-        return form_div_ctrl()
-            .append(form_label_ctrl(formElem.label, formElem.id))
-            .append(ctrlsWithValuesDiv)
-            .append(form_help_ctrl(formElem.help_tip))
-            .append(addbtnDivRow)
-    },
-    do_copo_sample_source_ctrl_2: function (formElem, elemValue) {
-        var ctrlsDiv = $('<div/>',
-            {
-                class: "ctrlDIV"
-            });
-
-        formElem["data_maxItems"] = 1; //enforces single item selection rather than the default multiple
-
-        ctrlsDiv = get_multi_search_span(formElem, ctrlsDiv);
-
-        if (Object.prototype.toString.call(elemValue) === '[object Array]' && elemValue.length > 1) {
-            elemValue = elemValue.toString();
-        }
-
-
-        //resolve control values
-        var ctrlObjects = resolve_ctrl_values(ctrlsDiv.clone(), 0, formElem, elemValue);
-        var ctrlsWithValuesDiv = ctrlObjects.ctrlsWithValuesDiv;
-
-
-        //build source creation controls
-
-        var sourceBtnDiv = $('<div/>',
-            {
-                id: "sourceFormCollapsible",
-                class: "collapse"
-            });
-
-        var sourceButton = $('<button/>',
-            {
-                type: "button",
-                style: "border-radius:0;",
-                class: "btn btn-xs btn-primary create-sample-source-btn",
-                html: '<i class="fa fa-plus-circle"></i> Create & Assign New Source',
-                click: function (event) {
-                    event.preventDefault();
-
-                    var divState = sourceBtnDiv.is(":visible");
-
-                    if (!htmlFormSource.find("form").length && divState) {
-                        divState = false;
-                    }
-
-                    if (divState) {//already open, will be closing in a bit
-                        $(this).find("i").attr({class: "fa fa-plus-circle"});
-                        sourceBtnDiv.collapse('hide');
-                    } else {//already close, will be opening in a bit
-                        $(this).find("i").attr({class: "fa fa-minus-circle"});
-                        sourceBtnDiv.empty();
-                        htmlFormSource = $('<div/>');
-
-                        var funcParams = Object();
-                        funcParams['formElem'] = formElem;
-                        funcParams['formValue'] = null;
-                        funcParams['buttonObject'] = $(this);
-                        funcParams['ctrlsDiv'] = ctrlsDiv;
-                        funcParams['ctrlsWithValuesDiv'] = ctrlsWithValuesDiv;
-
-                        build_source_form(funcParams);
-                        sourceBtnDiv.append(htmlFormSource);
-                        sourceBtnDiv.collapse('show');
-                    }
-                }
-            });
-
-        var sourceCtrlDiv = $('<div/>').append(sourceButton).append(sourceBtnDiv);
-
-
-        return form_div_ctrl()
-            .append(form_label_ctrl(formElem.label, formElem.id))
-            .append(ctrlsWithValuesDiv)
-            .append(form_help_ctrl(formElem.help_tip))
-            .append(sourceCtrlDiv)
-
     },
     do_hidden_ctrl: function (formElem, elemValue) {
 
@@ -947,6 +1060,84 @@ var dispatchFormControl = {
         });
     },
     do_copo_button_list_ctrl: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        var radioGroup = $('<div/>');
+
+        var hiddenCtrl = $('<input/>',
+            {
+                type: "hidden",
+                name: formElem.id,
+                id: formElem.id
+            });
+
+
+        for (var i = 0; i < formElem.option_values.length; ++i) {
+            var option = formElem.option_values[i];
+
+            var radioCtrl = $('<input/>',
+                {
+                    type: "radio",
+                    name: formElem.id + "_input",
+                    value: option.value,
+                    change: function (evt) {
+                        if ($(this).is(':checked')) {
+                            hiddenCtrl.val($(this).val());
+                        }
+                    },
+                });
+
+            if (option.value == elemValue) {
+                radioCtrl.attr('checked', true);
+                hiddenCtrl.val(elemValue);
+            }
+
+            var radioCtrlTxt = $('<span/>',
+                {
+                    style: "padding-left:5px;",
+                    html: option.label,
+                    "data-lbl": option.label,
+                    "data-desc": option.description,
+                    "data-value": option.value,
+                    mouseover: function (evt) {
+                        $(this).popover({
+                            title: $(this).attr("data-lbl"),
+                            content: $(this).attr("data-desc"),
+                            container: 'body',
+                            trigger: 'hover',
+                            html: true,
+                            placement: 'right',
+                            template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
+                            '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
+                            '</h3><div class="popover-content"><p></p></div></div></div>'
+                        });
+
+                        $(this).popover("show");
+                    },
+                });
+
+            var radioCtrlLabel = $('<label/>', {
+                style: "font-weight: normal; cursor:pointer;"
+            }).append(radioCtrl).append(radioCtrlTxt);
+
+            var radioCtrlDiv = $('<div/>',
+                {
+                    style: "position: relative; display: block; margin-top: 10px; margin-bottom: 5px;"
+                }).append(radioCtrlLabel);
+
+            radioGroup.append(radioCtrlDiv);
+        }
+
+        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append(radioGroup).append(hiddenCtrl);
+
+        return form_div_ctrl()
+            .append(form_help_ctrl(formElem.help_tip))
+            .append(ctrlsDiv);
+    },
+    do_copo_button_list_ctrl_old: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>');
 
         var hiddenCtrl = $('<input/>',
@@ -970,7 +1161,7 @@ var dispatchFormControl = {
             var option = formElem.option_values[i];
 
             var listGroupTitleHTML = '<h4 class="list-group-item-heading">' + option.label + '</h4>';
-            listGroupTitleHTML += '<p class="list-group-item-text" style="line-height: 1.5;">' + option.description + '</p>';
+            listGroupTitleHTML += '<p class="list-group-item-text" style="line-height: 1.7; font-size: 14px;">' + option.description + '</p>';
 
             var listDiv = $('<div/>',
                 {
@@ -979,14 +1170,23 @@ var dispatchFormControl = {
 
             listGroup.append(listDiv);
 
+            var optionValueElem = $('<input/>',
+                {
+                    type: "hidden",
+                    class: "button-value-elem",
+                    name: option.label + "_value",
+                    value: option.value
+                })
+
             var btnSample = $('<a/>',
                 {
                     class: "list-group-item",
                     title: formElem.help_tip + " " + option.label,
+                    style: "border: 1px solid #cccccc;",
                     href: "#",
                     click: function (event) {
                         event.preventDefault();
-                        hiddenCtrl.val(option.value);
+                        hiddenCtrl.val($(this).parent().find(".button-value-elem").val());
 
                         $(this).closest(".copo-button-listDiv").siblings('.copo-button-listDiv').removeClass("copo-list-type-selected well well-sm");
                         $(this).closest(".copo-button-listDiv").addClass("copo-list-type-selected well well-sm").css("margin-bottom", "0px");
@@ -994,7 +1194,7 @@ var dispatchFormControl = {
                 });
 
             btnSample.append(listGroupTitleHTML);
-            listDiv.append(btnSample);
+            listDiv.append(btnSample).append(optionValueElem);
 
             if (i == 0) {//remember to set this back to 0, for the first element to be selected by default
                 hiddenCtrl.val(option.value);
@@ -1007,8 +1207,10 @@ var dispatchFormControl = {
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv)
 
-    },
-    do_copo_item_count_ctrl: function (formElem, elemValue) {
+    }
+    ,
+    do_copo_item_slider_ctrl: function (formElem, elemValue) {
+
         var ctrlsDiv = $('<div/>',
             {
                 class: "range-slider-parent"
@@ -1057,7 +1259,6 @@ var dispatchFormControl = {
 
         countCtrlOutputDiv.append(countCtrlBtn);
 
-
         var countCtrlOutput = $('<span/>',
             {
                 class: "range-slider-output",
@@ -1075,8 +1276,275 @@ var dispatchFormControl = {
         return form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
+    },
+    do_copo_item_count_ctrl: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        var errorHelpDiv = $('<div/>',
+            {
+                class: "help-block with-errors"
+            });
+
+        var min = 1;
+        if (formElem.hasOwnProperty("min")) {
+            min = formElem.min
+        }
+
+
+        var counter_ctrl = $('<input/>',
+            {
+                type: "number",
+                min: min,
+                class: "input-copo form-control",
+                id: formElem.id,
+                name: formElem.id,
+                value: 1,
+                keypress: function (evt) {
+                    var charCode = (evt.which) ? evt.which : evt.keyCode
+
+                    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                        $(this).closest(ctrlsDiv).find(".help-block").html('<span style="color: #a94442;">Please enter a number!</span>');
+                        $(this).val(1);
+                        return false;
+                    } else {
+                        $(this).closest(ctrlsDiv).find(".help-block").html("");
+                        return true;
+                    }
+                }
+            });
+
+        if (formElem.hasOwnProperty("max")) {
+            counter_ctrl.attr("max", formElem.max);
+        }
+
+        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append(counter_ctrl).append(errorHelpDiv);
+
+        return form_div_ctrl()
+            .append(form_help_ctrl(formElem.help_tip))
+            .append(ctrlsDiv);
     }
 };
+
+
+function create_attachable_component(formElem) {
+    var formCtrl = $('<form/>',
+        {
+            "data-toggle": "validator",
+        });
+
+    var formBodyDiv = $('<div/>',
+        {
+            class: "row"
+        }).append($('<div/>',
+        {
+            class: "col-sm-12 col-md-12 col-lg-12"
+        }).append(formCtrl));
+
+    var helpCtrl = $('<div/>',
+        {
+            html: '<span style="padding:6px;">Help tips</span><input class="copo-help-chk" type="checkbox" name="helptips-chk-sub">',
+            class: "tips-switch-form-div form-group pull-right"
+        });
+
+    var helpDivRow = $('<div/>',
+        {
+            class: "row helpDivRow",
+            style: "margin-bottom:20px;"
+        });
+
+    var cloneCol = $('<div/>',
+        {
+            class: "col-sm-7 col-md-7 col-lg-7"
+        });
+
+    var helpCtrl = $('<div/>',
+        {
+            class: "col-sm-5 col-md-5 col-lg-5"
+        }).append(helpCtrl);
+
+    helpDivRow.append(cloneCol).append(helpCtrl);
+
+    var dialog = new BootstrapDialog({
+        type: BootstrapDialog.TYPE_PRIMARY,
+        size: BootstrapDialog.SIZE_NORMAL,
+        title: function () {
+            return $('<span>Create & Assign ' + formElem.label + '</span>');
+        },
+        closable: false,
+        animate: true,
+        draggable: false,
+        onhide: function (dialogRef) {
+            $('.popover').popover('destroy'); //hide any shown popovers
+        },
+        onshown: function (dialogRef) {
+            //prevent enter keypress from submitting form automatically
+            formCtrl.keypress(function (e) {
+                //Enter key
+                if (e.which == 13) {
+                    return false;
+                }
+            });
+
+            //custom validators
+            custom_validate(formCtrl);
+
+            //validate on submit event
+            formCtrl.validator().on('submit', function (e) {
+                if (e.isDefaultPrevented()) {
+                    return false;
+                } else {
+                    e.preventDefault();
+
+                    var csrftoken = $.cookie('csrftoken');
+                    var form_values = {};
+
+                    formCtrl.find(":input").each(function () {
+                        form_values[this.id] = $(this).val();
+                    });
+
+                    var auto_fields = JSON.stringify(form_values);
+
+                    $.ajax({
+                        url: copoFormsURL,
+                        type: "POST",
+                        headers: {'X-CSRFToken': csrftoken},
+                        data: {
+                            'task': "save",
+                            'auto_fields': auto_fields,
+                            'component': formElem.option_component,
+                            'visualize': "created_component_json"
+                        },
+                        success: function (data) {
+                            //get the selectize control
+                            if (selectizeObjects.hasOwnProperty(formElem.id)) {
+                                var selectizeControl = selectizeObjects[formElem.id];
+
+                                //refresh options with the newly created record
+                                var options = formElem.option_values.options;
+                                options.unshift(data.option_values.options[0]); //expects one item in the returned options
+
+                                //refresh the control
+                                selectizeControl.addOption(options);
+                                selectizeControl.refreshOptions();
+
+                                //set the new record
+                                selectizeControl.setValue(data.created_record_id, false);
+
+                                refresh_tool_tips();
+                            }
+
+                            dialogRef.close();
+                        },
+                        error: function () {
+                            alert("Couldn't create and assign record!");
+                        }
+                    });
+                }
+            });
+
+            //refresh form validator
+            refresh_validator(formCtrl);
+
+            //refresh controls
+            refresh_tool_tips();
+
+            //set up help tips
+            set_up_help_ctrl("helptips-chk-sub");
+        },
+        buttons: [
+            {
+                label: 'Cancel',
+                action: function (dialogRef) {
+                    $('.popover').popover('destroy'); //hide any shown popovers
+                    dialogRef.close();
+                }
+            },
+            {
+                icon: 'glyphicon glyphicon-save',
+                label: 'Save',
+                cssClass: 'btn-primary',
+                action: function (dialogRef) {
+                    validate_forms(formCtrl);
+                }
+            }
+        ]
+    });
+
+    var $dialogContent = $('<div/>');
+
+    var formLoader = get_spinner_image();
+
+    $dialogContent.append(formLoader);
+    $dialogContent.append(helpDivRow).append(formBodyDiv);
+    dialog.realize();
+    dialog.setMessage($dialogContent);
+    dialog.open();
+
+    var csrftoken = $.cookie('csrftoken');
+
+    $.ajax({
+        url: copoFormsURL,
+        type: "POST",
+        headers: {'X-CSRFToken': csrftoken},
+        data: {
+            'task': 'form_and_component_records',
+            'component': formElem.option_component
+        },
+        success: function (data) {
+            //generate controls and attach to form object
+            var formSchema = data.form.form_schema;
+            formCtrl.append(generate_form_controls(formSchema, data.form.form_value));
+
+            //attach clone control
+            if (data.component_records.length) {
+                cloneCol.append(build_clone_control(data.component_records, formElem.label));
+
+                //listen to clone control value change
+                cloneCol.find(".copo-clone-control").on("change", function (event) {
+                    event.preventDefault();
+
+                    //retriev record and rebuild form
+                    var formLoader2 = get_spinner_image();
+                    formCtrl.html(formLoader2);
+
+                    $.ajax({
+                        url: copoFormsURL,
+                        type: "POST",
+                        headers: {'X-CSRFToken': csrftoken},
+                        data: {
+                            'task': "component_record",
+                            'component': formElem.option_component,
+                            'target_id': $(this).val()
+                        },
+                        success: function (clone_data) {
+                            formLoader2.remove();
+                            formCtrl.append(generate_form_controls(formSchema, clone_data.component_record));
+
+                            //refresh form validator
+                            refresh_validator(formCtrl);
+
+                            //refresh controls
+                            refresh_tool_tips();
+                        },
+                        error: function () {
+                            alert("Couldn't retrieve clone record!");
+                        }
+                    });
+                });
+            }
+
+            formLoader.remove();
+
+        },
+        error: function () {
+            alert("Couldn't create requested form");
+        }
+    });
+
+}
 
 
 function form_help_ctrl(tip) {
@@ -1091,22 +1559,30 @@ function form_help_ctrl(tip) {
 function form_div_ctrl() {
     return $('<div/>',
         {
-            class: "form-group copo-form-group"
+            style: "padding-bottom:5px;",
+            class: "form-group copo-form-group",
+            tabindex: -1
         });
 }
 
 function form_label_ctrl(lbl, target) {
-    return $('<label/>',
-        {
-            text: lbl,
-            for: target
-        });
+    var lblCtrl = '';
+
+    if (lbl) {
+        lblCtrl = $('<label/>',
+            {
+                text: lbl,
+                for: target
+            });
+    }
+    return lblCtrl
 }
 
 function do_array_ctrls(ctrlsDiv, counter, formElem) {
     var addbtnDiv = $('<div/>',
         {
-            style: 'margin-top:2px;'
+            style: 'margin-top:2px;',
+            class: 'array-add-new-button-div'
         });
 
     var addBtn = $('<button/>',
@@ -1116,11 +1592,13 @@ function do_array_ctrls(ctrlsDiv, counter, formElem) {
             type: "button",
             html: '<i class="fa fa-plus-circle"></i> Add ' + formElem.label,
             click: function (event) {
+                event.preventDefault();
                 ++counter;
 
                 get_element_clone(ctrlsDiv, counter).insertBefore(addbtnDiv);
 
                 //refresh controls
+                refresh_validator($(this).closest("form"));
                 refresh_tool_tips();
             }
         });
@@ -1164,7 +1642,6 @@ function get_element_clone(ctrlsDiv, counter) {
         });
 
     delDiv.append(delBtn);
-
     cloneDiv.append(ctrlClone).append(delDiv);
 
     return cloneDiv
@@ -1274,292 +1751,44 @@ function resolve_ctrl_values_aux_1(ctrlObjectID, formElem, elemValue) {
     return embedValue;
 }
 
-function build_source_form(funcParams) {
-    var formValue = funcParams.formValue;
+function get_basic_input(sp, formElem) {
+    var fv = formElem.id.split(".").slice(-1)[0];
 
-    //build panel to hold form
-    var newSourcePanel = $('<div/>', {
-        class: "panel panel-primary",
-        style: 'margin-top:1px;'
-    });
-
-    var newSourcePanelHeading = $('<div/>', {
-        class: "panel-heading",
-        html: "New Source"
-    });
-
-    var newSourcePanelBody = $('<div/>', {
-        class: "panel-body"
-    });
-
-    newSourcePanel.append(newSourcePanelHeading).append(newSourcePanelBody);
-
-    //form control
-    var sourceSchema = copoSchemas.source_schema;
-
-    var formCtrl = $('<form/>',
+    var input = ($('<input/>',
         {
-            "data-toggle": "validator"
-        });
-
-    newSourcePanelBody.append(formCtrl);
-
-
-    //generate controls given component schema
-    for (var i = 0; i < sourceSchema.length; ++i) {
-        var sourceFormElem = sourceSchema[i];
-        var control = sourceFormElem.control;
-        var elemValue = null;
-
-        if (formValue) {
-            var elem = sourceFormElem.id.split(".").slice(-1)[0];
-            if (formValue[elem]) {
-                elemValue = formValue[elem];
-            }
-        }
-
-        if (sourceFormElem.hidden == "true") {
-            control = "hidden";
-        }
-
-        try {
-            formCtrl.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](sourceFormElem, elemValue));
-        }
-        catch (err) {
-            formCtrl.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + sourceFormElem.label + '): Cannot resolve form control!</div>');
-        }
+            type: "text",
+            placeholder: formElem.placeholder,
+            id: fv,
+            name: fv,
+            class: 'form-control'
+        }));
+    if (sp) {
+        $(sp).append(input)
+        return sp
     }
+    return input
+}
 
-    //add source panel to DOM! This will enable us to begin registering events on form objects
-    htmlFormSource.append(newSourcePanel);
-
-    //save and cancel buttons
-    var saveSourceBtnDiv = $('<div/>',
+function get_basic_label(sp, formElem) {
+    var fv = formElem.id.split(".").slice(-1)[0];
+    var label = $('<label/>',
         {
-            style: 'margin-top:10px;',
-            class: 'pull-right',
-        });
-
-
-    var saveSourcebtn = $('<button/>',
-        {
-            class: "btn btn-sm btn-primary",
-            html: '<i class="glyphicon glyphicon-save"></i>Save Source',
-            click: function (event) {
-                event.preventDefault();
-                validate_forms(htmlFormSource.find("form"));
-            }
-        });
-
-    var cancelSourceBtn = $('<button/>',
-        {
-            style: 'margin-right:3px;',
-            class: "btn btn-sm btn-default",
-            html: 'Cancel',
-            click: function (event) {
-                event.preventDefault();
-                hide_source_form(funcParams);
-            }
-        });
-
-    //add buttons div
-    saveSourceBtnDiv.append(cancelSourceBtn).append(saveSourcebtn);
-
-    //add buttons to panel
-    newSourcePanelBody.append('<hr/>').append(saveSourceBtnDiv);
-
-    //add clone control
-    source_clone_ctrl(funcParams);
-
-    //add custom validators
-    custom_validate(htmlFormSource.find("form"));
-
-    //add validate on submit event
-    htmlFormSource.find("form").validator().on('submit', function (e) {
-        if (e.isDefaultPrevented()) {
-            return false;
-        } else {
-            e.preventDefault();
-            save_source_form(funcParams);
-        }
-    });
-
-    refresh_form_aux_controls();
-
-    //help tips
-    setup_formelement_hint($('input[name="helptips-chk"]'), htmlFormSource.find("form").find(":input"));
-}
-
-function save_source_form(funcParams) {
-    //start save routine
-    var ctrlsDiv = funcParams.ctrlsDiv;
-    var formElem = funcParams.formElem;
-    var ctrlsWithValuesDiv = funcParams.ctrlsWithValuesDiv;
-    var csrftoken = $.cookie('csrftoken');
-
-    var form_values = {};
-    htmlFormSource.find("form").find(":input").each(function () {
-        form_values[this.id] = $(this).val();
-    });
-
-    var auto_fields = JSON.stringify(form_values);
-
-    $.ajax({
-        url: copoFormsURL,
-        type: "POST",
-        headers: {'X-CSRFToken': csrftoken},
-        data: {
-            'task': "save",
-            'auto_fields': auto_fields,
-            'component': "source",
-            'visualize': "sources_json_and_last_record_id"
-        },
-        success: function (data) {
-
-            var sampleSourceValues = []; //basically, this means the created source being set (or, only set one sample source)
-
-            if (data.last_record_id) {
-                sampleSourceValues.push(data.last_record_id);
-            }
-
-            if (sampleSourceValues.length > 0) {
-                sampleSourceValues = sampleSourceValues.join();
-            }
-
-            var ctrlObjectsSourceContext = resolve_ctrl_values(ctrlsDiv.clone(), 0, formElem, sampleSourceValues);
-            ctrlObjectsSourceContext.ctrlsWithValuesDiv.find(".elem-json").val(JSON.stringify(data.option_values));
-
-            ctrlsWithValuesDiv.html(ctrlObjectsSourceContext.ctrlsWithValuesDiv.html());
-
-            refresh_tool_tips();
-        },
-        error: function () {
-            alert("Couldn't add source!");
-        }
-    });
-    //end save routine
-
-
-    //after save...remove form
-    hide_source_form(funcParams);
-}
-
-function hide_source_form(funcParams) {
-    $('.popover').popover('destroy'); //hide any shown popovers
-    htmlFormSource.empty();
-    funcParams.buttonObject.find("i").attr({class: "fa fa-plus-circle"});
-
-    $("#global_form_save_btn").prop('disabled', false); //enable save button in parent form
-}
-
-function show_source_form(funcParams) {
-    funcParams.buttonObject.find("i").attr({class: "fa fa-minus-circle"});
-    $("#global_form_save_btn").prop('disabled', true); //disable save button in parent form
-
-    build_source_form(funcParams);
-}
-
-function source_clone_ctrl(funcParams) {
-    var component = "source";
-    var formElem = funcParams.formElem;
-    var sourceSchema = copoSchemas.source_schema;
-    var csrftoken = $.cookie('csrftoken');
-
-    //do clone only if there are 'clonables'
-    $.ajax({
-        url: copoVisualsURL,
-        type: "POST",
-        headers: {'X-CSRFToken': csrftoken},
-        data: {
-            'task': 'sources_json_component',
-            'component': component
-        },
-        success: function (data) {
-            componentRecords[component] = $.extend(true, Object(), data.component_records);
-            formElem.option_values = data.option_values;
-
-            if (formElem.option_values.options.length > 0) {
-                var cloneSourceCtrlsDiv = get_multi_search_span(formElem, $('<div/>')).clone();
-
-                //we don't need the id's and name's attr
-                cloneSourceCtrlsDiv.find(".copo-multi-values")
-                    .removeAttr("id")
-                    .removeAttr("name")
-                    .attr("placeholder", "Clone a Source record...") //set placeholder
-                    .attr('data-maxItems', '1') //make this a single select box; default is multiple
-
-
-                if (funcParams.hasOwnProperty("selectedSource")) {
-                    cloneSourceCtrlsDiv.find(".copo-multi-values").val(funcParams.selectedSource._id);
-                }
-
-
-                var cloneCtrl = $('<div/>',
-                    {
-                        class: "col-sm-7 col-md-7 col-lg-7",
-                    }).append(form_div_ctrl().append(cloneSourceCtrlsDiv));
-
-                var cloneSourceDivRow = $('<div/>',
-                    {
-                        class: "row",
-                        style: "margin-bottom:15px;"
-                    }).append(cloneCtrl);
-
-                cloneSourceDivRow.insertBefore(htmlFormSource.find("form"));
-
-                //handle change event for cloning source
-                cloneSourceCtrlsDiv.find(".copo-multi-values").on('change', function (event) {
-                    event.preventDefault();
-
-                    if (funcParams.hasOwnProperty("selectedSource") &&
-                        funcParams.selectedSource._id == $.extend(true, Object(), formElem.option_values.component_records[$(this).val()])["_id"]) {
-                        return false;
-                    }
-
-                    var component_record = $.extend(true, Object(), formElem.option_values.component_records[$(this).val()]);
-                    var labelElem = sourceSchema[0].id.split(".").slice(-1)[0];
-
-                    //generate unique characters to append to label elem
-                    var min = 10000;
-                    var max = 99999;
-                    var rand_postfix = (Math.floor(Math.random() * (max - min + 1)) + min).toString();
-                    component_record[labelElem] = component_record[labelElem] + "_CLONED_" + rand_postfix;
-
-                    hide_source_form(funcParams);
-                    funcParams['formValue'] = component_record;
-                    funcParams['selectedSource'] = $.extend(true, Object(), formElem.option_values.component_records[$(this).val()]);
-                    show_source_form(funcParams);
-
-                    return false;
-                });
-
-                refresh_tool_tips();
-
-            }
-
-        },
-        error: function () {
-            alert("Couldn't retrieve sources!");
-        }
-    });
-
-
+            for: fv
+        }).html(formElem.label)
+    return label
 }
 
 function get_ontology_span(ontologySpan, formElem) {
-    var ontologySchema = copoSchemas.ontology_schema;
+    var ontologySchema = copoSchemas[formElem.control.toLowerCase()];
 
     for (var i = 0; i < ontologySchema.length; ++i) {
         var fv = ontologySchema[i].id.split(".").slice(-1)[0];
-
         if (ontologySchema[i].hidden == "false") {
-
             //set restricted ontologies
             var localolsURL = olsURL;
             if (formElem.ontology_names && formElem.ontology_names.length) {
                 localolsURL = olsURL.replace("999", formElem.ontology_names.join(","));
             }
-
             ontologySpan.append('<input autocomplete="off" data-autocomplete="' + localolsURL + '" class="input-copo form-control ontology-field" type="text" id="' + fv + '" name="' + fv + '" />');
 
         } else {
@@ -1599,17 +1828,24 @@ function get_multi_search_span(formElem, ctrlsDiv) {
             value: JSON.stringify(formElem.option_values)
         });
 
+    var quickViewClass = ""; //will be passed along on hovering an option to inform the display of option details.
+
+    if (formElem.hasOwnProperty("option_component")) {
+        quickViewClass = formElem.option_component;
+    }
+
     var selectCtrl = $('<select/>',
         {
-            class: "input-copo copo-multi-search",
+            class: "input-copo copo-multi-search " + " copo-component-control-" + quickViewClass,
             placeholder: "Select " + formElem.label + "...",
-            multiple: "multiple"
+            multiple: "multiple",
+            "data-validate": true,
         });
 
     ctrlsDiv.append(selectCtrl).append(hiddenValuesCtrl).append(hiddenJsonCtrl);
 
     //set validation markers
-    var vM = set_validation_markers(formElem, hiddenValuesCtrl);
+    var vM = set_validation_markers(formElem, selectCtrl);
     ctrlsDiv.append(vM.errorHelpDiv);
 
     return ctrlsDiv;
@@ -1636,7 +1872,6 @@ function get_form_ctrl(ctrlsDiv, formElem, elemValue) {
 }
 
 function validate_forms(formObject) {
-    make_custom_fields_validate(); //removes disruptions to validator
     formObject.trigger('submit');
 }
 
@@ -1644,18 +1879,50 @@ function custom_validate(formObject) {
     formObject.validator({
         custom: {
             unique: function ($el) {//validates for unique fields
-                var parts = $el.attr("id").split(".").slice(1);
-                var component = parts[0];
-                var ctrl = parts[1];
+                //get array of items for test
+                //items in array must be of type String for the unique validation to work!!
+                var uniqueArray = JSON.parse($el.attr("data-unique-array"));
+                var newValue = $el.val().trim().toLowerCase();
 
                 var oKFlag = true;
-                if (componentRecords.hasOwnProperty(component)) {
-                    var matchValue = "";
-                    var newValue = $el.val().trim().toLowerCase();
-                    $.each(componentRecords[component], function (key, val) {
-                        matchValue = val[ctrl];
-                        if (Object.prototype.toString.call(matchValue) === '[object String]') {
-                            if (newValue == matchValue.trim().toLowerCase()) {
+
+                $.each(uniqueArray, function (index, item) {
+                    if (Object.prototype.toString.call(item) === '[object String]') {
+                        if (newValue == item.trim().toLowerCase()) {
+                            oKFlag = false;
+                            return false;
+                        }
+                    }
+                });
+
+                if (!oKFlag) {
+                    return "Not valid!";
+                }
+            },
+            batch: function ($el) {
+                //validates for batch unique fields, where the test focuses on siblings of the target element
+                //having a common family name
+
+                var uniqueArray = [];
+
+                //get family name
+                var familyName = $el.attr("data-family-name");
+
+                //get siblings...with same family name
+                $el.closest("form").find("[data-family-name='" + familyName + "']").each(function () {
+                    if (this.id != $el.attr("id")) {
+                        uniqueArray.push($(this).val().trim().toLowerCase());
+                    }
+                });
+
+                var newValue = $el.val().trim().toLowerCase();
+
+                var oKFlag = true;
+
+                if (newValue != "") {
+                    $.each(uniqueArray, function (index, item) {
+                        if (Object.prototype.toString.call(item) === '[object String]') {
+                            if (newValue == item) {
                                 oKFlag = false;
                                 return false;
                             }
@@ -1676,82 +1943,38 @@ function custom_validate(formObject) {
                 if (!oKFlag) {
                     return "Not valid!";
                 }
-            }
-        }
-    });
-}
+            },
+            characteristics: function ($el) {
+                //validates for copo-characteristics specific case: using value to validate unit
+                var validationSource = $el;
 
+                var oKFlag = true;
 
-function global_form_validate(formJSON) {
-    //this will only deal with required fields (for some custom controls) that were not previously validated
-    var custControls = ["copo-sample-source", "copo-select", "copo-multi-search", "copo-multi-select"];
-    var allowSubmit = true;
+                //get validation target
+                var validationTarget = $el.closest(".ctrlDIV").find(".copo-validation-target").first();
 
-    var form_values = Object();
-    htmlForm.find("form").find(":input").each(function () {
-        form_values[this.id] = $(this).val();
-    });
+                if (validationSource.val().trim().toLowerCase() != "") {
 
-    var violationList = Array();
+                    //is the validation source value numeric?
+                    if ($.isNumeric(validationSource.val().trim().toLowerCase())) {
+                        if (validationTarget.val().trim().toLowerCase() == "") {
+                            validationSource.attr("data-characteristics-error", "Please assign a value for " + validationTarget.attr("placeholder") + "!");
+                            oKFlag = false;
+                        }
+                    } else {
+                        if (validationTarget.val().trim().toLowerCase() != "") {
+                            validationSource.attr("data-characteristics-error", validationTarget.attr("placeholder") + " should be blank!");
+                            oKFlag = false;
+                        }
+                    }
+                }
 
-    for (var i = 0; i < formJSON.form_schema.length; ++i) {
-        var ctrlObject = formJSON.form_schema[i];
-
-        if (ctrlObject.hasOwnProperty("required") && (ctrlObject.required.toString() == "true")) {
-            if (ctrlObject.hasOwnProperty("control") && $.inArray(ctrlObject.control, custControls) > -1) {
-                if (!form_values[ctrlObject.id].trim()) {
-                    violationList.push(ctrlObject.label);
+                if (!oKFlag) {
+                    return "Not valid!";
                 }
             }
         }
-    }
-
-    if (violationList.length > 0) {
-        allowSubmit = false;
-
-        var message = "The following field is required!";
-
-        if (violationList.length > 1) {
-            message = "The following fields are required!";
-        }
-
-        //push error to UI
-        $("#show_form_errors").empty();
-
-        var alertDiv = $('<div/>',
-            {
-                class: "alert alert-danger"
-            });
-
-        alertDiv.append('<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>');
-
-        var lDiv = $('<div/>').append($('<div/>',
-            {
-                class: "row",
-                style: "margin-left: 10px;",
-                html: '<span>' + message + '</span>'
-            }));
-
-        $.each(violationList, function (k, v) {
-            k = (k + 1).toString();
-            lDiv.append($('<div/>',
-                {
-                    class: "row",
-                    style: "margin-left: 10px; margin-bottom:5px;",
-                    html: '<span>' + k + '.</span>' + '<span style="margin-left:5px;">' + v + '</span>'
-                }));
-        });
-        alertDiv.append(lDiv);
-
-        $("#show_form_errors").append(alertDiv);
-
-        //automatically close the alert
-        alertDiv.fadeTo(2500, 500).slideUp(1000, function () {
-            alertDiv.slideUp(1000);
-        });
-    }
-
-    return allowSubmit
+    });
 }
 
 function save_form(formJSON) {
@@ -1767,19 +1990,6 @@ function save_form(formJSON) {
     htmlForm.find("form").find(":input").each(function () {
         form_values[this.id] = $(this).val();
     });
-
-    //handle some special controls
-    for (var i = 0; i < formJSON.form_schema.length; ++i) {
-        if (formJSON.form_schema[i].control == "copo-sample-source" && formJSON.form_schema[i].type == "array") {
-            $.each(form_values[formJSON.form_schema[i].id].split(","), function (indx, value) {
-                if (indx == 0) {
-                    form_values[formJSON.form_schema[i].id] = value;
-                } else {
-                    form_values[formJSON.form_schema[i].id + "_" + indx] = value;
-                }
-            });
-        }
-    }
 
     var auto_fields = JSON.stringify(form_values);
 

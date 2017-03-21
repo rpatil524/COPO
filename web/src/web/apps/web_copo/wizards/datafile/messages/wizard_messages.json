@@ -27,7 +27,7 @@
       "text_class": "text-default"
     },
     "review_message": {
-      "text": "You have reached the final stage of the wizard. Use the 'Prev' and 'Next' buttons to review your entries. Alternatively, the quick navigation buttons can be used to jump to a specific stage. <br/><br/>Click <strong>Finish!</strong> to wrap up the current description.",
+      "text": "You have reached the final stage of the wizard. Use the 'Prev' and 'Next' buttons to review your entries.  <br/><br/>Click <strong>Finish!</strong> to wrap up the current description.",
       "text_class": "text-default"
     },
     "confirm_initiate_submission": {
@@ -51,7 +51,7 @@
       "text_class": "text-default"
     },
     "inherit_metadata_message": {
-      "text": "Some of the selected datafiles are ahead of others, in terms of description metadata, but can be inherited from. <br/><br/>Do you want selected datafiles having fewer description metadata to inherit the following metadata?",
+      "text": "Some of the selected datafiles are better described than others. <br/><br/>Do you want selected datafiles with less metadata to inherit the following metadata?",
       "text_class": "text-default"
     },
     "inherit_metadata_103_message": {
@@ -133,7 +133,7 @@
       "text_class": "text-info"
     },
     "singular_stage_message": {
-      "text": "Please be aware that all the items in the description bundle will be assigned the same metadata in this stage: the 'apply to all' button is disabled in this stage to emphasise this.  Click <b>Next</b>, when done, to proceed.",
+      "text": "Please be aware that all the items in the description bundle will be assigned the same metadata in this stage.  Click <b>Next</b>, when done, to proceed.",
       "text_class": "text-info"
     },
     "unselected_bundle_items_message": {

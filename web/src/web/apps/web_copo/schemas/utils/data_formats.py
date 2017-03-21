@@ -3,7 +3,6 @@ __author__ = 'etuka'
 import os
 import re
 import json
-
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 
@@ -14,7 +13,23 @@ class DataFormats:
         self.generated_controls = list()
         self.resource_objects = list()
         self.schema = schema.upper()
-        self.path_to_mappings = lkup.CONFIG_FILES[schema + "_MAPPINGS"]
+
+        self.path_to_mappings = lkup.UI_CONFIG_MAPPINGS
+
+        '''
+        NB: lkup.UI_CONFIG_MAPPINGS is the path to user interface (UI) schemas.
+        Fields assigned in the UI schemas override those assigned elsewhere (e.g., in a mapped configuration).
+        Every item under 'properties' in a UI schema must have the required attributes: "id" and "ref" defined:
+        "id" - to uniquely identify the item; "ref" - to map to some configuration (e.g., the ISA configuration).
+        The "ref" attribute may be left unassigned (i.e., ref: ""), only if no configuration is to be mapped, as is the
+        case with most of the schemas defiend under mappings.
+        Other attributes (e.g., "label") may be defined to override those defined, say, in some
+        configuration elsewhere.
+
+        Also, order matters! That is, the order of items in the properties list is preserved when those items are
+        rendered on the UI.
+        '''
+
         self.dispatch = {
             'isa_xml': self.isa_xml_mapping,
             'isa_json': self.isa_json_mapping,
@@ -24,17 +39,22 @@ class DataFormats:
     # generates template for UI rendering
     def generate_ui_template(self):
         new_list = []
-        for file_name in self.get_mapping_files():
-            file_dict = d_utils.json_to_pytype(os.path.join(self.path_to_mappings, file_name))
-            a = dict(file_handle=os.path.join(self.path_to_mappings, file_name), file_dict=file_dict)
-            self.resource_objects.append(a)
-            new_list = new_list + self.dispatch[
+        json_files_handle = self.get_mapping_files()
+        for file_name in json_files_handle:
+            file_dict = d_utils.json_to_pytype(file_name)
+            self.resource_objects.append(dict(file_handle=file_name, file_dict=file_dict))
+
+            mapped_list = self.dispatch[
                 file_dict['configuration']['provider'] + "_" + file_dict['configuration']['type']](file_dict)
+
+            if isinstance(mapped_list, list):
+                new_list.extend(mapped_list)
 
         if new_list:
             self.generated_controls = new_list
             # set some default fields
             self.set_type()
+            self.set_control_meta()
             self.set_deprecation()
             self.set_versioning()
             self.set_form_display()
@@ -186,6 +206,11 @@ class DataFormats:
             if not elem_dict.get("type"):
                 elem_dict["type"] = "string"
 
+    def set_control_meta(self):
+        for elem_dict in self.generated_controls:
+            if not elem_dict.get("control_meta"):
+                elem_dict["control_meta"] = dict()
+
     def set_versioning(self):
         for elem_dict in self.generated_controls:
             if not elem_dict.get("versions"):
@@ -232,58 +257,26 @@ class DataFormats:
         return match.group(1) if match else ''
 
     def get_mapping_files(self):
-        files = []
-        for file in os.listdir(self.path_to_mappings):
-            if file.endswith(".json"):
-                files.append(file)
+        json_files = list()
 
-        return files
+        for root, dirs, files in os.walk(self.path_to_mappings):
+            for name in files:
+                if name.endswith(".json"):
+                    json_files.append(os.path.join(root, name))
 
-    # todo: write a routine for mapping from an jsonschema
+        return json_files
+
+    # todo: write a routine for mapping from an jsonschema, i.e., if isa's xml and JSON schemas ever get harmonised
     def isa_json_mapping(self, arg_dict):
         return arg_dict['properties']
-        arm = arg_dict['configuration']['ref']
-        ref_schema = dict()
-
-        try:
-            ref_schema = lkup.ISA_SCHEMAS[arm]
-        except:
-            self.error_messages.append(
-                "Couldn't locate resource! Please ensure that a valid reference ('ref') is provided.")
-            return arg_dict['properties']
-
-        new_list = arg_dict['properties']
-        current_list = arg_dict['properties']
-
-        for elem_dict in current_list:
-            # try retrieving the mapping key...
-            mapping_key = str()
-
-            # in the following order
-            chk_key = "versions"
-            if elem_dict.get(chk_key) and len(elem_dict[chk_key]):
-                mapping_key = elem_dict[chk_key][-1:]
-            else:
-                chk_key = "ref"
-                if elem_dict.get(chk_key) and elem_dict[chk_key]:
-                    mapping_key = elem_dict[chk_key]
-                else:
-                    chk_key = "id"
-                    if elem_dict.get(chk_key) and elem_dict[chk_key]:
-                        mapping_key = elem_dict[chk_key].rsplit(".", 1)[1]
-
-            if not mapping_key:
-                return
 
     def copo_json_mapping(self, arg_dict):
         # get reference to the configuration resource
         arm = arg_dict['configuration']['ref']
-
         new_list = arg_dict['properties']
-        current_list = arg_dict['properties']
 
         # is there a configuration resource?
-        # basically mappings without a configuration resource is a way of hooking up to the schema grid generated,
+        # basically mappings without a configuration resource is a way of hooking up to the schema grid generated
         # rather than making an actual mapping between schema
         if not arm:
             return new_list

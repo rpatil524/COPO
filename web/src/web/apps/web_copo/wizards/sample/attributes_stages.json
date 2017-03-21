@@ -1,0 +1,14 @@
+{
+  "title": "ISA Sample Description",
+  "description": "Definitions for elements that appear in different stages of a wizard for describing isa samples. 'ref', id of stage; 'title',  header used for the stage; 'content', the function to call to generate stage html; items, actual form elements on the page; 'is_stage_stub', if the stage entry is a complete stage or a bootstrap; 'is_conditional_stage', displays a stage based on some condition being satisfied; 'is_singular_stage', if all items must have same value for this stage",
+  "properties": [
+    {
+      "ref": "sample_attributes",
+      "title": "Sample Attributes",
+      "message": "Enter the attributes that describe your sample(s)",
+      "items": [
+
+      ]
+    }
+  ]
+}

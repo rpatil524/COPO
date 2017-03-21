@@ -4,7 +4,6 @@
 {% load web_tags %}
 
 {% block stylesheet_block %}
-    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
     <link rel="stylesheet" href="{% static 'copo/css/copo/index.css' %}">
 
 {% endblock %}
@@ -32,6 +31,7 @@
         <input type="hidden" value="{% url 'copo:copo_submissions' profile_id='999' %}" name="submission_url"
                id="submission_url"/>
         <input type="hidden" value="{% url 'copo:copo_people' profile_id='999' %}" name="person_url" id="person_url"/>
+        <input type="hidden" value="{% url 'copo:copo_annotation' profile_id='999' %}" name="annotation_url" id="annotation_url"/>
 
     </div>
 {% endblock browse_header_block %}
@@ -91,7 +91,8 @@
                         </div>
                     </div>
                     <div class="component-item-body">
-                        <div style="background-color: transparent; font-size: 18px; font-weight: bold;" class="badge component-item-badge"></div>
+                        <div style="background-color: transparent; font-size: 18px; font-weight: bold;"
+                             class="badge component-item-badge"></div>
                         <div class="action-items" style="padding-top:20px;"></div>
                     </div>
                 </div>
@@ -105,14 +106,14 @@
                             <span class="profile-title" style="font-size: 16px; color: #4c49a0;"></span>
                         </a>
                     </div>
-                    <div class="panel-body profile-description" style="max-height: 100px; overflow-y: auto;"></div>
+                    <div class="panel-body profile-description" style="max-height: 100px; overflow-y: scroll;"></div>
                     <div class="panel-footer profile-date"></div>
                 </div>
             </div>
             <div class="col-sm-9 col-md-9 col-lg-9">
                 <div class="row components-section">
                     <!--Blank-->
-{#                    <div class="col-sm-2 col-md-2 col-lg-2"></div>#}
+                    {#                    <div class="col-sm-2 col-md-2 col-lg-2"></div>#}
                     <!--Datafiles-->
 
                     <!--Samples-->

@@ -1,0 +1,43 @@
+#annotation_content {
+    overflow-x: scroll;
+}
+
+td.column-highlighted {
+    background-color: #e7eef3;
+}
+
+td.table-header-highlighted {
+    background-color: #dfeffc;
+}
+
+td.table-header-labeled {
+    background-color: #a4e9c1;
+}
+
+#annotation_list {
+    margin-top: 30px
+}
+
+#annotations_table {
+    background-color: white;
+}
+
+#annotations_table tr {
+
+}
+
+#annotations_table th {
+    text-align: left;
+    border-bottom: 1px solid lightgrey;
+    padding: 15px 5px 2px 5px;
+    background-color: white;
+}
+
+#annotations_table td {
+    padding: 7px 5px 7px 8px;
+}
+
+.annotation_mouseover {
+    background-color: rgba(123, 187, 232, 1);
+    color: white;
+}

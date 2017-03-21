@@ -16,6 +16,8 @@ from exceptions_and_logging.logger import Logtype, Loglvl
 from exceptions_and_logging.CopoRuntimeError import CopoRuntimeError
 from django.conf import settings
 from allauth.account.forms import LoginForm
+from dal.copo_da import Annotation
+from bson import json_util as j
 
 LOGGER = settings.LOGGER
 
@@ -43,13 +45,17 @@ def login(request):
     return render(request, 'copo/auth/login.html', context)
 
 
+def test_pdf(request):
+    return render(request, 'copo/test_page.html', {})
+
+
 def test(request):
     try:
         LOGGER.log('Test Error Message 123', type=Logtype.FILE, level=Loglvl.INFO)
     except CopoRuntimeError as l:
         return render(request, 'copo/error_page.html', {'message': str(l)})
 
-    return HttpResponse("HELLO")
+    return render(request, 'copo/test_page.html')
 
 
 def test_submission(request):
@@ -106,6 +112,14 @@ def copo_publications(request, profile_id):
 
 
 @login_required
+def copo_annotation(request, profile_id):
+    request.session["profile_id"] = profile_id
+    profile = Profile().get_record(profile_id)
+
+    return render(request, 'copo/copo_annotations.html', {'profile_id': profile_id, 'profile': profile})
+
+
+@login_required
 def copo_people(request, profile_id):
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
@@ -146,15 +160,16 @@ def copo_visualize(request):
                      wizard_messages=broker_visuals.do_wizard_messages,
                      metadata_ratings=broker_visuals.do_metadata_ratings,
                      description_summary=broker_visuals.do_description_summary,
-                     sources_json_component=broker_visuals.get_sources_json_component,
-                     un_describe=broker_visuals.do_un_describe
+                     un_describe=broker_visuals.do_un_describe,
+                     attributes_display=broker_visuals.do_attributes_display,
+                     help_messages=broker_visuals.get_component_help_messages,
                      )
 
     if task in task_dict:
         context = task_dict[task]()
 
     out = jsonpickle.encode(context)
-    return HttpResponse(out, content_type='json')
+    return HttpResponse(out, content_type='application/json')
 
 
 @login_required
@@ -182,14 +197,16 @@ def copo_forms(request):
                          user_email=request.POST.get("user_email", str())
                          )
 
-    task_dict = dict(resources=broker_da.do_copo_schemas,
+    task_dict = dict(resources=broker_da.do_form_control_schemas,
                      save=broker_da.do_save_edit,
                      edit=broker_da.do_save_edit,
                      delete=broker_da.do_delete,
                      form=broker_da.do_form,
+                     form_and_component_records=broker_da.do_form_and_component_records,
                      doi=broker_da.do_doi,
                      initiate_submission=broker_da.do_initiate_submission,
-                     user_email=broker_da.do_user_email
+                     user_email=broker_da.do_user_email,
+                     component_record=broker_da.do_component_record,
                      )
 
     if task in task_dict:
@@ -197,7 +214,7 @@ def copo_forms(request):
 
     out = jsonpickle.encode(context)
 
-    return HttpResponse(out, content_type='json')
+    return HttpResponse(out, content_type='application/json')
 
 
 @login_required
@@ -259,10 +276,11 @@ def register_to_irods(request):
     out = jsonpickle.encode(return_structure)
     return HttpResponse(out, content_type='json')
 
+
 def view_oauth_tokens(request):
     return render(request, 'copo/copo_tokens.html', {})
 
 
-
 def annotate_data(request):
-    return render(request, 'annotate.html', {})
+    doc = Annotation().get_record(request.POST.get('target_id'))
+    return HttpResponse(j.dumps(doc))

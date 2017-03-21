@@ -5,6 +5,7 @@
 {% load html_tags %}
 
 {% block stylesheet_block %}
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_wizard.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/copo/sample_2.css' %}">
 {% endblock %}
 
@@ -30,64 +31,26 @@
 {% endblock page_tile %}
 
 {% block help_section %}
-    <div class="row" id="copoSampleHelp">
-        <div class="col-sm-12 col-md-12 col-lg-12" style="padding-right: 0px !important;">
-            <div class="panel panel-default">
-                <div class="panel-heading" style="font-size: 18px; padding: 15px 15px !important;">Information Panel
-                </div>
-                <div class="panel-body">
-                    <ul id="copo-sample-tabs" class="nav nav-tabs copo-tab-navs">
-                        <li class="active">
-                            <a data-toggle="tab" href="#sampleListTips" data-component="sampleList">
-                                <span class="copo-data-panel-title">
-                                    <i class="fa fa-file"></i>
-                                    <span class="icon_text">Inspect</span>
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-toggle="tab" href="#describeTips" data-component="describeTips">
-                                <span class="copo-data-panel-title">
-                                    <i class="fa fa-tags"></i>
-                                    <span class="icon_text">Describe</span>
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-toggle="tab" href="#generatedSamples" data-component="generatedSamples">
-                                <span class="copo-data-panel-title">
-                                    <i class="fa fa-filter"></i>
-                                    <span class="icon_text">Samples</span>
-                                </span>
-                            </a>
-                        </li>
+    <div id="sampleHelpSection">
+        <div class="panel panel-default" style="border-radius: 0px;">
+            <div class="panel-heading" style="padding: 0px 0px;">
+                <div class="dropdown">
+                    <button class="btn btn-lg btn-default dropdown-toggle" type="button" id="helpCentreMenu"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i> Information Panel
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu componentHelpList" aria-labelledby="helpCentreMenu">
                     </ul>
-
-                    <div class="tab-content">
-                        <div id="sampleListTips" class="tab-pane fade in active">
-                            <p>
-                            <table id="samplelist_howtos"
-                                   class="table table-striped table-bordered order-column hover copo-datatable copo-table-header"
-                                   width="100%"></table>
-                            </p>
-                        </div>
-                        <div id="describeTips" class="tab-pane fade">
-                            <p>
-                            <table id="describe_howtos"
-                                   class="table table-striped table-bordered order-column hover copo-datatable copo-table-header"
-                                   width="100%"></table>
-                            </p>
-                        </div>
-                        <div id="generatedSamples" class="tab-pane fade">
-                            <h3 id="generatedSamplesPara"></h3>
-                            <p>
-                            <table id="generated_samples_table"
-                                   class="table table-striped table-bordered order-column hover copo-datatable copo-table-header"
-                                   width="100%"></table>
-                            </p>
-                        </div>
-
-                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div id="copo_instant_info"></div>
+                <div id="helptipsDiv" style="display: block;">
+                    <table id="sample_help_table"
+                           class="table table-striped table-bordered order-column hover copo-datatable copo-table-header"
+                           width="100%">
+                    </table>
                 </div>
             </div>
         </div>
@@ -102,7 +65,7 @@
 
     <div class="row">
         <div class="col-sm-12 col-md-12 col-lg-12" style="padding-right: 0px !important;">
-            <ul id="copo-datafile-tabs" class="nav nav-tabs copo-tab-navs">
+            <ul id="sample-display-tabs" class="nav nav-tabs copo-tab-navs">
                 <li class="active"><a data-toggle="tab" href="#fileListComponent" data-component="fileListComponent">
                     <span class="copo-data-panel-title">
                         <i class="fa fa-file"></i>
@@ -134,16 +97,18 @@
                     <div id="data_wizard_data" style="margin-top: 15px;">
                         <div class="row">
                             <div class="col-sm-12 col-md-12 col-lg-12">
-                                <div class="pull-right" id="wizard_steps_buttons">
+                                <div>
+                                    <button id="wizard_fire_button" type="button" class="btn btn-success">
+                                        <i class="fa fa-plus-circle">&nbsp;</i><span>Add New Samples</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                         <br/>
 
                         <div class="fuelux" style="margin-bottom: 5px;">
-                            <div class="wizard" data-initialize="wizard" id="dataFileWizard"
-                                 style="display: none;"
-                                 tabindex="0">
+                            <div class="wizard" data-initialize="wizard" id="sampleWizard"
+                                 style="display: none;">
                                 <div class="steps-container">
                                     <ul class="steps">
 
@@ -165,9 +130,9 @@
                     </div>
                     <div class="row">
                         <div class="col-md-8" style="display: none;">
-                            <button data-toggle="tooltip" title="Save & Exit Description "
+                            <button data-toggle="tooltip" title="Exit Description "
                                     id="remove_act"
-                                    class="btn btn-sm btn-primary" type="button">Exit Description
+                                    class="btn btn-danger" type="button">Exit Sample Description
                             </button>
                         </div>
                     </div>

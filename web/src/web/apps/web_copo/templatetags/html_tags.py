@@ -1,6 +1,7 @@
 __author__ = 'tonietuk'
 
 import json
+import copy
 from uuid import uuid4
 from django import template
 from django.core.urlresolvers import reverse
@@ -17,7 +18,8 @@ register = template.Library()
 table_id_dict = dict(publication="publication_table",
                      person="person_table",
                      sample="sample_table",
-                     datafile="datafile_table"
+                     datafile="datafile_table",
+                     annotation="annotation_table"
                      )
 
 
@@ -68,9 +70,9 @@ def generate_ui_labels(field_id):
 
 
 def get_control_options(f):
-    # option values are typically defined as a list of option,
-    # or in some special cases (e.g., 'copo-multi-search'),
-    # as JSON (dictionary). However, the options could also be resolved or generated dynamically
+    # option values are typically defined as a list,
+    # or in some cases (e.g., 'copo-multi-search'),
+    # as a dictionary. However, option values could also be resolved or generated dynamically
     # using callbacks. Callbacks, essentially, define functions that resolve options data
 
     option_values = list()
@@ -96,19 +98,19 @@ def get_control_options(f):
 
 @register.filter("generate_copo_form")
 def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), message_dict=dict(), profile_id=str()):
-    # message_dict templates are defined in the lookup dictionary, "MESSAGES_LKUPS"
+    # message_dict templates are defined in the lookup dictionary: "MESSAGES_LKUPS"
 
-    label_dict = dict(publication=dict(label="Publication", clonable=False),
-                      person=dict(label="Person", clonable=False),
-                      sample=dict(label="Sample", clonable=True),
-                      source=dict(label="Source", clonable=True),
-                      profile=dict(label="Profile", clonable=False),
-                      )
-
-    form_value = component_dict
-    form_schema = list()
+    label_dict = get_labels()
 
     da_object = DAComponent(component=component, profile_id=profile_id)
+
+    form_value = component_dict
+
+    # get record, if in edit mode
+    if target_id:
+        form_value = da_object.get_record(target_id)
+
+    form_schema = list()
 
     # get schema fields
     for f in da_object.get_schema().get("schema_dict"):
@@ -116,23 +118,21 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
 
             # if required, resolve data source for select-type controls,
             # i.e., if a callback is defined on the 'option_values' field
-
             if "option_values" in f:
                 f["option_values"] = get_control_options(f)
 
+            # resolve values for unique items...
+            # if a list of unique items is provided with the schema, use it, else dynamically
+            # generate unique items based on the component records
+            if "unique" in f and not f.get("unique_items", list()):
+                f["unique_items"] = generate_unique_items(component=component, profile_id=profile_id,
+                                                          elem_id=f["id"].split(".")[-1], record_id=target_id)
+
+            # filter based on sample type
+            if component == "sample" and not filter_sample_type(form_value, f):
+                continue
+
             form_schema.append(f)
-
-    # get record, if in edit context...and set form title
-
-    if target_id:
-        form_value = da_object.get_record(target_id)
-
-    # get all records: used in the UI for 'cloning' purposes
-
-    # get all records: used in the UI for 'cloning' and other purposes
-    component_records = list()
-    if label_dict.get(component, dict()).get("clonable", False):
-        component_records = generate_component_records(component, profile_id)
 
     return dict(component_name=component,
                 form_label=label_dict.get(component, dict()).get("label", str()),
@@ -140,24 +140,69 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
                 target_id=target_id,
                 form_schema=form_schema,
                 form_message=message_dict,
-                component_records=component_records,
-                clonable=label_dict.get(component, dict()).get("clonable", False),
                 )
 
 
+@register.filter("get_labels")
+def get_labels():
+    label_dict = dict(publication=dict(label="Publication"),
+                      person=dict(label="Person"),
+                      sample=dict(label="Sample"),
+                      source=dict(label="Source"),
+                      profile=dict(label="Profile"),
+                      annotation=dict(label="Annotation"),
+                      datafile=dict(label="Datafile"),
+                      )
+
+    return label_dict
+
+
+@register.filter("filter_sample_type")
+def filter_sample_type(form_value, elem):
+    # filters UI elements based on sample type
+
+    allowable = True
+    default_type = "biosample"
+    sample_types = list()
+
+    for s_t in d_utils.get_sample_type_options():
+        sample_types.append(s_t["value"])
+
+    if "sample_type" in form_value:
+        default_type = form_value["sample_type"]
+
+    if default_type not in elem.get("specifications", sample_types):
+        allowable = False
+
+    return allowable
+
+
 @register.filter("generate_component_record")
-def generate_component_records(component=str(), profile_id=str()):
+def generate_component_records(component=str(), profile_id=str(), label_key=str()):
+    da_object = DAComponent(component=component, profile_id=profile_id)
+    component_records = list()
+    schema = da_object.get_schema().get("schema_dict")
+
+    # if label_key is not provided, we will assume the first element in the schema to be the label_key
+
+    if not label_key:
+        label_key = schema[0]["id"].split(".")[-1]
+
+    for record in da_object.get_all_records():
+        option = dict(value=str(record["_id"]), label=record[label_key])
+        component_records.append(option)
+
+    return component_records
+
+
+@register.filter("generate_unique_items")
+def generate_unique_items(component=str(), profile_id=str(), elem_id=str(), record_id=str()):
     da_object = DAComponent(component=component, profile_id=profile_id)
     component_records = list()
 
     for record in da_object.get_all_records():
-        rec_dict = dict(_id=str(record["_id"]))
-        for f in da_object.get_schema().get("schema_dict"):
-            if f.get("show_in_form", True):
-                key_split = f["id"].split(".")[-1]
-                rec_dict[key_split] = record.get(key_split, d_utils.default_jsontype(f.get("type", str())))
-
-        component_records.append(rec_dict)
+        if elem_id in record and not str(record["_id"]) == record_id:
+            component_records.append(record[elem_id])
 
     return component_records
 
@@ -165,25 +210,6 @@ def generate_component_records(component=str(), profile_id=str()):
 @register.filter("generate_copo_table_data")
 def generate_copo_table_data(profile_id=str(), component=str()):
     # This method generates the 'json' for building an UI table
-
-    # define button
-    button_templates = d_utils.get_button_templates()
-
-    common_btn_dict = dict(row_btns=[button_templates['edit_row'], button_templates['delete_row']],
-                           global_btns=[button_templates['delete_global']])
-
-    buttons_dict = dict(publication=common_btn_dict,
-                        person=common_btn_dict,
-                        sample=dict(row_btns=[button_templates['info_row'], button_templates['edit_row'], button_templates['convert_row'], button_templates['delete_row']],
-                                    global_btns=[button_templates['add_new_samples_global'],
-                                                 button_templates['delete_global']]),
-                        source=common_btn_dict,
-                        profile=common_btn_dict,
-                        datafile=dict(
-                            row_btns=[button_templates['info_row'], button_templates['describe_row'],
-                                      button_templates['delete_row']],
-                            global_btns=[button_templates['describe_global'], button_templates['undescribe_global']])
-                        )
 
     # instantiate data access object
     da_object = DAComponent(profile_id, component)
@@ -194,9 +220,12 @@ def generate_copo_table_data(profile_id=str(), component=str()):
     columns = list()
     dataSet = list()
 
+    displayable_fields = list()
+
     # headers
     for f in da_object.get_schema().get("schema_dict"):
         if f.get("show_in_table", True):
+            displayable_fields.append(f)
             columns.append(dict(title=f["label"]))
 
     columns.append(dict(title=str()))  # extra 'blank' header for record actions column
@@ -204,12 +233,36 @@ def generate_copo_table_data(profile_id=str(), component=str()):
     # data
     for rec in records:
         row = list()
-        for f in da_object.get_schema().get("schema_dict"):
-            if f.get("show_in_table", True):
-                row.append(resolve_control_output(rec, f))
+        for df in displayable_fields:
+            row.append(resolve_control_output(rec, df))
 
         row.append(str(rec["_id"]))  # last element in a row exposes the id of the record
         dataSet.append(row)
+
+    # define action buttons
+    button_templates = d_utils.get_button_templates()
+
+    common_btn_dict = dict(row_btns=[button_templates['edit_row'], button_templates['delete_row']],
+                           global_btns=[button_templates['delete_global']])
+
+    sample_info = copy.deepcopy(button_templates['info_row'])
+    sample_info["text"] = "Sample Attributes"
+
+    buttons_dict = dict(publication=common_btn_dict,
+                        person=common_btn_dict,
+                        sample=dict(row_btns=[sample_info, button_templates['edit_row'],
+                                              button_templates['delete_row']],
+                                    global_btns=[button_templates['add_new_samples_global'],
+                                                 button_templates['delete_global']]),
+                        source=common_btn_dict,
+                        profile=common_btn_dict,
+                        annotation=common_btn_dict,
+                        datafile=dict(
+                            row_btns=[button_templates['info_row'], button_templates['describe_row'],
+                                      button_templates['delete_row']],
+                            global_btns=[button_templates['describe_global'],
+                                         button_templates['undescribe_global']])
+                        )
 
     action_buttons = dict(row_btns=buttons_dict.get(component).get("row_btns"),
                           global_btns=buttons_dict.get(component).get("global_btns")
@@ -261,6 +314,70 @@ def generate_copo_profiles_data(profiles=list()):
     return data_set
 
 
+@register.filter("generate_attributes")
+def generate_attributes(component, target_id):
+    da_object = DAComponent(component=component)
+    schema = da_object.get_schema().get("schema_dict")
+
+    columns = list()
+    record = da_object.get_record(target_id)
+
+    filter_attributes = dict(component=component)  # holds parameters for filtering out display columns
+
+    if component == "sample":  # sample decides what to show based on sample type
+        sample_types = list()
+
+        for s_t in d_utils.get_sample_type_options():
+            sample_types.append(s_t["value"])
+
+        sample_type = record.get("sample_type", str())
+        filter_attributes["sample_types"] = sample_types
+        filter_attributes["sample_type"] = sample_type
+
+    for f in schema:
+        # get relevant attributes based on filter
+        filter_attributes["elem"] = f
+
+        if attribute_filter(filter_attributes):
+
+            # get short-form id
+            f["id"] = f["id"].split(".")[-1]
+            col = dict(title=f["label"], id=f["id"], control=f["control"])
+
+            # if required, resolve data source for select-type controls,
+            # i.e., if a callback is defined on the 'option_values' field
+            if "option_values" in f:
+                f["option_values"] = get_control_options(f)
+
+            col["data"] = resolve_control_output(record, f)
+
+            columns.append(col)
+
+    return columns
+
+
+def attribute_filter(filter_attributes):
+    """
+    filters attribute for display
+    :param filter_attributes:
+    :return:
+    """
+    clear_attribute = True
+
+    elem = filter_attributes["elem"]
+    component = filter_attributes["component"]
+
+    if not elem.get("show_as_attribute", False):
+        return False
+
+    # do component-specific test here
+    if component == "sample":
+        if filter_attributes["sample_type"] not in elem.get("specifications", filter_attributes["sample_types"]):
+            return False
+
+    return clear_attribute
+
+
 def resolve_control_output(data_dict, elem):
     resolved_value = str()
 
@@ -280,38 +397,33 @@ def resolve_control_output(data_dict, elem):
 
 
 def get_resolver(data, elem):
-    func_map = dict(
-        resolve_copo_sample_source_data=resolve_copo_sample_source_data,
-        resolve_copo_characteristics_data=resolve_copo_characteristics_data,
-        resolve_copo_comment_data=resolve_copo_comment_data,
-        resolve_copo_multi_select_data=resolve_copo_multi_select_data,
-        resolve_copo_multi_search_data=resolve_copo_multi_search_data,
-        resolve_select_data=resolve_select_data,
-        resolve_ontology_term_data=resolve_ontology_term_data,
-        resolve_copo_select_data=resolve_copo_select_data,
-        resolve_datetime_data=resolve_datetime_data,
-        resolve_description_data=resolve_description_data
-    )
-    resolver_list = [
-        dict(control="copo-sample-source", resolver="resolve_copo_sample_source_data"),
-        dict(control="copo-characteristics", resolver="resolve_copo_characteristics_data"),
-        dict(control="copo-comment", resolver="resolve_copo_comment_data"),
-        dict(control="copo-multi-select", resolver="resolve_copo_multi_select_data"),
-        dict(control="copo-multi-search", resolver="resolve_copo_multi_search_data"),
-        dict(control="select", resolver="resolve_select_data"),
-        dict(control="ontology term", resolver="resolve_ontology_term_data"),
-        dict(control="copo-select", resolver="resolve_copo_select_data"),
-        dict(control="datetime", resolver="resolve_datetime_data"),
-        dict(control="datafile-description", resolver="resolve_description_data")
-    ]
+    """
+    function resolves data for UI display, by mapping control to a resolver function
+    :param data:
+    :param elem:
+    :return:
+    """
+    func_map = dict()
+    func_map["copo-characteristics"] = resolve_copo_characteristics_data
+    func_map["copo-environmental-characteristics"] = resolve_environmental_characteristics_data
+    func_map["copo-phenotypic-characteristics"] = resolve_phenotypic_characteristics_data
+    func_map["copo-comment"] = resolve_copo_comment_data
+    func_map["copo-multi-select"] = resolve_copo_multi_select_data
+    func_map["copo-multi-search"] = resolve_copo_multi_search_data
+    func_map["select"] = resolve_select_data
+    func_map["ontology term"] = resolve_ontology_term_data
+    func_map["copo-select"] = resolve_copo_select_data
+    func_map["datetime"] = resolve_datetime_data
+    func_map["datafile-description"] = resolve_description_data
+    func_map["date-picker"] = resolve_datepicker_data
+    func_map["copo-duration"] = resolve_copo_duration_data
 
-    resolver = [x for x in resolver_list if x['control'] == elem["control"].lower()]
-    if resolver:
-        resolver = func_map[resolver[0]["resolver"]](data, elem)
+    if elem["control"].lower() in func_map:
+        resolved_data = func_map[elem["control"].lower()](data, elem)
     else:
-        resolver = resolve_default_data(data)
+        resolved_data = resolve_default_data(data)
 
-    return resolver
+    return resolved_data
 
 
 def resolve_description_data(data, elem):
@@ -333,14 +445,24 @@ def resolve_description_data(data, elem):
             )
 
             # drill down to stage items
-
             for item in stage.get("items", list()):
                 item_id = item.get("id", str())
+                item_id = item_id.split(".")[-1]
                 item_dict = dict(label=item.get("label", str()), data=str())
 
+                resolved_value_sub = str()
                 if item_id in stage_data:
-                    # use item control and determine how to retrieve item data
-                    item_dict["data"] = get_resolver(stage_data[item_id], item)
+                    # resolve array data types
+                    if item.get("type", str()) == "array":
+                        resolved_value_sub = list()
+                        data = stage_data[item_id]
+                        for d in data:
+                            resolved_value_sub.append(get_resolver(d, item))
+                    else:
+                        # non-array types
+                        resolved_value_sub = get_resolver(stage_data[item_id], item)
+
+                    item_dict["data"] = resolved_value_sub
 
                 stage_dict.get("data").append(item_dict)
 
@@ -349,24 +471,23 @@ def resolve_description_data(data, elem):
     return resolved_value
 
 
-def resolve_copo_sample_source_data(data, elem):
-    option_values = None
-    resolved_value = str()
-    if "option_values" in elem:
-        option_values = get_control_options(elem)
-
-    if option_values and data:
-        value_field = option_values.get("value_field", str())
-        label_field = option_values.get("label_field", str())
-        for option in option_values["options"]:
-            if option.get(value_field, str()) == data:
-                resolved_value = option.get(label_field, str())
-
-    return resolved_value
-
-
 def resolve_copo_characteristics_data(data, elem):
-    schema = DataSchemas("COPO").get_ui_template().get("copo").get("material_attribute_value").get("fields")
+    schema = d_utils.get_copo_schema("material_attribute_value")
+
+    resolved_data = list()
+
+    for f in schema:
+        if f.get("show_in_table", True):
+            a = dict()
+            if f["id"].split(".")[-1] in data:
+                a[f["id"].split(".")[-1]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
+                resolved_data.append(a)
+
+    return resolved_data
+
+
+def resolve_environmental_characteristics_data(data, elem):
+    schema = d_utils.get_copo_schema("environment_variables")
 
     resolved_data = list()
 
@@ -377,18 +498,35 @@ def resolve_copo_characteristics_data(data, elem):
                 a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
                 resolved_data.append(a)
 
-    return resolved_data
+    return str(resolved_data) # turn this casting off after merge
 
 
-def resolve_copo_comment_data(data, elem):
-    schema = DataSchemas("COPO").get_ui_template().get("copo").get("comment").get("fields")
+def resolve_phenotypic_characteristics_data(data, elem):
+    schema = d_utils.get_copo_schema("phenotypic_variables")
 
     resolved_data = list()
 
     for f in schema:
         if f.get("show_in_table", True):
+            a = dict()
             if f["id"].split(".")[-1] in data:
-                resolved_data.append(data[f["id"].split(".")[-1]])
+                a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
+                resolved_data.append(a)
+
+    return str(resolved_data) # turn this casting off after merge
+
+
+def resolve_copo_comment_data(data, elem):
+    schema = d_utils.get_copo_schema("comment")
+
+    resolved_data = list()
+
+    for f in schema:
+        if f.get("show_in_table", True):
+            a = dict()
+            if f["id"].split(".")[-1] in data:
+                a[f["id"].split(".")[-1]] = data[f["id"].split(".")[-1]]
+                resolved_data.append(a)
 
     if not resolved_data:
         resolved_data = str()
@@ -425,6 +563,9 @@ def resolve_copo_multi_search_data(data, elem):
     resolved_value = list()
 
     option_values = None
+
+    if isinstance(data, list):
+        data = ','.join(map(str, data))
 
     if "option_values" in elem:
         option_values = get_control_options(elem)
@@ -484,6 +625,28 @@ def resolve_datetime_data(data, elem):
     if data:
         resolved_value = data.strftime('%d %b, %Y, %H:%M:%S')
     return resolved_value
+
+
+def resolve_datepicker_data(data, elem):
+    resolved_value = str()
+    if data:
+        resolved_value = data
+    return resolved_value
+
+
+def resolve_copo_duration_data(data, elem):
+    schema = d_utils.get_copo_schema("duration")
+
+    resolved_data = list()
+
+    for f in schema:
+        if f.get("show_in_table", True):
+            # a = dict()
+            if f["id"].split(".")[-1] in data:
+                # a[f["label"]] = data[f["id"].split(".")[-1]]
+                resolved_data.append(f["label"] + ": " + data[f["id"].split(".")[-1]])
+
+    return resolved_data
 
 
 def resolve_default_data(data):

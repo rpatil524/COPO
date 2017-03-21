@@ -185,7 +185,6 @@ div[class^="col-"], div[class*=" col-"] {
     color: #fff;
     background: transparent;
     margin-top: 13px;
-    cursor: hand;
     cursor: pointer;
     height: 30px;
     float: left;
@@ -213,7 +212,6 @@ div[class^="col-"], div[class*=" col-"] {
     position: absolute;
     right: 0px;
     cursor: pointer;
-    cursor: hand;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
@@ -230,7 +228,6 @@ div[class^="col-"], div[class*=" col-"] {
     right: 375px;
     margin-top: 2px;
     cursor: pointer;
-    cursor: hand;
 }
 
 .copo-search-bar {
@@ -748,7 +745,6 @@ th {
 
 /*end div box*/
 
-
 /*custom nav items*/
 .quick-component-create {
     margin-left: 10px;
@@ -759,6 +755,7 @@ th {
 .page-title-custom {
     padding-left: 0px !important;
     font-size: 20px;
+    font-weight: 500;
 }
 
 .copo-components-icons {
@@ -852,7 +849,6 @@ th {
     color: rgba(51, 51, 51, 1);
 }
 
-
 .btn-custom2 {
     background: rgba(188, 204, 203, 1);
     border-color: rgba(230, 235, 234, 1);
@@ -895,6 +891,33 @@ th {
     color: rgba(51, 51, 51, 1);
 }
 
+.btn-custom4 {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(235, 235, 235, 1);
+    color: rgba(255, 255, 255, 1);
+    font-size: 14px;
+    border-radius: 4px;
+    border-width: 1px;
+}
+
+.btn-custom4:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(235, 235, 235, 1);
+    color: rgba(255, 255, 255, 1);
+}
+
+.btn-custom4:active, .btn-custom4:focus {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(235, 235, 235, 1);
+    color: rgba(255, 255, 255, 1);
+}
+
+.btn.btn-custom4:active, .btn.btn-custom4.active {
+    background-image: none;
+    /*box-shadow: 0 3px 5px rgba(83, 140, 198, 0.5) inset;*/
+    outline: 0 none;
+}
+
 /*end custom buttons*/
 
 /*sidebar*/
@@ -931,36 +954,15 @@ th {
     color: #ffffff !important;
 }
 
-.sample-type-disable {
-    opacity: 0.2 !important;
+.copo-list-type-selected > a {
+    border: 1px solid transparent !important;
 }
 
-.sample-type {
-    border-radius: 0 !important;
-    margin-right: 3px;
-    border-color: transparent !important;
-    font-size: 16px !important;
-}
-
-.btn-sample-types {
-    background: rgba(161, 168, 34, 1);
-    border-color: rgba(204, 204, 204, 1);
-    color: rgba(255, 255, 255, 1);
-    font-size: 14px;
-    border-radius: 4px;
-    border-width: 1px;
-}
-
-.btn-sample-types:hover {
-    background: rgba(235, 235, 235, 1);
-    border-color: rgba(173, 173, 173, 1);
-    color: rgba(51, 51, 51, 1);
-}
-
-.btn-sample-types:active, .btn-sample-types:focus {
-    background: rgba(235, 235, 235, 1);
-    border-color: rgba(173, 173, 173, 1);
-    color: rgba(51, 51, 51, 1);
+.copo-active.active,
+.copo-active.active:hover {
+    background-color: #245580 !important;
+    text-shadow: none !important;
+    color: #ffffff !important;
 }
 
 /*end form state buttons*/
@@ -994,3 +996,70 @@ th {
 }
 
 /*end copo-tab-nav*/
+
+/*copo-component-attributes*/
+.copo-component-attributes-outer {
+    padding: 5px 0px;
+    margin-bottom: 3px;
+}
+
+.copo-component-attributes-inner {
+    padding: 3px;
+    border: 1px solid #595959;
+    border-radius: 2px;
+    margin-right: 3px;
+}
+
+.copo-component-attributes-inner-0 {
+    background-color: #ADD8E6;
+    padding: 3px;
+    border: 1px solid #595959;
+    border-radius: 2px;
+    margin-right: 3px;
+}
+
+/*end copo-component attributes*/
+
+/*datatable focus*/
+
+table.dataTable td.focus {
+    outline: 4px solid rgba(179, 0, 0, 0.6) !important;
+}
+
+/*end datatable focus*/
+
+/*selectize overrides*/
+.selectize-dropdown-content {
+    background-color: #ffffff !important;
+    border: 2px solid #D4E4ED;
+}
+
+.selectize-dropdown {
+    z-index: 9999 !important;
+}
+
+/*end selectize overrrides*/
+
+/*form control focus*/
+.copo-form-control-focus {
+    background-color: rgba(220, 233, 239, 0.2);
+    /*padding-bottom: 5px;*/
+    border-radius: 4px
+}
+/*end form control focus*/
+
+.datepicker-days th{
+    background-color: transparent;
+}
+
+input.date-picker{
+    width: 200px;
+}
+
+#gh_controls, #field_controls{
+    margin-top: 15px;
+}
+
+.autocomplete{
+    z-index: 10;
+}

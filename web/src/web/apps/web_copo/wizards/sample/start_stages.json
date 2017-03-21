@@ -5,7 +5,7 @@
     {
       "ref": "number_of_samples",
       "title": "Number of Samples",
-      "message": "How many samples do you want to describe? You can describe multiple samples with a common set of attributes.",
+      "message": "How many samples do you want to describe? You can describe multiple samples having a common set of attributes.",
       "items": [
         {
           "id": "number_of_samples",
@@ -13,14 +13,49 @@
           "label": "Number of Samples",
           "hidden": "false",
           "required": "true",
-          "control": "copo-item-count"
+          "control": "copo-item-count",
+          "min": 1,
+          "max": 1000
+        }
+      ]
+    },
+    {
+      "ref": "confirm_sample_clone",
+      "is_conditional_stage": true,
+      "callback": {
+        "function": "confirm_sample_clone",
+        "parameter": ""
+      },
+      "title": "Sample Clone",
+      "message": "Do you want to clone an existing sample? Cloning an existing sample can speed up the description process.",
+      "items": [
+        {
+          "id": "confirm_sample_clone",
+          "help_tip": "Select 'Yes' if you intend to clone an existing sample",
+          "label": "Clone a Sample?",
+          "hidden": "false",
+          "required": "true",
+          "control": "copo-button-list",
+          "default_value": "yes",
+          "option_values": [
+            {
+              "value": "yes",
+              "label": "Yes",
+              "description": "Select this option if you wish to clone an existing sample. You will, at a later stage, be able to select a sample to clone. "
+            },
+            {
+              "value": "no",
+              "label": "No",
+              "description": "Select this option if you do not wish to clone a sample."
+            }
+          ]
         }
       ]
     },
     {
       "ref": "sample_type",
       "title": "Sample Type",
-      "message": "How do want to describe your samples? Sample Type provides specifications to help capture sample metadata.",
+      "message": "How do want to describe your samples? Sample Type provides suitable metadata specifications for your description.",
       "items": [
         {
           "id": "sample_type",
@@ -29,44 +64,81 @@
           "hidden": "false",
           "required": "true",
           "control": "copo-button-list",
-          "default_value": "bio",
-          "option_values": [
-            {
-              "value": "biosample",
-              "label": "BioSample",
-              "description": "BioSamples are <strong>repository agnostic</strong>, and are better suited for describing samples in a generic manner or in contexts where the target repository isn't known <i>a priori</i>."
-            },
-            {
-              "value": "isasample",
-              "label": "ISA Sample",
-              "description": "ISA samples are based on the ISA specification, and are better tailored for describing samples that will subsequently become part of data submissions to repositories such as <strong>ENA</strong> and <strong>Metabolights</strong>."
+          "default_value": "isasample",
+          "option_values": {
+            "callback": {
+              "function": "get_sample_type_options",
+              "parameter": ""
             }
-          ]
+          }
+        }
+      ]
+    },
+    {
+      "ref": "sample_clone",
+      "is_conditional_stage": true,
+      "callback": {
+        "function": "display_sample_clone",
+        "parameter": "confirm_sample_clone"
+      },
+      "title": "Clone Target",
+      "message": "You may now select a sample to clone",
+      "items": [
+        {
+          "id": "sample_clone",
+          "type": "string",
+          "help_tip": "Select sample to clone",
+          "label": "Sample",
+          "hidden": "false",
+          "required": "false",
+          "control": "copo-multi-search",
+          "show_create_button": false,
+          "option_component": "sample",
+          "data_maxItems": 1,
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_samples_json",
+              "parameter": ""
+            }
+          }
         }
       ]
     },
     {
       "ref": "sample_name",
-      "title": "Sample Name",
-      "message": "What is the name of your sample? The sample name will be used as a prefix for labelling your samples.",
+      "title": "Sample Bundle",
+      "message": "Please provide information that can be used to label your samples. If you already have sample names entered elsewhere, you can enter or paste them as tab or comma delimited string values in the <strong>Provided Names</strong> box. Alternatively, you can supply a ‘bundle name’, in the <strong>Bundle Name</strong> box, that will form the base part from which individual sample names may be derived. Please note the following: <ol><li> <strong>Provided Names</strong>, if supplied, takes precedence over <strong>Bundle Name</strong> </li><li>Sample names, both generated and provided, will be validated in the next stage for uniqueness</li></ol>",
       "items": [
         {
           "type": "string",
-          "required": "true",
-          "ref": "Sample Name",
+          "required": "false",
           "hidden": "false",
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "name",
+          "id": "bundle_name",
           "show_in_table": true,
-          "unique": true,
           "control": "text",
-          "versions": [
-            "name"
-          ],
-          "help_tip": "A Sample represents major outputs resulting from a protocol application other than the special case outputs of Extract or a Labeled Extract.",
-          "label": "Sample Name"
+          "help_tip": "A bundle name is the base part from which individual sample names may be derived.",
+          "label": "Bundle Name"
+        }
+      ]
+    },
+    {
+      "ref": "assigned_sample_name",
+      "title": "Sample Name",
+      "message": "Do you want to modify the generated sample names to better reflect individual samples in your bundle?",
+      "items": [
+        {
+          "type": "string",
+          "required": "true",
+          "hidden": "false",
+          "default_value": "",
+          "id": "assigned_sample_name",
+          "control": "text",
+          "help_tip": "Assigned sample names",
+          "label": "Sample Names"
         }
       ]
     },

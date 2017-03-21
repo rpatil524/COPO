@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<EXPERIMENT_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.experiment.xsd">
+	<EXPERIMENT alias="58501ad974d3e1009fa0208d:generic_assay:a_58501ad974d3e1009fa0208d:EXP1" broker_name="TGAC" center_name="TGAC">
+		<TITLE>Sequencing library derived from sample Musa NAC genes_1481644205_1</TITLE>
+		<STUDY_REF refname="58501ad974d3e1009fa0208d"/>
+		<DESIGN>
+			<DESIGN_DESCRIPTION>See study and sample descriptions for details</DESIGN_DESCRIPTION>
+			<SAMPLE_DESCRIPTOR refname="58501ad974d3e1009fa0208d:sample:Musa NAC genes_1481644205_1"/>
+			<LIBRARY_DESCRIPTOR>
+				<LIBRARY_NAME>58501ad974d3e1009fa0208d:assay:Musa NAC genes_1481644205_1.None</LIBRARY_NAME>
+				<LIBRARY_STRATEGY>OTHER</LIBRARY_STRATEGY>
+				<LIBRARY_SOURCE>METAGENOMIC</LIBRARY_SOURCE>
+				<LIBRARY_SELECTION>unspecified</LIBRARY_SELECTION>
+				<LIBRARY_LAYOUT>
+					<SINGLE/>
+				</LIBRARY_LAYOUT>
+				<LIBRARY_CONSTRUCTION_PROTOCOL>
+ protocol_description: </LIBRARY_CONSTRUCTION_PROTOCOL>
+			</LIBRARY_DESCRIPTOR>
+			<SPOT_DESCRIPTOR>
+				<SPOT_DECODE_SPEC>
+					<READ_SPEC>
+						<READ_INDEX>0</READ_INDEX>
+						<READ_CLASS>Technical Read</READ_CLASS>
+						<READ_TYPE>Adapter</READ_TYPE>
+						<BASE_COORD>1</BASE_COORD>
+					</READ_SPEC>
+					<READ_SPEC>
+						<READ_INDEX>1</READ_INDEX>
+						<READ_CLASS>Application Read</READ_CLASS>
+						<READ_TYPE>Forward</READ_TYPE>
+						<BASE_COORD>5</BASE_COORD>
+					</READ_SPEC>
+				</SPOT_DECODE_SPEC>
+			</SPOT_DESCRIPTOR>
+		</DESIGN>
+		<PLATFORM>
+			<LS454>
+				<INSTRUMENT_MODEL>454 GS</INSTRUMENT_MODEL>
+			</LS454>
+		</PLATFORM>
+	</EXPERIMENT>
+</EXPERIMENT_SET>
+

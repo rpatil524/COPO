@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<SAMPLE_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.sample.xsd">
+	<SAMPLE alias="5850051274d3e1009da14912:sample:test_extended_1481637501_10" broker_name="TGAC" center_name="TGAC">
+		<TITLE>5850051274d3e1009da14912:sample:test_extended_1481637501_10</TITLE>
+		<SAMPLE_NAME>
+			<TAXON_ID>9606</TAXON_ID>
+			<SCIENTIFIC_NAME>Homo sapiens</SCIENTIFIC_NAME>
+		</SAMPLE_NAME>
+		<SAMPLE_ATTRIBUTES>
+			<SAMPLE_ATTRIBUTE>
+				<TAG>Source Name</TAG>
+				<VALUE>src-1</VALUE>
+			</SAMPLE_ATTRIBUTE>
+			<SAMPLE_ATTRIBUTE>
+				<TAG>Age</TAG>
+				<VALUE>78.0</VALUE>
+				<UNITS>year</UNITS>
+			</SAMPLE_ATTRIBUTE>
+			<SAMPLE_ATTRIBUTE>
+				<TAG>weight</TAG>
+				<VALUE>50.0</VALUE>
+				<UNITS>kilogram</UNITS>
+			</SAMPLE_ATTRIBUTE>
+		</SAMPLE_ATTRIBUTES>
+	</SAMPLE>
+</SAMPLE_SET>
+

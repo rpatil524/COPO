@@ -105,6 +105,8 @@ $(document).ready(function () {
                 }
                 else if (!data.finished) {
                     // update charts with returned upload status data
+                    $('#not_running_text').hide()
+                    $('#upload_progress_info').show()
                     $('canvas').each(function () {
                         $(this).siblings('h4').show();
                         $(this).show()
@@ -204,7 +206,8 @@ $(document).ready(function () {
                                 id: 'accessions-block'
                             });
 
-                            ac = data.accessions.split(',')
+                            //ac = data.accessions.split(',')
+                            ac = data.article_id.split(',')
                             $(ac).each(function (count, el) {
                                 var anc = jQuery('<a/>', {
                                     html: el + ' (Article ID)',

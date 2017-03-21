@@ -1,5 +1,5 @@
 var wizardMessages;
-var datafilesHowtos = null;
+var datafileHowtos = null;
 var currentIndx = 0;
 var descriptionBundle = [];
 var descriptionToken = null;
@@ -10,10 +10,13 @@ var silenceAlert = false; //use to temporary suppress stage alerts
 var descriptionWizSummary = {}; //wizard summary stage content
 var tempWizStore = null; // for holding wizard-related data pending wizard load event
 var onGoingDescription = false; //informs wizard state refresh/exit
+var setStageIndx = null; //moves the wizard to stage index specified
+
 
 $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
 
+    var csrftoken = $.cookie('csrftoken');
     var component = "datafile";
     var wizardURL = "/rest/data_wiz/";
     var copoFormsURL = "/copo/copo_forms/";
@@ -22,87 +25,64 @@ $(document).ready(function () {
     //test
     //end test
 
+
+    //on the fly info element
+    var onTheFlyElem = $("#copo_instant_info");
+
+    //help table
+    var pageHelpTable = "datafile_help_table"; //help pane table handle
+
+    //handle hover info for copo-select control types
+
+    $(document).on("mouseenter", ".selectize-dropdown-content .active", function (event) {
+        if ($(this).closest(".copo-multi-search").length) {
+            var recordId = $(this).attr("data-value"); // the id of the hovered-on option
+            var associatedComponent = ""; //the form control with which the event is associated
+
+            //get the associated component
+            var clss = $($(event.target)).closest(".input-copo").attr("class").split(" ");
+            $.each(clss, function (key, val) {
+                var cssSplit = val.split("copo-component-control-");
+                if (cssSplit.length > 1) {
+                    associatedComponent = cssSplit.slice(-1)[0];
+
+                    resolve_element_view(recordId, associatedComponent, $($(event.target)).closest(".input-copo"));
+                    return false;
+                }
+            });
+
+        }
+    });
+
     //handle UID - upload inspect describe - tabs
     $('#copo-datafile-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
-        var x = $(event.target).attr("data-component"); // active tab
-        set_datafiles_howtos(x);
+        var componentSelected = $(event.target).attr("data-component"); // active tab
+
+
+        $("#datafileDataHelp").find(".component-help").removeClass("disabled");
+        $("#datafileDataHelp").find(".component-help[data-component='" + componentSelected + "']").addClass("disabled");
+
+        set_component_help($(this).attr("data-component"), pageHelpTable, datafileHowtos);
 
         //check for temp data
-        if (x == "descriptionWizardComponent" && tempWizStore) {
+        if (componentSelected == "descriptionWizardComponent" && tempWizStore) {
             do_post_stage_retrieval2(tempWizStore);
             tempWizStore = null;
         }
     });
 
-    //handle help context
-    $("#copoDataHelp").find(".component-help").on("click", function (event) {
-        event.preventDefault();
-
-        $("#copoDataHelp").find(".component-help").removeClass("disabled");
-
+    //set help context
+    $(document).on("click", ".component-help", function () {
+        $(this).closest("ul").find(".component-help").removeClass("disabled");
         $(this).addClass("disabled");
 
-        set_datafiles_howtos($(this).attr("data-component"));
+        set_component_help($(this).attr("data-component"), pageHelpTable, datafileHowtos);
     });
 
 
     //handle popover close button
     $(document).on("click", ".popover .copo-close", function () {
         $(this).parents(".popover").popover('destroy');
-    });
-
-    //handle keyboard strokes to advance through wizard
-
-    //check if the control has focus
-    $('#dataFileWizard').on('keypress', function (event, data) {
-
-        if (event.keyCode == 13) {
-            event.preventDefault();
-            //here do the stage advance call
-        }
-        else if (event.keyCode == 39) {
-            var d = {'step': $('#dataFileWizard').data('fu.wizard').currentStep, 'direction': 'next'};
-            //d.step = $('#dataFileWizard').data('fu.wizard').currentStep
-            //d.direction = 'next'
-            $('#dataFileWizard').trigger('actionclicked.fu.wizard', d)
-        }
-        else if (event.keyCode == 37) {
-            var d = {'step': $('#dataFileWizard').data('fu.wizard').currentStep, 'direction': 'previous'};
-            //d.step = $('#dataFileWizard').data('fu.wizard').currentStep
-            //d.direction = 'next'
-            $('#dataFileWizard').trigger('actionclicked.fu.wizard', d)
-        }
-    });
-
-
-    // get table data to display via the DataTables API
-    var loaderObject = $('<div>',
-        {
-            style: 'text-align: center',
-            html: "<span class='fa fa-spinner fa-pulse fa-3x'></span>"
-        });
-
-
-    var tLoader = loaderObject.clone();
-    $("#data_all_data").append(tLoader);
-
-    csrftoken = $.cookie('csrftoken');
-
-    $.ajax({
-        url: copoVisualsURL,
-        type: "POST",
-        headers: {'X-CSRFToken': csrftoken},
-        data: {
-            'task': 'table_data',
-            'component': component
-        },
-        success: function (data) {
-            do_render_table(data);
-            tLoader.remove();
-        },
-        error: function () {
-            alert("Couldn't retrieve data files!");
-        }
     });
 
     //review-to-stage
@@ -176,6 +156,60 @@ $(document).ready(function () {
 
     });
 
+    // get table data to display via the DataTables API
+    var loaderObject = $('<div>',
+        {
+            style: 'text-align: center',
+            html: "<span class='fa fa-spinner fa-pulse fa-3x'></span>"
+        });
+
+
+    // get table data to display via the DataTables API
+    var tLoader = loaderObject.clone();
+    $("#data_all_data").append(tLoader);
+
+    $.ajax({
+        url: copoVisualsURL,
+        type: "POST",
+        headers: {'X-CSRFToken': csrftoken},
+        data: {
+            'task': 'table_data',
+            'component': component
+        },
+        success: function (data) {
+            do_render_table(data);
+            tLoader.remove();
+        },
+        error: function () {
+            alert("Couldn't retrieve datafiles!");
+        }
+    });
+
+    //call for help...
+
+    //loader image for help pane
+    var helpLoader = get_spinner_image();
+    $("#helptipsDiv").append(helpLoader);
+
+    $.ajax({
+        url: copoVisualsURL,
+        type: "POST",
+        headers: {'X-CSRFToken': csrftoken},
+        data: {
+            'task': 'help_messages',
+            'component': component
+        },
+        success: function (data) {
+            datafileHowtos = data.help_messages;
+            build_help_pane_menu(datafileHowtos, $("#datafileDataHelp").find(".componentHelpList"));
+            set_component_help('', pageHelpTable, datafileHowtos);
+            helpLoader.remove();
+        },
+        error: function () {
+            alert("Couldn't retrieve page help!");
+        }
+    });
+
 
     //******************************* wizard events *******************************//
 
@@ -190,8 +224,6 @@ $(document).ready(function () {
         },
         success: function (data) {
             wizardMessages = data.wiz_message;
-            datafilesHowtos = data.wiz_howtos;
-            set_datafiles_howtos("generalHelpTips");
             set_wizard_summary();
         },
         error: function () {
@@ -785,7 +817,7 @@ $(document).ready(function () {
         }
 
         //setup steps fast navigation
-        steps_fast_nav();
+        //steps_fast_nav();
     }
 
     function processing_request_dialog(message) {
@@ -941,7 +973,6 @@ $(document).ready(function () {
         }
 
 
-
         if (($('#dataFileWizard').is(":visible"))) {
             do_post_stage_retrieval2(data);
         } else {
@@ -977,8 +1008,18 @@ $(document).ready(function () {
                 step: currentIndx - 1
             });
 
+            //move wizard's focus to stage; usually called upon by a refresh action (e.g., value change)
+            if (setStageIndx) {
+
+                $('#dataFileWizard').wizard('selectedItem', {
+                    step: setStageIndx
+                });
+
+                setStageIndx = null;
+            }
+
             //setup fast nav for the stages
-            steps_fast_nav();
+            //steps_fast_nav();
 
 
         } else if (data.stage.stage) {
@@ -1150,8 +1191,6 @@ $(document).ready(function () {
 
     //functions clears the wizard and either exits or loads next item in batch
     function clear_wizard() {
-        //todo: need to decide what to save here before quitting the wizard
-
         //decommission wizard
         $('#dataFileWizard').wizard('removeSteps', 1, currentIndx + 1);
         $('#dataFileWizard').hide();
@@ -1166,6 +1205,8 @@ $(document).ready(function () {
         });
 
         silenceAlert = false;
+
+        $('.popover').popover('destroy'); //hide any shown popovers
 
 
         //clear wizard buttons
@@ -1190,7 +1231,7 @@ $(document).ready(function () {
         onGoingDescription = false;
 
         //clear stage message on help centre
-        $("#on_the_fly_info").empty();
+        onTheFlyElem.empty();
 
     }
 
@@ -1246,7 +1287,10 @@ $(document).ready(function () {
             step: proposedState
         });
 
-        return;
+        //stop execution
+        if (1 == 1) {
+            return false;
+        }
 
 
         var stage_data = collate_stage_data();
@@ -1338,7 +1382,7 @@ $(document).ready(function () {
         // but also, can the items be bundled together (e.g., going to same repo)?
         // what of inheriting metadata from already existing bundle items?
 
-        // one can also silence (i.e add to batch = true) if you are only refreshing the wizard without necessarily
+        // one can also 'silence' if you are only refreshing the wizard without necessarily
         // altering items in the bundle. if silence = false, then all validation steps will be performed/enforced
         // before engaging the description bundle
 
@@ -1393,6 +1437,7 @@ $(document).ready(function () {
                                 refresh_targets_data(data.validatation_results.extra_information.candidates_data);
                                 do_post_stage_retrieval(data);
                                 refresh_batch_display();
+
                             } else {
                                 var dialog = new BootstrapDialog({
                                     buttons: [
@@ -1909,6 +1954,36 @@ $(document).ready(function () {
     } //end of func
 
 
+    function resolve_element_view(recordId, associatedComponent, eventTarget) {
+        //maps form element by id to component type e.g source, sample
+
+        if (associatedComponent == "") {
+            return false;
+        }
+
+        onTheFlyElem.append(get_spinner_image());
+
+        $.ajax({
+            url: copoVisualsURL,
+            type: "POST",
+            headers: {'X-CSRFToken': csrftoken},
+            data: {
+                'task': "attributes_display",
+                'component': associatedComponent,
+                'target_id': recordId
+            },
+            success: function (data) {
+                var gAttrib = build_attributes_display(data)
+                onTheFlyElem.html(gAttrib);
+            },
+            error: function () {
+                onTheFlyElem.html('');
+                onTheFlyElem.append("Couldn't retrieve attributes!");
+            }
+        });
+    }
+
+
     function setup_element_hint() {
         $(":input").focus(function () {
             var elem = $(this).closest(".copo-form-group");
@@ -1926,7 +2001,7 @@ $(document).ready(function () {
                 var pop = elem.popover({
                     title: title,
                     content: content,
-                    container: 'body',
+                    //container: 'body',
                     trigger: 'hover',
                     placement: 'right',
                     template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
@@ -2004,17 +2079,17 @@ $(document).ready(function () {
 
             var elemValue = null;
 
-            if (formValue) {
-                if (formValue[formElem.id]) {
-                    elemValue = formValue[formElem.id];
+            //set default values
+            if (formElem.default_value) {
+                elemValue = formElem.default_value;
+            } else {
+                elemValue = "";
+            }
 
-                    if (!elemValue) {
-                        if (formElem.default_value) {
-                            elemValue = formElem.default_value;
-                        } else {
-                            elemValue = "";
-                        }
-                    }
+            if (formValue) {
+                var elem = formElem.id.split(".").slice(-1)[0];
+                if (formValue[elem]) {
+                    elemValue = formValue[elem];
                 }
             }
 
@@ -2026,9 +2101,7 @@ $(document).ready(function () {
                 formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
             }
             catch (err) {
-                console.log(control.toLowerCase());
                 formDiv.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + formElem.label + '): Cannot resolve form control!</div>');
-                console.log(err);
             }
 
             //any triggers?
@@ -2093,6 +2166,7 @@ $(document).ready(function () {
                                         onGoingDescription = true;
                                         clear_wizard();
                                         silenceAlert = silnAlert;
+                                        setStageIndx = $('#dataFileWizard').wizard('selectedItem').step;
                                         add_to_batch(batchTargets, true);
                                     },
                                     error: function () {
@@ -2109,44 +2183,72 @@ $(document).ready(function () {
             ]
         });
 
-        dialog_display(dialog, messageTitle, wizardMessages.stage_dependency_message.text, "warning");
+        var triggerMessage = '';
 
+        try {
+            triggerMessage = formElem.trigger.message;
+        }
+        catch (err) {
+            ;
+        }
+
+        dialog_display(dialog, messageTitle, triggerMessage, "warning");
     }
-
 
     var dispatchEventHandler = {
         study_type_change: function (formElem) {
             var previousValue = null;
-
             $(document)
                 .off("focus", "#" + formElem.id)
                 .on("focus", "#" + formElem.id, function () {
                     previousValue = this.value;
                 });
-
             $(document)
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
-                    element_value_change(formElem, previousValue, "Study Type Change");
+                    element_value_change(formElem, previousValue, formElem.label + " Change");
                 });
         },
         target_repo_change: function (formElem) {
             var previousValue = null;
-
             $(document)
                 .off("focus", "#" + formElem.id)
                 .on("focus", "#" + formElem.id, function () {
                     previousValue = this.value;
                 });
-
             $(document)
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
-                    element_value_change(formElem, previousValue, "Target Repo Change");
+                    element_value_change(formElem, previousValue, formElem.label + " Change");
+                });
+        },
+        growth_facility_change: function (formElem) {
+            var previousValue = null;
+            $(document)
+                .off("focus", "#" + formElem.id)
+                .on("focus", "#" + formElem.id, function () {
+                    previousValue = this.value;
+                });
+            $(document)
+                .off(formElem.trigger.type, "#" + formElem.id)
+                .on(formElem.trigger.type, "#" + formElem.id, function () {
+                    element_value_change(formElem, previousValue, formElem.label + " Change");
+                });
+        },
+        get_nutrient_controls: function (formElem) {
+            var previousValue = null;
+            $(document)
+                .off("focus", "#" + formElem.id)
+                .on("focus", "#" + formElem.id, function () {
+                    previousValue = this.value;
+                });
+            $(document)
+                .off(formElem.trigger.type, "#" + formElem.id)
+                .on(formElem.trigger.type, "#" + formElem.id, function () {
+                    element_value_change(formElem, previousValue, formElem.label + " Change");
                 });
         }
     };
-
 
     function set_wizard_summary() {
         descriptionWizSummary = {
@@ -2413,7 +2515,7 @@ $(document).ready(function () {
         var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
 
         //clear stage message
-        $("#on_the_fly_info").empty();
+        onTheFlyElem.empty();
 
         //get last stage index
         var lastElementIndx = $('.steps li').last().index() + 1;
@@ -2431,7 +2533,33 @@ $(document).ready(function () {
 
         //set stage message
         if (stage_objects && stage_objects[activeStageIndx].hasOwnProperty("message")) {
-            $("#on_the_fly_info").append('<div class="text-default alert alert-warning help-centre-content">' + stage_objects[activeStageIndx].message + '</div>');
+            onTheFlyElem.empty();
+
+            if (stage_objects[activeStageIndx].message) {
+                var attributesPanel = $('<div/>', {
+                    class: "panel panel-info",
+                    style: "margin-top: 5px; font-size: 12px;"
+                });
+
+                var attributesPanelHeading = $('<div/>', {
+                    class: "panel-heading",
+                    style: "background-image: none; font-weight: 600;",
+                    html: stage_objects[activeStageIndx].title
+                });
+
+                attributesPanel.append(attributesPanelHeading);
+
+
+                var attributesPanelBody = $('<div/>', {
+                    class: "panel-body"
+                });
+
+                attributesPanelBody.append('<span style="line-height: 1.5;">' + stage_objects[activeStageIndx].message + '</span>');
+
+                attributesPanel.append(attributesPanelBody);
+
+                onTheFlyElem.append(attributesPanel);
+            }
         }
 
         //set up data source
@@ -3184,130 +3312,6 @@ $(document).ready(function () {
         }
 
         elem.find(".collapse").collapse('show');
-    }
-
-    function dialog_display(dialog, dTitle, dMessage, dType) {
-        var dTypeObject = {
-            "warning": "fa fa-exclamation-circle copo-icon-warning",
-            "danger": "fa fa-times-circle copo-icon-danger",
-            "info": "fa fa-exclamation-circle copo-icon-info"
-        };
-
-        var dTypeClass = "fa fa-exclamation-circle copo-icon-default";
-
-        if (dTypeObject.hasOwnProperty(dType)) {
-            dTypeClass = dTypeObject[dType];
-        }
-
-        var iconElement = $('<div/>', {
-            class: dTypeClass + " wizard-alert-icon"
-        });
-
-
-        var $dialogContent = $('<div></div>');
-        $dialogContent.append($('<div/>').append(iconElement));
-        $dialogContent.append('<div class="copo-custom-modal-message">' + dMessage + '</div>');
-        dialog.realize();
-        dialog.setClosable(false);
-        dialog.setSize(BootstrapDialog.SIZE_NORMAL);
-        dialog.getModalHeader().hide();
-        dialog.setTitle(dTitle);
-        dialog.setMessage($dialogContent);
-        dialog.getModalBody().prepend('<div class="copo-custom-modal-title">' + dialog.getTitle() + '</div>');
-        dialog.getModalBody().addClass('copo-custom-modal-body');
-        //dialog.getModalContent().css('border', '4px solid rgba(255, 255, 255, 0.3)');
-        dialog.open();
-    }
-
-
-    function set_datafiles_howtos(component) {
-        if (!datafilesHowtos.hasOwnProperty(component)) {
-            component = "generalHelpTips"; //general help tips
-        }
-
-
-        var dataSet = []; //sampleHowtos[component].properties;
-
-        $.each(datafilesHowtos[component].properties, function (key, val) {
-            var option = {};
-            option["rank"] = key + 1;
-            option["title"] = val.title;
-            option["content"] = val.content;
-            dataSet.push(option);
-        });
-
-
-        //set data
-        var table = null;
-
-        if ($.fn.dataTable.isDataTable('#datafile_howtos')) {
-            //if table instance already exists, then do refresh
-            table = $('#datafile_howtos').DataTable();
-        }
-
-        if (table) {
-            //clear old, set new data
-            table
-                .clear()
-                .draw();
-            table
-                .rows
-                .add(dataSet);
-            table
-                .columns
-                .adjust()
-                .draw();
-            table
-                .search('')
-                .columns()
-                .search('')
-                .draw();
-        } else {
-            table = $('#datafile_howtos').DataTable({
-                data: dataSet,
-                searchHighlight: true,
-                "lengthChange": false,
-                order: [[0, "asc"]],
-                language: {
-                    "info": " _START_ to _END_ of _TOTAL_ help tips",
-                    "lengthMenu": "_MENU_ tips",
-                },
-                columns: [
-                    {
-                        "data": "rank",
-                        "visible": false
-                    },
-                    {
-                        "data": null,
-                        "title": "Tips",
-                        "render": function (data, type, row, meta) {
-                            var aLink = $('<a/>', {
-                                "data-toggle": "collapse",
-                                href: "#helpcentretips" + meta.row,
-                                html: data.title
-                            });
-
-                            var aDiv = $('<div/>', {
-                                "class": "collapse help-centre-content",
-                                id: "helpcentretips" + meta.row,
-                                html: data.content,
-                                style: "background-color: #fff; margin-top: 10px; border-radius: 4px;"
-                            });
-                            return $('<div></div>').append(aLink).append(aDiv).html();
-                        }
-                    },
-                    {
-                        "data": "content",
-                        "visible": false
-                    }
-                ],
-                "columnDefs": [
-                    {"orderData": 0,}
-                ]
-            });
-        }
-
-        $('#datafile_howtos tr:eq(0) th:eq(0)').text(datafilesHowtos[component].title + " Tips");
     }
 
 })//end document ready

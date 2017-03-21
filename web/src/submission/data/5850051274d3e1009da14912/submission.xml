@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<SUBMISSION alias="5850051274d3e1009da14912" broker_name="TGAC" center_name="TGAC" submission_date="2016-12-13T00:00:00+00:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.submission.xsd">
+	<CONTACTS>
+		<CONTACT inform_on_error="support@copo.org" inform_on_status="support@copo.org" name="COPO support"/>
+		<CONTACT inform_on_error="felix.shaw@tgac.ac.uk" inform_on_status="felix.shaw@tgac.ac.uk" name="Felix Shaw"/>
+	</CONTACTS>
+	<ACTIONS>
+		<ACTION>
+			<ADD schema="project" source="project_set.xml"/>
+		</ACTION>
+		<ACTION>
+			<ADD schema="sample" source="sample_set.xml"/>
+		</ACTION>
+		<ACTION>
+			<ADD schema="experiment" source="experiment_set.xml"/>
+		</ACTION>
+		<ACTION>
+			<ADD schema="run" source="run_set.xml"/>
+		</ACTION>
+	</ACTIONS>
+</SUBMISSION>
+

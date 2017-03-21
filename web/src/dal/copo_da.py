@@ -22,6 +22,7 @@ DataFileCollection = 'DataFileCollection'
 RemoteFileCollection = 'RemoteFileCollection'
 DescriptionCollection = 'DescriptionCollection'
 ProfileCollection = 'Profiles'
+AnnotationReference = 'AnnotationCollection'
 
 handle_dict = dict(publication=get_collection_ref(PubCollection),
                    person=get_collection_ref(PersonCollection),
@@ -29,7 +30,8 @@ handle_dict = dict(publication=get_collection_ref(PubCollection),
                    source=get_collection_ref(SourceCollection),
                    profile=get_collection_ref(ProfileCollection),
                    submission=get_collection_ref(SubmissionCollection),
-                   datafile=get_collection_ref(DataFileCollection)
+                   datafile=get_collection_ref(DataFileCollection),
+                   annotation=get_collection_ref(AnnotationReference)
                    )
 
 
@@ -49,6 +51,7 @@ class ProfileInfo:
                         num_data="datafile",
                         num_sample="sample",
                         num_submission="submission",
+                        num_annotation="annotation"
                         )
 
         status = dict()
@@ -90,6 +93,7 @@ class DAComponent:
             source="copo.source",
             profile="copo.profile",
             submission="copo.submission",
+            annotation="copo.annotation",
             investigation="i_",
             study="s_",
             assay="a_",
@@ -115,6 +119,7 @@ class DAComponent:
         if auto_fields:
             fields = DecoupleFormSubmission(auto_fields, self.get_schema().get("schema")).get_schema_fields_updated()
 
+        # should have target_id for updates and return empty string for inserts
         target_id = kwargs.pop("target_id", str())
 
         # set system fields
@@ -141,18 +146,25 @@ class DAComponent:
             if not target_id and f_id not in fields:
                 fields[f_id] = data_utils.default_jsontype(f.type)
 
-        if target_id:
-            self.get_collection_handle().update(
-                {"_id": ObjectId(target_id)},
-                {'$set': fields})
+        # if True, then the database action (to save/update) is never performed, but validated 'fields' is returned
+        validate_only = kwargs.pop("validate_only", False)
+
+        # use the equality (==) test to save-guard against all sorts of value the 'validate_only' can assume
+        if validate_only == True:
+            return fields
         else:
-            doc = self.get_collection_handle().insert(fields)
-            target_id = str(doc)
+            if target_id:
+                self.get_collection_handle().update(
+                    {"_id": ObjectId(target_id)},
+                    {'$set': fields})
+            else:
+                doc = self.get_collection_handle().insert(fields)
+                target_id = str(doc)
 
-        # return saved record
-        rec = self.get_record(target_id)
+            # return saved record
+            rec = self.get_record(target_id)
 
-        return rec
+            return rec
 
     def get_all_records(self, sort_by='_id', sort_direction=-1):
         doc = dict(deleted=data_utils.get_not_deleted_flag())
@@ -173,19 +185,68 @@ class Publication(DAComponent):
         super(Publication, self).__init__(profile_id, "publication")
 
 
+class Annotation(DAComponent):
+    def __init__(self, profile_id=None):
+        super(Annotation, self).__init__(profile_id, "annotation")
+
+    def get_annotations_for_page(self, document_id):
+        doc = self.get_collection_handle().find_one({
+            "_id": ObjectId(document_id)
+        })
+        return doc['annotation']
+
+    def update_annotation(self, document_id, annotation_id, fields, delete=False):
+        # first remove element
+        self.get_collection_handle().update(
+            {
+                'annotation._id': ObjectId(annotation_id)
+            },
+            {
+                '$pull':
+                    {'annotation':
+                         {'_id': ObjectId(annotation_id)}
+                     }
+            }
+        )
+        if delete == False:
+            # now add new element
+            fields['_id'] = annotation_id
+            self.get_collection_handle().update(
+                {
+                    '_id': ObjectId(document_id)
+                },
+                {
+                    '$push': {'annotation': fields}
+                }
+            )
+            return fields
+        return ''
+
+    def add_to_annotation(self, id, fields):
+        fields['_id'] = ObjectId()
+        self.get_collection_handle().update(
+            {'_id': ObjectId(id)},
+            {'$push':
+                 {'annotation': fields}
+             }
+        )
+        return fields
+
+    def annotation_exists(self, doc_name, uid):
+        return self.get_collection_handle().find({'document_name': {'$regex': "^" + doc_name}}).count() > 0
+
+    def get_annotation_by_name(self, doc_name, uid):
+        return self.get_collection_handle().find_one({'document_name': {'$regex': "^" + doc_name}})
+
+
 class Person(DAComponent):
     def __init__(self, profile_id=None):
         super(Person, self).__init__(profile_id, "person")
 
     def create_sra_person(self):
         """
-        create an (SRA) person record and attach to profile
-
-        Args:
-            profile_id: to be linked to created record
-
+        creates an (SRA) person record and attach to profile
         Returns:
-
         """
         user = ThreadLocal.get_current_user()
 
@@ -270,7 +331,7 @@ class Submission(DAComponent):
     def mark_figshare_article_published(self, article_id):
         return self.get_collection_handle().update_many(
             {
-                'accession': article_id
+                'accessions': article_id
             },
             {
                 "$set": {
@@ -280,14 +341,9 @@ class Submission(DAComponent):
         )
 
     def isComplete(self, sub_id):
-        doc = self.get_collection_handle().find_one
-        (
-            {
-                '_id': ObjectId(sub_id)
-            }
-        )
-        return doc['complete']
+        doc = self.get_collection_handle().find_one({"_id": ObjectId(sub_id)})
 
+        return doc.get("complete", False)
 
     def mark_submission_complete(self, sub_id):
         doc = self.get_collection_handle().update_one(
@@ -296,15 +352,19 @@ class Submission(DAComponent):
             },
             {
                 "$set": {
-                    "complete" : "true",
+                    "complete": "true",
                     "completed_on": datetime.now()
                 }
             }
         )
 
+
 class DataFile(DAComponent):
+
+
     def __init__(self, profile_id=None):
         super(DataFile, self).__init__(profile_id, "datafile")
+
 
     def get_by_file_id(self, file_id=None):
         docs = None
@@ -314,9 +374,11 @@ class DataFile(DAComponent):
 
         return docs
 
+
     def get_relational_record_for_id(self, datafile_id):
         chunked_upload = ChunkedUpload.objects.get(id=int(datafile_id))
         return chunked_upload
+
 
     def get_record_property(self, datafile_id=str(), elem=str()):
         """
@@ -333,6 +395,7 @@ class DataFile(DAComponent):
 
         property_dict = dict(
             target_repository=description_attributes.get("target_repository", dict()).get("deposition_context", str()),
+            attach_samples=description_attributes.get("attach_samples", dict()).get("study_samples", str()),
             sequencing_instrument=description_attributes.get("nucleic_acid_sequencing", dict()).get(
                 "sequencing_instrument", str()),
             study_type=description_attributes.get("study_type", dict()).get("study_type", str()),
@@ -341,6 +404,22 @@ class DataFile(DAComponent):
         )
 
         return property_dict.get(elem, str())
+
+
+    def add_fields_to_datafile_stage(self, target_ids, fields, target_stage_ref):
+
+        for target_id in target_ids:
+            # for each file in target_ids retrieve the datafile object
+            df = self.get_record(target_id)
+            # get the stage using list comprehension and add new fields
+            for idx, stage in enumerate(df['description']['stages']):
+                if 'ref' in stage and stage['ref'] == target_stage_ref:
+                    for field in fields:
+                        df['description']['stages'][idx]['items'].append(field)
+
+            # now update datafile record
+            self.get_collection_handle().update({'_id': ObjectId(target_id)},
+                                                {'$set': {'description.stages': df['description']['stages']}})
 
 
 class Profile(DAComponent):
