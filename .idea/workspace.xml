@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/dal/copo_da.py" afterPath="$PROJECT_DIR$/web/src/dal/copo_da.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py" />
-    </list>
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="" />
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -111,8 +102,8 @@
       <file leaf-file-name="start_stages.json" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="246">
-              <caret line="115" column="28" lean-forward="true" selection-start-line="115" selection-start-column="28" selection-end-line="115" selection-end-column="28" />
+            <state relative-caret-position="441">
+              <caret line="128" column="36" lean-forward="true" selection-start-line="128" selection-start-column="36" selection-end-line="128" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -1662,8 +1653,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="246">
-          <caret line="115" column="28" lean-forward="true" selection-start-line="115" selection-start-column="28" selection-end-line="115" selection-end-column="28" />
+        <state relative-caret-position="441">
+          <caret line="128" column="36" lean-forward="true" selection-start-line="128" selection-start-column="36" selection-end-line="128" selection-end-column="36" />
           <folding />
         </state>
       </provider>
