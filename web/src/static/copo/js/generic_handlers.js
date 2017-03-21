@@ -1269,8 +1269,8 @@ function do_help_tips_event() {
             title: title,
             content: content,
             //container: 'body',
-            template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
-            '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
+            template: '<div style="min-width: 300px" class="popover copo-popover-popover1"><div class="arrow">' +
+            '</div><div class="popover-inner"><h3 class="popover-title copo-popaover-title1">' +
             '</h3><div class="popover-content"><p></p></div></div></div>'
         });
 
