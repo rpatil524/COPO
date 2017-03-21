@@ -915,7 +915,6 @@ function do_array_display(data) {
                     //get all keys, our target is always the first key,
                     // since 'data' is formatted in such a manner to produce objects of one and only one element
                     var dKeys = Object.keys(data[i][j]);
-                    console.log(dKeys);
                     divElement.append(get_attributes_inner_div_1().html("<span style='font-weight: bold;'>" + dKeys[0] + "</span>: " + data[i][j][dKeys[0]]));
                 } else {
                     var dKeys = Object.keys(data[i][j]);
@@ -1003,6 +1002,69 @@ function build_attributes_display(data) {
 
     attributesPanelBody.append(notAssignedSpan);
 
+
+    if (componentAttributes.length > 0) {
+        notAssignedSpan.remove();
+
+        for (var i = 0; i < componentAttributes.length; ++i) {
+            var currentItem = componentAttributes[i];
+
+            var itemLabel = $('<div/>', {
+                html: currentItem.title,
+                style: "font-size:12px; font-weight:bold"
+            });
+
+            var itemDiv = $('<div/>', {
+                style: "padding: 5px; border: 1px solid #ddd; border-radius:2px; margin-bottom:3px;"
+            }).append(itemLabel).append(format_display_data(currentItem.data));
+
+            attributesPanelBody.append(itemDiv);
+        }
+    }
+
+    attributesPanel.append(attributesPanelBody);
+
+    return $('<div/>').append(attributesPanel);
+}
+
+
+function build_element_lookup(data) {
+    //build view
+    var componentLabel = '';
+    var componentAttributes = [];
+
+    if (data.hasOwnProperty("component_label")) {
+        componentLabel = data.component_label;
+    }
+
+    if (data.hasOwnProperty("component_attributes")) {
+        componentAttributes = data.component_attributes;
+    }
+
+    var attributesPanel = $('<div/>', {
+        class: "panel panel-info",
+        style: "margin-top: 5px; font-size: 12px;"
+    });
+
+    var attributesPanelHeading = $('<div/>', {
+        class: "panel-heading",
+        style: "background-image: none; font-weight: 600;",
+        html: componentLabel + " Lookup"
+    });
+
+    attributesPanel.append(attributesPanelHeading);
+
+
+    var attributesPanelBody = $('<div/>', {
+        class: "panel-body"
+    });
+
+    var notAssignedSpan = $('<span/>', {
+        class: "text-danger",
+        html: "Attributes not assigned!"
+    });
+
+    attributesPanelBody.append(notAssignedSpan);
 
     if (componentAttributes.length > 0) {
         notAssignedSpan.remove();

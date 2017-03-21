@@ -1,8 +1,6 @@
 __author__ = 'etuka'
 
 import copy
-import random
-import string
 import pandas as pd
 from bson import ObjectId
 from dal.copo_da import Sample
@@ -262,11 +260,17 @@ class WizardHelper:
 
             partial_schema = dict(fields=[elem_spec])
 
-            # resolve the new entry given the schema specification
+            # resolve the new entry given  'partial_schema'
             resolved_data = DecoupleFormSubmission(auto_fields, d_utils.json_to_object(
                 partial_schema).fields).get_schema_fields_updated()
 
-            # update sample records
+            # kick in some validation here before proceeding to save!
+            validate_status = self.do_validation(elem_spec, resolved_data, target_rows)
+
+            if validate_status.get("status") == "error":
+                return validate_status
+
+            # set bulk object
             bulk = Sample().get_collection_handle().initialize_unordered_bulk_op()
 
             if update_element_indx != "":
@@ -282,11 +286,13 @@ class WizardHelper:
                     if isinstance(amendable_entity, list):
                         amendable_entity[update_element_indx:update_element_indx + 1] = resolved_data[column_reference][
                                                                                         :]
-                    bulk.find({'_id': u_c["_id"]}).update({'$set': {column_reference: amendable_entity}})
+                        bulk.find({'_id': u_c["_id"]}).update({'$set': {column_reference: amendable_entity}})
             else:
                 for t_r in target_rows:
                     bulk.find({'_id': ObjectId(t_r["recordID"])}).update(
                         {'$set': {column_reference: resolved_data[column_reference]}})
+
+            # execute bulk object
             bulk.execute()
 
         update_list = list()
@@ -317,3 +323,69 @@ class WizardHelper:
             claim_is = True
 
         return claim_is
+
+    def do_validation(self, elem_spec, resolved_data, target_rows):
+        """
+        validates data given element's specification or schema
+        :param elem_spec:
+        :param resolved_data:
+        :param target_rows:
+        :return:
+        """
+        validation_result = dict(status="success", message="")
+        resolved_data = resolved_data[elem_spec["id"].split(".")[-1]]
+
+        # validate required attributes
+        if "required" in elem_spec and str(elem_spec["required"]).lower() == "true":
+            if isinstance(resolved_data, str) and resolved_data.strip() == str():
+                validation_result["status"] = "error"
+                validation_result["message"] = "The " + elem_spec["label"] + " value is required!"
+
+                return validation_result
+
+                # should probably add validation for object types here, that might need some thinking though
+
+        # validate unique attributes
+        if "unique" in elem_spec and str(elem_spec["unique"]).lower() == "true":
+            if isinstance(resolved_data, str) and Sample().get_collection_handle().find(
+                    {'name': {'$regex': "^" + resolved_data + "$", "$options": 'i'}}).count() >= 1:
+                validation_result["status"] = "error"
+                validation_result["message"] = "Nothing to update or the " + elem_spec[
+                    "label"] + " value already exists!"
+
+                return validation_result
+
+                # should probably add validation for object types here, that might need some thinking though
+
+        # validate characteristics attributes
+        if "control" in elem_spec and elem_spec["control"] == "copo-characteristics":
+            objects_of_interest = dict(unit=str(), value=str())
+
+            if resolved_data:
+                extracted_objects = resolved_data[0]
+                for k, v in extracted_objects.items():
+                    if k in objects_of_interest:
+                        objects_of_interest[k] = v['annotationValue']
+
+            is_numeric = False
+            if objects_of_interest['value']:
+                try:
+                    objects_of_interest['value'] = float(objects_of_interest['value'])
+                    is_numeric = True
+                except ValueError:
+                    pass
+
+            if is_numeric and not objects_of_interest['unit']:
+                validation_result["status"] = "error"
+                validation_result["message"] = "Numeric value requires a unit!"
+
+                return validation_result
+            # commenting out the 'elif' condition below prevents an update lock up;
+            # a case where you can't update the value because of the unit, and vice versa
+            # elif not is_numeric and objects_of_interest['unit']:
+            #     validation_result["status"] = "error"
+            #     validation_result["message"] = "Non-numeric value does not require a unit!"
+            #
+            #     return validation_result
+
+        return validation_result

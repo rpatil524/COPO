@@ -476,7 +476,7 @@ function set_validation_markers(formElem, ctrl) {
     var errorHelpDiv = "";
 
     //required marker
-    if (formElem.hasOwnProperty("required") && (formElem.required.toString() == "true")) {
+    if (formElem.hasOwnProperty("required") && (formElem.required.toString().toLowerCase() == "true")) {
         ctrl.attr("required", true);
         ctrl.attr("data-error", "The " + formElem.label + " value is required!");
 
@@ -484,7 +484,7 @@ function set_validation_markers(formElem, ctrl) {
     }
 
     //unique marker...
-    if (formElem.hasOwnProperty("unique") && (formElem.unique.toString() == "true")) {
+    if (formElem.hasOwnProperty("unique") && (formElem.unique.toString().toLowerCase() == "true")) {
         var uniqueArray = [];
 
         if (formElem.hasOwnProperty("unique_items")) {
@@ -502,7 +502,7 @@ function set_validation_markers(formElem, ctrl) {
 
 
     //batch unique marker...allows unique test for siblings of the same kind on the form
-    if (formElem.hasOwnProperty("batch") && (formElem.batch.toString() == "true")) {
+    if (formElem.hasOwnProperty("batch") && (formElem.batch.toString().toLowerCase() == "true")) {
         ctrl.attr("data-batch", "batch");
         ctrl.attr("data-family-name", formElem.batchuniquename);
         ctrl.attr('data-batch-error', "The " + formElem.label + " value has already been assigned!");
@@ -511,7 +511,7 @@ function set_validation_markers(formElem, ctrl) {
     }
 
     //email marker...
-    if (formElem.hasOwnProperty("email") && (formElem.email.toString() == "true")) {
+    if (formElem.hasOwnProperty("email") && (formElem.email.toString().toLowerCase() == "true")) {
         ctrl.attr("data-email", "email");
         ctrl.attr('data-email-error', "Please enter a valid value for the " + formElem.label);
 
@@ -519,7 +519,7 @@ function set_validation_markers(formElem, ctrl) {
     }
 
     //characteristic marker
-    if (formElem.hasOwnProperty("characteristics") && (formElem.characteristics.toString() == "true")) {
+    if (formElem.hasOwnProperty("characteristics") && (formElem.characteristics.toString().toLowerCase() == "true")) {
         ctrl.attr("data-characteristics", "characteristics");
         ctrl.attr('data-characteristics-error', "Invalid value state!");
 
@@ -1919,14 +1919,16 @@ function custom_validate(formObject) {
 
                 var oKFlag = true;
 
-                $.each(uniqueArray, function (index, item) {
-                    if (Object.prototype.toString.call(item) === '[object String]') {
-                        if (newValue == item) {
-                            oKFlag = false;
-                            return false;
+                if (newValue != "") {
+                    $.each(uniqueArray, function (index, item) {
+                        if (Object.prototype.toString.call(item) === '[object String]') {
+                            if (newValue == item) {
+                                oKFlag = false;
+                                return false;
+                            }
                         }
-                    }
-                });
+                    });
+                }
 
                 if (!oKFlag) {
                     return "Not valid!";
@@ -1956,12 +1958,12 @@ function custom_validate(formObject) {
                     //is the validation source value numeric?
                     if ($.isNumeric(validationSource.val().trim().toLowerCase())) {
                         if (validationTarget.val().trim().toLowerCase() == "") {
-                            validationSource.attr("data-characteristics-error", "Please assign a value for "+ validationTarget.attr("placeholder") + "!");
+                            validationSource.attr("data-characteristics-error", "Please assign a value for " + validationTarget.attr("placeholder") + "!");
                             oKFlag = false;
                         }
                     } else {
                         if (validationTarget.val().trim().toLowerCase() != "") {
-                            validationSource.attr("data-characteristics-error",  validationTarget.attr("placeholder") + " should be blank!");
+                            validationSource.attr("data-characteristics-error", validationTarget.attr("placeholder") + " should be blank!");
                             oKFlag = false;
                         }
                     }

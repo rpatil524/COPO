@@ -2544,7 +2544,7 @@ $(document).ready(function () {
                 var attributesPanelHeading = $('<div/>', {
                     class: "panel-heading",
                     style: "background-image: none; font-weight: 600;",
-                    html: " Stage Message [" + stage_objects[activeStageIndx].title + "]"
+                    html: stage_objects[activeStageIndx].title
                 });
 
                 attributesPanel.append(attributesPanelHeading);

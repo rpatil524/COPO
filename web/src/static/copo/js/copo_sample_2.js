@@ -28,6 +28,12 @@ $(document).ready(function () {
 
 
         //test
+        // $(document).on("click", ".ontology-field", function (event) {
+        //     var data = Object();
+        //     data["component_label"] = this.id;
+        //     var gAttrib = build_element_lookup(data);
+        //     $("#copo_instant_info").html(gAttrib);
+        // });
         //end test
 
         //on the fly info element
@@ -187,6 +193,23 @@ $(document).ready(function () {
             $(self).data('step', data.step);
 
             stage_navigate(evt, data);
+        });
+
+        //handle events for step change
+        $('#sampleWizard').on('changed.fu.wizard', function (evt, data) {
+            var currentStep = data.step;
+            if (currentStep > 0
+                && $('#wizard_form_' + currentStep).length
+                && $('#wizard_form_' + currentStep).find("#current_stage").length) {
+                var current_stage = $('#wizard_form_' + currentStep).find("#current_stage").val();
+
+                for (var i = 0; i < negotiatedStages.length; ++i) {
+                    if (current_stage == negotiatedStages[i].ref) {
+                        display_stage_message(negotiatedStages[i].message, negotiatedStages[i].title);
+                        break;
+                    }
+                }
+            }
         });
 
         // handle/attach events to table buttons
@@ -378,6 +401,7 @@ $(document).ready(function () {
                                 });
 
                                 elem.show();
+                                onTheFlyElem.html('');
 
                                 set_generated_samples();
                                 samplesGenerated = true;
@@ -522,9 +546,9 @@ $(document).ready(function () {
                     //get bundle name
                     var bundleName = get_stage_inputs_by_ref("sample_name");
                     if ($.isEmptyObject(bundleName)) {
-                        bundleName = "no_name";
+                        bundleName = "";
                     } else {
-                        bundleName = bundleName["name"];
+                        bundleName = bundleName["bundle_name"];
                     }
 
                     $.ajax({
@@ -570,8 +594,10 @@ $(document).ready(function () {
             for (var i = 1; i < requestedNumberOfSamples + 1; ++i) {
                 var schemaCopy = $.extend(true, Object(), sampleSchema);
                 schemaCopy.id = "assigned_sample_" + i.toString();
-                schemaCopy.default_value = bundleName + "_" + i.toString();
-                schemaCopy.control_meta.input_group_addon_label = i.toString();
+                if (bundleName) {
+                    schemaCopy.default_value = bundleName + "_" + i.toString();
+                }
+                schemaCopy.control_meta.input_group_addon_label = i.toString() + ".";
 
                 generatedSampleNames.push(schemaCopy);
             }
@@ -756,17 +782,10 @@ $(document).ready(function () {
 
             //form controls
             var formPanel = $('<div/>', {
-                class: "panel panel-copo-data panel-primary",
+                class: "panel panel-copo-data",
                 style: "margin-top: 5px; font-size: 14px;"
             });
 
-            var formPanelHeading = $('<div/>', {
-                class: "panel-heading",
-                style: "background-image: none; line-height:1.4;",
-                html: stage_message
-            });
-
-            formPanel.append(formPanelHeading);
 
             stageHTML.append(formPanel);
 
@@ -979,7 +998,7 @@ $(document).ready(function () {
                     'target_id': recordId
                 },
                 success: function (data) {
-                    var gAttrib = build_attributes_display(data)
+                    var gAttrib = build_attributes_display(data);
                     onTheFlyElem.html(gAttrib);
                 },
                 error: function () {
@@ -1238,7 +1257,7 @@ $(document).ready(function () {
                             var cellEditPanel = get_cell_edit_panel();
 
                             //set cell edit data
-                            cellEditPanel.find(".panel-body").append(htmlCtrl); //attach form control
+                            cellEditPanel.find(".panel-body").append(htmlCtrl).append(set_error_div()); //attach form control
                             cellEditPanel.find(".panel-footer").append(set_dynamic_cell_data()); //attach action buttons
 
                             $(node)
@@ -1365,8 +1384,6 @@ $(document).ready(function () {
         function generate_sample_table_columns(generatedSamples) {
             //generates sample table column, beginning with static columns
 
-            console.log(generatedSamples[0]._recordMeta)
-
             var sampleTableColumns = [
                 {title: "S/N", data: 'rank', visible: true, name: "rank"},
                 {title: "Attributes", data: 'attributes', visible: false, name: "attributes"},
@@ -1428,6 +1445,21 @@ $(document).ready(function () {
             }
 
             return sampleTableDataSource;
+        }
+
+        function set_error_div() {
+            var ctrlsDiv = $('<div/>',
+                {
+                    class: "row",
+                    style: "display:none; color:#a94442;"
+                });
+
+            var sp = $('<div/>',
+                {
+                    class: "col-sm-12 col-md-12 col-lg-12 error-div"
+                });
+
+            return ctrlsDiv.append(sp);
         }
 
         function set_dynamic_cell_data() {
@@ -1501,7 +1533,7 @@ $(document).ready(function () {
 
         function get_cell_edit_panel() {
             var attributesPanel = $('<div/>', {
-                class: "panel panel-default",
+                class: "panel panel-default cell-edit-panel",
                 style: "min-width:450px;"
             });
 
@@ -1526,9 +1558,14 @@ $(document).ready(function () {
 
             var node = cell.node();
 
+            //store the cell's current html state for future reference
+            var cellHTMLClone = $(node).find(".cell-edit-panel").clone(true);
+
             $(node).html(get_spinner_image());
 
             var rowIndx = cell.index().row;
+
+            $('.popover').remove();
 
             //perform action
             if (action == "cancel") {
@@ -1601,34 +1638,43 @@ $(document).ready(function () {
                         'auto_fields': JSON.stringify(form_values)
                     },
                     success: function (data) {
-                        var updatedSamples = data.updated_samples.generated_samples;
-                        formEditableElements = data.updated_samples.form_elements; //refresh form elements
+                        if (data.updated_samples.status && data.updated_samples.status == "error") {
+                            $(node)
+                                .html('')
+                                .append(cellHTMLClone);
+
+                            $(node).find(".error-div").html(data.updated_samples.message);
+                            $(node).find(".error-div").closest(".row").css("display", "block");
+                        } else {
+                            //re-enable keys
+                            datatable.keys.enable();
+                            dataTableTriggerSave = false;
+
+                            //remove cell's edit status
+                            $(node).removeClass('cell-currently-engaged'); //unlock cell
+
+                            //deselect previously selected rows
+                            datatable.rows('.selected').deselect();
 
 
-                        //re-enable keys
-                        datatable.keys.enable();
-                        dataTableTriggerSave = false;
+                            var updatedSamples = data.updated_samples.generated_samples;
+                            formEditableElements = data.updated_samples.form_elements; //refresh form elements
 
-                        //remove cell's edit status
-                        $(node).removeClass('cell-currently-engaged'); //unlock cell
+                            //set updated and refresh display
+                            for (var i = 0; i < updatedSamples.length; ++i) {
+                                if (updatedSamples[i].hasOwnProperty("_cell_id")) {
+                                    dataTableDataSource[updatedSamples[i]._cell_id].attributes = updatedSamples[i];
 
-                        //deselect previously selected rows
-                        datatable.rows('.selected').deselect();
-
-                        //set updated and refresh display
-                        for (var i = 0; i < updatedSamples.length; ++i) {
-                            if (updatedSamples[i].hasOwnProperty("_cell_id")) {
-                                dataTableDataSource[updatedSamples[i]._cell_id].attributes = updatedSamples[i];
-
-                                datatable
-                                    .row(updatedSamples[i]._cell_id)
-                                    .invalidate()
-                                    .draw();
+                                    datatable
+                                        .row(updatedSamples[i]._cell_id)
+                                        .invalidate()
+                                        .draw();
+                                }
                             }
-                        }
 
-                        //set focus on next row
-                        datatable.cell(cell.index().row + 1, cell.index().column).focus();
+                            //set focus on next row
+                            datatable.cell(cell.index().row + 1, cell.index().column).focus();
+                        }
 
                     },
                     error: function () {
@@ -1649,6 +1695,36 @@ $(document).ready(function () {
 
             return form_values;
 
+        }
+
+        function display_stage_message(stageMessage, stageTitle) {
+            onTheFlyElem.empty();
+
+            if (stageMessage) {
+                var attributesPanel = $('<div/>', {
+                    class: "panel panel-info",
+                    style: "margin-top: 5px; font-size: 12px;"
+                });
+
+                var attributesPanelHeading = $('<div/>', {
+                    class: "panel-heading",
+                    style: "background-image: none; font-weight: 600;",
+                    html:  stageTitle
+                });
+
+                attributesPanel.append(attributesPanelHeading);
+
+
+                var attributesPanelBody = $('<div/>', {
+                    class: "panel-body"
+                });
+
+                attributesPanelBody.append('<span style="line-height: 1.7;">' + stageMessage + '</span>');
+
+                attributesPanel.append(attributesPanelBody);
+
+                onTheFlyElem.append(attributesPanel);
+            }
         }
 
     }

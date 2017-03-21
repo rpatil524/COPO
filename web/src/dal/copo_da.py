@@ -245,13 +245,8 @@ class Person(DAComponent):
 
     def create_sra_person(self):
         """
-        create an (SRA) person record and attach to profile
-
-        Args:
-            profile_id: to be linked to created record
-
+        creates an (SRA) person record and attach to profile
         Returns:
-
         """
         user = ThreadLocal.get_current_user()
 
