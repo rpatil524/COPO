@@ -3,9 +3,11 @@
  */
 $(document).ready(function () {
 
+
     //******************************Setup Annotator Specifics*************************//
     hide_controls()
     show_help()
+
     $.cookie('document_id', 'undefined', {expires: 1, path: '/',});
     $(document).data('annotator_type', 'txt')
     $(document).ajaxStart(function () {
