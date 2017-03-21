@@ -227,7 +227,7 @@ class Annotation(DAComponent):
         self.get_collection_handle().update(
             {'_id': ObjectId(id)},
             {'$push':
-                 {'annotation': fields}
+                 {'annotation': fields }
              }
         )
         return fields

@@ -20,18 +20,17 @@
     <link rel="stylesheet" href="{% static 'copo/rangeslider/rangeslider.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/copo/style.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/copo/menu.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.css' %}">
 
 
     <link rel="shortcut icon" href="{% static 'copo/img/COPO_icon.png' %}"/>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{% static 'copo/css/font-awesome/css/font-awesome.min.css' %}">
-    {#    <link rel="stylesheet" href="{% static 'copo/css/awesome/css/awesome-bootstrap-checkbox.css' %}">#}
+    <link rel="stylesheet" href="{% static 'copo/css/awesome/css/awesome-bootstrap-checkbox.css' %}">
 
-    <!-- Selectize -->
-    {#    <link rel="stylesheet" href="{% static 'copo/css/selectize/selectize.css' %}">#}
-{#    <link rel="stylesheet" href="{% static 'copo/selectize/selectize.css' %}">#}
-    <link rel="stylesheet" href="{% static 'copo/selectize/selectize.bootstrap3.css' %}">
+    <!-- Selectize Components -->
+    <link rel="stylesheet" href="{% static 'copo/css/selectize/selectize.css' %}">
 
     <!-- Google Fonts -->
     <link href='http://fonts.googleapis.com/css?family=Quattrocento+Sans' rel='stylesheet' type='text/css'>
@@ -51,13 +50,24 @@
     <script src="{% static 'copo/js/bootstrap-dialog.js' %}"></script>
     <script src="{% static 'copo/js/dropdowns-enhancement.js' %}"></script>
     <script src="{% static 'copo/selectize/standalone/selectize.min.js' %}"></script>
-    {#    <script src="{% static 'copo/js/selectize.js' %}"></script>#}
     <script src="{% static 'copo/bootstrap_switch/js/bootstrap-switch.js' %}"></script>
     <script src="{% static 'copo/fuelux/js/fuelux.js' %}"></script>
     <script src="{% static 'copo/validator1000hz/validator.min.js' %}"></script>
     <script src="{% static 'copo/rangeslider/rangeslider.min.js' %}"></script>
 
     <script src="{% static 'copo/js/base.js' %}"></script>
+
+    <script src="{% static 'copo/datatables/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'copo/datatables/js/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'copo/datatables/js/dataTables.select.min.js' %}"></script>
+    <script src="{% static 'copo/datatables/js/dataTables.keyTable.min.js' %}"></script>
+    <script src="{% static 'copo/datatables/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'copo/datatables/js/buttons.bootstrap.min.js' %}"></script>
+    <script src="{% static 'copo/search_highlight/dataTables.searchHighlight.min.js' %}"></script>
+    <script src="{% static 'copo/search_highlight/jquery.highlight.js' %}"></script>
+    <script src="{% static 'copo/bootstrap-datepicker-1.6.4-dist/js/bootstrap-datepicker.min.js' %}"></script>
+
+
 
     <!-- Additional javascripts -->
     {% block js_block %}{% endblock %}
@@ -83,16 +93,20 @@
     <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/search_highlight/dataTables.searchHighlight.css' %}">
     <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.css' %}">
+        <!-- PAGE LEVEL STYLES -->
+    {% block stylesheet_block %}{% endblock %}
 
-    <script src="{% static 'copo/datatables/js/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'copo/datatables/js/dataTables.bootstrap.min.js' %}"></script>
-    <script src="{% static 'copo/datatables/js/dataTables.select.min.js' %}"></script>
-    <script src="{% static 'copo/datatables/js/dataTables.keyTable.min.js' %}"></script>
-    <script src="{% static 'copo/datatables/js/dataTables.buttons.min.js' %}"></script>
-    <script src="{% static 'copo/datatables/js/buttons.bootstrap.min.js' %}"></script>
-    <script src="{% static 'copo/search_highlight/dataTables.searchHighlight.min.js' %}"></script>
-    <script src="{% static 'copo/search_highlight/jquery.highlight.js' %}"></script>
-    <script src="{% static 'copo/bootstrap-datepicker-1.6.4-dist/js/bootstrap-datepicker.min.js' %}"></script>
+    <!-- SASS styles -->
+    {% compress css %}
+        <link rel="stylesheet" type="text/scss" href="{% static 'copo/css/copo/colors/sass.scss' %}"/>
+    {% endcompress %}
+
+
+
+
+
+
+
 
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -194,12 +208,9 @@
 
     </script>
 
-    {# The stylesheetblock should always come last, so that inheriting template's styles take precedence over global styles. #}
-    {% block stylesheet_block %}{% endblock %}
-    {% compress css %}
-        <link rel="stylesheet" type="text/scss" href="{% static 'copo/css/copo/colors/sass.scss' %}"/>
-    {% endcompress %}
 </head>
+
+
 
 <body>
 

@@ -10,10 +10,8 @@
           xmlns="http://www.w3.org/1999/html">
     <link rel="stylesheet" href="{% static 'copo/handsontable/handsontable.full.css' %}"
           xmlns="http://www.w3.org/1999/html">
-
     <link rel="stylesheet" href="{% static 'copo/css/copo/datafile.css' %}" xmlns="http://www.w3.org/1999/html">
     <link rel="stylesheet" href="{% static 'copo/css/copo/copo_annotations.css' %}" xmlns="http://www.w3.org/1999/html">
-
 {% endblock %}
 
 
@@ -79,7 +77,8 @@
                             </small>
                             <div style="margin-top: 10px" class="dropdown" id="file_type_dropdown">
 
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" id="file_type_button">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+                                        id="file_type_button">
                                     File Type
                                     <span class="caret"></span></button>
                                 <ul class="dropdown-menu">
@@ -109,6 +108,9 @@
     </div><!-- /.modal -->
 
 
+
+
+
 {% endblock %}
 
 {% block help_section %}
@@ -128,13 +130,14 @@
                             </a>
                         </li>
                         <li role="separator" class="divider"></li>
-                        <li class="component-help" data-component="annotation"><a
-                                href="#">
-                            <div id="annotate_button" style="padding: 5px 5px 0px 0px;"><i
-                                    class="fa fa-upload copo-components-icons"></i>
-                                <span class="icon_text">Annotate</span></div>
-                        </a></li>
-
+                        <li class="component-help" data-component="annotation">
+                            <a href="#">
+                                <div id="annotate_button" style="padding: 5px 5px 0px 0px;">
+                                    <i class="fa fa-upload copo-components-icons"></i>
+                                    <span class="icon_text">Annotate</span>
+                                </div>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -148,12 +151,25 @@
                     Type in the box below to see possible ontological descriptors for the column selected.
                     <h3 class="h3">Selected Column:&nbsp <span class="label label-primary" id="selected_column_name">None Selected</span>
                     </h3>
-                    <input type="text" class="form-control ontology-field form-control-file" id="an-column"
-                           aria-describedby="fileHelp" data-autocomplete="/copo/ajax_search_ontology/999/">
-                </div>
-                <div id="annotation_list">
-                    <hr/>
 
+                    <label for="ontology_dropdown" id="ontology_dropdown_label">Select Ontology</label>
+                    <select id="ontology_dropdown">
+                        <option>a</option>
+                        <option>b</option>
+                        <option>c</option>
+                    </select>
+
+
+                    <input type="text" class="form-control ontology-field form-control-file" id="an-column"
+                           aria-describedby="fileHelp" data-autocomplete="/copo/ajax_search_ontology/999/"/>
+
+
+                </div>
+
+
+                <div id="annotation_list">
+
+                    <hr/>
                     Current Annotations
                     <table id="annotations_table">
                         <thead>
@@ -161,22 +177,12 @@
                             <th>Column</th>
                             <th>Annotation</th>
                             <th>Ontology</th>
+                            <th>Reference</th>
                             <th></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>rs1800497</td>
-                            <td>Human</td>
-                            <td>idomal</td>
-                            <td><i class="fa fa-minus-square" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>rs987765</td>
-                            <td>Coooo</td>
-                            <td>Poooooo</td>
-                            <td><i class="fa fa-minus-square" aria-hidden="true"></i></td>
-                        </tr>
+
                         </tbody>
                     </table>
 
@@ -191,6 +197,11 @@
 
     <script>
 
+
+
+    $(document).ready(function() {
+        $('.global-page-title').append('<span class="ajax_loading_div pull-right"><img style="display: inline" src="{% static 'copo/img/preload.gif' %}" class="ajax_loading_img"/> Saving ...</span>')
+    })
 
     </script>
     <script type="text/javascript" src="{% static "copo/annotator-2.0.0-alpha.3/pkg/annotator.js" %}"></script>

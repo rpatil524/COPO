@@ -64,13 +64,17 @@ $(document).ready(function () {
                     contentType: false,
                     dataType: 'json'
                 }).done(function (e) {
+                    // add mongo id to document data
+                    $(document).data('mongo_id', e._id.$oid)
                     $('#annotation_table_wrapper').hide()
                     $('#annotation_content').show()
 
-                    if (e.type == 'PDF Document') {
+                    if(e.type == 'PDF Document') {
+                        $(document).data('annotator_type', 'txt')
                         load_txt_data(e)
                     }
                     else if (e.type == 'Spreadsheet') {
+                        $(document).data('annotator_type', 'ss')
                         load_ss_data(e)
                     }
 

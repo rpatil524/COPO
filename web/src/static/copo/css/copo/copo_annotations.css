@@ -1,5 +1,11 @@
 #annotation_content {
     overflow-x: scroll;
+    width: 98%
+}
+
+#annotation_list{
+    margin-top: 25px;
+    padding-top: 15px
 }
 
 td.column-highlighted {
@@ -38,6 +44,48 @@ td.table-header-labeled {
 }
 
 .annotation_mouseover {
-    background-color: rgba(123, 187, 232, 1);
+    background-color: #8cd98c !important;
     color: white;
+}
+
+.currentColClass{
+    background-color: #f2f2f2 !important;
+}
+
+.labelledColumnClass{
+    background-color: #ecf9ec !important;
+    color: dimgrey !important;
+    font-weight: bolder;
+}
+
+.highlightedColumnClass{
+    background-color: #8cd98c !important;
+    color: white !important;
+}
+
+.currentHeaderClass{
+    background-color: #4478ba !important;
+    color: white !important;
+}
+
+#save_ss_annotation{
+    margin: 5px 10px 5px 0;
+}
+
+.delete_annotation{
+    cursor: pointer
+}
+
+.panel-body{
+    padding: 10px !important;
+}
+
+.ajax_loading_div{
+    width: 150px;
+
+}
+
+.ajax_loading_img{
+    width: 44px;
+    margin-right: 20px
 }
