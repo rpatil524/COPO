@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
 
     <link rel="stylesheet" type="text/css" href="{% static "copo/annotator-2.0.0-alpha.3/css/annotator.min.css" %} "/>
-
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_ontology_styles.css' %}"
+          xmlns="http://www.w3.org/1999/html">
 
 {% endblock %}
 
@@ -57,21 +58,26 @@
 
 
 
+    <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="true">
+            Dropdown
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            <li class="ontology_dd_item">
+                <span class="h5">
+                    <span class="ontology_dd_name">omit</span>
+                    <br/>
+                    <small class="ontology_dd_description">Test text about this ontology</small>
+                </span>
 
-    <input type="text" id="datepicker">
+            </li>
 
-
-
-    <div class="form-inline">
-
-        <input type="text" class="duration-control form-control" id="" placeholder="Years">
-        <input type="text" class="duration-control form-control" id="" placeholder="Months">
-        <input type="text" class="duration-control form-control" id="" placeholder="Days">
-
+        </ul>
     </div>
 
 
-    <div id="mdiv"></div>
 
 {% endblock %}
 
@@ -83,19 +89,7 @@
     <script>
 
         $(document).ready(function () {
-            $('#datepicker').datepicker({})
 
-
-            var txt = $('<input/>',
-                {
-                    type: "text",
-                    class: "input-copo form-control",
-                    id: "akjl",
-                    name: "akil",
-                    placeholder: 'jdhsjkahdkja'
-                });
-
-            $('#mdiv').append(txt)
         })
 
 
