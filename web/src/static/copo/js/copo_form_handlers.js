@@ -5,7 +5,6 @@
 var olsURL = ""; // url of ols lookup for ontology fields
 var copoSchemas = {};
 var copoFormsURL = "/copo/copo_forms/";
-var copoVisualsURL = "/copo/copo_visualize/";
 var globalDataBuffer = {};
 var htmlForm = $('<div/>'); //global form div
 var formMode = "add";
@@ -69,7 +68,7 @@ $(document).ready(function () {
                     $('#annotation_table_wrapper').hide()
                     $('#annotation_content').show()
 
-                    if(e.type == 'PDF Document') {
+                    if (e.type == 'PDF Document') {
                         $(document).data('annotator_type', 'txt')
                         load_txt_data(e)
                     }
@@ -132,9 +131,7 @@ var controlsMapping = {
     "copo-item-count": "do_copo_item_count_ctrl",
     "date-picker": "do_date_picker_ctrl",
     "copo-duration": "do_copo_duration_ctrl",
-    "text-percent": "do_percent_text_box",
-    "growth_conditions_select": "do_growth_conditions_select",
-    "ontology_triplet_control": "do_ontology_triplet_control"
+    "text-percent": "do_percent_text_box"
 };
 
 function json2HtmlForm(data) {
@@ -790,7 +787,7 @@ var dispatchFormControl = {
 
                 var sp = $('<div/>',
                     {
-                        class: "form-group col-sm-4"
+                        class: "form-group col-sm-4 col-md-4 col-lg-4"
                     });
 
                 if (formElem.hasOwnProperty("_displayOnlyThis") && (workingSchema[i].id.split(".").slice(-1)[0] != formElem["_displayOnlyThis"])) {
@@ -829,11 +826,13 @@ var dispatchFormControl = {
                 ctrlsDiv.append(ontologyCtrlObject);
 
                 //set validation markers for various special cases
-                if (ctrlsDiv.find(".copo-validation-source").length && ctrlsDiv.find(".copo-validation-target").length) {
-                    formElem["characteristics"] = "true";
-                    var validationSource = ctrlsDiv.find(".copo-validation-source").first();
-                    var vM = set_validation_markers(formElem, validationSource);
-                    ctrlsDiv.find(".form-group").append(vM.errorHelpDiv);
+                if (ontologyCtrlObject.find(".copo-validation-source").length) {
+                    var validationObject = ontologyCtrlObject.find(".copo-validation-source").first();
+
+                    var formElemAdHoc = Object(); //ad-hoc form element
+                    formElemAdHoc["characteristics"] = "true";
+                    var vM = set_validation_markers(formElemAdHoc, validationObject);
+                    ontologyCtrlObject.append(vM.errorHelpDiv);
                 }
 
             } else {
@@ -980,6 +979,8 @@ var dispatchFormControl = {
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
     do_copo_multi_search_ctrl: function (formElem, elemValue) {
+        formElem["type"] = "string"; //this for the purposes of the UI should be assigned a string temporarily, since multi_search takes care of the multiple values
+
         var ctrlsDiv = $('<div/>',
             {
                 class: "ctrlDIV"
@@ -994,6 +995,7 @@ var dispatchFormControl = {
             var addBtn = $('<button/>',
                 {
                     style: "border-radius:0;",
+                    type: "button",
                     class: "btn btn-xs btn-primary copo-component-control",
                     "data-component": formElem.option_component,
                     "data-element-id": formElem.id,
@@ -1637,6 +1639,7 @@ function get_element_clone(ctrlsDiv, counter) {
     var delBtn = $('<button/>',
         {
             style: "border-radius:0;",
+            type: "button",
             class: "btn btn-xs btn-danger pull-right",
             html: '<i class="fa fa-trash-o"></i> Delete',
             click: function (event) {
@@ -1957,18 +1960,23 @@ function custom_validate(formObject) {
                 //get validation target
                 var validationTarget = $el.closest(".ctrlDIV").find(".copo-validation-target").first();
 
-                if (validationSource.val().trim().toLowerCase() != "") {
-
-                    //is the validation source value numeric?
-                    if ($.isNumeric(validationSource.val().trim().toLowerCase())) {
-                        if (validationTarget.val().trim().toLowerCase() == "") {
-                            validationSource.attr("data-characteristics-error", "Please assign a value for " + validationTarget.attr("placeholder") + "!");
-                            oKFlag = false;
-                        }
-                    } else {
-                        if (validationTarget.val().trim().toLowerCase() != "") {
-                            validationSource.attr("data-characteristics-error", validationTarget.attr("placeholder") + " should be blank!");
-                            oKFlag = false;
+                if (validationTarget) {
+                    if (validationSource.val().trim().toLowerCase() != "") {
+                        //is the validation source value numeric?
+                        if ($.isNumeric(validationSource.val().trim().toLowerCase())) {
+                            if (!validationTarget.attr("data-error")) {
+                                validationTarget.attr("required", true);
+                                validationTarget.attr("data-error", "The " + validationTarget.attr("placeholder") + " value is required!");
+                                validationTarget.closest(".form-group").append('<div class="help-block with-errors"></div>');
+                            }
+                        } else {
+                            if (validationTarget.attr("data-error")) {
+                                validationTarget.removeAttr("data-error");
+                                validationTarget.removeAttr("required");
+                                validationTarget.removeClass("has-error");
+                                validationTarget.closest(".form-group").removeClass("has-error has-danger");
+                                validationTarget.closest(".form-group").find(".with-errors").remove();
+                            }
                         }
                     }
                 }

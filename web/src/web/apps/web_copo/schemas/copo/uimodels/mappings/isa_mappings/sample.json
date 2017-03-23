@@ -142,7 +142,7 @@
       "label": "Source",
       "show_in_form": true,
       "ref": "",
-      "type": "string",
+      "type": "array",
       "show_in_table": false,
       "hidden": "false",
       "option_values": {

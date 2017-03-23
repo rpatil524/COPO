@@ -108,7 +108,7 @@
     {
       "ref": "sample_name",
       "title": "Sample Bundle",
-      "message": "Please provide information that can be used to label your samples. If you already have sample names entered elsewhere, you can enter or paste them as tab or comma delimited string values in the <strong>Provided Names</strong> box. Alternatively, you can supply a ‘bundle name’, in the <strong>Bundle Name</strong> box, that will form the base part from which individual sample names may be derived. Please note the following: <ol><li> <strong>Provided Names</strong>, if supplied, takes precedence over <strong>Bundle Name</strong> </li><li>Sample names, both generated and provided, will be validated in the next stage for uniqueness</li></ol>",
+      "message": "Please provide information that can be used to label your samples. The <strong>Bundle Name</strong> forms the base part from which individual sample names may be derived.",
       "items": [
         {
           "type": "string",

@@ -1027,69 +1027,6 @@ function build_attributes_display(data) {
     return $('<div/>').append(attributesPanel);
 }
 
-
-function build_element_lookup(data) {
-    //build view
-    var componentLabel = '';
-    var componentAttributes = [];
-
-    if (data.hasOwnProperty("component_label")) {
-        componentLabel = data.component_label;
-    }
-
-    if (data.hasOwnProperty("component_attributes")) {
-        componentAttributes = data.component_attributes;
-    }
-
-    var attributesPanel = $('<div/>', {
-        class: "panel panel-info",
-        style: "margin-top: 5px; font-size: 12px;"
-    });
-
-    var attributesPanelHeading = $('<div/>', {
-        class: "panel-heading",
-        style: "background-image: none; font-weight: 600;",
-        html: componentLabel + " Lookup"
-    });
-
-    attributesPanel.append(attributesPanelHeading);
-
-
-    var attributesPanelBody = $('<div/>', {
-        class: "panel-body"
-    });
-
-    var notAssignedSpan = $('<span/>', {
-        class: "text-danger",
-        html: "Attributes not assigned!"
-    });
-
-    attributesPanelBody.append(notAssignedSpan);
-
-    if (componentAttributes.length > 0) {
-        notAssignedSpan.remove();
-
-        for (var i = 0; i < componentAttributes.length; ++i) {
-            var currentItem = componentAttributes[i];
-
-            var itemLabel = $('<div/>', {
-                html: currentItem.title,
-                style: "font-size:12px; font-weight:bold"
-            });
-
-            var itemDiv = $('<div/>', {
-                style: "padding: 5px; border: 1px solid #ddd; border-radius:2px; margin-bottom:3px;"
-            }).append(itemLabel).append(format_display_data(currentItem.data));
-
-            attributesPanelBody.append(itemDiv);
-        }
-    }
-
-    attributesPanel.append(attributesPanelBody);
-
-    return $('<div/>').append(attributesPanel);
-}
-
 function get_components_properties() {
     var componentProperties = [
         {
@@ -1269,7 +1206,7 @@ function do_help_tips_event() {
             title: title,
             content: content,
             //container: 'body',
-            template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
+            template: '<div style="min-width: 300px;" class="popover copo-popover-popover1"><div class="arrow">' +
             '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
             '</h3><div class="popover-content"><p></p></div></div></div>'
         });

@@ -1212,99 +1212,8 @@ $(document).ready(function () {
                             dataTableTriggerSave = false;
                             $(node).addClass('cell-currently-engaged'); //cell locked for edit, unlock with the TAB key
 
-                            //get cell's derived id
-                            var derived_id = cell.data();
-
-                            //get cell's actual id
-                            var rowMeta = table.row(cell.index().row).data().attributes._recordMeta;
-                            var rowMetaResult = $.grep(rowMeta, function (e) {
-                                return e.derived_id == derived_id;
-                            });
-
-                            //get spec for the cell form element
-                            var formEditableElementsCopy = $.extend(true, Object(), formEditableElements);
-                            var formElem = formEditableElementsCopy[rowMetaResult[0].actual_id];
-                            var control = formElem.control;
-
-                            //in certain cases with object type kind of controls,
-                            //only some entities generated via formElem spec might need to be displayed
-                            //the presence of such will be flagged by 'meta'
-                            if (rowMetaResult[0].hasOwnProperty("meta")) {
-                                formElem["_displayOnlyThis"] = rowMetaResult[0].meta;
-                            }
-
-                            //get element value
-                            var rowAttributes = $.extend(true, Object(), table.row(cell.index().row).data().attributes);
-                            var elemValue = rowAttributes[rowMetaResult[0].actual_id];
-
-                            //get specific index to pass through
-                            var removeAddButton = false;
-                            if (rowMetaResult[0].hasOwnProperty("indx") && Object.prototype.toString.call(elemValue) === '[object Array]') {
-                                var newElemValue = [];
-                                newElemValue.push(elemValue[parseInt(rowMetaResult[0].indx)]);
-                                elemValue = newElemValue;
-                                removeAddButton = true; //remove add button for array type elements
-                            }
-
-                            var htmlCtrl = dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue);
-                            htmlCtrl.find("label").remove();
-
-                            if (removeAddButton) {
-                                htmlCtrl.find(".array-add-new-button-div").remove();
-                            }
-
-                            //create cell edit panel
-                            var cellEditPanel = get_cell_edit_panel();
-
-                            //set cell edit data
-                            cellEditPanel.find(".panel-body").append(htmlCtrl).append(set_error_div()); //attach form control
-                            cellEditPanel.find(".panel-footer").append(set_dynamic_cell_data()); //attach action buttons
-
-                            $(node)
-                                .html('')
-                                .append(cellEditPanel);
-
-                            //set focus to control
-                            if (cellEditPanel.find(".form-control")) {
-                                cellEditPanel.find(".form-control").focus();
-                            } else if (cellEditPanel.find(".input-copo")) {
-                                cellEditPanel.find(".input-copo").focus();
-                            }
-
-                            refresh_tool_tips();
-
-                            //set focus to selectize control
-                            if (selectizeObjects.hasOwnProperty(formElem.id)) {
-                                var selectizeControl = selectizeObjects[formElem.id];
-                                selectizeControl.focus();
-                            }
-
-
-                            //build cell edit function parameter object
-                            var cellParams = Object();
-                            cellParams["datatable"] = datatable;
-                            cellParams["cell"] = cell;
-                            cellParams["action"] = "current";
-
-                            cellEditPanel.find(".cell-apply").click(function () {
-                                cellParams["action"] = $(this).attr("data-action");
-                                cellParams["selectedRows"] = table.rows('.selected').indexes();
-                                cellParams["allRows"] = table.rows().indexes();
-                                cellEditPanel.find(".cell-apply").popover('destroy');
-
-                                var form_values = Object();
-                                cellEditPanel.find(":input").each(function () {
-                                    try {
-                                        form_values[this.id] = $(this).val().trim();
-                                    }
-                                    catch (err) {
-                                        form_values[this.id] = $(this).val();
-                                    }
-                                });
-                                cellParams["form_values"] = form_values;
-
-                                set_cell_dynamic(cellParams);
-                            });
+                            //set cell edit form
+                            set_cell_form(node, cell, table, '');
                         }
                     });
 
@@ -1447,23 +1356,35 @@ $(document).ready(function () {
             return sampleTableDataSource;
         }
 
-        function set_error_div() {
+        function set_error_div(error_message) {
+            if (!error_message) {
+                return false;
+            }
+
             var ctrlsDiv = $('<div/>',
                 {
                     class: "row",
-                    style: "display:none; color:#a94442;"
+                    style: "color:#a94442;"
                 });
 
             var sp = $('<div/>',
                 {
-                    class: "col-sm-12 col-md-12 col-lg-12 error-div"
+                    class: "col-sm-12 col-md-12 col-lg-12 error-div",
+                    html: error_message
                 });
 
             return ctrlsDiv.append(sp);
         }
 
-        function set_dynamic_cell_data() {
+        function set_dynamic_cell_data(formElem) {
             var parentObject = $('<div/>');
+
+            var violationList = []; //list allows button display filtering
+
+            //unique violation
+            if (formElem.hasOwnProperty("unique") && (formElem.unique.toString().toLowerCase() == "true")) {
+                violationList.push('unique');
+            }
 
             var components = [
                 {
@@ -1471,33 +1392,50 @@ $(document).ready(function () {
                     action: "current",
                     description: "Apply this update to current cell.",
                     className: "btn btn-primary btn-xs",
-                    style: "margin-right: 2px;"
+                    style: "margin-right: 2px;",
+                    violations: []
                 },
                 {
                     title: "Apply to selected",
                     action: "selected",
                     description: "Apply this update to selected records. Do remember to highlight the records for which you intend to apply the update.",
                     className: "btn btn-primary btn-xs",
-                    style: "margin-right: 2px;"
+                    style: "margin-right: 2px;",
+                    violations: ['unique']
                 },
                 {
                     title: "Apply to all",
                     action: "all",
                     description: "Apply this update to all records.",
                     className: "btn btn-primary btn-xs",
-                    style: "margin-right: 2px;"
+                    style: "margin-right: 2px;",
+                    violations: ['unique']
                 },
                 {
                     title: "Cancel",
                     action: "cancel",
                     description: "Cancel this update.",
                     className: "btn btn-warning btn-xs pull-right",
-                    style: ""
+                    style: "",
+                    violations: []
                 }
             ];
 
             for (var i = 0; i < components.length; ++i) {
                 var option = components[i];
+
+                var render = true;
+
+                violationList.forEach(function (item) {
+                    if ($.inArray(item, option.violations) !== -1) {
+                        render = false;
+                        return false;
+                    }
+                });
+
+                if (!render) {
+                    continue;
+                }
 
                 var elem = $('<button/>',
                     {
@@ -1551,15 +1489,128 @@ $(document).ready(function () {
             return attributesPanel;
         }
 
+        function set_cell_form(node, cell, table, error_message) {
+            //get cell's derived id
+            var derived_id = cell.data();
+
+            //get cell's actual id
+            var rowMeta = table.row(cell.index().row).data().attributes._recordMeta;
+            var rowMetaResult = $.grep(rowMeta, function (e) {
+                return e.derived_id == derived_id;
+            });
+
+            //get record id
+            var recordId = table.row(cell.index().row).data().attributes._id;
+
+            //get spec for the cell form element
+            var formEditableElementsCopy = $.extend(true, Object(), formEditableElements);
+            var formElem = formEditableElementsCopy[rowMetaResult[0].actual_id];
+            var control = formElem.control;
+
+            //in certain cases with object type kind of controls,
+            //only some entities generated via formElem spec might need to be displayed
+            //the presence of such will be flagged by 'meta'
+            if (rowMetaResult[0].hasOwnProperty("meta")) {
+                formElem["_displayOnlyThis"] = rowMetaResult[0].meta;
+            }
+
+            //retrieve record to obtain element value
+            $.ajax({
+                url: copoFormsURL,
+                type: "POST",
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    'task': "component_record",
+                    'component': component,
+                    'target_id': recordId
+                },
+                success: function (data) {
+                    //get element value
+                    var rowAttributes = data.component_record;
+                    var elemValue = rowAttributes[rowMetaResult[0].actual_id];
+
+                    //get specific index to pass through
+                    var removeAddButton = false;
+                    if (rowMetaResult[0].hasOwnProperty("indx") && Object.prototype.toString.call(elemValue) === '[object Array]') {
+                        var newElemValue = [];
+                        newElemValue.push(elemValue[parseInt(rowMetaResult[0].indx)]);
+                        elemValue = newElemValue;
+                        removeAddButton = true; //remove add button for array type elements
+                    }
+
+                    var htmlCtrl = dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue);
+                    htmlCtrl.find("label").remove();
+
+                    if (removeAddButton) {
+                        htmlCtrl.find(".array-add-new-button-div").remove();
+                    }
+
+                    //create cell edit panel
+                    var cellEditPanel = get_cell_edit_panel();
+
+                    //set cell edit data
+                    cellEditPanel.find(".panel-body").append(htmlCtrl).append(set_error_div(error_message)); //attach form control
+                    cellEditPanel.find(".panel-footer").append(set_dynamic_cell_data(formElem)); //attach action buttons
+
+                    $(node)
+                        .html('')
+                        .append(cellEditPanel);
+
+                    //set focus to control
+                    if (cellEditPanel.find(".form-control")) {
+                        cellEditPanel.find(".form-control").focus();
+                    } else if (cellEditPanel.find(".input-copo")) {
+                        cellEditPanel.find(".input-copo").focus();
+                    }
+
+                    refresh_tool_tips();
+
+                    //set focus to selectize control
+                    if (selectizeObjects.hasOwnProperty(formElem.id)) {
+                        var selectizeControl = selectizeObjects[formElem.id];
+                        selectizeControl.focus();
+                    }
+
+
+                    //build cell edit function parameter object
+                    var cellParams = Object();
+                    cellParams["datatable"] = table;
+                    cellParams["cell"] = cell;
+                    cellParams["action"] = "current";
+
+                    cellEditPanel.find(".cell-apply").click(function () {
+                        cellParams["action"] = $(this).attr("data-action");
+                        cellParams["selectedRows"] = table.rows('.selected').indexes();
+                        cellParams["allRows"] = table.rows().indexes();
+                        cellEditPanel.find(".cell-apply").popover('destroy');
+
+                        var form_values = Object();
+                        cellEditPanel.find(":input").each(function () {
+                            try {
+                                form_values[this.id] = $(this).val().trim();
+                            }
+                            catch (err) {
+                                form_values[this.id] = $(this).val();
+                            }
+                        });
+                        cellParams["form_values"] = form_values;
+
+                        set_cell_dynamic(cellParams);
+                    });
+                },
+                error: function () {
+                    alert("Couldn't retrieve cell value!");
+                }
+            });
+
+        }
+
         function set_cell_dynamic(cellParams) {
             var datatable = cellParams.datatable;
             var cell = cellParams.cell;
             var action = cellParams.action;
 
             var node = cell.node();
-
-            //store the cell's current html state for future reference
-            var cellHTMLClone = $(node).find(".cell-edit-panel").clone(true);
 
             $(node).html(get_spinner_image());
 
@@ -1639,12 +1690,8 @@ $(document).ready(function () {
                     },
                     success: function (data) {
                         if (data.updated_samples.status && data.updated_samples.status == "error") {
-                            $(node)
-                                .html('')
-                                .append(cellHTMLClone);
-
-                            $(node).find(".error-div").html(data.updated_samples.message);
-                            $(node).find(".error-div").closest(".row").css("display", "block");
+                            //re-display edit form with error message
+                            set_cell_form(node, cell, datatable, data.updated_samples.message);
                         } else {
                             //re-enable keys
                             datatable.keys.enable();
@@ -1656,20 +1703,17 @@ $(document).ready(function () {
                             //deselect previously selected rows
                             datatable.rows('.selected').deselect();
 
-
                             var updatedSamples = data.updated_samples.generated_samples;
                             formEditableElements = data.updated_samples.form_elements; //refresh form elements
 
                             //set updated and refresh display
-                            for (var i = 0; i < updatedSamples.length; ++i) {
-                                if (updatedSamples[i].hasOwnProperty("_cell_id")) {
-                                    dataTableDataSource[updatedSamples[i]._cell_id].attributes = updatedSamples[i];
+                            for (var i = 0; i < targetRows.length; ++i) {
+                                dataTableDataSource[targetRows[i].rowID].attributes._recordMeta[cell.index().columnVisible - 1] = updatedSamples[0]._recordMeta[cell.index().columnVisible - 1];
 
-                                    datatable
-                                        .row(updatedSamples[i]._cell_id)
-                                        .invalidate()
-                                        .draw();
-                                }
+                                datatable
+                                    .row(targetRows[i].rowID)
+                                    .invalidate()
+                                    .draw();
                             }
 
                             //set focus on next row
@@ -1709,7 +1753,7 @@ $(document).ready(function () {
                 var attributesPanelHeading = $('<div/>', {
                     class: "panel-heading",
                     style: "background-image: none; font-weight: 600;",
-                    html:  stageTitle
+                    html: stageTitle
                 });
 
                 attributesPanel.append(attributesPanelHeading);

@@ -132,7 +132,7 @@ class WizardHelper:
 
         return sample_name_schema
 
-    def resolve_object_arrays_column(sefl, columns):
+    def resolve_object_arrays_column(self, columns):
         """
         function deconstructs object type controls into discrete items for tabular rendering and editing
         :param columns:
@@ -284,8 +284,13 @@ class WizardHelper:
                 for u_c in update_candidates:  # set element based on index
                     amendable_entity = u_c[column_reference]
                     if isinstance(amendable_entity, list):
-                        amendable_entity[update_element_indx:update_element_indx + 1] = resolved_data[column_reference][
-                                                                                        :]
+                        update_element = amendable_entity[update_element_indx]
+                        if update_meta:
+                            # update only the specified sub-document
+                            update_element[update_meta] = resolved_data[column_reference][0][update_meta]
+                            amendable_entity[update_element_indx] = update_element
+                        else:
+                            amendable_entity[update_element_indx] = resolved_data[column_reference][0]
                         bulk.find({'_id': u_c["_id"]}).update({'$set': {column_reference: amendable_entity}})
             else:
                 for t_r in target_rows:
@@ -295,18 +300,10 @@ class WizardHelper:
             # execute bulk object
             bulk.execute()
 
-        update_list = list()
-        for t_r in target_rows:
-            update_list.append(ObjectId(t_r["recordID"]))
+        # pass on one representative update sample record to be resolved for display
+        sample = Sample().get_record(target_rows[0]["recordID"])
 
-        updated_samples = cursor_to_list(Sample().get_collection_handle().find({"_id": {"$in": update_list}}))
-
-        for t_r in target_rows:
-            for u_s in updated_samples:
-                if t_r["recordID"] == str(u_s["_id"]):
-                    u_s["_cell_id"] = t_r["rowID"]
-
-        return self.resolve_samples_display(updated_samples, sample_type)
+        return self.resolve_samples_display([sample], sample_type)
 
     def truth_test_1(self, elem, sample_type):
         """
@@ -377,15 +374,15 @@ class WizardHelper:
 
             if is_numeric and not objects_of_interest['unit']:
                 validation_result["status"] = "error"
-                validation_result["message"] = "Numeric value requires a unit!"
+                validation_result["message"] = "Numeric value requires a unit! Set the unit value to continue."
 
                 return validation_result
-            # commenting out the 'elif' condition below prevents an update lock up;
-            # a case where you can't update the value because of the unit, and vice versa
-            # elif not is_numeric and objects_of_interest['unit']:
-            #     validation_result["status"] = "error"
-            #     validation_result["message"] = "Non-numeric value does not require a unit!"
-            #
-            #     return validation_result
+                # commenting out the 'elif' condition below prevents an update lock up;
+                # a case where you can't update the value because of the unit, and vice versa
+                # elif not is_numeric and objects_of_interest['unit']:
+                #     validation_result["status"] = "error"
+                #     validation_result["message"] = "Non-numeric value does not require a unit!"
+                #
+                #     return validation_result
 
         return validation_result

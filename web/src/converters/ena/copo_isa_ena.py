@@ -1016,7 +1016,7 @@ class ISAHelpers:
 
     def treat_record_characteristics(self, records, all_derived_from=list()):
         """
-        given records with associated characteristics, factorValues, derivesFrom properties, make such isa-record-ready
+        given records with associated characteristics, factorValues, derivesFrom properties, make such are isa-record-ready
         :param records:
         :return: treated records
         """
