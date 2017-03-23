@@ -5,12 +5,17 @@
  */
 
 $(document).ready(function () {
+    build_submission_table()
+
+    //$('#submission_table').DataTable()
+
+
     $('#upload_progress_info').hide()
     var csrftoken = $.cookie('csrftoken');
     $('#current-submissions').DataTable();
     $('.submission_panel').on('click', change_selected);
     $('.file_info').on('click', get_file_info);
-    $('.upload_button').on('click', handle_upload);
+    $(document).on('click', '.upload_button', handle_upload);
     $('.delete_button').on('click', handle_delete);
     $(document).on('click', '.publish_button', publish_figshare_article)
 
@@ -246,6 +251,40 @@ $(document).ready(function () {
 
 });
 
+
+function build_submission_table() {
+    var profile_id = $('#profile_id').val()
+    $.ajax({
+        url: '/rest/copo_get_submission_table_data/',
+        method: 'POST',
+        headers: {'X-CSRFToken': $.cookie('csrftoken')},
+        dataType: 'json',
+        data: {'profile_id': profile_id}
+    }).done(function (data) {
+
+        // for each element, create a row in the submissions table
+        $(data).each(function (idx, element) {
+
+            var row = $('<tr/>')
+            $(row).append('<td>' + element.repository + '</td>')
+            $(row).append('<td style="cursor: pointer"><a>Files / Accessions <span style="vertical-align: middle" class="fa fa-info-circle fa-2x"></span></a></td>')
+            $(row).append('<td>' + element.date_created + '</td>')
+            $(row).append('<td>' + element.status + '</td>')
+            $(row).append('<div style="margin-top: 20px" class="progress">'
+                + '<div class="progress-bar progress-bar-success progress-bar-striped active" role = "progressbar"'
+                + 'aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width:0%">0%</div></div>')
+            $(row).append('<td><span class="upload_speed">0</span>MB/sec</td>')
+            $(row).append('<td><button type="button" class="btn btn-default upload_button">'
+                + '<span style="margin:0" class="glyphicon glyphicon-cloud-upload"></span></button></td>')
+
+            $(row).data('submission_id', element._id.$oid)
+            $('#submission_table tbody').append(row)
+        })
+        $('#submission_table').DataTable()
+    })
+}
+
+
 function change_selected(e) {
 
     // change colors of table rows
@@ -268,7 +307,6 @@ function change_selected(e) {
     $('#status-panel').data('accessions_visible', false)
 
 }
-
 
 function handle_upload(e) {
     $(e.currentTarget).hide();
@@ -336,14 +374,14 @@ function publish_figshare_article(e) {
     var d = {'submission_id': sub_id}
 
     $.ajax({
-            url: '/copo/publish_figshare/',
-            data: {'submission_id': sub_id},
-            type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
-            dataType: 'json'
-        })
+        url: '/copo/publish_figshare/',
+        data: {'submission_id': sub_id},
+        type: "POST",
+        headers: {'X-CSRFToken': csrftoken},
+        dataType: 'json'
+    })
         .done(function (e) {
-            if(e.status_code == 201 || e.status_code == 200){
+            if (e.status_code == 201 || e.status_code == 200) {
                 $('#status-panel').empty()
                 $('#status-panel').data('accessions_visible', false)
             }

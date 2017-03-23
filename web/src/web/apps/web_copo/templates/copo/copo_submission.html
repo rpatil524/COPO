@@ -7,8 +7,6 @@
 {% block stylesheet_block %}
     <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
     <link rel="stylesheet" href="{% static 'copo/css/copo/submission.css' %}" xmlns="http://www.w3.org/1999/html">
-
-
 {% endblock %}
 
 
@@ -34,7 +32,48 @@
 
 {% block content %}
 
+    <input type="hidden" id="profile_id" value="{{ profile_id }}"/>
+
+    <table id="submission_table">
+        <thead>
+        <tr>
+            <th>
+                Type
+            </th>
+            <th>
+                Files / Accessions
+            </th>
+            <th>
+                Created
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                Uploaded Percentage
+            </th>
+            <th>
+                Upload Speed
+            </th>
+            <th>
+                Send
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        
+        </tbody>
+    </table>
+
+
+
+
+
+
+
+    <!--
     <input type="hidden" id="displayed_submission" value=""/>
+
 
     <div class="row">
         <div class="col-lg-4 col-md-4 col-sm-4">
@@ -45,7 +84,8 @@
                 <div class="panel-body panel-overflow">
 
 					{% for s in submission %}
-						<div class="submission_panel" data-submission-id="{{ s|mongo_id }}" data-submission-status="{{ s.complete }}">
+						<div class="submission_panel" data-submission-id="{{ s|mongo_id }}" data-submission-status="
+        {{ s.complete }}">
 							<div class="submission_header submission_pending">
 								{{ s|produce_submission_header }}
 								<span class="pull-right display-1">
@@ -62,9 +102,7 @@
 
 									</div>
 									<div class="col-lg-6 col-md-6 col-sm-6 text-center padding">
-										<!--<div class="checkbox">
-                                            <input type="checkbox" value="">
-                                        </div>-->
+
 										{% if s.complete == "false" %}
 
 										<div class="ctl-buttons">
@@ -108,6 +146,7 @@
 		</div>
 
 	</div>
+    -->
 {% endblock %}
 
 {% block js_block %}
@@ -115,4 +154,5 @@
     <script src="{% static 'copo/js/copo_submission.js' %}"></script>
     <script src="{% static 'copo/chart_js/Chart.js' %}"></script>
     <script src="{% static 'copo/js/bootstrap-dialog.js' %}"></script>
+
 {% endblock %}

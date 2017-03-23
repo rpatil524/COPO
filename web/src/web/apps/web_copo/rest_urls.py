@@ -30,5 +30,6 @@ urlpatterns = [
     url(r'^get_partial_uploads/', rest.get_partial_uploads, name='get_partial_uploads'),
     url(r'^get_excel_data/', ajax.get_excel_data, name='get_excel_data'),
     url(r'^save_ss_annotation', a_views.save_ss_annotation, name='save_ss_annotation'),
-    url(r'^delete_ss_annotation/', a_views.delete_ss_annotation, name='delete_ss_annotation')
+    url(r'^delete_ss_annotation/', a_views.delete_ss_annotation, name='delete_ss_annotation'),
+    url(r'^copo_get_submission_table_data/', views.copo_get_submission_table_data, name='get_submissions')
 ]

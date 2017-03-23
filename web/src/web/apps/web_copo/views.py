@@ -227,6 +227,17 @@ def copo_submissions(request, profile_id):
 
 
 @login_required
+def copo_get_submission_table_data(request):
+    profile_id = request.POST.get('profile_id')
+    submission = Submission(profile_id=profile_id).get_all_records()
+    for s in submission:
+        s['date_created'] = s['date_created'].strftime('%d %b %Y - %I:%M %p')
+        s['date_modified'] = s['date_modified'].strftime('%d %b %Y - %I:%M %p')
+    out = j.dumps(submission)
+    return HttpResponse(out)
+
+
+@login_required
 def goto_error(request, message="Something went wrong, but we're not sure what!"):
     try:
         LOGGER.log(message)
