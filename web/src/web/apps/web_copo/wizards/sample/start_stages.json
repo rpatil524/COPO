@@ -82,7 +82,7 @@
         "parameter": "confirm_sample_clone"
       },
       "title": "Clone Target",
-      "message": "You may now select a sample to clone",
+      "message": "Select a sample to clone from the list of samples. ",
       "items": [
         {
           "id": "sample_clone",

@@ -861,7 +861,7 @@ var dispatchFormControl = {
             if (commentSchema[i].hidden == "false") {
                 var sp = $('<div/>',
                     {
-                        class: "form-group col-sm-6"
+                        class: "form-group col-sm-6 col-md-6 col-lg-6"
                     });
 
                 if (formElem.hasOwnProperty("_displayOnlyThis") && (fv != formElem["_displayOnlyThis"])) {
@@ -879,8 +879,8 @@ var dispatchFormControl = {
                     {
                         class: "form-control copo-comment-control",
                         rows: 2,
-                        cols: 35,
-                        placeholder: commentSchema[i].label.toLowerCase(),
+                        style: "min-width: 100%;",
+                        placeholder: commentSchema[i].label,
                         id: formElem.id + '.' + fv,
                         name: formElem.id + '.' + fv
                     });
@@ -1109,19 +1109,31 @@ var dispatchFormControl = {
                     "data-desc": option.description,
                     "data-value": option.value,
                     mouseover: function (evt) {
-                        $(this).popover({
-                            title: $(this).attr("data-lbl"),
-                            content: $(this).attr("data-desc"),
-                            container: 'body',
-                            trigger: 'hover',
-                            html: true,
-                            placement: 'right',
-                            template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
-                            '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
-                            '</h3><div class="popover-content"><p></p></div></div></div>'
-                        });
+                        if ($(this).attr("data-desc") && !$(this).closest(".radioCtrlDiv").find(".description-alert").length) {
+                            var descriptionAlert = $('<div/>',
+                                {
+                                    class: "alert alert-info alert-dismissable description-alert",
+                                    style: "background-image: none; background-color: transparent; line-height:1.7;"
+                                });
 
-                        $(this).popover("show");
+                            var descriptionAnchor = $('<div/>',
+                                {
+                                    href: "#",
+                                    class: "close",
+                                    "data-dismiss": "alert",
+                                    "arial-label": "close",
+                                    html: "&times;"
+                                });
+
+                            var descriptionText = $('<span/>',
+                                {
+                                    html: $(this).attr("data-desc")
+                                });
+
+                            descriptionAlert.append(descriptionAnchor);
+                            descriptionAlert.append(descriptionText);
+                            $(this).closest(".radioCtrlDiv").append(descriptionAlert);
+                        }
                     },
                 });
 
@@ -1131,7 +1143,8 @@ var dispatchFormControl = {
 
             var radioCtrlDiv = $('<div/>',
                 {
-                    style: "position: relative; display: block; margin-top: 10px; margin-bottom: 5px;"
+                    style: "position: relative; display: block; margin-top: 10px; margin-bottom: 5px;",
+                    class: "radioCtrlDiv"
                 }).append(radioCtrlLabel);
 
             radioGroup.append(radioCtrlDiv);
