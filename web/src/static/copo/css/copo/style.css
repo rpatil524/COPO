@@ -4,10 +4,10 @@ body {
     font-size: 1.4em;
 }
 
-.wrapper{
+.wrapper {
     margin: 0 auto;
     background-color: rgba(255, 255, 255, 0.8);
-    width: 500px;
+    width: 100%;
     padding: 20px;
     border-radius: 15px;
 }
@@ -1053,20 +1053,21 @@ table.dataTable td.focus {
     /*padding-bottom: 5px;*/
     border-radius: 4px
 }
+
 /*end form control focus*/
 
-.datepicker-days th{
+.datepicker-days th {
     background-color: transparent;
 }
 
-input.date-picker{
+input.date-picker {
     width: 200px;
 }
 
-#gh_controls, #field_controls{
+#gh_controls, #field_controls {
     margin-top: 15px;
 }
 
-.autocomplete{
+.autocomplete {
     z-index: 10;
 }
