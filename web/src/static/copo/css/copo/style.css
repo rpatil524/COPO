@@ -1071,3 +1071,7 @@ input.date-picker {
 .autocomplete {
     z-index: 10;
 }
+
+input[data-autocomplete] {
+    border: 1px solid #ccc !important;
+}
