@@ -112,8 +112,8 @@
       <file leaf-file-name="copo_sample_2.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="413">
-              <caret line="1491" column="66" lean-forward="true" selection-start-line="1491" selection-start-column="66" selection-end-line="1491" selection-end-column="66" />
+            <state relative-caret-position="143">
+              <caret line="1473" column="61" lean-forward="true" selection-start-line="1473" selection-start-column="61" selection-end-line="1473" selection-end-column="61" />
               <folding>
                 <marker date="1490258580000" expanded="true" signature="35671:35689" ph="..." />
                 <marker date="1490258580000" expanded="true" signature="41665:41683" ph="..." />
@@ -1264,8 +1264,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="413">
-          <caret line="1491" column="66" lean-forward="true" selection-start-line="1491" selection-start-column="66" selection-end-line="1491" selection-end-column="66" />
+        <state relative-caret-position="143">
+          <caret line="1473" column="61" lean-forward="true" selection-start-line="1473" selection-start-column="61" selection-end-line="1473" selection-end-column="61" />
           <folding>
             <marker date="1490258580000" expanded="true" signature="35671:35689" ph="..." />
             <marker date="1490258580000" expanded="true" signature="41665:41683" ph="..." />
