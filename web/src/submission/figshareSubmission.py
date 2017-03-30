@@ -52,9 +52,12 @@ class FigshareSubmit(object):
             data['authors'] = lst
             data['description'] = sub.get('title_author_description', dict()).get('description')
             cat = sub.get('type_category', dict()).get('categories')
-            cat = cat.split(',')
-            cat = list(map(int, cat))
-            data['categories'] = cat
+            if cat:
+                cat = cat.split(',')
+                cat = list(map(int, cat))
+                data['categories'] = cat
+            else:
+                data['categories'] = list()
             data['tags'] = sub.get('tags', dict()).get('keywords').split(',')
             data['references'] = sub.get('tags', dict()).get('references').split(',')
             for idx, x in enumerate(data['references']):

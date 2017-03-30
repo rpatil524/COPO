@@ -233,6 +233,11 @@ def copo_get_submission_table_data(request):
     for s in submission:
         s['date_created'] = s['date_created'].strftime('%d %b %Y - %I:%M %p')
         s['date_modified'] = s['date_modified'].strftime('%d %b %Y - %I:%M %p')
+        if s['complete'] == 'false' or s['complete'] == False:
+            s['status'] = 'Pending'
+        else:
+            s['status'] = 'Submitted'
+
     out = j.dumps(submission)
     return HttpResponse(out)
 

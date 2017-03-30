@@ -227,7 +227,7 @@ class Annotation(DAComponent):
         self.get_collection_handle().update(
             {'_id': ObjectId(id)},
             {'$push':
-                 {'annotation': fields }
+                 {'annotation': fields}
              }
         )
         return fields
@@ -358,13 +358,26 @@ class Submission(DAComponent):
             }
         )
 
+    def get_file_accession(self, sub_id):
+        doc = self.get_collection_handle().find_one(
+            {
+                '_id': ObjectId(sub_id)
+            },
+            {
+                'accessions': 1,
+                'bundle': 1
+            }
+        )
+        filenames = list()
+        for file_id in doc['bundle']:
+            f = DataFile().get_by_file_name_id(file_id=file_id)
+            filenames.append(f['name'])
+        return {'accessions': doc, 'filenames': filenames}
+
 
 class DataFile(DAComponent):
-
-
     def __init__(self, profile_id=None):
         super(DataFile, self).__init__(profile_id, "datafile")
-
 
     def get_by_file_id(self, file_id=None):
         docs = None
@@ -374,11 +387,23 @@ class DataFile(DAComponent):
 
         return docs
 
+    def get_by_file_name_id(self, file_id=None):
+        docs = None
+        if file_id:
+            docs = self.get_collection_handle().find_one(
+                {
+                    "_id": ObjectId(file_id), "deleted": data_utils.get_not_deleted_flag()
+                },
+                {
+                    "name": 1
+                }
+            )
+
+        return docs
 
     def get_relational_record_for_id(self, datafile_id):
         chunked_upload = ChunkedUpload.objects.get(id=int(datafile_id))
         return chunked_upload
-
 
     def get_record_property(self, datafile_id=str(), elem=str()):
         """
@@ -404,7 +429,6 @@ class DataFile(DAComponent):
         )
 
         return property_dict.get(elem, str())
-
 
     def add_fields_to_datafile_stage(self, target_ids, fields, target_stage_ref):
 
@@ -493,11 +517,15 @@ class RemoteDataFile:
         df = self.GET(str(doc))
         return df
 
+    def delete_transfer(self, transfer_id):
+        self.RemoteFileCollection.delete_one({'_id': ObjectId(transfer_id)})
+
     def update_transfer(self, transfer_id, fields, delete="0"):
 
         fields["deleted"] = delete
         if 'transfer_rate' in fields:
             speed = fields.pop("transfer_rate")
+
             self.RemoteFileCollection.update(
                 {
                     "_id": ObjectId(transfer_id)

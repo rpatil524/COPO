@@ -5,10 +5,10 @@
  */
 
 $(document).ready(function () {
+
     build_submission_table()
 
     //$('#submission_table').DataTable()
-
 
     $('#upload_progress_info').hide()
     var csrftoken = $.cookie('csrftoken');
@@ -18,233 +18,51 @@ $(document).ready(function () {
     $(document).on('click', '.upload_button', handle_upload);
     $('.delete_button').on('click', handle_delete);
     $(document).on('click', '.publish_button', publish_figshare_article)
-
-    num_pts = 100;
-    var ctx = document.getElementById("bandwidth_chart");
-    Chart.defaults.global.animation.duration = 0;
-    init_data = Array.apply(null, Array(num_pts)).map(Number.prototype.valueOf, 0);
-    labels = Array.apply(null, Array(num_pts)).map(Number.prototype.valueOf, 0);
-    var myChart = new Chart(ctx, {
-
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    borderColor: "rgba(91,192,222, 1)",
-                    backgroundColor: "rgba(91,192,222,1)",
-                    data: init_data
-                }]
-            },
-            options: {
-                scaleShowLabels: false,
-                scales: {
-
-                    xAxes: [{
-                        display: false,
-                        gridLines: {
-                            lineWidth: 0,
-                            color: "rgba(255,255,255,0)"
-                        },
-                        ticks: {
-                            suggestedMin: 0,
-                            suggestedMax: 4,
-                        },
-
-                    }],
-                    yAxes: [{
-                        display: true,
-                        gridLines: {
-                            lineWidth: 0,
-                            color: "rgba(255,255,255,0)"
-                        },
-                        ticks: {
-                            suggestedMin: 0,
-                            suggestedMax: 4,
-
-                        },
-                        label: 'aha'
-                    }]
-                }
-            }
-        }
-    );
-
-    var pie_data = {
-        labels: [],
-        datasets: [
-            {
-                data: [0, 100],
-                backgroundColor: [
-                    "rgba(91,192,222, 1)",
-                    "rgba(91,192,222, 0.1)",
-
-                ],
-            }]
-    };
-    var cty = document.getElementById("completed_chart");
-    var completed_chart = new Chart(cty, {
-        type: 'doughnut',
-        data: pie_data,
-        options: {}
-    });
-
-
-    //$('#bandwidth_chart').height(400).width(400)
-    //$('#completed_chart').height(400).width(800)
+    $(document).on('click', '.submission_row', get_accession_info)
 
     setInterval(function () {
 
-        //update chart data
-        var id_to_send = $('#displayed_submission').val();
-        $.get("/rest/get_upload_information/", {submission_id: id_to_send})
-            .done(function (data) {
-
-                data = JSON.parse(data);
-                var canvases = $('canvas');
-                if (data.found == false) {
-                    $('canvas').each(function () {
-                        $(this).siblings('h4').hide();
-                        $(this).hide()
+        //get table row ids
+        var ids = new Array
+        $('.submission_row').each(function (idx, row) {
+            ids.push($(row).data('submission_id'))
+        })
+        ids = JSON.stringify(ids)
+        $.ajax({
+            url: "/rest/get_upload_information/",
+            data: {'ids': ids},
+            dataType: 'json',
+            method: 'GET'
+        }).done(function (data) {
+            $(data.return).each(function (idx, element) {
+                var s_id = element.id;
+                var tr = $(".submission_row[data-submission_id='" + s_id + "']")
+                var pct_complete = 0
+                try {
+                    var pct_complete = (Number((element.complete).toFixed(2)))
+                }
+                catch (TypeError) {
+                    pct_complete = 100
+                }
+                $(tr).find('.progress-bar').css('width', pct_complete + '%')
+                $(tr).find('.progress-bar').html(pct_complete + ' %')
+                var mean_speed = 0
+                try {
+                    // try to calculate mean speed
+                    element.speeds.forEach(function (entry) {
+                        mean_speed += entry
                     })
-
+                    mean_speed /= element.speeds.length
+                    // convert to MB
+                    mean_speed = mean_speed / 8
+                    mean_speed = (Number((mean_speed).toFixed(2)))
                 }
-                else if (!data.finished) {
-                    // update charts with returned upload status data
-                    $('#not_running_text').hide()
-                    $('#upload_progress_info').show()
-                    $('canvas').each(function () {
-                        $(this).siblings('h4').show();
-                        $(this).show()
-                    });
-
-
-                    myChart.chart.config.data.datasets[0].data = data.speeds;
-                    update = [data.complete, 100 - data.complete];
-                    completed_chart.config.data.datasets[0].data = update;
-
-                    myChart.update();
-                    completed_chart.update()
-
+                catch (TypeError) {
+                    mean_speed = 0
                 }
-                else {
-                    // hide charts and show accession data
-                    $('canvas').each(function () {
-                        $(this).siblings('h4').hide();
-                        $(this).hide()
-                    });
-                    $('#not_running_text').hide()
-                    if ($('#status-panel').data('accessions_visible') != true) {
-
-                        if (data.repo == 'ena') {
-                            $('#status-panel').append('<h3 id="accessions-header">Accessions</h3>');
-
-                            // create accession panels
-                            var panel_group = jQuery('<div/>', {
-                                class: 'panel-group',
-                                id: 'accessions-block'
-                            });
-                            var c = 1;
-                            // for each key, create a collapsable panel
-                            for (var key in data.accessions) {
-
-                                var panel = jQuery('<div/>', {
-                                    class: 'panel panel-default',
-                                });
-                                var panel_heading = jQuery('<div/>', {
-                                    class: 'panel-heading'
-                                });
-                                var panel_title = jQuery('<h4/>', {
-                                    class: 'panel-title'
-                                });
-
-                                a_key = key[0].toUpperCase() + key.slice(1);
-                                var title = $.parseHTML('<a data-toggle="collapse" href="#collapse' + c + '">' + a_key + '</a>');
-
-                                $(title).appendTo(panel_title);
-                                $(panel_title).appendTo(panel_heading);
-                                $(panel_heading).appendTo(panel);
-
-                                var collapse = jQuery('<div/>', {
-                                    id: 'collapse' + c,
-                                    class: 'panel-collapse collapse'
-                                });
-                                c = c + 1;
-
-                                var panel_body = jQuery('<div/>', {
-                                    class: 'panel-body'
-                                });
-
-                                var ul = jQuery('<ul/>');
-
-                                if (key == 'sample') {
-                                    $(data.accessions['sample']).each(function (count, smp) {
-                                        var li = jQuery('<li/>', {
-                                            html: '<span title="Biosample Accession: ' + smp.biosample_accession + '">' + smp.sample_accession + ' - <small>' + smp.sample_alias + '</small></span>'
-                                        });
-                                        $(li).appendTo(ul)
-                                    })
-                                }
-                                else {
-
-                                    var li = jQuery('<li/>', {
-                                        html: data.accessions[key].accession + ' - <small>' + data.accessions[key].alias + '</small>'
-                                    });
-                                    $(li).appendTo(ul)
-                                }
-                                $(ul).appendTo(panel_body);
-                                $(panel_body).appendTo(collapse);
-                                $(collapse).appendTo(panel);
-
-                                $(panel).appendTo(panel_group)
-
-                            }
-
-                            $(panel_group).appendTo('#status-panel');
-                            $('#status-panel').data('accessions_visible', true)
-                        }
-                        else if (data.repo == 'figshare') {
-                            $('#status-panel').append('<h3 id="accessions-header">Accessions</h3>');
-
-                            // create accession panels
-                            var panel_group = jQuery('<div/>', {
-                                class: 'panel-group',
-                                id: 'accessions-block'
-                            });
-
-                            //ac = data.accessions.split(',')
-                            ac = data.article_id.split(',')
-                            $(ac).each(function (count, el) {
-                                var anc = jQuery('<a/>', {
-                                    html: el + ' (Article ID)',
-                                    href: el,
-                                });
-                                $(anc).appendTo(panel_group)
-                            })
-
-                            // check status
-                            if (data.status == 'not published') {
-                                console.log('not published')
-
-                                var button = jQuery('<div/>', {
-                                    html: "<a data-sub_id='" + data.sub_id + "' class='publish_button btn btn-primary'>Publish</a>",
-                                })
-
-                                panel_group.append('<h4>Not Yet Published</h4>')
-                                panel_group.append('This Figshare article has been uploaded but is not yet published and publicly viewable. Click below to publish. Once published, the article can no longer be deleted</br></br>')
-                                $(button).appendTo(panel_group)
-
-                            }
-
-                            $(panel_group).appendTo('#status-panel');
-                            $('#status-panel').data('accessions_visible', true)
-                        }
-
-
-                    }
-                    $(".submission_panel[data-submission-id=" + id_to_send + "]").find('.ctl-buttons').hide()
-
-                }
-            });
+                $(tr).find('.upload_speed').html(mean_speed)
+            })
+        })
 
 
     }, 1000)
@@ -265,19 +83,36 @@ function build_submission_table() {
         // for each element, create a row in the submissions table
         $(data).each(function (idx, element) {
 
-            var row = $('<tr/>')
-            $(row).append('<td>' + element.repository + '</td>')
-            $(row).append('<td style="cursor: pointer"><a>Files / Accessions <span style="vertical-align: middle" class="fa fa-info-circle fa-2x"></span></a></td>')
-            $(row).append('<td>' + element.date_created + '</td>')
-            $(row).append('<td>' + element.status + '</td>')
-            $(row).append('<div style="margin-top: 20px" class="progress">'
-                + '<div class="progress-bar progress-bar-success progress-bar-striped active" role = "progressbar"'
-                + 'aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width:0%">0%</div></div>')
-            $(row).append('<td><span class="upload_speed">0</span>MB/sec</td>')
-            $(row).append('<td><button type="button" class="btn btn-default upload_button">'
-                + '<span style="margin:0" class="glyphicon glyphicon-cloud-upload"></span></button></td>')
+            if (element.complete == "true" || element.complete == true) {
+                var percent_complete = '100';
+                var progress_bar_style = 'progress-bar-success'
+                var striped = ''
+                var active_button = 'disabled'
+            }
+            else {
+                var striped = 'progress-bar-striped'
+                var progress_bar_style = 'progress-bar-info'
+                var percent_complete = '0'
+                var active_button = 'active'
+            }
 
-            $(row).data('submission_id', element._id.$oid)
+
+            var send_cell = '<td><button type="button" class="btn btn-default upload_button ' + active_button + '">'
+                + '<span style="margin:0" class="glyphicon glyphicon-cloud-upload"></span></button>' +
+                '<span class="ajax_span" style="visibility: hidden"><img src="/static/copo/img/ajax.gif" style="margin-left: 20px; height: 32px"></span>' +
+                '</td>'
+
+
+            var row = $('<tr class="submission_row" data-submission_id="' + element._id.$oid + '"></tr>')
+            $(row).append('<td>' + element.repository + '</td>')
+            $(row).append('<td style="cursor: pointer"><a data-toggle="modal" data-target="#accessionModal">Files / Accessions <span style="vertical-align: middle" class="fa fa-info-circle fa-2x"></span></a></td>')
+            $(row).append('<td>' + element.date_created + '</td>')
+            $(row).append('<td class="status">' + element.status + '</td>')
+            $(row).append('<div style="margin-top: 20px" class="progress">'
+                + '<div class="progress-bar ' + progress_bar_style + ' ' + striped + ' active" role = "progressbar"'
+                + 'aria-valuenow="' + percent_complete + '" aria-valuemin="0" aria-valuemax="100" style="width:' + percent_complete + '%">' + percent_complete + '%</div></div>')
+            $(row).append('<td><span class="upload_speed">0</span>MB/sec</td>')
+            $(row).append(send_cell)
             $('#submission_table tbody').append(row)
         })
         $('#submission_table').DataTable()
@@ -309,33 +144,74 @@ function change_selected(e) {
 }
 
 function handle_upload(e) {
-    $(e.currentTarget).hide();
+
+    var btn = $(e.currentTarget)
+    if (btn.hasClass('disabled')) {
+        return false;
+    }
+
+    btn.addClass('disabled');
+    var tr = btn.closest('tr')
+    var submission_id = $(tr).data('submission_id')
+
     BootstrapDialog.show({
         title: 'Upload Submission',
         message: 'Are you sure you want to upload this submission bundle.',
         buttons: [{
             label: 'Yes',
             action: function (dialog) {
+                $(tr).find('.ajax_span').css('visibility', 'visible')
                 dialog.close();
                 var csrftoken = $.cookie('csrftoken');
-                $.post("/rest/submit_to_repo/", {
-                    'sub_id': $('#displayed_submission').val(),
-                    'csrfmiddlewaretoken': csrftoken
+                $.ajax({
+                    url: "/rest/submit_to_repo/",
+                    data: {'sub_id': submission_id},
+                    headers: {'X-CSRFToken': $.cookie('csrftoken')},
+                    method: 'POST',
+                    dataType: 'json'
                 }).done(function (data) {
-                    $(e.currentTarget).closest('tr').find('.delete_button', '.upload_button').remove();
-                    $(e.currentTarget).closest('tr').removeClass('active').addClass('success')
+                    if (data.status == 1) {
+                        // we have uploaded the file, so change table row
+                        $(tr).find('.progress-bar').css('width', '100%')
+                        $(tr).find('.progress-bar').removeClass('progress-bar-striped').removeClass('progress-bar-info').addClass('progress-bar-success')
+                        $(tr).find('.progress-bar').html('100%')
+                        $(tr).find('.status').html('Submitted')
+                        var remove_button = true
+                    }
+                    else {
+                        BootstrapDialog.show({
+                            title: 'Error In Upload',
+                            message: '<p>Please see below and fix</p>' + data.status,
+                            buttons: [
+                                {
+                                    label: 'Continue',
+                                    action: function (dialog) {
+                                        dialog.close()
+                                    }
+                                }
+                            ]
+                        })
+                    }
+                }).fail(function (data) {
+                    console.log(data)
+                }).always(function (data) {
+                    $(tr).find('.ajax_span').css('visibility', 'hidden')
+                    if (remove_button == true) {
+
+                    }
+                    else {
+                        btn.removeClass('disabled');
+                    }
                 })
             }
-
-
         }, {
             label: 'No',
             action: function (dialog) {
                 dialog.close();
             }
-
         }]
     });
+
 }
 
 function handle_delete(e) {
@@ -500,3 +376,153 @@ function get_file_info(e) {
 }
 
 
+function get_accession_info(e) {
+
+    // get table row
+    var sub_id = $(e.currentTarget).data('submission_id')
+    $.ajax({
+        url: '/rest/get_accession_data',
+        data: {'sub_id': sub_id},
+        method: 'GET',
+        dataType: 'json'
+    }).done(function (data) {
+
+        $('#file_accession_panel').empty()
+
+        // create accession panels
+        var panel_group = jQuery('<div/>', {
+            class: 'panel-group',
+            id: 'files-block'
+        });
+        var c = 1;
+
+        var h = $('<h4></h4>', {
+            html: 'Submission Files'
+        })
+        $(h).appendTo(panel_group);
+
+        var panel = jQuery('<div/>', {
+            class: 'panel panel-default',
+        });
+        var panel_heading = jQuery('<div/>', {
+            class: 'panel-heading'
+        });
+        var panel_title = jQuery('<h4/>', {
+            class: 'panel-title'
+        });
+
+        var title = $.parseHTML('<a data-toggle="collapse" href="#collapse' + c + '">Files</a>');
+
+        $(title).appendTo(panel_title);
+        $(panel_title).appendTo(panel_heading);
+        $(panel_heading).appendTo(panel);
+
+        var collapse = jQuery('<div/>', {
+            id: 'collapse' + c,
+            class: 'panel-collapse collapse'
+        });
+        c = c + 1;
+
+        var panel_body = jQuery('<div/>', {
+            class: 'panel-body'
+        });
+
+        var ul = jQuery('<ul/>');
+        var li;
+        $(data.sub.filenames).each(function (count, smp) {
+            li = jQuery('<li/>', {
+                class: 'filelist_li',
+                html: smp
+            });
+            $(li).appendTo(ul)
+        })
+
+        $(ul).appendTo(panel_body);
+        $(panel_body).appendTo(collapse);
+        $(collapse).appendTo(panel);
+
+        $(panel).appendTo(panel_group)
+        $(panel_group).appendTo('#file_accession_panel');
+
+
+        panel_group = jQuery('<div/>', {
+            class: 'panel-group',
+            id: 'accessions-block'
+        });
+
+        var h4 = $('<h4></h4>', {
+            html: 'Submission Accessions'
+        })
+        $(h4).appendTo(panel_group);
+
+        if (Object.keys(data.sub.accessions).length == 0){
+            var message = $('<span></span>', {
+                html: 'Accessions not available yet'
+            })
+            $(panel_group).appendTo('#file_accession_panel');
+            $(message).appendTo('#file_accession_panel');
+        }
+        else {
+            for (var key in data.sub.accessions.accessions) {
+
+                panel = jQuery('<div/>', {
+                    class: 'panel panel-default',
+                });
+                panel_heading = jQuery('<div/>', {
+                    class: 'panel-heading'
+                });
+                panel_title = jQuery('<h4/>', {
+                    class: 'panel-title'
+                });
+
+                var a_key = key[0].toUpperCase() + key.slice(1);
+                title = $.parseHTML('<a data-toggle="collapse" href="#collapse' + c + '">' + a_key + '</a>');
+
+                $(title).appendTo(panel_title);
+                $(panel_title).appendTo(panel_heading);
+                $(panel_heading).appendTo(panel);
+
+                collapse = jQuery('<div/>', {
+                    id: 'collapse' + c,
+                    class: 'panel-collapse collapse'
+                });
+                c = c + 1;
+
+                panel_body = jQuery('<div/>', {
+                    class: 'panel-body'
+                });
+
+                ul = jQuery('<ul/>');
+
+                var li2
+                if (key == 'sample') {
+                    $(data.sub.accessions.accessions['sample']).each(function (count, smp) {
+                        li2 = jQuery('<li/>', {
+                            html: '<span title="Biosample Accession: ' + smp.biosample_accession + '">' + smp.sample_accession + ' - <small>' + smp.sample_alias + '</small></span>'
+                        });
+                        $(li2).appendTo(ul)
+                    })
+                }
+                else {
+
+                    li2 = jQuery('<li/>', {
+                        html: data.sub.accessions.accessions[key].accession + ' - <small>' + data.sub.accessions.accessions[key].alias + '</small>'
+                    });
+                    $(li2).appendTo(ul)
+                }
+                $(ul).appendTo(panel_body);
+                $(panel_body).appendTo(collapse);
+                $(collapse).appendTo(panel);
+
+                $(panel).appendTo(panel_group)
+
+            }
+            $(panel_group).appendTo('#file_accession_panel');
+        }
+
+
+        $('#status-panel').data('accessions_visible', true)
+    })
+
+
+}
