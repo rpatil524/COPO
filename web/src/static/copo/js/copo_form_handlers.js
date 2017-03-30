@@ -1796,7 +1796,7 @@ function get_ontology_span(ontologySpan, formElem) {
             if (formElem.ontology_names && formElem.ontology_names.length) {
                 localolsURL = olsURL.replace("999", formElem.ontology_names.join(","));
             }
-            ontologySpan.append('<input autocomplete="off" data-autocomplete="' + localolsURL + '" class="input-copo form-control ontology-field" type="text" id="' + fv + '" name="' + fv + '" />');
+            ontologySpan.append('<input style="min-width: 100%;" autocomplete="off" data-autocomplete="' + localolsURL + '" class="input-copo form-control ontology-field" type="text" id="' + fv + '" name="' + fv + '" />');
 
         } else {
             ontologySpan.append($('<input/>',

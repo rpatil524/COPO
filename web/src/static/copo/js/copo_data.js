@@ -253,13 +253,13 @@ $(document).ready(function () {
         var dialog = new BootstrapDialog({
             buttons: [
                 {
-                    label: 'Cancel',
+                    label: 'Continue Describing',
                     action: function (dialogRef) {
                         dialogRef.close();
                     }
                 },
                 {
-                    label: 'Exit Wizard',
+                    label: 'Exit Description',
                     cssClass: 'btn-primary',
                     action: function (dialogRef) {
                         dialogRef.close();
@@ -269,7 +269,7 @@ $(document).ready(function () {
             ]
         });
 
-        dialog_display(dialog, "Wizard Exit Alert", wizardMessages.exit_wizard_message.text, "warning");
+        dialog_display(dialog, "Exit Description", wizardMessages.exit_wizard_message.text, "warning");
 
     });
 
@@ -279,13 +279,13 @@ $(document).ready(function () {
         var dialog = new BootstrapDialog({
             buttons: [
                 {
-                    label: 'Cancel',
+                    label: 'Continue Describing',
                     action: function (dialogRef) {
                         dialogRef.close();
                     }
                 },
                 {
-                    label: 'Continue',
+                    label: 'Cancel Description',
                     cssClass: 'btn-danger',
                     action: function (dialogRef) {
                         dialogRef.close();
@@ -314,7 +314,7 @@ $(document).ready(function () {
             ]
         });
 
-        dialog_display(dialog, "Discard Description", wizardMessages.discard_description_message.text, "danger");
+        dialog_display(dialog, "Cancel Description", wizardMessages.discard_description_message.text, "danger");
 
     });
 
@@ -1082,8 +1082,18 @@ $(document).ready(function () {
             html: "<strong>Apply this description to all items in the description bundle?</strong>"
         });
 
+        var showApplyTo = "";
+
+        if (stage_objects[currentIndx].is_singular_stage) {
+            spanMessage = $('<span/>', {
+                html: "<strong>This description will apply to all items in the description bundle</strong>"
+            });
+
+            showApplyTo = " display: none;";
+        }
+
         var spanInput = $('<span/>', {
-            style: "font-weight: bold; margin-left: 5px;",
+            style: "font-weight: bold; margin-left: 5px;" + showApplyTo,
             html: '<input type="checkbox" name="apply-scope-chk-' + currentIndx + '" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">'
         });
 
@@ -1346,7 +1356,7 @@ $(document).ready(function () {
                     }
                 },
                 {
-                    label: 'Continue',
+                    label: 'Discard',
                     cssClass: 'btn-danger',
                     action: function (dialogRef) {
                         dialogRef.close();
