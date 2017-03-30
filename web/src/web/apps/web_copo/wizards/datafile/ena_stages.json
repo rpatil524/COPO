@@ -10,7 +10,7 @@
       "items": [
         {
           "id": "study_type",
-          "help_tip": "Select Study Type from the list drop-down",
+          "help_tip": "Select Study Type from the drop-down list",
           "label": "Study Type",
           "hidden": "false",
           "required": "true",
@@ -42,7 +42,7 @@
         {
           "id": "study_samples",
           "type": "string",
-          "help_tip": "",
+          "help_tip": "Specify the sample you used in your study",
           "label": "Sample",
           "hidden": "false",
           "required": "true",

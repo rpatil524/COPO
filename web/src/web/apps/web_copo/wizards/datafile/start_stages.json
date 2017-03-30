@@ -11,7 +11,7 @@
       "items": [
         {
           "id": "deposition_context",
-          "help_tip": "Select the target repository from the drop-down",
+          "help_tip": "Select the target repository from the drop-down list",
           "label": "Target Repository",
           "hidden": "false",
           "required": "true",

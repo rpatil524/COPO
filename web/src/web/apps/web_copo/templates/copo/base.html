@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{% static 'copo/css/copo/style.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/copo/menu.css' %}">
     <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/webui_popover/jquery.webui-popover.css' %}">
 
 
     <link rel="shortcut icon" href="{% static 'copo/img/COPO_icon.png' %}"/>
@@ -31,6 +32,17 @@
 
     <!-- Selectize Components -->
     <link rel="stylesheet" href="{% static 'copo/selectize/selectize.bootstrap3.css' %}">
+
+    <!-- DataTables components -->
+    <link rel="stylesheet" href="{% static 'copo/datatables/css/jquery.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/datatables/css/dataTables.bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/datatables/css/select.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/datatables/css/keyTable.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/datatables/css/keyTable.bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/search_highlight/dataTables.searchHighlight.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.css' %}">
 
     <!-- Google Fonts -->
     <link href='http://fonts.googleapis.com/css?family=Quattrocento+Sans' rel='stylesheet' type='text/css'>
@@ -66,7 +78,7 @@
     <script src="{% static 'copo/search_highlight/dataTables.searchHighlight.min.js' %}"></script>
     <script src="{% static 'copo/search_highlight/jquery.highlight.js' %}"></script>
     <script src="{% static 'copo/bootstrap-datepicker-1.6.4-dist/js/bootstrap-datepicker.min.js' %}"></script>
-
+    <script src="{% static 'copo/webui_popover/jquery.webui-popover.js' %}"></script>
 
 
     <!-- Additional javascripts -->
@@ -83,17 +95,7 @@
     <link rel="stylesheet" href="{% static 'copo/css/easyui/themes/icon.css' %}">
     <script src="{% static 'copo/js/easyui/jquery.easyui.min.js' %}"></script>
 
-    <!-- DataTables components -->
-    <link rel="stylesheet" href="{% static 'copo/datatables/css/jquery.dataTables.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/datatables/css/dataTables.bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/datatables/css/select.dataTables.min.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.dataTables.min.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/datatables/css/keyTable.dataTables.min.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/datatables/css/keyTable.bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/search_highlight/dataTables.searchHighlight.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.css' %}">
-        <!-- PAGE LEVEL STYLES -->
+    <!-- PAGE LEVEL STYLES -->
     {% block stylesheet_block %}{% endblock %}
 
     <!-- SASS styles -->
@@ -202,7 +204,6 @@
     </script>
 
 </head>
-
 
 
 <body>
