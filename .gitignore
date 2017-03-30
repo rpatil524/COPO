@@ -99,6 +99,7 @@ ENV/
 # add ignore for chunked_uploads
 web/src/media
 web/src/media/chunked_uploads
+media/*
 
 web/src/static/CACHE/css/**
 mongo/mongodata

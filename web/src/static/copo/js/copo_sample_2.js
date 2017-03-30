@@ -28,6 +28,7 @@ $(document).ready(function () {
 
 
         //test
+
         // $(document).on("click", ".ontology-field", function (event) {
         //     var data = Object();
         //     data["component_label"] = this.id;
@@ -41,28 +42,6 @@ $(document).ready(function () {
 
         //help table
         var pageHelpTable = "sample_help_table"; //help pane table handle
-
-        //handle hover info for copo-select control types
-
-        $(document).on("mouseenter", ".selectize-dropdown-content .active", function (event) {
-            if ($(this).closest(".copo-multi-search").length) {
-                var recordId = $(this).attr("data-value"); // the id of the hovered-on option
-                var associatedComponent = ""; //the form control with which the event is associated
-
-                //get the associated component
-                var clss = $($(event.target)).closest(".input-copo").attr("class").split(" ");
-                $.each(clss, function (key, val) {
-                    var cssSplit = val.split("copo-component-control-");
-                    if (cssSplit.length > 1) {
-                        associatedComponent = cssSplit.slice(-1)[0];
-
-                        resolve_element_view(recordId, associatedComponent, $($(event.target)).closest(".input-copo"));
-                        return false;
-                    }
-                });
-
-            }
-        });
 
 
         //handle inspect, describe - tabs
@@ -97,11 +76,6 @@ $(document).ready(function () {
             add_new_samples();
         });
 
-
-        //handle popover close button
-        $(document).on("click", ".popover .copo-close", function () {
-            $(this).parents(".popover").popover('destroy');
-        });
 
         // get table data to display via the DataTables API
         var tableLoader = get_spinner_image();
@@ -418,7 +392,7 @@ $(document).ready(function () {
             }
 
             //form controls help tip
-            setup_element_hint();
+            refresh_tool_tips()
 
             //autocomplete
             auto_complete();
@@ -471,9 +445,6 @@ $(document).ready(function () {
                     set_up_validator($("#wizard_form_" + currentIndx));
                 }
 
-                //form controls help tip
-                setup_element_hint();
-
                 //refresh tooltips
                 refresh_tool_tips();
 
@@ -511,7 +482,6 @@ $(document).ready(function () {
                                 stageCopy["data"] = data.component_record;
                                 $("#wizard_form_" + currentIndx).html(wizardStagesForms(stageCopy));
                                 //
-                                setup_element_hint();
                                 refresh_tool_tips();
 
                                 set_up_validator($("#wizard_form_" + currentIndx));
@@ -524,7 +494,7 @@ $(document).ready(function () {
                         stageCopy["data"] = null;
                         $("#wizard_form_" + currentIndx).html(wizardStagesForms(stageCopy));
                         //
-                        setup_element_hint();
+
                         refresh_tool_tips();
 
                         set_up_validator($("#wizard_form_" + currentIndx));
@@ -573,7 +543,6 @@ $(document).ready(function () {
                             //generate controls based on stage items and append to the stage form
                             $("#wizard_form_" + currentIndx).html(wizardStagesForms(stageCopy));
 
-                            setup_element_hint();
                             refresh_tool_tips();
 
                             set_up_validator($("#wizard_form_" + currentIndx));
@@ -978,66 +947,6 @@ $(document).ready(function () {
             }
 
         } //end of func
-
-        function resolve_element_view(recordId, associatedComponent, eventTarget) {
-            //maps form element by id to component type e.g source, sample
-
-            if (associatedComponent == "") {
-                return false;
-            }
-
-            onTheFlyElem.append(get_spinner_image());
-
-            $.ajax({
-                url: copoVisualsURL,
-                type: "POST",
-                headers: {'X-CSRFToken': csrftoken},
-                data: {
-                    'task': "attributes_display",
-                    'component': associatedComponent,
-                    'target_id': recordId
-                },
-                success: function (data) {
-                    var gAttrib = build_attributes_display(data);
-                    onTheFlyElem.html(gAttrib);
-                },
-                error: function () {
-                    onTheFlyElem.html('');
-                    onTheFlyElem.append("Couldn't retrieve attributes!");
-                }
-            });
-        }
-
-
-        function setup_element_hint() {
-            $(":input").focus(function () {
-                var elem = $(this).closest(".copo-form-group");
-                if (elem.length) {
-
-                    var title = elem.find("label").html();
-                    var content = "";
-                    if (elem.find(".form-input-help").length) {
-                        content = (elem.find(".form-input-help").html());
-                    }
-
-                    $('.popover').popover('hide'); //hide any shown popovers
-
-
-                    var pop = elem.popover({
-                        title: title,
-                        content: content,
-                        // container: 'body',
-                        trigger: 'hover',
-                        placement: 'right',
-                        template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
-                        '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
-                        '</h3><div class="popover-content"><p></p></div></div></div>'
-                    });
-
-                }
-
-            });
-        }//end of function
 
         function wizardStagesForms(stage) {
             var formValue = stage.data;

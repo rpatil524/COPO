@@ -381,9 +381,8 @@ function set_up_help_ctrl(ctrlName) {
         });
 
     $('input[name="' + ctrlName + '"]').on('switchChange.bootstrapSwitch', function (event, state) {
-        if (!state) {
-            //remove all dangling popovers
-            $('.popover').remove();
+        if($(this).closest(".helpDivRow").siblings(".formDivRow").length) {
+            toggle_display_help_tips(state, $(this).closest(".helpDivRow").siblings(".formDivRow").first());
         }
     });
 
@@ -412,10 +411,9 @@ function set_up_form_help_div(data) {
 function set_up_form_body_div(data) {
     var formBodyDiv = $('<div/>',
         {
-            class: "row"
+            class: "row formDivRow"
         }).append($('<div/>',
         {
-            id: "copo_component_forms",
             class: "col-sm-12 col-md-12 col-lg-12"
         }).append(htmlForm));
 
@@ -1356,7 +1354,7 @@ function create_attachable_component(formElem) {
 
     var formBodyDiv = $('<div/>',
         {
-            class: "row"
+            class: "row formDivRow"
         }).append($('<div/>',
         {
             class: "col-sm-12 col-md-12 col-lg-12"
@@ -1379,12 +1377,12 @@ function create_attachable_component(formElem) {
             class: "col-sm-7 col-md-7 col-lg-7"
         });
 
-    var helpCtrl = $('<div/>',
+    var helpCtrlCol = $('<div/>',
         {
             class: "col-sm-5 col-md-5 col-lg-5"
         }).append(helpCtrl);
 
-    helpDivRow.append(cloneCol).append(helpCtrl);
+    helpDivRow.append(cloneCol).append(helpCtrlCol);
 
     var dialog = new BootstrapDialog({
         type: BootstrapDialog.TYPE_PRIMARY,

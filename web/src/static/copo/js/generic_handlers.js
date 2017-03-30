@@ -1,17 +1,20 @@
 //**some re-usable functions across different modules
 var AnnotationEventAdded = false;
+var selectizeObjects = Object(); //stores reference to selectize objects initialised on the page
+
 $(document).ready(function () {
-    //set up helptips events
+    setup_autocomplete()
+
+    //set up help tips events
     do_help_tips_event();
 
-    setup_autocomplete()
+    //set up copo-multi-search component lookup
+    do_multi_search_lookup();
+
+    //set up global navigation components
     do_component_navbar($("#nav_component_name").val());
 
-
 });
-
-
-var selectizeObjects = Object(); //stores reference to selectize objects initialised on the page
 
 function setup_autocomplete() {
     var copoFormsURL = "/copo/copo_forms/";
@@ -408,6 +411,8 @@ function refresh_tool_tips() {
 
     refresh_range_slider();
     auto_complete();
+
+    do_help_tips_event();
 
     setup_datepicker();
 
@@ -978,7 +983,7 @@ function build_attributes_display(data) {
     }
 
     var attributesPanel = $('<div/>', {
-        class: "panel panel-info",
+        class: "panel panel-default",
         style: "margin-top: 5px; font-size: 12px;"
     });
 
@@ -988,11 +993,11 @@ function build_attributes_display(data) {
         html: componentLabel + " Attributes"
     });
 
-    attributesPanel.append(attributesPanelHeading);
+    // attributesPanel.append(attributesPanelHeading);
 
 
     var attributesPanelBody = $('<div/>', {
-        class: "panel-body"
+        // class: "panel-body"
     });
 
     var notAssignedSpan = $('<span/>', {
@@ -1015,16 +1020,16 @@ function build_attributes_display(data) {
             });
 
             var itemDiv = $('<div/>', {
-                style: "padding: 5px; border: 1px solid #ddd; border-radius:2px; margin-bottom:3px;"
+                style: "padding: 5px; border: 2px solid #D4E4ED; border-radius:4px; margin-bottom:4px;"
             }).append(itemLabel).append(format_display_data(currentItem.data));
 
             attributesPanelBody.append(itemDiv);
         }
     }
 
-    attributesPanel.append(attributesPanelBody);
+    //attributesPanel.append(attributesPanelBody);
 
-    return $('<div/>').append(attributesPanel);
+    return $('<div/>').append(attributesPanelBody);
 }
 
 function get_components_properties() {
@@ -1164,34 +1169,44 @@ function do_profile_navigate(parentObject) {
 
 } //end of func
 
+function refresh_webpop(elem, title, content, exrta_meta) {
+    var config = {
+        title: title,
+        content: '<div class="webpop-content-div">' + content + '</div>',
+        closeable: true,
+        cache: false,
+        trigger: 'hover',
+        animation: 'fade',
+        placement: 'right',
+        dismissible: false,
+        onHide: function ($element) {
+            WebuiPopovers.updateContent(elem, '<div class="webpop-content-div">' + content + '</div>');
+        },
+        onShow: function ($element) {
+            ;
+        }
+    };
+
+    //refresh config with extra configurations
+    $.each(exrta_meta, function (key, val) {
+        config[key] = val;
+    });
+
+    elem.webuiPopover(config);
+}
+
+function toggle_display_help_tips(state, parentElement) {
+    if (!state) {
+        parentElement.find(".copo-form-group").webuiPopover('destroy');
+    } else {
+        do_help_tips_event();
+    }
+}
+
 function do_help_tips_event() {
-    //helptips events
-    $(document).on('mouseover', '.copo-form-group', function () {
-        //look for an helptip checkbox and use this, if it exists, to inform display of tooltip
+    //help tips events
 
-        var toolTipCtrl = $(this).closest("form").closest(".row").siblings(".helpDivRow").find(".copo-help-chk");
-        var showTip = true;
-
-        if (toolTipCtrl.length) {
-            //helptip check control present,
-            //has it been initialised?
-            if ($(this).closest("form").closest(".row").siblings(".helpDivRow").find(".bootstrap-switch-container").length) {
-                var state = toolTipCtrl.bootstrapSwitch('state');
-                if (!state) {
-                    showTip = false;
-                }
-            }
-        }
-
-        if (!showTip) {
-            $(this).popover('destroy');
-            $('.popover').remove();
-            return false;
-        }
-
-
-        $(this).addClass("copo-form-control-focus");
-
+    $(document).find(".copo-form-group").each(function () {
         var elem = $(this);
 
         var title = elem.find("label").html();
@@ -1200,28 +1215,87 @@ function do_help_tips_event() {
             content = (elem.find(".form-input-help").html());
         }
 
-        $('.popover').remove();
+        var refresh = true; //flag for instantiating popover on element
 
-        var pop = elem.popover({
-            title: title,
-            content: content,
-            //container: 'body',
-            template: '<div style="min-width: 300px;" class="popover copo-popover-popover1"><div class="arrow">' +
-            '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
-            '</h3><div class="popover-content"><p></p></div></div></div>'
-        });
+        if (!(content || title)) {//only display if element has a content or title
+            refresh = false;
+        }
 
-        pop.popover('show');
+        //also, check for help display button
+        if (elem.closest(".formDivRow").length && elem.closest(".formDivRow").siblings(".helpDivRow").length) {
+            var toolTipCtrl = elem.closest(".formDivRow").siblings(".helpDivRow").find(".copo-help-chk");
 
+            if (toolTipCtrl.length) {
+                //helptip check control present, get its state if it's been initialised
+                if (elem.closest(".formDivRow").siblings(".helpDivRow").find(".bootstrap-switch-container").length) {
+                    refresh = toolTipCtrl.bootstrapSwitch('state');
+                }
+            }
+        }
 
-    });
+        if (refresh) {
+            var exrta_meta = {};
+            refresh_webpop(elem, title, content, exrta_meta);
+        }
 
-    $(document).on('mouseout', '.copo-form-group', function () {
-        $(this).removeClass("copo-form-control-focus");
-
-        $('.popover').remove();
     });
 } //end of func
+
+function do_multi_search_lookup() {
+    //handle hover info for copo-select control types
+
+    $(document).on("mouseenter", ".selectize-dropdown-content .active", function (event) {
+        if ($(this).closest(".copo-multi-search").length) {
+            var recordId = $(this).attr("data-value"); // the id of the hovered-on option
+            var associatedComponent = ""; //the form control with which the event is associated
+
+            //get the associated component
+            var clss = $($(event.target)).closest(".input-copo").attr("class").split(" ");
+            $.each(clss, function (key, val) {
+                var cssSplit = val.split("copo-component-control-");
+                if (cssSplit.length > 1) {
+                    associatedComponent = cssSplit.slice(-1)[0];
+
+                    resolve_element_view(recordId, associatedComponent, $($(event.target)).closest(".copo-form-group"));
+                    return false;
+                }
+            });
+
+        }
+    });
+}
+
+
+function resolve_element_view(recordId, associatedComponent, eventTarget) {
+    //maps form element by id to component type e.g source, sample
+
+    var copoVisualsURL = "/copo/copo_visualize/";
+    var csrftoken = $.cookie('csrftoken');
+
+    if (associatedComponent == "") {
+        return false;
+    }
+
+    $.ajax({
+        url: copoVisualsURL,
+        type: "POST",
+        headers: {'X-CSRFToken': csrftoken},
+        data: {
+            'task': "attributes_display",
+            'component': associatedComponent,
+            'target_id': recordId
+        },
+        success: function (data) {
+            var gAttrib = build_attributes_display(data);
+            WebuiPopovers.updateContent(eventTarget, gAttrib);
+        },
+        error: function () {
+            var message = "Couldn't retrieve attributes!";
+            WebuiPopovers.updateContent(eventTarget, '<div class="webpop-content-div">' + message + '</div>');
+        }
+    });
+}
+
 
 function get_spinner_image() {
     var loaderObject = $('<div>',

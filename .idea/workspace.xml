@@ -2,9 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="resolving conflicts">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/dal/mongo_util.py" afterPath="$PROJECT_DIR$/web/src/dal/mongo_util.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" afterPath="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_sample_2.html" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_sample_2.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/ena_stages.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/ena_stages.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/start_stages.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/start_stages.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/settings/data.py" afterPath="$PROJECT_DIR$/web/src/web/settings/data.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -62,24 +72,73 @@
     </favorites_list>
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+    <leaf>
+      <file leaf-file-name="copo_sample_2.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="95">
+              <caret line="661" column="19" lean-forward="true" selection-start-line="661" selection-start-column="19" selection-end-line="661" selection-end-column="19" />
+              <folding>
+                <marker date="1490695762000" expanded="true" signature="34236:34254" ph="..." />
+                <marker date="1490695762000" expanded="true" signature="38058:38076" ph="..." />
+                <marker date="1490695762000" expanded="true" signature="38269:38321" ph="..." />
+                <marker date="1490695762000" expanded="true" signature="63650:63667" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="copo_data.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_data.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="253">
+              <caret line="3011" column="54" lean-forward="false" selection-start-line="3011" selection-start-column="44" selection-end-line="3011" selection-end-column="54" />
+              <folding>
+                <marker date="1490817803000" expanded="true" signature="32221:32239" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="41063:41117" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="43458:43464" ph=" " />
+                <marker date="1490817803000" expanded="true" signature="63408:63445" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="68178:68196" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="70677:70714" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="72142:72178" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="81764:81782" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="81930:81982" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="85272:85290" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="90357:90394" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="93523:93540" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="94712:94732" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="95052:95095" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="95282:95288" ph=" " />
+                <marker date="1490817803000" expanded="true" signature="95648:95683" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="95895:95913" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="100082:100100" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="102288:102323" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="102679:102695" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="102782:102805" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="117501:117518" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="122852:122870" ph="..." />
+                <marker date="1490817803000" expanded="true" signature="122911:122929" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="generic_handlers.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-567">
-              <caret line="1166" column="9" lean-forward="false" selection-start-line="1166" selection-start-column="9" selection-end-line="1166" selection-end-column="9" />
+            <state relative-caret-position="256">
+              <caret line="1186" column="9" lean-forward="true" selection-start-line="1186" selection-start-column="9" selection-end-line="1186" selection-end-column="9" />
               <folding>
-                <marker date="1490259493000" expanded="true" signature="5179:5199" ph="..." />
-                <marker date="1490259493000" expanded="true" signature="5537:5580" ph="..." />
-                <marker date="1490259493000" expanded="true" signature="5767:5773" ph=" " />
-                <marker date="1490259493000" expanded="true" signature="12590:12596" ph=" " />
-                <marker date="1490259493000" expanded="true" signature="22290:22338" ph="..." />
-                <marker date="1490259493000" expanded="true" signature="22352:22382" ph="..." />
-                <marker date="1490259493000" expanded="true" signature="22505:22518" ph="..." />
-                <marker date="1490259493000" expanded="true" signature="29422:29458" ph="..." />
-                <marker date="1490259493000" expanded="true" signature="30536:30554" ph="..." />
-                <marker date="1490259493000" expanded="true" signature="30934:30951" ph="..." />
-                <marker date="1490259493000" expanded="true" signature="40144:40161" ph="..." />
+                <marker date="1490878813000" expanded="true" signature="5300:5320" ph="..." />
+                <marker date="1490878813000" expanded="true" signature="5658:5701" ph="..." />
+                <marker date="1490878813000" expanded="true" signature="5888:5894" ph=" " />
+                <marker date="1490878813000" expanded="true" signature="12711:12717" ph=" " />
+                <marker date="1490878813000" expanded="true" signature="22438:22486" ph="..." />
+                <marker date="1490878813000" expanded="true" signature="22500:22530" ph="..." />
+                <marker date="1490878813000" expanded="true" signature="22653:22666" ph="..." />
+                <marker date="1490878813000" expanded="true" signature="29570:29606" ph="..." />
+                <marker date="1490878813000" expanded="true" signature="30684:30702" ph="..." />
+                <marker date="1490878813000" expanded="true" signature="31082:31099" ph="..." />
               </folding>
             </state>
           </provider>
@@ -88,16 +147,16 @@
       <file leaf-file-name="copo_form_handlers.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="1115" column="115" lean-forward="false" selection-start-line="1115" selection-start-column="115" selection-end-line="1115" selection-end-column="115" />
+            <state relative-caret-position="76">
+              <caret line="1179" column="34" lean-forward="false" selection-start-line="1179" selection-start-column="16" selection-end-line="1179" selection-end-column="34" />
               <folding>
-                <marker date="1490392173000" expanded="true" signature="10063:10070" ph="×" />
-                <marker date="1490392173000" expanded="true" signature="10134:10152" ph="..." />
-                <marker date="1490392173000" expanded="true" signature="10855:10867" ph="..." />
-                <marker date="1490392173000" expanded="true" signature="37838:37872" ph="..." />
-                <marker date="1490392173000" expanded="true" signature="42481:42496" ph="..." />
-                <marker date="1490392173000" expanded="true" signature="43571:43583" ph="..." />
-                <marker date="1490392173000" expanded="true" signature="58175:58191" ph="..." />
+                <marker date="1490648135000" expanded="true" signature="10063:10070" ph="×" />
+                <marker date="1490648135000" expanded="true" signature="10134:10152" ph="..." />
+                <marker date="1490648135000" expanded="true" signature="10855:10867" ph="..." />
+                <marker date="1490648135000" expanded="true" signature="37893:37927" ph="..." />
+                <marker date="1490648135000" expanded="true" signature="42536:42551" ph="..." />
+                <marker date="1490648135000" expanded="true" signature="43637:43649" ph="..." />
+                <marker date="1490648135000" expanded="true" signature="58247:58263" ph="..." />
               </folding>
             </state>
           </provider>
@@ -106,71 +165,19 @@
       <file leaf-file-name="style.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/css/copo/style.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="512">
-              <caret line="1075" column="38" lean-forward="false" selection-start-line="1075" selection-start-column="38" selection-end-line="1075" selection-end-column="38" />
+            <state relative-caret-position="546">
+              <caret line="1085" column="26" lean-forward="true" selection-start-line="1085" selection-start-column="26" selection-end-line="1085" selection-end-column="26" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="copo_sample_2.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="293">
-              <caret line="1483" column="68" lean-forward="true" selection-start-line="1483" selection-start-column="68" selection-end-line="1483" selection-end-column="68" />
-              <folding>
-                <marker date="1490258580000" expanded="true" signature="35671:35689" ph="..." />
-                <marker date="1490258580000" expanded="true" signature="41665:41683" ph="..." />
-                <marker date="1490258580000" expanded="true" signature="41876:41928" ph="..." />
-                <marker date="1490258580000" expanded="true" signature="67257:67274" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="copo_sample_2.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_sample_2.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="63" column="0" lean-forward="true" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+            <state relative-caret-position="-757">
+              <caret line="34" column="29" lean-forward="true" selection-start-line="34" selection-start-column="29" selection-end-line="34" selection-end-column="29" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="copo_data.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_data.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="3220" column="113" lean-forward="false" selection-start-line="3220" selection-start-column="113" selection-end-line="3220" selection-end-column="113" />
-              <folding>
-                <marker date="1490373501000" expanded="true" signature="33446:33464" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="42220:42274" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="44615:44621" ph=" " />
-                <marker date="1490373501000" expanded="true" signature="64635:64672" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="69405:69423" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="71904:71941" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="73369:73405" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="77689:77751" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="77793:77799" ph=" " />
-                <marker date="1490373501000" expanded="true" signature="86227:86245" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="86393:86445" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="89735:89753" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="94820:94857" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="97986:98003" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="99175:99195" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="99515:99558" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="99745:99751" ph=" " />
-                <marker date="1490373501000" expanded="true" signature="100111:100146" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="100358:100376" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="104545:104563" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="106751:106786" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="107142:107158" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="107245:107268" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="122306:122323" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="128598:128616" ph="..." />
-                <marker date="1490373501000" expanded="true" signature="128657:128675" ph="..." />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -178,18 +185,18 @@
       <file leaf-file-name="copo_data.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_data.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="155" column="38" lean-forward="false" selection-start-line="155" selection-start-column="38" selection-end-line="155" selection-end-column="38" />
+            <state relative-caret-position="525">
+              <caret line="101" column="25" lean-forward="true" selection-start-line="101" selection-start-column="25" selection-end-line="101" selection-end-column="25" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="start_stages.json" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json">
+      <file leaf-file-name="copo_sample_2.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_sample_2.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="84" column="69" lean-forward="false" selection-start-line="84" selection-start-column="69" selection-end-line="84" selection-end-column="69" />
+            <state relative-caret-position="30">
+              <caret line="62" column="21" lean-forward="false" selection-start-line="62" selection-start-column="21" selection-end-line="62" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -209,36 +216,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>search</find>
-      <find>display</find>
-      <find>get_basic_label</find>
-      <find>required</find>
-      <find>validate</find>
-      <find>validator</find>
-      <find>derivesFrom</find>
-      <find>do_percent_text_box</find>
-      <find>meta</find>
-      <find>_cell_id</find>
-      <find>attributes</find>
-      <find>target_id</find>
-      <find>split</find>
+      <find>wiza</find>
+      <find>switchChange</find>
+      <find>copo_component_forms</find>
+      <find>formBodyDiv</find>
+      <find>copo-form-control-focus</find>
       <find>email</find>
-      <find>each</find>
-      <find>set_cell_form</find>
-      <find>selectize</find>
-      <find>Apply this description to all items in the description bundle?</find>
-      <find>stage_objects</find>
-      <find>singular</find>
-      <find>$.ajax</find>
-      <find>form_submit_btn</find>
-      <find>cell</find>
-      <find>discard description</find>
-      <find>exit</find>
-      <find>apply</find>
-      <find>bootstrapSwitch</find>
-      <find>apply_to_btn_</find>
-      <find>min-width</find>
-      <find>auto</find>
+      <find>toggle_help_tips</find>
+      <find>copo-help-chk</find>
+      <find>// now set up switch button to support the tool tips</find>
+      <find>setup_element_hint</find>
+      <find>tips-switch-form-div</find>
+      <find>formdivrow</find>
+      <find>formDivRow</find>
+      <find>helpDivRow</find>
+      <find>eventTarget</find>
+      <find>bootstrap-switch-container</find>
+      <find>popover</find>
+      <find>resolve_element_view</find>
+      <find>copo_mongo</find>
+      <find>selectizeObjects</find>
+      <find>object</find>
+      <find>pop</find>
+      <find>key</find>
+      <find>default</find>
+      <find>popo</find>
+      <find>list-group</find>
+      <find>none</find>
+      <find>panel-default</find>
+      <find>onshow</find>
+      <find>exrta_meta</find>
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/web/src/static/copo/css</dir>
@@ -257,7 +264,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/web/src/api/urls.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/css/copo/colors/sass.scss" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/annotation_annotation.json" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/index.html" />
@@ -287,24 +293,28 @@
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/rest_urls.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/error_page.html" />
         <option value="$PROJECT_DIR$/web/src/dal/copo_da.py" />
-        <option value="$PROJECT_DIR$/web/src/dal/mongo_util.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_annotations.html" />
         <option value="$PROJECT_DIR$/web/src/static/copo/css/copo/copo_annotations.css" />
-        <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/sample.json" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" />
         <option value="$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_data.html" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_annotations.js" />
         <option value="$PROJECT_DIR$/web/src/api/annotate_views.py" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" />
+        <option value="$PROJECT_DIR$/mongo/Dockerfile" />
+        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/start_stages.json" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/ena_stages.json" />
+        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js" />
+        <option value="$PROJECT_DIR$/web/src/web/settings/data.py" />
+        <option value="$PROJECT_DIR$/web/src/dal/mongo_util.py" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/sample.json" />
+        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_data.html" />
+        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_sample_2.html" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json" />
+        <option value="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" />
       </list>
     </option>
   </component>
@@ -318,9 +328,10 @@
     <handled-path value="$PROJECT_DIR$/web/src/static/copo/annotator-2.0.0-alpha.3/node_modules" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="23" />
-    <option name="width" value="1440" />
-    <option name="height" value="830" />
+    <option name="x" value="-1920" />
+    <option name="y" value="-94" />
+    <option name="width" value="1920" />
+    <option name="height" value="1057" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -337,7 +348,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -352,6 +362,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -795,54 +806,31 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="830" extended-state="6" />
+    <frame x="-1920" y="-94" width="1920" height="1057" extended-state="6" />
     <editor active="true" />
     <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1943557" sideWeight="0.49182117" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39910814" sideWeight="0.5042598" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298731" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293348" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32887402" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23319027" sideWeight="0.49182117" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25181347" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25181347" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39910814" sideWeight="0.5042598" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30673575" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24947916" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12552084" sideWeight="0.50817883" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.36449865" sideWeight="0.49574015" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Mongo Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-    </layout>
-    <layout-to-restore>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39910814" sideWeight="0.5042598" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298731" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293348" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Mongo Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24920128" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32887402" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16770834" sideWeight="0.49618322" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12552084" sideWeight="0.50817883" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24041452" sideWeight="0.49574015" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Mongo Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25181347" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4152249" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24947916" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30623305" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22395833" sideWeight="0.5038168" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.44056708" sideWeight="0.49574015" order="3" side_tool="false" content_ui="tabs" />
-    </layout-to-restore>
+    </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="processedProjectFiles" value="true" />
@@ -904,104 +892,11 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="157" />
+      <option name="time" value="162" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base_2col.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/csv_to_datatable.js" />
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt" />
-    <entry file="file://$PROJECT_DIR$/production.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/requirements/base.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="447">
-          <caret line="58" column="11" lean-forward="false" selection-start-line="58" selection-start-column="11" selection-end-line="58" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/requirements/dev.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/Dockerfile">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" column="39" lean-forward="false" selection-start-line="21" selection-start-column="39" selection-end-line="21" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nginx/Dockerfile">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nginx/sites-enabled/django_project">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="492">
-          <caret line="51" column="1" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="51" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/docker-compose.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="11" lean-forward="false" selection-start-line="5" selection-start-column="7" selection-end-line="5" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1560">
-          <caret line="104" column="29" lean-forward="false" selection-start-line="104" selection-start-column="29" selection-end-line="104" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/metadata_rater.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="33" column="75" lean-forward="false" selection-start-line="33" selection-start-column="75" selection-end-line="33" selection-end-column="75" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/metadata_rating_templates/rating_template_v1.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" column="7" lean-forward="false" selection-start-line="23" selection-start-column="7" selection-end-line="23" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8925">
-          <caret line="596" column="108" lean-forward="false" selection-start-line="596" selection-start-column="108" selection-end-line="596" selection-end-column="108" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="433">
-          <caret line="42" column="52" lean-forward="false" selection-start-line="42" selection-start-column="52" selection-end-line="42" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/setup_annotator.js" />
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/api_urls.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -1015,13 +910,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
           <caret line="32" column="37" lean-forward="false" selection-start-line="32" selection-start-column="37" selection-end-line="32" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1365">
-          <caret line="110" column="15" lean-forward="false" selection-start-line="110" selection-start-column="15" selection-end-line="110" selection-end-column="15" />
         </state>
       </provider>
     </entry>
@@ -1043,27 +931,6 @@
     <entry file="file://$USER_HOME$/Documents/dev/environments/django10/lib/python3.4/site-packages/django/core/handlers/base.py" />
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_annotations.html" />
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/css/copo/copo_annotations.css" />
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="384">
-          <caret line="90" column="0" lean-forward="false" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/dal/mongo_util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="58" column="12" lean-forward="false" selection-start-line="58" selection-start-column="12" selection-end-line="58" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/sample.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="149">
-          <caret line="169" column="23" lean-forward="true" selection-start-line="169" selection-start-column="23" selection-end-line="169" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="173">
@@ -1113,13 +980,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="23">
-          <caret line="75" column="8" lean-forward="false" selection-start-line="75" selection-start-column="8" selection-end-line="75" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4410">
@@ -1127,19 +987,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="32" column="35" lean-forward="false" selection-start-line="32" selection-start-column="35" selection-end-line="32" selection-end-column="35" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/environments/copodev/lib/python3.4/site-packages/pandas/io/excel.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="213">
           <caret line="182" column="4" lean-forward="false" selection-start-line="182" selection-start-column="4" selection-end-line="182" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1147,15 +998,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
           <caret line="121" column="5" lean-forward="true" selection-start-line="121" selection-start-column="5" selection-end-line="121" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_data.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="155" column="38" lean-forward="false" selection-start-line="155" selection-start-column="38" selection-end-line="155" selection-end-column="38" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1163,7 +1005,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="11" column="58" lean-forward="false" selection-start-line="11" selection-start-column="58" selection-end-line="11" selection-end-column="58" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1171,117 +1012,266 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
           <caret line="71" column="43" lean-forward="true" selection-start-line="71" selection-start-column="43" selection-end-line="71" selection-end-column="43" />
-          <folding>
-            <element signature="e#0#36#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/css/copo/style.css">
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base_simple.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="512">
-          <caret line="1075" column="38" lean-forward="false" selection-start-line="1075" selection-start-column="38" selection-end-line="1075" selection-end-column="38" />
-          <folding />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_data.js">
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="765">
+          <caret line="51" column="4" lean-forward="false" selection-start-line="51" selection-start-column="4" selection-end-line="51" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="218">
+          <caret line="82" column="60" lean-forward="true" selection-start-line="82" selection-start-column="60" selection-end-line="82" selection-end-column="60" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/miappe_stages.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-6886">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/miappe_mappings/miappe_rooting_greenhouse.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-31">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1260">
+          <caret line="84" column="40" lean-forward="false" selection-start-line="84" selection-start-column="40" selection-end-line="84" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/ena_stages.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="44" column="64" lean-forward="false" selection-start-line="44" selection-start-column="64" selection-end-line="44" selection-end-column="64" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/start_stages.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="67">
+          <caret line="13" column="75" lean-forward="false" selection-start-line="13" selection-start-column="75" selection-end-line="13" selection-end-column="75" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mongo/Dockerfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="69" lean-forward="false" selection-start-line="7" selection-start-column="69" selection-end-line="7" selection-end-column="69" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/postgres/init.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/Dockerfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/setup/copo_social.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-286">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/settings/serv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="24" lean-forward="true" selection-start-line="14" selection-start-column="24" selection-end-line="14" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/environments/copodev/lib/python3.4/site-packages/pymongo/mongo_client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="645">
+          <caret line="78" column="8" lean-forward="false" selection-start-line="78" selection-start-column="8" selection-end-line="78" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/docker-compose.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="12" lean-forward="false" selection-start-line="5" selection-start-column="12" selection-end-line="5" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="24" column="26" lean-forward="false" selection-start-line="24" selection-start-column="26" selection-end-line="24" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/dal/copo_base_da.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
-          <caret line="3220" column="113" lean-forward="false" selection-start-line="3220" selection-start-column="113" selection-end-line="3220" selection-end-column="113" />
-          <folding>
-            <marker date="1490373501000" expanded="true" signature="33446:33464" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="42220:42274" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="44615:44621" ph=" " />
-            <marker date="1490373501000" expanded="true" signature="64635:64672" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="69405:69423" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="71904:71941" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="73369:73405" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="77689:77751" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="77793:77799" ph=" " />
-            <marker date="1490373501000" expanded="true" signature="86227:86245" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="86393:86445" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="89735:89753" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="94820:94857" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="97986:98003" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="99175:99195" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="99515:99558" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="99745:99751" ph=" " />
-            <marker date="1490373501000" expanded="true" signature="100111:100146" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="100358:100376" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="104545:104563" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="106751:106786" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="107142:107158" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="107245:107268" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="122306:122323" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="128598:128616" ph="..." />
-            <marker date="1490373501000" expanded="true" signature="128657:128675" ph="..." />
-          </folding>
+          <caret line="11" column="38" lean-forward="false" selection-start-line="11" selection-start-column="38" selection-end-line="11" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/sample.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" column="6" lean-forward="false" selection-start-line="17" selection-start-column="6" selection-end-line="17" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/dal/mongo_util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" column="20" lean-forward="true" selection-start-line="17" selection-start-column="20" selection-end-line="17" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/settings/data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="21" column="42" lean-forward="true" selection-start-line="21" selection-start-column="42" selection-end-line="21" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="329">
+          <caret line="89" column="19" lean-forward="false" selection-start-line="89" selection-start-column="19" selection-end-line="89" selection-end-column="19" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="293">
-          <caret line="1483" column="68" lean-forward="true" selection-start-line="1483" selection-start-column="68" selection-end-line="1483" selection-end-column="68" />
+        <state relative-caret-position="95">
+          <caret line="661" column="19" lean-forward="true" selection-start-line="661" selection-start-column="19" selection-end-line="661" selection-end-column="19" />
           <folding>
-            <marker date="1490258580000" expanded="true" signature="35671:35689" ph="..." />
-            <marker date="1490258580000" expanded="true" signature="41665:41683" ph="..." />
-            <marker date="1490258580000" expanded="true" signature="41876:41928" ph="..." />
-            <marker date="1490258580000" expanded="true" signature="67257:67274" ph="..." />
+            <marker date="1490695762000" expanded="true" signature="34236:34254" ph="..." />
+            <marker date="1490695762000" expanded="true" signature="38058:38076" ph="..." />
+            <marker date="1490695762000" expanded="true" signature="38269:38321" ph="..." />
+            <marker date="1490695762000" expanded="true" signature="63650:63667" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-757">
+          <caret line="34" column="29" lean-forward="true" selection-start-line="34" selection-start-column="29" selection-end-line="34" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="76">
+          <caret line="1179" column="34" lean-forward="false" selection-start-line="1179" selection-start-column="16" selection-end-line="1179" selection-end-column="34" />
+          <folding>
+            <marker date="1490648135000" expanded="true" signature="10063:10070" ph="×" />
+            <marker date="1490648135000" expanded="true" signature="10134:10152" ph="..." />
+            <marker date="1490648135000" expanded="true" signature="10855:10867" ph="..." />
+            <marker date="1490648135000" expanded="true" signature="37893:37927" ph="..." />
+            <marker date="1490648135000" expanded="true" signature="42536:42551" ph="..." />
+            <marker date="1490648135000" expanded="true" signature="43637:43649" ph="..." />
+            <marker date="1490648135000" expanded="true" signature="58247:58263" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_data.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="101" column="25" lean-forward="true" selection-start-line="101" selection-start-column="25" selection-end-line="101" selection-end-column="25" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_sample_2.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="63" column="0" lean-forward="true" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+        <state relative-caret-position="30">
+          <caret line="62" column="21" lean-forward="false" selection-start-line="62" selection-start-column="21" selection-end-line="62" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/css/copo/style.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="546">
+          <caret line="1085" column="26" lean-forward="true" selection-start-line="1085" selection-start-column="26" selection-end-line="1085" selection-end-column="26" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-567">
-          <caret line="1166" column="9" lean-forward="false" selection-start-line="1166" selection-start-column="9" selection-end-line="1166" selection-end-column="9" />
+        <state relative-caret-position="256">
+          <caret line="1186" column="9" lean-forward="true" selection-start-line="1186" selection-start-column="9" selection-end-line="1186" selection-end-column="9" />
           <folding>
-            <marker date="1490259493000" expanded="true" signature="5179:5199" ph="..." />
-            <marker date="1490259493000" expanded="true" signature="5537:5580" ph="..." />
-            <marker date="1490259493000" expanded="true" signature="5767:5773" ph=" " />
-            <marker date="1490259493000" expanded="true" signature="12590:12596" ph=" " />
-            <marker date="1490259493000" expanded="true" signature="22290:22338" ph="..." />
-            <marker date="1490259493000" expanded="true" signature="22352:22382" ph="..." />
-            <marker date="1490259493000" expanded="true" signature="22505:22518" ph="..." />
-            <marker date="1490259493000" expanded="true" signature="29422:29458" ph="..." />
-            <marker date="1490259493000" expanded="true" signature="30536:30554" ph="..." />
-            <marker date="1490259493000" expanded="true" signature="30934:30951" ph="..." />
-            <marker date="1490259493000" expanded="true" signature="40144:40161" ph="..." />
+            <marker date="1490878813000" expanded="true" signature="5300:5320" ph="..." />
+            <marker date="1490878813000" expanded="true" signature="5658:5701" ph="..." />
+            <marker date="1490878813000" expanded="true" signature="5888:5894" ph=" " />
+            <marker date="1490878813000" expanded="true" signature="12711:12717" ph=" " />
+            <marker date="1490878813000" expanded="true" signature="22438:22486" ph="..." />
+            <marker date="1490878813000" expanded="true" signature="22500:22530" ph="..." />
+            <marker date="1490878813000" expanded="true" signature="22653:22666" ph="..." />
+            <marker date="1490878813000" expanded="true" signature="29570:29606" ph="..." />
+            <marker date="1490878813000" expanded="true" signature="30684:30702" ph="..." />
+            <marker date="1490878813000" expanded="true" signature="31082:31099" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js">
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_data.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="1115" column="115" lean-forward="false" selection-start-line="1115" selection-start-column="115" selection-end-line="1115" selection-end-column="115" />
+        <state relative-caret-position="253">
+          <caret line="3011" column="54" lean-forward="false" selection-start-line="3011" selection-start-column="44" selection-end-line="3011" selection-end-column="54" />
           <folding>
-            <marker date="1490392173000" expanded="true" signature="10063:10070" ph="×" />
-            <marker date="1490392173000" expanded="true" signature="10134:10152" ph="..." />
-            <marker date="1490392173000" expanded="true" signature="10855:10867" ph="..." />
-            <marker date="1490392173000" expanded="true" signature="37838:37872" ph="..." />
-            <marker date="1490392173000" expanded="true" signature="42481:42496" ph="..." />
-            <marker date="1490392173000" expanded="true" signature="43571:43583" ph="..." />
-            <marker date="1490392173000" expanded="true" signature="58175:58191" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="32221:32239" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="41063:41117" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="43458:43464" ph=" " />
+            <marker date="1490817803000" expanded="true" signature="63408:63445" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="68178:68196" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="70677:70714" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="72142:72178" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="81764:81782" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="81930:81982" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="85272:85290" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="90357:90394" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="93523:93540" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="94712:94732" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="95052:95095" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="95282:95288" ph=" " />
+            <marker date="1490817803000" expanded="true" signature="95648:95683" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="95895:95913" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="100082:100100" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="102288:102323" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="102679:102695" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="102782:102805" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="117501:117518" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="122852:122870" ph="..." />
+            <marker date="1490817803000" expanded="true" signature="122911:122929" ph="..." />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="84" column="69" lean-forward="false" selection-start-line="84" selection-start-column="69" selection-end-line="84" selection-end-column="69" />
-          <folding />
         </state>
       </provider>
     </entry>

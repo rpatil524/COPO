@@ -32,28 +32,6 @@ $(document).ready(function () {
     //help table
     var pageHelpTable = "datafile_help_table"; //help pane table handle
 
-    //handle hover info for copo-select control types
-
-    $(document).on("mouseenter", ".selectize-dropdown-content .active", function (event) {
-        if ($(this).closest(".copo-multi-search").length) {
-            var recordId = $(this).attr("data-value"); // the id of the hovered-on option
-            var associatedComponent = ""; //the form control with which the event is associated
-
-            //get the associated component
-            var clss = $($(event.target)).closest(".input-copo").attr("class").split(" ");
-            $.each(clss, function (key, val) {
-                var cssSplit = val.split("copo-component-control-");
-                if (cssSplit.length > 1) {
-                    associatedComponent = cssSplit.slice(-1)[0];
-
-                    resolve_element_view(recordId, associatedComponent, $($(event.target)).closest(".input-copo"));
-                    return false;
-                }
-            });
-
-        }
-    });
-
     //handle UID - upload inspect describe - tabs
     $('#copo-datafile-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
         var componentSelected = $(event.target).attr("data-component"); // active tab
@@ -77,12 +55,6 @@ $(document).ready(function () {
         $(this).addClass("disabled");
 
         set_component_help($(this).attr("data-component"), pageHelpTable, datafileHowtos);
-    });
-
-
-    //handle popover close button
-    $(document).on("click", ".popover .copo-close", function () {
-        $(this).parents(".popover").popover('destroy');
     });
 
     //review-to-stage
@@ -362,10 +334,8 @@ $(document).ready(function () {
                         //refresh stage form, iff apply-to-all control is false
                         if (!get_apply_check_state(activeStageIndx)) {
                             $('#wizard_form_' + activeStageIndx).html(wizardStagesForms(data.stage.stage).html());
-                            refresh_tool_tips();
 
-                            //form controls help tip
-                            setup_element_hint();
+                            refresh_tool_tips();
 
                             //ontology autocomplete
                             auto_complete();
@@ -959,8 +929,7 @@ $(document).ready(function () {
             elem.hide();
         }
 
-        //form controls help tip
-        setup_element_hint();
+        refresh_tool_tips();
 
         //autocomplete
         auto_complete();
@@ -1018,6 +987,8 @@ $(document).ready(function () {
                 setStageIndx = null;
             }
 
+            refresh_tool_tips();
+
             //setup fast nav for the stages
             //steps_fast_nav();
 
@@ -1037,12 +1008,16 @@ $(document).ready(function () {
                 step: currentIndx
             });
 
+            refresh_tool_tips();
+
         } else {
             if (stepIntercept) {
                 $('#dataFileWizard').wizard('selectedItem', {
                     step: $('#dataFileWizard').wizard('selectedItem').step + 1
                 });
             }
+
+            refresh_tool_tips();
         }
 
         //refresh tooltips
@@ -1215,9 +1190,6 @@ $(document).ready(function () {
         });
 
         silenceAlert = false;
-
-        $('.popover').popover('destroy'); //hide any shown popovers
-
 
         //clear wizard buttons
         $('#wizard_steps_buttons').html('');
@@ -1963,99 +1935,6 @@ $(document).ready(function () {
 
     } //end of func
 
-
-    function resolve_element_view(recordId, associatedComponent, eventTarget) {
-        //maps form element by id to component type e.g source, sample
-
-        if (associatedComponent == "") {
-            return false;
-        }
-
-        onTheFlyElem.append(get_spinner_image());
-
-        $.ajax({
-            url: copoVisualsURL,
-            type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
-            data: {
-                'task': "attributes_display",
-                'component': associatedComponent,
-                'target_id': recordId
-            },
-            success: function (data) {
-                var gAttrib = build_attributes_display(data)
-                onTheFlyElem.html(gAttrib);
-            },
-            error: function () {
-                onTheFlyElem.html('');
-                onTheFlyElem.append("Couldn't retrieve attributes!");
-            }
-        });
-    }
-
-
-    function setup_element_hint() {
-        $(":input").focus(function () {
-            var elem = $(this).closest(".copo-form-group");
-            if (elem.length) {
-
-                var title = elem.find("label").html();
-                var content = "";
-                if (elem.find(".form-input-help").length) {
-                    content = (elem.find(".form-input-help").html());
-                }
-
-                $('.popover').popover('hide'); //hide any shown popovers
-
-
-                var pop = elem.popover({
-                    title: title,
-                    content: content,
-                    //container: 'body',
-                    trigger: 'hover',
-                    placement: 'right',
-                    template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
-                    '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
-                    '</h3><div class="popover-content"><p></p></div></div></div>'
-                });
-
-            }
-
-        });
-    }//end of function
-
-    function steps_fast_nav() {
-        $('#wizard_steps_buttons').html('');
-
-        $('#wizard_steps_buttons').append('<span class="glyphicon glyphicon-arrow-right" style="font-size: 20px; ' +
-            'vertical-align: text-bottom;"></span><span><label>Quick jump to step: &nbsp; </label></span>');
-
-        var steps = $(".steps li:not(li:last-child)");
-        steps.each(function (idx, li) {
-            var lbl = idx + 1;
-            var stp = $('<button/>',
-                {
-                    text: lbl,
-                    class: "btn btn-default copo-wiz-button",
-                    title: $(li).find('.wiz-title').html(),
-                    click: function () {
-                        $('#dataFileWizard').wizard('selectedItem', {
-                            step: idx + 1
-                        });
-                        var elems = $('.copo-wiz-button');
-                        elems.removeClass();
-                        elems.addClass('btn btn-default copo-wiz-button');
-                        stp.removeClass();
-                        stp.addClass('btn btn-primary copo-wiz-button');
-                    }
-                });
-
-            stp.tooltip();
-
-            $('#wizard_steps_buttons').append(stp);
-
-        });
-    }
 
     function do_deque(item) {//removes item from the batch
         var position = -1;
@@ -2820,9 +2699,6 @@ $(document).ready(function () {
 
                                 refresh_tool_tips();
 
-                                //form controls help tip
-                                setup_element_hint();
-
                                 //ontology autocomplete
                                 auto_complete();
                             } else {
@@ -2893,10 +2769,8 @@ $(document).ready(function () {
                             //display stage
                             $('#wizard_form_' + activeStageIndx).empty();
                             $('#wizard_form_' + activeStageIndx).append(wizardStagesForms(data.stage.stage));
-                            refresh_tool_tips();
 
-                            //form controls help tip
-                            setup_element_hint();
+                            refresh_tool_tips();
 
                             //ontology autocomplete
                             auto_complete();
@@ -2936,10 +2810,8 @@ $(document).ready(function () {
                                         //display stage
                                         $('#wizard_form_' + activeStageIndx).empty();
                                         $('#wizard_form_' + activeStageIndx).append(wizardStagesForms(data.stage.stage));
-                                        refresh_tool_tips();
 
-                                        //form controls help tip
-                                        setup_element_hint();
+                                        refresh_tool_tips();
 
                                         //ontology autocomplete
                                         auto_complete();
@@ -3136,22 +3008,10 @@ $(document).ready(function () {
                                         metadataDescription += '<div style="margin-top: 10px;">Click the <span class="btn btn-info btn-xs"><i class="fa fa-info-circle"> </i></span> button on the right for more details.</div>';
 
 
-                                        if ($(this).data('bs.popover')) {
-                                            var pop = $(this).data('bs.popover');
-                                            pop.options.content = "<span>" + metadataDescription + "</span>";
-                                        } else {
-                                            $(this).popover({
-                                                title: 'Metadata Rating',
-                                                content: "<span>" + metadataDescription + "</span>",
-                                                container: 'body',
-                                                html: true,
-                                                trigger: 'hover',
-                                                template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
-                                                '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
-                                                '</h3><div class="popover-content"><p></p></div></div></div>'
-                                            });
+                                        $(this).webuiPopover('destroy');
+                                        var exrta_meta = {width: 300};
+                                        refresh_webpop($(this), 'Metadata Rating', metadataDescription, exrta_meta);
 
-                                        }
 
                                         return false;
                                     }

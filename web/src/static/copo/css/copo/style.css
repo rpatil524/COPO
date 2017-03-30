@@ -1075,3 +1075,15 @@ input.date-picker {
 input[data-autocomplete] {
     border: 1px solid #ccc !important;
 }
+
+/*webuipopovers styling*/
+.webpop-content-div {
+    line-height: 20px;
+    font-size: 14px;
+}
+
+.webui-popover-title {
+    background-color: #D4E4ED !important;
+}
+
+/*end webuipopovers styling*/
