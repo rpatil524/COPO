@@ -17,6 +17,8 @@ DATABASES = {
 # settings for mongodb
 MONGO_DB = os.environ['MONGO_DB']
 MONGO_HOST = os.environ['MONGO_HOST']
+MONGO_USER = os.environ['MONGO_USER']
+MONGO_USER_PASSWORD = os.environ['MONGO_USER_PASSWORD']
 MONGO_PORT = int(os.environ['MONGO_PORT'])
 
 # settings for redis
