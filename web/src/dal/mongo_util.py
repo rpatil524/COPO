@@ -7,8 +7,7 @@ from django.conf import settings
 
 
 def get_collection_ref(collection_name):
-    uri = 'mongodb://' + settings.MONGO_USER + ':' + settings.MONGO_USER_PASSWORD + '@' + settings.MONGO_HOST
-    return MongoClient(uri)[settings.MONGO_DB][collection_name]
+    return settings.MONGO_CLIENT[collection_name]
 
 def get_mongo_client():
     return pymongo.MongoClient(settings.MONGO_HOST, settings.MONGO_PORT)
