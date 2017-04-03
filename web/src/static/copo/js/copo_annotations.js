@@ -207,6 +207,9 @@ function load_ss_data(e) {
         beforeOnCellMouseDown: _beforeOnCellMouseDown,
         afterSelection: _afterSelection,
     });
+    show_help()
+    show_controls()
+    show_annotation_list()
     $(document).data('hot', hot)
     $.cookie('document_id', e._id.$oid, {expires: 1, path: '/',});
     // clear annotations table and populate with annotations
@@ -221,9 +224,11 @@ function load_ss_data(e) {
 
 function _beforeOnCellMouseDown(event, coords, element) {
     // prevent clicks in the leftmost column doing anything
+    /*
     if (coords.col == 0) {
         event.stopImmediatePropagation();
     }
+    */
 }
 
 
