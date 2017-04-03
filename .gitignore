@@ -100,6 +100,7 @@ ENV/
 web/src/media
 web/src/media/chunked_uploads
 media/*
+web/src/submission/data/*
 
 web/src/static/CACHE/css/**
 mongo/mongodata

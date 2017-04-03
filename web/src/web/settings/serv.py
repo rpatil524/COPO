@@ -3,7 +3,7 @@ import os
 
 REPOSITORIES = {
     'ASPERA': {
-        'resource_path': 'tools/reposit/aspera/Aspera Connect.app/Contents/Resources/',
+        'resource_path': 'tools/reposit/aspera/Aspera Connect.app/Contents/Resources/'+os.environ['ASPERA_PLUGIN_DIRECTORY']+'/',
         'user_token': os.environ['WEBIN_USER'],
         'password': os.environ['WEBIN_USER_PASSWORD'],
         'remote_path': ''
