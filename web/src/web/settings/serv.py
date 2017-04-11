@@ -3,7 +3,7 @@ import os
 
 REPOSITORIES = {
     'ASPERA': {
-        'resource_path': 'tools/reposit/aspera/Aspera Connect.app/Contents/Resources/',
+        'resource_path': '/Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/tools/reposit/aspera/AsperaConnect.app/Contents/Resources',
         'user_token': os.environ['WEBIN_USER'],
         'password': os.environ['WEBIN_USER_PASSWORD'],
         'remote_path': ''
