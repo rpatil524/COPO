@@ -3009,9 +3009,7 @@ $(document).ready(function () {
 
 
                                         $(this).webuiPopover('destroy');
-                                        var exrta_meta = {width: 300};
-                                        refresh_webpop($(this), 'Metadata Rating', metadataDescription, exrta_meta);
-
+                                        refresh_webpop($(this), 'Metadata Rating', metadataDescription, {width: 300});
 
                                         return false;
                                     }

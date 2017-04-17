@@ -9,7 +9,7 @@ server {
     client_max_body_size 1000M;
 
     location /static {
-       	autoindex on;
+        autoindex off;
         alias /copo/static/;
     }
 

@@ -905,131 +905,122 @@ function get_data_item_collapse(link, itemData, itemCount) {
     return ctrlDiv.html();
 }
 
-function do_string_display(data) {
-    return get_attributes_outer_div().append(get_attributes_inner_div_1().html(data));
-}
+function format_camel_case(xter) {
+    var a = xter
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, function (str) {
+            return str.toUpperCase();
+        });
 
-function do_array_display(data) {
-    var ctrlDiv = $('<div/>');
 
-    for (var i = 0; i < data.length; ++i) {
-        if (Object.prototype.toString.call(data[i][0]) === '[object Object]') {
-            var divElement = get_attributes_outer_div();
-            for (var j = 0; j < data[i].length; ++j) {
-                if (j == 0) {
-                    //get all keys, our target is always the first key,
-                    // since 'data' is formatted in such a manner to produce objects of one and only one element
-                    var dKeys = Object.keys(data[i][j]);
-                    divElement.append(get_attributes_inner_div_1().html("<span style='font-weight: bold;'>" + dKeys[0] + "</span>: " + data[i][j][dKeys[0]]));
-                } else {
-                    var dKeys = Object.keys(data[i][j]);
-                    // if (data[i][j][dKeys[0]] == '') {
-                    //     continue; //don't display entries without a value
-                    // }
-                    divElement.append(get_attributes_inner_div().html("<span style='font-weight: bold'>" + dKeys[0] + "</span>: " + data[i][j][dKeys[0]]));
-                }
-            }
+    var refinedXter = a.trim().split(/\s+/g);
 
-            ctrlDiv.append(divElement);
-        } else if (Object.prototype.toString.call(data[i][0]) === '[object String]') {
-            ctrlDiv.append(get_attributes_outer_div().append(data[i]));
-        }
+    for (var i = 1; i < refinedXter.length; ++i) {
+        var str = refinedXter[i];
+        str = str.toLowerCase().replace(/\b[a-z]/g, function (letter) {
+            return letter.toLowerCase();
+        });
+
+        refinedXter[i] = str;
     }
 
-    return ctrlDiv
-}
+    return refinedXter.join(' ');
 
-function do_object_display(data) {
-    var ctrlDiv = $('<div/>');
-
-    $.each(subValObject, function (key, val) {
-        var divElement = get_attributes_outer_div();
-        var keyDisplay = get_attributes_inner_div_1().html(key);
-        var valueDisplay = get_attributes_inner_div().html(val);
-
-        divElement.append(keyDisplay).append(valueDisplay);
-        ctrlDiv.append(divElement);
-    });
-
-    return ctrlDiv
-
-}
-
-function format_display_data(displayData) {
-    //function builds a display displayData
-    // based on type, a different handle is passed the responsibility of display
-    if (Object.prototype.toString.call(displayData) === '[object String]') {
-        return do_string_display(displayData);
-    } else if (Object.prototype.toString.call(displayData) === '[object Array]') {
-        return do_array_display(displayData);
-    } else if (Object.prototype.toString.call(displayData) === '[object Object]') {
-        return do_object_display(displayData);
-    } else {
-        return displayData
-    }
 }
 
 function build_attributes_display(data) {
-    //build view
-    var componentLabel = '';
-    var componentAttributes = [];
+    var resolvedDiv = $('<div/>');
 
-    if (data.hasOwnProperty("component_label")) {
-        componentLabel = data.component_label;
-    }
-
-    if (data.hasOwnProperty("component_attributes")) {
-        componentAttributes = data.component_attributes;
-    }
-
-    var attributesPanel = $('<div/>', {
-        class: "panel panel-default",
-        style: "margin-top: 5px; font-size: 12px;"
-    });
-
-    var attributesPanelHeading = $('<div/>', {
-        class: "panel-heading",
-        style: "background-image: none; font-weight: 600;",
-        html: componentLabel + " Attributes"
-    });
-
-    // attributesPanel.append(attributesPanelHeading);
-
-
-    var attributesPanelBody = $('<div/>', {
-        // class: "panel-body"
-    });
-
-    var notAssignedSpan = $('<span/>', {
-        class: "text-danger",
-        html: "Attributes not assigned!"
-    });
-
-    attributesPanelBody.append(notAssignedSpan);
-
-
-    if (componentAttributes.length > 0) {
-        notAssignedSpan.remove();
-
-        for (var i = 0; i < componentAttributes.length; ++i) {
-            var currentItem = componentAttributes[i];
-
-            var itemLabel = $('<div/>', {
-                html: currentItem.title,
-                style: "font-size:12px; font-weight:bold"
+    data.component_attributes.forEach(function (entry) {
+        var iRow = $('<div/>',
+            {
+                class: "row",
+                style: "border-bottom: 1px solid #ddd;"
             });
 
-            var itemDiv = $('<div/>', {
-                style: "padding: 5px; border: 2px solid #D4E4ED; border-radius:4px; margin-bottom:4px;"
-            }).append(itemLabel).append(format_display_data(currentItem.data));
+        resolvedDiv.append(iRow);
 
-            attributesPanelBody.append(itemDiv);
+        var labelCol = $('<div/>',
+            {
+                class: "col-sm-5 col-md-5 col-lg-5"
+            });
+
+        var valueCol = $('<div/>',
+            {
+                class: "col-sm-7 col-md-7 col-lg-7"
+            });
+
+        iRow.append(labelCol);
+        iRow.append(valueCol);
+
+        labelCol.append(entry.title);
+
+        var valueNode = [];
+        if (Object.prototype.toString.call(entry.data) === '[object String]') {
+            valueNode.push(entry.data);
+        } else if (Object.prototype.toString.call(entry.data) === '[object Array]') {
+            entry.data.forEach(function (item) {
+                var valueNode_sub = [];
+                item.forEach(function (item_sub) {
+                    if (Object.prototype.toString.call(item_sub) === '[object String]') {
+                        valueNode.push(item_sub);
+                    } else if (Object.prototype.toString.call(item_sub) === '[object Object]') {
+                        $.each(item_sub, function (key, val) {
+                            valueNode_sub.push(format_camel_case(key) + ":  " + val);
+                        });
+                    }
+                });
+
+                if (valueNode_sub.length > 0) {
+                    valueNode.push(valueNode_sub.join("<br/>"));
+                }
+            });
         }
+
+
+        var breakr = $('<div/>',
+            {
+                style: "border-top: 1px solid #f4f7fc;"
+            });
+
+        if (valueNode.length > 1) {
+            valueCol.append(valueNode[0]);
+            for (var i = 1; i < valueNode.length; ++i) {
+                valueCol.append(breakr.clone().append(valueNode[i]));
+            }
+        } else {
+            valueCol.append(valueNode.join("<br/>"));
+        }
+    });
+
+    return resolvedDiv;
+}
+
+function get_panel(panelType) {
+    if (!panelType) {
+        panelType = 'default'
     }
 
-    //attributesPanel.append(attributesPanelBody);
+    var panelClass = "panel panel-" + panelType;
+    var panel = $('<div/>', {
+        class: "panel panel-info",
+    });
 
-    return $('<div/>').append(attributesPanelBody);
+    var panelHeading = $('<div/>', {
+        class: "panel-heading",
+        style: "background-image: none;"
+    });
+
+    panel.append(panelHeading);
+
+
+    var panelBody = $('<div/>', {
+        class: "panel-body"
+    });
+
+    panel.append(panelBody);
+
+    return $('<div/>').append(panel).clone();
 }
 
 function get_components_properties() {
@@ -1175,15 +1166,18 @@ function refresh_webpop(elem, title, content, exrta_meta) {
         content: '<div class="webpop-content-div">' + content + '</div>',
         closeable: true,
         cache: false,
+        width: 300,
         trigger: 'hover',
+        arrow: false,
         animation: 'fade',
         placement: 'right',
         dismissible: false,
         onHide: function ($element) {
             WebuiPopovers.updateContent(elem, '<div class="webpop-content-div">' + content + '</div>');
+            elem.removeClass("copo-form-control-focus");
         },
         onShow: function ($element) {
-            ;
+            elem.addClass("copo-form-control-focus");
         }
     };
 
@@ -1234,8 +1228,7 @@ function do_help_tips_event() {
         }
 
         if (refresh) {
-            var exrta_meta = {};
-            refresh_webpop(elem, title, content, exrta_meta);
+            refresh_webpop(elem, title, content, {});
         }
 
     });
@@ -1287,7 +1280,7 @@ function resolve_element_view(recordId, associatedComponent, eventTarget) {
         },
         success: function (data) {
             var gAttrib = build_attributes_display(data);
-            WebuiPopovers.updateContent(eventTarget, gAttrib);
+            WebuiPopovers.updateContent(eventTarget, '<div class="webpop-content-div">' + gAttrib.html() + '</div>');
         },
         error: function () {
             var message = "Couldn't retrieve attributes!";
@@ -1317,13 +1310,14 @@ function build_help_pane_menu(helpObject, parentObject) {
 
         var aElem = $('<a/>',
             {
-                href: "#"
+                href: "#",
+                style: "padding-left: 10px",
             });
 
         var divElem = $('<div/>',
             {
                 style: "padding: 5px 5px 0px 0px;",
-                html: val.title
+                html: '<span><i style="padding-right: 5px;" class="fa fa-circle-o" aria-hidden="true"></i>' + val.title + '</span>'
             });
 
         aElem.append(divElem);

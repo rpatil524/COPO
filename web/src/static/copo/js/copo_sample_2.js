@@ -14,7 +14,6 @@ var descriptionWizSummary = {}; //wizard summary stage content
 var tempWizStore = null; // for holding wizard-related data pending wizard load event
 var initialSampleAttributes = {}; //holds initial attributes shared by all samples before editing
 var dataTableDataSource = []; // the data-source used for sample table generation
-var dataTableTriggerSave = false; //flag for determining the state of datatables keys state
 
 $(document).ready(function () {
         //****************************** Event Handlers Block *************************//
@@ -26,15 +25,10 @@ $(document).ready(function () {
         var copoVisualsURL = "/copo/copo_visualize/";
         var copoFormsURL = "/copo/copo_forms/";
 
+        var resolvedAccessionData = null; //holds data from sample accession resolution
+
 
         //test
-
-        // $(document).on("click", ".ontology-field", function (event) {
-        //     var data = Object();
-        //     data["component_label"] = this.id;
-        //     var gAttrib = build_element_lookup(data);
-        //     $("#copo_instant_info").html(gAttrib);
-        // });
         //end test
 
         //on the fly info element
@@ -176,12 +170,61 @@ $(document).ready(function () {
                 && $('#wizard_form_' + currentStep).length
                 && $('#wizard_form_' + currentStep).find("#current_stage").length) {
                 var current_stage = $('#wizard_form_' + currentStep).find("#current_stage").val();
+                var current_stage_object = null;
 
                 for (var i = 0; i < negotiatedStages.length; ++i) {
                     if (current_stage == negotiatedStages[i].ref) {
                         display_stage_message(negotiatedStages[i].message, negotiatedStages[i].title);
+                        current_stage_object = negotiatedStages[i];
                         break;
                     }
+                }
+
+                //some initial 'reactions' here; first for sample clone stage
+                if (current_stage == "sample_clone") {
+                    var radios = document.getElementsByName("sample_clone_route_input");
+                    var existingRadioObject = null; //keep a reference to the existing and resolve radio button for further validation down the line
+                    var resolveRadioObject = null;
+
+                    for (var i = 0; i < radios.length; ++i) {
+                        $('#wizard_form_' + currentStep).find("#" + radios[i].value).closest(".copo-form-group").hide();
+
+                        if (radios[i].value == "clone_existing") {
+                            existingRadioObject = radios[i];
+                        }
+
+                        if (radios[i].value == "clone_resolved") {
+                            resolveRadioObject = radios[i];
+                        }
+                    }
+
+                    //disable option if no existing samples to clone
+                    var disableExistingOption = false;
+                    for (var i = 0; i < current_stage_object.items.length; ++i) {
+                        if (current_stage_object.items[i].id == "clone_existing" && (current_stage_object.items[i].option_values.options.length == 0)) {
+                            disableExistingOption = true;
+                        }
+                    }
+
+                    if (disableExistingOption) {
+                        existingRadioObject.disabled = true;
+
+                        //default to another radio option
+                        resolveRadioObject.checked = true;
+                        $('#wizard_form_' + currentStep).find("#sample_clone_route").val(resolveRadioObject.value);
+                    }
+
+                    //show corresponding form element
+                    $('#wizard_form_' + currentStep).find("#" + $('#wizard_form_' + currentStep).find("#sample_clone_route").val()).closest(".copo-form-group").show();
+
+                } else if (current_stage == "sample_name") {
+                    var radios = document.getElementsByName("sample_name_route_input");
+                    for (var i = 0; i < radios.length; ++i) {
+                        $('#wizard_form_' + currentStep).find("#" + radios[i].value).closest(".copo-form-group").hide();
+                    }
+
+                    //show corresponding form element
+                    $('#wizard_form_' + currentStep).find("#" + $('#wizard_form_' + currentStep).find("#sample_name_route").val()).closest(".copo-form-group").show();
                 }
             }
         });
@@ -193,6 +236,89 @@ $(document).ready(function () {
             $(document).on("click", ".copo-dt", function (event) {
                 do_record_task($(this));
             });
+
+        });
+
+        //clone route
+        $(document).on("click", ".copo-radio-option", function (event) {
+
+            if ($(this).attr("name") == "sample_clone_route_input") {
+                var radios = document.getElementsByName("sample_clone_route_input");
+                for (var i = 0; i < radios.length; i++) {
+                    $(this).closest("form").find("#" + radios[i].value).closest(".copo-form-group").hide();
+                }
+
+                $(this).closest("form").find("#" + $(this).val()).closest(".copo-form-group").show();
+            }
+
+            if ($(this).attr("name") == "sample_name_route_input") {
+                var radios = document.getElementsByName("sample_name_route_input");
+                for (var i = 0; i < radios.length; i++) {
+                    $(this).closest("form").find("#" + radios[i].value).closest(".copo-form-group").hide();
+                }
+
+                $(this).closest("form").find("#" + $(this).val()).closest(".copo-form-group").show();
+            }
+        });
+
+        //sample accession resolution
+        $(document).on("click", ".resolver-submit", function (event) {
+            event.preventDefault();
+
+            var dataElem = $(this).closest(".input-group").find(".resolver-data");
+            var resolverValue = dataElem.val();
+            resolverValue = resolverValue.replace(/^\s+|\s+$/g, '');
+            dataElem.val('');
+
+            var parentElem = $(this).closest(".copo-form-group");
+
+            if (resolverValue.length == 0) {
+                return false;
+            }
+
+            var spinnerElem = $('<button/>',
+                {
+                    type: "button",
+                    class: "btn btn-default",
+                    html: '<i class="fa fa-spinner fa-pulse fa-1x"></i>'
+                });
+
+            spinnerElem.insertBefore($(this));
+
+            //get resolver uri
+            var resolverURL = dataElem.attr("data-resolve-uri") + resolverValue;
+
+            //get resolver component
+            var resolverComponent = dataElem.attr("data-resolve-component");
+
+            if (resolverComponent.toLowerCase() == "sample") {
+                $.ajax({
+                    url: resolverURL,
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        // name: query,
+                    },
+                    success: function (data) {
+                        resolvedAccessionData = data;
+                        var resolvedData = build_resolved_data(data);
+                        parentElem.webuiPopover('destroy');
+                        var meta_extra = {placement: "auto-right", height: 300};
+                        refresh_webpop(parentElem, "Resolved Sample [" + resolverValue + "]", resolvedData, meta_extra);
+                        parentElem.webuiPopover('show');
+
+                        //remove visual cues
+                        spinnerElem.remove();
+                        parentElem.removeClass("has-error has-danger");
+                        parentElem.find(".help-block").html("");
+                    },
+                    error: function () {
+                        spinnerElem.remove();
+                        parentElem.addClass("has-error has-danger");
+                        parentElem.find(".help-block").html("Couldn't resolve " + resolverValue + "!");
+                    }
+                });
+            }//end of sample resolver
 
         });
 
@@ -462,22 +588,37 @@ $(document).ready(function () {
             //we might need to rebuild stage form for certain stages...
             if (stage.hasOwnProperty("ref")) {
                 if (stage.ref == "sample_attributes") {
-                    if (get_clone_data()) {
+                    var clone_data = get_clone_data();
+                    if (clone_data) {
                         //rebuild stage form with data from the cloned target
-                        var clone_record_id = get_clone_data(); //check for clone data
+
+                        var ajaxData = {
+                            'task': "component_record",
+                            'component': component,
+                            'target_id': clone_data
+                        };
+                        var ajaxUrl = copoFormsURL;
+
+                        if (Object.prototype.toString.call(clone_data) === '[object Object]') {
+                            //possibly dealing with a resolved sample; the resolved data is provided
+
+                            ajaxData = {
+                                'request_action': "resolved_object",
+                                'component': component,
+                                'resolved_object': JSON.stringify(clone_data)
+                            }
+
+                            ajaxUrl = wizardURL;
+                        }
 
                         $("#wizard_form_" + currentIndx).html(get_spinner_image());
 
                         //fetch record and rebuild stage form...this time with data
                         $.ajax({
-                            url: copoFormsURL,
+                            url: ajaxUrl,
                             type: "POST",
                             headers: {'X-CSRFToken': csrftoken},
-                            data: {
-                                'task': "component_record",
-                                'component': component,
-                                'target_id': clone_record_id
-                            },
+                            data: ajaxData,
                             success: function (data) {
                                 stageCopy["data"] = data.component_record;
                                 $("#wizard_form_" + currentIndx).html(wizardStagesForms(stageCopy));
@@ -513,12 +654,29 @@ $(document).ready(function () {
                         requestedNumberOfSamples = parseInt(requestedNumberOfSamples["number_of_samples"]);
                     }
 
-                    //get bundle name
-                    var bundleName = get_stage_inputs_by_ref("sample_name");
-                    if ($.isEmptyObject(bundleName)) {
-                        bundleName = "";
-                    } else {
-                        bundleName = bundleName["bundle_name"];
+                    //get sample name
+                    var sampleName = get_stage_inputs_by_ref("sample_name");
+                    var genNameObject = '';
+
+                    if (!$.isEmptyObject(sampleName) && (sampleName.hasOwnProperty('sample_name_route'))) {
+                        if (sampleName['sample_name_route'].trim().toString() == "bundle_name"
+                            && (sampleName.hasOwnProperty('bundle_name'))) {
+                            var bundle_name = sampleName['bundle_name'].trim().toString();
+                            if (bundle_name) {
+                                genNameObject = bundle_name;
+                            }
+                        } else if (sampleName['sample_name_route'].trim().toString() == "provided_names"
+                            && (sampleName.hasOwnProperty('provided_names'))) {
+                            var provided_names = sampleName['provided_names'].trim().toString();
+
+                            if (provided_names) {
+                                if (provided_names.indexOf(',') != -1) {//it is comma separated...
+                                    genNameObject = provided_names.split(',');
+                                } else {// tab separated
+                                    genNameObject = provided_names.split(/\s+/);
+                                }
+                            }
+                        }
                     }
 
                     $.ajax({
@@ -530,7 +688,7 @@ $(document).ready(function () {
                         },
                         success: function (data) {
                             $("#wizard_form_" + currentIndx).html('');
-                            stageCopy.items = generate_sample_names(data.sample_name_schema, requestedNumberOfSamples, bundleName);
+                            stageCopy.items = generate_sample_names(data.sample_name_schema, requestedNumberOfSamples, genNameObject);
 
                             //refresh negotiated stages with new stage items
                             for (var i = 0; i < negotiatedStages.length; ++i) {
@@ -557,17 +715,21 @@ $(document).ready(function () {
 
         } //end of func
 
-        function generate_sample_names(sampleSchema, requestedNumberOfSamples, bundleName) {
+        function generate_sample_names(sampleSchema, requestedNumberOfSamples, genNameObject) {
             var generatedSampleNames = [];
 
             for (var i = 1; i < requestedNumberOfSamples + 1; ++i) {
                 var schemaCopy = $.extend(true, Object(), sampleSchema);
                 schemaCopy.id = "assigned_sample_" + i.toString();
-                if (bundleName) {
-                    schemaCopy.default_value = bundleName + "_" + i.toString();
+                if (genNameObject) {
+                    if (Object.prototype.toString.call(genNameObject) === '[object String]') {
+                        schemaCopy.default_value = genNameObject + "_" + i.toString();
+                    } else if (Object.prototype.toString.call(genNameObject) === '[object Array]' && genNameObject[i - 1] !== undefined) {
+                        schemaCopy.default_value = genNameObject[i - 1].trim();
+                    }
                 }
-                schemaCopy.control_meta.input_group_addon_label = i.toString() + ".";
 
+                schemaCopy.control_meta.input_group_addon_label = i.toString() + ".";
                 generatedSampleNames.push(schemaCopy);
             }
 
@@ -736,14 +898,23 @@ $(document).ready(function () {
         }
 
         function get_clone_data() {
-            var sample_clone = get_stage_inputs_by_ref("sample_clone");
-            var record_id = null;
+            var sampleClone = get_stage_inputs_by_ref("sample_clone");
+            var genCloneObject = null;
 
-            if (sample_clone.hasOwnProperty("sample_clone")) {
-                record_id = sample_clone["sample_clone"];
+            if (!$.isEmptyObject(sampleClone) && (sampleClone.hasOwnProperty('sample_clone_route'))) {
+                if (sampleClone['sample_clone_route'].trim().toString() == "clone_existing"
+                    && (sampleClone.hasOwnProperty('clone_existing'))) {
+                    var clone_existing = sampleClone['clone_existing'];
+                    if (clone_existing) {
+                        genCloneObject = clone_existing;
+                    }
+                } else if (sampleClone['sample_clone_route'].trim().toString() == "clone_resolved"
+                    && (resolvedAccessionData)) {
+                    genCloneObject = resolvedAccessionData;
+                }
             }
 
-            return record_id
+            return genCloneObject;
         }
 
         function get_pane_content(stage_content, currentIndx, stage_message) {
@@ -936,7 +1107,11 @@ $(document).ready(function () {
                             'target_id': ids[0]
                         },
                         success: function (data) {
-                            row.child(build_attributes_display(data).html()).show();
+                            var panel = get_panel("info");
+                            panel.find(".panel-heading").append(data.component_label + " Attributes");
+                            panel.find(".panel-body").append(build_attributes_display(data));
+                            row.child(panel.html()).show();
+
                         },
                         error: function () {
                             alert("Couldn't retrieve sample attributes!");
@@ -1118,51 +1293,50 @@ $(document).ready(function () {
                             }
 
                             table.keys.disable();
-                            dataTableTriggerSave = false;
                             $(node).addClass('cell-currently-engaged'); //cell locked for edit, unlock with the TAB key
 
                             //set cell edit form
                             set_cell_form(node, cell, table, '');
                         }
                     });
-
-                //also, use ENTER key to signal end of cell update...
-                table.on("keyup", function (e) {
-                    var code = (e.keyCode ? e.keyCode : e.which);
-                    if (code == 13 && table && !dataTableTriggerSave) {
-                        dataTableTriggerSave = true; //first time is to build control, only react at the second time
-                        return false;
-                    } else if (code == 13 && table && dataTableTriggerSave) {
-                        var cells = table.cells('.cell-currently-engaged');
-
-                        if (cells && cells[0].length > 0) {
-                            var cell = cells[0];
-                            var targetCell = table.cell(cell[0].row, cell[0].column);
-                            var node = targetCell.node();
-                            $(node).find(".cell-apply").popover('destroy');
-
-                            var cellParams = Object();
-                            cellParams["datatable"] = table;
-                            cellParams["cell"] = targetCell;
-                            cellParams["action"] = "current";
-
-                            var form_values = Object();
-                            $(node).find(":input").each(function () {
-                                try {
-                                    form_values[this.id] = $(this).val().trim();
-                                }
-                                catch (err) {
-                                    form_values[this.id] = $(this).val();
-                                }
-                            });
-                            cellParams["form_values"] = form_values;
-
-                            set_cell_dynamic(cellParams);
-                        }
-
-                    }
-                });
             }
+
+            //Enter-key event for table cell update...
+            $(document).on('keypress', '.copo-form-group', function (event) {
+                var code = (event.keyCode ? event.keyCode : event.which);
+                if (code == 13 && ($($(event.target)).closest("#generated_samples_table").length)) {
+                    var table = $('#generated_samples_table').DataTable();
+
+                    var cells = table.cells('.cell-currently-engaged');
+
+                    if (cells && cells[0].length > 0) {
+                        $(document).find(".copo-form-group").webuiPopover('destroy');
+
+                        var cell = cells[0];
+                        var targetCell = table.cell(cell[0].row, cell[0].column);
+                        var node = targetCell.node();
+                        $(node).find(".cell-apply").webuiPopover('destroy');
+
+                        var cellParams = Object();
+                        cellParams["datatable"] = table;
+                        cellParams["cell"] = targetCell;
+                        cellParams["action"] = "current";
+
+                        var form_values = Object();
+                        $(node).find(":input").each(function () {
+                            try {
+                                form_values[this.id] = $(this).val().trim();
+                            }
+                            catch (err) {
+                                form_values[this.id] = $(this).val();
+                            }
+                        });
+                        cellParams["form_values"] = form_values;
+
+                        set_cell_dynamic(cellParams);
+                    }
+                }
+            });
         }
 
         function set_generated_samples() {
@@ -1355,22 +1529,11 @@ $(document).ready(function () {
                         "data-title": option.title,
                         "data-desc": option.description,
                         "data-action": option.action,
-                        mouseenter: function (evt) {
-                            $(this).popover({
-                                title: $(this).attr("data-title"),
-                                content: $(this).attr("data-desc"),
-                                container: 'body',
-                                trigger: 'hover',
-                                html: true,
-                                placement: 'right',
-                                template: '<div class="popover copo-popover-popover1"><div class="arrow">' +
-                                '</div><div class="popover-inner"><h3 class="popover-title copo-popover-title1">' +
-                                '</h3><div class="popover-content"><p></p></div></div></div>'
-                            });
-
-                            $(this).popover("show");
-                        }
                     });
+
+                elem.webuiPopover('destroy');
+                var meta_extra = {width: 300, placement: 'bottom'};
+                refresh_webpop(elem, elem.attr("data-title"), elem.attr("data-desc"), meta_extra);
 
                 parentObject.append(elem);
             }
@@ -1488,10 +1651,12 @@ $(document).ready(function () {
                     cellParams["action"] = "current";
 
                     cellEditPanel.find(".cell-apply").click(function () {
+                        $(document).find(".copo-form-group").webuiPopover('destroy');
+
                         cellParams["action"] = $(this).attr("data-action");
                         cellParams["selectedRows"] = table.rows('.selected').indexes();
                         cellParams["allRows"] = table.rows().indexes();
-                        cellEditPanel.find(".cell-apply").popover('destroy');
+                        cellEditPanel.find(".cell-apply").webuiPopover('destroy');
 
                         var form_values = Object();
                         cellEditPanel.find(":input").each(function () {
@@ -1502,8 +1667,8 @@ $(document).ready(function () {
                                 form_values[this.id] = $(this).val();
                             }
                         });
-                        cellParams["form_values"] = form_values;
 
+                        cellParams["form_values"] = form_values;
                         set_cell_dynamic(cellParams);
                     });
                 },
@@ -1525,13 +1690,10 @@ $(document).ready(function () {
 
             var rowIndx = cell.index().row;
 
-            $('.popover').remove();
-
             //perform action
             if (action == "cancel") {
                 //re-enable keys
                 datatable.keys.enable();
-                dataTableTriggerSave = false;
 
                 //remove cell's edit status
                 $(node).removeClass('cell-currently-engaged'); //unlock cell
@@ -1543,6 +1705,7 @@ $(document).ready(function () {
                     .row(rowIndx)
                     .invalidate()
                     .draw();
+
             } else {
                 //get form values
                 var form_values = cellParams.form_values;
@@ -1604,7 +1767,6 @@ $(document).ready(function () {
                         } else {
                             //re-enable keys
                             datatable.keys.enable();
-                            dataTableTriggerSave = false;
 
                             //remove cell's edit status
                             $(node).removeClass('cell-currently-engaged'); //unlock cell
@@ -1623,6 +1785,7 @@ $(document).ready(function () {
                                     .row(targetRows[i].rowID)
                                     .invalidate()
                                     .draw();
+
                             }
 
                             //set focus on next row
@@ -1678,6 +1841,157 @@ $(document).ready(function () {
 
                 onTheFlyElem.append(attributesPanel);
             }
+        }
+
+        function build_resolved_data(data) {
+            var resolvedDiv = $('<div/>');
+
+            var omitList = ["_links", "accession"]; //keys to omit from the report
+
+            $.each(data, function (k, v) {
+
+                if (!(omitList.indexOf(k) === -1)) {
+                    return true;
+                }
+
+                if (Object.prototype.toString.call(v) === '[object String]') {
+                    var iRow = $('<div/>',
+                        {
+                            class: "row",
+                            style: "border-bottom: 1px solid #ddd;"
+                        });
+
+                    resolvedDiv.append(iRow);
+
+                    var labelCol = $('<div/>',
+                        {
+                            class: "col-sm-5 col-md-5 col-lg-5"
+                        });
+
+                    var valueCol = $('<div/>',
+                        {
+                            class: "col-sm-7 col-md-7 col-lg-7"
+                        });
+
+                    iRow.append(labelCol);
+                    iRow.append(valueCol);
+
+                    labelCol.append(format_camel_case(k));
+                    valueCol.append(v);
+                } else if (Object.prototype.toString.call(v) === '[object Object]') {
+                    if (k == "characteristics") {
+                        $.each(v, function (key, val) {
+                            var iRow = $('<div/>',
+                                {
+                                    class: "row",
+                                    style: "border-bottom: 1px solid #ddd;"
+                                });
+
+                            resolvedDiv.append(iRow);
+
+                            var labelCol = $('<div/>',
+                                {
+                                    class: "col-sm-5 col-md-5 col-lg-5"
+                                });
+
+                            var valueNode = [];
+
+                            if (Object.prototype.toString.call(val) === '[object Array]') {
+                                val.forEach(function (item) {
+                                    if (Object.prototype.toString.call(item) === '[object Object]') {
+                                        $.each(item, function (key22, val22) {
+                                            if (key22 == "text") {
+                                                valueNode.push(val22);
+                                            }
+                                        });
+                                    } else if (Object.prototype.toString.call(val2) === '[object String]') {
+                                        ;
+                                    } else if (Object.prototype.toString.call(val2) === '[object Array]') {
+                                        ;
+                                    }
+                                });
+                            }
+
+                            var valueCol = $('<div/>',
+                                {
+                                    class: "col-sm-7 col-md-7 col-lg-7"
+                                });
+
+                            labelCol.append(format_camel_case(key));
+
+                            var breakr = $('<div/>',
+                                {
+                                    style: "border-top: 1px solid #e2e2e2;"
+                                });
+
+                            if (valueNode.length > 1) {
+                                valueCol.append(valueNode[0]);
+                                for (var i = 1; i < valueNode.length; ++i) {
+                                    valueCol.append(breakr.clone().append(valueNode[i]));
+                                }
+                            } else {
+                                valueCol.append(valueNode.join("<br/>"));
+                            }
+
+                            iRow.append(labelCol);
+                            iRow.append(valueCol);
+                        });
+                    }
+
+                } else if (Object.prototype.toString.call(v) === '[object Array]') {
+                    var iRow = $('<div/>',
+                        {
+                            class: "row",
+                            style: "border-bottom: 1px solid #ddd;"
+                        });
+                    resolvedDiv.append(iRow);
+
+                    var labelCol = $('<div/>',
+                        {
+                            class: "col-sm-5 col-md-5 col-lg-5"
+                        });
+                    labelCol.append(format_camel_case(k));
+                    iRow.append(labelCol);
+
+                    var valueNode = [];
+                    if (Object.prototype.toString.call(v) === '[object Array]') {
+                        v.forEach(function (item) {
+                            if (Object.prototype.toString.call(item) === '[object Object]') {
+                                $.each(item, function (key22, val22) {
+                                    valueNode.push(format_camel_case(key22) + ":  " + val22);
+                                });
+                            } else if (Object.prototype.toString.call(val2) === '[object String]') {
+                                ;
+                            } else if (Object.prototype.toString.call(val2) === '[object Array]') {
+                                ;
+                            }
+                        });
+                    }
+
+                    var valueCol = $('<div/>',
+                        {
+                            class: "col-sm-7 col-md-7 col-lg-7"
+                        });
+
+                    var breakr = $('<div/>',
+                        {
+                            style: "border-top: 1px solid #e2e2e2;"
+                        });
+
+                    if (valueNode.length > 1) {
+                        valueCol.append(valueNode[0]);
+                        for (var i = 1; i < valueNode.length; ++i) {
+                            valueCol.append(breakr.clone().append(valueNode[i]));
+                        }
+                    } else {
+                        valueCol.append(valueNode.join("<br/>"));
+                    }
+
+                    iRow.append(valueCol);
+                }
+            });
+
+            return resolvedDiv.html();
         }
 
     }
