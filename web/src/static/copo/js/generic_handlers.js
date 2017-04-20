@@ -1280,7 +1280,12 @@ function resolve_element_view(recordId, associatedComponent, eventTarget) {
         },
         success: function (data) {
             var gAttrib = build_attributes_display(data);
-            WebuiPopovers.updateContent(eventTarget, '<div class="webpop-content-div">' + gAttrib.html() + '</div>');
+            var attribDiv = $('<div/>',
+                {
+                    style: "max-height:300px; overflow-y: scroll;"
+                });
+            attribDiv.append(gAttrib);
+            WebuiPopovers.updateContent(eventTarget, '<div class="webpop-content-div">' + $('<div/>').append(attribDiv).html() + '</div>');
         },
         error: function () {
             var message = "Couldn't retrieve attributes!";

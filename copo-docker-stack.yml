@@ -1,0 +1,179 @@
+version: "3"
+services:
+  copo-web:
+    image: tonietuk/copo-web
+    expose:
+      - "8000"
+    volumes:
+      - copo-code-data:/copo
+      - copo-media-data:/copo/media
+      - copo-static-data:/copo/static
+    networks:
+      - copo-frontend-network
+      - copo-backend-network
+    secrets:
+      - copo_web_secret_key
+      - copo_postgres_user_password
+      - copo_mongo_user_password
+      - copo_google_secret_key
+      - copo_figshare_client_id_key
+      - copo_facebook_secret_key
+      - copo_twitter_secret_key
+      - copo_orcid_secret_key
+      - copo_figshare_client_secret_key
+      - copo_figshare_consumer_secret_key
+    environment:
+      SECRET_KEY_FILE: "/run/secrets/copo_web_secret_key"
+      MEDIA_PATH: "media/"
+      DEBUG: "false"
+      ASPERA_PLUGIN_DIRECTORY: "aspera_linux_plugin"
+      MONGO_USER: "copo_user"
+      MONGO_USER_PASSWORD_FILE: "/run/secrets/copo_mongo_user_password"
+      MONGO_DB: "copo_mongo"
+      MONGO_HOST: "copo-mongo"
+      MONGO_PORT: "27017"
+      MONGO_MAX_POOL_SIZE: "100"
+      POSTGRES_DB: "copo"
+      POSTGRES_USER: "copo_user"
+      POSTGRES_PORT: "5432"
+      POSTGRES_SERVICE: "copo-postgres"
+      POSTGRES_PASSWORD_FILE: "/run/secrets/copo_postgres_user_password"
+      ORCID_SECRET_FILE: "/run/secrets/copo_orcid_secret_key"
+      FIGSHARE_CONSUMER_SECRET_FILE: "/run/secrets/copo_figshare_consumer_secret_key"
+      FIGSHARE_CLIENT_ID_FILE: "/run/secrets/copo_figshare_client_id_key"
+      FIGSHARE_CLIENT_SECRET_FILE: "/run/secrets/copo_figshare_client_secret_key"
+      GOOGLE_SECRET_FILE: "/run/secrets/copo_google_secret_key"
+      TWITTER_SECRET_FILE: "/run/secrets/copo_twitter_secret_key"
+      FACEBOOK_SECRET_FILE: "/run/secrets/copo_facebook_secret_key"
+    deploy:
+      placement:
+        constraints: [node.hostname == copo-1]
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    command: bash -c "python manage.py makemigrations rest && python manage.py makemigrations chunked_upload && python manage.py makemigrations && python manage.py migrate && python /copo/setup/copo_social.py && /usr/local/bin/gunicorn web.wsgi:application -w 4 -t 1000 -b :8000"
+  copo-nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      #- "80:443"
+    volumes:
+      - copo-code-data:/copo
+      - copo-static-data:/www/static
+    networks:
+      - copo-frontend-network
+    secrets:
+      - copo-project.crt
+      - copo-project.key
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+  copo-redis:
+    image: redis:alpine
+    environment:
+      REDIS_HOST: "copo-redis"
+      REDIS_PORT: "6379"
+    networks:
+      - copo-frontend-network
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+  copo-postgres:
+    image: postgres:9.4
+    volumes:
+      - copo-postgres-data:/var/lib/postgresql/data
+    networks:
+      - copo-backend-network
+    secrets:
+      - copo_postgres_user_password
+    environment:
+      POSTGRES_DB: "copo"
+      POSTGRES_USER: "copo_user"
+      POSTGRES_PORT: "5432"
+      POSTGRES_SERVICE: "copo-postgres"
+      POSTGRES_PASSWORD_FILE: "/run/secrets/copo_postgres_user_password"
+    deploy:
+      placement:
+        constraints: [node.hostname == copo-3]
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+  copo-mongo:
+    image: mongo:latest
+    volumes:
+      - copo-mongo-data:/data/db
+    networks:
+      - copo-backend-network
+    secrets:
+      - copo_mongo_initdb_root_password
+      - copo_mongo_user_password
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "copo_admin"
+      MONGO_INITDB_ROOT_PASSWORD_FILE: "/run/secrets/copo_mongo_initdb_root_password"
+      MONGO_USER: "copo_user"
+      MONGO_USER_PASSWORD_FILE: "/run/secrets/copo_mongo_user_password"
+      MONGO_DB: "copo_mongo"
+      MONGO_HOST: "copo-mongo"
+      MONGO_PORT: "27017"
+    deploy:
+      placement:
+        constraints: [node.hostname == copo-3]
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  copo-frontend-network:
+  copo-backend-network:
+
+volumes:
+  copo-media-data:
+  copo-mongo-data:
+  copo-static-data:
+  copo-code-data:
+  copo-postgres-data:
+
+secrets:
+  copo_mongo_initdb_root_password:
+    external: true
+  copo_mongo_user_password:
+    external: true
+  copo_postgres_user_password:
+    external: true
+  copo_web_secret_key:
+    external: true
+  copo_google_secret_key:
+    external: true
+  copo_figshare_client_id_key:
+    external: true
+  copo_facebook_secret_key:
+    external: true
+  copo_twitter_secret_key:
+    external: true
+  copo_orcid_secret_key:
+    external: true
+  copo_figshare_client_secret_key:
+    external: true
+  copo_figshare_consumer_secret_key:
+    external: true
+  copo-project.crt:
+    external: true
+  copo-project.key:
+    external: true

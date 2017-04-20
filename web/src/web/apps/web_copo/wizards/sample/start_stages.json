@@ -27,7 +27,7 @@
         "parameter": ""
       },
       "title": "Sample Clone",
-      "message": "This stage provides an opportunity to clone a sample. Sample cloning is a way of bootstrapping sample description, and can help speed up the description process. If you choose to clone a sample, you will, at a later stage, be able to select a clone target from an existing sample. Alternatively, you can clone from a remote service by resolving a sample accession.",
+      "message": "Do you want to clone a sample? Sample cloning is a way of bootstrapping sample description, and can help speed up the description process. If you choose to clone a sample, you will, at a later stage, be able to select a clone target from an existing sample. Alternatively, you can clone from a remote service by resolving a sample accession.",
       "items": [
         {
           "id": "confirm_sample_clone",
@@ -82,7 +82,7 @@
         "parameter": "confirm_sample_clone"
       },
       "title": "Clone Target",
-      "message": "In this stage, you can either select an existing sample record from your work profile to clone, or enter a sample accession to be resolved from a remote service. ",
+      "message": "How do you want to clone a sample? You can either select an existing sample record from your work profile to clone, or enter a sample accession to be resolved from a remote service. ",
       "items": [
         {
           "id": "sample_clone_route",
@@ -140,7 +140,7 @@
     {
       "ref": "sample_name",
       "title": "Proposed Sample Name",
-      "message": "Please provide information that can be used to label your samples. If you have predefined sample names elsewhere, you can copy and paste them as tab or comma delimited string values in the <strong>Predefined Names</strong> box. Alternatively, you can supply a ‘bundle name’, in the <strong>Bundle Name</strong> box, that will form the base part from which individual sample names may be derived. <br/>Please note that sample names, both generated and predefined, will be validated in the next stage for uniqueness.",
+      "message": "How do you want to label your samples? If you have predefined sample names elsewhere, you can copy and paste them as tab or comma delimited string values in the <strong>Predefined Names</strong> box. Alternatively, you can supply a ‘bundle name’, in the <strong>Bundle Name</strong> box, that will form the base part from which individual sample names may be derived. <br/>Please note that sample names, both generated and predefined, will be validated in the next stage for uniqueness.",
       "items": [
         {
           "id": "sample_name_route",

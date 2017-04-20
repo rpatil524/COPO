@@ -108,3 +108,6 @@ mongo/mongodata
 # add ignore for migrations
 0001_initial.py
 
+# logs
+web/src/exceptions_and_logging/logs
+

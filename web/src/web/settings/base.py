@@ -1,5 +1,6 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from tools import resolve_env
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -10,12 +11,12 @@ SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = resolve_env.get_env('SECRET_KEY')
 
 LOGIN_URL = '/accounts/auth/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True if os.getenv('DEBUG') == 'true' else False
+DEBUG = True if resolve_env.get_env('DEBUG') == 'true' else False
 
 ALLOWED_HOSTS = ['*']
 
@@ -38,9 +39,6 @@ PROJECT_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.orcid',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.twitter',
-    'allauth.socialaccount.providers.facebook',
     # 'web.apps.web_copo',
     'rest_framework',
     'chunked_upload',
@@ -163,7 +161,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # MEDIA_ROOT = STATIC_ROOT
 
-MEDIA_ROOT = os.path.join(BASE_DIR, os.environ['MEDIA_PATH'])
+MEDIA_ROOT = os.path.join(BASE_DIR, resolve_env.get_env('MEDIA_PATH'))
 
 ELASTIC_SEARCH_URL = 'http://localhost:9200/ontologies/plant_ontology/_search'
 
