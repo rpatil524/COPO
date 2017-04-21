@@ -1,13 +1,9 @@
-version: "3"
+version: "3.1"
 services:
   copo-web:
     image: tonietuk/copo-web
-    expose:
-      - "8000"
     volumes:
-      - copo-code-data:/copo
-      - copo-media-data:/copo/media
-      - copo-static-data:/copo/static
+      - copo-web-data:/copo/media
     networks:
       - copo-frontend-network
       - copo-backend-network
@@ -46,9 +42,6 @@ services:
       TWITTER_SECRET_FILE: "/run/secrets/copo_twitter_secret_key"
       FACEBOOK_SECRET_FILE: "/run/secrets/copo_facebook_secret_key"
     deploy:
-      placement:
-        constraints: [node.hostname == copo-1]
-      replicas: 1
       update_config:
         parallelism: 1
         delay: 10s
@@ -56,20 +49,16 @@ services:
         condition: on-failure
     command: bash -c "python manage.py makemigrations rest && python manage.py makemigrations chunked_upload && python manage.py makemigrations && python manage.py migrate && python /copo/setup/copo_social.py && /usr/local/bin/gunicorn web.wsgi:application -w 4 -t 1000 -b :8000"
   copo-nginx:
-    image: nginx:latest
+    image: tonietuk/copo-nginx
     ports:
       - "80:80"
       #- "80:443"
-    volumes:
-      - copo-code-data:/copo
-      - copo-static-data:/www/static
     networks:
       - copo-frontend-network
     secrets:
       - copo-project.crt
       - copo-project.key
     deploy:
-      replicas: 1
       update_config:
         parallelism: 1
         delay: 10s
@@ -144,10 +133,8 @@ networks:
   copo-backend-network:
 
 volumes:
-  copo-media-data:
+  copo-web-data:
   copo-mongo-data:
-  copo-static-data:
-  copo-code-data:
   copo-postgres-data:
 
 secrets:
