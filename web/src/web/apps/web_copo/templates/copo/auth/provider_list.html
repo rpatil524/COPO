@@ -26,8 +26,8 @@
                     <a style="margin-left: -20px; padding-bottom:20px"  title="{{ provider.name }}" class="socialaccount_provider {{ provider.id }}"
                        href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}"><img
                             height="100px" src="{% static 'copo/img/'|add:image_static %}"/>
-                        <span style="margin-left: -10px; font-size: large" class="login-button">Sign in with {{ provider.name }}</span></a>
-                    <hr style="margin-top:40px"/>
+                        <span style="font-size: large" class="login-button">Sign in with {{ provider.name }}</span></a>
+
                 {% else %}
 
                     <a title="{{ provider.name }}" class="socialaccount_provider {{ provider.id }}"

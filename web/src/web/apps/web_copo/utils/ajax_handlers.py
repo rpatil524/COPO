@@ -1,7 +1,7 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 01/12/2015'
 # this python file is for small utility functions which will be called from Javascript
 import json
-from bson import json_util
+from bson import json_util, ObjectId
 
 import requests
 from django.http import HttpResponse
@@ -51,33 +51,38 @@ def test_ontology(request):
 
 
 def get_upload_information(request):
-    submission_id = request.GET.get('submission_id')
-
+    submission_ids = request.GET.get('ids')
+    ids = json.loads(submission_ids)
     # tonietuk's intercept starts
-    if not submission_id:
+    if not submission_ids:
         data = {'found': False}
         return HttpResponse(json.dumps(data))
     # tonietuk's intercept ends
 
-    # get submission collection and check status
-    sub = Submission().get_record(submission_id)
-    if sub:
-        if not sub['complete'] or sub['complete'] == 'false':
-            rem = RemoteDataFile().get_by_sub_id(submission_id)
-            if rem:
-                speeds = rem['transfer_rate'][-100:]
-                complete = rem['pct_completed']
-                data = {'speeds': speeds, 'complete': complete, 'finished': False, 'found': True}
-                return HttpResponse(json.dumps(data))
-        else:
-            # elapsed = str(parser.parse(sub['completed_on']) - parser.parse(sub['commenced_on']))
-            # data = {'upload_time': str(elapsed), 'completed_on': sub['completed_on'], 'article_id': sub.get('article_id'), 'finished': True, 'found': True}
-            data = {'sub_id': str(sub['_id']), 'status': sub['status'], 'accessions': sub['accessions'],
-                    'repo': sub['repository'], 'completed_on': sub['completed_on'].strftime("%Y-%m-%d %H:%M:%S"),
-                    'article_id': sub.get('article_id'), 'finished': True, 'found': True}
-            return HttpResponse(json.dumps(data))
+    output = list()
 
-    data = {'found': False}
+    for id in ids:
+        # get submission collection and check status
+        sub = Submission().get_record(id)
+        if sub:
+            if not sub['complete'] or sub['complete'] == 'false':
+                # we are dealing with an uploading submission
+                rem = RemoteDataFile().get_by_sub_id(id)
+                if rem:
+                    speeds = rem['transfer_rate'][-30:]
+                    complete = rem['pct_completed']
+                    data = {'speeds': speeds, 'complete': complete, 'finished': False, 'found': True, 'id': id}
+                    output.append(data)
+            else:
+                # our submission has finished
+                # elapsed = str(parser.parse(sub['completed_on']) - parser.parse(sub['commenced_on']))
+                # data = {'upload_time': str(elapsed), 'completed_on': sub['completed_on'], 'article_id': sub.get('article_id'), 'finished': True, 'found': True}
+                data = {'id': id, 'status': sub['status'], 'accessions': sub['accessions'],
+                        'repo': sub['repository'], 'completed_on': sub['completed_on'].strftime("%Y-%m-%d %H:%M:%S"),
+                        'article_id': sub.get('article_id'), 'finished': True, 'found': True}
+                output.append(data)
+
+    data = {'return': output}
     return HttpResponse(json.dumps(data))
 
 
@@ -101,6 +106,15 @@ def delete_token(request):
     resp = Figshare().delete_token(tok_id)
     return HttpResponse(json_util.dumps({'resp': resp.acknowledged}))
 
+
 def get_excel_data(request):
     x = read_excel('/Users/fshaw/Dropbox/Shawtuk/dev/snps/test/test_data/ExampleSNPTable_small.xlsx', sheetname=0)
     return HttpResponse(json.dumps(x.values.tolist()))
+
+def get_accession_data(request):
+    sub_id = request.GET.get('sub_id')
+    sub = Submission().get_file_accession(sub_id)
+
+
+
+    return HttpResponse(json_util.dumps({'sub': sub}))

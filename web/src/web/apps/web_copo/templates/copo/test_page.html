@@ -77,6 +77,41 @@
         </ul>
     </div>
 
+    <table id="submission_table">
+        <thead>
+        <tr>
+            <th>
+                Type
+            </th>
+            <th>
+                Files / Accessions
+            </th>
+            <th>
+                Created
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                Uploaded Percentage
+            </th>
+            <th>
+                Upload Speed
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>ENA</td>
+            <td>Files / Accessions <span class="glyphicon glyphicon-envelope"></span></td>
+            <td>01/10/1981</td>
+            <td>Pending</td>
+            <td>43%</td>
+            <td>23MB/sec</td>
+        </tr>
+        </tbody>
+    </table>
+
 
 
 {% endblock %}
@@ -89,7 +124,7 @@
     <script>
 
         $(document).ready(function () {
-
+            $('#submission_table').DataTable()
         })
 
 

@@ -49,6 +49,8 @@ coverage.xml
 *.mo
 *.pot
 
+
+
 # Django stuff:
 *.log
 local_settings.py
@@ -100,11 +102,18 @@ ENV/
 web/src/media
 web/src/media/chunked_uploads
 media/*
+web/src/submission/data/*
 
 web/src/static/CACHE/css/**
 mongo/mongodata
 *.DS_Store
-.idea/workspace.xml
+/Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/idea/workspace.xml
 # add ignore for migrations
 0001_initial.py
 
+.idea/workspace.xml
+
+.gitignore.swp
+web/src/static/CACHE/
+web/src/submission/data/.gitignore
+web/src/tools/reposit/aspera/AsperaConnect.app/Contents/Resources/aspera_mac_plugin/

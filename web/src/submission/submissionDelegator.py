@@ -45,12 +45,14 @@ def delegate_submission(request):
 
     ## Submit to ENA
     elif repo == 'ena':
-        enaSubmission.EnaSubmit().submit(
+        result = enaSubmission.EnaSubmit().submit(
             sub_id=sub_id,
             dataFile_ids=sub['bundle'],
         )
-
-        return HttpResponse(jsonpickle.dumps({'status': 1}))
+        if result == True:
+            return HttpResponse(jsonpickle.dumps({'status': 1}))
+        else:
+            return HttpResponse(jsonpickle.dumps({'status': result}))
 
     # return default
     return HttpResponse({'status': 0})

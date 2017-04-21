@@ -61,13 +61,14 @@ class EnaSubmit(object):
             self.d_files.append(mongo_file)
             file_path.append(mongo_file.get("file_location", str()))
 
-        self._do_aspera_transfer(transfer_token=transfer_token,
+        case = self._do_aspera_transfer(transfer_token=transfer_token,
                                  user_name=user_name,
                                  password=password,
                                  remote_path=remote_path,
                                  file_path=file_path,
                                  path2library=path2library,
                                  sub_id=sub_id)
+        return case
 
     def _do_aspera_transfer(self, transfer_token=None, user_name=None, password=None, remote_path=None, file_path=None,
                             path2library=None, sub_id=None):
@@ -118,6 +119,8 @@ class EnaSubmit(object):
                             }
 
                             tokens = pexp_match.decode("utf-8").split(" ")
+
+                            lg.log(tokens, level=Loglvl.INFO, type=Logtype.FILE)
 
                             for token in tokens:
                                 if not token == '':
@@ -174,6 +177,8 @@ class EnaSubmit(object):
             except OSError:
                 return redirect('web.apps.web_copo.views.goto_error', request=HttpRequest(),
                                 message='There appears to be an issue with EBI.')
+            finally:
+                pass
 
         # setup paths for conversion directories
         conv_dir = os.path.join(self._dir, sub_id)
@@ -228,6 +233,15 @@ class EnaSubmit(object):
 
         accessions = dict()
 
+        # first check for errors
+        errors = xml.findall('*/ERROR')
+        if errors:
+            error_text = str()
+            for e in errors:
+                error_text = error_text + e.text
+            return error_text
+
+
         # get project accessions
         project = xml.find('./PROJECT')
         project_accession = project.get('accession', default='undefined')
@@ -270,3 +284,5 @@ class EnaSubmit(object):
         s['complete'] = True
         s['target_id'] = str(s.pop('_id'))
         Submission().save_record(dict(), **s)
+        RemoteDataFile().delete_transfer(transfer_token)
+        return True

@@ -7,8 +7,6 @@
 {% block stylesheet_block %}
     <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
     <link rel="stylesheet" href="{% static 'copo/css/copo/submission.css' %}" xmlns="http://www.w3.org/1999/html">
-
-
 {% endblock %}
 
 
@@ -34,80 +32,65 @@
 
 {% block content %}
 
-    <input type="hidden" id="displayed_submission" value=""/>
+    <input type="hidden" id="profile_id" value="{{ profile_id }}"/>
 
-    <div class="row">
-        <div class="col-lg-4 col-md-4 col-sm-4">
-            <div class="panel panel-default full-height">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Submissions</h3>
+    <table id="submission_table">
+        <thead>
+        <tr>
+            <th>
+                Type
+            </th>
+            <th>
+                Files / Accessions
+            </th>
+            <th>
+                Created
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                Uploaded Percentage
+            </th>
+            <th>
+                Upload Speed
+            </th>
+            <th>
+                Send
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+
+
+    <!-- files and accessions modal -->
+    <div class="modal fade" id="accessionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Files and Accessions in Submission</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <div class="panel-body panel-overflow">
+                <div id="file_accession_panel" class="modal-body">
 
-					{% for s in submission %}
-						<div class="submission_panel" data-submission-id="{{ s|mongo_id }}" data-submission-status="{{ s.complete }}">
-							<div class="submission_header submission_pending">
-								{{ s|produce_submission_header }}
-								<span class="pull-right display-1">
-									{{ s.date_created|timesince }} ago
-								</span>
-                            </div>
-                            <div class="submission_info_panel">
-                                <div class="row">
-                                    <div class="col-lg-6 col-md-6 col-sm-6">
-                                        <h3 class="h3">Files in bundle</h3>
-                                        {% for f_title in s.bundle %}
-                                            {{ f_title|datafile_title }}
-                                        {% endfor %}
 
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-6 text-center padding">
-										<!--<div class="checkbox">
-                                            <input type="checkbox" value="">
-                                        </div>-->
-										{% if s.complete == "false" %}
 
-										<div class="ctl-buttons">
-											<a class="btn btn-success upload_button" href="#"><i class="fa fa-upload"
-																				   aria-hidden="true"></i></a>
-											<a class="btn btn-danger" href="#"><i class="fa fa-trash-o"
-																				  aria-hidden="true"></i></a>
-										</div>
-										{% endif %}
-									</div>
-								</div>
-							</div>
-						</div>
-					{% endfor %}
-				</div>
-			</div>
-		</div>
-		<div class="col-lg-8 col-md-8 col-sm-8">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">Submission Status</h3>
-				</div>
-				<div class="panel-body" id="status-panel">
-					<div class="row" id="not_running_text">
-                        <div class="col-lg-12 col-md-12 col-sm-12">
-                            This submission has not been started. To initiate, click the green button on the submission panel.
-                        </div>
-                    </div>
-                    <div class="row" id="upload_progress_info">
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-							<h4 class="h4">Upload Speed</h4>
-							<canvas id="bandwidth_chart"></canvas>
-						</div>
-						<div class="col-lg-6 col-md-6 col-sm-6">
-							<h4 class="h4">Percent Complete</h4>
-							<canvas id="completed_chart"></canvas>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-	</div>
+
 {% endblock %}
 
 {% block js_block %}
@@ -115,4 +98,5 @@
     <script src="{% static 'copo/js/copo_submission.js' %}"></script>
     <script src="{% static 'copo/chart_js/Chart.js' %}"></script>
     <script src="{% static 'copo/js/bootstrap-dialog.js' %}"></script>
+
 {% endblock %}

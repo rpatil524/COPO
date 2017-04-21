@@ -1,13 +1,15 @@
 import time
 import os.path
 from chunked_upload.models import ChunkedUpload
-from chunked_upload.settings import UPLOAD_PATH
+from django.conf import settings
 from django_tools.middlewares import ThreadLocal
+import datetime
 
 
 def generate_filename2(instance, filename):
-    filename = os.path.join(UPLOAD_PATH, str(ThreadLocal.get_current_user().id), instance.filename)
-    return time.strftime(filename)
+    partition = datetime.datetime.now().strftime("%H_%M_%S_%f")
+    filename = os.path.join(settings.UPLOAD_PATH, str(ThreadLocal.get_current_user().id), partition, instance.filename)
+    return filename
 
 
 

@@ -42,7 +42,7 @@ def post_annotations(request):
         r = Annotation().add_to_annotation(document_id, data)
 
     r['id'] = r.pop('_id')
-    r['text'] = r['shortform'] + ' :-: ' + r['term_accession']
+    r['text'] = r['annotation_value'] + ' :-: ' + r['term_accession']
 
     return HttpResponse(j.dumps(r))
 
@@ -69,7 +69,10 @@ def handle_upload(request):
     if file_type == "Spreadsheet":
         # load spreadsheet data and return to backend
         s = read_excel(f)
-        raw = json.dumps(s.values.tolist())
+        raw = list()
+        raw.append(s.columns.tolist())
+        raw.extend(s.values.tolist())
+        raw = json.dumps(raw)
 
     elif file_type == "PDF Document":
         save_name = os.path.join(settings.MEDIA_ROOT, str(uuid.uuid4()))
