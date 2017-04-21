@@ -104,11 +104,6 @@ $(document).ready(function () {
     });
 
 
-    $(document).on("click", ".popover .copo-close", function () {
-        $(this).parents(".popover").popover('destroy');
-    });
-
-
 }); //end of document ready
 
 //map controls to rendering functions
@@ -131,7 +126,8 @@ var controlsMapping = {
     "copo-item-count": "do_copo_item_count_ctrl",
     "date-picker": "do_date_picker_ctrl",
     "copo-duration": "do_copo_duration_ctrl",
-    "text-percent": "do_percent_text_box"
+    "text-percent": "do_percent_text_box",
+    "copo-resolver": "do_copo_resolver_ctrl"
 };
 
 function json2HtmlForm(data) {
@@ -139,7 +135,9 @@ function json2HtmlForm(data) {
     //tidy up before closing the modal
     var doTidyClose = {
         closeIt: function (dialogRef) {
-            $('.popover').popover('destroy'); //hide any shown popovers
+            $(document).find(".copo-form-group").webuiPopover('destroy');
+            refresh_tool_tips();
+
             htmlForm.empty(); //clear form
             dialogRef.close();
         }
@@ -155,8 +153,8 @@ function json2HtmlForm(data) {
         animate: true,
         draggable: true,
         onhide: function (dialogRef) {
-            //remove all dangling popovers
-            $('.popover').popover('destroy');
+            $(document).find(".copo-form-group").webuiPopover('destroy');
+            refresh_tool_tips();
         },
         onshown: function (dialogRef) {
 
@@ -179,6 +177,8 @@ function json2HtmlForm(data) {
                     e.preventDefault();
 
                     save_form(data.form);
+                    $(document).find(".copo-form-group").webuiPopover('destroy');
+                    refresh_tool_tips();
                     dialogRef.close();
                 }
             });
@@ -195,7 +195,6 @@ function json2HtmlForm(data) {
             {
                 icon: 'glyphicon glyphicon-save',
                 label: 'Save',
-                id: 'global_form_save_btn',
                 cssClass: 'btn-primary',
                 action: function (dialogRef) {
                     validate_forms(htmlForm.find("form"));
@@ -381,7 +380,7 @@ function set_up_help_ctrl(ctrlName) {
         });
 
     $('input[name="' + ctrlName + '"]').on('switchChange.bootstrapSwitch', function (event, state) {
-        if($(this).closest(".helpDivRow").siblings(".formDivRow").length) {
+        if ($(this).closest(".helpDivRow").siblings(".formDivRow").length) {
             toggle_display_help_tips(state, $(this).closest(".helpDivRow").siblings(".formDivRow").first());
         }
     });
@@ -513,6 +512,14 @@ function set_validation_markers(formElem, ctrl) {
     if (formElem.hasOwnProperty("email") && (formElem.email.toString().toLowerCase() == "true")) {
         ctrl.attr("data-email", "email");
         ctrl.attr('data-email-error', "Please enter a valid value for the " + formElem.label);
+
+        errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
+    }
+
+    //phone marker...
+    if (formElem.hasOwnProperty("phone") && (formElem.phone.toString().toLowerCase() == "true")) {
+        ctrl.attr("data-phone", "phone");
+        ctrl.attr('data-phone-error', "Please enter a valid value for the " + formElem.label);
 
         errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
     }
@@ -1085,13 +1092,17 @@ var dispatchFormControl = {
             var radioCtrl = $('<input/>',
                 {
                     type: "radio",
+                    class: "copo-radio-option",
                     name: formElem.id + "_input",
                     value: option.value,
+                    "data-lbl": option.label,
+                    "data-desc": option.description,
+                    "data-value": option.value,
                     change: function (evt) {
                         if ($(this).is(':checked')) {
                             hiddenCtrl.val($(this).val());
                         }
-                    },
+                    }
                 });
 
             if (option.value == elemValue) {
@@ -1103,47 +1114,35 @@ var dispatchFormControl = {
                 {
                     style: "padding-left:5px;",
                     html: option.label,
-                    "data-lbl": option.label,
-                    "data-desc": option.description,
-                    "data-value": option.value,
-                    mouseover: function (evt) {
-                        if ($(this).attr("data-desc") && !$(this).closest(".radioCtrlDiv").find(".description-alert").length) {
-                            var descriptionAlert = $('<div/>',
-                                {
-                                    class: "alert alert-info alert-dismissable description-alert",
-                                    style: "background-image: none; background-color: transparent; line-height:1.7;"
-                                });
-
-                            var descriptionAnchor = $('<div/>',
-                                {
-                                    href: "#",
-                                    class: "close",
-                                    "data-dismiss": "alert",
-                                    "arial-label": "close",
-                                    html: "&times;"
-                                });
-
-                            var descriptionText = $('<span/>',
-                                {
-                                    html: $(this).attr("data-desc")
-                                });
-
-                            descriptionAlert.append(descriptionAnchor);
-                            descriptionAlert.append(descriptionText);
-                            $(this).closest(".radioCtrlDiv").append(descriptionAlert);
-                        }
-                    },
                 });
 
             var radioCtrlLabel = $('<label/>', {
-                style: "font-weight: normal; cursor:pointer;"
+                style: "font-weight: normal; cursor:pointer;",
             }).append(radioCtrl).append(radioCtrlTxt);
 
             var radioCtrlDiv = $('<div/>',
                 {
                     style: "position: relative; display: block; margin-top: 10px; margin-bottom: 5px;",
                     class: "radioCtrlDiv"
+
                 }).append(radioCtrlLabel);
+
+            radioCtrlDiv.mouseenter(function () {
+                if ($(this).find(".copo-radio-option").attr("data-desc") && !$(this).find(".copo-radio-description").length) {
+                    var descriptionDiv = $('<div/>',
+                        {
+                            style: "padding: 5px; border-left: 6px solid #D4E4ED; font-size:12px; color:#4d4d4d; max-width:400px; margin-bottom:4px; line-height:1.7;",
+                            class: "copo-radio-description",
+                        });
+
+                    descriptionDiv.append($(this).find(".copo-radio-option").attr("data-desc"));
+                    $(this).append(descriptionDiv);
+                }
+            });
+
+            radioCtrlDiv.mouseout(function () {
+                //$(this).find(".copo-radio-description").remove();
+            });
 
             radioGroup.append(radioCtrlDiv);
         }
@@ -1153,6 +1152,66 @@ var dispatchFormControl = {
         return form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
+    },
+    do_copo_resolver_ctrl: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>');
+
+        var inputGroupDiv = $('<div/>',
+            {
+                class: "input-group",
+            });
+
+        ctrlsDiv.append(inputGroupDiv);
+
+        //create input box for resolver data entry
+        var resolverDataInput = $('<input/>',
+            {
+                type: "text",
+                id: formElem.id,
+                name: formElem.id,
+                placeholder: "Enter " + formElem.label + "...",
+                class: "form-control resolver-data",
+                "data-resolve-uri": formElem.resolver_uri,
+                "data-resolve-component": formElem.resolver_component,
+                blur: function (event) {
+                    event.preventDefault();
+                    $(this).closest(".copo-form-group").find(".help-block").html("");
+                }
+            });
+
+        inputGroupDiv.append(resolverDataInput);
+
+        //create inputgroupbtnspan
+        var inputSpan = $('<span/>',
+            {
+                class: "input-group-btn",
+            });
+
+        inputGroupDiv.append(inputSpan);
+
+        //create resolver-submit button
+        var resolverSubmitBtn = $('<button/>',
+            {
+                type: "button",
+                class: "btn btn-primary resolver-submit",
+                html: "Resolve!"
+            });
+
+        inputSpan.append(resolverSubmitBtn);
+
+        //create help-block div
+        var helpDiv = $('<div/>',
+            {
+                class: "help-block",
+            });
+
+        ctrlsDiv.append(helpDiv);
+
+        return form_div_ctrl()
+            .append(form_label_ctrl(formElem.label, formElem.id))
+            .append(form_help_ctrl(formElem.help_tip))
+            .append(ctrlsDiv);
+
     },
     do_copo_button_list_ctrl_old: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>');
@@ -1300,11 +1359,6 @@ var dispatchFormControl = {
                 class: "ctrlDIV"
             });
 
-        var errorHelpDiv = $('<div/>',
-            {
-                class: "help-block with-errors"
-            });
-
         var min = 1;
         if (formElem.hasOwnProperty("min")) {
             min = formElem.min
@@ -1319,25 +1373,17 @@ var dispatchFormControl = {
                 id: formElem.id,
                 name: formElem.id,
                 value: 1,
-                keypress: function (evt) {
-                    var charCode = (evt.which) ? evt.which : evt.keyCode
-
-                    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                        $(this).closest(ctrlsDiv).find(".help-block").html('<span style="color: #a94442;">Please enter a number!</span>');
-                        $(this).val(1);
-                        return false;
-                    } else {
-                        $(this).closest(ctrlsDiv).find(".help-block").html("");
-                        return true;
-                    }
-                }
             });
 
         if (formElem.hasOwnProperty("max")) {
             counter_ctrl.attr("max", formElem.max);
         }
 
-        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append(counter_ctrl).append(errorHelpDiv);
+        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append(counter_ctrl);
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, counter_ctrl);
+        ctrlsDiv.append(vM.errorHelpDiv);
 
         return form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
@@ -1394,7 +1440,8 @@ function create_attachable_component(formElem) {
         animate: true,
         draggable: false,
         onhide: function (dialogRef) {
-            $('.popover').popover('destroy'); //hide any shown popovers
+            $(document).find(".copo-form-group").webuiPopover('destroy');
+            refresh_tool_tips();
         },
         onshown: function (dialogRef) {
             //prevent enter keypress from submitting form automatically
@@ -1453,6 +1500,9 @@ function create_attachable_component(formElem) {
                                 refresh_tool_tips();
                             }
 
+                            $(document).find(".copo-form-group").webuiPopover('destroy');
+                            refresh_tool_tips();
+
                             dialogRef.close();
                         },
                         error: function () {
@@ -1475,7 +1525,8 @@ function create_attachable_component(formElem) {
             {
                 label: 'Cancel',
                 action: function (dialogRef) {
-                    $('.popover').popover('destroy'); //hide any shown popovers
+                    $(document).find(".copo-form-group").webuiPopover('destroy');
+                    refresh_tool_tips();
                     dialogRef.close();
                 }
             },
@@ -1589,7 +1640,8 @@ function form_label_ctrl(lbl, target) {
         lblCtrl = $('<label/>',
             {
                 text: lbl,
-                for: target
+                for: target,
+                class: "control-label"
             });
     }
     return lblCtrl
@@ -1947,6 +1999,16 @@ function custom_validate(formObject) {
                         }
                     });
                 }
+
+                if (!oKFlag) {
+                    return "Not valid!";
+                }
+            },
+            phone: function ($el) {//validates for phone fields
+                var re = /^\+?(0|[1-9]\d*)$/;
+                var newValue = $el.val().trim();
+
+                var oKFlag = re.test(newValue);
 
                 if (!oKFlag) {
                     return "Not valid!";

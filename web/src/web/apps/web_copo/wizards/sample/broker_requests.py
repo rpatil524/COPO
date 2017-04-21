@@ -42,6 +42,7 @@ class BrokerRequests:
                             save_generated_samples=self.do_save_generated_samples,
                             sample_cell_update=self.do_sample_cell_update,
                             sample_name_schema=self.do_sample_name_schema,
+                            resolved_object=self.do_resolved_object,
                             )
 
         return request_dict
@@ -65,6 +66,16 @@ class BrokerRequests:
 
     def do_sample_name_schema(self):
         self.context['sample_name_schema'] = self.wizard_helper.sample_name_schema()
+
+        return self.context
+
+    def do_resolved_object(self):
+        resolved_object = self.param_dict.get("resolved_object", dict())
+
+        if resolved_object and isinstance(resolved_object, str):
+            resolved_object = ast.literal_eval(resolved_object)
+
+        self.context['component_record'] = self.wizard_helper.resolve_sample_object(resolved_object)
 
         return self.context
 

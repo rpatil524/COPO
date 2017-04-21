@@ -107,7 +107,7 @@ web/src/submission/data/*
 web/src/static/CACHE/css/**
 mongo/mongodata
 *.DS_Store
-/Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/idea/workspace.xml
+.idea/workspace.xml
 # add ignore for migrations
 0001_initial.py
 
@@ -117,3 +117,6 @@ mongo/mongodata
 web/src/static/CACHE/
 web/src/submission/data/.gitignore
 web/src/tools/reposit/aspera/AsperaConnect.app/Contents/Resources/aspera_mac_plugin/
+
+# logs
+web/src/exceptions_and_logging/logs

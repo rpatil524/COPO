@@ -1,5 +1,6 @@
 __author__ = 'etuka'
 
+import re
 import copy
 import pandas as pd
 from bson import ObjectId
@@ -7,6 +8,7 @@ from dal.copo_da import Sample
 from dal import cursor_to_list
 import web.apps.web_copo.lookup.lookup as lkup
 from django_tools.middlewares import ThreadLocal
+from converters.ena.copo_isa_ena import ISAHelpers
 import web.apps.web_copo.templatetags.html_tags as htags
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
@@ -131,6 +133,89 @@ class WizardHelper:
             sample_name_schema["unique_items"] = unique_names
 
         return sample_name_schema
+
+    def resolve_sample_object(self, resolved_object):
+        """
+        function normalises a resolved sample object to extract relevant sample attributes
+        :param resolved_object: sample object to be normalised
+        :return: the normalised object, which should conform to the sample schema
+        """
+
+        sample_object = dict(organism=dict(), characteristics=list(), comments=list())
+
+        ch = resolved_object.get("characteristics", dict())
+
+        for key in list(ch.keys()):
+            key_refined = re.findall('[a-zA-Z][^A-Z]*', key)
+            key_refined = [i.lower() for i in key_refined]
+            key_refined = ' '.join([str(i.lower()) for i in key_refined])
+            key_refined = key_refined.strip()
+
+            # each attribute can be divided into either of two buckets:
+            # characteristics; if it is ontologised, comment; if free text.
+
+            if isinstance(ch[key], list):  # attribute values are observed to be wrapped up as lists
+                for value in ch[key]:
+                    if isinstance(value, dict):
+                        if all(x in list(value.keys()) for x in ['ontologyTerms', 'text']):
+                            if isinstance(value['text'], str):
+                                material_value_dict = dict()
+
+                                category_dict = dict(annotationValue=key_refined)
+
+                                # purify category schema
+                                ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
+                                for onto in ontology_schema:
+                                    ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, onto,
+                                                                                      "ontology_annotation",
+                                                                                      category_dict)
+
+                                material_value_dict['category'] = ontology_schema
+                                value_dict = dict(annotationValue=value['text'])
+
+                                ontology_term = value['ontologyTerms'][0]  # interested only in the first entry,
+                                # ...we do recognise that there might be more than one entries here,
+                                # but selecting one will suffice
+
+                                value_dict['termAccession'] = ontology_term
+                                term_source = ''
+                                c_split = (ontology_term.split("/"))[-1]
+                                if c_split != ontology_term and c_split.split("_")[0] != c_split:
+                                    term_source = c_split.split("_")[0]
+                                value_dict['termSource'] = term_source
+
+                                # purify value schema
+                                ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
+                                for onto in ontology_schema:
+                                    ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, onto,
+                                                                                      "ontology_annotation",
+                                                                                      value_dict)
+
+                                material_value_dict['value'] = ontology_schema
+
+                                material_attribute_schema = d_utils.get_db_json_schema("material_attribute_value")
+                                for onto in material_attribute_schema:
+                                    material_attribute_schema = ISAHelpers().resolve_schema_key(
+                                        material_attribute_schema, onto,
+                                        "material_attribute_value",
+                                        material_value_dict)
+
+                                if key_refined == 'organism':  # organism entered differently
+                                    sample_object[key_refined] = material_value_dict['value']
+                                else:
+                                    sample_object['characteristics'].append(material_attribute_schema)
+                        elif all(x in list(value.keys()) for x in ['text']):
+                            if isinstance(value['text'], str):
+                                comment_schema = d_utils.get_db_json_schema("comment")
+                                for k in comment_schema:
+                                    comment_schema = ISAHelpers().resolve_schema_key(comment_schema, k,
+                                                                                     "comment",
+                                                                                     dict(name=key_refined,
+                                                                                          value=value['text']))
+
+                                sample_object['comments'].append(comment_schema)
+
+        return sample_object
 
     def resolve_object_arrays_column(self, columns):
         """

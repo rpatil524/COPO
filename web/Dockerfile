@@ -18,7 +18,7 @@ ENV PYTHONUNBUFFERED 0
 RUN mkdir /copo
 WORKDIR /copo
 
-COPY src/requirements /copo/requirements
+COPY web/src/requirements /copo/requirements
 RUN pip install -r requirements/dev.txt
 
-COPY src /copo/
+COPY web/src /copo/

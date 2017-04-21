@@ -9,7 +9,7 @@
       "items": [
         {
           "id": "number_of_samples",
-          "help_tip": "Enter number of samples",
+          "help_tip": "Enter number of samples to be described",
           "label": "Number of Samples",
           "hidden": "false",
           "required": "true",
@@ -27,11 +27,11 @@
         "parameter": ""
       },
       "title": "Sample Clone",
-      "message": "Do you want to clone an existing sample? Cloning an existing sample can speed up the description process.",
+      "message": "Do you want to clone a sample? Sample cloning is a way of bootstrapping sample description, and can help speed up the description process. If you choose to clone a sample, you will, at a later stage, be able to select a clone target from an existing sample. Alternatively, you can clone from a remote service by resolving a sample accession.",
       "items": [
         {
           "id": "confirm_sample_clone",
-          "help_tip": "Select 'Yes' if you intend to clone an existing sample",
+          "help_tip": "Please specify if you want to clone a sample",
           "label": "Clone a Sample?",
           "hidden": "false",
           "required": "true",
@@ -41,12 +41,12 @@
             {
               "value": "yes",
               "label": "Yes",
-              "description": "Select this option if you wish to clone an existing sample. You will, at a later stage, be able to select a sample to clone. "
+              "description": "Select this option if you want to clone an existing sample. "
             },
             {
               "value": "no",
               "label": "No",
-              "description": "Select this option if you do not wish to clone a sample."
+              "description": "Select this option if you do not want to clone a sample."
             }
           ]
         }
@@ -55,7 +55,7 @@
     {
       "ref": "sample_type",
       "title": "Sample Type",
-      "message": "How do want to describe your samples? Sample Type provides suitable metadata specifications for your description.",
+      "message": "How do you want to describe your samples? Sample Type provides suitable metadata specifications for your description.",
       "items": [
         {
           "id": "sample_type",
@@ -82,12 +82,33 @@
         "parameter": "confirm_sample_clone"
       },
       "title": "Clone Target",
-      "message": "Select a sample to clone from the list of samples. ",
+      "message": "How do you want to clone a sample? You can either select an existing sample record from your work profile to clone, or enter a sample accession to be resolved from a remote service. ",
       "items": [
         {
-          "id": "sample_clone",
+          "id": "sample_clone_route",
+          "help_tip": "Please specify and commit to a sample cloning method",
+          "label": "Clone Target",
+          "hidden": "false",
+          "required": "true",
+          "control": "copo-button-list",
+          "default_value": "clone_existing",
+          "option_values": [
+            {
+              "value": "clone_existing",
+              "label": "Existing Sample",
+              "description": "Select this option if you want to clone an existing sample in your work profile. Next, select the target sample from the list of samples below. <br/><span style='color:#a94442;'>Please note that this option is disabled when there are no samples in your profile.</span>"
+            },
+            {
+              "value": "clone_resolved",
+              "label": "Resolve Accession",
+              "description": "Select this option if you want to clone a sample from a remote service. Next, supply a valid and publicly available accession in the box below. <br/><span style='color:#a94442;'>Please note that this process currently only supports resolving accessions to the BioSamples database.</span>"
+            }
+          ]
+        },
+        {
+          "id": "clone_existing",
           "type": "string",
-          "help_tip": "Select sample to clone",
+          "help_tip": "Select an existing sample to clone",
           "label": "Sample",
           "hidden": "false",
           "required": "false",
@@ -102,14 +123,59 @@
               "parameter": ""
             }
           }
+        },
+        {
+          "id": "clone_resolved",
+          "type": "string",
+          "help_tip": "Enter sample accession to resolve, then click the <strong>Resolve!</strong> button",
+          "label": "Accession",
+          "hidden": "false",
+          "required": "false",
+          "control": "copo-resolver",
+          "resolver_uri": "https://www.ebi.ac.uk/biosamples/api/samples/",
+          "resolver_component": "sample"
         }
       ]
     },
     {
       "ref": "sample_name",
-      "title": "Sample Bundle",
-      "message": "Please provide information that can be used to label your samples. The <strong>Bundle Name</strong> forms the base part from which individual sample names may be derived.",
+      "title": "Proposed Sample Name",
+      "message": "How do you want to label your samples? If you have predefined sample names elsewhere, you can copy and paste them as tab or comma delimited string values in the <strong>Predefined Names</strong> box. Alternatively, you can supply a ‘bundle name’, in the <strong>Bundle Name</strong> box, that will form the base part from which individual sample names may be derived. <br/>Please note that sample names, both generated and predefined, will be validated in the next stage for uniqueness.",
       "items": [
+        {
+          "id": "sample_name_route",
+          "help_tip": "Please specify and commit to a sample naming method",
+          "label": "Specify a naming method",
+          "hidden": "false",
+          "required": "true",
+          "control": "copo-button-list",
+          "default_value": "provided_names",
+          "option_values": [
+            {
+              "value": "provided_names",
+              "label": "Predefined Names",
+              "description": "Select this option if you have predefined sample names elsewhere that you would like to use to label your samples. <br/>You will have to supply the sample names as tab or comma delimited string values."
+            },
+            {
+              "value": "bundle_name",
+              "label": "Bundle Name",
+              "description": "Select this option if you want to supply a ‘bundle name’. <br/>A bundle name forms the base part from which individual sample names will be derived."
+            }
+          ]
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "provided_names",
+          "show_in_table": true,
+          "control": "textarea",
+          "help_tip": "Enter your predefined sample names as tab or comma delimited string values in the provided text box (e.g., SMPXY_1EU,SMPXY_2EU,SMPXY_3BF).",
+          "label": "Predefined Names"
+        },
         {
           "type": "string",
           "required": "false",
@@ -120,14 +186,14 @@
           "id": "bundle_name",
           "show_in_table": true,
           "control": "text",
-          "help_tip": "A bundle name is the base part from which individual sample names may be derived.",
+          "help_tip": "Enter a bundle name. Generated names from this entry will be of the form: SMPXY_1, SMPXY_2, etc., where the 'SMPXY' part of a generated name is the entry you provide here.",
           "label": "Bundle Name"
         }
       ]
     },
     {
       "ref": "assigned_sample_name",
-      "title": "Sample Name",
+      "title": "Assigned Sample Name",
       "message": "Do you want to modify the generated sample names to better reflect individual samples in your bundle?",
       "items": [
         {
@@ -138,7 +204,7 @@
           "id": "assigned_sample_name",
           "control": "text",
           "help_tip": "Assigned sample names",
-          "label": "Sample Names"
+          "label": "Sample names"
         }
       ]
     },

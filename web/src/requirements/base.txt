@@ -4,6 +4,7 @@ botocore==1.4.76
 bs4==0.0.1
 chardet==2.3.0
 colorama==0.3.7
+configparser==3.5.0
 decorator==4.0.10
 defusedxml==0.4.1
 dict.sorted==1.0.0

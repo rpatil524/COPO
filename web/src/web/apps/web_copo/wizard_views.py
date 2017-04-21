@@ -56,6 +56,7 @@ def sample_wiz(request):
                                   number_to_generate=request.POST.get("number_to_generate", str()),
                                   column_reference=request.POST.get("column_reference", str()),
                                   bundle_name=request.POST.get("bundle_name", str()),
+                                  resolved_object=request.POST.get("resolved_object", dict()),
                                   ).post_context(request_action)
 
     out = jsonpickle.encode(context)

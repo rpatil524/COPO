@@ -1,11 +1,12 @@
 # define parameters for repositories
-import os
+from tools import resolve_env
 
 REPOSITORIES = {
     'ASPERA': {
-        'resource_path': 'tools/reposit/aspera/Aspera Connect.app/Contents/Resources/'+os.environ['ASPERA_PLUGIN_DIRECTORY']+'/',
-        'user_token': os.environ['WEBIN_USER'],
-        'password': os.environ['WEBIN_USER_PASSWORD'],
+        'resource_path': 'tools/reposit/aspera/Aspera Connect.app/Contents/Resources/' + resolve_env.get_env(
+            'ASPERA_PLUGIN_DIRECTORY') + '/',
+        'user_token': resolve_env.get_env('WEBIN_USER'),
+        'password': resolve_env.get_env('WEBIN_USER_PASSWORD'),
         'remote_path': ''
 
     },
@@ -13,27 +14,27 @@ REPOSITORIES = {
         'api': 'irods',
         'resource_path': '/tempZone/home/rods/copo-data',
         'credentials': {
-            'user_token': 'etuka',
-            'host_token': 'v0546.nbi.ac.uk',
+            'user_token': '',
+            'host_token': '',
             'program': 'python',
-            'password': 'RwvmPMC7',  # TODO: put defaults in secret_settings
+            'password': '',
             'script': 'myptest.py'
         }
     },
     'ORCID': {
         'api': 'orcid',
         'client_id': '0000-0002-4011-2520',
-        'client_secret': '634ce113-2768-40bf-a4a7-20e8fbf8aa10', # TODO: put in secret_settings
+        'client_secret': '634ce113-2768-40bf-a4a7-20e8fbf8aa10',  # TODO: put in secret_settings
         'urls': {
             'ouath/token': 'https://api.sandbox.orcid.org/oauth/token?',
             'base_url': 'https://sandbox.orcid.org',
-            'authorise_url': os.environ['ORCID_REDIRECT'],
+            'authorise_url': resolve_env.get_env('ORCID_REDIRECT'),
             'redirect': 'copo',
         }
     },
-    'ENA':{
-        'urls':{
-            'submission':{
+    'ENA': {
+        'urls': {
+            'submission': {
                 'test': 'https://www-test.ebi.ac.uk/ena/submit/drop-box/submit/',
                 'production': 'https://www.ebi.ac.uk/ena/submit/drop-box/submit/'
             }
