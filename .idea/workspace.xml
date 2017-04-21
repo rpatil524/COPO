@@ -2,41 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="completed submission view">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/copo-docker-stack.yml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mongo/Dockerfile" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/web/src/tools/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/web/src/tools/resolve_env.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/production.yml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docker-compose.yml" afterPath="$PROJECT_DIR$/docker-compose.yml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mongo/mongo-entrypoint/enpoint.sh" afterPath="$PROJECT_DIR$/mongo/mongo-entrypoint/enpoint.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nginx/Dockerfile" afterPath="$PROJECT_DIR$/nginx/Dockerfile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/copo-docker-stack.yml" afterPath="$PROJECT_DIR$/copo-docker-stack.yml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nginx/sites-enabled/django_project" afterPath="$PROJECT_DIR$/nginx/sites-enabled/django_project" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/Dockerfile" afterPath="$PROJECT_DIR$/web/Dockerfile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/requirements/base.txt" afterPath="$PROJECT_DIR$/web/src/requirements/base.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/setup/copo_social.py" afterPath="$PROJECT_DIR$/web/src/setup/copo_social.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" afterPath="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/collection_functions.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/collection_functions.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/ontology_annotation_schema.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/ontology_annotation_schema.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/person.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/person.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/sample.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/sample.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/source.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/source.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/component_navbar.html" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/component_navbar.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizard_views.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizard_views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/attributes_stages.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/attributes_stages.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/broker_requests.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/broker_requests.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/landing/index.html" afterPath="$PROJECT_DIR$/web/src/web/landing/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/settings/base.py" afterPath="$PROJECT_DIR$/web/src/web/settings/base.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/settings/data.py" afterPath="$PROJECT_DIR$/web/src/web/settings/data.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/settings/serv.py" afterPath="$PROJECT_DIR$/web/src/web/settings/serv.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -103,11 +70,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.5">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="copo-docker-stack.yml" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/copo-docker-stack.yml">
+          <file leaf-file-name="data.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/web/src/web/settings/data.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="390">
-                  <caret line="26" column="33" lean-forward="false" selection-start-line="26" selection-start-column="33" selection-end-line="26" selection-end-column="33" />
+                <state relative-caret-position="142">
+                  <caret line="23" column="69" lean-forward="true" selection-start-line="23" selection-start-column="69" selection-end-line="23" selection-end-column="69" />
                   <folding />
                 </state>
               </provider>
@@ -116,18 +83,18 @@
           <file leaf-file-name="copo_swarm_deploy.txt" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/../copo_swarm_deploy.txt">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-1451">
-                  <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+                <state relative-caret-position="507">
+                  <caret line="138" column="0" lean-forward="true" selection-start-line="138" selection-start-column="0" selection-end-line="138" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="Dockerfile" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/nginx/Dockerfile">
+          <file leaf-file-name="django_project" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/nginx/sites-enabled/django_project">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="75">
-                  <caret line="5" column="15" lean-forward="true" selection-start-line="5" selection-start-column="15" selection-end-line="5" selection-end-column="15" />
+                <state relative-caret-position="390">
+                  <caret line="46" column="34" lean-forward="false" selection-start-line="46" selection-start-column="34" selection-end-line="46" selection-end-column="34" />
                   <folding />
                 </state>
               </provider>
@@ -143,6 +110,16 @@
               </provider>
             </entry>
           </file>
+          <file leaf-file-name="enpoint.sh" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/mongo/mongo-entrypoint/enpoint.sh">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="184">
+                  <caret line="35" column="44" lean-forward="true" selection-start-line="35" selection-start-column="44" selection-end-line="35" selection-end-column="44" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
         </leaf>
       </split-first>
       <split-second>
@@ -150,8 +127,18 @@
           <file leaf-file-name="docker-compose.yml" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/docker-compose.yml">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="195">
-                  <caret line="40" column="60" lean-forward="true" selection-start-line="40" selection-start-column="60" selection-end-line="40" selection-end-column="60" />
+                <state relative-caret-position="555">
+                  <caret line="37" column="16" lean-forward="true" selection-start-line="37" selection-start-column="16" selection-end-line="37" selection-end-column="16" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="copo-docker-stack.yml" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/copo-docker-stack.yml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="75">
+                  <caret line="53" column="27" lean-forward="true" selection-start-line="53" selection-start-column="27" selection-end-line="53" selection-end-column="27" />
                   <folding />
                 </state>
               </provider>
@@ -173,7 +160,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>text-center</find>
       <find>block</find>
       <find>form_submit_btn</find>
       <find>hand</find>
@@ -203,6 +189,7 @@
       <find>print</find>
       <find>settin</find>
       <find>webp</find>
+      <find>redis</find>
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/web/src/static/copo/css</dir>
@@ -220,13 +207,11 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/.gitignore" root0="SKIP_INSPECTION" />
+    <setting file="dummy://restClient/response23.json" root0="SKIP_INSPECTION" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_publication.js" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/messages/wizard_messages.json" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_sample_2.html" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/messages/how_to.json" />
@@ -275,6 +260,9 @@
         <option value="$PROJECT_DIR$/web/src/web/settings/base.py" />
         <option value="$PROJECT_DIR$/mongo/mongo-entrypoint/enpoint.sh" />
         <option value="$PROJECT_DIR$/mongo/Dockerfile" />
+        <option value="$PROJECT_DIR$/copo-docker-stack.yml" />
+        <option value="$PROJECT_DIR$/../copo_swarm_deploy.txt" />
+        <option value="$PROJECT_DIR$/nginx/sites-enabled/django_project" />
       </list>
     </option>
   </component>
@@ -356,7 +344,57 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="nginx" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nginx" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sites-enabled" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="mongo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo-entrypoint" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -391,6 +429,374 @@
   <component name="RestClientSettings">
     <option name="REQUEST_HISTORY">
       <list>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://demo.dataverse.org" />
+          <option name="urlPath" value="/api/v1/dataverses/gkjhfhtjfjhghj" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="06745d26-1684-489d-a87b-52df9ba05375" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://demo.dataverse.org" />
+          <option name="urlPath" value="/api/v1/dataverses/" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="06745d26-1684-489d-a87b-52df9ba05375" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://demo.dataverse.org" />
+          <option name="urlPath" value="/api/v1/dataverses/" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="X-Dataverse-key" />
+                <option name="value" value="06745d26-1684-489d-a87b-52df9ba05375" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="06745d26-1684-489d-a87b-52df9ba05375" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="GET" />
+          <option name="urlBase" value="https://demo.dataverse.org" />
+          <option name="urlPath" value="/api/v1/dataverses/" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="X-Dataverse-key" />
+                <option name="value" value="06745d26-1684-489d-a87b-52df9ba05375" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://demo.dataverse.org" />
+          <option name="urlPath" value="/api/v1/dataverses/" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="X-Dataverse-key" />
+                <option name="value" value="06745d26-1684-489d-a87b-52df9ba05375" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="http://demo.dataverse.org" />
+          <option name="urlPath" value="/api/v1/dataverses/" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="X-Dataverse-key" />
+                <option name="value" value="06745d26-1684-489d-a87b-52df9ba05375" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://apitest.dataverse.org" />
+          <option name="urlPath" value="/api/v1/dataverses/" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="06745d26-1684-489d-a87b-52df9ba05375" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://apitest.dataverse.org" />
+          <option name="urlPath" value="/api/v1/dataverses" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="06745d26-1684-489d-a87b-52df9ba05375" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://apitest.dataverse.org" />
+          <option name="urlPath" value="/api/v1/dataverses" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="X-Dataverse-key" />
+                <option name="value" value="06745d26-1684-489d-a87b-52df9ba05375" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://apitest.dataverse.org" />
+          <option name="urlPath" value="/api/v1/dataverses" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="Accept" />
+                <option name="value" value="*/*" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="Cache-Control" />
+                <option name="value" value="no-cache" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="Authorization" />
+                <option name="value" value="Basic ZnNoYXc6TG9nYW5iZXJyeTIwMjk=" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="facilityid" />
+                <option name="value" value="3" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="status" />
+                <option name="value" value="1" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
         <RestClientRequest>
           <option name="biscuits">
             <list>
@@ -1074,28 +1480,28 @@
     <frame x="-1919" y="-94" width="1920" height="1057" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14483494" sideWeight="0.49182117" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25181347" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.42279792" sideWeight="0.51710653" order="9" side_tool="true" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33678755" sideWeight="0.5042598" order="9" side_tool="true" content_ui="tabs" />
+      <window_info id="REST Client" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33678755" sideWeight="0.49574015" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32885906" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24920128" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32885906" sideWeight="0.49767134" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32887402" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14483494" sideWeight="0.49182117" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25181347" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24920128" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12552084" sideWeight="0.50817883" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4229692" sideWeight="0.48289344" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="REST Client" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3378076" sideWeight="0.49773464" order="13" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32885906" sideWeight="0.49767134" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Mongo Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2785235" sideWeight="0.49767134" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4229692" sideWeight="0.48289344" order="3" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1334,13 +1740,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nginx/sites-enabled/django_project">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="4" lean-forward="false" selection-start-line="10" selection-start-column="4" selection-end-line="13" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/rest_urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
@@ -1369,14 +1768,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/settings/data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="23" column="19" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Documents/dev/environments/django10/lib/python3.4/site-packages/chunked_upload/settings.py" />
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js">
       <provider selected="true" editor-type-id="text-editor">
@@ -1401,7 +1792,7 @@
         <state relative-caret-position="210">
           <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding>
-            <element signature="e#72#81#0" expanded="true" />
+            <element signature="e#72#81#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1435,7 +1826,7 @@
         <state relative-caret-position="165">
           <caret line="11" column="90" lean-forward="false" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="90" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#9#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1453,7 +1844,7 @@
         <state relative-caret-position="435">
           <caret line="33" column="0" lean-forward="false" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
           <folding>
-            <element signature="e#25#39#0" expanded="true" />
+            <element signature="e#25#39#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1463,23 +1854,23 @@
         <state relative-caret-position="390">
           <caret line="26" column="39" lean-forward="false" selection-start-line="26" selection-start-column="39" selection-end-line="26" selection-end-column="39" />
           <folding>
-            <element signature="e#49#78#0" expanded="true" />
+            <element signature="e#49#78#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mongo/mongo-entrypoint/enpoint.sh">
+    <entry file="file://$PROJECT_DIR$/../swarm_deploy.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="35" column="44" lean-forward="true" selection-start-line="35" selection-start-column="44" selection-end-line="35" selection-end-column="44" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/docker-compose.yml">
+    <entry file="file://$PROJECT_DIR$/nginx/Dockerfile">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="40" column="60" lean-forward="true" selection-start-line="40" selection-start-column="60" selection-end-line="40" selection-end-column="60" />
+        <state relative-caret-position="75">
+          <caret line="5" column="15" lean-forward="true" selection-start-line="5" selection-start-column="15" selection-end-line="5" selection-end-column="15" />
           <folding />
         </state>
       </provider>
@@ -1492,34 +1883,50 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../swarm_deploy.txt">
+    <entry file="file://$PROJECT_DIR$/mongo/mongo-entrypoint/enpoint.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="184">
+          <caret line="35" column="44" lean-forward="true" selection-start-line="35" selection-start-column="44" selection-end-line="35" selection-end-column="44" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../copo_swarm_deploy.txt">
+    <entry file="file://$PROJECT_DIR$/web/src/web/settings/data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1451">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="142">
+          <caret line="23" column="69" lean-forward="true" selection-start-line="23" selection-start-column="69" selection-end-line="23" selection-end-column="69" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/copo-docker-stack.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="33" lean-forward="false" selection-start-line="26" selection-start-column="33" selection-end-line="26" selection-end-column="33" />
+        <state relative-caret-position="75">
+          <caret line="53" column="27" lean-forward="true" selection-start-line="53" selection-start-column="27" selection-end-line="53" selection-end-column="27" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nginx/Dockerfile">
+    <entry file="file://$PROJECT_DIR$/docker-compose.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="15" lean-forward="true" selection-start-line="5" selection-start-column="15" selection-end-line="5" selection-end-column="15" />
+        <state relative-caret-position="555">
+          <caret line="37" column="16" lean-forward="true" selection-start-line="37" selection-start-column="16" selection-end-line="37" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../copo_swarm_deploy.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="507">
+          <caret line="138" column="0" lean-forward="true" selection-start-line="138" selection-start-column="0" selection-end-line="138" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nginx/sites-enabled/django_project">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="46" column="34" lean-forward="false" selection-start-line="46" selection-start-column="34" selection-end-line="46" selection-end-column="34" />
           <folding />
         </state>
       </provider>

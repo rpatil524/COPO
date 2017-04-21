@@ -22,6 +22,8 @@ services:
       SECRET_KEY_FILE: "/run/secrets/copo_web_secret_key"
       MEDIA_PATH: "media/"
       DEBUG: "false"
+      REDIS_HOST: "copo-redis"
+      REDIS_PORT: "6379"
       ASPERA_PLUGIN_DIRECTORY: "aspera_linux_plugin"
       MONGO_USER: "copo_user"
       MONGO_USER_PASSWORD_FILE: "/run/secrets/copo_mongo_user_password"
@@ -66,9 +68,6 @@ services:
         condition: on-failure
   copo-redis:
     image: redis:alpine
-    environment:
-      REDIS_HOST: "copo-redis"
-      REDIS_PORT: "6379"
     networks:
       - copo-frontend-network
     deploy:
