@@ -1,6 +1,6 @@
 # settings for services e.g. postgres, mongo, redis, irods...
 
-import pymongo
+from pymongo import MongoClient
 from tools import resolve_env
 
 # settings for postgres
@@ -22,10 +22,14 @@ MONGO_USER = resolve_env.get_env('MONGO_USER')
 MONGO_USER_PASSWORD = resolve_env.get_env('MONGO_USER_PASSWORD')
 MONGO_PORT = int(resolve_env.get_env('MONGO_PORT'))
 MONGO_MAX_POOL_SIZE = int(resolve_env.get_env('MONGO_MAX_POOL_SIZE'))
-uri = 'mongodb://' + MONGO_USER + ':' + MONGO_USER_PASSWORD + '@' + MONGO_HOST
+
 
 # this is the global DB connection, either use get_collection_ref in dal.mongo_util.py or refer to this setting
-MONGO_CLIENT = pymongo.MongoClient(uri, maxPoolSize=MONGO_MAX_POOL_SIZE)[MONGO_DB]
+MONGO_CLIENT = MongoClient(host=MONGO_HOST, maxPoolSize=MONGO_MAX_POOL_SIZE)[MONGO_DB]
+MONGO_CLIENT.authenticate(MONGO_USER, MONGO_USER_PASSWORD, source='admin')
+
+# uri = 'mongodb://' + MONGO_USER + ':' + MONGO_USER_PASSWORD + '@' + MONGO_HOST
+# MONGO_CLIENT = pymongo.MongoClient(uri, maxPoolSize=MONGO_MAX_POOL_SIZE)[MONGO_DB]
 
 
 # settings for redis

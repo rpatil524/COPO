@@ -1,7 +1,6 @@
 __author__ = 'felixshaw'
 import pymongo
 from bson import ObjectId
-from pymongo import MongoClient
 
 from django.conf import settings
 
