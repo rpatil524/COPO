@@ -52,7 +52,7 @@ services:
       GOOGLE_SECRET_FILE: "/run/secrets/copo_google_secret_key"
       TWITTER_SECRET_FILE: "/run/secrets/copo_twitter_secret_key"
       FACEBOOK_SECRET_FILE: "/run/secrets/copo_facebook_secret_key"
-    command: bash -c "python manage.py makemigrations rest && python manage.py makemigrations chunked_upload && python manage.py makemigrations && python manage.py migrate && sh /copo/setup/copo_social.sh && /usr/local/bin/gunicorn web.wsgi:application -w 4 -t 1000 -b :8000"
+    command: bash -c "python manage.py makemigrations rest && python manage.py makemigrations chunked_upload && python manage.py makemigrations && python manage.py migrate && python /copo/social.py && /usr/local/bin/gunicorn web.wsgi:application -w 4 -t 1000 -b :8000"
   copo-nginx:
     image: tonietuk/copo-nginx
     ports:

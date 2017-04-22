@@ -14,7 +14,7 @@ web:
   env_file: .env
   environment:
     DEBUG: 'false'
-  command: bash -c "python manage.py makemigrations rest && python manage.py makemigrations chunked_upload && python manage.py makemigrations && python manage.py migrate && python /copo/setup/copo_social.py && /usr/local/bin/gunicorn web.wsgi:application -w 4 -t 1000 -b :8000"
+  command: bash -c "python manage.py makemigrations rest && python manage.py makemigrations chunked_upload && python manage.py makemigrations && python manage.py migrate && python /copo/social.py && /usr/local/bin/gunicorn web.wsgi:application -w 4 -t 1000 -b :8000"
 
 nginx:
   container_name: copo-nginx
