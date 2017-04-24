@@ -10,7 +10,7 @@ server {
 
     location /static {
         autoindex off;
-        alias /copo/static/;
+        alias /www/static/;
     }
 
     location /copo {
