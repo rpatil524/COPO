@@ -16,7 +16,7 @@ def main():
     cursor = None
 
     try:
-        print("Connecting to database...\n ->%s" % (conn_string))
+        print("Connecting to database...")
         conn = psycopg2.connect(conn_string)
 
         cursor = conn.cursor()
