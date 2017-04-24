@@ -1,4 +1,4 @@
-import ast
+import json
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -152,7 +152,7 @@ def copo_visualize(request):
                                    profile_id=profile_id,
                                    component=request.POST.get("component", str()),
                                    target_id=request.POST.get("target_id", str()),
-                                   datafile_ids=ast.literal_eval(request.POST.get("datafile_ids", "[]"))
+                                   datafile_ids=json.loads(request.POST.get("datafile_ids", "[]"))
                                    )
 
     task_dict = dict(table_data=broker_visuals.do_table_data,
@@ -187,8 +187,8 @@ def copo_forms(request):
                          profile_id=profile_id,
                          component=request.POST.get("component", str()),
                          target_id=request.POST.get("target_id", str()),
-                         target_ids=ast.literal_eval(request.POST.get("target_ids", "[]")),
-                         datafile_ids=ast.literal_eval(request.POST.get("datafile_ids", "[]")),
+                         target_ids=json.loads(request.POST.get("target_ids", "[]")),
+                         datafile_ids=json.loads(request.POST.get("datafile_ids", "[]")),
                          auto_fields=request.POST.get("auto_fields", dict()),
                          visualize=request.POST.get("visualize", str()),
                          id_handle=request.POST.get("id_handle", str()),

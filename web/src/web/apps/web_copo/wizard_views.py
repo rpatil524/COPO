@@ -1,6 +1,6 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 22/09/15'
-import ast
 
+import json
 import jsonpickle
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -16,8 +16,8 @@ def data_wiz(request):
     context = dict()
     request_action = request.POST.get("request_action", str())
 
-    description_targets = ast.literal_eval(request.POST.get("description_targets", "[]"))
-    description_bundle = ast.literal_eval(request.POST.get("description_bundle", "[]"))
+    description_targets = json.loads(request.POST.get("description_targets", "[]"))
+    description_bundle = json.loads(request.POST.get("description_bundle", "[]"))
 
     if description_bundle:
         request.session['description_bundle'] = description_bundle
@@ -42,8 +42,8 @@ def sample_wiz(request):
     context = dict()
     request_action = request.POST.get("request_action", str())
 
-    generated_samples = ast.literal_eval(request.POST.get("generated_samples", "[]"))
-    target_rows = ast.literal_eval(request.POST.get("target_rows", "[]"))
+    generated_samples = json.loads(request.POST.get("generated_samples", "[]"))
+    target_rows = json.loads(request.POST.get("target_rows", "[]"))
 
     context = samp.BrokerRequests(context=context,
                                   generated_samples=generated_samples,

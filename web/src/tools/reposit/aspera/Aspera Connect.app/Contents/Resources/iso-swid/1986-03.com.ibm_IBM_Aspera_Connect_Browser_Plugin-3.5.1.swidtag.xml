@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SoftwareIdentity name="IBM Aspera Connect Browser Plugin" uniqueId="f1f27dac4bd24067b289f65dd73fe5e5-3.5.1" version="3.5.1" versionScheme="multipartnumeric" xmlns="http://standards.iso.org/iso/19770/-2/2014-CD1/schema.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://standards.iso.org/iso/19770/-2/2014-CD1/schema.xsd swid.xsd">
+    <Meta persistentId="f1f27dac4bd24067b289f65dd73fe5e5"/>
+    <Meta taxonomyCode="SSBQKT"/>
+    <Meta taggingProcess="4-1-20140704"/>
+    <Entity name="IBM" regid="regid.1986-03.com.ibm" role="licensor publisher tagcreator"/>
+</SoftwareIdentity>

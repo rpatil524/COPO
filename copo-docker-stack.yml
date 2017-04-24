@@ -10,7 +10,7 @@ services:
     deploy:
       placement:
         constraints: [node.hostname == copo-1]
-      replicas: 1
+      replicas: 4
       update_config:
         parallelism: 1
         delay: 10s
@@ -27,6 +27,8 @@ services:
       - copo_orcid_secret_key
       - copo_figshare_client_secret_key
       - copo_figshare_consumer_secret_key
+      - copo_webin_user
+      - copo_webin_user_password
     environment:
       SECRET_KEY_FILE: "/run/secrets/copo_web_secret_key"
       MEDIA_PATH: "media/"
@@ -34,6 +36,8 @@ services:
       REDIS_HOST: "copo-redis"
       REDIS_PORT: "6379"
       ASPERA_PLUGIN_DIRECTORY: "aspera_linux_plugin"
+      WEBIN_USER_FILE: "/run/secrets/copo_webin_user"
+      WEBIN_USER_PASSWORD_FILE:  "/run/secrets/copo_webin_user_password"
       MONGO_USER: "copo_user"
       MONGO_USER_PASSWORD_FILE: "/run/secrets/copo_mongo_user_password"
       MONGO_DB: "copo_mongo"
@@ -113,6 +117,7 @@ services:
     deploy:
       placement:
         constraints: [node.hostname == copo-1]
+
       replicas: 1
       update_config:
         parallelism: 1
@@ -135,8 +140,11 @@ networks:
 
 volumes:
   copo-web-data:
+    external: true
   copo-mongo-data:
+    external: true
   copo-postgres-data:
+    external: true
 
 secrets:
   copo_mongo_initdb_root_password:

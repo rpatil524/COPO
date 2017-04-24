@@ -1,7 +1,7 @@
 __author__ = 'etuka'
 __date__ = '21 Nov 2016'
 
-import ast
+import json
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 import web.apps.web_copo.wizards.sample.wizard_helper as wizh
@@ -21,17 +21,17 @@ class BrokerRequests:
         self.auto_fields = self.param_dict.get("auto_fields", dict())
 
         if self.auto_fields and isinstance(self.auto_fields, str):
-            self.auto_fields = ast.literal_eval(self.auto_fields)
+            self.auto_fields = json.loads(self.auto_fields)
 
         self.update_metadata = self.param_dict.get("update_metadata", dict())
 
         if self.update_metadata and isinstance(self.update_metadata, str):
-            self.update_metadata = ast.literal_eval(self.update_metadata)
+            self.update_metadata = json.loads(self.update_metadata)
 
         self.initial_sample_attributes = self.param_dict.get("initial_sample_attributes", dict())
 
         if self.initial_sample_attributes and isinstance(self.initial_sample_attributes, str):
-            self.initial_sample_attributes = ast.literal_eval(self.initial_sample_attributes)
+            self.initial_sample_attributes = json.loads(self.initial_sample_attributes)
 
         # instance of wizard helper for handling request actions
         self.wizard_helper = wizh.WizardHelper()
@@ -73,7 +73,7 @@ class BrokerRequests:
         resolved_object = self.param_dict.get("resolved_object", dict())
 
         if resolved_object and isinstance(resolved_object, str):
-            resolved_object = ast.literal_eval(resolved_object)
+            resolved_object = json.loads(resolved_object)
 
         self.context['component_record'] = self.wizard_helper.resolve_sample_object(resolved_object)
 
