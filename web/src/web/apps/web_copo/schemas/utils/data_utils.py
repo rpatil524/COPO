@@ -116,6 +116,10 @@ def get_figshare_category_options():
     return output
 
 
+def get_dataverse_subject_dropdown():
+    return lookup.DROP_DOWNS['DATAVERSE_SUBJECTS']
+
+
 def get_figshare_article_options():
     return lookup.DROP_DOWNS['FIGSHARE_ARTICLE_TYPES']
 
@@ -402,7 +406,8 @@ def get_copo_schema(component, as_object=False):
         hydroponics=schema_base.get('miappe').get('nutrients').get('hydroponics').get('fields', list()),
         soil=schema_base.get('miappe').get('nutrients').get('soil').get('fields', list()),
         phenotypic_variables=schema_base.get("miappe").get("phenotypic_variables").get("fields", list()),
-        environment_variables=schema_base.get("miappe").get("environment_variables").get("fields", list())
+        environment_variables=schema_base.get("miappe").get("environment_variables").get("fields", list()),
+        dataverse=schema_base.get("dcterms").get("fields", list())
     )
 
     schema = schema_dict.get(component, list())

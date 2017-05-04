@@ -168,3 +168,12 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 48 * 60 * 60  #
 
 SITE_ID = 1
+
+DATAVERSE = {
+    "TEST_DATAVERSE_API_URL": "https://apitest.dataverse.org//api/v1",
+    "TEST_DATAVERSE_SERVICE": "/dvn/api/data-deposit/v1.1/swordv2/",
+    "TEST_DATAVERSE_API_TOKEN": "06745d26-1684-489d-a87b-52df9ba05375",
+    "HARVARD_TOKEN": "ea9a511b-d8ae-49ee-9614-9fe131dd8f5f",
+    "HARVARD_TEST_API": "demo.dataverse.org",
+    "HARVARD_TEST_TOKEN": "227bc74d-088f-423f-8f49-d8503f62f7de"
+}

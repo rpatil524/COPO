@@ -20,5 +20,6 @@ WORKDIR /copo
 
 COPY src/requirements /copo/requirements
 RUN pip install -r requirements/dev.txt
+RUN pip install -e git+https://github.com/IQSS/dataverse-client-python.git#egg=dataverse
 
 COPY src /copo/

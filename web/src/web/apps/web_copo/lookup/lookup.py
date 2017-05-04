@@ -299,6 +299,64 @@ DROP_DOWNS = {
         }
 
     ],
+    "DATAVERSE_SUBJECTS": [
+        {
+            'value': 'Arts and Humanities',
+            'label': 'Arts and Humanities',
+        },
+        {
+            'value': 'Computer and Information Science',
+            'label': 'Computer and Information Science',
+        },
+        {
+            'value': 'Law',
+            'label': 'Law',
+        },
+        {
+            'value': 'Engineering',
+            'label': 'Engineering',
+        },
+        {
+            'value': 'Social Sciences',
+            'label': 'Social Sciences',
+        },
+        {
+            'value': 'Medicine, Health and Life Sciences',
+            'label': 'Medicine, Health and Life Sciences',
+        },
+        {
+            'value': 'Agricultural Sciences',
+            'label': 'Agricultural Sciences',
+        },
+        {
+            'value': 'Astronomy and Astrophysics',
+            'label': 'Astronomy and Astrophysics',
+        },
+        {
+            'value': 'Business and Management',
+            'label': 'Business and Management',
+        },
+        {
+            'value': 'Chemistry',
+            'label': 'Chemistry',
+        },
+        {
+            'value': 'Earth and Environmental Sciences',
+            'label': 'Earth and Environmental Sciences',
+        },
+        {
+            'value': 'Mathematical Sciences',
+            'label': 'Mathematical Sciences',
+        },
+        {
+            'value': 'Physics',
+            'label': 'Physics',
+        },
+        {
+            'value': 'Other',
+            'label': 'Other',
+        }
+    ],
     "LICENSE_TYPES": [
         {
             'value': 'Apache-2.0',
@@ -352,6 +410,10 @@ DROP_DOWNS = {
             'value': 'miappe',
             'label': 'MIAPPE Compliant'
         },
+        {
+            'value': 'dcterms',
+            'label': 'Dataverse'
+        }
         # {
         #     'value': 'MetaboLights',
         #     'label': 'MetaboLights'
@@ -636,7 +698,8 @@ WIZARD_FILES = {
     'figshare': os.path.join(RESOLVER['wizards_datafile'], 'figshare_stages.json'),
     'miappe': os.path.join(RESOLVER['wizards_datafile'], 'miappe_stages.json'),
     'sample_start': os.path.join(RESOLVER['wizards_sample'], 'start_stages.json'),
-    'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json')
+    'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json'),
+    'dcterms': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#

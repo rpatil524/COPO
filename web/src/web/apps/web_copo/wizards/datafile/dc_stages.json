@@ -1,0 +1,111 @@
+{
+  "title": "MIAPPE Experiment (Minimum Information About Plant Phenotyping Experiments)",
+  "description": "Configuration for MIAPPE Phenotyping experiments",
+  "properties": [
+    {
+      "ref": "title_author_contributor",
+      "title": "Contacts",
+      "message": "",
+      "items": [
+        {
+          "type": "string",
+          "required": "true",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:title",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "dcterms:title"
+          ],
+          "help_tip": "Enter a name for this item.",
+          "label": "Title"
+        },
+        {
+          "type": "string",
+          "required": "true",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:author",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "dcterms:author"
+          ],
+          "help_tip": "Enter an author for this item. (Lastname/Firstname)",
+          "label": "Author (Lastname / Firstname)"
+        },
+        {
+          "type": "string",
+          "required": "true",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:contributor",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "dcterms:contributor"
+          ],
+          "help_tip": "Enter a contact email address for this item.",
+          "label": "Contributor Email"
+        }
+      ]
+    },
+    {
+      "ref": "subject_description",
+      "title": "Description",
+      "message": "",
+      "items": [
+        {
+          "type": "string",
+          "required": "true",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:description",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "dcterms:description"
+          ],
+          "help_tip": "Describe the purpose, scope or nature of this item.",
+          "label": "Description"
+        },
+        {
+          "type": "string",
+          "required": "true",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:subject",
+          "show_in_table": true,
+          "control": "select",
+          "option_values": {
+            "callback": {
+              "function": "get_dataverse_subject_dropdown",
+              "parameter": ""
+            }
+          },
+          "versions": [
+            "dcterms:subject"
+          ],
+          "help_tip": "Enter subject from dropdown.",
+          "label": "Subject"
+        }
+      ]
+    }
+  ]
+}

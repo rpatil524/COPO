@@ -475,8 +475,28 @@ class Profile(DAComponent):
         # trigger after save actions
         if not kwargs.get("target_id", str()):
             Person(profile_id=str(rec["_id"])).create_sra_person()
-
         return rec
+
+
+    def add_dataverse_details(self, profile_id, dataverse):
+        dv_obj = {'alias': dataverse.alias, 'title' :dataverse.title, 'is_published': dataverse.is_published}
+        handle_dict['profile'].update_one({'_id': ObjectId(profile_id)}, {'$set':{'dataverse': dv_obj}})
+
+
+    def check_for_dataverse_details(self, profile_id):
+        p = self.get_record(ObjectId(profile_id))
+        if 'dataverse' in p:
+            return p['dataverse']
+
+    def add_dataverse_dataset_details(self, profile_id, dataset):
+        ds_object = {'doi': dataset.doi, 'title': dataset.title}
+        handle_dict['profile'].update_one({'_id': ObjectId(profile_id)}, {'$set' : {'dataverse.dataset': ds_object}})
+
+    def check_for_dataset_details(self, profile_id):
+        p = self.get_record(ObjectId(profile_id))
+        if 'dataverse' in p:
+            if 'dataset' in p['dataverse']:
+                return p['dataverse']['dataset']
 
 
 class RemoteDataFile:

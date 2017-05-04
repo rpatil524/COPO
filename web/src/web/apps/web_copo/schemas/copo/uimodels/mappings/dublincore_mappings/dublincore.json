@@ -1,0 +1,103 @@
+{
+  "configuration": {
+    "type": "json",
+    "provider": "copo",
+    "ref": ""
+  },
+  "title": "Dublin core mappings",
+  "description": "Dublin Core fields",
+  "properties": [
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "title"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Title",
+      "show_in_form": true,
+      "id": "copo.dcterms.title",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text"
+    },
+
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "creator"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Author (Lastname, Firstname)",
+      "show_in_form": true,
+      "id": "copo.dcterms.creator",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "subject"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Subject or Keywords",
+      "show_in_form": true,
+      "id": "copo.dcterms.subject",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "description"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Description",
+      "show_in_form": true,
+      "id": "copo.dcterms.description",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "contributor"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Description",
+      "show_in_form": true,
+      "id": "copo.dcterms.contributor",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text"
+    }
+
+  ]
+}

@@ -1,1 +1,137 @@
-{"configuration": {"type": "json", "provider": "copo", "ref": ""}, "properties": [{"help_tip": "Enter the title of the profile. This will appear in submissions of research objects, associated with this profile, to remote repositories.", "required": "true", "default_value": "", "control_meta": {}, "versions": ["title"], "ref": "", "deprecated": false, "hidden": "false", "label": "Title", "show_in_form": true, "id": "copo.profile.title", "type": "string", "show_in_table": true, "control": "text"}, {"help_tip": "Enter a description for this profile.", "required": "true", "default_value": "", "control_meta": {}, "versions": ["description"], "ref": "", "deprecated": false, "hidden": "false", "label": "Description", "show_in_form": true, "id": "copo.profile.description", "type": "string", "show_in_table": true, "control": "textarea"}, {"help_tip": "", "required": "true", "default_value": "", "control_meta": {}, "versions": ["date_created"], "ref": "", "deprecated": false, "hidden": "true", "label": "Created", "show_in_form": false, "id": "copo.profile.date_created", "type": "string", "show_in_table": true, "control": "datetime"}, {"help_tip": "", "required": "true", "default_value": "", "control_meta": {}, "versions": ["date_modified"], "ref": "", "deprecated": false, "hidden": "true", "label": "Modified", "show_in_form": false, "id": "copo.profile.date_modified", "type": "string", "show_in_table": true, "control": "datetime"}, {"help_tip": "", "required": "true", "default_value": "", "control_meta": {}, "versions": ["copo_id"], "ref": "", "deprecated": false, "hidden": "true", "label": "COPO ID", "show_in_form": false, "id": "copo.profile.copo_id", "type": "string", "show_in_table": false, "control": "text"}, {"help_tip": "", "required": "true", "default_value": "", "control_meta": {}, "versions": ["user_id"], "ref": "", "deprecated": false, "hidden": "true", "label": "User ID", "show_in_form": false, "id": "copo.profile.user_id", "type": "string", "show_in_table": false, "control": "text"}, {"help_tip": "", "required": "true", "default_value": "", "control_meta": {}, "versions": ["deleted"], "ref": "", "deprecated": false, "hidden": "true", "label": "Delete", "show_in_form": false, "id": "copo.profile.deleted", "type": "string", "show_in_table": false, "control": "text"}], "description": "Attributes for COPO Profile schema.", "title": "Profile mappings"}
+{
+  "configuration": {
+    "type": "json",
+    "provider": "copo",
+    "ref": ""
+  },
+  "properties": [
+    {
+      "help_tip": "Enter the title of the profile. This will appear in submissions of research objects, associated with this profile, to remote repositories.",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "title"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Title",
+      "show_in_form": true,
+      "id": "copo.profile.title",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text"
+    },
+    {
+      "help_tip": "Enter a description for this profile.",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "description"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Description",
+      "show_in_form": true,
+      "id": "copo.profile.description",
+      "type": "string",
+      "show_in_table": true,
+      "control": "textarea"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "date_created"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "true",
+      "label": "Created",
+      "show_in_form": false,
+      "id": "copo.profile.date_created",
+      "type": "string",
+      "show_in_table": true,
+      "control": "datetime"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "date_modified"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "true",
+      "label": "Modified",
+      "show_in_form": false,
+      "id": "copo.profile.date_modified",
+      "type": "string",
+      "show_in_table": true,
+      "control": "datetime"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "copo_id"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "true",
+      "label": "COPO ID",
+      "show_in_form": false,
+      "id": "copo.profile.copo_id",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "user_id"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "true",
+      "label": "User ID",
+      "show_in_form": false,
+      "id": "copo.profile.user_id",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "deleted"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "true",
+      "label": "Delete",
+      "show_in_form": false,
+      "id": "copo.profile.deleted",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text"
+    }
+  ],
+  "description": "Attributes for COPO Profile schema.",
+  "title": "Profile mappings"
+}
