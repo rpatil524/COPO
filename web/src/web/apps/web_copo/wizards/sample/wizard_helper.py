@@ -70,6 +70,7 @@ class WizardHelper:
         return wizard_stages
 
     def save_initial_samples(self, generated_samples, sample_type, initial_sample_attributes):
+
         bulk = Sample().get_collection_handle().initialize_unordered_bulk_op()
 
         # form record template, for first item in generated_sample
