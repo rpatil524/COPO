@@ -4,8 +4,8 @@ from dal.mongo_util import get_collection_ref
 
 OAuthCollectionName = 'OAuthToken'
 
-class OAuthToken:
 
+class OAuthToken:
     def __init__(self):
         self.OAuthToken = get_collection_ref('OAuthToken')
 
@@ -15,3 +15,14 @@ class OAuthToken:
             return doc
         else:
             return False
+
+    def cyverse_get_token(self, user):
+        doc = self.OAuthToken.find_one({'service': 'cyverse', 'user': user})
+        if doc:
+            return doc
+        else:
+            return False
+
+    def cyverse_save_token(self, user, token):
+        return self.OAuthToken.insert({'service': 'cyverse', 'user': user, 'token': token})
+
