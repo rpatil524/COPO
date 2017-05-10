@@ -15,6 +15,13 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
+      resources:
+        limits:
+          cpus: '0.4'
+          memory: 1G
+        reservations:
+          cpus: '0.4'
+          memory: 1G
     secrets:
       - copo_mongo_initdb_root_password
       - copo_mongo_user_password
@@ -39,6 +46,13 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
+      resources:
+        limits:
+          cpus: '0.4'
+          memory: 1G
+        reservations:
+          cpus: '0.4'
+          memory: 1G
     secrets:
       - copo_postgres_user_password
     environment:
@@ -58,6 +72,13 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
+        reservations:
+          cpus: '0.3'
+          memory: 512M
   copo-web:
     image: tonietuk/copo-web
     volumes:
@@ -75,6 +96,13 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 4G
     secrets:
       - copo_web_secret_key
       - copo_postgres_user_password
@@ -134,6 +162,13 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
+      resources:
+        limits:
+          cpus: '0.4'
+          memory: 1G
+        reservations:
+          cpus: '0.4'
+          memory: 1G
     secrets:
       - copo-project.crt
       - copo-project.key
