@@ -2,7 +2,7 @@ import ast
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, redirect
 from django.template import RequestContext
 from jsonpickle import encode
 from submission.submissionDelegator import delegate_submission
@@ -10,6 +10,7 @@ from dal.orcid_da import Orcid
 from api.handlers.general import *
 from django_tools.middlewares import ThreadLocal
 from dal.copo_da import ProfileInfo, Profile, Submission
+from dal.OAuthTokens import OAuthToken
 from dal.broker_da import BrokerDA, BrokerVisuals
 from .lookup.lookup import HTML_TAGS
 from exceptions_and_logging.logger import Logtype, Loglvl
@@ -18,6 +19,8 @@ from django.conf import settings
 from allauth.account.forms import LoginForm
 from dal.copo_da import Annotation
 from bson import json_util as j
+import requests
+from rauth import OAuth2Service
 
 LOGGER = settings.LOGGER
 
@@ -135,10 +138,11 @@ def copo_samples(request, profile_id):
 
 
 @login_required
-def copo_data(request, profile_id):
+def copo_data(request, profile_id, cyverse_file_data=None):
+    request.session['datafile_url'] = request.path
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
-    return render(request, 'copo/copo_data.html', {'profile_id': profile_id, 'profile': profile})
+    return render(request, 'copo/copo_data.html', {'profile_id': profile_id, 'profile': profile, 'cyverse_files': cyverse_file_data})
 
 
 @login_required
@@ -300,3 +304,72 @@ def view_oauth_tokens(request):
 def annotate_data(request):
     doc = Annotation().get_record(request.POST.get('target_id'))
     return HttpResponse(j.dumps(doc))
+
+
+def load_cyverse_files(request, url, token):
+
+    # get file data and pass to copo_data view
+    url_filesystem = 'https://agave.iplantc.org/terrain/v2/secured/filesystem/directory?path=/iplant/home/shared'
+    headers = {"Authorization": "Bearer " + token['token']['access_token']}
+    cvd = requests.get(url_filesystem, headers=headers)
+    cyverse_data = json.loads(cvd.content.decode('utf-8'))
+    fnames = list()
+    for el in cyverse_data['folders']:
+        fnames.append({'text': el['label']})
+    return copo_data(request, request.session['profile_id'], json.dumps(fnames))
+
+def agave_oauth(request):
+
+    # check for token
+    token = OAuthToken().cyverse_get_token(request.user.id)
+    if token:
+        # get token and pass
+        url = request.path
+        return load_cyverse_files(request, url, token)
+    else:
+
+        service = OAuth2Service(
+            name='copo_api',
+            client_id='KOm9gFBPVwq6sfCMgumZRJG5j8wa',
+            client_secret='gAnX96MinyBfZ_gsvkr0nEDLpR8a',
+            access_token_url='https://agave.iplantc.org/oauth2/token',
+            authorize_url='https://agave.iplantc.org/oauth2/authorize',
+            base_url='https://agave.iplantc.org/oauth2/')
+
+        # the return URL is used to validate the request
+        params = {'redirect_uri': 'http://127.0.0.1:8000/copo/agave_oauth',
+                  'response_type': 'code'}
+        if not 'code' in request.GET:
+            # save url for initial page
+
+            url = service.get_authorize_url(**params)
+            return redirect(url)
+        else:
+
+            # once the above URL is consumed by a client we can ask for an access
+            # token. note that the code is retrieved from the redirect URL above,
+            # as set by the provider
+            code = request.GET['code']
+
+            params = {
+                "grant_type": "authorization_code",
+                "code": code,
+                "client_id": "KOm9gFBPVwq6sfCMgumZRJG5j8wa",
+                "client_secret": "gAnX96MinyBfZ_gsvkr0nEDLpR8a",
+                "redirect_uri": "http://127.0.0.1:8000/copo/agave_oauth"
+            }
+
+            r = requests.post("https://agave.iplantc.org/oauth2/token", data=params)
+
+            if r.status_code == 401:
+                # refresh token
+                pass
+            else:
+                # save token
+                t = json.loads(r.content.decode('utf-8'))
+                OAuthToken().cyverse_save_token(request.user.id, t)
+                return redirect(request.session['datafile_url'])
+
+
+def check_token():
+    pass
