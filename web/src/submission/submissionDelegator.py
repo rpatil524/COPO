@@ -58,6 +58,10 @@ def delegate_submission(request):
             sub_id=sub_id,
             dataFile_ids=sub['bundle']
         )
+        if result == True:
+            return HttpResponse(jsonpickle.dumps({'status': 1}))
+        else:
+            return HttpResponse(jsonpickle.dumps({'status': result}))
 
     # return default
     return HttpResponse({'status': 0})

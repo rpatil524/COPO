@@ -6,10 +6,11 @@ from dataverse.exceptions import ConnectionError
 import uuid
 import requests
 import json
-from dal.copo_da import Submission
+from dal.copo_da import Submission, DataFile
 from django_tools.middlewares.ThreadLocal import get_current_user, get_current_request
 from dal.copo_da import Profile
 import datetime
+from bson import ObjectId
 
 
 class DataverseSubmit(object):
@@ -27,6 +28,7 @@ class DataverseSubmit(object):
         dataset = self._get_dataset(profile_id, dataverse, connection)
         meta = dict()
 
+        '''
         m = dataset.get_metadata()
 
         meta["title"] = "TITLE123"
@@ -38,8 +40,12 @@ class DataverseSubmit(object):
         d = dataset.update_metadata(meta)
 
         #  get details of files
-
-        file = self._upload_files(dataset)
+        '''
+        file = self._upload_files(dataverse, dataset, dataFile_ids, sub_id)
+        if not file:
+            return 'File already present'
+        else:
+            return True
 
     def _get_dataverse(self, profile_id, connection):
 
@@ -66,18 +72,49 @@ class DataverseSubmit(object):
             dataset = dataverse.get_dataset_by_doi(ds_details['doi'])
         return dataset
 
-    def _upload_files(self, dataset):
+    def _upload_files(self, dataverse, dataset, dataFile_ids, sub_id):
         url_dataset_id = 'https://%s/api/datasets/:persistentId/add?persistentId=%s&key=%s' % (self.host,
                                                                                                dataset.doi,
                                                                                                self.token)
-        file_content = 'content: %s' % datetime.datetime.now()
-        files = {'file': ('sample_file.txt', file_content)}
+        accessions = list()
+        for id in dataFile_ids:
+            file = DataFile().get_record(ObjectId(id))
+            file_location = file['file_location']
 
-        params = dict(description='Blue skies!',
-                      categories=['Lily', 'Rosemary', 'Jack of Hearts'])
-        params_as_json_string = json.dumps(params)
-        payload = dict(jsonData=params_as_json_string)
-        r = requests.post(url_dataset_id, data=payload, files=files)
+            with open(file_location, "rb") as f:
+                file_content = f.read()
+                file_content = file_content + str(uuid.uuid1()).encode('utf-8')
+
+            name = file['name']
+            files = {'file': (name, file_content)}
+
+            payload = dict()
+            #params = dict(description='Blue skies!',
+            #              categories=['Lily', 'Rosemary', 'Jack of Hearts'])
+            #params_as_json_string = json.dumps(params)
+            #payload = dict(jsonData=params_as_json_string)
+            r = requests.post(url_dataset_id, data=payload, files=files)
+            if r.status_code == 400:
+                resp = json.loads(r.content.decode('utf-8'))
+                if resp['status'] == 'ERROR':
+                    return False
+
+            # add mongo_file id
+            acc = json.loads(r.content.decode('utf-8'))['data']['files'][0]['dataFile']
+            acc['mongo_file_id'] = id
+            acc['dataset_doi'] = dataset.doi
+            acc['dataverse_title'] = dataverse.title
+            acc['dataverse_alias'] = dataverse.alias
+            accessions.append(acc)
+
+        # save accessions to mongo profile record
+        s = Submission().get_record(sub_id)
+        s['accessions'] = accessions
+        s['complete'] = True
+        s['target_id'] = str(s.pop('_id'))
+        Submission().save_record(dict(), **s)
+        Submission().mark_submission_complete(sub_id)
+        return True
 
     def _connect(self, host, token):
         try:

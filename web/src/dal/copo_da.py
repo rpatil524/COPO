@@ -374,6 +374,10 @@ class Submission(DAComponent):
             filenames.append(f['name'])
         return {'accessions': doc, 'filenames': filenames}
 
+    def get_file_accession_for_dataverse_entry(self, mongo_file_id):
+        return self.get_collection_handle().find_one({'accessions.mongo_file_id': mongo_file_id},
+                                                      {'_id': 0, 'accessions.$': 1})
+
 
 class DataFile(DAComponent):
     def __init__(self, profile_id=None):

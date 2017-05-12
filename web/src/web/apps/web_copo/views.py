@@ -20,6 +20,7 @@ from allauth.account.forms import LoginForm
 from dal.copo_da import Annotation
 from bson import json_util as j
 import requests
+import datetime
 from rauth import OAuth2Service
 
 LOGGER = settings.LOGGER
@@ -324,6 +325,7 @@ def agave_oauth(request):
     token = OAuthToken().cyverse_get_token(request.user.id)
     if token:
         # get token and pass
+        OAuthToken().check_token(token)
         url = request.path
         return load_cyverse_files(request, url, token)
     else:
@@ -371,5 +373,3 @@ def agave_oauth(request):
                 return redirect(request.session['datafile_url'])
 
 
-def check_token():
-    pass

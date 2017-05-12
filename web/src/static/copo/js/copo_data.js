@@ -17,16 +17,16 @@ $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
 
     var cyverse_files = $('#cyverse_file_data').val()
-    cyverse_files = JSON.parse(cyverse_files)
-
-
-    $('#cyverse_files_link').on('click', function(e) {
-        if (cyverse_files) {
-            $('#file_tree').treeview({data: cyverse_files, showCheckbox: true});
-            $('#file_tree').css('visibility', 'visible')
-            e.preventDefault()
-        }
-    })
+    if(cyverse_files != "None") {
+        cyverse_files = JSON.parse(cyverse_files)
+        $('#cyverse_files_link').on('click', function (e) {
+            if (cyverse_files) {
+                $('#file_tree').treeview({data: cyverse_files, showCheckbox: true});
+                $('#file_tree').css('visibility', 'visible')
+                e.preventDefault()
+            }
+        })
+    }
 
     var csrftoken = $.cookie('csrftoken');
     var component = "datafile";
