@@ -1027,6 +1027,7 @@ function build_attributes_display(data) {
     return $('<div/>').append(attributesPanel);
 }
 
+// Set COPO frontpage properties in this dictionary
 function get_components_properties() {
     var componentProperties = [
         {
@@ -1082,7 +1083,7 @@ function get_components_properties() {
         },
         {
             component: 'annotation',
-            title: 'Annotations',
+            title: 'Generic Annotations',
             addLi: ["simple"], //relevant add related li item for the component
             addLabel: "Add Annotation",
             iconClass: "fa fa-pencil",

@@ -1,6 +1,6 @@
 {
-  "title": "MIAPPE Experiment (Minimum Information About Plant Phenotyping Experiments)",
-  "description": "Configuration for MIAPPE Phenotyping experiments",
+  "title": "Dublin Core (dc) Metadata schema used by Dataverse",
+  "description": "The Dublin Core Metadata Initiative (DCMI) supports shared innovation in metadata design and best practices across a broad range of purposes and business models.",
   "properties": [
     {
       "ref": "title_author_contributor",
@@ -22,7 +22,7 @@
             "dcterms:title"
           ],
           "help_tip": "Enter a name for this item.",
-          "label": "Title"
+          "label": "Title *"
         },
         {
           "type": "string",
@@ -32,14 +32,14 @@
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "dcterms:author",
+          "id": "dcterms:creator",
           "show_in_table": true,
           "control": "text",
           "versions": [
-            "dcterms:author"
+            "dcterms:creator"
           ],
           "help_tip": "Enter an author for this item. (Lastname/Firstname)",
-          "label": "Author (Lastname / Firstname)"
+          "label": "Author (Lastname / Firstname) *"
         },
         {
           "type": "string",
@@ -56,7 +56,7 @@
             "dcterms:contributor"
           ],
           "help_tip": "Enter a contact email address for this item.",
-          "label": "Contributor Email"
+          "label": "Contributor Email *"
         }
       ]
     },
@@ -80,7 +80,7 @@
             "dcterms:description"
           ],
           "help_tip": "Describe the purpose, scope or nature of this item.",
-          "label": "Description"
+          "label": "Description *"
         },
         {
           "type": "string",
@@ -103,7 +103,209 @@
             "dcterms:subject"
           ],
           "help_tip": "Enter subject from dropdown.",
-          "label": "Subject"
+          "label": "Subject *"
+        }
+      ]
+    },
+    {
+      "ref": "optional_fields",
+      "title": "Further details where applicable",
+      "message": "",
+      "items": [
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:publisher",
+          "show_in_table": true,
+          "control": "text",
+          "other_schemas":{
+            "dataverse":{
+              "name": "producerName",
+              "version": "4.6.1"
+            }
+          },
+          "versions": [
+            "dcterms:publisher"
+          ],
+          "help_tip": "Person or agency financially or administratively responsible for the Dataset.",
+          "label": "Producer"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:date",
+          "show_in_table": true,
+          "control": "date-picker",
+          "other_schemas": {
+            "dataverse": {
+              "name": "productionDate",
+              "version": "4.6.1"
+            }
+          },
+          "versions": [
+            "dcterms:date"
+          ],
+          "help_tip": "Production date of Dataset.",
+          "label": "Production Date"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:type",
+          "show_in_table": true,
+          "control": "text",
+          "other_schemas": {
+            "dataverse": {
+              "name": "kindOfData",
+              "version": "4.6.1"
+            }
+          },
+          "versions": [
+            "dcterms:type"
+          ],
+          "help_tip": "Type of data included in the file: survey data, census/enumeration data, aggregate data, clinical.",
+          "label": "Kind of Data"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:source",
+          "show_in_table": true,
+          "control": "text",
+          "other_schemas": {
+            "dataverse": {
+              "name": "dataSources",
+              "version": "4.6.1"
+            }
+          },
+          "versions": [
+            "dcterms:source"
+          ],
+          "help_tip": "List of books, articles, data files if any that served as the sources for the Dataset.",
+          "label": "Data Sources"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:relation",
+          "show_in_table": true,
+          "control": "text",
+          "other_schemas": {
+            "dataverse": {
+              "name": "relatedMaterial",
+              "version": "4.6.1"
+            }
+          },
+          "versions": [
+            "dcterms:relation"
+          ],
+          "help_tip": "Any related material (journal article citation is not included here - see: dcterms:isReferencedBy below).",
+          "label": "Related Material"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:coverage",
+          "show_in_table": true,
+          "control": "text",
+          "other_schemas": {
+            "dataverse": {
+              "name": "otherGeographicCoverage",
+              "version": "4.6.1"
+            }
+          },
+          "versions": [
+            "dcterms:coverage"
+          ],
+          "help_tip": "General information on the geographic coverage of the Dataset.",
+          "label": "General Geographic Information"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:license",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "dcterms:license"
+          ],
+          "help_tip": "Set the license to CC0 (default in Dataverse for new Datasets), otherwise enter “NONE” and fill in the dcterms:rights field.",
+          "label": "License"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:termsofuse",
+          "show_in_table": true,
+          "control": "text",
+          "versions": [
+            "dcterms:termsofuse"
+          ],
+          "help_tip": "If not using CC0, enter any terms of use or restrictions for the Dataset.",
+          "label": "Terms of Use"
+        },
+        {
+          "type": "string",
+          "required": "false",
+          "ref": "",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "id": "dcterms:isReferencedBy",
+          "show_in_table": true,
+          "control": "text",
+          "other_schemas": {
+            "dataverse": {
+              "name": "publicationCitation",
+              "version": "4.6.1"
+            }
+          },
+          "versions": [
+            "dcterms:isReferencedBy"
+          ],
+          "help_tip": "The publication (journal article, book, other work) that uses this dataset (include citation, permanent identifier (DOI), and permanent URL).",
+          "label": "Referenced By"
         }
       ]
     }

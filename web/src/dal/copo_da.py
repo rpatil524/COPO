@@ -68,6 +68,8 @@ class ProfileInfo:
             {'profile_id': self.profile_id, 'deleted': data_utils.get_not_deleted_flag()})
 
 
+
+
 class DAComponent:
     def __init__(self, profile_id=None, component=str()):
         self.profile_id = profile_id
@@ -494,13 +496,13 @@ class Profile(DAComponent):
 
     def add_dataverse_dataset_details(self, profile_id, dataset):
         ds_object = {'doi': dataset.doi, 'title': dataset.title}
-        handle_dict['profile'].update_one({'_id': ObjectId(profile_id)}, {'$set' : {'dataverse.dataset': ds_object}})
+        handle_dict['profile'].update_one({'_id': ObjectId(profile_id)}, {'$push' : {'dataverse.datasets': ds_object}})
 
     def check_for_dataset_details(self, profile_id):
         p = self.get_record(ObjectId(profile_id))
         if 'dataverse' in p:
-            if 'dataset' in p['dataverse']:
-                return p['dataverse']['dataset']
+            if 'datasets' in p['dataverse']:
+                return p['dataverse']['datasets']
 
 
 class RemoteDataFile:

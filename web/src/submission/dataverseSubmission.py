@@ -25,22 +25,22 @@ class DataverseSubmit(object):
         profile_id = get_current_request().session.get('profile_id')
         connection = self._connect(self.host, self.token)
         dataverse = self._get_dataverse(profile_id, connection)
-        dataset = self._get_dataset(profile_id, dataverse, connection)
+
+        # get datafile mongo object to extract dataset metadata
+        # all files submitted in this call will have the same dataverse dc:metadata
+        id = dataFile_ids[0]
+        df = DataFile().get_record(ObjectId(id))
         meta = dict()
+        meta["title"] = df['description']['attributes']['title_author_contributor']['dcterms:title']
+        meta["authorName"] = df['description']['attributes']['title_author_contributor']['dcterms:author']
+        meta["datasetContactEmail"] = df['description']['attributes']['title_author_contributor']['dcterms:contributor']
+        meta["subject"] = df['description']['attributes']['subject_description']['dcterms:subject']
+        meta["dsDescriptionValue"] = df['description']['attributes']['subject_description']['dcterms:description']
 
-        '''
-        m = dataset.get_metadata()
-
-        meta["title"] = "TITLE123"
-        meta["authorName"] = "AUTHOR123"
-        meta["subject"] = "SUBJECT123"
-        meta["dsDescriptionValue"] = "DESCRIPTION123"
-        meta["datasetContactEmail"] = "ABC@GMAIL.COM"
-
-        d = dataset.update_metadata(meta)
+        dataset = self._get_dataset(profile_id=profile_id, dataverse=dataverse, meta=meta)
 
         #  get details of files
-        '''
+
         file = self._upload_files(dataverse, dataset, dataFile_ids, sub_id)
         if not file:
             return 'File already present'
@@ -61,12 +61,12 @@ class DataverseSubmit(object):
             dataverse = connection.get_dataverse(dv_details['alias'])
         return dataverse
 
-    def _get_dataset(self, profile_id, dataverse, connection):
+    def _get_dataset(self, profile_id, dataverse, meta):
         # create new dataset if none exists already
         ds_details = Profile().check_for_dataset_details(profile_id)
         if not ds_details:
             suffix = str(uuid.uuid1()).split('-')[0]
-            dataset = dataverse.create_dataset('test', 'test_description', 'f.shaw@tgac.ac.uk')
+            dataset = dataverse.create_dataset(meta.pop('title'), meta.pop('subject'), meta.pop('authorName'), **meta)
             Profile().add_dataverse_dataset_details(profile_id, dataset)
         else:
             dataset = dataverse.get_dataset_by_doi(ds_details['doi'])
@@ -83,7 +83,7 @@ class DataverseSubmit(object):
 
             with open(file_location, "rb") as f:
                 file_content = f.read()
-                file_content = file_content + str(uuid.uuid1()).encode('utf-8')
+                #file_content = file_content + str(uuid.uuid1()).encode('utf-8')
 
             name = file['name']
             files = {'file': (name, file_content)}

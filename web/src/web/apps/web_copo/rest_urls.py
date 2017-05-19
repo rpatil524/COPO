@@ -35,5 +35,6 @@ urlpatterns = [
     url(r'^delete_ss_annotation/', a_views.delete_ss_annotation, name='delete_ss_annotation'),
     url(r'^copo_get_submission_table_data/', views.copo_get_submission_table_data, name='get_submissions'),
     url(r'^get_accession_data/', ajax.get_accession_data, name='get_accession_data'),
-    url(r'^test_sword/', su.test_module, name='test_module')
+    url(r'^test_sword/', su.test_module, name='test_module'),
+    url(r'^call_get_dataset_details/', ajax.call_get_dataset_details, name='call_get_dataset_details')
 ]

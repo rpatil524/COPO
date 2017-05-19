@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django_tools.middlewares import ThreadLocal
 from jsonpickle import encode
 from dateutil import parser
-
+from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
 from django.conf import settings
 from dal.copo_da import ProfileInfo, RemoteDataFile, Submission
@@ -16,6 +16,7 @@ from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
 from pandas import read_excel
+from submission.dataverseSubmission import DataverseSubmit
 
 
 def get_source_count(self):
@@ -114,7 +115,10 @@ def get_excel_data(request):
 def get_accession_data(request):
     sub_id = request.GET.get('sub_id')
     sub = Submission().get_file_accession(sub_id)
-
-
-
     return HttpResponse(json_util.dumps({'sub': sub}))
+
+def call_get_dataset_details(request):
+    profile_id = request.GET['profile_id']
+    resp = Profile().check_for_dataset_details(profile_id)
+    return HttpResponse(json.dumps(resp))
+
