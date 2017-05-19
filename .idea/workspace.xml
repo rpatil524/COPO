@@ -1,92 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="completed submission view">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtCore.framework/Resources/Info.plist" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtCore.framework/Versions/4/QtCore" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtCore.framework/_CodeSignature/CodeDirectory" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtCore.framework/_CodeSignature/CodeRequirements" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtCore.framework/_CodeSignature/CodeResources" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtCore.framework/_CodeSignature/CodeSignature" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtGui.framework/Resources/Info.plist" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtGui.framework/Resources/qt_menu.nib/classes.nib" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtGui.framework/Resources/qt_menu.nib/info.nib" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtGui.framework/Resources/qt_menu.nib/keyedobjects.nib" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtGui.framework/Versions/4/QtGui" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtGui.framework/_CodeSignature/CodeDirectory" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtGui.framework/_CodeSignature/CodeRequirements" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtGui.framework/_CodeSignature/CodeResources" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtGui.framework/_CodeSignature/CodeSignature" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtNetwork.framework/Resources/Info.plist" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtNetwork.framework/Versions/4/QtNetwork" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtNetwork.framework/_CodeSignature/CodeDirectory" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtNetwork.framework/_CodeSignature/CodeRequirements" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtNetwork.framework/_CodeSignature/CodeResources" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtNetwork.framework/_CodeSignature/CodeSignature" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtSql.framework/Resources/Info.plist" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtSql.framework/Versions/4/QtSql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtSql.framework/_CodeSignature/CodeDirectory" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtSql.framework/_CodeSignature/CodeRequirements" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtSql.framework/_CodeSignature/CodeResources" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtSql.framework/_CodeSignature/CodeSignature" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtXml.framework/Resources/Info.plist" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtXml.framework/Versions/4/QtXml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtXml.framework/_CodeSignature/CodeDirectory" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtXml.framework/_CodeSignature/CodeRequirements" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtXml.framework/_CodeSignature/CodeResources" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Frameworks/QtXml.framework/_CodeSignature/CodeSignature" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Info.plist" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/MacOS/asperaconnect" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/PkgInfo" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/PlugIns/sqldrivers/libqsqlite.dylib" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/PlugIns/sqldrivers/libqsqlodbc.dylib" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/ascp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/_CodeSignature/CodeResources" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/aspera_osx_plugin/ascp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/dublincore_mappings/dublincore.json" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/.ascp.swp" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/.ascp.swp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/AsperaConnect.icns" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/AsperaConnect.icns" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/aspera-license" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/aspera-license" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/aspera.conf" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/aspera.conf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/aspera_web_cert.pem" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/aspera_web_cert.pem" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/aspera_web_key.pem" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/aspera_web_key.pem" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/asperaweb_id_dsa.openssh" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/asperaweb_id_dsa.openssh" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/asperaweb_id_dsa.putty" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/asperaweb_id_dsa.putty" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/asunprotect" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/asunprotect" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/empty.lproj" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/empty.lproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/en.lproj/locversion.plist" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/en.lproj/locversion.plist" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/es.lproj/asperaconnect_es_ES.qm" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/es.lproj/asperaconnect_es_ES.qm" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/es.lproj/locversion.plist" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/es.lproj/locversion.plist" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/es.lproj/qt_es.qm" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/es.lproj/qt_es.qm" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/fr.lproj/asperaconnect_fr_FR.qm" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/fr.lproj/asperaconnect_fr_FR.qm" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/fr.lproj/locversion.plist" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/fr.lproj/locversion.plist" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/fr.lproj/qt_fr.qm" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/fr.lproj/qt_fr.qm" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/iso-swid/1986-03.com.ibm_IBM_Aspera_Connect_Browser_Plugin-3.5.1.swidtag.xml" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/iso-swid/1986-03.com.ibm_IBM_Aspera_Connect_Browser_Plugin-3.5.1.swidtag.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/ja.lproj/asperaconnect_ja_JP.qm" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/ja.lproj/asperaconnect_ja_JP.qm" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/ja.lproj/locversion.plist" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/ja.lproj/locversion.plist" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/ja.lproj/qt_ja.qm" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/ja.lproj/qt_ja.qm" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/notices.txt" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/notices.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/product-info.mf" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/product-info.mf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/qt.conf" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/qt.conf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/runAsperaENA.py" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/runAsperaENA.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/runAsperaENA.sh" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/runAsperaENA.sh" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/testing.exp" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/testing.exp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/testing.py" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/testing.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/testing.sh" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/testing.sh" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/testing.txt" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/testing.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/zh_CN.lproj/asperaconnect_zh_CN.qm" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/zh_CN.lproj/asperaconnect_zh_CN.qm" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/zh_CN.lproj/locversion.plist" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/zh_CN.lproj/locversion.plist" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera_Connect.app/Contents/Resources/zh_CN.lproj/qt_zh_CN.qm" afterPath="$PROJECT_DIR$/web/src/tools/reposit/aspera/Aspera Connect.app/Contents/Resources/aspera_mac_plugin/zh_CN.lproj/qt_zh_CN.qm" />
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/dal/copo_da.py" afterPath="$PROJECT_DIR$/web/src/dal/copo_da.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/annotator-2.0.0-alpha.3/node_modules/.bin/extract-zip" afterPath="$PROJECT_DIR$/web/src/static/copo/annotator-2.0.0-alpha.3/node_modules/.bin/extract-zip" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/annotator-2.0.0-alpha.3/node_modules/.bin/mime" afterPath="$PROJECT_DIR$/web/src/static/copo/annotator-2.0.0-alpha.3/node_modules/.bin/mime" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" afterPath="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/rest_urls.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/rest_urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
@@ -158,8 +75,8 @@
       <file leaf-file-name="dataverseSubmission.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="96" column="0" lean-forward="false" selection-start-line="96" selection-start-column="0" selection-end-line="96" selection-end-column="0" />
+            <state relative-caret-position="185">
+              <caret line="35" column="25" lean-forward="false" selection-start-line="35" selection-start-column="25" selection-end-line="35" selection-end-column="25" />
               <folding>
                 <element signature="e#51#83#0" expanded="true" />
               </folding>
@@ -167,20 +84,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="copo_form_handlers.js" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js">
+      <file leaf-file-name="submissionDelegator.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="543">
-              <caret line="1077" column="31" lean-forward="true" selection-start-line="1077" selection-start-column="31" selection-end-line="1077" selection-end-column="31" />
-              <folding>
-                <marker date="1494604731000" expanded="true" signature="10063:10070" ph="×" />
-                <marker date="1494604731000" expanded="true" signature="10134:10152" ph="..." />
-                <marker date="1494604731000" expanded="true" signature="10855:10867" ph="..." />
-                <marker date="1494604731000" expanded="true" signature="37165:37199" ph="..." />
-                <marker date="1494604731000" expanded="true" signature="41808:41823" ph="..." />
-                <marker date="1494604731000" expanded="true" signature="42898:42910" ph="..." />
-                <marker date="1494604731000" expanded="true" signature="57502:57518" ph="..." />
-              </folding>
+            <state relative-caret-position="465">
+              <caret line="58" column="0" lean-forward="false" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -190,6 +99,26 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="95">
               <caret line="368" column="35" lean-forward="false" selection-start-line="368" selection-start-column="35" selection-end-line="368" selection-end-column="35" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dataset.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Documents/dev/environments/django10/src/dataverse/dataverse/dataset.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-2420">
+              <caret line="25" column="8" lean-forward="false" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="8" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dataverse.py" pinned="false" current-in-tab="true">
+        <entry file="file://$USER_HOME$/Documents/dev/environments/django10/src/dataverse/dataverse/dataverse.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="336">
+              <caret line="111" column="0" lean-forward="false" selection-start-line="111" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -215,11 +144,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="copo_da.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
+      <file leaf-file-name="dc_stages.json" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1354">
-              <caret line="77" column="8" lean-forward="false" selection-start-line="77" selection-start-column="8" selection-end-line="77" selection-end-column="8" />
+            <state relative-caret-position="96">
+              <caret line="285" column="10" lean-forward="true" selection-start-line="285" selection-start-column="10" selection-end-line="285" selection-end-column="10" />
               <folding />
             </state>
           </provider>
@@ -259,7 +188,6 @@
       <find>upload_but</find>
       <find>author</find>
       <find>proper</find>
-      <find>label</find>
       <find>ena</find>
       <find>first second last</find>
       <find>dublin</find>
@@ -269,6 +197,7 @@
       <find>du</find>
       <find>d</find>
       <find>dc</find>
+      <find>label</find>
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/web/src/static/copo/css</dir>
@@ -338,10 +267,10 @@
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/rest_urls.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_submission.js" />
-        <option value="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/dublincore_mappings/dublincore.json" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json" />
+        <option value="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" />
       </list>
     </option>
   </component>
@@ -839,7 +768,7 @@
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
-    <property name="SearchEverywhereHistoryKey" value="views&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/views.py&#10;copo_f&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_form_handlers.js&#10;urls&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;copo_submission&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/submission/enaSubmission.py&#10;index&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/index.js&#10;base&#9;FILE&#9;file:///Users/fshaw/Documents/dev/environments/django10/lib/python3.4/site-packages/django/core/handlers/base.py&#10;copo_sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;copo_data&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_data.js&#10;rest&#9;null&#9;null&#10;rating_template_v1&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/schemas/utils/metadata_rating_templates/rating_template_v1.json&#10;rating&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/schemas/utils/metadata_rating_templates/rating_template_v1.json&#10;look&#9;null&#9;null&#10;ena&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/submission/enaSubmission.py&#10;setting&#9;FILE&#9;file:///Users/fshaw/Documents/dev/environments/django10/lib/python3.4/site-packages/chunked_upload/settings.py&#10;req&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt&#10;rest_ur&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;copo&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;copo_s&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;enar&#9;null&#9;null&#10;copo_da&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/dal/copo_da.py&#10;ajax&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;url&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;submiss&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;giti&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;test&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/test_page.html&#10;annotat&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_annotations.html&#10;git&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;gitignore&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;style&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/css/copo/style.css&#10;error&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/error_page.html&#10;annotation&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/css/copo/copo_annotations.css&#10;rat&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/schemas/utils/metadata_rating_templates/rating_template_v1.json&#10;api/a&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/api/annotate_views.py&#10;gene&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/generic_handlers.js&#10;require&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt&#10;gener&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/generic_handlers.js&#10;copo_forms&#9;null&#9;null&#10;aja&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;figsha&#9;null&#9;null&#10;figshare&#9;null&#9;null&#10;person&#9;FILE&#9;file:///Users/etuka/Dropbox/Dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/person.json&#10;copo_a&#9;FILE&#9;file:///Users/etuka/Dropbox/Dev/COPO/web/src/static/copo/js/copo_annotations.js&#10;html&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templatetags/html_tags.py&#10;copo_An&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_annotations.js&#10;copo_form&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_form_handlers.js&#10;copo_d&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/dal/copo_da.py&#10;index.js&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/index.js&#10;data_&#9;null&#9;null" />
+    <property name="SearchEverywhereHistoryKey" value="dc&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json&#10;views&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/views.py&#10;copo_f&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_form_handlers.js&#10;urls&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;copo_submission&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/submission/enaSubmission.py&#10;index&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/index.js&#10;base&#9;FILE&#9;file:///Users/fshaw/Documents/dev/environments/django10/lib/python3.4/site-packages/django/core/handlers/base.py&#10;copo_sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;copo_data&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_data.js&#10;rest&#9;null&#9;null&#10;rating_template_v1&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/schemas/utils/metadata_rating_templates/rating_template_v1.json&#10;rating&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/schemas/utils/metadata_rating_templates/rating_template_v1.json&#10;look&#9;null&#9;null&#10;ena&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/submission/enaSubmission.py&#10;setting&#9;FILE&#9;file:///Users/fshaw/Documents/dev/environments/django10/lib/python3.4/site-packages/chunked_upload/settings.py&#10;req&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt&#10;rest_ur&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;copo&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;copo_s&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;enar&#9;null&#9;null&#10;copo_da&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/dal/copo_da.py&#10;ajax&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;url&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;submiss&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;giti&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;test&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/test_page.html&#10;annotat&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_annotations.html&#10;git&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;gitignore&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;style&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/css/copo/style.css&#10;error&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/error_page.html&#10;annotation&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/css/copo/copo_annotations.css&#10;rat&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/schemas/utils/metadata_rating_templates/rating_template_v1.json&#10;api/a&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/api/annotate_views.py&#10;gene&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/generic_handlers.js&#10;require&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt&#10;gener&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/generic_handlers.js&#10;copo_forms&#9;null&#9;null&#10;aja&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;figsha&#9;null&#9;null&#10;figshare&#9;null&#9;null&#10;person&#9;FILE&#9;file:///Users/etuka/Dropbox/Dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/person.json&#10;copo_a&#9;FILE&#9;file:///Users/etuka/Dropbox/Dev/COPO/web/src/static/copo/js/copo_annotations.js&#10;html&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templatetags/html_tags.py&#10;copo_An&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_annotations.js&#10;copo_form&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_form_handlers.js&#10;copo_d&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/dal/copo_da.py&#10;index.js&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/index.js&#10;data_&#9;null&#9;null" />
     <property name="add_unversioned_files" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/dublincore_mappings" />
   </component>
@@ -1849,7 +1778,14 @@
       <option name="project" value="LOCAL" />
       <updated>1490887891437</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="wizard for dataverse complete">
+      <created>1495206128990</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1495206128990</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -1895,13 +1831,12 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1920" height="986" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4229692" sideWeight="0.51710653" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32885906" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2080537" sideWeight="0.49767134" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2080537" sideWeight="0.49767134" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Mongo Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32887402" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15335463" sideWeight="0.49182117" order="0" side_tool="false" content_ui="combo" />
@@ -1910,7 +1845,7 @@
       <window_info id="JsonViewer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4427754" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15665236" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12552084" sideWeight="0.50817883" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32913166" sideWeight="0.48289344" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32885906" sideWeight="0.48289344" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1998,22 +1933,11 @@
     <MESSAGE value="adding controls for annotation/ontology filtering" />
     <MESSAGE value="fix for source array type making converter crash" />
     <MESSAGE value="completed submission view" />
-    <option name="LAST_COMMIT_MESSAGE" value="completed submission view" />
+    <MESSAGE value="wizard for dataverse complete" />
+    <option name="LAST_COMMIT_MESSAGE" value="wizard for dataverse complete" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py</url>
-          <line>75</line>
-          <option name="timeStamp" value="413" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py</url>
-          <line>39</line>
-          <option name="timeStamp" value="416" />
-        </line-breakpoint>
-      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -2021,7 +1945,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="419" />
+      <option name="time" value="425" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Python.DjangoServer">
@@ -2182,6 +2106,19 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="273">
           <caret line="1085" column="28" lean-forward="false" selection-start-line="1085" selection-start-column="28" selection-end-line="1085" selection-end-column="28" />
+          <folding>
+            <marker date="1494843419000" expanded="true" signature="5179:5199" ph="..." />
+            <marker date="1494843419000" expanded="true" signature="5537:5580" ph="..." />
+            <marker date="1494843419000" expanded="true" signature="5767:5773" ph=" " />
+            <marker date="1494843419000" expanded="true" signature="12590:12596" ph=" " />
+            <marker date="1494843419000" expanded="true" signature="22290:22338" ph="..." />
+            <marker date="1494843419000" expanded="true" signature="22352:22382" ph="..." />
+            <marker date="1494843419000" expanded="true" signature="22505:22518" ph="..." />
+            <marker date="1494843419000" expanded="true" signature="29422:29458" ph="..." />
+            <marker date="1494843419000" expanded="true" signature="30536:30554" ph="..." />
+            <marker date="1494843419000" expanded="true" signature="30934:30951" ph="..." />
+            <marker date="1494843419000" expanded="true" signature="40204:40221" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2247,22 +2184,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Documents/dev/environments/django10/src/dataverse/dataverse/dataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2040">
-          <caret line="123" column="8" lean-forward="false" selection-start-line="123" selection-start-column="8" selection-end-line="123" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/dev/environments/django10/src/dataverse/dataverse/dataverse.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1411">
-          <caret line="91" column="8" lean-forward="false" selection-start-line="91" selection-start-column="8" selection-end-line="91" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/dal/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -2323,24 +2244,6 @@
         <state relative-caret-position="202">
           <caret line="184" column="0" lean-forward="false" selection-start-line="184" selection-start-column="0" selection-end-line="184" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="58" column="0" lean-forward="false" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="96" column="0" lean-forward="false" selection-start-line="96" selection-start-column="0" selection-end-line="96" selection-end-column="0" />
-          <folding>
-            <element signature="e#51#83#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2424,19 +2327,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="394">
-          <caret line="95" column="26" lean-forward="false" selection-start-line="95" selection-start-column="26" selection-end-line="95" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="385">
           <caret line="408" column="106" lean-forward="false" selection-start-line="408" selection-start-column="106" selection-end-line="408" selection-end-column="106" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="254">
+          <caret line="1060" column="6" lean-forward="true" selection-start-line="1060" selection-start-column="6" selection-end-line="1060" selection-end-column="6" />
+          <folding>
+            <marker date="1494604731000" expanded="true" signature="10063:10070" ph="×" />
+            <marker date="1494604731000" expanded="true" signature="10134:10152" ph="..." />
+            <marker date="1494604731000" expanded="true" signature="10855:10867" ph="..." />
+            <marker date="1494604731000" expanded="true" signature="37165:37199" ph="..." />
+            <marker date="1494604731000" expanded="true" signature="41808:41823" ph="..." />
+            <marker date="1494604731000" expanded="true" signature="42898:42910" ph="..." />
+            <marker date="1494604731000" expanded="true" signature="57502:57518" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2448,27 +2359,53 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json">
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="558">
-          <caret line="307" column="34" lean-forward="false" selection-start-line="307" selection-start-column="34" selection-end-line="307" selection-end-column="34" />
+        <state relative-caret-position="394">
+          <caret line="95" column="26" lean-forward="false" selection-start-line="95" selection-start-column="26" selection-end-line="95" selection-end-column="26" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js">
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="543">
-          <caret line="1077" column="31" lean-forward="true" selection-start-line="1077" selection-start-column="31" selection-end-line="1077" selection-end-column="31" />
+        <state relative-caret-position="96">
+          <caret line="285" column="10" lean-forward="true" selection-start-line="285" selection-start-column="10" selection-end-line="285" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="58" column="0" lean-forward="false" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/dev/environments/django10/src/dataverse/dataverse/dataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2420">
+          <caret line="25" column="8" lean-forward="false" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="35" column="25" lean-forward="false" selection-start-line="35" selection-start-column="25" selection-end-line="35" selection-end-column="25" />
           <folding>
-            <marker date="1494604731000" expanded="true" signature="10063:10070" ph="×" />
-            <marker date="1494604731000" expanded="true" signature="10134:10152" ph="..." />
-            <marker date="1494604731000" expanded="true" signature="10855:10867" ph="..." />
-            <marker date="1494604731000" expanded="true" signature="37165:37199" ph="..." />
-            <marker date="1494604731000" expanded="true" signature="41808:41823" ph="..." />
-            <marker date="1494604731000" expanded="true" signature="42898:42910" ph="..." />
-            <marker date="1494604731000" expanded="true" signature="57502:57518" ph="..." />
+            <element signature="e#51#83#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/dev/environments/django10/src/dataverse/dataverse/dataverse.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="111" column="0" lean-forward="false" selection-start-line="111" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

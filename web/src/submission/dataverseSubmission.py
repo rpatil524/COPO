@@ -31,11 +31,30 @@ class DataverseSubmit(object):
         id = dataFile_ids[0]
         df = DataFile().get_record(ObjectId(id))
         meta = dict()
-        meta["title"] = df['description']['attributes']['title_author_contributor']['dcterms:title']
-        meta["authorName"] = df['description']['attributes']['title_author_contributor']['dcterms:author']
-        meta["datasetContactEmail"] = df['description']['attributes']['title_author_contributor']['dcterms:contributor']
-        meta["subject"] = df['description']['attributes']['subject_description']['dcterms:subject']
-        meta["dsDescriptionValue"] = df['description']['attributes']['subject_description']['dcterms:description']
+        meta["title"] = df.get('description').get('attributes').get('title_author_contributor').get('dcterms:title')
+        meta["authorName"] = df.get('description').get('attributes').get('title_author_contributor').get(
+            'dcterms:creator')
+        meta["datasetContactEmail"] = df.get('description').get('attributes').get('title_author_contributor').get(
+            'dcterms:contributor')
+        meta["subject"] = df.get('description').get('attributes').get('subject_description').get('dcterms:subject')
+        meta["dsDescriptionValue"] = df.get('description').get('attributes').get('subject_description').get(
+            'dcterms:description')
+        meta["producerName"] = df.get('description').get('attributes').get('optional_fields').get(
+            'dcterms:publisher')
+        meta["productionDate"] = df.get('description').get('attributes').get('optional_fields').get('dcterms:date')
+        meta["kindOfData"] = df.get('description').get('attributes').get('optional_fields').get('dcterms:type')
+        meta["dataSources"] = df.get('description').get('attributes').get('optional_fields').get('dcterms:source')
+        meta["relatedMaterial"] = df.get('description').get('attributes').get('optional_fields').get('dcterms:relation')
+        meta["otherGeographicCoverage"] = df.get('description').get('attributes').get('optional_fields').get(
+            'dcterms:coverage')
+        meta["otherGeographicCoverage"] = df.get('description').get('attributes').get('optional_fields').get(
+            'dcterms:coverage')
+        meta["license"] = df.get('description').get('attributes').get('optional_fields').get(
+            'dcterms:license')
+        meta["termsofuse"] = df.get('description').get('attributes').get('optional_fields').get(
+            'dcterms:rights')
+        meta["publicationCitation"] = df.get('description').get('attributes').get('optional_fields').get(
+            'dcterms:isReferencedBy')
 
         dataset = self._get_dataset(profile_id=profile_id, dataverse=dataverse, meta=meta)
 
@@ -83,16 +102,16 @@ class DataverseSubmit(object):
 
             with open(file_location, "rb") as f:
                 file_content = f.read()
-                #file_content = file_content + str(uuid.uuid1()).encode('utf-8')
+                # file_content = file_content + str(uuid.uuid1()).encode('utf-8')
 
             name = file['name']
             files = {'file': (name, file_content)}
 
             payload = dict()
-            #params = dict(description='Blue skies!',
+            # params = dict(description='Blue skies!',
             #              categories=['Lily', 'Rosemary', 'Jack of Hearts'])
-            #params_as_json_string = json.dumps(params)
-            #payload = dict(jsonData=params_as_json_string)
+            # params_as_json_string = json.dumps(params)
+            # payload = dict(jsonData=params_as_json_string)
             r = requests.post(url_dataset_id, data=payload, files=files)
             if r.status_code == 400:
                 resp = json.loads(r.content.decode('utf-8'))

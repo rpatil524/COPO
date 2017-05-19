@@ -264,7 +264,7 @@
           "versions": [
             "dcterms:license"
           ],
-          "help_tip": "Set the license to CC0 (default in Dataverse for new Datasets), otherwise enter “NONE” and fill in the dcterms:rights field.",
+          "help_tip": "Set the license to CC0 (default in Dataverse for new Datasets), otherwise enter “NONE” and fill in the Terms of Use field.",
           "label": "License"
         },
         {
