@@ -88,7 +88,7 @@ class EnaSubmit(object):
             f_str = str()
             for f in file_path:
                 f_str = f_str + ' ' + f
-            cmd = "./ascp -d -QT -l300M -L- {f_str!s} {user_name!s}:{remote_path!s}".format(**locals())
+            cmd = "./ascp -d -QT -l700M -L- {f_str!s} {user_name!s}:{remote_path!s}".format(**locals())
             lg.log(cmd, level=Loglvl.INFO, type=Logtype.FILE)
             os.chdir(path2library)
 
@@ -223,7 +223,7 @@ class EnaSubmit(object):
          -F "SAMPLE=@' + os.path.join(remote_path, sample_file) + '" \
          -F "EXPERIMENT=@' + os.path.join(remote_path, experiment_file) + '" \
          -F "RUN=@' + os.path.join(remote_path, run_file) + '" \
-         "https://www-test.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20Webin-39233%20Apple123"'
+         "https://www.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20Webin-39233%20Apple123"'
 
         output = subprocess.check_output(curl_cmd, shell=True)
         lg.log(output, level=Loglvl.INFO, type=Logtype.FILE)
