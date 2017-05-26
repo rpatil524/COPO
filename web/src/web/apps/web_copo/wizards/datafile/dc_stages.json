@@ -227,29 +227,7 @@
           "help_tip": "Any related material (journal article citation is not included here - see: dcterms:isReferencedBy below).",
           "label": "Related Material"
         },
-        {
-          "type": "string",
-          "required": "false",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": "",
-          "show_in_form": true,
-          "id": "dcterms:coverage",
-          "show_in_table": true,
-          "control": "text",
-          "other_schemas": {
-            "dataverse": {
-              "name": "otherGeographicCoverage",
-              "version": "4.6.1"
-            }
-          },
-          "versions": [
-            "dcterms:coverage"
-          ],
-          "help_tip": "General information on the geographic coverage of the Dataset.",
-          "label": "General Geographic Information"
-        },
+
         {
           "type": "string",
           "required": "false",

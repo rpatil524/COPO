@@ -80,13 +80,11 @@ def authenticate_figshare(request):
                    'control': HTML_TAGS['oauth_required']})
 
 
-def test_figshare_submit(request):
-    # from submission.figshareSubmission import FigshareSubmit as fs
-    # from dal.figshare_da import Figshare as f
-    #
-    # token = f().get_token_for_user(request.user.id)['token']
-    #
-    # fs().submit(["5732ee6268236b786d9d567c"], token)
+def test_dataverse_submit(request):
+    from submission.dataverseSubmission import DataverseSubmit
+
+
+    DataverseSubmit().submit(dataFile_ids=["5923015868236b5bc86874e4"], sub_id="5923059768236b6c72122575")
     return render(request, 'copo/test_page.html', {})
 
 

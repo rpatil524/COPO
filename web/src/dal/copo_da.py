@@ -485,8 +485,7 @@ class Profile(DAComponent):
 
 
     def add_dataverse_details(self, profile_id, dataverse):
-        dv_obj = {'alias': dataverse.alias, 'title' :dataverse.title, 'is_published': dataverse.is_published}
-        handle_dict['profile'].update_one({'_id': ObjectId(profile_id)}, {'$set':{'dataverse': dv_obj}})
+        handle_dict['profile'].update_one({'_id': ObjectId(profile_id)}, {'$set':{'dataverse': dataverse}})
 
 
     def check_for_dataverse_details(self, profile_id):

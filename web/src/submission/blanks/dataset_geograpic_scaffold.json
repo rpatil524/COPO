@@ -1,0 +1,73 @@
+{
+  "geospatial": {
+    "displayName": "Geospatial",
+    "fields": [
+      {
+        "typeName": "geographicCoverage",
+        "multiple": true,
+        "typeClass": "compound",
+        "value": [
+          {
+            "country": {
+              "typeName": "country",
+              "multiple": false,
+              "typeClass": "controlledVocabulary",
+              "value": ""
+            },
+            "state": {
+              "typeName": "state",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": ""
+            },
+            "city": {
+              "typeName": "city",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": ""
+            },
+            "otherGeographicCoverage": {
+              "typeName": "otherGeographicCoverage",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": ""
+            }
+          }
+        ]
+      },
+      {
+        "typeName": "geographicBoundingBox",
+        "multiple": true,
+        "typeClass": "compound",
+        "value": [
+          {
+            "westLongitude": {
+              "typeName": "westLongitude",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": ""
+            },
+            "eastLongitude": {
+              "typeName": "eastLongitude",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": ""
+            },
+            "southLongitude": {
+              "typeName": "southLongitude",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": ""
+            },
+            "northLongitude": {
+              "typeName": "northLongitude",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": ""
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
