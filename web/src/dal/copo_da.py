@@ -68,8 +68,6 @@ class ProfileInfo:
             {'profile_id': self.profile_id, 'deleted': data_utils.get_not_deleted_flag()})
 
 
-
-
 class DAComponent:
     def __init__(self, profile_id=None, component=str()):
         self.profile_id = profile_id
@@ -378,7 +376,7 @@ class Submission(DAComponent):
 
     def get_file_accession_for_dataverse_entry(self, mongo_file_id):
         return self.get_collection_handle().find_one({'accessions.mongo_file_id': mongo_file_id},
-                                                      {'_id': 0, 'accessions.$': 1})
+                                                     {'_id': 0, 'accessions.$': 1})
 
 
 class DataFile(DAComponent):
@@ -483,10 +481,8 @@ class Profile(DAComponent):
             Person(profile_id=str(rec["_id"])).create_sra_person()
         return rec
 
-
     def add_dataverse_details(self, profile_id, dataverse):
-        handle_dict['profile'].update_one({'_id': ObjectId(profile_id)}, {'$set':{'dataverse': dataverse}})
-
+        handle_dict['profile'].update_one({'_id': ObjectId(profile_id)}, {'$set': {'dataverse': dataverse}})
 
     def check_for_dataverse_details(self, profile_id):
         p = self.get_record(ObjectId(profile_id))
@@ -494,8 +490,9 @@ class Profile(DAComponent):
             return p['dataverse']
 
     def add_dataverse_dataset_details(self, profile_id, dataset):
-        ds_object = {'doi': dataset.doi, 'title': dataset.title}
-        handle_dict['profile'].update_one({'_id': ObjectId(profile_id)}, {'$push' : {'dataverse.datasets': ds_object}})
+
+        handle_dict['profile'].update_one({'_id': ObjectId(profile_id)}, {'$push': {'dataverse.datasets': dataset}})
+        return [dataset]
 
     def check_for_dataset_details(self, profile_id):
         p = self.get_record(ObjectId(profile_id))

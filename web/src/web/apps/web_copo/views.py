@@ -84,7 +84,7 @@ def test_dataverse_submit(request):
     from submission.dataverseSubmission import DataverseSubmit
 
 
-    DataverseSubmit().submit(dataFile_ids=["5923015868236b5bc86874e4"], sub_id="5923059768236b6c72122575")
+    DataverseSubmit().submit(dataFile_ids=["592ee1e668236b82e40b4c56"], sub_id="592ee7f168236b85d16510ef")
     return render(request, 'copo/test_page.html', {})
 
 

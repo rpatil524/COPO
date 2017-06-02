@@ -39,7 +39,7 @@
             "dcterms:creator"
           ],
           "help_tip": "Enter an author for this item. (Lastname/Firstname)",
-          "label": "Author (Lastname / Firstname) *"
+          "label": "Author (comma separated) *"
         },
         {
           "type": "string",
@@ -187,7 +187,7 @@
           "ref": "",
           "hidden": "false",
           "deprecated": false,
-          "default_value": "",
+          "default_value": [],
           "show_in_form": true,
           "id": "dcterms:source",
           "show_in_table": true,
@@ -202,7 +202,7 @@
             "dcterms:source"
           ],
           "help_tip": "List of books, articles, data files if any that served as the sources for the Dataset.",
-          "label": "Data Sources"
+          "label": "Data Sources (comma separated)"
         },
         {
           "type": "string",
@@ -210,7 +210,7 @@
           "ref": "",
           "hidden": "false",
           "deprecated": false,
-          "default_value": "",
+          "default_value": [],
           "show_in_form": true,
           "id": "dcterms:relation",
           "show_in_table": true,
@@ -225,7 +225,7 @@
             "dcterms:relation"
           ],
           "help_tip": "Any related material (journal article citation is not included here - see: dcterms:isReferencedBy below).",
-          "label": "Related Material"
+          "label": "Related Material (comma separated)"
         },
 
         {
@@ -234,7 +234,7 @@
           "ref": "",
           "hidden": "false",
           "deprecated": false,
-          "default_value": "",
+          "default_value": "CC0",
           "show_in_form": true,
           "id": "dcterms:license",
           "show_in_table": true,
@@ -268,7 +268,7 @@
           "ref": "",
           "hidden": "false",
           "deprecated": false,
-          "default_value": "",
+          "default_value": [],
           "show_in_form": true,
           "id": "dcterms:isReferencedBy",
           "show_in_table": true,
@@ -283,7 +283,7 @@
             "dcterms:isReferencedBy"
           ],
           "help_tip": "The publication (journal article, book, other work) that uses this dataset (include citation, permanent identifier (DOI), and permanent URL).",
-          "label": "Referenced By"
+          "label": "Referenced by (comma separated)"
         }
       ]
     }

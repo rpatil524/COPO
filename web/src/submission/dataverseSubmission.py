@@ -5,6 +5,7 @@ from dataverse import Connection, Dataverse, Dataset, DataverseFile
 from dataverse.exceptions import ConnectionError
 import uuid
 import requests
+from requests.compat import urlencode, urljoin
 import json
 from dal.copo_da import Submission, DataFile
 from django_tools.middlewares.ThreadLocal import get_current_user, get_current_request
@@ -12,6 +13,7 @@ from dal.copo_da import Profile
 import datetime
 from bson import ObjectId
 from pprint import pprint
+import copy
 
 
 class DataverseSubmit(object):
@@ -27,15 +29,11 @@ class DataverseSubmit(object):
         dataverse = self._get_dataverse(profile_id=profile_id)
         dataset = self._get_dataset(profile_id=profile_id, dataFile_ids=dataFile_ids, dataverse=dataverse)
 
-        # dataset = self._get_dataset(profile_id=profile_id, dataverse=dataverse, meta=meta)
-
         #  get details of files
 
-        # file = self._upload_files(dataverse, dataset, dataFile_ids, sub_id)
-        # if not file:
-        #    return 'File already present'
-        # else:
-        #    return True
+        file = self._upload_files(dataverse, dataset, dataFile_ids, sub_id)
+        if not file:
+            return 'File already present'
         return True
 
     def _get_dataverse(self, profile_id):
@@ -45,6 +43,7 @@ class DataverseSubmit(object):
         u = get_current_user()
         # create new dataverse if none exists already
         dv_details = Profile().check_for_dataverse_details(profile_id)
+
         if not dv_details:
             # dataverse = connection.create_dataverse(dv_alias, '{0} {1}'.format(u.first_name, u.last_name), u.email)
             dv_details = self._create_dataverse(profile_id)
@@ -99,15 +98,19 @@ class DataverseSubmit(object):
                     n_dict['value'] = df.get('description').get('attributes').get('title_author_contributor').get(
                         'dcterms:title')
                 elif n_dict['typeName'] == 'author':
-                    # export authors
-                    for authors in n_dict['value']:
-                        for author_key in authors.keys():
-                            if author_key == 'authorName':
-                                authors[author_key]['value'] = df.get('description').get('attributes').get(
-                                    'title_author_contributor').get(
-                                    'dcterms:creator')
-                            elif author_key == 'authorAffiliation':
-                                authors[author_key]['value'] = email.rsplit('@')[1]
+                    # get authors from mongo
+                    authors = listize(
+                        df.get('description').get('attributes').get('title_author_contributor').get('dcterms:creator'))
+                    author_obj = n_dict['value']
+                    authors_list = list()
+                    for m in authors:
+                        temp = copy.deepcopy(author_obj[0])
+                        # reverse names
+                        names = m.strip().split(' ')
+                        temp['authorName']['value'] = names[1] + ' ' + names[0]
+                        temp['authorAffiliation']['value'] = email.rsplit('@')[1]
+                        authors_list.append(temp)
+                    n_dict['value'] = authors_list
                 elif n_dict['typeName'] == 'datasetContact':
                     for contacts in n_dict['value']:
                         for contact_key in contacts.keys():
@@ -148,24 +151,43 @@ class DataverseSubmit(object):
                 elif n_dict['typeName'] == 'dataSources':
                     n_dict['value'] = df.get('description').get('attributes').get('optional_fields').get(
                         'dcterms:source')
+                    n_dict['value'] = listize(n_dict['value'])
+                    if not n_dict['value']:
+                        n_dict['value'] = []
                 elif n_dict['typeName'] == 'relatedMaterial':
                     n_dict['value'] = df.get('description').get('attributes').get('optional_fields').get(
                         'dcterms:relation')
-                # TODO - other fields not working i.e. dataSources and relatedMaterials, which cause Dataverse to throw HTTP500 with glassfish error. Have left issue on github: https://github.com/IQSS/dataverse/issues/3859
-
-            new_dataset_url = self.host + '{0}/{1}/{2}/?key={3}'.format('dataverses', dataverse['data']['alias'], 'datasets',
+                    n_dict['value'] = listize(n_dict['value'])
+                    if not n_dict['value']:
+                        n_dict['value'] = []
+                        # TODO - if other fields are required, add them into the dataset_scaffold template, and extract them from the datafile object
+            new_dataset_url = self.host + '{0}/{1}/{2}/?key={3}'.format('dataverses', dataverse['data']['alias'],
+                                                                        'datasets',
                                                                         self.token)
             resp = requests.post(new_dataset_url,
                                  data=json.dumps(ds_scaf)
                                  )
-            with open('/Users/fshaw/Desktop/dataverse_output.json', 'a+') as output_file:
-                pprint(resp.content, output_file)
-            #return json.loads(resp.content.decode('utf-8'))
+
+            out = json.loads(resp.content.decode('utf-8'))
+            if out['status'] == "OK":
+                # now we get dataset details
+                dataset_id = out["data"]["id"]
+                url = urljoin(self.host, 'datasets/' + str(dataset_id) + '/?key=' + self.token)
+                d = requests.get(url)
+                out = json.loads(d.content.decode('utf-8'))
+                out['doi'] = out['data']['protocol'] + ':' + out['data']['authority'] + '/' + out['data']['identifier']
+
+        return out
 
     def _upload_files(self, dataverse, dataset, dataFile_ids, sub_id):
-        url_dataset_id = 'https://%s/api/datasets/:persistentId/add?persistentId=%s&key=%s' % (self.host,
-                                                                                               dataset.doi,
-                                                                                               self.token)
+
+        # TODO - get first dataset in dataverse...this should change in a future release
+        if isinstance(dataset, list):
+            dataset = dataset[0]
+
+        url_dataset_id = '{0}datasets/:persistentId/add?persistentId={1}&key={2}'.format(self.host,
+                                                                                         dataset['doi'],
+                                                                                         self.token)
         accessions = list()
         for id in dataFile_ids:
             file = DataFile().get_record(ObjectId(id))
@@ -180,7 +202,7 @@ class DataverseSubmit(object):
 
             payload = dict()
             params = dict(description='Blue skies!',
-                         categories=['Lily', 'Rosemary', 'Jack of Hearts'])
+                          categories=['Lily', 'Rosemary', 'Jack of Hearts'])
             params_as_json_string = json.dumps(params)
             payload = dict(jsonData=params_as_json_string)
             r = requests.post(url_dataset_id, data=payload, files=files)
@@ -192,9 +214,9 @@ class DataverseSubmit(object):
             # add mongo_file id
             acc = json.loads(r.content.decode('utf-8'))['data']['files'][0]['dataFile']
             acc['mongo_file_id'] = id
-            acc['dataset_doi'] = dataset.doi
-            acc['dataverse_title'] = dataverse.title
-            acc['dataverse_alias'] = dataverse.alias
+            acc['dataset_doi'] = dataset['doi']
+            acc['dataverse_title'] = dataverse['data']['name']
+            acc['dataverse_alias'] = dataverse['data']['alias']
             accessions.append(acc)
 
         # save accessions to mongo profile record
@@ -206,9 +228,10 @@ class DataverseSubmit(object):
         Submission().mark_submission_complete(sub_id)
         return True
 
-    def _connect(self, host, token):
-        try:
-            c = Connection(host, token)
-            return c
-        except ConnectionError:
-            return None
+
+def listize(list):
+    # split list by comma
+    if list == '':
+        return None
+    else:
+        return list.split(',')

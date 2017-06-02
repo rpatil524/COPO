@@ -100,6 +100,15 @@
             "multiple": false,
             "typeClass": "primitive",
             "value": ""
+          },
+          {
+            "typeName": "relatedMaterial",
+            "multiple": true,
+            "typeClass": "primitive",
+            "value": [
+              "RelatedMaterial1",
+              "RelatedMaterial2"
+            ]
           }
         ]
       }

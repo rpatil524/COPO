@@ -131,7 +131,8 @@ var controlsMapping = {
     "copo-item-count": "do_copo_item_count_ctrl",
     "date-picker": "do_date_picker_ctrl",
     "copo-duration": "do_copo_duration_ctrl",
-    "text-percent": "do_percent_text_box"
+    "text-percent": "do_percent_text_box",
+    "dataverse-author": "do_dataverse_author"
 };
 
 function json2HtmlForm(data) {
@@ -1331,6 +1332,9 @@ var dispatchFormControl = {
         return form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
+    },
+    do_dataverse_author: function do_dataverse_author(formElem){
+        alert('abc')
     }
 };
 
