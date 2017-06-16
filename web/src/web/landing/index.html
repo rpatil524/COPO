@@ -1,35 +1,40 @@
-{% load staticfiles %}
 <!DOCTYPE html>
-<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
-<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
-<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if lt IE 7 ]>
+<html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]>
+<html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]>
+<html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!-->
 <html lang="en">
 <!--<![endif]-->
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
     <!--[if IE]>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <![endif]-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <![endif]-->
     <title>COPO - Collaborative Open Plant Omics</title>
     <!--REQUIRED STYLE SHEETS-->
     <!-- BOOTSTRAP CORE STYLE CSS -->
-    <link href="{% static 'landing/css/bootstrap.css' %}" rel="stylesheet"/>
+    <link href="assets/css/bootstrap.css" rel="stylesheet"/>
     <!-- FONTAWESOME STYLE CSS -->
-    <link href="{% static 'landing/css/font-awesome.min.css' %}" rel="stylesheet"/>
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet"/>
     <!-- CUSTOM STYLE CSS -->
-    <link href="{% static 'landing/css/style.css' %}" rel="stylesheet"/>
+    <link href="assets/css/style.css" rel="stylesheet"/>
     <!-- GOOGLE FONT -->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Raleway|Slabo+27px" rel="stylesheet">
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
 </head>
+
 <body>
 
 
@@ -47,15 +52,16 @@
     <!-- Collect the nav links for toggling -->
     <div class="collapse navbar-collapse navbar-ex1-collapse">
         <ul class="nav navbar-nav pull-right">
-            <li><a href="#home">HOME</a>
-            </li>
+
             <li><a href="#about">Project</a>
             </li>
-
+            <li><a href="#news-sec">News</a>
+            </li>
             <li><a href="#work-sec">People</a>
             </li>
-            <li><a href="#contact-sec">Content</a>
+            <li><a href="#contact-sec">Contact</a>
             </li>
+
 
         </ul>
     </div>
@@ -67,15 +73,32 @@
 
 <!--End Navigation -->
 
+<div id="myCarousel" class="carousel container slide">
+    <div class="carousel-inner">
+        <div class="active item one"></div>
+        <div class="item four"></div>
+        <div class="item five"></div>
+        <div class="item seven"></div>
+    </div>
+</div>
 
 <!--Header section  -->
 <div class="container" id="home">
     <div class="row text-center">
         <div class="col-md-12 col-md-12 col-sm-12">
             <h1>
-                <img class="header-img" src="/static/copo/img/copo_white_800.png">
+                <img class="header-img" src="assets/img/logo8_white_trans.png">
             </h1>
-            <h2 class="head-sub-main">describe &nbsp deposit &nbsp discover</h2>
+            <h2 class="sub-head" id="carousel_text">describe &nbsp deposit &nbsp discover</h2>
+            <!--
+            <div class="head-sub-main">
+                <p id="carousel_text" class="text-center">Publications, data, images, and other ‘research objects’ can
+                    be submitted through COPO to remote long-term
+                    storage repositories, with a helpful graphical user interface (GUI) relieving much of the
+                    eye-watering
+                    formatting burden required for preparing the information that goes alongside the research data.</p>
+            </div>
+            -->
         </div>
     </div>
 </div>
@@ -83,189 +106,275 @@
 
 <!--About Section-->
 <section class="color-white" id="about">
-    <div class="container">
-
-        <div class="row">
-            <div class="col-md-12 col-md-12 col-sm-12">
-                <h2 style="padding-top:50px;">Project</h2>
-                <h4>
-                    <strong>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Curabitur nec nisl odio. Mauris vehicula at nunc id posuere.
-                    </strong>
-                </h4>
+<!--    <div class="container"> -->
+  <div class="row">
+    <div class="col-lg-2 col-md-2 col-sm-2"></div>
+    <div class="col-lg-8 col-md-8 col-sm-8">
+      <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-12 info-wrap">
+          <div id="pub-panel" class="info-panel">
+            <div class="info-panel-header">
+              <!-- <i class="fa fa-book fa-2x" aria-hidden="true"></i> -->
+              <span class="icon-text">Publication</span>
             </div>
-
+            <div id="pub-panel-inner">
+            COPO is a portal for plant scientists to describe, store and retrieve data more easily, using community standards and public repositories that enable the open sharing of results. COPO can link your outputs to your ORCiD profile.
+            </div>
+          </div>
         </div>
-
-
+        <div class="col-lg-4 col-md-4 col-sm-12 info-wrap">
+          <div id="cit-panel" class="info-panel">
+            <div class="info-panel-header">
+              <!-- <i class="fa fa-retweet fa-2x" aria-hidden="true"></i> -->
+              <span class="icon-text">Citation</span>
+            </div>
+            <div id="cit-panel-inner">
+            By tracking unique identifiers and DOIs, COPO can provide a way to monitor usage and get credit for your work, such as source code or research data, which still are not typically cited in the majority of scientific papers.
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-12 info-wrap">
+          <div id="auto-panel" class="info-panel">
+            <div class="info-panel-header">
+              <!--<i class="fa fa-magic fa-2x" aria-hidden="true"></i>-->
+              <span class="icon-text">Automation</span>
+            </div>
+            <div id="auto-panel-inner">
+            COPO Wizards allow metadata to be added to your research objects with guided help and natural workflows. COPO can suggest metadata that might be appropriate for your data based on past submissions and similar workflows.
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+    <div class="col-lg-2 col-md-2 col-sm-2"></div>
+  </div>
+<!--    </div> -->
 </section>
-
-
 <!--End About Section-->
 
-
-<!-- WORK Flow Section -->
-<section class="color-green" id="work-sec">
+<section class="color-green" id="news-sec">
     <div class="container">
-
         <div class="row">
-            <div class="col-md-12 col-md-12 col-sm-12">
-                <h2>2nd COPO Workshop Agenda - 12th/13th December 2016</h2>
-                <h4>
-                    Day 1
-                </h4>
+            <div class="col-lg-1 col-md-1 col-sm-1"></div>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+                <div class="news-item">
+                    <!-- CONTENT HERE -->
+                    <h2 class="project-para">COPO 2nd Workshop <span
+                            class="small">13th-14th December</span></h2>
+                    <div class="news-item-text">We are pleased to announce the 2nd COPO Workshop / User group will be
+                        held in mid December. The purpose of this workshop is to demonstrate progress so far, gauge
+                        user opinion as the usability of the current COPO implementation and to discuss features and
+                        functionality the community would like to see implemented in the near future.
+                        <br/><br/>
+                        Please find the <a href="agenda_workshop2.html">agenda</a> for the meeting here.
+                    </div>
 
-
-                <span class="lead">Short project and group introduction</span>
-                <ul>
-
-                    <li>Set out what we want to achieve</li>
-                    <li>Experimental metadata collection (spreadsheets, ISA standard)</li>
-                    <li>Spreadsheet annotation technologies (hypothes.is, RightField, OntoMaton)</li>
-                    <li>Raw sequence data submissions (ENA)</li>
-                </ul>
-                <span class="lead">Group Breakout</span>
-                <ul>
-                    <li>Real world sequence datasets that the groups are able to/want to share</li>
-                    <li>Understand breadth of experimental data collection and opportunities to standardise</li>
-                </ul>
-
-                <h4>Day 2</h4>
-
-                <span class="lead">Continue group breakouts</span>
-                <ul>
-                    <li>Start working on annotating experimental metadata using hypothes.is/annotator.js</li>
-                    <li>Use Ontology Lookup Service (OLS) to search and use ontology terms for annotation</li>
-                    <li>Use Zooma (<a href="https://www.ebi.ac.uk/spot/zooma/">https://www.ebi.ac.uk/spot/zooma/</a>) to
-                        collate terms that don’t exist in ontologies
-                    </li>
-                    <li>Use COPO to submit ENA data</li>
-                </ul>
-
-                <div class="lead">Summary and thanks</div>
-                <div class="lead">Developer meetup</div>
-                <div class="lead">SAB Conference Call</div>
-
-
+                </div>
             </div>
-
+            <div class="col-lg-1 col-md-1 col-sm-1"></div>
         </div>
-
-
     </div>
 </section>
 
-<section class="color-white">
+<section class="color-white" id="work-sec">
     <div class="container">
-
-
         <div class="row">
             <h2>Organisations</h2>
-            <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="/static/landing/img/oerc-logo.jpg"/>
-                <div class="p_bio">
+            <div class="col-md-3 col-md-3 col-sm-3 organisation">
+                <div class="o_img">
+                    <img class="org_img" src="assets/img/ei.png"/>
+                </div>
+                <div class="o_bio">
+                    <h4>Earlham Institute</h4>
+                    The Data Infrastructure and Algorithms group focuses on research into understanding how best to
+                    manage, represent and analyse
+                    data for open science, as well as exploring new hardware, algorithms and methodologies to develop
+                    tools to push the boundaries of data-driven informatics in the life sciences. The team applies their
+                    research expertise to develop infrastructure platforms for data and software dissemination and
+                    publication,
+                    assembly algorithms for viral and microbial metagenomics, large-scale data visualisation, and best
+                    practice and training in bioinformatics.
+                </div>
+            </div>
+            <div class="col-md-3 col-md-3 col-sm-3 organisation">
+                <div class="o_img">
+                    <img class="org_img" src="assets/img/oerc-logo.jpg"/>
+                </div>
+                <div class="o_bio">
                     <h4>Oxford e-Research Centre</h4>
-
-                    Anthony Etuk (Toni) works as a Research Software Engineer at the Earlham Institute. He has a PhD in
-                    Computer Science from the University of Aberdeen. His area of interest was multi-agent systems, with
-                    a focus on computational models of Trust and Reputation. He continues to explore these techniques,
-                    and a number of techniques from Machine Learning and statistics, in contexts of Open Science and
-                    Bioinformatics.
+                    The Oxford team mainly contributes elements of the open source metadata tracking framework
+                    <a href="http://isa-tools.org">ISA Tools</a>, which is supported by an international
+                    community (<a href="http://www.isacommons.org/">ISA Commons</a>). The team develops
+                    the metadata representation, providing the model and configurations that enable standards-compliant
+                    reporting, metadata deposition APIs and services, as well as conversion and validation services.
+                    These functionalities are being developed within and incorporated into the wider ISA-API project
+                    <a href="https://github.com/ISA-tools/isa-api">https://github.com/ISA-tools/isa-api</a>.
+                </div>
+            </div>
+            <div class="col-md-3 col-md-3 col-sm-3 organisation">
+                <div class="o_img">
+                    <img class="org_img" src="assets/img/york.png"/>
+                </div>
+                <div class="o_bio">
+                    <h4>University of York</h4>
+                    The York team deals with community liaison and provides a connection to key user groups of the COPO platform, assists with user testing and usability via the <a href="http://www.garnetcommunity.org.uk/">GARNet Network</a> and the <a href="http://globalplantcouncil.org/">Global Plant Council</a>.
+                </div>
+            </div>
+            <div class="col-md-3 col-md-3 col-sm-3 organisation">
+                <div class="o_img">
+                    <img class="org_img" src="assets/img/ebi.png"/>
+                </div>
+                <div class="o_bio">
+                    <h4>EMBL-EBI</h4>
+                    The role of EMBL-EBI in COPO is to support data from COPO to the public archives, and to
+                    disseminate integrated data sets prepared through the COPO infrastructure through Ensembl Plants and
+                    other public resources.
                 </div>
             </div>
         </div>
-
 
         <div class="row">
             <h2>People</h2>
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="/static/landing/img/toni.jpg"/>
+                <img src="assets/img/rob.jpg"/>
+                <div class="p_bio">
+                    <h4>Robert Davey</h4>
+                    <p class="p_position">Earlham Institute</p>
+                    Rob leads the <a href="http://www.earlham.ac.uk/davey-group">Data Infrastructure and Algorithms
+                    group</a> at the Earlham Institute and is the PI for the COPO project. He has a PhD in Computer
+                    Science from the University of East Anglia, undertaken at the Roberts lab in the <a
+                        href="http://www.ncyc.co.uk">National Collection of Yeast Cultures</a>. Rob leads a number of
+                    large computing infrastructure development and deployment projects, is a certified <a
+                        href="http://software-carpentry.org">Software Carpentry</a> instructor, an editorial board
+                    member for Nature Scientific Data, and a <a href="https://www.software.ac.uk">Software
+                    Sustainability Institute</a> Fellow.
+                    <p class="p_orcid"><img src="assets/img/orcid.png"><a href="http://orcid.org/0000-0002-5589-7754">orcid.org/0000-0002-5589-7754</a>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3 col-md-3 col-sm-3 person">
+                <img src="assets/img/toni.jpg"/>
                 <div class="p_bio">
                     <h4>Toni Etuk</h4>
                     <p class="p_position">Earlham Institute</p>
-                    Anthony Etuk (Toni) works as a Research Software Engineer at the Earlham Institute. He has a PhD in
+                    Toni is a Research Software Engineer at the Earlham Institute. He has a PhD in
                     Computer Science from the University of Aberdeen. His area of interest was multi-agent systems, with
                     a focus on computational models of Trust and Reputation. He continues to explore these techniques,
                     and a number of techniques from Machine Learning and statistics, in contexts of Open Science and
                     Bioinformatics.
-
-                    <p class="p_orcid"><img src="/static/landing/img/orcid.png"><a
+                    <p class="p_orcid"><img src="assets/img/orcid.png"><a
                             href="http://orcid.org/0000-0001-8320-660X">orcid.org/0000-0001-8320-660X</a></p>
                 </div>
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="/static/landing/img/david.png"/>
+                <img src="assets/img/felix.jpg"/>
+                <div class="p_bio">
+                    <h4>Felix Shaw</h4>
+                    <p class="p_position">Earlham Institute</p>
+                    Felix is a Research Software Engineer working on the COPO platform; a tool for creating,
+                    depositing and searching for bundles of research objects. His PhD is in Computer Science studying
+                    facial
+                    animation, computer graphics, signal processing and machine learning. His current interests are in
+                    the fields of data science, open source and how to apply machine learning techniques in these areas
+                    to improve the tools available to researchers.
+                    <p class="p_orcid"><img src="assets/img/orcid.png"><a
+                            href="http://orcid.org/0000-0001-9649-5906">orcid.org/0000-0001-9649-5906</a></p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 col-md-3 col-sm-3 person">
+                <img src="assets/img/Susanna.jpg"/>
+                <div class="p_bio">
+                    <h4>Susanna Sansone</h4>
+                    <p class="p_position">Oxford e-Research Centre</p>
+                    Susanna is Associate Director at the University of Oxford e-Research Centre. Her interests are in
+                    the areas of knowledge and information management, and interoperability of
+                    applications. Since 2000, her projects have focused on improving the collection, curation and
+                    representation of multi-dimensional life, environmental and biomedical sciences data, to support
+                    data reproducibility and the evolution of scholarly publishing.
+                    <p class="p_orcid"><img src="assets/img/orcid.png"><a
+                            href="http://orcid.org/0000-0001-5306-5690">orcid.org/0000-0001-5306-5690</a></p>
+                </div>
+            </div>
+            <div class="col-md-3 col-md-3 col-sm-3 person">
+                <img src="assets/img/david.png"/>
                 <div class="p_bio">
                     <h4>David Johnson</h4>
-                    <p class="p_position">Oxford eResearch Centre</p>
+                    <p class="p_position">Oxford e-Research Centre</p>
                     David Johnson is a Senior Research Associate / Research Software Engineer in the Oxford e-Research
                     Centre. His work concerns the development of data infrastructure to support data-intensive research
                     in the life, natural, and biomedical sciences. In the COPO project, David is part of the ISA Team
                     developing the underlying 'omics standards framework that COPO uses.
-                    <p class="p_orcid"><img src="/static/landing/img/orcid.png"><a
+                    <p class="p_orcid"><img src="assets/img/orcid.png"><a
                             href="http://orcid.org/0000-0002-2323-6847">orcid.org/0000-0002-2323-6847</a></p>
                 </div>
             </div>
-
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="/static/landing/img/Susanna.jpg"/>
+                <img src="assets/img/Alejandra.jpg"/>
                 <div class="p_bio">
-                    <h4>Pauli Gaultieri</h4>
-                    <p class="p_position">Oxford eResearch</p>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
-                    and
-                    scrambled it to make a type specimen book.
+                    <h4>Alejandra Gonzalez Beltran</h4>
+                    <p class="p_position">Oxford e-Research Centre</p>
+                    Alejandra is a Research Lecturer at the University of Oxford e-Research Centre, where she focuses on
+                    developing methodologies and software tools for data science, including
+                    knowledge management and data analysis. She mainly deals with heterogeneous biological and
+                    biomedical data, within the context of the ISA infrastructure. She brings these skills along with a
+                    wealth of software engineering experience to the COPO project.
+                    <p class="p_orcid"><img src="assets/img/orcid.png"><a
+                            href="http://orcid.org/0000-0003-3499-8262">orcid.org/0000-0003-3499-8262</a></p>
                 </div>
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="/static/landing/img/Alejandra.jpg"/>
+                <img src="assets/img/Philippe.jpg"/>
                 <div class="p_bio">
-                    <h4>Christopher Molisanti</h4>
-                    <p class="p_position">Oxford eResearch</p>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
-                    and
-                    scrambled it to make a type specimen book.
+                    <h4>Philippe Rocca-Serra</h4>
+                    <p class="p_position">Oxford e-Research Centre</p>
+                    Phillipe has been an active member of several standardisation efforts aimed at promoting the vision
+                    for open data and open science. As part of several EU projects in toxicogenomics and nutrigenomics,
+                    he coordinated the development of the ISA project, which now continues at the University of Oxford
+                    e-Research Centre. As part of the COPO project he provides technical expertise with regards to
+                    metadata collection and experimental design.
+                    <p class="p_orcid"><img src="assets/img/orcid.png"><a
+                            href="http://orcid.org/0000-0001-9853-5668">orcid.org/0000-0001-9853-5668</a></p>
                 </div>
             </div>
-
         </div>
-
         <div class="row">
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="/static/landing/img/Philippe.jpg"/>
+                <img src="assets/img/katherine.png"/>
                 <div class="p_bio">
-                    <h4>Pauli Gaultieri</h4>
-                    <p class="p_position">Oxford eResearch</p>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
-                    and
-                    scrambled it to make a type specimen book.
+                    <h4>Katherine Denby</h4>
+                    <p class="p_position">University of York</p>
+                    Katherine is a Professor in the Department of Biology at the University of York. She uses experimental and computational/mathematical tools to elucidate gene regulatory networks underlying plant responses to the environment and re-engineer these networks to enhance stress tolerance, particularly disease resistance. She has expertise in large scale data analysis and integration, and interest in making such data easily discoverable and accessible for others.
+                    <p class="p_orcid"><img src="assets/img/orcid.png"><a href="http://orcid.org/0000-0002-7857-6814">orcid.org/0000-0002-7857-6814</a></p>
                 </div>
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="/static/landing/img/felix.jpg"/>
+                <img src="assets/img/paul.png"/>
                 <div class="p_bio">
-                    <h4>Felix Shaw</h4>
-                    <p class="p_position">Earlham Institute</p>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
-                    and
-                    scrambled it to make a type specimen book.
-                    <p class="p_orcid"><img src="/static/landing/img/orcid.png"><a
-                            href="http://orcid.org/0000-0001-9649-5906">orcid.org/0000-0001-9649-5906</a></p>
+                    <h4>Paul Kersey</h4>
+                    <p class="p_position">EMBL EBI</p>
+                    Paul works at EMBL-EBI where he has been in charge Ensembl covering non-vertebrate species,
+                    including human pathogens, disease vectors, crop plants,
+                    and model species.
 
+                    The role of EMBL-EBI in COPO is to support data from through COPO to the public archives, and to
+                    disseminate integrated data sets prepared through the COPO infrastructure through Ensembl Plants and
+                    other public resources.
+                </div>
+            </div>
+            <div class="col-md-3 col-md-3 col-sm-3 person">
+                <img src="assets/img/ruth.jpg"/>
+                <div class="p_bio">
+                    <h4>Ruth Bastow</h4>
+                    <p class="p_position">Global Plant Council</p>
+Ruth manages the day-to-day operations of the Global Plant Council which is a coalition of 28 learned plant, crop and agricultural science societies across the globe and represents ~55,000 researchers. Ruth has a proven track record in national and international project management for a number of different research projects and networks. In additional to her current administrative, policy, and advocacy work in the plant sciences she also has a background in plant science data standards, ontologies, and data sharing.
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-
-<!--End WORK Flow  Section -->
 <!-- Contact Section -->
 <section class="color-light " id="contact-sec">
     <div class="container">
@@ -304,7 +413,7 @@
             </div>
             <div class="col-md-6">
 
-                <form action="mailto:copo@tgac.ac.uk?subject=I'm intetested in COPO!" method="post" enctype="text/plain">
+                <form id="email_form" action="mailto:copo@earlham.ac.uk?subject=I'm intetested in COPO!" method="post" enctype="text/plain">
                     <div class="row">
                         <div class="col-md-6 col-sm-6">
                             <div class="form-group">
@@ -324,18 +433,16 @@
                                           placeholder="Message"></textarea>
                             </div>
                             <div class="form-group">
-                                <button type="submit" class="btn btn-default">Submit Request</button>
+                                <button id="email_submit" type="submit" class="btn btn-default">Submit Request</button>
+
                             </div>
                         </div>
                     </div>
                 </form>
                 <br/>
                 <div id="social-icon">
-                    <a href="#"><i class="fa fa-facebook fa-2x"></i></a>
-                    <a href="#"><i class="fa fa-twitter fa-2x"></i></a>
-                    <a href="#"><i class="fa fa-linkedin fa-2x"></i></a>
-                    <a href="#"><i class="fa fa-google-plus fa-2x"></i></a>
-                    <a href="#"><i class="fa fa-pinterest fa-2x"></i></a>
+
+
                 </div>
             </div>
 
@@ -348,17 +455,19 @@
 <div class="for-full-back " id="footer">
 
 
+    <span class="pull-left"><a href="https://www.jetbrains.com/pycharm/"><img style="margin-top: -10px" height="40px" src="assets/img/icon_PyCharm.png">&nbsp COPO is written using PyCharm. Its awesome!</a></span>
     <a href="https://github.com/collaborative-open-plant-omics">https://github.com/collaborative-open-plant-omics</a>
 
 </div>
 <!--End footer Section -->
 <!-- JAVASCRIPT FILES PLACED AT THE BOTTOM TO REDUCE THE LOADING TIME  -->
 <!-- CORE JQUERY  -->
-<script src="../../static/landing/plugins/jquery-1.10.2.js"></script>
+<script src="assets/plugins/jquery-1.10.2.js"></script>
 <!-- BOOTSTRAP CORE SCRIPT   -->
-<script src="../../static/landing/plugins/bootstrap.js"></script>
+<script src="assets/plugins/bootstrap.js"></script>
 <!-- CUSTOM SCRIPTS -->
-<script src="../../static/landing/js/custom.js"></script>
+<script src="assets/js/custom.js"></script>
 
 </body>
+
 </html>
