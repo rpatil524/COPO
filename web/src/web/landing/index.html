@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <!--[if lt IE 7 ]>
 <html class="ie ie6" lang="en"> <![endif]-->
@@ -20,11 +21,11 @@
     <title>COPO - Collaborative Open Plant Omics</title>
     <!--REQUIRED STYLE SHEETS-->
     <!-- BOOTSTRAP CORE STYLE CSS -->
-    <link href="assets/css/bootstrap.css" rel="stylesheet"/>
+    <link href="/static/assets/css/bootstrap.css" rel="stylesheet"/>
     <!-- FONTAWESOME STYLE CSS -->
-    <link href="assets/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="/static/assets/css/font-awesome.min.css" rel="stylesheet"/>
     <!-- CUSTOM STYLE CSS -->
-    <link href="assets/css/style.css" rel="stylesheet"/>
+    <link href="/static/assets/css/style.css" rel="stylesheet"/>
     <!-- GOOGLE FONT -->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link href="https://fonts.googleapis.com/css?family=Raleway|Slabo+27px" rel="stylesheet">
@@ -61,7 +62,7 @@
             </li>
             <li><a href="#contact-sec">Contact</a>
             </li>
-
+            
 
         </ul>
     </div>
@@ -87,7 +88,7 @@
     <div class="row text-center">
         <div class="col-md-12 col-md-12 col-sm-12">
             <h1>
-                <img class="header-img" src="assets/img/logo8_white_trans.png">
+                <img class="header-img" src="/static/assets/img/logo8_white_trans.png">
             </h1>
             <h2 class="sub-head" id="carousel_text">describe &nbsp deposit &nbsp discover</h2>
             <!--
@@ -120,7 +121,7 @@
             <div id="pub-panel-inner">
             COPO is a portal for plant scientists to describe, store and retrieve data more easily, using community standards and public repositories that enable the open sharing of results. COPO can link your outputs to your ORCiD profile.
             </div>
-          </div>
+          </div> 
         </div>
         <div class="col-lg-4 col-md-4 col-sm-12 info-wrap">
           <div id="cit-panel" class="info-panel">
@@ -182,7 +183,7 @@
             <h2>Organisations</h2>
             <div class="col-md-3 col-md-3 col-sm-3 organisation">
                 <div class="o_img">
-                    <img class="org_img" src="assets/img/ei.png"/>
+                    <img class="org_img" src="/static/assets/img/ei.png"/>
                 </div>
                 <div class="o_bio">
                     <h4>Earlham Institute</h4>
@@ -198,7 +199,7 @@
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 organisation">
                 <div class="o_img">
-                    <img class="org_img" src="assets/img/oerc-logo.jpg"/>
+                    <img class="org_img" src="/static/assets/img/oerc-logo.jpg"/>
                 </div>
                 <div class="o_bio">
                     <h4>Oxford e-Research Centre</h4>
@@ -213,7 +214,7 @@
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 organisation">
                 <div class="o_img">
-                    <img class="org_img" src="assets/img/york.png"/>
+                    <img class="org_img" src="/static/assets/img/york.png"/>
                 </div>
                 <div class="o_bio">
                     <h4>University of York</h4>
@@ -222,7 +223,7 @@
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 organisation">
                 <div class="o_img">
-                    <img class="org_img" src="assets/img/ebi.png"/>
+                    <img class="org_img" src="/static/assets/img/ebi.png"/>
                 </div>
                 <div class="o_bio">
                     <h4>EMBL-EBI</h4>
@@ -236,7 +237,7 @@
         <div class="row">
             <h2>People</h2>
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="assets/img/rob.jpg"/>
+                <img src="/static/assets/img/rob.jpg"/>
                 <div class="p_bio">
                     <h4>Robert Davey</h4>
                     <p class="p_position">Earlham Institute</p>
@@ -248,12 +249,12 @@
                         href="http://software-carpentry.org">Software Carpentry</a> instructor, an editorial board
                     member for Nature Scientific Data, and a <a href="https://www.software.ac.uk">Software
                     Sustainability Institute</a> Fellow.
-                    <p class="p_orcid"><img src="assets/img/orcid.png"><a href="http://orcid.org/0000-0002-5589-7754">orcid.org/0000-0002-5589-7754</a>
+                    <p class="p_orcid"><img src="/static/assets/img/orcid.png"><a href="http://orcid.org/0000-0002-5589-7754">orcid.org/0000-0002-5589-7754</a>
                     </p>
                 </div>
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="assets/img/toni.jpg"/>
+                <img src="/static/assets/img/toni.jpg"/>
                 <div class="p_bio">
                     <h4>Toni Etuk</h4>
                     <p class="p_position">Earlham Institute</p>
@@ -262,12 +263,12 @@
                     a focus on computational models of Trust and Reputation. He continues to explore these techniques,
                     and a number of techniques from Machine Learning and statistics, in contexts of Open Science and
                     Bioinformatics.
-                    <p class="p_orcid"><img src="assets/img/orcid.png"><a
+                    <p class="p_orcid"><img src="/static/assets/img/orcid.png"><a
                             href="http://orcid.org/0000-0001-8320-660X">orcid.org/0000-0001-8320-660X</a></p>
                 </div>
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="assets/img/felix.jpg"/>
+                <img src="/static/assets/img/felix.jpg"/>
                 <div class="p_bio">
                     <h4>Felix Shaw</h4>
                     <p class="p_position">Earlham Institute</p>
@@ -277,14 +278,14 @@
                     animation, computer graphics, signal processing and machine learning. His current interests are in
                     the fields of data science, open source and how to apply machine learning techniques in these areas
                     to improve the tools available to researchers.
-                    <p class="p_orcid"><img src="assets/img/orcid.png"><a
+                    <p class="p_orcid"><img src="/static/assets/img/orcid.png"><a
                             href="http://orcid.org/0000-0001-9649-5906">orcid.org/0000-0001-9649-5906</a></p>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="assets/img/Susanna.jpg"/>
+                <img src="/static/assets/img/Susanna.jpg"/>
                 <div class="p_bio">
                     <h4>Susanna Sansone</h4>
                     <p class="p_position">Oxford e-Research Centre</p>
@@ -293,12 +294,12 @@
                     applications. Since 2000, her projects have focused on improving the collection, curation and
                     representation of multi-dimensional life, environmental and biomedical sciences data, to support
                     data reproducibility and the evolution of scholarly publishing.
-                    <p class="p_orcid"><img src="assets/img/orcid.png"><a
+                    <p class="p_orcid"><img src="/static/assets/img/orcid.png"><a
                             href="http://orcid.org/0000-0001-5306-5690">orcid.org/0000-0001-5306-5690</a></p>
                 </div>
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="assets/img/david.png"/>
+                <img src="/static/assets/img/david.png"/>
                 <div class="p_bio">
                     <h4>David Johnson</h4>
                     <p class="p_position">Oxford e-Research Centre</p>
@@ -306,12 +307,12 @@
                     Centre. His work concerns the development of data infrastructure to support data-intensive research
                     in the life, natural, and biomedical sciences. In the COPO project, David is part of the ISA Team
                     developing the underlying 'omics standards framework that COPO uses.
-                    <p class="p_orcid"><img src="assets/img/orcid.png"><a
+                    <p class="p_orcid"><img src="/static/assets/img/orcid.png"><a
                             href="http://orcid.org/0000-0002-2323-6847">orcid.org/0000-0002-2323-6847</a></p>
                 </div>
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="assets/img/Alejandra.jpg"/>
+                <img src="/static/assets/img/Alejandra.jpg"/>
                 <div class="p_bio">
                     <h4>Alejandra Gonzalez Beltran</h4>
                     <p class="p_position">Oxford e-Research Centre</p>
@@ -320,12 +321,12 @@
                     knowledge management and data analysis. She mainly deals with heterogeneous biological and
                     biomedical data, within the context of the ISA infrastructure. She brings these skills along with a
                     wealth of software engineering experience to the COPO project.
-                    <p class="p_orcid"><img src="assets/img/orcid.png"><a
+                    <p class="p_orcid"><img src="/static/assets/img/orcid.png"><a
                             href="http://orcid.org/0000-0003-3499-8262">orcid.org/0000-0003-3499-8262</a></p>
                 </div>
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="assets/img/Philippe.jpg"/>
+                <img src="/static/assets/img/Philippe.jpg"/>
                 <div class="p_bio">
                     <h4>Philippe Rocca-Serra</h4>
                     <p class="p_position">Oxford e-Research Centre</p>
@@ -334,23 +335,23 @@
                     he coordinated the development of the ISA project, which now continues at the University of Oxford
                     e-Research Centre. As part of the COPO project he provides technical expertise with regards to
                     metadata collection and experimental design.
-                    <p class="p_orcid"><img src="assets/img/orcid.png"><a
+                    <p class="p_orcid"><img src="/static/assets/img/orcid.png"><a
                             href="http://orcid.org/0000-0001-9853-5668">orcid.org/0000-0001-9853-5668</a></p>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="assets/img/katherine.png"/>
+                <img src="/static/assets/img/katherine.png"/>
                 <div class="p_bio">
                     <h4>Katherine Denby</h4>
                     <p class="p_position">University of York</p>
                     Katherine is a Professor in the Department of Biology at the University of York. She uses experimental and computational/mathematical tools to elucidate gene regulatory networks underlying plant responses to the environment and re-engineer these networks to enhance stress tolerance, particularly disease resistance. She has expertise in large scale data analysis and integration, and interest in making such data easily discoverable and accessible for others.
-                    <p class="p_orcid"><img src="assets/img/orcid.png"><a href="http://orcid.org/0000-0002-7857-6814">orcid.org/0000-0002-7857-6814</a></p>
+                    <p class="p_orcid"><img src="/static/assets/img/orcid.png"><a href="http://orcid.org/0000-0002-7857-6814">orcid.org/0000-0002-7857-6814</a></p>
                 </div>
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="assets/img/paul.png"/>
+                <img src="/static/assets/img/paul.png"/>
                 <div class="p_bio">
                     <h4>Paul Kersey</h4>
                     <p class="p_position">EMBL EBI</p>
@@ -364,7 +365,7 @@
                 </div>
             </div>
             <div class="col-md-3 col-md-3 col-sm-3 person">
-                <img src="assets/img/ruth.jpg"/>
+                <img src="/static/assets/img/ruth.jpg"/>
                 <div class="p_bio">
                     <h4>Ruth Bastow</h4>
                     <p class="p_position">Global Plant Council</p>
@@ -434,15 +435,15 @@ Ruth manages the day-to-day operations of the Global Plant Council which is a co
                             </div>
                             <div class="form-group">
                                 <button id="email_submit" type="submit" class="btn btn-default">Submit Request</button>
-
+                                
                             </div>
                         </div>
                     </div>
                 </form>
                 <br/>
                 <div id="social-icon">
-
-
+                    
+                    
                 </div>
             </div>
 
@@ -455,18 +456,18 @@ Ruth manages the day-to-day operations of the Global Plant Council which is a co
 <div class="for-full-back " id="footer">
 
 
-    <span class="pull-left"><a href="https://www.jetbrains.com/pycharm/"><img style="margin-top: -10px" height="40px" src="assets/img/icon_PyCharm.png">&nbsp COPO is written using PyCharm. Its awesome!</a></span>
+    <span class="pull-left"><a href="https://www.jetbrains.com/pycharm/"><img style="margin-top: -10px" height="40px" src="/static/assets/img/icon_PyCharm.png">&nbsp COPO is written using PyCharm. Its awesome!</a></span>
     <a href="https://github.com/collaborative-open-plant-omics">https://github.com/collaborative-open-plant-omics</a>
 
 </div>
 <!--End footer Section -->
 <!-- JAVASCRIPT FILES PLACED AT THE BOTTOM TO REDUCE THE LOADING TIME  -->
 <!-- CORE JQUERY  -->
-<script src="assets/plugins/jquery-1.10.2.js"></script>
+<script src="/static/assets/plugins/jquery-1.10.2.js"></script>
 <!-- BOOTSTRAP CORE SCRIPT   -->
-<script src="assets/plugins/bootstrap.js"></script>
+<script src="/static/assets/plugins/bootstrap.js"></script>
 <!-- CUSTOM SCRIPTS -->
-<script src="assets/js/custom.js"></script>
+<script src="/static/assets/js/custom.js"></script>
 
 </body>
 
