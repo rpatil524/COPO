@@ -358,6 +358,20 @@ class Submission(DAComponent):
             }
         )
 
+    def mark_figshare_article_id(self, sub_id, article_id):
+        if not type(article_id) is list:
+            article_id = [article_id]
+        doc = self.get_collection_handle().update_one(
+            {
+                '_id': ObjectId(sub_id)
+            },
+            {
+                "$set": {
+                    "accessions": article_id,
+                }
+            }
+        )
+
     def get_file_accession(self, sub_id):
         doc = self.get_collection_handle().find_one(
             {
