@@ -255,6 +255,19 @@ class BrokerVisuals:
         return self.context
 
     def get_component_help_messages(self):
-        self.context['help_messages'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS['HELP_MESSAGES'][self.component])
+        self.context['help_messages'] = dict()
+        self.context['global_help_messages'] = dict()
+
+        paths_dict = lkup.MESSAGES_LKUPS['HELP_MESSAGES']
+
+        if self.component in paths_dict:
+            self.context['help_messages'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS['HELP_MESSAGES'][self.component])
+
+        # get global help
+        if "global" in paths_dict:
+            global_help_dict = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS['HELP_MESSAGES']["global"])
+
+            if self.component in global_help_dict:
+                self.context['global_help_messages'] = {self.component: global_help_dict[self.component]}
 
         return self.context

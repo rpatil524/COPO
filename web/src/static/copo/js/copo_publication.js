@@ -9,6 +9,9 @@ $(document).ready(function () {
 
     csrftoken = $.cookie('csrftoken');
 
+    //global_help_call
+    do_global_help(component);
+
     $.ajax({
         url: copoVisualsURL,
         type: "POST",

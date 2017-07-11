@@ -60,6 +60,10 @@ div[class^="col-"], div[class*=" col-"] {
     margin-top: 0px;
 }
 
+.copo-header-icons {
+    font-size: 22px !important;
+}
+
 /*table styling*/
 .copo-datatable {
     font-size: 12px;
@@ -1087,3 +1091,14 @@ input[data-autocomplete] {
 }
 
 /*end webuipopovers styling*/
+
+/*help centre*/
+.help-centre-content {
+    padding: 10px;
+    line-height: 1.7;
+    font-size: 13px;
+}
+
+.show-me-demo {
+    color: rgba(179, 0, 0, 0.6);
+}
