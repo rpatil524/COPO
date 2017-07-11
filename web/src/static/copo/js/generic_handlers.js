@@ -1,6 +1,8 @@
 //**some re-usable functions across different modules
 var AnnotationEventAdded = false;
 var selectizeObjects = Object(); //stores reference to selectize objects initialised on the page
+var copoVisualsURL = "/copo/copo_visualize/";
+var csrftoken = $.cookie('csrftoken');
 
 $(document).ready(function () {
     setup_autocomplete()
@@ -13,6 +15,10 @@ $(document).ready(function () {
 
     //set up global navigation components
     do_component_navbar($("#nav_component_name").val());
+
+    var tableLoader = get_spinner_image();
+    tableLoader.attr("id", "global_help_loader");
+    $("#global_help_panel").append(tableLoader);
 
 });
 
@@ -1262,9 +1268,6 @@ function do_multi_search_lookup() {
 function resolve_element_view(recordId, associatedComponent, eventTarget) {
     //maps form element by id to component type e.g source, sample
 
-    var copoVisualsURL = "/copo/copo_visualize/";
-    var csrftoken = $.cookie('csrftoken');
-
     if (associatedComponent == "") {
         return false;
     }
@@ -1333,7 +1336,32 @@ function build_help_pane_menu(helpObject, parentObject) {
     });
 }
 
+function do_global_help(component) {
+    //global help
+
+    $.ajax({
+        url: copoVisualsURL,
+        type: "POST",
+        headers: {'X-CSRFToken': csrftoken},
+        data: {
+            'task': 'help_messages',
+            'component': component
+        },
+        success: function (data) {
+            set_component_help(component, "global_help_table", data.global_help_messages);
+            $("#global_help_loader").remove();
+        },
+        error: function () {
+            alert("Couldn't retrieve page help!");
+        }
+    });
+}
+
 function set_component_help(helpEntryKey, tableID, helpJSON) {
+    if(!helpJSON) {
+        return;
+    }
+
     if (!helpJSON.hasOwnProperty(helpEntryKey)) {
         helpEntryKey = Object.keys(helpJSON)[0];
     }
@@ -1345,8 +1373,13 @@ function set_component_help(helpEntryKey, tableID, helpJSON) {
         option["rank"] = key + 1;
         option["title"] = val.title;
         option["content"] = val.content;
+        var helpID = Math.random() + Math.random() + Math.random();
+        helpID = helpID.toString();
+        option["help_id"] = helpID.replace(".", "_");
         dataSet.push(option);
     });
+
+
 
 
     //set data
@@ -1395,13 +1428,13 @@ function set_component_help(helpEntryKey, tableID, helpJSON) {
                     "render": function (data, type, row, meta) {
                         var aLink = $('<a/>', {
                             "data-toggle": "collapse",
-                            href: "#helpcentretips" + meta.row,
+                            href: "#helpcentretips" + meta.row + data.help_id,
                             html: data.title
                         });
 
                         var aDiv = $('<div/>', {
                             "class": "collapse help-centre-content",
-                            id: "helpcentretips" + meta.row,
+                            id: "helpcentretips" + meta.row + data.help_id,
                             html: data.content,
                             style: "background-color: #fff; margin-top: 10px; border-radius: 4px;"
                         });

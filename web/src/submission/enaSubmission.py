@@ -9,7 +9,6 @@ from dal.copo_da import RemoteDataFile, Submission, Profile
 from web.apps.web_copo.lookup.copo_enums import *
 
 import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element
 
 from isatools.convert import json2sra
 from isatools import isajson
@@ -19,9 +18,7 @@ import subprocess, os, pexpect
 from datetime import datetime
 
 from django.shortcuts import redirect
-from django.http import HttpResponse, HttpRequest
-
-from django_tools.middlewares import ThreadLocal
+from django.http import HttpRequest
 
 REPOSITORIES = settings.REPOSITORIES
 BASE_DIR = settings.BASE_DIR
@@ -223,7 +220,8 @@ class EnaSubmit(object):
          -F "SAMPLE=@' + os.path.join(remote_path, sample_file) + '" \
          -F "EXPERIMENT=@' + os.path.join(remote_path, experiment_file) + '" \
          -F "RUN=@' + os.path.join(remote_path, run_file) + '" \
-         "https://www.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20Webin-39233%20Apple123"'
+         "https://www-test.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20Webin-39233%20Apple123"'
+         ## "https://www.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20Webin-39233%20Apple123"'
 
         output = subprocess.check_output(curl_cmd, shell=True)
         lg.log(output, level=Loglvl.INFO, type=Logtype.FILE)

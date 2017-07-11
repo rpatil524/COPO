@@ -657,6 +657,7 @@ MESSAGES_LKUPS = {
     'HELP_MESSAGES': {
         'datafile': os.path.join(RESOLVER['lookup'], 'help_messages', 'datafile_help.json'),
         'sample': os.path.join(RESOLVER['lookup'], 'help_messages', 'sample_help.json'),
+        'global': os.path.join(RESOLVER['lookup'], 'help_messages', 'global_help.json'),
     },
     'datafile_wizard': os.path.join(RESOLVER['wizards_datafile'], 'messages', 'wizard_messages.json'),
     'sample_wizard_messages': os.path.join(RESOLVER['wizards_sample'], 'messages', 'wizard_messages.json'),

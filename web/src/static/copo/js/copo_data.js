@@ -22,8 +22,9 @@ $(document).ready(function () {
     var copoFormsURL = "/copo/copo_forms/";
     var copoVisualsURL = "/copo/copo_visualize/";
 
-    //test
-    //end test
+
+    //global_help_call
+    do_global_help(component);
 
 
     //on the fly info element

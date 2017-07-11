@@ -7,6 +7,9 @@ $(document).ready(function () {
     var copoVisualsURL = "/copo/copo_visualize/";
     csrftoken = $.cookie('csrftoken');
 
+    //global_help_call
+    do_global_help(component);
+
     load_profiles();
 
     //trigger refresh of profiles list
