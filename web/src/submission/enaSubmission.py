@@ -2,6 +2,7 @@ __author__ = 'felix.shaw@tgac.ac.uk - 03/05/2016'
 
 import converters.ena.copo_isa_ena as cnv
 from bson.json_util import dumps
+from tools import resolve_env
 from django.conf import settings
 from dal.copo_da import DataFile
 from dal.copo_da import RemoteDataFile, Submission, Profile
@@ -9,7 +10,6 @@ from dal.copo_da import RemoteDataFile, Submission, Profile
 from web.apps.web_copo.lookup.copo_enums import *
 
 import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element
 
 from isatools.convert import json2sra
 from isatools import isajson
@@ -19,9 +19,7 @@ import subprocess, os, pexpect
 from datetime import datetime
 
 from django.shortcuts import redirect
-from django.http import HttpResponse, HttpRequest
-
-from django_tools.middlewares import ThreadLocal
+from django.http import HttpRequest
 
 REPOSITORIES = settings.REPOSITORIES
 BASE_DIR = settings.BASE_DIR
@@ -61,13 +59,14 @@ class EnaSubmit(object):
             self.d_files.append(mongo_file)
             file_path.append(mongo_file.get("file_location", str()))
 
-        self._do_aspera_transfer(transfer_token=transfer_token,
-                                 user_name=user_name,
-                                 password=password,
-                                 remote_path=remote_path,
-                                 file_path=file_path,
-                                 path2library=path2library,
-                                 sub_id=sub_id)
+        case = self._do_aspera_transfer(transfer_token=transfer_token,
+                                        user_name=user_name,
+                                        password=password,
+                                        remote_path=remote_path,
+                                        file_path=file_path,
+                                        path2library=path2library,
+                                        sub_id=sub_id)
+        return case
 
     def _do_aspera_transfer(self, transfer_token=None, user_name=None, password=None, remote_path=None, file_path=None,
                             path2library=None, sub_id=None):
@@ -87,7 +86,7 @@ class EnaSubmit(object):
             f_str = str()
             for f in file_path:
                 f_str = f_str + ' ' + f
-            cmd = "./ascp -d -QT -l300M -L- {f_str!s} {user_name!s}:{remote_path!s}".format(**locals())
+            cmd = "./ascp -d -QT -l700M -L- {f_str!s} {user_name!s}:{remote_path!s}".format(**locals())
             lg.log(cmd, level=Loglvl.INFO, type=Logtype.FILE)
             os.chdir(path2library)
 
@@ -118,6 +117,8 @@ class EnaSubmit(object):
                             }
 
                             tokens = pexp_match.decode("utf-8").split(" ")
+
+                            lg.log(tokens, level=Loglvl.INFO, type=Logtype.FILE)
 
                             for token in tokens:
                                 if not token == '':
@@ -174,6 +175,8 @@ class EnaSubmit(object):
             except OSError:
                 return redirect('web.apps.web_copo.views.goto_error', request=HttpRequest(),
                                 message='There appears to be an issue with EBI.')
+            finally:
+                pass
 
         # setup paths for conversion directories
         conv_dir = os.path.join(self._dir, sub_id)
@@ -213,12 +216,21 @@ class EnaSubmit(object):
         experiment_file = os.path.join(xml_dir, 'experiment_set.xml')
         run_file = os.path.join(xml_dir, 'run_set.xml')
 
+        # "https://www-test.ebi.ac.uk"
+        # "https://www.ebi.ac.uk"
+        pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
+        user_token = resolve_env.get_env('WEBIN_USER')
+        user_token = user_token.split("@")[0]
+        ena_uri = "https://www-test.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20{user_token!s}%20{pass_word!s}".format(
+            **locals())
+
         curl_cmd = 'curl -k -F "SUBMISSION=@' + submission_file + '" \
          -F "PROJECT=@' + os.path.join(remote_path, project_file) + '" \
          -F "SAMPLE=@' + os.path.join(remote_path, sample_file) + '" \
          -F "EXPERIMENT=@' + os.path.join(remote_path, experiment_file) + '" \
-         -F "RUN=@' + os.path.join(remote_path, run_file) + '" \
-         "https://www-test.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20Webin-39233%20Apple123"'
+         -F "RUN=@' + os.path.join(remote_path, run_file) + '"' \
+                   + '   "' + ena_uri + '"'
+
 
         output = subprocess.check_output(curl_cmd, shell=True)
         lg.log(output, level=Loglvl.INFO, type=Logtype.FILE)
@@ -227,6 +239,14 @@ class EnaSubmit(object):
         xml = ET.fromstring(output)
 
         accessions = dict()
+
+        # first check for errors
+        errors = xml.findall('*/ERROR')
+        if errors:
+            error_text = str()
+            for e in errors:
+                error_text = error_text + e.text
+            return error_text
 
         # get project accessions
         project = xml.find('./PROJECT')
@@ -270,3 +290,5 @@ class EnaSubmit(object):
         s['complete'] = True
         s['target_id'] = str(s.pop('_id'))
         Submission().save_record(dict(), **s)
+        RemoteDataFile().delete_transfer(transfer_token)
+        return True
