@@ -69,6 +69,7 @@ def forward_to_figshare(request):
 
     # get details
     redirect_url = request.META['HTTP_REFERER']
+    # Figshare will not redirect to a non HTTPS url so check for this
     if not 'https' in redirect_url:
         redirect_url = redirect_url.replace("http", "https")
     redirect_url = FIGSHARE_API_URLS['access_token'].format(**locals())

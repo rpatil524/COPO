@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizard_views.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizard_views.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
@@ -186,8 +185,8 @@
       <file leaf-file-name="wizard_views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizard_views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="91">
-              <caret line="72" column="8" lean-forward="false" selection-start-line="72" selection-start-column="8" selection-end-line="72" selection-end-column="8" />
+            <state relative-caret-position="76">
+              <caret line="71" column="69" lean-forward="false" selection-start-line="71" selection-start-column="69" selection-end-line="71" selection-end-column="69" />
               <folding>
                 <element signature="e#49#60#0" expanded="true" />
                 <element signature="e#429#1664#0" expanded="true" />
@@ -1641,7 +1640,14 @@
       <option name="project" value="LOCAL" />
       <updated>1499943757820</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="adding comments and error checking to Figshare Oauth workflow">
+      <created>1499945657527</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1499945657527</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1759,7 +1765,8 @@
     <MESSAGE value="completed submission view" />
     <MESSAGE value="fixed figshare accessions" />
     <MESSAGE value="improve and simplify the Figshare oauth workflow" />
-    <option name="LAST_COMMIT_MESSAGE" value="improve and simplify the Figshare oauth workflow" />
+    <MESSAGE value="adding comments and error checking to Figshare Oauth workflow" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding comments and error checking to Figshare Oauth workflow" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2225,8 +2232,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizard_views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="91">
-          <caret line="72" column="8" lean-forward="false" selection-start-line="72" selection-start-column="8" selection-end-line="72" selection-end-column="8" />
+        <state relative-caret-position="76">
+          <caret line="71" column="69" lean-forward="false" selection-start-line="71" selection-start-column="69" selection-end-line="71" selection-end-column="69" />
           <folding>
             <element signature="e#49#60#0" expanded="true" />
             <element signature="e#429#1664#0" expanded="true" />
