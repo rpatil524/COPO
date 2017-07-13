@@ -32,5 +32,6 @@ urlpatterns = [
     url(r'^save_ss_annotation', a_views.save_ss_annotation, name='save_ss_annotation'),
     url(r'^delete_ss_annotation/', a_views.delete_ss_annotation, name='delete_ss_annotation'),
     url(r'^copo_get_submission_table_data/', views.copo_get_submission_table_data, name='get_submissions'),
-    url(r'^get_accession_data/', ajax.get_accession_data, name='get_accession_data')
+    url(r'^get_accession_data/', ajax.get_accession_data, name='get_accession_data'),
+    url(r'^set_session_variable/', ajax.set_session_variable, name='set_session_variable')
 ]

@@ -111,6 +111,7 @@ def get_excel_data(request):
     x = read_excel('/Users/fshaw/Dropbox/Shawtuk/dev/snps/test/test_data/ExampleSNPTable_small.xlsx', sheetname=0)
     return HttpResponse(json.dumps(x.values.tolist()))
 
+
 def get_accession_data(request):
     sub_id = request.GET.get('sub_id')
     sub = Submission().get_file_accession(sub_id)
@@ -118,3 +119,9 @@ def get_accession_data(request):
 
 
     return HttpResponse(json_util.dumps({'sub': sub}))
+
+def set_session_variable(request):
+    key = request.POST['key']
+    value = request.POST['value']
+    request.session[key] = value
+    return HttpResponse(True)
