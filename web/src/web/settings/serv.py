@@ -12,13 +12,6 @@ REPOSITORIES = {
     'IRODS': {
         'api': 'irods',
         'resource_path': '/tempZone/home/rods/copo-data',
-        'credentials': {
-            'user_token': 'etuka',
-            'host_token': 'v0546.nbi.ac.uk',
-            'program': 'python',
-            'password': 'RwvmPMC7',  # TODO: put defaults in secret_settings
-            'script': 'myptest.py'
-        }
     },
     'ORCID': {
         'api': 'orcid',
