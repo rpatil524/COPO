@@ -9,15 +9,15 @@
       },
       {
         "title": "How do I create a Profile?",
-        "content": "Click on the <mark><span><i class='fa fa-plus-circle'></i><span class='icon_text'>&nbsp;New Profile</span></span></mark> button at the top left corner of the page to create a new Profile. <p><a href='/static/copo/movies/copo_profile_create.mov' target='_blank'><span class='show-me-demo'>Show me</span></a></p>"
+        "content": "Click on the <mark><span><i class='fa fa-plus-circle'></i><span class='icon_text'>&nbsp;New Profile</span></span></mark> button at the top left corner of the page to create a new Profile. <p><div><video width='400' controls><source src='/static/copo/movies/copo_profile_create.mov'>Your browser does not support HTML5 video.</video></div></p>"
       },
       {
         "title": "How many Profiles can I have in COPO?",
         "content": "As many as possible! Since a Profile would typically represent a piece of research project, you can create as many Profiles as required in COPO to represent different projects (e.g., new grant, sub project within a large grant, PhD project)"
       },
       {
-        "title": "How do I create components within a Profile?",
-        "content": "Each Profile created in COPO provides a means for defining a set of associated components (Datafiles, Samples, Publications, etc.). Instances of these components (e.g., uploading one or more datafiles, adding a person or collaborator) can be created in any order, although some of them may have some form of dependencies (e.g., Datafiles depending on Samples). <p>You can create a Profile component through one of two ways: <ol><li>Within the Profile page: only possible if the <mark><i class='fa fa-plus-circle'></i></mark> button is found on a component block.<p><a href='/static/copo/movies/create_component_profile_1.mov' target='_blank'><span class='show-me-demo'>Show me</span></a></p></li><li>By navigating to the component page: use the <mark><i class='fa fa-eye'></i></mark> button found on the component block to navigate to the component page. Follow the specific component creation instructions on the target page.<p><a href='/static/copo/movies/create_component_profile_2.mov' target='_blank'><span class='show-me-demo'>Show me</span></a></p> </li></ol>"
+        "title": "How do I create components in a Profile?",
+        "content": "Each Profile created in COPO provides a means for defining a set of associated components (Datafiles, Samples, Publications, etc.). Instances of these components (e.g., uploading one or more datafiles, adding a person or collaborator) can be created in any order, although some of them may have some form of dependencies (e.g., Datafiles depending on Samples). <p>You can create a Profile component through one of two ways: <ol><li>Within the Profile page: only possible if the <mark><i class='fa fa-plus-circle'></i></mark> button is found on a component block.<p><div><video width='400' controls><source src='/static/copo/movies/create_component_profile_1.mov'>Your browser does not support HTML5 video.</video></div></p></li><li>By navigating to the component page: use the <mark><i class='fa fa-eye'></i></mark> button found on the component block to navigate to the component page. Follow the specific component creation instructions on the target page. <p><div><video width='400' controls><source src='/static/copo/movies/create_component_profile_2.mov'>Your browser does not support HTML5 video.</video></div></p></li></ol>"
       }
     ]
   },
