@@ -676,7 +676,7 @@ METADATA_RATING_TEMPLATE_LKUPS = {
 
 FIGSHARE_API_URLS = {
     'base_url': 'https://api.figshare.com/v2/{endpoint}',
-    'access_token': 'https://figshare.com/account/applications/authorize?client_id=978ec401ab6ad6c1d66f0b6cef3015d71a4734d7&scope=all&response_type=code&redirect_url={redirect_url}/',
+    'access_token': 'https://figshare.com/account/applications/authorize?client_id=978ec401ab6ad6c1d66f0b6cef3015d71a4734d7&scope=all&response_type=code&redirect_uri={redirect_url}/',
     'login_return': '{return_url}?figshare_oauth=true',
     'authorization_token': 'https://api.figshare.com/v2/token'
 }

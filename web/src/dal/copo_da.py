@@ -345,17 +345,30 @@ class Submission(DAComponent):
 
         return doc.get("complete", False)
 
-    def mark_submission_complete(self, sub_id):
-        doc = self.get_collection_handle().update_one(
-            {
-                '_id': ObjectId(sub_id)
-            },
-            {
+    def mark_submission_complete(self, sub_id, article_id=None):
+        if article_id:
+            if not type(article_id) is list:
+                article_id = [article_id]
+            f = {
+                "$set": {
+                    "complete": "true",
+                    "completed_on": datetime.now(),
+                    "accessions": article_id
+                }
+            }
+        else:
+            f = {
                 "$set": {
                     "complete": "true",
                     "completed_on": datetime.now()
                 }
             }
+        doc = self.get_collection_handle().update_one(
+            {
+                '_id': ObjectId(sub_id)
+            },
+            f
+
         )
 
     def get_file_accession(self, sub_id):
@@ -365,14 +378,18 @@ class Submission(DAComponent):
             },
             {
                 'accessions': 1,
-                'bundle': 1
+                'bundle': 1,
+                'repository': 1
             }
         )
-        filenames = list()
-        for file_id in doc['bundle']:
-            f = DataFile().get_by_file_name_id(file_id=file_id)
-            filenames.append(f['name'])
-        return {'accessions': doc, 'filenames': filenames}
+        if doc['repository'] == 'figshare':
+            return {'accessions': doc['accessions'], 'repo': 'figshare'}
+        else:
+            filenames = list()
+            for file_id in doc['bundle']:
+                f = DataFile().get_by_file_name_id(file_id=file_id)
+                filenames.append(f['name'])
+            return {'accessions': doc, 'filenames': filenames, 'repo': doc['repository']}
 
 
 class DataFile(DAComponent):

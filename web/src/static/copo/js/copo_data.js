@@ -16,6 +16,20 @@ var setStageIndx = null; //moves the wizard to stage index specified
 $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
 
+    // firstly, if the url contains Figshare oauth return params and the selected_datafile is set, we are dealing with a
+    // return from a Figshare oauth login, so attempt to load the datafile into the wizard
+
+    // get url
+    var url = window.location.search
+    if( url.includes('state') && url.includes('code')){
+        // now check for selected_datafile
+        if ($('#selected_datafile').val() != '' || $('#selected_datafile').val() != undefined){
+            alert('ask toni how we can load file ' + $('#selected_datafile').val() + ' into his wizard')
+        }
+    }
+
+
+
     var csrftoken = $.cookie('csrftoken');
     var component = "datafile";
     var wizardURL = "/rest/data_wiz/";
@@ -182,6 +196,25 @@ $(document).ready(function () {
             alert("Couldn't retrieve page help!");
         }
     });
+
+
+    // inform session of currently selected datafile id
+    $(document).on('click', '.copo-dt', function(e){
+        var datafile_id = $(e.currentTarget).attr("data-record-id")
+        $.ajax(
+            {
+                url: '/rest/set_session_variable/',
+                type: "POST",
+                headers: {'X-CSRFToken': csrftoken},
+                data:{
+                    "key": "datafile_id",
+                    "value": datafile_id
+                },
+                success: function(data){
+                    console.log("sent data to session " + data)
+                }
+            })
+        })
 
 
     //******************************* wizard events *******************************//

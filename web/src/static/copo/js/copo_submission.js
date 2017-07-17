@@ -460,7 +460,7 @@ function get_accession_info(e) {
         })
         $(h4).appendTo(panel_group);
 
-        if (Object.keys(data.sub.accessions).length == 0){
+        if (Object.keys(data.sub.accessions).length == 0) {
             var message = $('<span></span>', {
                 html: 'Accessions not available yet'
             })
@@ -468,61 +468,121 @@ function get_accession_info(e) {
             $(message).appendTo('#file_accession_panel');
         }
         else {
-            for (var key in data.sub.accessions.accessions) {
 
-                panel = jQuery('<div/>', {
+            if (data.sub.repo == 'figshare') {
+
+                // create accession panels
+                var panel_group = jQuery('<div/>', {
+                    class: 'panel-group',
+                    id: 'acc-block'
+                });
+                var c = 2;
+
+                var h = $('<h4></h4>', {
+                    html: 'Accessions'
+                })
+                $(h).appendTo(panel_group);
+
+                var panel = jQuery('<div/>', {
                     class: 'panel panel-default',
                 });
-                panel_heading = jQuery('<div/>', {
+                var panel_heading = jQuery('<div/>', {
                     class: 'panel-heading'
                 });
-                panel_title = jQuery('<h4/>', {
+                var panel_title = jQuery('<h4/>', {
                     class: 'panel-title'
                 });
 
-                var a_key = key[0].toUpperCase() + key.slice(1);
-                title = $.parseHTML('<a data-toggle="collapse" href="#collapse' + c + '">' + a_key + '</a>');
+                var title = $.parseHTML('<a data-toggle="collapse" href="#collapse' + c + '">Accessions</a>');
 
                 $(title).appendTo(panel_title);
                 $(panel_title).appendTo(panel_heading);
                 $(panel_heading).appendTo(panel);
 
-                collapse = jQuery('<div/>', {
+                var collapse = jQuery('<div/>', {
                     id: 'collapse' + c,
                     class: 'panel-collapse collapse'
                 });
                 c = c + 1;
 
-                panel_body = jQuery('<div/>', {
+                var panel_body = jQuery('<div/>', {
                     class: 'panel-body'
                 });
 
-                ul = jQuery('<ul/>');
-
-                var li2
-                if (key == 'sample') {
-                    $(data.sub.accessions.accessions['sample']).each(function (count, smp) {
-                        li2 = jQuery('<li/>', {
-                            html: '<span title="Biosample Accession: ' + smp.biosample_accession + '">' + smp.sample_accession + ' - <small>' + smp.sample_alias + '</small></span>'
-                        });
-                        $(li2).appendTo(ul)
-                    })
-                }
-                else {
-
-                    li2 = jQuery('<li/>', {
-                        html: data.sub.accessions.accessions[key].accession + ' - <small>' + data.sub.accessions.accessions[key].alias + '</small>'
+                var ul = jQuery('<ul/>');
+                var li;
+                $(data.sub.accessions).each(function (count, smp) {
+                    li = jQuery('<li/>', {
+                        class: 'filelist_li',
+                        html: '<a href="https://figshare.com/account/articles/' + smp + '">' + 'Figshare Accession: ' + smp + '</a>'
                     });
-                    $(li2).appendTo(ul)
-                }
+                    $(li).appendTo(ul)
+                })
+
                 $(ul).appendTo(panel_body);
                 $(panel_body).appendTo(collapse);
                 $(collapse).appendTo(panel);
 
                 $(panel).appendTo(panel_group)
-
+                $(panel_group).appendTo('#file_accession_panel');
             }
-            $(panel_group).appendTo('#file_accession_panel');
+            else {
+                for (var key in data.sub.accessions.accessions) {
+
+                    panel = jQuery('<div/>', {
+                        class: 'panel panel-default',
+                    });
+                    panel_heading = jQuery('<div/>', {
+                        class: 'panel-heading'
+                    });
+                    panel_title = jQuery('<h4/>', {
+                        class: 'panel-title'
+                    });
+
+                    var a_key = key[0].toUpperCase() + key.slice(1);
+                    title = $.parseHTML('<a data-toggle="collapse" href="#collapse' + c + '">' + a_key + '</a>');
+
+                    $(title).appendTo(panel_title);
+                    $(panel_title).appendTo(panel_heading);
+                    $(panel_heading).appendTo(panel);
+
+                    collapse = jQuery('<div/>', {
+                        id: 'collapse' + c,
+                        class: 'panel-collapse collapse'
+                    });
+                    c = c + 1;
+
+                    panel_body = jQuery('<div/>', {
+                        class: 'panel-body'
+                    });
+
+                    ul = jQuery('<ul/>');
+
+                    var li2
+                    if (key == 'sample') {
+                        $(data.sub.accessions.accessions['sample']).each(function (count, smp) {
+                            li2 = jQuery('<li/>', {
+                                html: '<span title="Biosample Accession: ' + smp.biosample_accession + '">' + smp.sample_accession + ' - <small>' + smp.sample_alias + '</small></span>'
+                            });
+                            $(li2).appendTo(ul)
+                        })
+                    }
+                    else {
+
+                        li2 = jQuery('<li/>', {
+                            html: data.sub.accessions.accessions[key].accession + ' - <small>' + data.sub.accessions.accessions[key].alias + '</small>'
+                        });
+                        $(li2).appendTo(ul)
+                    }
+                    $(ul).appendTo(panel_body);
+                    $(panel_body).appendTo(collapse);
+                    $(collapse).appendTo(panel);
+
+                    $(panel).appendTo(panel_group)
+
+                }
+                $(panel_group).appendTo('#file_accession_panel');
+            }
         }
 
 

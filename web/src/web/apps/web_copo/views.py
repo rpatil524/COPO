@@ -18,6 +18,11 @@ from django.conf import settings
 from allauth.account.forms import LoginForm
 from dal.copo_da import Annotation
 from bson import json_util as j
+from dal.figshare_da import Figshare
+from web.apps.web_copo.lookup.lookup import FIGSHARE_API_URLS
+import requests
+import ast
+import web.apps.web_copo.lookup.lookup as lkup
 
 LOGGER = settings.LOGGER
 
@@ -138,7 +143,48 @@ def copo_samples(request, profile_id):
 def copo_data(request, profile_id):
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
-    return render(request, 'copo/copo_data.html', {'profile_id': profile_id, 'profile': profile})
+
+    '''
+        if code is in url, this is a redirect from Figshare (or some other oauth based authentication service), 
+        so continue the oauth sequence by sapping the auth token for an access token
+    '''
+    code = request.GET.get('code')
+    if code:
+        FIGSHARE_CREDENTIALS = settings.FIGSHARE_CREDENTIALS
+        client_id = FIGSHARE_CREDENTIALS['client_id']
+        token_url = FIGSHARE_API_URLS['authorization_token']
+
+        # now get token
+        data = {
+            'client_id': client_id,
+            'code': code,
+            'client_secret': FIGSHARE_CREDENTIALS['client_secret'],
+            'grant_type': 'authorization_code',
+            'scope': 'all'
+        }
+        try:
+            r = requests.post(token_url, data)
+            data_dict = ast.literal_eval(r.content.decode('utf-8'))
+            token = data_dict['token']
+            t = Figshare().put_token_for_user(user_id=ThreadLocal.get_current_user().id, token=token)
+            if t:
+                # mark fighshare submissions for this user as token obtained
+                Submission().mark_all_token_obtained(user_id=request.user.id)
+
+                # if all is well, the access token will be stored in FigshareSubmussionCollection
+        except Exception as e:
+            print(e)
+
+        else:
+            # retrieve token
+            token = Figshare().get_token_for_user(user_id=ThreadLocal.get_current_user().id)
+
+    if request.session['datafile_id']:
+        selected_file = request.session['datafile_id']
+    else:
+        selected_file = None
+    return render(request, 'copo/copo_data.html',
+                  {'profile_id': profile_id, 'profile': profile, 'selected_file': selected_file})
 
 
 @login_required

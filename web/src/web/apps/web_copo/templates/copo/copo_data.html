@@ -36,6 +36,7 @@
         <input type="hidden" id="hashing_image" value="{% static 'copo/img/pacman.gif' %}"/>
         <input type="hidden" value="{% url 'copo:copo_submissions' profile_id=profile_id %}" name="submission_url"
                id="submission_url"/>
+        <input type="hidden" id="selected_datafile" value="{{ selected_file }}"/>
     </div>
 {% endblock browse_header_block %}
 
@@ -114,7 +115,8 @@
                               style="margin-right:40px">
                             {% csrf_token %}
                             <span id="upload_files_button"
-                                  class="btn btn-primary fileinput-button" style="background-image: none; border-color:transparent;">
+                                  class="btn btn-primary fileinput-button"
+                                  style="background-image: none; border-color:transparent;">
                                     <span>Select files...</span>
                                         <input type="file" name="file"
                                                onchange="get_chunk_size(event)" multiple/>
