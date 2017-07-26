@@ -183,10 +183,8 @@ def copo_data(request, profile_id):
         df_id = request.session['datafile_id']
     except:
         df_id = None
-    if df_id:
-        selected_file = request.session['datafile_id']
-    else:
-        selected_file = None
+    selected_file = df_id
+
     return render(request, 'copo/copo_data.html',
                   {'profile_id': profile_id, 'profile': profile, 'selected_file': selected_file})
 
