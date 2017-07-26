@@ -9,6 +9,7 @@ import pexpect
 import datetime
 import uuid
 from pandas import read_excel, read_csv
+from numpy import NaN
 import json
 
 
@@ -61,14 +62,17 @@ def search_all(request):
 
 def handle_upload(request):
     f = request.FILES['file']
+
     # TODO - this should be changed to a uuid
 
     file_name = os.path.splitext(f.name)[0]
     file_type = request.POST['file_type']
+    skip_rows = request.POST['skip_rows']
 
     if file_type == "Spreadsheet":
         # load spreadsheet data and return to backend
-        s = read_excel(f)
+        s = read_excel(f, skiprows=int(skip_rows))
+        s = s.replace(NaN, "")
         raw = list()
         raw.append(s.columns.tolist())
         raw.extend(s.values.tolist())

@@ -52,6 +52,7 @@ $(document).ready(function () {
                 var formData = new FormData();
                 formData.append('file', $('#InputFile')[0].files[0]);
                 formData.append('file_type', $('#file_type_dropdown').val())
+                formData.append('skip_rows', $('#row_skip_dd').val())
                 var csrftoken = $.cookie('csrftoken');
                 var url = "/api/upload_annotation_file/"
                 $.ajax({

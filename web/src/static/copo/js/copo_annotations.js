@@ -29,6 +29,7 @@ $(document).ready(function () {
     $(document).on('click', '#annotations_table tbody tr', select_from_annotation_list)
     $(document).on('click', '.delete_annotation', delete_annotation)
     $('.ajax_loading_div').css('visibility', 'hidden')
+    $(document).on('click', '#doc_type_select li', show_skip_dropdown)
 
     //******************************Event Handlers Block*************************//
     // get table data to display via the DataTables API
@@ -130,6 +131,15 @@ $(document).ready(function () {
 // global variable for selected cell
 cell;
 
+function show_skip_dropdown(e){
+    if($('#file_type_dropdown_label').html() == 'Spreadsheet') {
+        $('#row_skip_div').css('visibility', 'visible')
+    }
+    else{
+        $('#row_skip_div').css('visibility', 'hidden')
+    }
+}
+
 function show_help() {
 
     $('#help_tips').show()
@@ -142,7 +152,7 @@ function show_controls() {
     auto_complete();
 }
 
-function show_annotation_list(){
+function show_annotation_list() {
     $('#help_tips').hide()
     $('#annotation_list').show()
 }
@@ -153,7 +163,7 @@ function hide_controls() {
     $('#annotation_list').hide()
 }
 
-function remove_ss_controls(){
+function remove_ss_controls() {
     $('#annotation_panel').hide()
 }
 
@@ -230,10 +240,10 @@ function load_ss_data(e) {
 function _beforeOnCellMouseDown(event, coords, element) {
     // prevent clicks in the leftmost column doing anything
     /*
-    if (coords.col == 0) {
-        event.stopImmediatePropagation();
-    }
-    */
+     if (coords.col == 0) {
+     event.stopImmediatePropagation();
+     }
+     */
 }
 
 
@@ -356,10 +366,10 @@ function add_line_to_annotation_table(line_data) {
 function delete_annotation(e, replacement) {
     // function called when delete button is clicked on annotation list
     var tr;
-    if ('currentTarget' in e){
+    if ('currentTarget' in e) {
         tr = $(e.currentTarget).closest('tr')
     }
-    else{
+    else {
         tr = e;
     }
 
