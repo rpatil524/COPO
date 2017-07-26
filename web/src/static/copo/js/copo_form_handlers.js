@@ -128,7 +128,7 @@ var controlsMapping = {
     "date-picker": "do_date_picker_ctrl",
     "copo-duration": "do_copo_duration_ctrl",
     "text-percent": "do_percent_text_box",
-    "copo-resolver": "do_copo_resolver_ctrl"
+    "copo-resolver": "do_copo_resolver_ctrl",
     "text-percent": "do_percent_text_box",
     "dataverse-author": "do_dataverse_author"
 };
