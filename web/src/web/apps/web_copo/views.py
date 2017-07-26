@@ -179,7 +179,11 @@ def copo_data(request, profile_id):
             # retrieve token
             token = Figshare().get_token_for_user(user_id=ThreadLocal.get_current_user().id)
 
-    if request.session['datafile_id']:
+    try:
+        df_id = request.session['datafile_id']
+    except:
+        df_id = None
+    if df_id:
         selected_file = request.session['datafile_id']
     else:
         selected_file = None
