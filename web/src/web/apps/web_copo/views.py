@@ -2,7 +2,7 @@ import json
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, redirect
 from django.template import RequestContext
 from jsonpickle import encode
 from submission.submissionDelegator import delegate_submission
@@ -10,6 +10,7 @@ from dal.orcid_da import Orcid
 from api.handlers.general import *
 from django_tools.middlewares import ThreadLocal
 from dal.copo_da import ProfileInfo, Profile, Submission
+from dal.OAuthTokens import OAuthToken
 from dal.broker_da import BrokerDA, BrokerVisuals
 from .lookup.lookup import HTML_TAGS
 from exceptions_and_logging.logger import Logtype, Loglvl
@@ -23,6 +24,9 @@ from web.apps.web_copo.lookup.lookup import FIGSHARE_API_URLS
 import requests
 import ast
 import web.apps.web_copo.lookup.lookup as lkup
+import requests
+import datetime
+from rauth import OAuth2Service
 
 LOGGER = settings.LOGGER
 
@@ -81,13 +85,11 @@ def authenticate_figshare(request):
                    'control': HTML_TAGS['oauth_required']})
 
 
-def test_figshare_submit(request):
-    # from submission.figshareSubmission import FigshareSubmit as fs
-    # from dal.figshare_da import Figshare as f
-    #
-    # token = f().get_token_for_user(request.user.id)['token']
-    #
-    # fs().submit(["5732ee6268236b786d9d567c"], token)
+def test_dataverse_submit(request):
+    from submission.dataverseSubmission import DataverseSubmit
+
+
+    DataverseSubmit().submit(dataFile_ids=["592ee1e668236b82e40b4c56"], sub_id="592ee7f168236b85d16510ef")
     return render(request, 'copo/test_page.html', {})
 
 
@@ -140,9 +142,11 @@ def copo_samples(request, profile_id):
 
 
 @login_required
-def copo_data(request, profile_id):
+def copo_data(request, profile_id, cyverse_file_data=None):
+    request.session['datafile_url'] = request.path
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
+    return render(request, 'copo/copo_data.html', {'profile_id': profile_id, 'profile': profile, 'cyverse_files': cyverse_file_data})
 
     '''
         if code is in url, this is a redirect from Figshare (or some other oauth based authentication service), 
@@ -348,3 +352,71 @@ def view_oauth_tokens(request):
 def annotate_data(request):
     doc = Annotation().get_record(request.POST.get('target_id'))
     return HttpResponse(j.dumps(doc))
+
+
+def load_cyverse_files(request, url, token):
+
+    # get file data and pass to copo_data view
+    url_filesystem = 'https://agave.iplantc.org/terrain/v2/secured/filesystem/directory?path=/iplant/home/shared'
+    headers = {"Authorization": "Bearer " + token['token']['access_token']}
+    cvd = requests.get(url_filesystem, headers=headers)
+    cyverse_data = json.loads(cvd.content.decode('utf-8'))
+    fnames = list()
+    for el in cyverse_data['folders']:
+        fnames.append({'text': el['label']})
+    return copo_data(request, request.session['profile_id'], json.dumps(fnames))
+
+def agave_oauth(request):
+
+    # check for token
+    token = OAuthToken().cyverse_get_token(request.user.id)
+    if token:
+        # get token and pass
+        OAuthToken().check_token(token)
+        url = request.path
+        return load_cyverse_files(request, url, token)
+    else:
+
+        service = OAuth2Service(
+            name='copo_api',
+            client_id='KOm9gFBPVwq6sfCMgumZRJG5j8wa',
+            client_secret='gAnX96MinyBfZ_gsvkr0nEDLpR8a',
+            access_token_url='https://agave.iplantc.org/oauth2/token',
+            authorize_url='https://agave.iplantc.org/oauth2/authorize',
+            base_url='https://agave.iplantc.org/oauth2/')
+
+        # the return URL is used to validate the request
+        params = {'redirect_uri': 'http://127.0.0.1:8000/copo/agave_oauth',
+                  'response_type': 'code'}
+        if not 'code' in request.GET:
+            # save url for initial page
+
+            url = service.get_authorize_url(**params)
+            return redirect(url)
+        else:
+
+            # once the above URL is consumed by a client we can ask for an access
+            # token. note that the code is retrieved from the redirect URL above,
+            # as set by the provider
+            code = request.GET['code']
+
+            params = {
+                "grant_type": "authorization_code",
+                "code": code,
+                "client_id": "KOm9gFBPVwq6sfCMgumZRJG5j8wa",
+                "client_secret": "gAnX96MinyBfZ_gsvkr0nEDLpR8a",
+                "redirect_uri": "http://127.0.0.1:8000/copo/agave_oauth"
+            }
+
+            r = requests.post("https://agave.iplantc.org/oauth2/token", data=params)
+
+            if r.status_code == 401:
+                # refresh token
+                pass
+            else:
+                # save token
+                t = json.loads(r.content.decode('utf-8'))
+                OAuthToken().cyverse_save_token(request.user.id, t)
+                return redirect(request.session['datafile_url'])
+
+

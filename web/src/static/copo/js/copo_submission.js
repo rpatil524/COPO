@@ -12,7 +12,7 @@ $(document).ready(function () {
 
 
     build_submission_table()
-
+    get_dataset_data()
     //$('#submission_table').DataTable()
 
     $('#upload_progress_info').hide()
@@ -70,9 +70,27 @@ $(document).ready(function () {
         })
 
 
-    }, 1000)
+    }, 5000)
 
 });
+
+function get_dataset_data() {
+    $.getJSON('/rest/call_get_dataset_details', {'profile_id': $('#profile_id').val()}, function (data) {
+        if (data != 'null') {
+            var output = 'Please select a Dataset to add to.<br/><br/>'
+            output = output + '<div id="dataset_selector">'
+            $(data).each(function(idx, it){
+                output = output + '<div style="margin-top: 10px"><label class="radio-inline"><input type="radio" name="optradio">' + it.title + '</label></div>'
+            })
+            output = output + '<div style="margin-top: 10px"><label class="radio-inline"><input type="radio" name="optradio">New Dataset</label></div>'
+            output = output + '</div>'
+            $(document).data('message', output)
+        }
+        else {
+            $(document).data('message', 'Are you sure you want to upload this submission bundle.')
+        }
+    })
+}
 
 
 function build_submission_table() {
@@ -109,7 +127,7 @@ function build_submission_table() {
 
 
             var row = $('<tr class="submission_row" data-submission_id="' + element._id.$oid + '"></tr>')
-            $(row).append('<td>' + element.repository + '</td>')
+            $(row).append('<td class="repo_cell"">' + element.repository + '</td>')
             $(row).append('<td style="cursor: pointer"><a data-toggle="modal" data-target="#accessionModal">Files / Accessions <span style="vertical-align: middle" class="fa fa-info-circle fa-2x"></span></a></td>')
             $(row).append('<td>' + element.date_created + '</td>')
             $(row).append('<td class="status">' + element.status + '</td>')
@@ -159,15 +177,21 @@ function handle_upload(e) {
     var tr = btn.closest('tr')
     var submission_id = $(tr).data('submission_id')
 
+    var message = $(document).data('message')
+    if ($(tr).find('.repo_cell').html() != 'dcterms'){
+        message = 'Are you sure you want to upload this submission bundle.'
+    }
+
     BootstrapDialog.show({
         title: 'Upload Submission',
-        message: 'Are you sure you want to upload this submission bundle.',
+        message: message,
         buttons: [{
             label: 'Yes',
             action: function (dialog) {
                 $(tr).find('.ajax_span').css('visibility', 'visible')
                 dialog.close();
                 var csrftoken = $.cookie('csrftoken');
+                $('#dataset_selector')
                 $.ajax({
                     url: "/rest/submit_to_repo/",
                     data: {'sub_id': submission_id},
@@ -175,6 +199,7 @@ function handle_upload(e) {
                     method: 'POST',
                     dataType: 'json'
                 }).done(function (data) {
+                    get_dataset_data()
                     if (data.status == 1) {
                         // we have uploaded the file, so change table row
                         $(tr).find('.progress-bar').css('width', '100%')
@@ -207,13 +232,16 @@ function handle_upload(e) {
                     else {
                         btn.removeClass('disabled');
                     }
+                    get_dataset_data()
                 })
             }
         }, {
             label: 'No',
             action: function (dialog) {
                 dialog.close();
+                get_dataset_data()
             }
+
         }]
     });
 
@@ -528,6 +556,54 @@ function get_accession_info(e) {
             }
             else {
                 for (var key in data.sub.accessions.accessions) {
+            if (data.sub.accessions.accessions instanceof Array) {
+                panel = jQuery('<div/>', {
+                    class: 'panel panel-default',
+                });
+                panel_heading = jQuery('<div/>', {
+                    class: 'panel-heading'
+                });
+                panel_title = jQuery('<h4/>', {
+                    class: 'panel-title'
+                });
+
+                //var a_key = key[0].toUpperCase() + key.slice(1);
+                title = $.parseHTML('<a data-toggle="collapse" href="#collapse' + c + '">Accessions</a>');
+
+                $(title).appendTo(panel_title);
+                $(panel_title).appendTo(panel_heading);
+                $(panel_heading).appendTo(panel);
+
+                collapse = jQuery('<div/>', {
+                    id: 'collapse' + c,
+                    class: 'panel-collapse collapse'
+                });
+                c = c + 1;
+
+                panel_body = jQuery('<div/>', {
+                    class: 'panel-body'
+                });
+
+                ul = jQuery('<ul/>');
+                var ul = jQuery('<ul/>');
+                d = data.sub.accessions.accessions[0]
+                var allowed_keys = ['filesize', 'id', 'dataverse_title', 'dataset_doi']
+
+                for (var key in d) {
+                    if ($.inArray(key, allowed_keys) > -1) {
+                        li2 = jQuery('<li/>', {
+                            html: '<span>' + key + ' - <small>' + d[key] + '</small></span>'
+                        });
+                        $(li2).appendTo(ul)
+                    }
+                }
+                $(ul).appendTo(panel_body);
+                $(panel_body).appendTo(collapse);
+                $(collapse).appendTo(panel);
+                $(panel).appendTo(panel_group)
+            }
+            else {
+                for (var key in data.sub.accessions.accessions) {
 
                     panel = jQuery('<div/>', {
                         class: 'panel panel-default',
@@ -577,12 +653,11 @@ function get_accession_info(e) {
                     $(ul).appendTo(panel_body);
                     $(panel_body).appendTo(collapse);
                     $(collapse).appendTo(panel);
-
                     $(panel).appendTo(panel_group)
-
                 }
-                $(panel_group).appendTo('#file_accession_panel');
             }
+
+            $(panel_group).appendTo('#file_accession_panel');
         }
 
 

@@ -117,6 +117,10 @@ def get_figshare_category_options():
     return output
 
 
+def get_dataverse_subject_dropdown():
+    return lookup.DROP_DOWNS['DATAVERSE_SUBJECTS']
+
+
 def get_figshare_article_options():
     return lookup.DROP_DOWNS['FIGSHARE_ARTICLE_TYPES']
 

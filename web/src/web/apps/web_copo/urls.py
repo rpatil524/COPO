@@ -3,6 +3,7 @@ from . import views
 from web.apps.web_copo.utils import ajax_handlers
 
 urlpatterns = [url(r'^$', views.index, name='index'),
+               url(r'^dataverse_submit/$', views.test_dataverse_submit, name='test_dataverse_submit'),
                url(r'^test_submission', views.test_submission, name='test_submission'),
                url(r'^test_pdf', views.test_pdf, name='test_pdf'),
                url(r'^test', views.test, name='test'),
@@ -41,5 +42,6 @@ urlpatterns = [url(r'^$', views.index, name='index'),
                url(r'^get_tokens_for_user/$', ajax_handlers.get_tokens_for_user, name='get_tokens_for_user'),
                url(r'^delete_token/$', ajax_handlers.delete_token, name='delete_token'),
                url(r'^get_annotation/$', views.annotate_data, name='annotate_data'),
+               url(r'^agave_oauth/$', views.agave_oauth, name='agave_oauth'),
 
                ]

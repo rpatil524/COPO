@@ -16,10 +16,10 @@
           "anyOf": []
         },
         "figshare": {
-
         },
-        "miappe":{
-
+        "miappe": {
+        },
+        "dcterms": {
         }
       }
     },
@@ -36,10 +36,10 @@
           ]
         },
         "figshare": {
-
         },
-        "miappe":{
-
+        "miappe": {
+        },
+        "dcterms": {
         }
       }
     },
@@ -56,10 +56,10 @@
           ]
         },
         "figshare": {
-
         },
-        "miappe":{
-
+        "miappe": {
+        },
+        "dcterms": {
         }
       }
     }

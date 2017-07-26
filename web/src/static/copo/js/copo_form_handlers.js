@@ -129,6 +129,8 @@ var controlsMapping = {
     "copo-duration": "do_copo_duration_ctrl",
     "text-percent": "do_percent_text_box",
     "copo-resolver": "do_copo_resolver_ctrl"
+    "text-percent": "do_percent_text_box",
+    "dataverse-author": "do_dataverse_author"
 };
 
 function json2HtmlForm(data) {
@@ -1389,6 +1391,9 @@ var dispatchFormControl = {
         return form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
+    },
+    do_dataverse_author: function do_dataverse_author(formElem){
+        alert('abc')
     }
 };
 

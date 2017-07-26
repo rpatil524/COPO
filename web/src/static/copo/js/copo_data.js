@@ -16,6 +16,18 @@ var setStageIndx = null; //moves the wizard to stage index specified
 $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
 
+    var cyverse_files = $('#cyverse_file_data').val()
+    if(cyverse_files != "None") {
+        cyverse_files = JSON.parse(cyverse_files)
+        $('#cyverse_files_link').on('click', function (e) {
+            if (cyverse_files) {
+                $('#file_tree').treeview({data: cyverse_files, showCheckbox: true});
+                $('#file_tree').css('visibility', 'visible')
+                e.preventDefault()
+            }
+        })
+    }
+
     // firstly, if the url contains Figshare oauth return params and the selected_datafile is set, we are dealing with a
     // return from a Figshare oauth login, so attempt to load the datafile into the wizard
 
