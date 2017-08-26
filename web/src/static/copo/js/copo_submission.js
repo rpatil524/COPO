@@ -7,9 +7,6 @@
 $(document).ready(function () {
     var component = "submission";
 
-    //global_help_call
-    do_global_help(component);
-
 
     build_submission_table()
 

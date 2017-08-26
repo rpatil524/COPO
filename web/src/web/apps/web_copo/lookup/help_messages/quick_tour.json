@@ -1,0 +1,65 @@
+{
+  "description": "Provides messages for creating quick tour of system components/elements:",
+  "properties": {
+    "new_profile_button": {
+      "title": "Create New Profile",
+      "content": "Click here to create a new Profile. A COPO Profile is a collection of 'research objects' or components that form part of a research project or study."
+    },
+    "documentation_button": {
+      "title": "Documentation",
+      "content": "Click here to access COPO's documentation."
+    },
+    "global_notification_button": {
+      "title": "Notification Component",
+      "content": "Click this button to view system notifications."
+    },
+    "global_user_authenticated_button": {
+      "title": "Authenticated User",
+      "content": "Click here to access the following tasks: <ul><li>View your ORCiD profile</li><li>View obtained tokens</li><li>Logout of the system</li></ul>"
+    },
+    "profile_links_button_group": {
+      "title": "Profile Links",
+      "content": "Shortcut buttons for accessing profile components."
+    },
+    "copo_data_upload_tab": {
+      "title": "File Upload Tab",
+      "content": "Select this tab to access the file upload view. <br/>For more information about this control, including a demonstration of its usage, please use the help component."
+    },
+    "copo_data_inspect_tab": {
+      "title": "File Inspect Tab",
+      "content": "Select this tab to view files uploaded to COPO. <br/>For more information about this control, including a demonstration of its usage, please use the help component."
+    },
+    "copo_data_describe_tab": {
+      "title": "File Describe Tab",
+      "content": "Select this tab to view the file description wizard and files currently being described. <br/>For more information about this control, including a demonstration of its usage, please use the help component."
+    },
+    "copo_data_upload_file_button": {
+      "title": "Upload File Button",
+      "content": "Click this button to upload files to COPO. Multiple files can be selected and uploaded at once. <p>Uploaded files are displayed in the <strong>Inspect</strong> pane. "
+    },
+    "datafile_table_describe": {
+      "title": "Describe Button",
+      "content": "Use this button to activate the datafile description wizard. Please note that one or more files must be selected before clicking the describe button. Once clicked, the view will change to display the wizard, where the target datafiles may be described."
+    },
+    "profile_details_panel": {
+      "title": "Profile Details",
+      "content": "View a profile details here having selected a profile record."
+    },
+    "page_context_help_panel": {
+      "title": "Help",
+      "content": "Interact with the help pane to find help topics relevant to the page and/or current task."
+    },
+    "profile_table": {
+      "title": "Profile Records",
+      "content": "Profile records list.<ol><li>Click the <span class='fa-stack' style='color:green; font-size:10px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> button beside a record to view details</li><li>Click on a column header to sort by the column</li><li>Use the table search tool to filter the displayed list based on matched terms</li></ol>"
+    },
+    "new_publication_button": {
+      "title": "Create New Publication",
+      "content": "Click here to create a new Publication. You will be provided with the following options: <ol><li>Manually enter a new publication record using the publication form</li><li>Resolve a Digital Object Identifier (DOI) to retrieve a target publication record from an external service</li><li>Resolve a PubMed ID to retrieve a target publication record from an external service</li></ol>"
+    },
+    "page_activity_panel": {
+      "title": "Task",
+      "content": "Interact with the task pane to perform available tasks on selected records. <ol><li>Select one or more records by clicking on target rows</li><li>Select the required task from available tasks to perform</li></ol>"
+    }
+  }
+}

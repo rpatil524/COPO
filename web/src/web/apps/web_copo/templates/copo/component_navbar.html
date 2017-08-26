@@ -1,4 +1,4 @@
-<div hidden id="hidden_attrs">
+<div hidden>
     <!-- hidden attributes  -->
     <input type="hidden" id="view_copo_profile_url" value="{% url 'copo:view_copo_profile' profile_id=profile_id %}"/>
 
@@ -15,102 +15,9 @@
            id="annotation_url"/>
 </div>
 
-<nav class="navbar" id="copo_components_navs">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <span class="navbar-brand page-title-custom"></span>
-        </div>
+<div class="row" style="margin-bottom:30px;">
+    <div class="col-sm-6 col-md-6 col-lg-6 copo-page-header-left">
+    </div>
+    <div class="col-sm-6 col-md-6 col-lg-6 copo-page-header-right"></div>
+</div>
 
-        <div class="collapse navbar-collapse quick-component-create">
-            <ul class="nav navbar-nav nav-page-menu">
-                <li class="active quick-component-create new-form-call data-record-add-li" data-component=""
-                    data-add-li="simple">
-                    <a style="color:#000 !important;" href="#">
-                            <span class="component-add-label">
-                                <i class="fa fa-plus-circle"></i>
-                                <span class="icon_text"></span>
-                            </span>
-                    </a>
-                </li>
-                <li class="dropdown data-record-add-li" data-add-li="publication">
-                    <a style="color:#000 !important;" href="#" class="dropdown-toggle "
-                       data-toggle="dropdown" role="button"
-                       aria-haspopup="true"
-                       aria-expanded="false">
-                            <span class="component-add-label">
-                                <i class="fa fa-plus-circle"></i>
-                                <span class="icon_text"></span>
-                            </span>
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu keep-open-on-click"
-                        style="height:180px !important; min-width:210px !important;">
-                        <li class="new-form-call" data-component=""><a href="#">
-                            <div style="padding: 5px 5px 5px 5px;">New Publication</div>
-                        </a>
-                        </li>
-                        <li>
-                            <div class="fuelux" style="padding: 10px 0px 10px 15px;">
-                                <div data-initialize="placard" class="placard">
-                                    <div class="placard-popup" style="bottom: -34px;"></div>
-                                    <input style="font-size: 12px;" type="text" placeholder="Resolve DOI"
-                                           class="form-control placard-field glass resolver-data"
-                                           data-resolver="doi">
-
-                                    <div class="placard-footer">
-                                        <button type="button" class="btn btn-primary btn-xs placard-cancel">Cancel
-                                        </button>
-                                        <button type="button"
-                                                class="btn btn-primary btn-xs placard-cancel resolver-submit">
-                                            Resolve
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="fuelux" style="padding: 0px 5px 10px 15px;">
-                                <div data-initialize="placard" class="placard">
-                                    <div class="placard-popup" style="bottom: -34px;"></div>
-                                    <input style="font-size: 12px;" type="text" placeholder="Resolve PubMed ID"
-                                           class="form-control placard-field glass resolver-data"
-                                           data-resolver="pmid">
-
-                                    <div class="placard-footer">
-                                        <button type="button" class="btn btn-primary btn-xs placard-cancel">Cancel
-                                        </button>
-                                        <button type="button"
-                                                class="btn btn-primary btn-xs placard-cancel resolver-submit">
-                                            Resolve
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </li>
-                <li class="data-record-add-li" data-add-li="loader">
-                    <div style="padding-top:15px;" id="doiLoader"></div>
-                </li>
-            </ul>
-
-            <ul class="nav navbar-nav navbar-right collapse navbar-collapse" style="margin-right: -40px;">
-                <li>
-                    <div style="font-size:14px; margin-top: 25px; margin-right: 15px; color: rgba(38, 77, 115, 0.99);">Profile links
-                    </div>
-                </li>
-                <li>
-                    <div class="btn-group">
-{#                        <a title="Profile Home" data-toggle="tooltip" class="btn btn-custom4"#}
-{#                           href="{% url 'copo:view_copo_profile' profile_id=profile_id %}">#}
-{#                            <i class="fa fa-external-link" style="color: #0f0f0f;"></i>#}
-{#                        </a>#}
-                    </div>
-                    <div class="btn-group profile-links" style="padding-bottom: 15px; padding-top: 15px;"></div>
-                </li>
-
-            </ul>
-
-        </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
-</nav>

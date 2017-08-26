@@ -4,6 +4,7 @@ __date__ = '13 May 2016'
 import ast
 from bson import ObjectId
 from django.contrib.auth.models import User
+from django_tools.middlewares import ThreadLocal
 
 import web.apps.web_copo.lookup.lookup as lkup
 from api.doi_metadata import DOI2Metadata
@@ -53,7 +54,7 @@ class BrokerDA:
         """
 
         copo_schemas = dict()
-        for k,v in d_utils.object_type_control_map().items():
+        for k, v in d_utils.object_type_control_map().items():
             copo_schemas[k] = d_utils.get_copo_schema(v)
 
         self.context["copo_schemas"] = copo_schemas
@@ -162,7 +163,7 @@ class BrokerVisuals:
     def do_table_data(self):
         table_data_dict = dict(
             annotation=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
-            publication=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
+            publication=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             person=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
             datafile=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
             sample=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
@@ -182,7 +183,7 @@ class BrokerVisuals:
         record_object = self.param_dict.get("record_object", dict())
 
         table_data_dict = dict(
-            publication=(htags.get_record_data, dict(record_object=record_object, component=self.component)),
+            publication=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             person=(htags.get_record_data, dict(record_object=record_object, component=self.component)),
             sample=(htags.get_record_data, dict(record_object=record_object, component=self.component)),
             profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_for_user())),
@@ -255,19 +256,62 @@ class BrokerVisuals:
         return self.context
 
     def get_component_help_messages(self):
+        self.context['context_help'] = dict()
         self.context['help_messages'] = dict()
-        self.context['global_help_messages'] = dict()
+        self.context['quick_tour_messages'] = dict()
 
         paths_dict = lkup.MESSAGES_LKUPS['HELP_MESSAGES']
 
         if self.component in paths_dict:
             self.context['help_messages'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS['HELP_MESSAGES'][self.component])
 
-        # get global help
-        if "global" in paths_dict:
-            global_help_dict = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS['HELP_MESSAGES']["global"])
+        # get quick tour
+        if "quick_tour" in paths_dict:
+            quick_tour_dict = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS['HELP_MESSAGES']["quick_tour"])
+            self.context['quick_tour_messages'] = quick_tour_dict.get("properties", dict())
 
-            if self.component in global_help_dict:
-                self.context['global_help_messages'] = {self.component: global_help_dict[self.component]}
+        # context help
+        if "context_help" in paths_dict:
+            self.context['context_help'] = d_utils.json_to_pytype(
+                lkup.MESSAGES_LKUPS['HELP_MESSAGES']["context_help"])
+
+        # get user email
+        self.context = self.do_user_has_email()
+
+        return self.context
+
+    def do_user_has_email(self):
+        req = ThreadLocal.get_current_request()
+        user = User.objects.get(pk=int(req.user.id))
+
+        self.context['user_has_email'] = bool(user.email.strip())
+
+        return self.context
+
+    def do_update_quick_tour_flag(self):
+        req = ThreadLocal.get_current_request()
+        quick_tour_flag = self.param_dict.get("quick_tour_flag", "false")
+
+        if quick_tour_flag == "false":
+            quick_tour_flag = False
+        else:
+            quick_tour_flag = True
+
+        req.session["quick_tour_flag"] = quick_tour_flag
+        self.context["quick_tour_flag"] = req.session["quick_tour_flag"]
+
+        return self.context
+
+    def do_get_component_info(self):
+        target_id = self.param_dict.get("target_id", str())
+        da_object = DAComponent(target_id, self.component)
+        print(target_id)
+        print(self.component)
+        self.context["component_info"] = "welcome to " + str(da_object.get_component_count())
+
+        return self.context
+
+    def do_get_profile_info(self):
+        self.context["component_info"] = "welcome to " + self.component
 
         return self.context

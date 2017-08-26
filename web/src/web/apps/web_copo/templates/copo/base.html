@@ -45,7 +45,7 @@
     <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.css' %}">
 
     <!-- Google Fonts -->
-    <link href='http://fonts.googleapis.com/css?family=Quattrocento+Sans' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Quattrocento+Sans' rel='stylesheet' type='text/css'>
 
 
     <!--[if lt IE 9]>
@@ -79,6 +79,7 @@
     <script src="{% static 'copo/search_highlight/jquery.highlight.js' %}"></script>
     <script src="{% static 'copo/bootstrap-datepicker-1.6.4-dist/js/bootstrap-datepicker.min.js' %}"></script>
     <script src="{% static 'copo/webui_popover/jquery.webui-popover.js' %}"></script>
+
 
 
     <!-- Additional javascripts -->
@@ -174,7 +175,7 @@
                                 'user_email': emaddres
                             },
                             success: function (data) {
-                                ;
+                                $(".takeatour").trigger("click");
                             },
                             error: function () {
                                 alert("Couldn't add email!");
@@ -211,6 +212,11 @@
 
 <!-- hidden fields -->
 <input type="hidden" id="elastic_search_ajax" value="{% url 'copo:ajax_search_ontology' ontology_names='999' %}"/>
+<!-- end hidden fields -->
+
+<!-- template components -->
+{% include "components_template.html" %}
+<!-- end template components -->
 
 <nav id="copo-global-nav" class="navbar navbar-default navbar-fixed-top" style="background: rgba(38, 38, 38, 0.95);">
     <div class="container-fluid">
@@ -239,50 +245,20 @@
                     </div>
                 </form>
             </li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
-                   aria-expanded="false">
-
-                    <i class="fa fa-question-circle-o copo-header-icons" aria-hidden="true" title="Help">&nbsp;<span
-                            class="caret"></span></i>
+            <li class="dropdown" style="margin-left: 15px;">
+                <a href="/docs/">
+                    <span data-copo-tour-id="documentation_button">Documentation</span>
                 </a>
-
-                <ul id="global_help_panel" class="dropdown-menu keep-open-on-click panel panel-default"
-                    style="width:550px !important; overflow: auto; border: none; max-height: 600px;">
-                    <div class="panel-heading">COPO Help</div>
-                    <div class="panel-body">
-                        <table id="global_help_table"
-                               class="table table-striped table-bordered order-column hover copo-datatable copo-table-header"
-                               width="100%">
-                        </table>
-                    </div>
-                </ul>
-            </li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
-                   aria-expanded="false">
-
-                    <i class="fa fa-cloud-upload copo-header-icons" aria-hidden="true" title="Notifications">&nbsp;<span
-                            class="caret"></span></i>
-                </a>
-
-                <ul class="dropdown-menu keep-open-on-click"
-                    style="min-width:320px !important; overflow: auto;">
-                    <li>
-                        <div id="global-status-message">
-                            <div style="padding:10px; color: rgba(85, 85, 85, 1);">
-                                No notifications
-                            </div>
-                        </div>
-                    </li>
-                </ul>
             </li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
                    aria-expanded="false">
                     {% if user.is_authenticated %}
-                        <i class="fa fa-user copo-header-icons" aria-hidden="true"
-                           title="{{ user }}">&nbsp;<span class="caret"></span></i>
+                        <span data-copo-tour-id="global_user_authenticated_button">{{ user }}<span
+                                class="caret" style="margin-left: 5px;"></span></span>
+                        {#                        <i data-copo-tour-id="global_user_authenticated_button" class="fa fa-user copo-header-icons"#}
+                        {#                           aria-hidden="true" data-toggle="tooltip"#}
+                        {#                           title="{{ user }}"></i>#}
                         {% if not user.email %}
                             <script type="text/javascript">
                                 do_email_form();

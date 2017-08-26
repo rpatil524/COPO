@@ -1,23 +1,12 @@
 {
   "profile": {
     "title": "Profile FAQs",
-    "description": "Provides help frequently asked questions (FAQs) on different components. Each entry (under properties) consists of a 'title' for the information title and 'content' for the body of the message. ",
+    "description": "Provides help frequently asked questions (FAQs) on different components. Each entry (under properties) consists of a 'title' for the information title and 'content' for the body of the message. If you need to filter or give more weight to items being display, define this using context ",
     "properties": [
       {
         "title": "What is a COPO Profile?",
-        "content": "A COPO Profile is a collection of 'research objects' or components that form part of a research project or study. COPO currently provides templates for creating/describing the following components: <ul><li>Datafiles</li><li>Samples</li><li>Submission</li><li>Publications</li><li>People</li> <li>Annotations</li></ul>"
-      },
-      {
-        "title": "How do I create a Profile?",
-        "content": "Click on the <mark><span><i class='fa fa-plus-circle'></i><span class='icon_text'>&nbsp;New Profile</span></span></mark> button at the top left corner of the page to create a new Profile. <p><div><video width='400' controls><source src='/static/copo/movies/copo_profile_create.mov'>Your browser does not support HTML5 video.</video></div></p>"
-      },
-      {
-        "title": "How many Profiles can I have in COPO?",
-        "content": "As many as possible! Since a Profile would typically represent a piece of research project, you can create as many Profiles as required in COPO to represent different projects (e.g., new grant, sub project within a large grant, PhD project)"
-      },
-      {
-        "title": "How do I create components in a Profile?",
-        "content": "Each Profile created in COPO provides a means for defining a set of associated components (Datafiles, Samples, Publications, etc.). Instances of these components (e.g., uploading one or more datafiles, adding a person or collaborator) can be created in any order, although some of them may have some form of dependencies (e.g., Datafiles depending on Samples). <p>You can create a Profile component through one of two ways: <ol><li>Within the Profile page: only possible if the <mark><i class='fa fa-plus-circle'></i></mark> button is found on a component block.<p><div><video width='400' controls><source src='/static/copo/movies/create_component_profile_1.mov'>Your browser does not support HTML5 video.</video></div></p></li><li>By navigating to the component page: use the <mark><i class='fa fa-eye'></i></mark> button found on the component block to navigate to the component page. Follow the specific component creation instructions on the target page. <p><div><video width='400' controls><source src='/static/copo/movies/create_component_profile_2.mov'>Your browser does not support HTML5 video.</video></div></p></li></ol>"
+        "content": "A COPO Profile is a collection of 'research objects' or components that form part of a research project or study. COPO currently provides templates for creating/describing the following components: <ul><li>Datafiles</li><li>Samples</li><li>Submission</li><li>Publications</li><li>People</li> <li>Annotations</li></ul>",
+        "context": ["profile"]
       }
     ]
   },
@@ -26,8 +15,28 @@
     "description": "Provides help frequently asked questions (FAQs) on different components. Each entry (under properties) consists of a 'title' for the information title and 'content' for the body of the message. ",
     "properties": [
       {
-        "title": "What is a Datafile",
-        "content": "..."
+        "title": "How do I describe datafiles?",
+        "content": "<ol><li>Select the datafiles to be described under the <strong>Inspect</strong> pane</li><li>Click the <strong>Describe</strong> button</li><li>The description wizard will be launched with the target files available for description</li></ol>",
+        "context": ["datafile","describe"]
+      },
+      {
+        "title": "How do I exit a description?",
+        "content": "You can select to exit a description at any stage <ol><li>Click on the <strong>Exit Description</strong> button at the bottom of the wizard pane</li><li> You will be prompted to confirm the requested action</li><li> All previously entered description metadata will be saved for the future</li></ol>",
+        "context": ["datafile","describe"]
+      },
+      {
+        "title": "How do I discard a description metadata?",
+        "content": "<ol><li>Select the target datafiles under the <strong>Inspect</strong> pane</li><li>Click the <strong>[Un]Describe</strong> button</li><li>Any associated description metadata with the target datafiles will be deleted, and the status flag beside the affected files should change to red.</li></ol>",
+        "context": ["datafile","describe"]
+      },{
+        "title": "What file types can I upload to COPO?",
+        "content": "Our aim is not to provide a list of file formats and/or extensions COPO would necessarily support. However, datafiles uploaded to COPO should potentially be suitable (conforming to formats) for submission to the supported repositories. The following file types/formats should loosely be supported in COPO:<ol><li>FASTQ to FASTA format (e.g., .fastq, .fastq.gz, .fasta)</li><li>PDFs (i.e., .pdf)</li><li>Image file formats (e.g., JPEG, PNG, GIF, BMP)</li></ol>",
+        "context": ["datafile","upload"]
+      },
+      {
+        "title": "How long can I keep my file in COPO?",
+        "content": "COPO only brokers the submission of data to remote repositories, and is not equipped to act as a 'silo' for datafiles. <p>Datafiles uploaded to the system are held only for short periods of time (apprx. two weeks), pending deposition of same to remote repositories. <p>However, given that individual project needs or circumstances may differ considerably, we are more than happy to discuss ways to better support your specific data workflow.",
+        "context": ["datafile","upload"]
       }
     ]
   },

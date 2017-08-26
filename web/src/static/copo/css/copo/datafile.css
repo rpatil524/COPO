@@ -56,67 +56,6 @@
     color: red;
 }
 
-/*summary table styling*/
-
-td.summary-details-control {
-    position: relative;
-    cursor: pointer;
-}
-
-td.summary-details-control:before {
-    position: absolute;
-    font-family: 'FontAwesome';
-    content: "\f055";
-    color: forestgreen;
-    top: 30%;
-    left: 50%;
-
-}
-
-tr.shown td.summary-details-control {
-    position: relative;
-    cursor: pointer;
-}
-
-tr.shown td.summary-details-control:before {
-    position: absolute;
-    font-family: 'FontAwesome';
-    content: "\f056";
-    color: darkred;
-    top: 30%;
-    left: 50%;
-
-}
-
-span.summary-details-control {
-    position: relative;
-    cursor: pointer;
-}
-
-span.summary-details-control:before {
-    position: absolute;
-    font-family: 'FontAwesome';
-    content: "\f055";
-    color: #3a6c55;
-    top: 10%;
-    left: 50%;
-    font-size: 13px;
-
-}
-
-div.shown span.summary-details-control:before {
-    position: absolute;
-    font-family: 'FontAwesome';
-    content: "\f056";
-    color: darkred;
-    top: 10%;
-    left: 50%;
-    font-size: 13px;
-
-}
-
-/*end summary table styling*/
-
 
 /*remote side bar*/
 

@@ -25,8 +25,6 @@ $(document).ready(function () {
         var copoVisualsURL = "/copo/copo_visualize/";
         var copoFormsURL = "/copo/copo_forms/";
 
-        do_global_help(component);
-
         var resolvedAccessionData = null; //holds data from sample accession resolution
 
 

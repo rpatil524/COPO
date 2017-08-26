@@ -157,11 +157,8 @@ a.component-btns {
 }
 
 .profile-details.panel-default > .panel-heading {
-    background-image: none;
-    background-repeat: no-repeat;
-    background-color: #ffffff;
+    background: #ffffff none no-repeat;
     padding:0px;
-    /*border-bottom: none;*/
 }
 
 .profile-details.panel-default > .panel-footer {

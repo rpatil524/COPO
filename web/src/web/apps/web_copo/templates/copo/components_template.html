@@ -1,0 +1,82 @@
+<div id="components_templates" style="display: none;">
+    <!-- Panel template -->
+    <div class="panel-template">
+        <div class="panel panel-info">
+            <div class="panel-heading">Panel Heading</div>
+            <div class="panel-body">Panel Content</div>
+        </div>
+    </div>
+
+    <!-- Quick tour button template -->
+    <div class="quick-tour-template">
+        <li class="list-inline-item" data-toggle="tooltip" title="Quick Tour" style="padding: 0px;">
+            <a class="takeatour" style="text-decoration: none;" href="#" role="button"
+               aria-haspopup="true"
+               aria-expanded="false">
+            <span class="fa-stack" style="color:rgba(230, 138, 0,1.0);">
+                <i class="fa fa-circle fa-stack-2x"></i>
+                <i class="fa fa-lightbulb-o fa-stack-1x fa-inverse copo-cbtns"></i>
+            </span>
+            </a>
+        </li>
+    </div>
+
+    <!-- New profile button template -->
+    <div class="new-profile-template">
+        <li class="list-inline-item" data-toggle="tooltip" title="Add new profile" style="padding: 0px;">
+            <a class="new-form-call" style="text-decoration: none;" href="#" role="button"
+               data-copo-tour-id="new_profile_button"
+               data-component="profile">
+            <span class="fa-stack text-primary">
+                <i class="fa fa-circle fa-stack-2x"></i>
+                <i class="fa fa-plus fa-stack-1x fa-inverse copo-cbtns"></i>
+            </span>
+            </a>
+        </li>
+    </div>
+
+    <!-- New publication button template -->
+    <div class="new-publication-template">
+        <li data-copo-tour-id="new_publication_button" class="list-inline-item" data-toggle="tooltip"
+            title="Add new publication" style="padding: 0px;">
+            <a style="text-decoration: none;" href="#" role="button" data-toggle="collapse" data-target="#pub_options">
+            <span class="fa-stack text-primary">
+                <i class="fa fa-circle fa-stack-2x"></i>
+                <i class="fa fa-plus fa-stack-1x fa-inverse copo-cbtns"></i>
+            </span>
+            </a>
+        </li>
+    </div>
+
+    <!-- Help panel template - sidebar component -->
+    <div class="help-panel-template">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <div class="panel panel-info">
+                    <div class="panel-heading" data-copo-tour-id="page_context_help_panel"
+                         style="background-image:none;">
+                        <div class="row">
+                            <div class="col-sm-10 col-md-10 col-lg-10">
+                                <strong>Help</strong>
+                            </div>
+                            <div class="col-sm-2 col-md-2 col-lg-2 shown">
+                                <span class="pull-right panel-details-control"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body panel-content-div">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12">
+                                <select class="context-help-ctrl" placeholder="Select a help topic..."></select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12 context-help-display">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

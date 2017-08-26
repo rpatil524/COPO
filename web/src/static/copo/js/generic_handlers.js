@@ -3,8 +3,13 @@ var AnnotationEventAdded = false;
 var selectizeObjects = Object(); //stores reference to selectize objects initialised on the page
 var copoVisualsURL = "/copo/copo_visualize/";
 var csrftoken = $.cookie('csrftoken');
+var quickTourMessages = Object(); //holds quick tour messages
+var quickTourArray = []; //holds quick tour elements
+var quickTourFlag = true; //flag to decide whether or not to display quick tour
 
 $(document).ready(function () {
+    var componentName = $("#nav_component_name").val();
+
     setup_autocomplete()
 
     //set up help tips events
@@ -14,11 +19,10 @@ $(document).ready(function () {
     do_multi_search_lookup();
 
     //set up global navigation components
-    do_component_navbar($("#nav_component_name").val());
+    do_page_controls(componentName);
 
-    var tableLoader = get_spinner_image();
-    tableLoader.attr("id", "global_help_loader");
-    $("#global_help_panel").append(tableLoader);
+    //global_help_call
+    do_global_help(componentName);
 
 });
 
@@ -63,13 +67,12 @@ function do_component_delete_confirmation(params) {
         animate: true,
         onhide: function () {
         },
-        buttons: [
-            {
-                label: 'Cancel',
-                action: function (dialogRef) {
-                    doTidyClose["closeIt"](dialogRef);
-                }
-            },
+        buttons: [{
+            label: 'Cancel',
+            action: function (dialogRef) {
+                doTidyClose["closeIt"](dialogRef);
+            }
+        },
             {
                 icon: 'glyphicon glyphicon-trash',
                 label: 'Delete',
@@ -82,7 +85,9 @@ function do_component_delete_confirmation(params) {
                     $.ajax({
                         url: copoFormsURL,
                         type: "POST",
-                        headers: {'X-CSRFToken': csrftoken},
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
                         data: {
                             'task': "delete",
                             'component': params.component,
@@ -135,7 +140,9 @@ function do_render_table(data) {
             //highlight new row
             $(rowNode)
                 .addClass('row-insert-higlight')
-                .animate({color: 'black'});
+                .animate({
+                    color: 'black'
+                });
 
             lastRecord = data.table_data.row_data;
 
@@ -174,12 +181,12 @@ function do_render_table(data) {
                     var bTns = data.table_data.action_buttons.row_btns; //row buttons
                     rndHTML = '<span style="white-space: nowrap;">';
                     for (var i = 0; i < bTns.length; ++i) {
-                        rndHTML += '<a data-action-target="row" data-record-action="'
-                            + bTns[i].btnAction + '" data-record-id="'
-                            + rdata[rdata.length - 1]
-                            + '" data-toggle="tooltip" style="display: inline-block; white-space: normal;" title="'
-                            + bTns[i].text + '" class="' + bTns[i].className + ' btn-xs"><i class="'
-                            + bTns[i].iconClass + '"> </i><span></span></a>&nbsp;';
+                        rndHTML += '<a data-action-target="row" data-record-action="' +
+                            bTns[i].btnAction + '" data-record-id="' +
+                            rdata[rdata.length - 1] +
+                            '" data-toggle="tooltip" style="display: inline-block; white-space: normal;" title="' +
+                            bTns[i].text + '" class="' + bTns[i].className + ' btn-xs"><i class="' +
+                            bTns[i].iconClass + '"> </i><span></span></a>&nbsp;';
                     }
                     rndHTML += '</span>';
                 }
@@ -298,7 +305,9 @@ function do_render_table(data) {
             ordering: true,
             scrollX: scrollX,
             lengthChange: true,
-            order: [[orderIndx, "desc"]],
+            order: [
+                [orderIndx, "desc"]
+            ],
             select: {
                 style: 'multi'
             },
@@ -362,12 +371,12 @@ function do_render_table(data) {
                     $(this).addClass(this.className); //attach supplied class
                     $(this).attr('data-record-action', btnImage.btnAction); //data attribute to signal action type
                     $(this).attr('data-action-target', 'rows'); //data attribute to signal batch action
+                    $(this).attr('data-copo-tour-id', data.table_data.table_id + "_" + btnImage.btnAction); //quick tour component: table_id + action type
                     //
                     ////attach icon to button
                     try {
                         $('<i class="' + bTns[value].iconClass + '">&nbsp;</i>').prependTo($(this));
-                    }
-                    catch (err) {
+                    } catch (err) {
                     }
 
                 });
@@ -475,7 +484,7 @@ function refresh_range_slider() {
         });
     });
 
-}//end of function
+} //end of function
 
 
 //refreshes selectboxes to pick up events
@@ -498,7 +507,7 @@ function refresh_selectbox() {
         }
     });
 
-}//end of function
+} //end of function
 
 function refresh_multiselectbox() {
     $('.copo-multi-select').each(function () {
@@ -568,8 +577,8 @@ function refresh_multisearch() {
                 render: {
                     item: function (item, escape) {
                         return '<div>' +
-                            (item[elemSpecs.label_field] ? '<span>'
-                                + escape(item[elemSpecs.label_field]) + '</span>' : '') +
+                            (item[elemSpecs.label_field] ? '<span>' +
+                                escape(item[elemSpecs.label_field]) + '</span>' : '') +
                             '</div>';
                     },
                     option: function (item, escape) {
@@ -614,12 +623,10 @@ var auto_complete = function () {
     function do_select(item) {
         if ($(document).data('annotator_type') == 'txt') {
             $('#annotator-field-0').val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
-        }
-        else if ($(document).data('annotator_type') == 'ss') {
+        } else if ($(document).data('annotator_type') == 'ss') {
             // this function defined in copo_annotations.js
             append_to_annotation_list(item)
-        }
-        else {
+        } else {
             $(this.Input).val($(item).data('annotation_value'));
             $(this.Input).siblings("[id*='termSource']").val($(item).data('term_source'));
             $(this.Input).siblings("[id*='termAccession']").val($(item).data('term_accession'));
@@ -662,8 +669,7 @@ var auto_complete = function () {
                 var short_form;
                 if (doc.ontology_prefix == undefined) {
                     short_form = "Origin Unknown"
-                }
-                else {
+                } else {
                     short_form = doc.ontology_prefix
                 }
                 li.innerHTML = '<span class="label label-info"><span title="' + short_form + '" style="color:white; padding-top:3px; padding-bottom:3px"><img style="height:15px; margin-right:10px" src="/static/copo/img/ontology.png"/>' + doc.ontology_prefix + ':' + doc.label + ' ' + '</span>' + ' - ' + '<span style="color:#fcff5e">' + doc.obo_id + '</span></span>';
@@ -688,8 +694,7 @@ var auto_complete = function () {
 
                 ul.appendChild(li);
                 li = document.createElement("li");
-            }
-            catch (err) {
+            } catch (err) {
                 console.log(err);
                 li = document.createElement("li");
             }
@@ -698,7 +703,7 @@ var auto_complete = function () {
         this.DOMResults.append(ul)
     }
 
-}//end of function
+} //end of function
 
 function isInArray(value, array) {
     //checks if a value is in array
@@ -708,10 +713,9 @@ function isInArray(value, array) {
 function get_attributes_outer_div() {
     //used in rendering table information
 
-    var ctrlsDiv = $('<div/>',
-        {
-            class: "copo-component-attributes-outer"
-        });
+    var ctrlsDiv = $('<div/>', {
+        class: "copo-component-attributes-outer"
+    });
 
     return ctrlsDiv.clone();
 }
@@ -720,10 +724,9 @@ function get_attributes_outer_div() {
 function get_attributes_inner_div() {
     //used in rendering table information
 
-    var ctrlSpan = $('<span/>',
-        {
-            class: "copo-component-attributes-inner"
-        });
+    var ctrlSpan = $('<span/>', {
+        class: "copo-component-attributes-inner"
+    });
 
     return ctrlSpan.clone();
 }
@@ -731,10 +734,9 @@ function get_attributes_inner_div() {
 function get_attributes_inner_div_1() {
     //used in rendering table information
 
-    var ctrlSpan = $('<span/>',
-        {
-            class: "copo-component-attributes-inner-0"
-        });
+    var ctrlSpan = $('<span/>', {
+        class: "copo-component-attributes-inner-0"
+    });
 
     return ctrlSpan.clone();
 }
@@ -874,12 +876,11 @@ function get_data_list_panel(itemData, link) {
 
 function get_data_item_collapse(link, itemData, itemCount) {
     // create badge
-    var badgeSpan = $('<span/>',
-        {
-            class: "badge",
-            style: "background: #fff;  border-radius: 5px; margin-left: 2px; margin-bottom: 1px;",
-            html: itemCount
-        });
+    var badgeSpan = $('<span/>', {
+        class: "badge",
+        style: "background: #fff;  border-radius: 5px; margin-left: 2px; margin-bottom: 1px;",
+        html: itemCount
+    });
 
     //create button
     var itemsLanguage = "items";
@@ -896,12 +897,11 @@ function get_data_item_collapse(link, itemData, itemCount) {
         })
         .html($('<div/>').append(badgeSpan).html() + '<span style="margin-left: 2px; margin-bottom:0px;"> ' + itemsLanguage + '</span>');
 
-    var collapseDiv = $('<div>',
-        {
-            id: link,
-            class: "collapse",
-            html: itemData
-        });
+    var collapseDiv = $('<div>', {
+        id: link,
+        class: "collapse",
+        html: itemData
+    });
 
     var ctrlDiv = $('<div/>')
         .append(collapseBtn)
@@ -938,23 +938,20 @@ function build_attributes_display(data) {
     var resolvedDiv = $('<div/>');
 
     data.component_attributes.forEach(function (entry) {
-        var iRow = $('<div/>',
-            {
-                class: "row",
-                style: "border-bottom: 1px solid #ddd;"
-            });
+        var iRow = $('<div/>', {
+            class: "row",
+            style: "border-bottom: 1px solid #ddd;"
+        });
 
         resolvedDiv.append(iRow);
 
-        var labelCol = $('<div/>',
-            {
-                class: "col-sm-5 col-md-5 col-lg-5"
-            });
+        var labelCol = $('<div/>', {
+            class: "col-sm-5 col-md-5 col-lg-5"
+        });
 
-        var valueCol = $('<div/>',
-            {
-                class: "col-sm-7 col-md-7 col-lg-7"
-            });
+        var valueCol = $('<div/>', {
+            class: "col-sm-7 col-md-7 col-lg-7"
+        });
 
         iRow.append(labelCol);
         iRow.append(valueCol);
@@ -984,10 +981,9 @@ function build_attributes_display(data) {
         }
 
 
-        var breakr = $('<div/>',
-            {
-                style: "border-top: 1px solid #f4f7fc;"
-            });
+        var breakr = $('<div/>', {
+            style: "border-top: 1px solid #f4f7fc;"
+        });
 
         if (valueNode.length > 1) {
             valueCol.append(valueNode[0]);
@@ -1002,6 +998,55 @@ function build_attributes_display(data) {
     return resolvedDiv;
 }
 
+function get_collapsible_panel(panelType) {
+    if (!panelType) {
+        panelType = 'default'
+    }
+
+    var panelGroup = $('<div/>', {
+        class: "panel-group",
+    });
+
+    var panelClass = "panel panel-" + panelType;
+    var panel = $('<div/>', {
+        class: panelClass,
+    });
+
+    var panelHeading = $('<div/>', {
+        class: "panel-heading",
+    });
+
+    var panelTitle = $('<div/>', {
+        class: "panel-title"
+    });
+
+    var panelTitleAnchor = $('<a/>', {
+        "data-toggle": "collapse"
+    });
+
+    panelTitle.append(panelTitleAnchor);
+    panelHeading.append(panelTitle);
+
+    panel.append(panelHeading);
+
+    var panelCollapse = $('<div/>', {
+        class: "panel-collapse collapse",
+    });
+
+
+    var panelBody = $('<div/>', {
+        class: "panel-body"
+    });
+
+    panelCollapse.append(panelBody);
+
+    panel.append(panelCollapse);
+
+    panelGroup.append(panel);
+
+    return $('<div/>').append(panelGroup).clone();
+}
+
 function get_panel(panelType) {
     if (!panelType) {
         panelType = 'default'
@@ -1009,7 +1054,7 @@ function get_panel(panelType) {
 
     var panelClass = "panel panel-" + panelType;
     var panel = $('<div/>', {
-        class: "panel panel-info",
+        class: panelClass,
     });
 
     var panelHeading = $('<div/>', {
@@ -1029,67 +1074,77 @@ function get_panel(panelType) {
     return $('<div/>').append(panel).clone();
 }
 
-function get_components_properties() {
+function get_reusable_messages(messageKey) {
+    var globalUIMessages = {
+        "select_records_task": "No records selected! Please select one or more records to perform a task.",
+        "no_defined_task_record": "No task defined for the selected record!",
+        "no_defined_task_records": "No task defined for the selected records!",
+        "task_to_perform_record": "What task do you want to perform on the selected record?",
+        "task_to_perform_records": "What task do you want to perform on the selected records?",
+    }
+
+    var message = '';
+    if (globalUIMessages.hasOwnProperty(messageKey)) {
+        message = globalUIMessages[messageKey];
+    }
+
+    return message;
+}
+
+function get_profile_components() {
     var componentProperties = [
+        {
+            component: 'profile',
+            title: 'Work Profiles',
+            buttons: ["quick-tour-template", "new-profile-template"],
+            panels: ["help-panel-template"]
+        },
         {
             component: 'datafile',
             title: 'Datafiles',
-            addLi: [], //specifies what navbar item (e.g. profile dropdown, add component) are displayed on the page
-            addLabel: "Upload Datafile",
             iconClass: "fa fa-database",
             countsKey: "num_data",
-            actions: ["inspect"], //specifies what action buttons are displayed alongside the component on the profile page
+            buttons: ["quick-tour-template"],
             colorClass: "data_color" //specifies the color
-
         },
         {
             component: 'sample',
             title: 'Samples',
-            addLi: [],
-            addLabel: "Add Sample",
             iconClass: "fa fa-filter",
             countsKey: "num_sample",
-            actions: ["inspect"],
+            buttons: ["quick-tour-template"],
             colorClass: "samples_color"
         },
         {
             component: 'submission',
             title: 'Submissions',
-            addLi: [],
-            addLabel: "New Submission",
             iconClass: "fa fa-envelope",
             countsKey: "num_submission",
-            actions: ["inspect"],
+            buttons: ["quick-tour-template"],
             colorClass: "submissions_color"
         },
         {
             component: 'publication',
             title: 'Publications',
-            addLi: ["publication", "loader"], //add relevant li item for the component
-            addLabel: "Add Publication",
             iconClass: "fa fa-paperclip",
             countsKey: "num_pub",
-            actions: ["inspect", "add"],
+            buttons: ["quick-tour-template"],
             colorClass: "pubs_color"
         },
         {
             component: 'person',
             title: 'People',
-            addLi: ["simple"], //relevant add related li item for the component
-            addLabel: "Add Person",
             iconClass: "fa fa-users",
             countsKey: "num_person",
-            actions: ["inspect", "add"],
+            buttons: ["quick-tour-template"],
             colorClass: "people_color"
         },
         {
             component: 'annotation',
             title: 'Annotations',
-            addLi: ["simple"], //relevant add related li item for the component
-            addLabel: "Add Annotation",
             iconClass: "fa fa-pencil",
             countsKey: "num_annotation",
-            actions: ["inspect"],
+            buttons: ["quick-tour-template",],
             colorClass: "annotations_color"
         }
     ];
@@ -1097,72 +1152,93 @@ function get_components_properties() {
     return componentProperties
 }
 
+
 //builds component-page navbar
-function do_component_navbar(component) {
+function do_page_controls(componentName) {
+    var component = null;
+    var components = get_profile_components();
+
+    components.forEach(function (comp) {
+        if (comp.component == componentName) {
+            component = comp;
+            return false;
+        }
+    });
+
     if (component == null) {
         return false;
     }
 
-    //build profile components navigation
-    do_profile_navigate($("#copo_components_navs").find(".profile-links"));
 
-    var componentProperties = get_components_properties();
+    var pageHeaders = $(".copo-page-headers"); //holds page and global buttons
 
-    var result = $.grep(componentProperties, function (e) {
-        return e.component == component;
+    var PageTitle = $('<span/>', {
+        class: "page-title-custom",
+        style: "margin-right:10px;",
+        html: component.title
     });
 
-    if (result.length) {
-        //page title
-        $("#copo_components_navs").find(".page-title-custom").html(result[0].title);
+    pageHeaders.append(PageTitle);
 
-        //set 'add' menu
-        //...first remove non-relevant list items
-        $("#copo_components_navs").find(".nav-page-menu").find(".data-record-add-li").each(function () {
-            if ($.inArray($(this).attr("data-add-li"), result[0].addLi) == -1) {
-                $(this).remove();
-            }
-        });
+    return;
 
-        //check for and set label for add menu
-        if ($("#copo_components_navs").find(".nav-page-menu").find(".component-add-label").length) {
-            $("#copo_components_navs").find(".nav-page-menu").find(".component-add-label").find(".icon_text").html(result[0].addLabel);
-        }
 
-        //set data component for new form call
-        if ($("#copo_components_navs").find(".nav-page-menu").find(".new-form-call").length) {
-            $("#copo_components_navs").find(".nav-page-menu").find(".new-form-call").attr("data-component", component);
-        }
+    //create other buttons types for lhcolumn; component buttons group goes in the right hand side
 
-        //set profile menu
-        $("#copo_components_navs").find(".profile-links").find("[data-component='" + component + "']").addClass("active");
+    component.buttons.forEach(function (item) {
+        // if (item == "components_quick_nav") {
+        //     // add right hand side buttons
+        //     var componentsDIV = $('<div/>', {
+        //         class: "pull-right"
+        //     });
+        //
+        //     rhColumn.append(componentsDIV);
+        //
+        //     var components = get_profile_components();
+        //     components.forEach(function (comp) {
+        //         if (comp.component == component.component || comp.component == "profile") {
+        //             return false;
+        //         }
+        //
+        //         var componentBTN = $('<a/>', {
+        //             class: "btn btn-sm copo-btn-grps " + comp.colorClass,
+        //             style: "margin-right: 3px; font-size: 10px;",
+        //             href: $("#" + comp.component + "_url").val(),
+        //             title: "Navigate to " + comp.title + " page"
+        //         });
+        //
+        //         var componentICON = $('<i/>', {
+        //             class: "copo-components-icons " + comp.iconClass,
+        //             style: "color: rgb(255, 255, 255);",
+        //         });
+        //
+        //         var componentTXT = $('<span/>', {
+        //             class: "icon_text",
+        //             style: "color: #ffffff; padding-left: 3px;",
+        //             html: comp.title
+        //         });
+        //
+        //         componentBTN.append(componentICON).append(componentTXT);
+        //
+        //
+        //         componentsDIV.append(componentBTN);
+        //
+        //     });
+        //
+        // } else {
+        //     try {
+        //         var liButton = $("#" + item).find(".list-inline-item").clone();
+        //         lULElem.append(liButton);
+        //     } catch (e) {
+        //         ;
+        //     }
+        // }
+    });
 
-        refresh_tool_tips();
-    }
-} //end of func
 
-//builds the quick navigation to components within a profile
-function do_profile_navigate(parentObject) {
-    var components = get_components_properties();
-
-    for (var i = 0; i < components.length; ++i) {
-        var aElem = $('<a/>',
-            {
-                "data-component": components[i].component,
-                class: "btn btn-primary",
-                title: components[i].title,
-                "data-toggle": "tooltip",
-                href: $("#" + components[i].component + "_url").val()
-            });
-
-        var iElem = $('<i/>',
-            {
-                class: "copo-components-icons " + components[i].iconClass + " ",
-            });
-
-        aElem.append(iElem);
-        parentObject.append(aElem);
-    }
+    //refresh components...
+    quick_tour_event();
+    refresh_tool_tips();
 
 } //end of func
 
@@ -1217,7 +1293,7 @@ function do_help_tips_event() {
 
         var refresh = true; //flag for instantiating popover on element
 
-        if (!(content || title)) {//only display if element has a content or title
+        if (!(content || title)) { //only display if element has a content or title
             refresh = false;
         }
 
@@ -1275,7 +1351,9 @@ function resolve_element_view(recordId, associatedComponent, eventTarget) {
     $.ajax({
         url: copoVisualsURL,
         type: "POST",
-        headers: {'X-CSRFToken': csrftoken},
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
         data: {
             'task': "attributes_display",
             'component': associatedComponent,
@@ -1283,10 +1361,9 @@ function resolve_element_view(recordId, associatedComponent, eventTarget) {
         },
         success: function (data) {
             var gAttrib = build_attributes_display(data);
-            var attribDiv = $('<div/>',
-                {
-                    style: "max-height:300px; overflow-y: scroll;"
-                });
+            var attribDiv = $('<div/>', {
+                style: "max-height:300px; overflow-y: scroll;"
+            });
             attribDiv.append(gAttrib);
             WebuiPopovers.updateContent(eventTarget, '<div class="webpop-content-div">' + $('<div/>').append(attribDiv).html() + '</div>');
         },
@@ -1299,34 +1376,30 @@ function resolve_element_view(recordId, associatedComponent, eventTarget) {
 
 
 function get_spinner_image() {
-    var loaderObject = $('<div>',
-        {
-            style: 'text-align: center',
-            html: "<span class='fa fa-spinner fa-pulse fa-3x'></span>"
-        });
+    var loaderObject = $('<div>', {
+        style: 'text-align: center',
+        html: "<span class='fa fa-spinner fa-pulse fa-3x'></span>"
+    });
 
     return loaderObject.clone();
 }
 
 function build_help_pane_menu(helpObject, parentObject) {
     $.each(helpObject, function (key, val) {
-        var liElem = $('<li/>',
-            {
-                class: "component-help",
-                "data-component": key
-            });
+        var liElem = $('<li/>', {
+            class: "component-help",
+            "data-component": key
+        });
 
-        var aElem = $('<a/>',
-            {
-                href: "#",
-                style: "padding-left: 10px",
-            });
+        var aElem = $('<a/>', {
+            href: "#",
+            style: "padding-left: 10px",
+        });
 
-        var divElem = $('<div/>',
-            {
-                style: "padding: 5px 5px 0px 0px;",
-                html: '<span><i style="padding-right: 5px;" class="fa fa-circle-o" aria-hidden="true"></i>' + val.title + '</span>'
-            });
+        var divElem = $('<div/>', {
+            style: "padding: 5px 5px 0px 0px;",
+            html: '<span><i style="padding-right: 5px;" class="fa fa-circle-o" aria-hidden="true"></i>' + val.title + '</span>'
+        });
 
         aElem.append(divElem);
 
@@ -1336,20 +1409,103 @@ function build_help_pane_menu(helpObject, parentObject) {
     });
 }
 
+function sanitise_help_list(contextHelpList) {
+    var dataSet = [];
+
+    if (contextHelpList.properties) {
+        var dtd = contextHelpList.properties;
+
+        for (var i = 0; i < dtd.length; ++i) {
+            var option = {};
+            option["id"] = i + 1;
+            option["title"] = dtd[i].title;
+            option["content"] = dtd[i].content;
+            option["context"] = dtd[i].context;
+            dataSet.push(option);
+        }
+    }
+
+    return dataSet;
+}
+
+function do_context_help(data) {
+    //does current page request context help?
+
+    //context-help-request test: if true then page requests context help control to be added
+    if (!$(".context-help-request").length) {
+        return false;
+    }
+
+
+    $(".context-help-request").append($("#ctrl_contextual_help_component").children(":first").clone());
+
+
+    var dtd = sanitise_help_list(data);
+    var elem = $('.context-help-ctrl');
+
+
+    elem.selectize({
+        maxItems: 1,
+        valueField: 'id',
+        labelField: 'title',
+        searchField: ['title', 'content', 'context'],
+        onChange: function (value) {
+            if (value) {
+                var result = $.grep(dtd, function (e) {
+                    return e.id == value;
+                });
+
+                if (result.length) {
+                    elem.closest(".panel-body").find(".context-help-display").html(result[0].content);
+                }
+            } else {
+                elem.closest(".panel-body").find(".context-help-display").html('');
+            }
+        },
+        options: dtd,
+        create: false
+    });
+
+    //add events
+    elem.closest(".panel").find(".panel-details-control").click(function (e) {
+        var triggerElem = $(this);
+        if (elem.closest(".panel").find(".panel-body").is(':visible')) {
+            triggerElem.closest("div").removeClass("shown");
+            elem.closest(".panel").find(".panel-body").css("display", "none");
+        } else {
+            triggerElem.closest("div").addClass("shown");
+            elem.closest(".panel").find(".panel-body").css("display", "block");
+        }
+    });
+
+}
+
 function do_global_help(component) {
     //global help
 
     $.ajax({
         url: copoVisualsURL,
         type: "POST",
-        headers: {'X-CSRFToken': csrftoken},
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
         data: {
             'task': 'help_messages',
             'component': component
         },
         success: function (data) {
-            set_component_help(component, "global_help_table", data.global_help_messages);
-            $("#global_help_loader").remove();
+            //set quick tour message and trigger display event
+            try {
+                do_context_help(data.context_help);
+                quickTourMessages = data.quick_tour_messages;
+                quickTourFlag = data.quick_tour_flag;
+
+                if (quickTourFlag && data.user_has_email) {
+                    $(".takeatour").trigger("click");
+                }
+
+            } catch (err) {
+            }
         },
         error: function () {
             alert("Couldn't retrieve page help!");
@@ -1358,7 +1514,7 @@ function do_global_help(component) {
 }
 
 function set_component_help(helpEntryKey, tableID, helpJSON) {
-    if(!helpJSON) {
+    if (!helpJSON) {
         return;
     }
 
@@ -1378,8 +1534,6 @@ function set_component_help(helpEntryKey, tableID, helpJSON) {
         option["help_id"] = helpID.replace(".", "_");
         dataSet.push(option);
     });
-
-
 
 
     //set data
@@ -1412,33 +1566,47 @@ function set_component_help(helpEntryKey, tableID, helpJSON) {
             data: dataSet,
             searchHighlight: true,
             "lengthChange": false,
-            order: [[0, "asc"]],
+            order: [
+                [0, "asc"]
+            ],
             language: {
                 "info": " _START_ to _END_ of _TOTAL_ help tips",
                 "lengthMenu": "_MENU_ tips",
             },
-            columns: [
-                {
-                    "data": "rank",
-                    "visible": false
-                },
+            columns: [{
+                "data": "rank",
+                "visible": false
+            },
                 {
                     "data": null,
                     "title": "Tips",
                     "render": function (data, type, row, meta) {
-                        var aLink = $('<a/>', {
-                            "data-toggle": "collapse",
-                            href: "#helpcentretips" + meta.row + data.help_id,
-                            html: data.title
+                        var panelVar = get_collapsible_panel("default");
+
+                        //restructure some default styling
+                        panelVar.find(".panel-title").css({
+                            "font-size": "13px",
+                            "font-weight": "500"
+                        });
+                        panelVar.find(".panel-group").css("margin-bottom", "0px");
+                        panelVar.find(".panel").css({
+                            "border-color": "rgba(51, 102, 153, 0.1)"
+                        });
+                        panelVar.find(".panel-heading").css({
+                            "background-image": "none",
+                            "background-color": "rgba(51, 102, 153, 0.1)"
                         });
 
-                        var aDiv = $('<div/>', {
-                            "class": "collapse help-centre-content",
-                            id: "helpcentretips" + meta.row + data.help_id,
-                            html: data.content,
-                            style: "background-color: #fff; margin-top: 10px; border-radius: 4px;"
-                        });
-                        return $('<div></div>').append(aLink).append(aDiv).html();
+                        var collapseId = "helpcentretips" + meta.row + data.help_id;
+
+                        panelVar.find(".panel-title").find("a")
+                            .attr("href", "#" + collapseId)
+                            .html(data.title);
+
+                        panelVar.find(".panel-collapse").attr("id", collapseId);
+                        panelVar.find(".panel-collapse").find(".panel-body").html('<div class="webpop-content-div" ">' + data.content + '</div>');
+
+                        return $('<div></div>').append(panelVar).html();
                     }
                 },
                 {
@@ -1446,13 +1614,15 @@ function set_component_help(helpEntryKey, tableID, helpJSON) {
                     "visible": false
                 }
             ],
-            "columnDefs": [
-                {"orderData": 0,}
-            ]
+            "columnDefs": [{
+                "orderData": 0,
+            }]
         });
     }
 
-    $('#' + tableID + ' tr:eq(0) th:eq(0)').text(helpJSON[helpEntryKey].title);
+    $('#' + tableID + ' tr:eq(0) th:eq(0)')
+        .text(helpJSON[helpEntryKey].title)
+        .css("color", "#fff");
 }
 
 function dialog_display(dialog, dTitle, dMessage, dType) {
@@ -1493,7 +1663,136 @@ function dialog_display(dialog, dTitle, dMessage, dType) {
     dialog.open();
 }
 
+function update_quick_tour_flag() {
+    WebuiPopovers.hideAll(); //hide all shown popovers
+
+    $.ajax({
+        url: copoVisualsURL,
+        type: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            'task': 'update_quick_tour_flag',
+            'quick_tour_flag': false
+        },
+        success: function (data) {
+            //set quick tour flag
+            try {
+                quickTourFlag = data.quick_tour_flag;
+            } catch (err) {
+            }
+        },
+        error: function () {
+            alert("Couldn't update settings!");
+        }
+    });
+}
+
+function quick_tour_event() {
+    $('.takeatour').on('click', function (e) {
+        var dismissTour = '<a class="dismisstouralert pull-right" href="#" role="button" ' +
+            'style="text-decoration: none; color:  #c93c00;" aria-haspopup="true" aria-expanded="false">' +
+            '<i class="fa fa-times-circle " aria-hidden="true">' +
+            '</i>&nbsp; Dismiss Tour</a>';
+
+        var takeTour = '<a class="takeatouryes" href="#" role="button" ' +
+            'style="text-decoration: none;" aria-haspopup="true" aria-expanded="false">' +
+            '<i class="fa fa-lightbulb-o " style="color: #35637e;" aria-hidden="true">' +
+            '</i>&nbsp; Take Tour</a>';
 
 
+        var messageContent = 'Do you want to take a quick tour of the page? <br/><span style="color: #35637e;">Please note that your screen will go dim, and regular page elements might be rendered temporarily inactive in the quick tour mode.</span>' + '<hr/>' + takeTour + dismissTour;
+
+        $(this).webuiPopover('destroy');
+
+        $(this).webuiPopover({
+            title: "Quick Tour",
+            content: '<div class="webpop-content-div">' + messageContent + '</div>',
+            trigger: 'sticky',
+            width: 300,
+            arrow: true,
+            closeable: true,
+            placement: 'bottom-right'
+        });
+    });
+
+    $(document).on("click", ".takeatouryes", function (e) {
+        quickTourArray = [];
+        WebuiPopovers.hideAll(); //hide all shown popovers
+
+        //retain quick tour elements with defined messages
+        $('[data-copo-tour-id]').each(function () {
+            if (quickTourMessages.hasOwnProperty($(this).attr("data-copo-tour-id"))) {
+                if ($(this).is(":visible")) { //only consider elements that are visible on the DOM
+                    quickTourArray.push($(this));
+                }
+            }
+        });
+
+        if (quickTourArray.length > 0) {
+            quick_tour_select();
+        }
+
+    });
+
+    $(document).on("click", ".quicktournext", function () {
+        if (quickTourArray.length > 0) {
+            quick_tour_select();
+        }
+    });
+
+    $(document).on("click", ".endcopotour", function () {
+        quickTourArray = [];
+        WebuiPopovers.hideAll(); //hide all shown popovers
+    });
+
+    $(document).on("click", ".dismisstouralert", function () {
+        update_quick_tour_flag();
+    });
+}
+
+function quick_tour_select() {
+    // display tour elements
+
+    var item = quickTourArray[0];
+    var itemMessage = quickTourMessages[item.attr("data-copo-tour-id")];
+
+    var endTour = '<a class="endcopotour pull-right" href="#" role="button" ' +
+        'style="text-decoration: none; color:  #c93c00;" aria-haspopup="true" aria-expanded="false">' +
+        '<i class="fa fa-times-circle " aria-hidden="true">' +
+        '</i>&nbsp; End Tour</a>';
+
+    var nextTip = endTour;
 
 
+    if (quickTourArray.length > 1) {
+        nextTip = '<a class="quicktournext" href="#" role="button" ' +
+            'style="text-decoration: none;" aria-haspopup="true" aria-expanded="false">' +
+            '<i class="fa fa-lightbulb-o " style="color: #35637e;" aria-hidden="true">' +
+            '</i>&nbsp; Next Tip</a>';
+
+        nextTip += endTour;
+    }
+
+    var messageContent = itemMessage.content + '<hr/>' + nextTip;
+
+    item.webuiPopover('destroy');
+    item.webuiPopover({
+        title: itemMessage.title,
+        content: '<div class="webpop-content-div">' + messageContent + '</div>',
+        trigger: 'sticky',
+        width: 300,
+        arrow: true,
+        closeable: true,
+        placement: 'auto-bottom',
+        backdrop: true,
+    });
+
+    for (var i = 0; i < quickTourArray.length; i++) {
+        if (quickTourArray[i].attr("data-copo-tour-id") === item.attr("data-copo-tour-id")) {
+            quickTourArray.splice(i, 1);
+            break;
+        }
+    }
+} //end of func

@@ -1,5 +1,4 @@
 body {
-
     font-family: "Helvetica", serif;
     font-size: 1.4em;
 }
@@ -35,7 +34,8 @@ body {
     padding: 5px 5px 0px;
 }
 
-div[class^="col-"], div[class*=" col-"] {
+div[class^="col-"],
+div[class*=" col-"] {
 / / border: 1 px solid black;
 }
 
@@ -65,11 +65,35 @@ div[class^="col-"], div[class*=" col-"] {
 }
 
 /*table styling*/
+
 .copo-datatable {
     font-size: 12px;
 }
 
+.dataTables_info {
+    padding-bottom: 15px !important;
+}
+
+.description-bundle-table .dataTables_info .select-item {
+    font-weight: 600;
+}
+
+.description-bundle-table {
+    width: 100%;
+    overflow: scroll;
+}
+
+.copo-noborders-table.dataTable thead th, copo-noborders-table.dataTable thead td {
+    border-bottom: 1px solid #ccc;
+    background-color: #fff !important;
+}
+
+.copo-noborders-table.dataTable.no-footer {
+    border-bottom: 1px solid #ccc;
+}
+
 /*page title*/
+
 .global-page-title {
     font-weight: 300;
     font-size: 21px;
@@ -90,21 +114,29 @@ div[class^="col-"], div[class*=" col-"] {
 /* end page title */
 
 /*h1 {*/
+
 /*font-size: x-large;*/
+
 /*}*/
 
 /*.h2 {*/
+
 /*font-family: 'Quattrocento Sans', sans-serif;*/
 
 /*color: #163657;*/
+
 /*}*/
 
 /*.h2 small {*/
+
 /*color: #163657*/
+
 /*}*/
 
 /*.h3 {*/
+
 /*color: #163657;*/
+
 /*font-family: 'Quattrocento Sans', sans-serif;*/
 
 /*}*/
@@ -124,9 +156,7 @@ div[class^="col-"], div[class*=" col-"] {
 }
 
 #sidebar ul {
-
     margin-top: 60px;
-
 }
 
 #sidebar li {
@@ -152,6 +182,7 @@ div[class^="col-"], div[class*=" col-"] {
 }
 
 /*global status*/
+
 #global_status_message {
     background-color: rgba(245, 245, 240, 0.95);
     border-color: rgba(245, 245, 240, 0.8);
@@ -181,6 +212,7 @@ div[class^="col-"], div[class*=" col-"] {
 }
 
 /*sidebar*/
+
 .copo-side-nav > li > a {
     color: #000;
     font-size: 12px;
@@ -213,6 +245,7 @@ div[class^="col-"], div[class*=" col-"] {
 /*end sidebar*/
 
 /*search box*/
+
 .copo-search-box {
     position: relative;
     margin-left: 400px;
@@ -269,6 +302,7 @@ div[class^="col-"], div[class*=" col-"] {
 /*end search box*/
 
 /* ICON CSS */
+
 .blue_icon {
     float: left;
     color: #163657;
@@ -285,7 +319,9 @@ div[class^="col-"], div[class*=" col-"] {
 }
 
 /*.panel-heading {*/
+
 /*padding: 8px 15px;*/
+
 /*}*/
 
 .btn {
@@ -293,6 +329,7 @@ div[class^="col-"], div[class*=" col-"] {
 }
 
 /* REPOSITORY CONTROLS CSS */
+
 #repo-feedback-cnt-1 {
     display: none;
 }
@@ -302,14 +339,14 @@ div[class^="col-"], div[class*=" col-"] {
 }
 
 .spacer {
-    margin-right: 20px; /* define margin as you see fit */
+    margin-right: 20px;
+    /* define margin as you see fit */
 }
 
 .vert-align {
     float: none;
     display: inline-block;
     vertical-align: middle;
-
 }
 
 .login_box {
@@ -325,7 +362,6 @@ div[class^="col-"], div[class*=" col-"] {
     -moz-box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.75);
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.75);
     */
-
 }
 
 .serif {
@@ -349,7 +385,6 @@ div[class^="col-"], div[class*=" col-"] {
 .breadcrumb {
     margin: 0 !important;
     background-color: whitesmoke;
-
 }
 
 /* Overriding some properties of Popover */
@@ -390,6 +425,7 @@ div[class^="col-"], div[class*=" col-"] {
 }
 
 /* CUSTOM POPOVERS */
+
 .copo-popover-title1 {
     background-color: #D4E4ED !important;
     color: #202D38 !important;
@@ -400,6 +436,7 @@ div[class^="col-"], div[class*=" col-"] {
 }
 
 /*overrides popover's property*/
+
 .popover {
     max-width: 400px !important;
 }
@@ -490,11 +527,13 @@ div[class^="col-"], div[class*=" col-"] {
 /* END CUSTOM POPOVERS*/
 
 /*customising Bootstrap badge*/
+
 .label-as-badge {
     border-radius: 1em;
 }
 
 /*class for highlighting delete target*/
+
 .row-delete-higlight {
     color: red;
 }
@@ -504,6 +543,7 @@ div[class^="col-"], div[class*=" col-"] {
 }
 
 /*class for help tips switch displayed on forms*/
+
 .tips-switch-form-div {
     background-color: #fff;
     border: 1px solid rgba(0, 0, 0, .2);
@@ -512,6 +552,7 @@ div[class^="col-"], div[class*=" col-"] {
 }
 
 /*class for actions bar displayed alongside tabular data*/
+
 .tab-actions-div {
     position: fixed;
     z-index: 1000;
@@ -539,6 +580,7 @@ hr {
 }
 
 /*custom panel */
+
 .copo-panel {
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.12), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
     border-radius: 4px !important;
@@ -569,14 +611,24 @@ hr {
     padding: 10px 25px;
 }
 
+.copo-sidebar-panel {
+    background-image: none;
+    background-color: rgba(212, 228, 237, 1.0);
+    color: #000;
+}
+
 /*.panel > .panel-heading {*/
+
 /*background: #ff0000;*/
+
 /*color: #fff;*/
+
 /*}*/
 
 /*end custom panel*/
 
 /*removing padding from columns*/
+
 .nopadding {
     padding: 5px !important;
     /*margin: 0 !important;*/
@@ -584,7 +636,9 @@ hr {
 
 /*end removing padding from columns*/
 
-.typeahead, .tt-query, .tt-hint {
+.typeahead,
+.tt-query,
+.tt-hint {
     border: 2px solid #ccc;
     border-radius: 8px;
     height: 30px;
@@ -667,6 +721,7 @@ hr {
 }
 
 /*close button used on elements such as popovers, etc.*/
+
 .copo-close {
     color: #202D38;
     font-size: 20px;
@@ -676,7 +731,8 @@ hr {
     position: relative;
 }
 
-.copo-close:hover, .copo-close:focus {
+.copo-close:hover,
+.copo-close:focus {
     color: #202D38;
     cursor: pointer;
     opacity: 0.7;
@@ -729,7 +785,6 @@ th {
 }
 
 .login-underline {
-
     margin-bottom: 50px
 }
 
@@ -757,6 +812,7 @@ th {
 /*end div box*/
 
 /*custom nav items*/
+
 .quick-component-create {
     margin-left: 10px;
     color: #000;
@@ -774,7 +830,8 @@ th {
     font-size: 12px !important;
 }
 
-.navbar-brand, .navbar-nav > li > a {
+.navbar-brand,
+.navbar-nav > li > a {
     text-shadow: none !important;
 }
 
@@ -839,6 +896,7 @@ th {
 /*end custom nav items*/
 
 /*custom buttons*/
+
 .btn-custom {
     background: rgba(104, 105, 104, 1);
     border-color: rgba(104, 105, 104, 1);
@@ -854,7 +912,8 @@ th {
     color: rgba(0, 0, 0, 1);
 }
 
-.btn-custom:active, .btn-custom:focus {
+.btn-custom:active,
+.btn-custom:focus {
     background: rgba(235, 235, 235, 1);
     border-color: rgba(173, 173, 173, 1);
     color: rgba(51, 51, 51, 1);
@@ -875,7 +934,8 @@ th {
     color: rgba(250, 249, 235, 1);
 }
 
-.btn-custom2:active, .btn-custom2:focus {
+.btn-custom2:active,
+.btn-custom2:focus {
     background: rgba(235, 235, 235, 1);
     border-color: rgba(173, 173, 173, 1);
     color: rgba(51, 51, 51, 1);
@@ -896,7 +956,8 @@ th {
     color: rgba(51, 51, 51, 1);
 }
 
-.btn-custom3:active, .btn-custom3:focus {
+.btn-custom3:active,
+.btn-custom3:focus {
     background: rgba(235, 235, 235, 1);
     border-color: rgba(173, 173, 173, 1);
     color: rgba(51, 51, 51, 1);
@@ -917,13 +978,15 @@ th {
     color: rgba(255, 255, 255, 1);
 }
 
-.btn-custom4:active, .btn-custom4:focus {
+.btn-custom4:active,
+.btn-custom4:focus {
     background: rgba(255, 255, 255, 1);
     border-color: rgba(235, 235, 235, 1);
     color: rgba(255, 255, 255, 1);
 }
 
-.btn.btn-custom4:active, .btn.btn-custom4.active {
+.btn.btn-custom4:active,
+.btn.btn-custom4.active {
     background-image: none;
     /*box-shadow: 0 3px 5px rgba(83, 140, 198, 0.5) inset;*/
     outline: 0 none;
@@ -932,6 +995,7 @@ th {
 /*end custom buttons*/
 
 /*sidebar*/
+
 .copo-sidebar {
     display: none;
 }
@@ -948,17 +1012,32 @@ th {
         padding: 5px;
         position: fixed;
         top: 51px;
-        z-index: 1000;
+        /* z-index: 1000;  */
+    }
+}
+
+@media (min-width: 101px) {
+    .copo-sidebar {
+        background-color: rgba(247, 248, 249, 0.6);
+        border-right: 1px solid #eee;
+        bottom: 0;
+        display: block;
+        right: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding: 5px;
+        top: 51px;
     }
 }
 
 .copo-main {
-    top: 51px;
+    top: 61px;
 }
 
 /*end sidebar*/
 
 /*form state buttons*/
+
 .copo-list-type-selected,
 .copo-list-type-selected > .list-group-item-heading {
     background: #5cb85c !important;
@@ -979,6 +1058,7 @@ th {
 /*end form state buttons*/
 
 /*custom rangeslider*/
+
 .rangeslider__fill {
     background: #4583e0 none repeat scroll 0 0 !important;
     position: absolute;
@@ -987,7 +1067,10 @@ th {
 /*end custom rangeslider*/
 
 /*copo-tab-nav*/
-.copo-tab-navs.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+
+.copo-tab-navs.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
     -moz-border-bottom-colors: none;
     -moz-border-left-colors: none;
     -moz-border-right-colors: none;
@@ -1009,6 +1092,7 @@ th {
 /*end copo-tab-nav*/
 
 /*copo-component-attributes*/
+
 .copo-component-attributes-outer {
     padding: 5px 0px;
     margin-bottom: 3px;
@@ -1040,6 +1124,7 @@ table.dataTable td.focus {
 /*end datatable focus*/
 
 /*selectize overrides*/
+
 .selectize-dropdown-content {
     background-color: #ffffff !important;
     border: 2px solid #D4E4ED;
@@ -1052,6 +1137,7 @@ table.dataTable td.focus {
 /*end selectize overrrides*/
 
 /*form control focus*/
+
 .copo-form-control-focus {
     background-color: rgba(220, 233, 239, 0.2);
     /*padding-bottom: 5px;*/
@@ -1068,7 +1154,8 @@ input.date-picker {
     width: 200px;
 }
 
-#gh_controls, #field_controls {
+#gh_controls,
+#field_controls {
     margin-top: 15px;
 }
 
@@ -1081,6 +1168,7 @@ input[data-autocomplete] {
 }
 
 /*webuipopovers styling*/
+
 .webpop-content-div {
     line-height: 20px;
     font-size: 12px;
@@ -1093,6 +1181,7 @@ input[data-autocomplete] {
 /*end webuipopovers styling*/
 
 /*help centre*/
+
 .help-centre-content {
     padding: 10px;
     line-height: 1.7;
@@ -1102,3 +1191,161 @@ input[data-autocomplete] {
 .show-me-demo {
     color: rgba(179, 0, 0, 0.6);
 }
+
+/*button components styling*/
+
+.copo-btn-grps {
+    margin-top: 5px !important;
+    padding-left: 5px !important;
+}
+
+.dtables-dbuttons {
+    margin-right: 5px !important;
+    background: #336699 none;
+    color: #fff;
+    border-radius: 4px !important;
+}
+
+.dtables-dbuttons:hover {
+    background: #204060 none;
+    color: #fff;
+}
+
+.copo-cbtns {
+    font-size: 16px !important;
+}
+
+/*end profile components styling*/
+
+/*information panel styling*/
+
+.info-panel-div {
+    line-height: 20px;
+    font-size: 13px;
+}
+
+.panel-content-div {
+    line-height: 20px;
+    font-size: 12px;
+}
+
+/*end information panel styling*/
+
+/* webui styling */
+
+.copo-webui-popover {
+    background-clip: padding-box;
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    display: block;
+    min-height: 32px;
+    min-width: 50px;
+    padding: 1px;
+    text-align: left;
+    white-space: normal;
+}
+
+.copo-webui-popover-title {
+    background-color: #d4e4ed;
+    border-bottom: 1px solid #f2f2f2;
+    border-radius: 5px 5px 0 0;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 18px;
+    margin: 0;
+    padding: 8px 14px;
+}
+
+.copo-webui-popover .copo-webui-popover-content {
+    display: block;
+    overflow: auto;
+    padding: 9px 14px;
+}
+
+/* end webui styling */
+
+/*summary table styling*/
+
+td.summary-details-control {
+    position: relative;
+    cursor: pointer;
+}
+
+td.summary-details-control:before {
+    position: absolute;
+    font-family: 'FontAwesome';
+    content: "\f055";
+    color: forestgreen;
+    /*top: 30%;*/
+    left: 50%;
+    font-size: 14px;
+}
+
+tr.shown td.summary-details-control {
+    position: relative;
+    cursor: pointer;
+}
+
+tr.shown td.summary-details-control:before {
+    position: absolute;
+    font-family: 'FontAwesome';
+    content: "\f056";
+    color: darkred;
+    /*top: 30%;*/
+    left: 50%;
+    font-size: 14px;
+}
+
+span.summary-details-control {
+    position: relative;
+    cursor: pointer;
+}
+
+span.summary-details-control:before {
+    position: absolute;
+    font-family: 'FontAwesome';
+    content: "\f055";
+    color: #3a6c55;
+    /*top: 10%;*/
+    left: 50%;
+    font-size: 14px;
+}
+
+div.shown span.summary-details-control:before {
+    position: absolute;
+    font-family: 'FontAwesome';
+    content: "\f056";
+    color: darkred;
+    /*top: 10%;*/
+    left: 50%;
+    font-size: 14px;
+}
+
+span.panel-details-control {
+    cursor: pointer;
+}
+
+span.panel-details-control:before {
+    font-family: 'FontAwesome';
+    content: "\f055";
+    color: rgba(0, 51, 102, 0.4);
+    font-size: 14px;
+}
+
+div.shown span.panel-details-control:before {
+    font-family: 'FontAwesome';
+    content: "\f056";
+    color: rgba(0, 51, 102, 0.4);
+    font-size: 14px;
+}
+
+/*end summary table styling*/
+
+/*task panel*/
+.task-panel-noselected {
+    color: #c93c00;
+    /*font-weight: 600;*/
+}
+
+/*end task panel*/

@@ -81,6 +81,14 @@ class DAComponent:
             pass
         return doc
 
+    def get_component_count(self):
+        count = 0
+        if self.get_collection_handle():
+            count = self.get_collection_handle().count(
+                        {'profile_id': self.profile_id, 'deleted': data_utils.get_not_deleted_flag()})
+
+        return count
+
     def get_collection_handle(self):
         return handle_dict.get(self.component, None)
 

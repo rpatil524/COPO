@@ -2,7 +2,7 @@
 
 $data_color: #1f2e2e;
 $samples_color: #bfbb11;
-$submissions_color: #ffc200;
+$submissions_color: #194d19;
 $pubs_color: #e88801;
 $people_color: #c93c00;
 $annotations_color: #6871C9;
@@ -15,7 +15,6 @@ $annotations_color: #6871C9;
 
 .data_color_icon {
     color: $data_color;
-    text-shadow: 1px 1px 1px #ccc;
 }
 
 .pubs_color {
@@ -26,7 +25,6 @@ $annotations_color: #6871C9;
 
 .pubs_color_icon {
     color: $pubs_color;
-    text-shadow: 1px 1px 1px #ccc;
 }
 
 .samples_color {
@@ -37,7 +35,6 @@ $annotations_color: #6871C9;
 
 .samples_color_icon {
     color: $samples_color;
-    text-shadow: 1px 1px 1px #ccc;
 }
 
 .submissions_color {
@@ -48,7 +45,6 @@ $annotations_color: #6871C9;
 
 .submissions_color_icon {
     color: $submissions_color;
-    text-shadow: 1px 1px 1px #ccc;
 }
 
 .people_color {
@@ -59,7 +55,6 @@ $annotations_color: #6871C9;
 
 .people_color_icon {
     color: $people_color;
-    text-shadow: 1px 1px 1px #ccc;
 }
 
 .annotations_color{
@@ -69,5 +64,4 @@ $annotations_color: #6871C9;
 
 .annotations_color_icon {
     color: $annotations_color;
-    text-shadow: 1px 1px 1px #ccc;
 }

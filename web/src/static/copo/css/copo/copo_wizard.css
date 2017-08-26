@@ -159,19 +159,6 @@ ol {
     list-style-type: decimal !important;
 }
 
-.dataTables_info {
-    padding-bottom: 15px !important;
-}
-
-.description-bundle-table .dataTables_info .select-item {
-    font-weight: 600;
-}
-
-.description-bundle-table {
-    width: 100%;
-    overflow: scroll;
-}
-
 .wizard-control-message {
     font-size: 12px;
     line-height: 1.4;

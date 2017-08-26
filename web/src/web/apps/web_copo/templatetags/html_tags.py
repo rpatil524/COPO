@@ -15,11 +15,13 @@ from allauth.socialaccount import providers
 
 register = template.Library()
 
+# dictionary of components table id, gotten from the UI
 table_id_dict = dict(publication="publication_table",
                      person="person_table",
                      sample="sample_table",
                      datafile="datafile_table",
-                     annotation="annotation_table"
+                     annotation="annotation_table",
+                     profile="profile_table"
                      )
 
 
@@ -207,6 +209,62 @@ def generate_unique_items(component=str(), profile_id=str(), elem_id=str(), reco
     return component_records
 
 
+@register.filter("generate_table_records")
+def generate_table_records(profile_id=str(), component=str()):
+    # generates component records for for building an UI table
+
+    # instantiate data access object
+    da_object = DAComponent(profile_id, component)
+
+    # get records
+    records = da_object.get_all_records()
+
+    # get schema
+    schema = da_object.get_schema().get("schema_dict")
+
+    data_set = list()
+    columns = list()
+    col_flag = True
+
+    for pr in records:
+        option = dict()
+
+        for f in schema:
+            if f.get("show_in_table", True):
+
+                # add data
+                option[f["id"].split(".")[-1]] = resolve_control_output(pr, f)
+
+                # add column
+                if col_flag:
+                    columns.append(dict(data=f["id"].split(".")[-1],
+                                        title=f.get("label", str())))
+
+        # add record id
+        option["record_id"] = str(pr["_id"])
+
+        data_set.append(option)
+        col_flag = False
+
+    # add record id column
+    columns.append(dict(data="record_id"))
+
+    # define action buttons
+
+    button_templates = d_utils.get_button_templates()
+    action_buttons = [button_templates["edit_record_single"],
+                      button_templates["delete_record_multi"],
+                      button_templates["summarise_record_single"]
+                      ]
+
+    return_dict = dict(dataSet=data_set,
+                       action_buttons=action_buttons,
+                       columns=columns,
+                       )
+
+    return return_dict
+
+
 @register.filter("generate_copo_table_data")
 def generate_copo_table_data(profile_id=str(), component=str()):
     # This method generates the 'json' for building an UI table
@@ -311,7 +369,22 @@ def generate_copo_profiles_data(profiles=list()):
 
         data_set.append(temp_set)
 
-    return data_set
+    # include action buttons that would be applied to records of this component.
+    # Action buttons are divided into categories:
+    # (1) 'single' - if the button's action is intended to impact a single record
+    # (2) 'multi' - if the buttons's action is intended to impact multiple records
+
+    button_templates = d_utils.get_button_templates()
+    action_buttons = [button_templates["edit_record_single"],
+                      button_templates["delete_record_multi"],
+                      button_templates["summarise_record_single"]
+                      ]
+
+    return_dict = dict(dataSet=data_set,
+                       action_buttons=action_buttons
+                       )
+
+    return return_dict
 
 
 @register.filter("generate_attributes")
@@ -498,7 +571,7 @@ def resolve_environmental_characteristics_data(data, elem):
                 a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
                 resolved_data.append(a)
 
-    return str(resolved_data) # turn this casting off after merge
+    return str(resolved_data)  # turn this casting off after merge
 
 
 def resolve_phenotypic_characteristics_data(data, elem):
@@ -513,7 +586,7 @@ def resolve_phenotypic_characteristics_data(data, elem):
                 a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
                 resolved_data.append(a)
 
-    return str(resolved_data) # turn this casting off after merge
+    return str(resolved_data)  # turn this casting off after merge
 
 
 def resolve_copo_comment_data(data, elem):

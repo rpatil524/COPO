@@ -500,104 +500,9 @@ VOCAB = {
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
-# THIS IS DEPRECATED!!! SEE copo_form_handlers.js
 # tags for generating html elements
 HTML_TAGS = {
-    "text": "<div class='form-group copo-form-group'><label for='{elem_id!s}'>{elem_label!s}</label><br/>"
-            "<input class='input-copo form-control' type='text' id='{elem_id!s}' name='{elem_id!s}' value='{elem_value!s}'>"
-            "<span class='form-input-help' style='display: none'>{elem_help_tip!s}</span></div>",
-
-    "textarea": "<div class='form-group copo-form-group'><label for='{elem_id!s}'>{elem_label!s}</label><br/>"
-                "<textarea class='form-control' rows='6' cols='40' id='{elem_id!s}' name='{elem_id!s}'>{elem_value!s}</textarea>"
-                "<span class='form-input-help' style='display: none'>{elem_help_tip!s}</span></div>",
-
-    "select": "<div class='form-group copo-form-group {elem_class!s}'><label for='{elem_id!s}'>{elem_label!s}</label><br/>"
-              "<select class='form-control input-copo' id='{elem_id!s}' name='{elem_id!s}'> {option_values!s} </select>"
-              "<span class='form-input-help' style='display: none'>{elem_help_tip!s}</span></div>",
-
-    "date": "<div class='form-group copo-form-group'><label for='{elem_id!s}'>{elem_label!s}</label><br/>"
-            "<input type='text' class='pop_date_picker input-copo' id='{elem_id!s}' name='{elem_id!s}' "
-            "value='{elem_value!s}'><span class='form-input-help' style='display: none'>{elem_help_tip!s}</span></div>",
-
-    "hidden": "<input type='hidden' id='{elem_id!s}' name='{elem_id!s}' value='{elem_value!s}'>",
-
-    "file": "",
-
-    "ontology term": "<div class='form-group copo-form-group'><label for='{elem_id!s}.annotationValue'>{elem_label!s}</label><br/>"
-                     "<span class='ontology_span'><input autocomplete='off' data-autocomplete='{ols_url}' "
-                     "class='input-copo ontology-field' type='text' id='{elem_id!s}.annotationValue' value='{annotationValue!s}' "
-                     "name='{elem_id!s}.annotationValue' />"
-                     "<input type='hidden' id='{elem_id!s}.termSource' name='{elem_id!s}.termSource' value='{termSource!s}'>"
-                     "<input type='hidden' id='{elem_id!s}.termAccession' name='{elem_id!s}.termAccession' value='{termAccession!s}'></span>"
-                     "<span class='form-input-help' style='display: none'>{elem_help_tip!s}</span></div>",
-
-    "copo-multi-select": "<div class='form-group copo-form-group'><label for='{elem_id!s}'>{elem_label!s}</label><br/>"
-                         "<select class='input-copo copo-multi-select' multiple "
-                         "placeholder='Select options...'> {option_values!s} </select>"
-                         "<span class='form-input-help' style='display: none'>{elem_help_tip!s}</span>"
-                         "<input type='hidden' class='copo-multi-values' id='{elem_id!s}' name='{elem_id!s}' "
-                         "value='{elem_value!s}'></div>",
-
-    "copo-multi-search": "<div class='form-group copo-form-group'><label for='{elem_id!s}'>{elem_label!s}</label><br/>"
-                         "<select id='{elem_id!s}_copo-multi-search' "
-                         "class='input-copo copo-multi-search' placeholder='Select options...' "
-                         "multiple='multiple'></select>"
-                         "<span class='form-input-help' style='display: none'>{elem_help_tip!s}</span>"
-                         "<input type='hidden' data-control='copo-multi-search' "
-                         "class='copo-multi-values' id='{elem_id!s}' name='{elem_id!s}'> "
-                         "<input type='hidden' class='elem-json' value='{elem_json!s}'></div>",
-
-    "copo-select": "<div style='padding-bottom:1px;' class='form-group copo-form-group'>"
-                   "<label for='{elem_id!s}'>{elem_label!s}</label><br/>"
-                   "<input class='copo-select input-copo' type='text' id='{elem_id!s}' "
-                   "name='{elem_id!s}' value='{elem_value!s}'>"
-                   "<span class='form-input-help' style='display: none'>{elem_help_tip!s}</span></div>",
-
     "oauth_required": '<a href="/rest/forward_to_figshare/"> Grant COPO access to your Figshare account </a>',
-
-    "characteristic/factor":
-        '<div class="sample_attributes_div" style="border: 1px solid #">'
-
-        '<div style="display: inline-block;">'
-        '<input type="text" name="category_annotationValue_{elem_id!s}_{div_id!s}" data-field_type="{copo_module!s}_{field_type!s}" id="category_annotationValue_{elem_id!s}_{div_id!s}"'
-        ' class="input-copo"'
-        ' value="{annotationValue!s}" placeholder="{elem_label!s}"/>'
-        '<datalist id="list_{elem_id!s}_{div_id!s}"></list>'
-        '<input type="hidden" name="category_termAccession_{elem_id!s}_{div_id!s}"'
-        ' id="category_termAccession_{elem_id!s}_{div_id!s}" value="{termAccession!s}"/>'
-        '<input type="hidden" name="category_termSource_{elem_id!s}_{div_id!s}"'
-        ' id="category_termSource_{elem_id!s}_{div_id!s}" value="{termSource!s}"/>'
-        '</div>'
-
-        '<div style="display: inline-block;">'
-        '<input type="text" value="{value!s}" name="value_annotationValue_{elem_id!s}_{div_id!s}" data-field_type="{copo_module!s}_{field_type!s}" id="value_annotationValue_{elem_id!s}_{div_id!s}" class="input-copo" placeholder="value"/>'
-        '</div>'
-
-        '<div style="display: inline-block;">'
-        '<span class="ontology_span">'
-        '<input type="text" value="{unit!s}" list="list_{elem_id!s}_{div_id!s}"  autocomplete="off" data-autocomplete="{ols_url}" name="unit_annotationValue_{elem_id!s}_{div_id!s}" data-field_type="{copo_module!s}_{field_type!s}" id="unit_annotationValue_{elem_id!s}_{div_id!s}"'
-        ' class="input-copo ontology-field" placeholder="unit" value="{unit!s}" />'
-        '</span>'
-        '<datalist id="list_{elem_id!s}_{div_id!s}"></list>'
-        '</div>'
-
-        '<input type="hidden" name="termAccessionNumber_{elem_id!s}_{div_id!s}"'
-        ' id="termAccessionNumber_{elem_id!s}_{div_id!s}" value="{termAccession!s}"/>'
-
-        '<input type="hidden" name="termSourceREF_{elem_id!s}_{div_id!s}"'
-        ' id="termSourceREF_{elem_id!s}_{div_id!s}" value="{termSource!s}"/>'
-
-        '<div style="display: inline-block;">'
-        '<a id="sample_attribute_remove_{div_id!s}"'
-        ' name="sample_attribute_remove_{div_id!s}"'
-        ' class="btn btn-xs btn-danger sample-attribute-remove" href="#">'
-        '<i class="fa fa-trash-o fa-sm"></i> Delete</a>'
-        '</div></div>'
-
-        '<button class="btn btn-xs btn-success char_factor ">'
-        '<i class="fa fa-plus-circle"></i>'
-        'New</button>',
-
     "bootstrap_button": '<button type="button" id="{btn_id!s}" class="btn btn-{btn_type!s}">{btn_text!s}</button>',
     "bootstrap_button_right": '<button type="button" id="{btn_id!s}" class="btn btn-{btn_type!s} pull-right">{btn_text!s}</button>',
     "bootstrap_button_small": '<button type="button" id="{btn_id!s}" class="btn btn-{btn_type!s} btn-sm">{btn_text!s}</button>',
@@ -658,12 +563,13 @@ MESSAGES_LKUPS = {
         'datafile': os.path.join(RESOLVER['lookup'], 'help_messages', 'datafile_help.json'),
         'sample': os.path.join(RESOLVER['lookup'], 'help_messages', 'sample_help.json'),
         'global': os.path.join(RESOLVER['lookup'], 'help_messages', 'global_help.json'),
+        'quick_tour': os.path.join(RESOLVER['lookup'], 'help_messages', 'quick_tour.json'),
+        'context_help': os.path.join(RESOLVER['lookup'], 'help_messages', 'context_help.json'),
     },
     'datafile_wizard': os.path.join(RESOLVER['wizards_datafile'], 'messages', 'wizard_messages.json'),
     'sample_wizard_messages': os.path.join(RESOLVER['wizards_sample'], 'messages', 'wizard_messages.json'),
     'lookup_messages': os.path.join(RESOLVER['lookup'], 'messages.json'),
     'message_templates': os.path.join(RESOLVER['lookup'], 'message_templates.json'),
-    'button_templates': os.path.join(RESOLVER['lookup'], 'button_templates.json'),
     'exception_messages': os.path.join(RESOLVER['copo_exceptions'], 'messages.json')
 }
 
@@ -698,4 +604,97 @@ ISA_SCHEMAS = {
     'material_attribute_value_schema': '/schemas/copo/dbmodels/material_attribute_value_schema.json',
     'protocol_schema': '/schemas/copo/dbmodels/protocol_schema.json',
     'protocol_parameter_schema': '/schemas/copo/dbmodels/protocol_parameter_schema.json',
+}
+
+# •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
+# templates for composing reusable UI buttons
+BUTTON_TEMPLATES = {
+    "title": "Button templates",
+    "description": "Provides templates for composing reusable buttons. 'btnType' can either be: "
+                   "(1) 'single' - if the button's action is intended to impact just a single record (e.g., edit), or "
+                   "(2) 'multi' - if the buttons's action is intended to impact one or more records",
+    "templates": {
+        "edit_record_single": {
+            "text": "Edit",
+            "className": "copo-dt",
+            "iconClass": "fa fa-pencil-square-o",
+            "btnColor": "#5cb85c",
+            "btnAction": "edit",
+            "btnType": "single",
+            "btnMessage": "Edit selected"
+        },
+        "delete_record_multi": {
+            "text": "Delete",
+            "className": "copo-dt",
+            "iconClass": "fa fa-trash-o",
+            "btnColor": "#d9534f",
+            "btnAction": "delete",
+            "btnType": "multi",
+            "btnMessage": "Delete selected"
+        },
+        "summarise_record_single": {
+            "text": "Summarise",
+            "className": "copo-dt",
+            "iconClass": "fa fa-info",
+            "btnColor": "#0086b3",
+            "btnAction": "summarise",
+            "btnType": "single",
+            "btnMessage": "View record summary"
+        },
+        "edit_row": {
+            "text": "Edit",
+            "className": "copo-dt btn btn-success",
+            "iconClass": "fa fa-pencil-square-o",
+            "btnAction": "edit",
+            "btnType": "single"
+        },
+        "delete_row": {
+            "text": "Delete",
+            "className": "copo-dt btn btn-danger",
+            "iconClass": "fa fa-trash-o",
+            "btnAction": "delete"
+        },
+        "describe_row": {
+            "text": "Describe",
+            "className": "copo-dt btn btn-primary",
+            "iconClass": "fa fa-tags",
+            "btnAction": "describe"
+        },
+        "add_new_samples_global": {
+            "text": "Add New Samples",
+            "className": "copo-dt btn btn-success",
+            "iconClass": "fa fa-plus-circle",
+            "btnAction": "new_samples"
+        },
+        "info_row": {
+            "text": "Info",
+            "className": "copo-dt btn btn-info",
+            "iconClass": "fa fa-info-circle",
+            "btnAction": "info"
+        },
+        "convert_row": {
+            "text": "Convert",
+            "className": "copo-dt btn btn-custom",
+            "iconClass": "fa fa-superpowers",
+            "btnAction": "convert"
+        },
+        "delete_global": {
+            "text": "Delete selected",
+            "className": "copo-dt btn btn-danger",
+            "iconClass": "fa fa-trash-o",
+            "btnAction": "delete"
+        },
+        "describe_global": {
+            "text": "Describe",
+            "className": "copo-dt btn btn-primary",
+            "iconClass": "fa fa-tags",
+            "btnAction": "describe"
+        },
+        "undescribe_global": {
+            "text": "[Un]Describe",
+            "className": "copo-dt btn btn-danger",
+            "iconClass": "fa fa-tags",
+            "btnAction": "undescribe"
+        }
+    }
 }

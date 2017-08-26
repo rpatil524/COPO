@@ -2100,12 +2100,14 @@ function save_form(formJSON) {
         success: function (data) {
             globalDataBuffer = data;
             if (data.table_data) {
-                if (data.component && data.component == "profile") {
-                    var event = jQuery.Event("refreshprofiles");
-                    $('body').trigger(event);
-                } else {
-                    do_render_table(data);
-                }
+                var event = jQuery.Event("refreshtable");
+                $('body').trigger(event);
+                // if (data.component && data.component == "profile") {
+                //     var event = jQuery.Event("refreshprofiles");
+                //     $('body').trigger(event);
+                // } else {
+                //     do_render_table(data);
+                // }
 
             } else if (data.profiles_counts) {
                 var event = jQuery.Event("refreshprofilescounts");

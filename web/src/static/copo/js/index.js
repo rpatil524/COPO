@@ -7,58 +7,23 @@ $(document).ready(function () {
     var copoVisualsURL = "/copo/copo_visualize/";
     csrftoken = $.cookie('csrftoken');
 
-    //global_help_call
-    do_global_help(component);
-
     load_profiles();
 
+
     //trigger refresh of profiles list
-    $('body').on('refreshprofiles', function (event) {
+    $('body').on('refreshtable', function (event) {
         do_render_profile_table(globalDataBuffer);
     });
 
-    $('body').on('refreshprofilescounts', function (event) {
-        do_render_profile_counts(globalDataBuffer);
+    //handle task button event
+    $(document).on("click", ".copo-dt", function (event) {
+        event.preventDefault();
+        do_record_task($(this));
     });
 
-    $(document).on('click', '.component-li', function (event) {
-        //hide_component_panels();
-    });
-
-    $(document).on("click", ".modules-panel", function (event) {
-        var targetID = $(this).attr("data-target-id");
-
-        $('.modules-panel').each(function () {
-            if ($(this).attr('data-target-id') != targetID) {
-                $(this).closest(".panel-group").find(".collapse").collapse('hide');
-            }
-        });
-    });
-
-    //form call
-    $(document).on('click', '.index-form-call', function (e) {
-        e.preventDefault();
-
-        var component = $(this).attr("data-component");
-        var profile_id = $(this).attr("data-profile");
-
-        $.ajax({
-            url: copoFormsURL,
-            type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
-            data: {
-                'task': 'form',
-                'component': component,
-                'profile_id': profile_id,
-                'visualize': 'profiles_counts'
-            },
-            success: function (data) {
-                json2HtmlForm(data);
-            },
-            error: function () {
-                alert("Couldn't build " + component + " form!");
-            }
-        });
+    //details button hover
+    $(document).on("mouseover", ".detail-hover-message", function (event) {
+        $(this).prop('title', 'Click to view profile details');
     });
 
     //event handler for resolving doi and pubmed
@@ -87,7 +52,9 @@ $(document).ready(function () {
         $.ajax({
             url: copoFormsURL,
             type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
             data: {
                 'task': 'doi',
                 'component': component,
@@ -122,13 +89,12 @@ $(document).ready(function () {
                 animate: true,
                 closable: true,
                 draggable: true,
-                buttons: [
-                    {
-                        label: 'Cancel',
-                        action: function (dialogRef) {
-                            dialogRef.close();
-                        }
-                    },
+                buttons: [{
+                    label: 'Cancel',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                    }
+                },
                     {
                         label: 'Delete',
                         cssClass: 'btn-danger',
@@ -146,158 +112,312 @@ $(document).ready(function () {
 
     //******************************Functions Block******************************//
 
-    function isInArray(value, array) {
-        return array.indexOf(value) > -1;
-    }
 
     function do_render_profile_table(data) {
-        var dtd = data.table_data;
+        var dtd = data.table_data.dataSet;
+        var actionsButtons = data.table_data.action_buttons;
 
-        var components = get_components_properties();
+        set_empty_component_message(dtd); //display empty profile message for potential first time users
 
+        if (dtd.length == 0) {
+            return false;
+        }
+
+        var tableID = 'copo_profiles_table';
+
+        var dataSet = [];
+
+        for (var i = 0; i < dtd.length; ++i) {
+            var data = dtd[i];
+
+            //get profile id
+            var record_id = '';
+            var result = $.grep(data, function (e) {
+                return e.key == "_id";
+            });
+
+            if (result.length) {
+                record_id = result[0].data;
+            }
+
+            //get title
+            var title = '';
+            var result = $.grep(data, function (e) {
+                return e.key == "title";
+            });
+
+            if (result.length) {
+                title = result[0].data;
+            }
+
+            //get description
+            var description = '';
+            var result = $.grep(data, function (e) {
+                return e.key == "description";
+            });
+
+            if (result.length) {
+                description = result[0].data;
+            }
+
+            //get date
+            var profile_date = '';
+            var result = $.grep(data, function (e) {
+                return e.key == "date_created";
+            });
+
+            if (result.length) {
+                profile_date = result[0].data;
+            }
+
+            if (record_id) {
+                var option = {};
+                option["title"] = title;
+                option["description"] = description;
+                option["profile_date"] = profile_date;
+                option["record_id"] = record_id;
+                dataSet.push(option);
+            }
+        }
+
+
+        //set data
         var table = null;
 
-        if ($.fn.dataTable.isDataTable('#copo_profiles_table')) {
+        if ($.fn.dataTable.isDataTable('#' + tableID)) {
             //if table instance already exists, then do refresh
-            table = $('#copo_profiles_table').DataTable();
+            table = $('#' + tableID).DataTable();
         }
 
         if (table) {
             //clear old, set new data
-            table.clear().draw();
-            table.rows.add(dtd);
-            table.columns.adjust().draw();
+            table
+                .clear()
+                .draw();
+            table
+                .rows
+                .add(dataSet);
+            table
+                .columns
+                .adjust()
+                .draw();
+            table
+                .search('')
+                .columns()
+                .search('')
+                .draw();
         } else {
-            var table = $('#copo_profiles_table').DataTable({
-                data: dtd,
+            table = $('#' + tableID).DataTable({
+                data: dataSet,
+                searchHighlight: true,
                 ordering: true,
-                lengthChange: false,
-                language: {
-                    "info": "Showing _START_ to _END_ of _TOTAL_ work profiles",
-                    "search": "Search work profiles:",
-                    "emptyTable": "No work profiles available! Use the 'New Profile' button to create work profiles."
+                lengthChange: true,
+                buttons: [
+                    'selectAll',
+                    'selectNone'
+                ],
+                select: {
+                    style: 'multi', //os, multi, api
+                    items: 'row' //row, cell, column
                 },
-                order: [[1, "desc"]],
+                language: {
+                    "info": "Showing _START_ to _END_ of _TOTAL_ profiles",
+                    "search": "Search:",
+                    "lengthMenu": "show _MENU_ records",
+                    "emptyTable": "No work profiles available! Use the 'New Profile' button to create work profiles.",
+                    buttons: {
+                        selectAll: "Select all",
+                        selectNone: "Select none",
+                    }
+                },
+                order: [
+                    [2, "desc"]
+                ],
                 columns: [
                     {
-                        "data": null,
+                        "className": 'summary-details-control detail-hover-message',
                         "orderable": false,
-                        "render": function (data) {
-                            //grab template from DOM
-                            var cellHTML = $(".profile-components-copy").clone().css("display", "block");
-
-                            //get profile id
-                            var record_id = null;
-                            var result = $.grep(data, function (e) {
-                                return e.key == "_id";
-                            });
-
-                            if (result.length) {
-                                record_id = result[0].data;
-                            }
-
-                            //get title
-                            var result = $.grep(data, function (e) {
-                                return e.key == "title";
-                            });
-
-                            if (result.length) {
-                                cellHTML.find(".profile-details").find(".profile-title")
-                                    .html(result[0].data);
-
-                                cellHTML.find(".profile-details").find(".profile-title-link")
-                                    .attr("href", $("#view_copo_profile_url").val().replace("999", record_id));
-                            }
-
-                            //get description
-                            var result = $.grep(data, function (e) {
-                                return e.key == "description";
-                            });
-
-                            if (result.length) {
-                                cellHTML.find(".profile-details")
-                                    .attr("id", "profile-" + record_id);
-
-                                cellHTML.find(".profile-details > .profile-description").html(result[0].data);
-                            }
-
-                            //get date
-                            var result = $.grep(data, function (e) {
-                                return e.key == "date_created";
-                            });
-
-                            if (result.length) {
-                                cellHTML.find(".profile-details > .profile-date").html("[" + result[0].data + "]");
-                            }
-
-                            // get components
-                            for (var i = 0; i < components.length; ++i) {
-                                var componentElem = cellHTML.find(".componentTemplateElements > .componentItemElement").clone();
-
-                                //add color class
-                                componentElem.find(".component-item").addClass(components[i].colorClass);
-
-                                // add icon class
-                                componentElem.find(".component-item-header").find(".copo-components-icons").addClass(components[i].iconClass);
-                                componentElem.find(".component-item-header").find(".copo-components-icons").removeClass(function (index, css) {
-                                    return (css.match(/(^|\s)copo-icon-\S+/g) || []).join(' ');
-                                });
-
-
-                                componentElem.find(".component-item-header").find(".copo-components-icons").css("color", "#ffffff");
-
-                                //title
-                                componentElem.find(".component-item-header > div > span.icon_text").html(components[i].title);
-
-                                //record count
-                                componentElem.find(".component-item-body").find(".component-item-badge").attr("id", record_id + "_" + components[i].countsKey);
-
-                                //action buttons
-
-                                if ($.inArray("add", components[i].actions) > -1) {
-                                    //add action
-                                    var addElem = cellHTML.find(".componentTemplateElements > .componentAddElement").clone();
-                                    addElem.attr("data-component", components[i].component);
-                                    addElem.attr("data-profile", record_id);
-                                    addElem.find("i").prop("title", components[i].addLabel);
-
-                                    componentElem.find(".component-item-body").find(".action-items").append(addElem);
-                                }
-
-                                if ($.inArray("inspect", components[i].actions) > -1) {
-                                    //inspect action
-                                    var inspectElem = cellHTML.find(".componentTemplateElements > .componentInspectElement").clone();
-                                    inspectElem.attr("href", $("#" + components[i].component + "_url").val().replace("999", record_id));
-                                    inspectElem.find("i").prop("title", "Inspect " + components[i].title);
-
-                                    componentElem.find(".component-item-body").find(".action-items").append(inspectElem);
-                                }
-
-
-                                cellHTML.find(".components-section").append(componentElem);
-                            }
-
-
-                            return cellHTML.html();
-                        }
+                        "data": null,
+                        "title": "Details",
+                        "defaultContent": ''
                     },
                     {
-                        "data": dtd,
-                        "visible": false,
-                        "render": function (data) {
-                            return "";
-                        }
+                        "data": "title",
+                        "title": "Title",
+                        "visible": true
+                    },
+                    {
+                        "data": "profile_date",
+                        "title": "Date created",
+                        "visible": true
+                    },
+                    {
+                        "data": "description",
+                        "visible": false
+                    },
+                    {
+                        "data": "record_id",
+                        "visible": false
                     }
                 ],
+                "columnDefs": [
+                    {"width": "15%", "targets": 2},
+                    {"width": "5%", "targets": 0}
+                ],
                 fnDrawCallback: function () {
-                    $("#copo_profiles_table thead").remove();
                     refresh_tool_tips();
-                    update_counts();
-                }
+                    refresh_sub_table(tableID);
+                },
+                dom: 'Bfrtlip',
             });
+
+            table
+                .buttons()
+                .nodes()
+                .each(function (value) {
+                    $(this)
+                        .removeClass("btn-default")
+                        .addClass(' btn-sm dtables-dbuttons');
+                });
+
+            place_task_buttons(actionsButtons, tableID); //this will place custom buttons on the table for executing tasks on records
         }
 
-    }//end of func
+
+        if (table) {
+            table.on('select', function (e, dt, type, indexes) {
+                activity_agent(dt);
+            });
+
+            table.on('deselect', function (e, dt, type, indexes) {
+                activity_agent(dt);
+            });
+
+
+            table.on('mouseenter', 'tr', function () {
+                var row = table.row(this);
+                var currentRow = $(this);
+
+                //close other rows
+                $('#' + tableID + ' tbody').find('tr').each(function () {
+                    $(this).find(".recordbtns-div").css("display", "none");
+                });
+
+                if (row.data()) {
+                    currentRow.find(".recordbtns-div").css("display", "block");
+                }
+            });
+
+        }
+
+    } //end of func
+
+    function append_component_buttons(record_id) {
+        //components row
+        var components = get_profile_components();
+        var componentsDIV = $('<div/>', {
+            // class: "pull-right"
+        });
+
+        components.forEach(function (comp) {
+            //skip profile definition
+            if (comp.component == "profile") {
+                return false;
+            }
+
+            var componentBTN = $('<a/>', {
+                class: "btn btn-sm " + comp.colorClass,
+                style: "background-image: none; border: none; margin-left: 3px; font-size: 10px;",
+                href: $("#" + comp.component + "_url").val().replace("999", record_id),
+                title: "Navigate to " + comp.title + " page"
+            });
+
+            var componentICON = $('<i/>', {
+                class: "copo-components-icons " + comp.iconClass,
+                style: "color: #fff"
+            });
+
+            var componentTXT = $('<span/>', {
+                class: "icon_text",
+                style: "color: #ffffff; padding-left: 3px;",
+                html: comp.title
+            });
+
+            componentBTN.append(componentICON).append(componentTXT);
+            componentsDIV.append(componentBTN);
+        });
+
+        return componentsDIV;
+    }
+
+
+    function refresh_sub_table(tableID) {
+        var table = $('#' + tableID).DataTable();
+        // handle opening and closing summary details
+        $('#' + tableID + ' tbody')
+            .off('click', 'td.summary-details-control')
+            .on('click', 'td.summary-details-control', function (event) {
+                event.preventDefault();
+
+                var tr = $(this).closest('tr');
+                var row = table.row(tr);
+
+                //close other rows
+                $('#' + tableID + ' tbody').find('tr').each(function () {
+
+                    var row_all = table.row($(this));
+
+                    if (row_all.child.isShown()) {
+                        // This row is already open - close it
+                        if (row_all.data().record_id != row.data().record_id) {
+                            row_all.child('');
+                            row_all.child.hide();
+                            $(this).removeClass('shown');
+                        }
+                    }
+                });
+
+                if (row.child.isShown()) {
+                    // This row is already open - close it
+                    row.child('');
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    // expand row
+
+                    var contentHtml = $('<table/>', {
+                        // cellpadding: "5",
+                        cellspacing: "0",
+                        border: "0",
+                        // style: "padding-left:50px;"
+                    });
+
+
+                    //profile components row
+                    var descriptionTR = $('<tr/>');
+                    var descriptionTD1 = $('<td/>').append('&nbsp;');
+                    var descriptionTD2 = $('<td/>').append(append_component_buttons(row.data().record_id));
+                    descriptionTR
+                        .append(descriptionTD1)
+                        .append(descriptionTD2);
+
+                    contentHtml.append(descriptionTR);
+
+                    //description row
+                    descriptionTR = $('<tr/>');
+                    descriptionTD1 = $('<td/>').append('<span style="font-weight: bold;">Description:</span>');
+                    descriptionTD2 = $('<td/>').append(row.data().description);
+                    descriptionTR
+                        .append(descriptionTD1)
+                        .append(descriptionTD2);
+
+                    contentHtml.append(descriptionTR);
+
+                    row.child($('<div></div>').append(contentHtml).html()).show();
+                    tr.addClass('shown');
+                }
+            });
+    }
 
     function do_render_profile_counts(data) {
         if (data.profiles_counts) {
@@ -321,14 +441,15 @@ $(document).ready(function () {
         $.ajax({
             url: copoVisualsURL,
             type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
             data: {
                 'task': 'profiles_counts',
                 'component': component
             },
             success: function (data) {
                 do_render_profile_counts(data);
-                hide_component_panels();
             },
             error: function () {
                 alert("Couldn't retrieve profiles information!");
@@ -336,17 +457,13 @@ $(document).ready(function () {
         });
     }
 
-    function hide_component_panels() {
-        $('.modules-panel').each(function () {
-            $(this).closest(".panel-group").find(".collapse").collapse('hide');
-        });
-    }
-
     function load_profiles() {
         $.ajax({
             url: copoVisualsURL,
             type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
             data: {
                 'task': 'table_data',
                 'component': component
@@ -360,5 +477,64 @@ $(document).ready(function () {
         });
     }
 
+    function do_record_task(elem) {
+        var task = elem.attr('data-action').toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
+        var tableID = elem.attr('data-table'); //get target table
 
-})//end document ready
+        //retrieve target records and execute task
+        var table = $('#' + tableID).DataTable();
+        var records = []; //
+        $.map(table.rows('.selected').data(), function (item) {
+            records.push(item);
+        });
+
+
+        if (task == "edit") {
+            $.ajax({
+                url: copoFormsURL,
+                type: "POST",
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    'task': 'form',
+                    'component': component,
+                    'target_id': records[0].record_id //only allowing row action for edit, hence first record taken as target
+                },
+                success: function (data) {
+                    json2HtmlForm(data);
+                },
+                error: function () {
+                    alert("Couldn't build profile form!");
+                }
+            });
+        }
+
+        table.rows().deselect(); //deselect all rows
+
+        //handle button actions
+        // if (ids.length > 0) {
+        //     if (task == "edit") {
+        //         $.ajax({
+        //             url: copoFormsURL,
+        //             type: "POST",
+        //             headers: {'X-CSRFToken': csrftoken},
+        //             data: {
+        //                 'task': 'form',
+        //                 'component': component,
+        //                 'target_id': ids[0] //only allowing row action for edit, hence first record taken as target
+        //             },
+        //             success: function (data) {
+        //                 json2HtmlForm(data);
+        //             },
+        //             error: function () {
+        //                 alert("Couldn't build publication form!");
+        //             }
+        //         });
+        //     } else if (task == "delete") { //handles delete, allows multiple row delete
+        //         var deleteParams = {component: component, target_ids: ids};
+        //         do_component_delete_confirmation(deleteParams);
+        //     }
+        // }
+    }
+
+
+}) //end document ready

@@ -3,7 +3,7 @@ __author__ = 'etuka'
 import os
 
 
-# function resolves environment variables: both direct variable and file assignments - mutually exclusive
+# function resolves environment variables: both direct variable and file assignments
 # this provides a means of accommodating 'secrets'
 # this module is inspired by the current direction recommended in:
 # https://docs.docker.com/engine/swarm/secrets/#build-support-for-docker-secrets-into-your-images

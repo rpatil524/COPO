@@ -12,7 +12,7 @@ footer, header, hgroup, menu, nav, section {
 }
 
 body {
-    line-height: 1;
+    /*line-height: 1;*/
 }
 
 ol, ul {
@@ -107,24 +107,24 @@ header nav li.active a, header nav a:active {
     box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.7);
 }
 
-.badge {
-    display: inline-block;
-    vertical-align: text-top;
-    margin-left: 10px;
-    padding: 0 5px;
-    line-height: 16px;
-    font-size: 11px;
-    color: white;
-    text-shadow: 0 1px #902a27;
-    background: #e93631;
-    border-radius: 2px;
-    background-image: -webkit-linear-gradient(top, #f65d5f, #e93631);
-    background-image: -moz-linear-gradient(top, #f65d5f, #e93631);
-    background-image: -o-linear-gradient(top, #f65d5f, #e93631);
-    background-image: linear-gradient(to bottom, #f65d5f, #e93631);
-    -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.2), 0 1px rgba(0, 0, 0, 0.2);
-    box-shadow: inset 0 1px rgba(255, 255, 255, 0.2), 0 1px rgba(0, 0, 0, 0.2);
-}
+/*.badge {*/
+    /*display: inline-block;*/
+    /*vertical-align: text-top;*/
+    /*margin-left: 10px;*/
+    /*padding: 0 5px;*/
+    /*line-height: 16px;*/
+    /*font-size: 11px;*/
+    /*color: white;*/
+    /*text-shadow: 0 1px #902a27;*/
+    /*background: #e93631;*/
+    /*border-radius: 2px;*/
+    /*background-image: -webkit-linear-gradient(top, #f65d5f, #e93631);*/
+    /*background-image: -moz-linear-gradient(top, #f65d5f, #e93631);*/
+    /*background-image: -o-linear-gradient(top, #f65d5f, #e93631);*/
+    /*background-image: linear-gradient(to bottom, #f65d5f, #e93631);*/
+    /*-webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.2), 0 1px rgba(0, 0, 0, 0.2);*/
+    /*box-shadow: inset 0 1px rgba(255, 255, 255, 0.2), 0 1px rgba(0, 0, 0, 0.2);*/
+/*}*/
 
 .dropdown-menu {
     min-width: 0px !important;

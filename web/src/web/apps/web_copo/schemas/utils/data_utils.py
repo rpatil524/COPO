@@ -2,6 +2,7 @@ __author__ = 'etuka'
 
 import os
 import json
+import copy
 import requests
 from datetime import datetime
 from bson.json_util import dumps
@@ -302,7 +303,7 @@ def get_deleted_flag():
 
 
 def get_button_templates():
-    return json_to_pytype(lookup.MESSAGES_LKUPS["button_templates"])["templates"]
+    return copy.deepcopy(lookup.BUTTON_TEMPLATES)["templates"]
 
 
 def get_db_json_schema(component):

@@ -39,9 +39,6 @@ $(document).ready(function () {
     var annotationURL = "/copo/get_annotation/";
     csrftoken = $.cookie('csrftoken');
 
-    //global_help_call
-    do_global_help(component);
-
 
     $.ajax({
         url: copoVisualsURL,
