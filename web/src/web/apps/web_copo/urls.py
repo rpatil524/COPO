@@ -43,5 +43,7 @@ urlpatterns = [url(r'^$', views.index, name='index'),
                url(r'^delete_token/$', ajax_handlers.delete_token, name='delete_token'),
                url(r'^get_annotation/$', views.annotate_data, name='annotate_data'),
                url(r'^agave_oauth/$', views.agave_oauth, name='agave_oauth'),
+               url(r'^import_ena_accession/$', views.import_ena_accession,
+                   name='import_ena_accession')
 
                ]

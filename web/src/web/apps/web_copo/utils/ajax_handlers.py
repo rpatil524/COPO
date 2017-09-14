@@ -130,3 +130,5 @@ def set_session_variable(request):
     value = request.POST['value']
     request.session[key] = value
     return HttpResponse(True)
+
+

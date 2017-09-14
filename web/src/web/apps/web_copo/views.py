@@ -27,6 +27,8 @@ import web.apps.web_copo.lookup.lookup as lkup
 import requests
 import datetime
 from rauth import OAuth2Service
+from web.apps.web_copo.utils import EnaImports as eimp
+
 
 LOGGER = settings.LOGGER
 
@@ -419,4 +421,16 @@ def agave_oauth(request):
                 OAuthToken().cyverse_save_token(request.user.id, t)
                 return redirect(request.session['datafile_url'])
 
+def import_ena_accession(request):
 
+    if request.method == 'GET':
+        profile_id = request.session['profile_id']
+        return render(request, 'copo/import_ena_accession.html', {'profile_id': profile_id})
+    else:
+        accessions = request.POST['accessions']
+        accessions = accessions.split(',')
+
+        output = list()
+        for acc in accessions:
+            output.append(eimp.do_import_ena_accession(acc))
+        return HttpResponse(output)

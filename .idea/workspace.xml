@@ -2,7 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/web/src/static/copo/js/import_ena_accession.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/import_ena_accession.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/EnaImports.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nginx/Dockerfile" afterPath="$PROJECT_DIR$/nginx/Dockerfile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/submission/enaSubmission.py" afterPath="$PROJECT_DIR$/web/src/submission/enaSubmission.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/dbmodels/isa/xmls/transcription_seq.xml" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/dbmodels/isa/xmls/transcription_seq.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/assay_transcription_seq.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/assay_transcription_seq.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
@@ -68,519 +78,98 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="annotate_views.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/api/annotate_views.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="243">
-              <caret line="75" column="0" lean-forward="false" selection-start-line="75" selection-start-column="0" selection-end-line="75" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#36#0" expanded="true" />
-                <element signature="e#398#1309#0" expanded="true" />
-                <element signature="e#1341#1644#0" expanded="true" />
-                <marker date="1501077849000" expanded="false" signature="3521:4067" ph="..." />
-                <marker date="1501077849000" expanded="false" signature="4103:4455" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="copo_annotations.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_annotations.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="105" column="0" lean-forward="false" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
-              <folding>
-                <marker date="1501077849000" expanded="true" signature="2885:2891" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="4717:5029" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="4751:4994" ph="..." />
-                <marker date="1501077849000" expanded="false" signature="4846:4863" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="5157:5385" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="5516:9939" ph="{% block help_section ... %}" />
-                <marker date="1501077849000" expanded="true" signature="5573:9922" ph="..." />
-                <marker date="1501077849000" expanded="false" signature="5623:5642" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="5643:9911" ph="..." />
-                <marker date="1501077849000" expanded="false" signature="5691:5708" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="5709:7118" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="5748:7099" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="5858:6128" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="6208:7076" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="6293:6504" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="6334:6474" ph="..." />
-                <marker date="1501077849000" expanded="false" signature="6397:6422" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="6651:7050" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="6692:7020" ph="..." />
-                <marker date="1501077849000" expanded="false" signature="6759:6784" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="6785:6987" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="7155:9896" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="7255:7386" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="7506:9248" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="7649:7777" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="7920:9007" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="8035:8297" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="8410:8980" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="8442:8950" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="8542:8917" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="8592:8879" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="9117:9225" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="9293:9877" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="9411:9853" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="9443:9758" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="9472:9725" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="9790:9824" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="9941:11176" ph="{% block js_block ... %}" />
-                <marker date="1501077849000" expanded="true" signature="9974:10246" ph="..." />
-                <marker date="1501077849000" expanded="false" signature="10016:10231" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="copo_annotations.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_annotations.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-757">
-              <caret line="22" column="53" lean-forward="false" selection-start-line="22" selection-start-column="53" selection-end-line="22" selection-end-column="53" />
-              <folding>
-                <marker date="1501077849000" expanded="false" signature="13229:14523" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="13496:13744" ph="{&quot;url&quot;: '/rest/delete_ss_annotation/'...}" />
-                <marker date="1501077849000" expanded="true" signature="13556:13645" ph="{&quot;document_id&quot;: doc_id...}" />
-                <marker date="1501077849000" expanded="false" signature="13764:14520" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="13796:14424" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="13849:14260" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="14438:14514" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="14668:15148" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="14915:15008" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="15025:15090" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="15183:15622" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="15408:15474" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="15491:15561" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="copo_form_handlers.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-416">
-              <caret line="55" column="42" lean-forward="false" selection-start-line="55" selection-start-column="42" selection-end-line="55" selection-end-column="42" />
-              <folding>
-                <marker date="1501077849000" expanded="true" signature="380:3454" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="980:3448" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="1306:2902" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="1456:2891" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="1857:2150" ph="{&quot;url&quot;: url...}" />
-                <marker date="1501077849000" expanded="false" signature="2170:2875" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="2447:2577" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="2632:2760" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="2916:3442" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="2938:3430" ph="{&quot;url&quot;: copoFormsURL...}" />
-                <marker date="1501077849000" expanded="true" signature="3080:3178" ph="{&quot;task&quot;: 'form'...}" />
-                <marker date="1501077849000" expanded="false" signature="3221:3323" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="3360:3416" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="3542:4479" ph="{&quot;text&quot;: &quot;do_text_ctrl&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="4511:7070" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="4575:4814" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="4615:4808" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="4854:6698" ph="{&quot;type&quot;: BootstrapDialog.TYPE_PRIMARY...}" />
-                <marker date="1501077849000" expanded="false" signature="4970:5048" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="5160:5278" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="5318:6206" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="5437:5569" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="5502:5555" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="5769:6152" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="5815:5868" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="5874:6138" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="6225:6692" ph="[...]" />
-                <marker date="1501077849000" expanded="true" signature="6239:6407" ph="{&quot;label&quot;: 'Cancel'...}" />
-                <marker date="1501077849000" expanded="false" signature="6319:6393" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="6421:6682" ph="{&quot;icon&quot;: 'glyphicon glyphicon-save'...}" />
-                <marker date="1501077849000" expanded="false" signature="6590:6668" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="7126:8555" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="7294:7327" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="7333:7445" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="7379:7437" ph="{&quot;data-toggle&quot;: &quot;validator&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="7552:8513" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="7697:7862" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="7792:7852" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="7868:8040" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="7910:7977" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="7983:8030" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="8138:8260" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="8281:8507" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="8612:9674" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="8696:9650" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="8832:8997" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="8927:8987" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="9003:9175" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="9045:9112" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="9118:9165" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="9273:9396" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="9417:9644" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="9709:10581" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="9752:9798" ph="{&quot;style&quot;: &quot;display:none;&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="9870:9982" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="9995:10002" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="10042:10397" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="10089:10389" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="10180:10187" ph="×" />
-                <marker date="1501077849000" expanded="true" signature="10251:10269" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="10430:10466" ph="{&quot;class&quot;: &quot;row&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="10495:10557" ph="{&quot;class&quot;: &quot;col-sm-12 col-md-12 col-lg-12&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="10613:10870" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="10669:10755" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="10761:10845" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="10897:11169" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="10938:11143" ph="{&quot;html&quot;: '&lt;span style=&quot;padding:6px;&quot;&gt;Help tips&lt;/span&gt;&lt;input class=&quot;copo-help-chk&quot; type=&quot;checkbox&quot; name=&quot;helptips-chk&quot;&gt;'...}" />
-                <marker date="1501077849000" expanded="true" signature="10972:10984" ph="..." />
-                <marker date="1501077849000" expanded="false" signature="11207:11731" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="11327:11420" ph="{&quot;size&quot;: &quot;mini&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="11523:11726" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="11600:11720" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="11769:12185" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="11809:11898" ph="{&quot;class&quot;: &quot;row helpDivRow&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="11941:12000" ph="{&quot;class&quot;: &quot;col-sm-7 col-md-7 col-lg-7&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="12043:12102" ph="{&quot;class&quot;: &quot;col-sm-5 col-md-5 col-lg-5&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="12223:12502" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="12267:12314" ph="{&quot;class&quot;: &quot;row formDivRow&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="12343:12405" ph="{&quot;class&quot;: &quot;col-sm-12 col-md-12 col-lg-12&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="12569:13575" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="12610:12676" ph="{&quot;style&quot;: &quot;padding:1px; margin-bottom:-15px;&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="12805:13000" ph="{&quot;type&quot;: &quot;hidden&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="13067:13199" ph="{&quot;class&quot;: &quot;input-copo copo-multi-select&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="13317:13469" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="13615:13804" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="13854:16559" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="14073:14281" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="14405:14881" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="15070:15368" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="15489:15715" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="15836:16062" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="16209:16433" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="16603:44344" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="16662:17251" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="16711:16771" ph="{&quot;class&quot;: &quot;ctrlDIV input-group&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="16818:16876" ph="{&quot;class&quot;: &quot;input-group-addon&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="16950:17114" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="false" signature="17309:17869" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="17358:17406" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="17454:17628" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="false" signature="17920:19665" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="17969:18017" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="18101:18281" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="true" signature="18491:19512" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="18614:19501" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="18721:18828" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="18841:18882" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="18977:19045" ph="{&quot;class&quot;: &quot;input-group&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="19119:19248" ph="{&quot;class&quot;: &quot;input-group-addon&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="19315:19398" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="19404:19487" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="19722:20280" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="19771:19819" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="19867:20039" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="false" signature="20335:20919" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="20385:20433" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="20484:20678" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="false" signature="20972:22027" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="21021:21069" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="21148:21300" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="true" signature="21410:21903" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="21575:21661" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="21699:21797" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="22087:23442" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="22212:22260" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="22320:23366" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="22387:22427" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="22567:22644" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="22840:22964" ph="//..." />
-                <marker date="1501077849000" expanded="true" signature="23033:23086" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="23183:23290" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="23509:26636" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="23632:23696" ph="{&quot;class&quot;: &quot;ctrlDIV form-inline row&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="23755:26560" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="23896:26331" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="23956:24050" ph="{&quot;class&quot;: &quot;form-group col-sm-4 col-md-4 col-lg-4&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="24200:24637" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="24222:24515" ph="//..." />
-                <marker date="1501077849000" expanded="true" signature="24545:24617" ph="{&quot;style&quot;: &quot;display: none; &quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="24825:25704" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="24860:24937" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="25042:25686" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="25908:26316" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="26337:26550" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="26405:26533" ph="{&quot;id&quot;: fv...}" />
-                <marker date="1501077849000" expanded="false" signature="26695:28601" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="26818:26882" ph="{&quot;class&quot;: &quot;ctrlDIV form-inline row&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="26941:28525" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="27062:28255" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="27121:27215" ph="{&quot;class&quot;: &quot;form-group col-sm-6 col-md-6 col-lg-6&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="27324:27761" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="27346:27639" ph="//..." />
-                <marker date="1501077849000" expanded="true" signature="27669:27741" ph="{&quot;style&quot;: &quot;display: none; &quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="27827:28168" ph="{&quot;class&quot;: &quot;form-control copo-comment-control&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="28261:28515" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="28329:28498" ph="{&quot;type&quot;: &quot;hidden&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="28661:29507" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="28710:28758" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="28926:29383" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="28953:29372" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="29160:29358" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="29571:31149" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="29620:29668" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="29809:29967" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="true" signature="30046:30258" ph="{&quot;class&quot;: &quot;input-copo copo-multi-select&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="30368:30861" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="30533:30619" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="30657:30755" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="31213:32860" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="31428:31476" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="31845:32827" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="31903:32475" ph="{&quot;style&quot;: &quot;border-radius:0;&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="32322:32456" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="32535:32613" ph="{&quot;class&quot;: &quot;col-sm-12 col-md-12 col-lg-12&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="32691:32752" ph="{&quot;class&quot;: &quot;row btn-row&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="32918:33542" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="32967:33015" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="33099:33300" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="false" signature="33595:33834" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="33649:33797" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="false" signature="33871:34028" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="33898:34020" ph="{&quot;href&quot;: &quot;/rest/forward_to_figshare/&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="34091:36990" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="34140:34188" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="34282:34396" ph="{&quot;name&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="true" signature="34465:36756" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="34578:35124" ph="{&quot;type&quot;: &quot;radio&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="34944:35106" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="34998:35084" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="35171:35278" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="35340:35447" ph="{&quot;style&quot;: &quot;padding-left:5px;&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="35498:35576" ph="{&quot;style&quot;: &quot;font-weight: normal; cursor:pointer;&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="35678:35844" ph="{&quot;style&quot;: &quot;position: relative; display: block; margin-top: 10px; margin-bottom: 5px;&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="35919:36565" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="36046:36551" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="37050:38783" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="37141:37194" ph="{&quot;class&quot;: &quot;input-group&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="37348:37897" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="false" signature="37734:37883" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="38035:38092" ph="{&quot;class&quot;: &quot;input-group-btn&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="38237:38375" ph="{&quot;type&quot;: &quot;button&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="38503:38555" ph="{&quot;class&quot;: &quot;help-block&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="38850:41444" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="38940:39088" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="true" signature="39178:39229" ph="{&quot;class&quot;: &quot;list-group&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="39387:41320" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="39618:39652" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="39742:39810" ph="{&quot;class&quot;: &quot;copo-button-listDiv&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="39918:40112" ph="{&quot;type&quot;: &quot;hidden&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="40416:40871" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="41031:41309" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="41512:43330" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="41562:41622" ph="{&quot;class&quot;: &quot;range-slider-parent&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="41676:41901" ph="{&quot;min&quot;: &quot;1&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="41956:42135" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="true" signature="42190:42307" ph="{&quot;style&quot;: &quot;margin-top:15px;&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="42409:42485" ph="{&quot;style&quot;: &quot;margin-top:20px; text-align:center;&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="42544:42743" ph="{&quot;type&quot;: &quot;button&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="42852:42981" ph="{&quot;class&quot;: &quot;range-slider-output&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="43392:44342" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="43441:43489" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="43656:43873" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="false" signature="44395:51948" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="44437:44488" ph="{&quot;data-toggle&quot;: &quot;validator&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="44534:44581" ph="{&quot;class&quot;: &quot;row formDivRow&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="44610:44672" ph="{&quot;class&quot;: &quot;col-sm-12 col-md-12 col-lg-12&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="44733:44942" ph="{&quot;html&quot;: '&lt;span style=&quot;padding:6px;&quot;&gt;Help tips&lt;/span&gt;&lt;input class=&quot;copo-help-chk&quot; type=&quot;checkbox&quot; name=&quot;helptips-chk-sub&quot;&gt;'...}" />
-                <marker date="1501077849000" expanded="true" signature="44767:44779" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="44987:45076" ph="{&quot;class&quot;: &quot;row helpDivRow&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="45119:45178" ph="{&quot;class&quot;: &quot;col-sm-7 col-md-7 col-lg-7&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="45224:45283" ph="{&quot;class&quot;: &quot;col-sm-5 col-md-5 col-lg-5&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="45395:49437" ph="{&quot;type&quot;: BootstrapDialog.TYPE_PRIMARY...}" />
-                <marker date="1501077849000" expanded="false" signature="45511:45599" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="45712:45830" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="45870:48851" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="45987:46119" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="46052:46105" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="46293:48613" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="46339:46392" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="46398:48599" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="46604:46689" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="46788:48579" ph="{&quot;url&quot;: copoFormsURL...}" />
-                <marker date="1501077849000" expanded="true" signature="46962:47223" ph="{&quot;task&quot;: &quot;save&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="47274:48412" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="47410:48198" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="48457:48557" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="48870:49431" ph="[...]" />
-                <marker date="1501077849000" expanded="true" signature="48884:49159" ph="{&quot;label&quot;: 'Cancel'...}" />
-                <marker date="1501077849000" expanded="false" signature="48964:49145" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="49173:49421" ph="{&quot;icon&quot;: 'glyphicon glyphicon-save'...}" />
-                <marker date="1501077849000" expanded="false" signature="49342:49407" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="49757:51943" ph="{&quot;url&quot;: copoFormsURL...}" />
-                <marker date="1501077849000" expanded="true" signature="49867:49979" ph="{&quot;task&quot;: 'form_and_component_records'...}" />
-                <marker date="1501077849000" expanded="false" signature="50014:51844" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="50296:51799" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="50531:51783" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="50767:51763" ph="{&quot;url&quot;: copoFormsURL...}" />
-                <marker date="1501077849000" expanded="true" signature="50941:51147" ph="{&quot;task&quot;: &quot;component_record&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="51204:51599" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="51644:51741" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="51873:51937" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="51980:52125" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="52014:52121" ph="{&quot;html&quot;: tip...}" />
-                <marker date="1501077849000" expanded="false" signature="52152:52316" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="52185:52312" ph="{&quot;style&quot;: &quot;padding-bottom:5px;&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="52356:52579" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="52394:52558" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="52440:52550" ph="{&quot;text&quot;: lbl...}" />
-                <marker date="1501077849000" expanded="false" signature="52634:53404" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="52676:52771" ph="{&quot;style&quot;: 'margin-top:2px;'...}" />
-                <marker date="1501077849000" expanded="true" signature="52815:53346" ph="{&quot;style&quot;: &quot;border-radius:0;&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="53042:53336" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="53452:54368" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="53539:53727" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="53562:53721" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="53770:53819" ph="{&quot;style&quot;: 'margin-top:20px;'...}" />
-                <marker date="1501077849000" expanded="true" signature="53861:53906" ph="{&quot;style&quot;: 'padding:5px;'...}" />
-                <marker date="1501077849000" expanded="true" signature="53950:54268" ph="{&quot;style&quot;: &quot;border-radius:0;&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="54168:54258" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="54439:57889" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="54625:54712" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="54667:54706" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="54733:57667" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="54773:56604" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="54813:56593" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="54946:55474" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="54981:55456" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="55128:55211" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="55647:56579" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="55772:56561" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="55996:56452" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="56039:56426" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="56610:57661" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="56701:57649" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="56732:57635" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="57225:57616" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="57338:57594" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="57412:57568" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="57961:58453" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="58042:58108" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="58160:58427" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="58494:58834" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="58586:58746" ph="{&quot;id&quot;: fv...}" />
-                <marker date="1501077849000" expanded="true" signature="58762:58815" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="58875:59037" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="58965:58996" ph="{&quot;for&quot;: fv...}" />
-                <marker date="1501077849000" expanded="false" signature="59090:60050" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="59215:60022" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="59329:59821" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="59484:59587" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="59635:59651" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="59827:60016" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="59891:60003" ph="{&quot;id&quot;: fv...}" />
-                <marker date="1501077849000" expanded="false" signature="60103:61537" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="60258:60313" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="60364:60605" ph="{&quot;id&quot;: formElem.id...}" />
-                <marker date="1501077849000" expanded="true" signature="60656:60785" ph="{&quot;type&quot;: &quot;hidden&quot;...}" />
-                <marker date="1501077849000" expanded="true" signature="60958:61017" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="61063:61302" ph="{&quot;multiple&quot;: &quot;multiple&quot;...}" />
-                <marker date="1501077849000" expanded="false" signature="61593:62194" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="61830:61922" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="62308:67118" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="62335:67114" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="62353:67108" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="62390:63210" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="62391:62558" ph="//..." />
-                <marker date="1501077849000" expanded="false" signature="62795:63103" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="62881:63085" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="62950:63063" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="63136:63196" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="63246:64515" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="63264:63403" ph="//..." />
-                <marker date="1501077849000" expanded="false" signature="63698:63870" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="63751:63852" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="64010:64410" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="64075:64390" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="64165:64368" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="64217:64342" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="64441:64501" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="64551:64829" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="64755:64815" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="64865:65276" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="65202:65262" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="65322:67098" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="65685:66993" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="65762:66975" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="65916:66384" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="65988:66358" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="66461:66927" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="67024:67084" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="67149:68945" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="67267:67363" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="67490:67543" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="67744:67791" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="67844:68941" ph="{&quot;url&quot;: copoFormsURL...}" />
-                <marker date="1501077849000" expanded="true" signature="67954:68161" ph="{&quot;task&quot;: task...}" />
-                <marker date="1501077849000" expanded="false" signature="68196:68865" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="68268:68550" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="68337:68467" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="68473:68535" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="68582:68706" ph="{...}" />
-                <marker date="1501077849000" expanded="true" signature="68736:68854" ph="{...}" />
-                <marker date="1501077849000" expanded="false" signature="68894:68935" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="364">
-              <caret line="186" column="0" lean-forward="false" selection-start-line="186" selection-start-column="0" selection-end-line="186" selection-end-column="0" />
+            <state relative-caret-position="1650">
+              <caret line="431" column="0" lean-forward="false" selection-start-line="431" selection-start-column="0" selection-end-line="431" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+                <element signature="e#4239#4429#0" expanded="true" />
+                <element signature="e#12576#12627#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="EnaImports.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/EnaImports.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="214">
+              <caret line="42" column="16" lean-forward="false" selection-start-line="42" selection-start-column="16" selection-end-line="42" selection-end-column="16" />
+              <folding>
+                <element signature="e#101#111#0" expanded="true" />
+                <element signature="e#299#604#0" expanded="true" />
+                <element signature="e#631#928#0" expanded="true" />
+                <element signature="e#1763#2236#0" expanded="true" />
+                <element signature="e#2279#3052#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="enaSubmission.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="183">
+              <caret line="186" column="8" lean-forward="false" selection-start-line="186" selection-start-column="8" selection-end-line="186" selection-end-column="8" />
+              <folding>
+                <element signature="e#1141#2452#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sra2isatab.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Documents/dev/environments/django10/lib/python3.4/site-packages/isatools/convert/sra2isatab.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1574">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#17#0" expanded="true" />
+                <element signature="e#3542#6788#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="json2sra.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Documents/dev/environments/django10/lib/python3.4/site-packages/isatools/convert/json2sra.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="349">
+              <caret line="26" column="10" lean-forward="true" selection-start-line="26" selection-start-column="10" selection-end-line="26" selection-end-column="10" />
+              <folding>
+                <element signature="e#0#33#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ena_stages.json" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/ena_stages.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="450">
+              <caret line="30" column="39" lean-forward="false" selection-start-line="7" selection-start-column="32" selection-end-line="30" selection-end-column="39" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="generic_handlers.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js">
+      <file leaf-file-name="start_stages.json" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/start_stages.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="444">
-              <caret line="681" column="63" lean-forward="false" selection-start-line="681" selection-start-column="63" selection-end-line="681" selection-end-column="63" />
-              <folding>
-                <element signature="n#!!block;n#do_render_table#0" expanded="true" />
-                <marker date="1501077849000" expanded="true" signature="5528:5548" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="5886:5929" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="6116:6122" ph=" " />
-                <marker date="1501077849000" expanded="true" signature="12939:12945" ph=" " />
-                <marker date="1501077849000" expanded="true" signature="22666:22714" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="22728:22758" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="22881:22894" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="29795:29831" ph="..." />
-                <marker date="1501077849000" expanded="true" signature="43181:43200" ph="..." />
-              </folding>
+            <state relative-caret-position="405">
+              <caret line="27" column="67" lean-forward="true" selection-start-line="27" selection-start-column="67" selection-end-line="27" selection-end-column="67" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/urls.py">
+      <file leaf-file-name="submissionDelegator.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#41#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/api/urls.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="11" column="56" lean-forward="false" selection-start-line="11" selection-start-column="56" selection-end-line="11" selection-end-column="56" />
+            <state relative-caret-position="146">
+              <caret line="47" column="0" lean-forward="false" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -589,21 +178,22 @@
       <file leaf-file-name="base.py" pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/Documents/dev/environments/django10/lib/python3.4/site-packages/django/core/handlers/base.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="168">
+            <state relative-caret-position="408">
               <caret line="184" column="0" lean-forward="false" selection-start-line="184" selection-start-column="0" selection-end-line="184" selection-end-column="0" />
-              <folding>
-                <element signature="e#10295#10768#0" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="lookup.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py">
+      <file leaf-file-name="import_ena_accession.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/import_ena_accession.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5250">
-              <caret line="351" column="30" lean-forward="false" selection-start-line="351" selection-start-column="30" selection-end-line="351" selection-end-column="30" />
-              <folding />
+            <state relative-caret-position="75">
+              <caret line="7" column="33" lean-forward="false" selection-start-line="7" selection-start-column="33" selection-end-line="7" selection-end-column="33" />
+              <folding>
+                <element signature="e#0#42#0" expanded="false" />
+                <element signature="e#537#586#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -613,44 +203,45 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
+        <option value="CSS File" />
         <option value="HTML File" />
         <option value="JavaScript File" />
-        <option value="CSS File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>resources</find>
-      <find>f</find>
-      <find>forward</find>
-      <find>forward_</find>
-      <find>forward_to</find>
-      <find>forward_to_</find>
-      <find>forward_to_f</find>
-      <find>forward_to_fig</find>
-      <find>forward_to_figs</find>
-      <find>forward_to_figsh</find>
-      <find>forward_to_figsha</find>
-      <find>forward_to_figshare</find>
-      <find>addtoqueue</find>
-      <find>cannot find temp file to delete.....no worries</find>
-      <find>P</find>
-      <find>PDF</find>
-      <find>PDF D</find>
-      <find>PDF Do</find>
-      <find>PDF Doc</find>
-      <find>PDF Docu</find>
-      <find>PDF Docum</find>
-      <find>PDF Docume</find>
-      <find>PDF Document</find>
       <find>/</find>
       <find>/api</find>
       <find>/api/</find>
-      <find>$.ajax</find>
       <find>upload_annotation_file</find>
       <find>form_submit_btn</find>
+      <find>Cannot resolve form control!</find>
+      <find>V</find>
+      <find>View Tok</find>
+      <find>View Token</find>
+      <find>View Tokens</find>
+      <find>profile_</find>
+      <find>view_copo_profile</find>
+      <find>ajax</find>
+      <find>$</find>
+      <find>$.a</find>
+      <find>$.aj</find>
+      <find>$.ajax</find>
+      <find>aj</find>
+      <find>ajax_h</find>
+      <find>a</find>
+      <find>aja</find>
+      <find>ajax_</find>
+      <find>ajax_ha</find>
+      <find>ajax_han</find>
+      <find>ajax_hand</find>
+      <find>ajax_handl</find>
+      <find>ajax_handle</find>
+      <find>ajax_handler</find>
+      <find>ajax_handlers</find>
+      <find>utils</find>
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/web/src/static/copo/css</dir>
@@ -673,19 +264,12 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/error_page.html" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/css/copo/copo_annotations.css" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/sample.json" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/css/copo/copo_ontology_styles.css" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_ontology_functions.js" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/test_page.html" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_submission.json" />
         <option value="$PROJECT_DIR$/web/src/submission/submissionDelegator.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/rest/models.py" />
         <option value="$PROJECT_DIR$/web/src/web/settings/chunked_upload.py" />
-        <option value="$PROJECT_DIR$/web/src/submission/enaSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/exceptions_and_logging/logs/2017-03-29.log" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_submission.html" />
         <option value="$PROJECT_DIR$/web/src/web/wsgi.py" />
@@ -696,11 +280,9 @@
         <option value="$PROJECT_DIR$/web/src/setup/copo_social.sh" />
         <option value="$PROJECT_DIR$/docker-compose.yml" />
         <option value="$PROJECT_DIR$/web/src/dal/mongo_util.py" />
-        <option value="$PROJECT_DIR$/web/src/web/settings/data.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/broker_requests.py" />
         <option value="$PROJECT_DIR$/web/src/web/settings/serv.py" />
         <option value="$PROJECT_DIR$/web/src/social.py" />
-        <option value="$PROJECT_DIR$/nginx/Dockerfile" />
         <option value="$PROJECT_DIR$/nginx/sites-enabled/django_project" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py" />
         <option value="$PROJECT_DIR$/../copo_swarm_deploy.txt" />
@@ -710,20 +292,29 @@
         <option value="$PROJECT_DIR$/web/Dockerfile" />
         <option value="$PROJECT_DIR$/web/src/submission/figshareSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/dal/copo_da.py" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_submission.js" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py" />
         <option value="$PROJECT_DIR$/web/src/web/settings/base.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/rest_urls.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_data.html" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizard_views.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_annotations.js" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_annotations.html" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
         <option value="$PROJECT_DIR$/web/src/api/annotate_views.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/rest_urls.py" />
+        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
+        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_submission.js" />
+        <option value="$PROJECT_DIR$/web/src/web/settings/data.py" />
+        <option value="$PROJECT_DIR$/nginx/Dockerfile" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/import_ena_accession.html" />
+        <option value="$PROJECT_DIR$/web/src/static/copo/js/import_ena_accession.js" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/EnaImports.py" />
+        <option value="$PROJECT_DIR$/web/src/submission/enaSubmission.py" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/ena_stages.json" />
       </list>
     </option>
   </component>
@@ -744,8 +335,8 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="y" value="23" />
-    <option name="width" value="1920" />
-    <option name="height" value="986" />
+    <option name="width" value="1440" />
+    <option name="height" value="806" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -781,7 +372,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -790,6 +380,86 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="External Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="&lt; Python 3.4.3 virtualenv at ~/Documents/dev/environments/django10 &gt;" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="External Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="&lt; Python 3.4.3 virtualenv at ~/Documents/dev/environments/django10 &gt;" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="site-packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="External Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="&lt; Python 3.4.3 virtualenv at ~/Documents/dev/environments/django10 &gt;" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="site-packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="isatools" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="External Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="&lt; Python 3.4.3 virtualenv at ~/Documents/dev/environments/django10 &gt;" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="site-packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="isatools" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="convert" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="COPO" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -845,6 +515,32 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="settings" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -908,7 +604,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="templates" />
+              <option name="myItemId" value="wizards" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -942,33 +638,11 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="templates" />
+              <option name="myItemId" value="wizards" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="copo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="COPO" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="COPO" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="static" />
+              <option name="myItemId" value="datafile" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -990,11 +664,19 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="static" />
+              <option name="myItemId" value="web" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="copo" />
+              <option name="myItemId" value="apps" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web_copo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="utils" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1016,20 +698,79 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="static" />
+              <option name="myItemId" value="web" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="copo" />
+              <option name="myItemId" value="apps" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="js" />
+              <option name="myItemId" value="web_copo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="templatetags" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="submission" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nginx" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="COPO" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nginx" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sites-enabled" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
@@ -1041,7 +782,7 @@
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
-    <property name="SearchEverywhereHistoryKey" value="views&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/views.py&#10;gene&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/generic_handlers.js&#10;copo_form&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_form_handlers.js&#10;ajax&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;rest&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;forward_to&#9;null&#9;null&#10;middle&#9;null&#9;null&#10;lookup&#9;null&#9;null&#10;wizard_vi&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/wizard_views.py&#10;copo_sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;ena&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/submission/enaSubmission.py&#10;setting&#9;FILE&#9;file:///Users/fshaw/Documents/dev/environments/django10/lib/python3.4/site-packages/chunked_upload/settings.py&#10;req&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt&#10;rest_ur&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;copo&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;copo_s&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;enar&#9;null&#9;null&#10;copo_da&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/dal/copo_da.py&#10;urls&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/urls.py&#10;url&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;submiss&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;giti&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;test&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/test_page.html&#10;annotat&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_annotations.html&#10;git&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;gitignore&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;base&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/base.html&#10;style&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/css/copo/style.css&#10;error&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/error_page.html&#10;annotation&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/css/copo/copo_annotations.css&#10;rat&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/schemas/utils/metadata_rating_templates/rating_template_v1.json&#10;api/a&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/api/annotate_views.py&#10;require&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt&#10;gener&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/generic_handlers.js&#10;copo_forms&#9;null&#9;null&#10;aja&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;figsha&#9;null&#9;null&#10;figshare&#9;null&#9;null&#10;person&#9;FILE&#9;file:///Users/etuka/Dropbox/Dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/person.json&#10;copo_a&#9;FILE&#9;file:///Users/etuka/Dropbox/Dev/COPO/web/src/static/copo/js/copo_annotations.js&#10;html&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templatetags/html_tags.py&#10;copo_An&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_annotations.js&#10;copo_d&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/dal/copo_da.py&#10;index.js&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/index.js&#10;data_&#9;null&#9;null" />
+    <property name="SearchEverywhereHistoryKey" value="ajax&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;copo_su&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;views&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/views.py&#10;gene&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/generic_handlers.js&#10;copo_form&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_form_handlers.js&#10;rest&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;forward_to&#9;null&#9;null&#10;middle&#9;null&#9;null&#10;lookup&#9;null&#9;null&#10;wizard_vi&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/wizard_views.py&#10;copo_sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;ena&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/submission/enaSubmission.py&#10;setting&#9;FILE&#9;file:///Users/fshaw/Documents/dev/environments/django10/lib/python3.4/site-packages/chunked_upload/settings.py&#10;req&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt&#10;rest_ur&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;copo&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;copo_s&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;enar&#9;null&#9;null&#10;copo_da&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/dal/copo_da.py&#10;urls&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/urls.py&#10;url&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;submiss&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;giti&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;test&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/test_page.html&#10;annotat&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_annotations.html&#10;git&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;gitignore&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;base&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/base.html&#10;style&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/css/copo/style.css&#10;error&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/error_page.html&#10;annotation&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/css/copo/copo_annotations.css&#10;rat&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/schemas/utils/metadata_rating_templates/rating_template_v1.json&#10;api/a&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/api/annotate_views.py&#10;require&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt&#10;gener&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/generic_handlers.js&#10;copo_forms&#9;null&#9;null&#10;aja&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;figsha&#9;null&#9;null&#10;figshare&#9;null&#9;null&#10;person&#9;FILE&#9;file:///Users/etuka/Dropbox/Dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/person.json&#10;copo_a&#9;FILE&#9;file:///Users/etuka/Dropbox/Dev/COPO/web/src/static/copo/js/copo_annotations.js&#10;html&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templatetags/html_tags.py&#10;copo_An&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_annotations.js&#10;copo_d&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/dal/copo_da.py&#10;index.js&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/index.js&#10;data_&#9;null&#9;null" />
     <property name="add_unversioned_files" value="$PROJECT_DIR$/web/src/exceptions_and_logging/logs/2017-03-29.log&#10;true" />
     <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
   </component>
@@ -1684,117 +1425,6 @@
       </list>
     </option>
   </component>
-  <component name="RestoreUpdateTree" date="Moments ago" ActionInfo="_Update">
-    <UpdatedFiles>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Updated from server" />
-        <option name="myStatusName" value="Changed on server" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="CHANGED_ON_SERVER" />
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Updated" />
-          <option name="myStatusName" value="Changed" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="UPDATED" />
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/help_messages/global_help.json</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html</PATH>
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Created" />
-          <option name="myStatusName" value="Created" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="CREATED" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Deleted" />
-          <option name="myStatusName" value="Deleted" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="true" />
-          <option name="myId" value="REMOVED_FROM_REPOSITORY" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Restored" />
-          <option name="myStatusName" value="Will be restored" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="RESTORED" />
-        </FILE-GROUP>
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Modified" />
-        <option name="myStatusName" value="Modified" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MODIFIED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Skipped" />
-        <option name="myStatusName" value="Skipped" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="SKIPPED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Merged with conflicts" />
-        <option name="myStatusName" value="Will be merged with conflicts" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MERGED_WITH_CONFLICTS" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Merged with tree conflicts" />
-        <option name="myStatusName" value="Merged with tree conflicts" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MERGED_WITH_TREE_CONFLICT" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Merged with property conflicts" />
-        <option name="myStatusName" value="Will be merged with property conflicts" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MERGED_WITH_PROPERTY_CONFLICT" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Merged" />
-        <option name="myStatusName" value="Will be merged" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MERGED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Not in repository" />
-        <option name="myStatusName" value="Not in repository" />
-        <option name="mySupportsDeletion" value="true" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="UNKNOWN" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Locally added" />
-        <option name="myStatusName" value="Locally added" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="LOCALLY_ADDED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Locally removed" />
-        <option name="myStatusName" value="Locally removed" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="LOCALLY_REMOVED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Switched" />
-        <option name="myStatusName" value="Switched" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="SWITCHED" />
-      </FILE-GROUP>
-    </UpdatedFiles>
-  </component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -2265,7 +1895,14 @@
       <option name="project" value="LOCAL" />
       <updated>1501078798411</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="merging harvard dataverse work into main">
+      <created>1501083165297</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1501083165297</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TodoView">
@@ -2278,7 +1915,8 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1920" height="986" extended-state="6" />
+    <frame x="0" y="23" width="1440" height="806" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.42276424" sideWeight="0.2825465" order="9" side_tool="true" content_ui="tabs" />
@@ -2287,13 +1925,12 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32885906" sideWeight="0.49767134" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Mongo Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32887402" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19808307" sideWeight="0.49182117" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3662375" sideWeight="0.49182117" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27837837" sideWeight="0.49767134" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="JsonViewer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24892704" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12552084" sideWeight="0.50817883" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.38169643" sideWeight="0.7174535" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14664805" sideWeight="0.7174535" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -2303,6 +1940,7 @@
       <window_info id="REST Client" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4403794" sideWeight="0.49499285" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25181347" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27837837" sideWeight="0.49767134" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -2386,10 +2024,18 @@
     <MESSAGE value="adding comments and error checking to Figshare Oauth workflow 2" />
     <MESSAGE value="fixing missing rows crash in annotation of spreadsheets, adding skip rows option when loading to account for data not starting from row 1 of the spreadsheet, and fix for ols lookup returns sometimes displaying undefined" />
     <MESSAGE value="fixing bug in views where missing datafile_id in views causes page crash on datafile page load" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixing bug in views where missing datafile_id in views causes page crash on datafile page load" />
+    <MESSAGE value="merging harvard dataverse work into main" />
+    <option name="LAST_COMMIT_MESSAGE" value="merging harvard dataverse work into main" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/web/src/submission/enaSubmission.py</url>
+          <line>192</line>
+          <option name="timeStamp" value="264" />
+        </line-breakpoint>
+      </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
@@ -2400,99 +2046,11 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="251" />
+      <option name="time" value="265" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/docker-compose.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-120">
-          <caret line="16" column="186" lean-forward="false" selection-start-line="16" selection-start-column="186" selection-end-line="16" selection-end-column="186" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/.sass-cache/a7658091246d8dbf6502ca8ba9f2593bbd2df96d/sass.scssc" />
-    <entry file="file://$PROJECT_DIR$/web/src/static/CACHE/css/sass.0aabaacc52bd.css" />
-    <entry file="file://$PROJECT_DIR$/web/src/static/CACHE/css/sass.b9849a0f7952.css" />
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="72" column="0" lean-forward="false" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/broker_requests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1418">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="116" column="11" lean-forward="true" selection-start-line="116" selection-start-column="11" selection-end-line="116" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mongo/mongo-entrypoint/enpoint.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="175">
-          <caret line="27" column="13" lean-forward="false" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/copo_swarm_deploy.txt" />
-    <entry file="file://$PROJECT_DIR$/web/src/social.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="14" column="15" lean-forward="false" selection-start-line="14" selection-start-column="15" selection-end-line="14" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nginx/sites-enabled/django_project">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="58" lean-forward="false" selection-start-line="7" selection-start-column="58" selection-end-line="7" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/dbmodels/isa/xmls/investigation.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="111">
-          <caret line="64" column="67" lean-forward="false" selection-start-line="64" selection-start-column="67" selection-end-line="64" selection-end-column="67" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="605" column="68" lean-forward="false" selection-start-line="605" selection-start-column="68" selection-end-line="605" selection-end-column="68" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="19" lean-forward="false" selection-start-line="17" selection-start-column="19" selection-end-line="17" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/sample.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-585">
-          <caret line="153" column="7" lean-forward="true" selection-start-line="153" selection-start-column="7" selection-end-line="153" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="96">
-          <caret line="211" column="102" lean-forward="false" selection-start-line="211" selection-start-column="88" selection-end-line="211" selection-end-column="102" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/publication.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="651">
@@ -2535,20 +2093,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nginx/Dockerfile">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="36" lean-forward="false" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2235">
-          <caret line="205" column="37" lean-forward="false" selection-start-line="205" selection-start-column="37" selection-end-line="205" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1350">
@@ -2577,21 +2121,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2175">
-          <caret line="509" column="19" lean-forward="false" selection-start-line="509" selection-start-column="19" selection-end-line="509" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1395">
           <caret line="293" column="21" lean-forward="false" selection-start-line="293" selection-start-column="21" selection-end-line="293" selection-end-column="21" />
-          <folding>
-            <element signature="e#11826#12470#0" expanded="false" />
-            <element signature="e#12522#13173#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2599,7 +2132,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1110">
           <caret line="65" column="29" lean-forward="false" selection-start-line="65" selection-start-column="29" selection-end-line="65" selection-end-column="29" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2607,10 +2139,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="14" column="6" lean-forward="false" selection-start-line="14" selection-start-column="6" selection-end-line="14" selection-end-column="6" />
-          <folding>
-            <element signature="e#50#82#0" expanded="false" />
-            <element signature="e#533#2865#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2618,15 +2146,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1110">
           <caret line="75" column="5" lean-forward="false" selection-start-line="75" selection-start-column="5" selection-end-line="75" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/rest_urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="17" lean-forward="false" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2634,7 +2153,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="570">
           <caret line="38" column="79" lean-forward="false" selection-start-line="38" selection-start-column="79" selection-end-line="38" selection-end-column="79" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2642,44 +2160,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="390">
           <caret line="26" column="104" lean-forward="false" selection-start-line="26" selection-start-column="104" selection-end-line="26" selection-end-column="104" />
-          <folding>
-            <element signature="e#6826#7333#0" expanded="false" />
-            <element signature="e#7225#7308#0" expanded="false" />
-            <element signature="e#7987#8355#0" expanded="false" />
-            <element signature="e#63186#66027#0" expanded="false" />
-            <marker date="1499943640000" expanded="true" signature="33452:33470" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="42294:42348" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="44689:44695" ph=" " />
-            <marker date="1499943640000" expanded="true" signature="64639:64676" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="69409:69427" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="71908:71945" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="73373:73409" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="82995:83013" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="83161:83213" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="86503:86521" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="91588:91625" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="94754:94771" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="95943:95963" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="96283:96326" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="96513:96519" ph=" " />
-            <marker date="1499943640000" expanded="true" signature="96879:96914" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="97126:97144" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="101313:101331" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="103519:103554" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="103910:103926" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="104013:104036" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="118732:118749" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="124013:124031" ph="..." />
-            <marker date="1499943640000" expanded="true" signature="124072:124090" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/settings/data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="585">
-          <caret line="40" column="0" lean-forward="false" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2687,21 +2167,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
           <caret line="73" column="60" lean-forward="false" selection-start-line="73" selection-start-column="60" selection-end-line="73" selection-end-column="60" />
-          <folding>
-            <element signature="e#49#60#0" expanded="false" />
-            <element signature="e#429#1664#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="101" column="0" lean-forward="false" selection-start-line="101" selection-start-column="0" selection-end-line="101" selection-end-column="0" />
-          <folding>
-            <element signature="e#1653#3263#0" expanded="false" />
-            <element signature="e#4441#4563#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2709,82 +2174,22 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5250">
           <caret line="351" column="30" lean-forward="false" selection-start-line="351" selection-start-column="30" selection-end-line="351" selection-end-column="30" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/annotate_document.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="150" column="37" lean-forward="true" selection-start-line="150" selection-start-column="37" selection-end-line="150" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/annotate_dep.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-170">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/annotate_document.html" />
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/annotate_dep.html" />
     <entry file="file://$PROJECT_DIR$/web/src/web/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_annotations.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
+        <state relative-caret-position="1575">
           <caret line="105" column="0" lean-forward="false" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
-          <folding>
-            <marker date="1501077849000" expanded="true" signature="2885:2891" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="4717:5029" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="4751:4994" ph="..." />
-            <marker date="1501077849000" expanded="false" signature="4846:4863" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="5157:5385" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="5516:9939" ph="{% block help_section ... %}" />
-            <marker date="1501077849000" expanded="true" signature="5573:9922" ph="..." />
-            <marker date="1501077849000" expanded="false" signature="5623:5642" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="5643:9911" ph="..." />
-            <marker date="1501077849000" expanded="false" signature="5691:5708" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="5709:7118" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="5748:7099" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="5858:6128" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="6208:7076" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="6293:6504" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="6334:6474" ph="..." />
-            <marker date="1501077849000" expanded="false" signature="6397:6422" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="6651:7050" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="6692:7020" ph="..." />
-            <marker date="1501077849000" expanded="false" signature="6759:6784" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="6785:6987" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="7155:9896" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="7255:7386" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="7506:9248" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="7649:7777" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="7920:9007" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="8035:8297" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="8410:8980" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="8442:8950" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="8542:8917" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="8592:8879" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="9117:9225" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="9293:9877" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="9411:9853" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="9443:9758" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="9472:9725" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="9790:9824" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="9941:11176" ph="{% block js_block ... %}" />
-            <marker date="1501077849000" expanded="true" signature="9974:10246" ph="..." />
-            <marker date="1501077849000" expanded="false" signature="10016:10231" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2792,451 +2197,244 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="11" column="56" lean-forward="false" selection-start-line="11" selection-start-column="56" selection-end-line="11" selection-end-column="56" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/dev/environments/django10/lib/python3.4/site-packages/django/core/handlers/base.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="184" column="0" lean-forward="false" selection-start-line="184" selection-start-column="0" selection-end-line="184" selection-end-column="0" />
-          <folding>
-            <element signature="e#10295#10768#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_annotations.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-757">
+        <state relative-caret-position="270">
           <caret line="22" column="53" lean-forward="false" selection-start-line="22" selection-start-column="53" selection-end-line="22" selection-end-column="53" />
-          <folding>
-            <marker date="1501077849000" expanded="false" signature="13229:14523" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="13496:13744" ph="{&quot;url&quot;: '/rest/delete_ss_annotation/'...}" />
-            <marker date="1501077849000" expanded="true" signature="13556:13645" ph="{&quot;document_id&quot;: doc_id...}" />
-            <marker date="1501077849000" expanded="false" signature="13764:14520" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="13796:14424" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="13849:14260" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="14438:14514" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="14668:15148" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="14915:15008" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="15025:15090" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="15183:15622" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="15408:15474" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="15491:15561" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-416">
-          <caret line="55" column="42" lean-forward="false" selection-start-line="55" selection-start-column="42" selection-end-line="55" selection-end-column="42" />
-          <folding>
-            <marker date="1501077849000" expanded="true" signature="380:3454" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="980:3448" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="1306:2902" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="1456:2891" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="1857:2150" ph="{&quot;url&quot;: url...}" />
-            <marker date="1501077849000" expanded="false" signature="2170:2875" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="2447:2577" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="2632:2760" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="2916:3442" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="2938:3430" ph="{&quot;url&quot;: copoFormsURL...}" />
-            <marker date="1501077849000" expanded="true" signature="3080:3178" ph="{&quot;task&quot;: 'form'...}" />
-            <marker date="1501077849000" expanded="false" signature="3221:3323" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="3360:3416" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="3542:4479" ph="{&quot;text&quot;: &quot;do_text_ctrl&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="4511:7070" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="4575:4814" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="4615:4808" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="4854:6698" ph="{&quot;type&quot;: BootstrapDialog.TYPE_PRIMARY...}" />
-            <marker date="1501077849000" expanded="false" signature="4970:5048" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="5160:5278" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="5318:6206" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="5437:5569" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="5502:5555" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="5769:6152" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="5815:5868" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="5874:6138" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="6225:6692" ph="[...]" />
-            <marker date="1501077849000" expanded="true" signature="6239:6407" ph="{&quot;label&quot;: 'Cancel'...}" />
-            <marker date="1501077849000" expanded="false" signature="6319:6393" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="6421:6682" ph="{&quot;icon&quot;: 'glyphicon glyphicon-save'...}" />
-            <marker date="1501077849000" expanded="false" signature="6590:6668" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="7126:8555" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="7294:7327" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="7333:7445" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="7379:7437" ph="{&quot;data-toggle&quot;: &quot;validator&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="7552:8513" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="7697:7862" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="7792:7852" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="7868:8040" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="7910:7977" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="7983:8030" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="8138:8260" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="8281:8507" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="8612:9674" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="8696:9650" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="8832:8997" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="8927:8987" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="9003:9175" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="9045:9112" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="9118:9165" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="9273:9396" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="9417:9644" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="9709:10581" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="9752:9798" ph="{&quot;style&quot;: &quot;display:none;&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="9870:9982" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="9995:10002" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="10042:10397" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="10089:10389" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="10180:10187" ph="×" />
-            <marker date="1501077849000" expanded="true" signature="10251:10269" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="10430:10466" ph="{&quot;class&quot;: &quot;row&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="10495:10557" ph="{&quot;class&quot;: &quot;col-sm-12 col-md-12 col-lg-12&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="10613:10870" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="10669:10755" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="10761:10845" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="10897:11169" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="10938:11143" ph="{&quot;html&quot;: '&lt;span style=&quot;padding:6px;&quot;&gt;Help tips&lt;/span&gt;&lt;input class=&quot;copo-help-chk&quot; type=&quot;checkbox&quot; name=&quot;helptips-chk&quot;&gt;'...}" />
-            <marker date="1501077849000" expanded="true" signature="10972:10984" ph="..." />
-            <marker date="1501077849000" expanded="false" signature="11207:11731" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="11327:11420" ph="{&quot;size&quot;: &quot;mini&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="11523:11726" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="11600:11720" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="11769:12185" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="11809:11898" ph="{&quot;class&quot;: &quot;row helpDivRow&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="11941:12000" ph="{&quot;class&quot;: &quot;col-sm-7 col-md-7 col-lg-7&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="12043:12102" ph="{&quot;class&quot;: &quot;col-sm-5 col-md-5 col-lg-5&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="12223:12502" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="12267:12314" ph="{&quot;class&quot;: &quot;row formDivRow&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="12343:12405" ph="{&quot;class&quot;: &quot;col-sm-12 col-md-12 col-lg-12&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="12569:13575" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="12610:12676" ph="{&quot;style&quot;: &quot;padding:1px; margin-bottom:-15px;&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="12805:13000" ph="{&quot;type&quot;: &quot;hidden&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="13067:13199" ph="{&quot;class&quot;: &quot;input-copo copo-multi-select&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="13317:13469" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="13615:13804" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="13854:16559" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="14073:14281" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="14405:14881" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="15070:15368" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="15489:15715" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="15836:16062" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="16209:16433" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="16603:44344" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="16662:17251" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="16711:16771" ph="{&quot;class&quot;: &quot;ctrlDIV input-group&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="16818:16876" ph="{&quot;class&quot;: &quot;input-group-addon&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="16950:17114" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="false" signature="17309:17869" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="17358:17406" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="17454:17628" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="false" signature="17920:19665" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="17969:18017" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="18101:18281" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="true" signature="18491:19512" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="18614:19501" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="18721:18828" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="18841:18882" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="18977:19045" ph="{&quot;class&quot;: &quot;input-group&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="19119:19248" ph="{&quot;class&quot;: &quot;input-group-addon&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="19315:19398" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="19404:19487" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="19722:20280" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="19771:19819" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="19867:20039" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="false" signature="20335:20919" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="20385:20433" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="20484:20678" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="false" signature="20972:22027" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="21021:21069" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="21148:21300" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="true" signature="21410:21903" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="21575:21661" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="21699:21797" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="22087:23442" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="22212:22260" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="22320:23366" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="22387:22427" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="22567:22644" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="22840:22964" ph="//..." />
-            <marker date="1501077849000" expanded="true" signature="23033:23086" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="23183:23290" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="23509:26636" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="23632:23696" ph="{&quot;class&quot;: &quot;ctrlDIV form-inline row&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="23755:26560" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="23896:26331" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="23956:24050" ph="{&quot;class&quot;: &quot;form-group col-sm-4 col-md-4 col-lg-4&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="24200:24637" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="24222:24515" ph="//..." />
-            <marker date="1501077849000" expanded="true" signature="24545:24617" ph="{&quot;style&quot;: &quot;display: none; &quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="24825:25704" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="24860:24937" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="25042:25686" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="25908:26316" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="26337:26550" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="26405:26533" ph="{&quot;id&quot;: fv...}" />
-            <marker date="1501077849000" expanded="false" signature="26695:28601" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="26818:26882" ph="{&quot;class&quot;: &quot;ctrlDIV form-inline row&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="26941:28525" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="27062:28255" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="27121:27215" ph="{&quot;class&quot;: &quot;form-group col-sm-6 col-md-6 col-lg-6&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="27324:27761" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="27346:27639" ph="//..." />
-            <marker date="1501077849000" expanded="true" signature="27669:27741" ph="{&quot;style&quot;: &quot;display: none; &quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="27827:28168" ph="{&quot;class&quot;: &quot;form-control copo-comment-control&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="28261:28515" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="28329:28498" ph="{&quot;type&quot;: &quot;hidden&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="28661:29507" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="28710:28758" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="28926:29383" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="28953:29372" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="29160:29358" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="29571:31149" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="29620:29668" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="29809:29967" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="true" signature="30046:30258" ph="{&quot;class&quot;: &quot;input-copo copo-multi-select&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="30368:30861" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="30533:30619" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="30657:30755" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="31213:32860" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="31428:31476" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="31845:32827" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="31903:32475" ph="{&quot;style&quot;: &quot;border-radius:0;&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="32322:32456" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="32535:32613" ph="{&quot;class&quot;: &quot;col-sm-12 col-md-12 col-lg-12&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="32691:32752" ph="{&quot;class&quot;: &quot;row btn-row&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="32918:33542" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="32967:33015" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="33099:33300" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="false" signature="33595:33834" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="33649:33797" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="false" signature="33871:34028" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="33898:34020" ph="{&quot;href&quot;: &quot;/rest/forward_to_figshare/&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="34091:36990" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="34140:34188" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="34282:34396" ph="{&quot;name&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="true" signature="34465:36756" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="34578:35124" ph="{&quot;type&quot;: &quot;radio&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="34944:35106" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="34998:35084" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="35171:35278" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="35340:35447" ph="{&quot;style&quot;: &quot;padding-left:5px;&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="35498:35576" ph="{&quot;style&quot;: &quot;font-weight: normal; cursor:pointer;&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="35678:35844" ph="{&quot;style&quot;: &quot;position: relative; display: block; margin-top: 10px; margin-bottom: 5px;&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="35919:36565" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="36046:36551" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="37050:38783" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="37141:37194" ph="{&quot;class&quot;: &quot;input-group&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="37348:37897" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="false" signature="37734:37883" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="38035:38092" ph="{&quot;class&quot;: &quot;input-group-btn&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="38237:38375" ph="{&quot;type&quot;: &quot;button&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="38503:38555" ph="{&quot;class&quot;: &quot;help-block&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="38850:41444" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="38940:39088" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="true" signature="39178:39229" ph="{&quot;class&quot;: &quot;list-group&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="39387:41320" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="39618:39652" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="39742:39810" ph="{&quot;class&quot;: &quot;copo-button-listDiv&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="39918:40112" ph="{&quot;type&quot;: &quot;hidden&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="40416:40871" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="41031:41309" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="41512:43330" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="41562:41622" ph="{&quot;class&quot;: &quot;range-slider-parent&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="41676:41901" ph="{&quot;min&quot;: &quot;1&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="41956:42135" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="true" signature="42190:42307" ph="{&quot;style&quot;: &quot;margin-top:15px;&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="42409:42485" ph="{&quot;style&quot;: &quot;margin-top:20px; text-align:center;&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="42544:42743" ph="{&quot;type&quot;: &quot;button&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="42852:42981" ph="{&quot;class&quot;: &quot;range-slider-output&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="43392:44342" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="43441:43489" ph="{&quot;class&quot;: &quot;ctrlDIV&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="43656:43873" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="false" signature="44395:51948" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="44437:44488" ph="{&quot;data-toggle&quot;: &quot;validator&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="44534:44581" ph="{&quot;class&quot;: &quot;row formDivRow&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="44610:44672" ph="{&quot;class&quot;: &quot;col-sm-12 col-md-12 col-lg-12&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="44733:44942" ph="{&quot;html&quot;: '&lt;span style=&quot;padding:6px;&quot;&gt;Help tips&lt;/span&gt;&lt;input class=&quot;copo-help-chk&quot; type=&quot;checkbox&quot; name=&quot;helptips-chk-sub&quot;&gt;'...}" />
-            <marker date="1501077849000" expanded="true" signature="44767:44779" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="44987:45076" ph="{&quot;class&quot;: &quot;row helpDivRow&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="45119:45178" ph="{&quot;class&quot;: &quot;col-sm-7 col-md-7 col-lg-7&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="45224:45283" ph="{&quot;class&quot;: &quot;col-sm-5 col-md-5 col-lg-5&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="45395:49437" ph="{&quot;type&quot;: BootstrapDialog.TYPE_PRIMARY...}" />
-            <marker date="1501077849000" expanded="false" signature="45511:45599" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="45712:45830" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="45870:48851" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="45987:46119" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="46052:46105" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="46293:48613" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="46339:46392" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="46398:48599" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="46604:46689" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="46788:48579" ph="{&quot;url&quot;: copoFormsURL...}" />
-            <marker date="1501077849000" expanded="true" signature="46962:47223" ph="{&quot;task&quot;: &quot;save&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="47274:48412" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="47410:48198" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="48457:48557" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="48870:49431" ph="[...]" />
-            <marker date="1501077849000" expanded="true" signature="48884:49159" ph="{&quot;label&quot;: 'Cancel'...}" />
-            <marker date="1501077849000" expanded="false" signature="48964:49145" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="49173:49421" ph="{&quot;icon&quot;: 'glyphicon glyphicon-save'...}" />
-            <marker date="1501077849000" expanded="false" signature="49342:49407" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="49757:51943" ph="{&quot;url&quot;: copoFormsURL...}" />
-            <marker date="1501077849000" expanded="true" signature="49867:49979" ph="{&quot;task&quot;: 'form_and_component_records'...}" />
-            <marker date="1501077849000" expanded="false" signature="50014:51844" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="50296:51799" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="50531:51783" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="50767:51763" ph="{&quot;url&quot;: copoFormsURL...}" />
-            <marker date="1501077849000" expanded="true" signature="50941:51147" ph="{&quot;task&quot;: &quot;component_record&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="51204:51599" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="51644:51741" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="51873:51937" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="51980:52125" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="52014:52121" ph="{&quot;html&quot;: tip...}" />
-            <marker date="1501077849000" expanded="false" signature="52152:52316" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="52185:52312" ph="{&quot;style&quot;: &quot;padding-bottom:5px;&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="52356:52579" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="52394:52558" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="52440:52550" ph="{&quot;text&quot;: lbl...}" />
-            <marker date="1501077849000" expanded="false" signature="52634:53404" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="52676:52771" ph="{&quot;style&quot;: 'margin-top:2px;'...}" />
-            <marker date="1501077849000" expanded="true" signature="52815:53346" ph="{&quot;style&quot;: &quot;border-radius:0;&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="53042:53336" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="53452:54368" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="53539:53727" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="53562:53721" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="53770:53819" ph="{&quot;style&quot;: 'margin-top:20px;'...}" />
-            <marker date="1501077849000" expanded="true" signature="53861:53906" ph="{&quot;style&quot;: 'padding:5px;'...}" />
-            <marker date="1501077849000" expanded="true" signature="53950:54268" ph="{&quot;style&quot;: &quot;border-radius:0;&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="54168:54258" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="54439:57889" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="54625:54712" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="54667:54706" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="54733:57667" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="54773:56604" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="54813:56593" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="54946:55474" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="54981:55456" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="55128:55211" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="55647:56579" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="55772:56561" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="55996:56452" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="56039:56426" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="56610:57661" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="56701:57649" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="56732:57635" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="57225:57616" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="57338:57594" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="57412:57568" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="57961:58453" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="58042:58108" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="58160:58427" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="58494:58834" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="58586:58746" ph="{&quot;id&quot;: fv...}" />
-            <marker date="1501077849000" expanded="true" signature="58762:58815" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="58875:59037" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="58965:58996" ph="{&quot;for&quot;: fv...}" />
-            <marker date="1501077849000" expanded="false" signature="59090:60050" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="59215:60022" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="59329:59821" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="59484:59587" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="59635:59651" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="59827:60016" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="59891:60003" ph="{&quot;id&quot;: fv...}" />
-            <marker date="1501077849000" expanded="false" signature="60103:61537" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="60258:60313" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="60364:60605" ph="{&quot;id&quot;: formElem.id...}" />
-            <marker date="1501077849000" expanded="true" signature="60656:60785" ph="{&quot;type&quot;: &quot;hidden&quot;...}" />
-            <marker date="1501077849000" expanded="true" signature="60958:61017" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="61063:61302" ph="{&quot;multiple&quot;: &quot;multiple&quot;...}" />
-            <marker date="1501077849000" expanded="false" signature="61593:62194" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="61830:61922" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="62308:67118" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="62335:67114" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="62353:67108" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="62390:63210" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="62391:62558" ph="//..." />
-            <marker date="1501077849000" expanded="false" signature="62795:63103" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="62881:63085" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="62950:63063" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="63136:63196" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="63246:64515" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="63264:63403" ph="//..." />
-            <marker date="1501077849000" expanded="false" signature="63698:63870" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="63751:63852" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="64010:64410" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="64075:64390" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="64165:64368" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="64217:64342" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="64441:64501" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="64551:64829" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="64755:64815" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="64865:65276" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="65202:65262" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="65322:67098" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="65685:66993" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="65762:66975" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="65916:66384" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="65988:66358" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="66461:66927" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="67024:67084" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="67149:68945" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="67267:67363" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="67490:67543" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="67744:67791" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="67844:68941" ph="{&quot;url&quot;: copoFormsURL...}" />
-            <marker date="1501077849000" expanded="true" signature="67954:68161" ph="{&quot;task&quot;: task...}" />
-            <marker date="1501077849000" expanded="false" signature="68196:68865" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="68268:68550" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="68337:68467" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="68473:68535" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="68582:68706" ph="{...}" />
-            <marker date="1501077849000" expanded="true" signature="68736:68854" ph="{...}" />
-            <marker date="1501077849000" expanded="false" signature="68894:68935" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="444">
+        <state relative-caret-position="1455">
           <caret line="681" column="63" lean-forward="false" selection-start-line="681" selection-start-column="63" selection-end-line="681" selection-end-column="63" />
-          <folding>
-            <element signature="n#!!block;n#do_render_table#0" expanded="true" />
-            <marker date="1501077849000" expanded="true" signature="5528:5548" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="5886:5929" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="6116:6122" ph=" " />
-            <marker date="1501077849000" expanded="true" signature="12939:12945" ph=" " />
-            <marker date="1501077849000" expanded="true" signature="22666:22714" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="22728:22758" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="22881:22894" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="29795:29831" ph="..." />
-            <marker date="1501077849000" expanded="true" signature="43181:43200" ph="..." />
-          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="118" column="53" lean-forward="false" selection-start-line="118" selection-start-column="53" selection-end-line="118" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3585">
+          <caret line="635" column="0" lean-forward="false" selection-start-line="635" selection-start-column="0" selection-end-line="635" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nginx/sites-enabled/django_project">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" column="32" lean-forward="false" selection-start-line="18" selection-start-column="32" selection-end-line="18" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nginx/Dockerfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="21" lean-forward="false" selection-start-line="3" selection-start-column="21" selection-end-line="3" selection-end-column="21" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/api/annotate_views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="243">
-          <caret line="75" column="0" lean-forward="false" selection-start-line="75" selection-start-column="0" selection-end-line="75" selection-end-column="0" />
+        <state relative-caret-position="747">
+          <caret line="74" column="30" lean-forward="true" selection-start-line="74" selection-start-column="30" selection-end-line="74" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_people.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-189">
+          <caret line="320" column="60" lean-forward="false" selection-start-line="320" selection-start-column="60" selection-end-line="320" selection-end-column="60" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base_1col.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/component_navbar.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="645">
+          <caret line="45" column="43" lean-forward="false" selection-start-line="45" selection-start-column="43" selection-end-line="45" selection-end-column="43" />
           <folding>
-            <element signature="e#0#36#0" expanded="true" />
-            <element signature="e#398#1309#0" expanded="true" />
-            <element signature="e#1341#1644#0" expanded="true" />
-            <marker date="1501077849000" expanded="false" signature="3521:4067" ph="..." />
-            <marker date="1501077849000" expanded="false" signature="4103:4455" ph="..." />
+            <element signature="e#0#32#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/import_ena_accession.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="600">
+          <caret line="40" column="52" lean-forward="false" selection-start-line="40" selection-start-column="52" selection-end-line="40" selection-end-column="72" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/settings/data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="10" column="52" lean-forward="false" selection-start-line="10" selection-start-column="16" selection-end-line="10" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/rest_urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="40" column="82" lean-forward="false" selection-start-line="40" selection-start-column="82" selection-end-line="40" selection-end-column="82" />
+          <folding>
+            <element signature="e#0#32#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="615">
+          <caret line="134" column="0" lean-forward="false" selection-start-line="134" selection-start-column="0" selection-end-line="134" selection-end-column="0" />
+          <folding>
+            <element signature="e#3721#3927#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/import_ena_accession.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="7" column="33" lean-forward="false" selection-start-line="7" selection-start-column="33" selection-end-line="7" selection-end-column="33" />
+          <folding>
+            <element signature="e#0#42#0" expanded="false" />
+            <element signature="e#537#586#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="364">
-          <caret line="186" column="0" lean-forward="false" selection-start-line="186" selection-start-column="0" selection-end-line="186" selection-end-column="0" />
+        <state relative-caret-position="1650">
+          <caret line="431" column="0" lean-forward="false" selection-start-line="431" selection-start-column="0" selection-end-line="431" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#4239#4429#0" expanded="true" />
+            <element signature="e#12576#12627#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/EnaImports.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="214">
+          <caret line="42" column="16" lean-forward="false" selection-start-line="42" selection-start-column="16" selection-end-line="42" selection-end-column="16" />
+          <folding>
+            <element signature="e#101#111#0" expanded="true" />
+            <element signature="e#299#604#0" expanded="true" />
+            <element signature="e#631#928#0" expanded="true" />
+            <element signature="e#1763#2236#0" expanded="true" />
+            <element signature="e#2279#3052#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="146">
+          <caret line="47" column="0" lean-forward="false" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/dev/environments/django10/lib/python3.4/site-packages/django/core/handlers/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="184" column="0" lean-forward="false" selection-start-line="184" selection-start-column="0" selection-end-line="184" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="186" column="8" lean-forward="false" selection-start-line="186" selection-start-column="8" selection-end-line="186" selection-end-column="8" />
+          <folding>
+            <element signature="e#1141#2452#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/dev/environments/django10/lib/python3.4/site-packages/isatools/convert/sra2isatab.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1574">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#17#0" expanded="true" />
+            <element signature="e#3542#6788#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/dev/environments/django10/lib/python3.4/site-packages/isatools/sra.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="32" column="7" lean-forward="true" selection-start-line="32" selection-start-column="7" selection-end-line="32" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/dev/environments/django10/lib/python3.4/site-packages/isatools/convert/json2sra.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="349">
+          <caret line="26" column="10" lean-forward="true" selection-start-line="26" selection-start-column="10" selection-end-line="26" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#33#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/ena_stages.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="30" column="39" lean-forward="false" selection-start-line="7" selection-start-column="32" selection-end-line="30" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/start_stages.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="27" column="67" lean-forward="true" selection-start-line="27" selection-start-column="67" selection-end-line="27" selection-end-column="67" />
           <folding />
         </state>
       </provider>

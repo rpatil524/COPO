@@ -74,6 +74,8 @@ class EnaSubmit(object):
         # check submission status
         submission_status = Submission().isComplete(sub_id)
 
+        submission_status = True
+
         if not submission_status or submission_status == 'false':
 
             lg.log('Starting aspera transfer', level=Loglvl.INFO, type=Logtype.FILE)
@@ -178,25 +180,26 @@ class EnaSubmit(object):
             finally:
                 pass
 
-        # setup paths for conversion directories
+        # # setup paths for conversion directories
         conv_dir = os.path.join(self._dir, sub_id)
         if not os.path.exists(os.path.join(conv_dir, 'json')):
-            os.makedirs(os.path.join(conv_dir, 'json'))
+             os.makedirs(os.path.join(conv_dir, 'json'))
         json_file_path = os.path.join(conv_dir, 'json', 'isa_json.json')
         xml_dir = conv_dir
         xml_path = os.path.join(xml_dir, 'run_set.xml')
-
-        #  Convert COPO JSON to ISA JSON
-        lg.log('Obtaining ISA-JSON', level=Loglvl.INFO, type=Logtype.FILE)
+        #
+        # #  Convert COPO JSON to ISA JSON
+        # lg.log('Obtaining ISA-JSON', level=Loglvl.INFO, type=Logtype.FILE)
         conv = cnv.Investigation(submission_token=sub_id)
         meta = conv.get_schema()
         json_file = open(json_file_path, '+w')
-        # dump metadata to output file
+        # # dump metadata to output file
         json_file.write(dumps(meta))
         json_file.close()
 
         # Validate ISA_JSON
         lg.log('Validating ISA-JSON', level=Loglvl.INFO, type=Logtype.FILE)
+
         with open(json_file_path) as json_file:
             v = isajson.validate(json_file)
             lg.log(v, level=Loglvl.INFO, type=Logtype.FILE)
