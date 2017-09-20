@@ -38,5 +38,6 @@ urlpatterns = [
     url(r'^set_session_variable/', ajax.set_session_variable, name='set_session_variable'),
     url(r'^get_accession_data/', ajax.get_accession_data, name='get_accession_data'),
     url(r'^test_sword/', su.test_module, name='test_module'),
-    url(r'^call_get_dataset_details/', ajax.call_get_dataset_details, name='call_get_dataset_details')
+    url(r'^call_get_dataset_details/', ajax.get_dataset_details, name='call_get_dataset_details'),
+    url(r'^samples_from_study/', ajax.get_samples_for_study, name='get_samples_for_study')
 ]

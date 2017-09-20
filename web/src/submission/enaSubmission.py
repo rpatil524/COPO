@@ -74,7 +74,7 @@ class EnaSubmit(object):
         # check submission status
         submission_status = Submission().isComplete(sub_id)
 
-        submission_status = True
+
 
         if not submission_status or submission_status == 'false':
 
@@ -208,7 +208,7 @@ class EnaSubmit(object):
         lg.log('Converting to SRA', level=Loglvl.INFO, type=Logtype.FILE)
         sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
         datafilehashes = conv.get_datafilehashes()
-        json2sra.convert2(json_fp=open(json_file_path), path=conv_dir, sra_settings=sra_settings,
+        json2sra.convert(json_fp=open(json_file_path), path=conv_dir, sra_settings=sra_settings,
                           datafilehashes=datafilehashes, validate_first=False)
 
         # finally submit to SRA

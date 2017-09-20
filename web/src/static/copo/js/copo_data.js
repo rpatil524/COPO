@@ -17,7 +17,7 @@ $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
 
     var cyverse_files = $('#cyverse_file_data').val()
-    if(cyverse_files != "None") {
+    if (cyverse_files != "None") {
         cyverse_files = JSON.parse(cyverse_files)
         $('#cyverse_files_link').on('click', function (e) {
             if (cyverse_files) {
@@ -33,13 +33,12 @@ $(document).ready(function () {
 
     // get url
     var url = window.location.search
-    if( url.includes('state') && url.includes('code')){
+    if (url.includes('state') && url.includes('code')) {
         // now check for selected_datafile
-        if ($('#selected_datafile').val() != '' || $('#selected_datafile').val() != undefined){
+        if ($('#selected_datafile').val() != '' || $('#selected_datafile').val() != undefined) {
             alert('ask toni how we can load file ' + $('#selected_datafile').val() + ' into his wizard')
         }
     }
-
 
 
     var csrftoken = $.cookie('csrftoken');
@@ -47,6 +46,7 @@ $(document).ready(function () {
     var wizardURL = "/rest/data_wiz/";
     var copoFormsURL = "/copo/copo_forms/";
     var copoVisualsURL = "/copo/copo_visualize/";
+    var samples_from_study_url = "/rest/samples_from_study/"
 
 
     //global_help_call
@@ -98,9 +98,7 @@ $(document).ready(function () {
         $(this).closest(".wizard-message-panel").find(".message-pane-collapse").collapse('toggle');
     });
 
-
     //show alerts
-
     $(document).on("click", ".close-stage-alert", function (event) {
         $(this).closest(".collapse").collapse('hide');
     });
@@ -211,22 +209,22 @@ $(document).ready(function () {
 
 
     // inform session of currently selected datafile id
-    $(document).on('click', '.copo-dt', function(e){
+    $(document).on('click', '.copo-dt', function (e) {
         var datafile_id = $(e.currentTarget).attr("data-record-id")
         $.ajax(
             {
                 url: '/rest/set_session_variable/',
                 type: "POST",
                 headers: {'X-CSRFToken': csrftoken},
-                data:{
+                data: {
                     "key": "datafile_id",
                     "value": datafile_id
                 },
-                success: function(data){
+                success: function (data) {
                     console.log("sent data to session " + data)
                 }
             })
-        })
+    })
 
 
     //******************************* wizard events *******************************//
@@ -501,8 +499,47 @@ $(document).ready(function () {
         }
     });
 
+    //handle annotation wizard study dropdown onchange
+    $(document).on('change', '#study_copo', handle_wizard_study_dropdown_onchange)
+
 
     //****************************** Functions Block ******************************//
+    function handle_wizard_study_dropdown_onchange(event) {
+        var val = $(event.currentTarget).val()
+        if (val == "none") {
+            $('#sample_copo').attr('disabled', 'disabled')
+            $('#study_ena').removeAttr('disabled')
+            $('#sample_ena').removeAttr('disabled')
+        }
+        else {
+            $('#study_ena').attr('disabled', 'disabled')
+            $('#sample_ena').attr('disabled', 'disabled')
+            $('#sample_copo').removeAttr('disabled')
+            // now get samples in stufy
+            var csrftoken = $.cookie('csrftoken');
+            $.ajax(
+                {
+                    headers: {'X-CSRFToken': csrftoken},
+                    url: samples_from_study_url,
+                    data:{'profile_id': val},
+                    dataType: 'json',
+                    method: 'POST'
+                }
+            ).done(function(data){
+                $(data).each(function(idx, element){
+                    var option = $('<option/>',{
+                        html: element['name'] + ' (' + element['organism']['annotationValue'] + ')',
+                        value: element['_id']
+                    })
+                    $('#sample_copo').append(option)
+                })
+
+            }).fail(function(data){
+                console.log('error')
+            })
+        }
+    }
+
     function add_step(auto_fields) {
         //step being requested
         currentIndx += 1;
@@ -2490,6 +2527,7 @@ $(document).ready(function () {
                 });
 
                 attributesPanelBody.append('<span style="line-height: 1.5;">' + stage_objects[activeStageIndx].message + '</span>');
+
 
                 attributesPanel.append(attributesPanelBody);
 

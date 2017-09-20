@@ -11,7 +11,7 @@ from dateutil import parser
 from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
 from django.conf import settings
-from dal.copo_da import ProfileInfo, RemoteDataFile, Submission
+from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, Sample, Source
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
@@ -118,17 +118,42 @@ def get_accession_data(request):
     sub = Submission().get_file_accession(sub_id)
     return HttpResponse(json_util.dumps({'sub': sub}))
 
-def call_get_dataset_details(request):
+def get_dataset_details(request):
     profile_id = request.GET['profile_id']
     resp = Profile().check_for_dataset_details(profile_id)
     return HttpResponse(json.dumps(resp))
 
-
+def get_samples_for_study(request):
+    # get all samples which have corresponding profile_id number
+    profile_id = request.POST['profile_id']
+    samples = Sample().get_from_profile_id(profile_id=profile_id)
+    output = list()
+    for s in samples:
+        source = Source().get_record(s['derivesFrom'][0])
+        s.update(source)
+        output.append(s)
+    return HttpResponse(json_util.dumps(output))
 
 def set_session_variable(request):
+
     key = request.POST['key']
-    value = request.POST['value']
+    try:
+        value = request.POST['value']
+    except:
+        value = None
     request.session[key] = value
     return HttpResponse(True)
 
 
+def get_continuation_studies():
+    user = ThreadLocal.get_current_user()
+    profiles = Profile().get_for_user(user.id)
+    output = list()
+    for p in profiles:
+        output.append(
+            {
+                "value": p.title,
+                "label": p._id
+            }
+        )
+    return output

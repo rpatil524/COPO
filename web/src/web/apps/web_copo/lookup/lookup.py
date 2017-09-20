@@ -399,8 +399,16 @@ DROP_DOWNS = {
     ],
     "REPOSITORIES": [
         {
-            'value': 'ena',
-            'label': 'European Nucleotide Archive (ENA)'
+            'value': 'ena-seq',
+            'label': 'European Nucleotide Archive (Sequence Reads)'
+        },
+        {
+            'value': 'ena-asm',
+            'label': 'European Nucleotide Archive (Sequence Assemblies)'
+        },
+        {
+            'value': 'ena-ant',
+            'label': 'European Nucleotide Archive (Sequence Annotations)'
         },
         {
             'value': 'figshare',
@@ -422,6 +430,23 @@ DROP_DOWNS = {
         #     'value': 'unknown',
         #     'label': 'Unknown'
         # }
+    ],
+    "OMICS_TYPES": [
+        {
+            "value": 1,
+            "label": "Sequence Reads",
+            "description": "Use this option to submit raw data from various sequencing platforms"
+        },
+        {
+            "value": 2,
+            "label": "Sequence Assemblies",
+            "description": "Use this option to submit assembled scaffolds",
+        },
+        {
+            "value": 3,
+            "label": "Annotations",
+            "description": "Use this option to submit Annotations of objects already submitted"
+        }
     ],
     "SAMPLE_TYPES": [
         {
@@ -694,7 +719,9 @@ UI_INFO = {
 # specifies file paths holding the configs for wizard stages:
 WIZARD_FILES = {
     'start': os.path.join(RESOLVER['wizards_datafile'], 'start_stages.json'),
-    'ena': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages.json'),
+    'ena-seq': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages_seq.json'),
+    'ena-asm': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages_asm.json'),
+    'ena-ant': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages_ant.json'),
     'figshare': os.path.join(RESOLVER['wizards_datafile'], 'figshare_stages.json'),
     'miappe': os.path.join(RESOLVER['wizards_datafile'], 'miappe_stages.json'),
     'sample_start': os.path.join(RESOLVER['wizards_sample'], 'start_stages.json'),

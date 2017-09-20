@@ -6,10 +6,7 @@ import os
 import pysam
 import PyPDF2
 from datetime import time
-
 from dal.ena_da import EnaCollection
-
-
 
 
 def get_sample_html_from_details_id(details_id):

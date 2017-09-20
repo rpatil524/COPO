@@ -130,7 +130,8 @@ var controlsMapping = {
     "text-percent": "do_percent_text_box",
     "copo-resolver": "do_copo_resolver_ctrl",
     "text-percent": "do_percent_text_box",
-    "dataverse-author": "do_dataverse_author"
+    "dataverse-author": "do_dataverse_author",
+    "label": "do_label",
 };
 
 function json2HtmlForm(data) {
@@ -722,8 +723,12 @@ var dispatchFormControl = {
                     lbl = option.label;
                     vl = option.value;
                 }
-
-                $('<option value="' + vl + '">' + lbl + '</option>').appendTo(selectCtrl);
+                if (vl == "required") {
+                    $('<option disabled selected value>' + lbl + '</option>').appendTo(selectCtrl)
+                }
+                else {
+                    $('<option value="' + vl + '">' + lbl + '</option>').appendTo(selectCtrl);
+                }
             }
         }
 
@@ -1392,8 +1397,12 @@ var dispatchFormControl = {
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
     },
-    do_dataverse_author: function do_dataverse_author(formElem){
+    do_dataverse_author: function do_dataverse_author(formElem) {
         alert('abc')
+    },
+    do_label: function (formElem, elemValue) {
+        alert(formElem)
+        alert(elemValue)
     }
 };
 

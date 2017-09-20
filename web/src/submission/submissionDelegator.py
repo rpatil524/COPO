@@ -42,7 +42,7 @@ def delegate_submission(request):
             return HttpResponse(jsonpickle.dumps({'status': 1, 'url': reverse('copo:authenticate_figshare')}))
 
     ## Submit to ENA
-    elif repo == 'ena':
+    elif 'ena' in repo:
         result = enaSubmission.EnaSubmit().submit(
             sub_id=sub_id,
             dataFile_ids=sub['bundle'],
