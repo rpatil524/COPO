@@ -175,6 +175,7 @@ class EnaSubmit(object):
                 # close thread
                 thread.close()
                 lg.log('Aspera Transfer completed', level=Loglvl.INFO, type=Logtype.FILE)
+                return true
 
             except OSError:
                 return redirect('web.apps.web_copo.views.goto_error', request=HttpRequest(),
@@ -313,8 +314,17 @@ class EnaSubmit(object):
 
 
     def do_annotation_submission(self, sub_id, remote_path, transfer_token):
+
         study = xml.do_study_xml(sub_id)
         sample = xml.do_sample_xml(sub_id)
         analysis = xml.do_analysis_xml(sub_id)
         submission = xml.do_submission_xml(sub_id)
+
+        xml_dir = os.path.join(self._dir, sub_id)
+        if not os.path.exists(os.path.join(xml_dir)):
+            os.makedirs(os.path.join(xml_dir))
+
+        with open(os.path.join(xml_dir, 'study.xml'), "w+") as ff:
+            ff.write(study)
+        
         return submission

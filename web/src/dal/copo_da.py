@@ -280,15 +280,6 @@ class Person(DAComponent):
 
         return
 
-    
-    def has_inform_on_status_role(self):
-        sra_roles = list()
-        return all()
-
-
-    def has_inform_on_error_role(self):
-        sra_roles = list()
-        return all(x in sra_roles for x in ['SRA Inform On Error'])
 
 
 class Source(DAComponent):

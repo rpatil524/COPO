@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="create wizard for omics annotations">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/web/src/function_testing.py" />
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/codestyles/javascriptstyle.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/web/src/submission/blanks/dataverse_scaffold.json" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/web/src/submission/ena_xml_util.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/dal/copo_da.py" afterPath="$PROJECT_DIR$/web/src/dal/copo_da.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/submission/enaSubmission.py" afterPath="$PROJECT_DIR$/web/src/submission/enaSubmission.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/test_page.html" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/test_page.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/ena_stages_ant.json" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/ena_stages_ant.json" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -84,15 +77,25 @@
       <file leaf-file-name="enaSubmission.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="318" column="22" lean-forward="true" selection-start-line="318" selection-start-column="22" selection-end-line="318" selection-end-column="22" />
+            <state relative-caret-position="259">
+              <caret line="317" column="24" lean-forward="false" selection-start-line="317" selection-start-column="24" selection-end-line="317" selection-end-column="24" />
               <folding>
                 <element signature="e#51#92#0" expanded="true" />
                 <element signature="e#915#1161#0" expanded="true" />
                 <element signature="e#1216#2527#0" expanded="true" />
-                <element signature="e#2719#9000#0" expanded="true" />
-                <element signature="e#9090#14435#0" expanded="true" />
+                <element signature="e#2719#9028#0" expanded="true" />
+                <element signature="e#9118#14463#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="lookup.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="155">
+              <caret line="413" column="32" lean-forward="false" selection-start-line="413" selection-start-column="32" selection-end-line="413" selection-end-column="32" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -101,7 +104,7 @@
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="123">
-              <caret line="102" column="0" lean-forward="true" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
+              <caret line="102" column="0" lean-forward="false" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
               <folding>
                 <element signature="e#4724#5175#0" expanded="true" />
               </folding>
@@ -112,16 +115,16 @@
       <file leaf-file-name="ena_xml_util.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/submission/ena_xml_util.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="419">
-              <caret line="222" column="26" lean-forward="true" selection-start-line="222" selection-start-column="26" selection-end-line="222" selection-end-column="26" />
+            <state relative-caret-position="61">
+              <caret line="208" column="37" lean-forward="true" selection-start-line="208" selection-start-column="37" selection-end-line="208" selection-end-column="37" />
               <folding>
                 <element signature="e#47#119#0" expanded="true" />
-                <element signature="e#274#1847#0" expanded="true" />
-                <element signature="e#1881#4219#0" expanded="true" />
-                <element signature="e#4255#6574#0" expanded="true" />
-                <element signature="e#8436#8626#0" expanded="true" />
-                <element signature="e#8653#8982#0" expanded="true" />
-                <element signature="e#9013#9087#0" expanded="true" />
+                <element signature="e#274#1857#0" expanded="true" />
+                <element signature="e#1891#4239#0" expanded="true" />
+                <element signature="e#4275#6604#0" expanded="true" />
+                <element signature="e#8466#8656#0" expanded="true" />
+                <element signature="e#8683#9012#0" expanded="true" />
+                <element signature="e#9043#9117#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -130,18 +133,16 @@
       <file leaf-file-name="copo_da.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="285" column="19" lean-forward="false" selection-start-line="285" selection-start-column="19" selection-end-line="285" selection-end-column="19" />
+            <state relative-caret-position="243">
+              <caret line="279" column="0" lean-forward="false" selection-start-line="279" selection-start-column="0" selection-end-line="279" selection-end-column="0" />
               <folding>
                 <element signature="e#2736#2799#0" expanded="true" />
                 <element signature="e#2840#3027#0" expanded="true" />
                 <element signature="e#8468#8518#0" expanded="true" />
                 <element signature="e#8566#8719#0" expanded="true" />
-                <element signature="e#8762#9707#0" expanded="true" />
-                <element signature="e#9853#9939#0" expanded="true" />
-                <element signature="e#10018#10068#0" expanded="true" />
-                <element signature="e#14413#14511#0" expanded="true" />
-                <element signature="e#14549#14669#0" expanded="true" />
+                <element signature="e#9787#9837#0" expanded="true" />
+                <element signature="e#14182#14280#0" expanded="true" />
+                <element signature="e#14318#14438#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -151,7 +152,7 @@
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/ena_stages_ant.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="416">
-              <caret line="175" column="36" lean-forward="true" selection-start-line="175" selection-start-column="36" selection-end-line="175" selection-end-column="36" />
+              <caret line="175" column="36" lean-forward="false" selection-start-line="175" selection-start-column="36" selection-end-line="175" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -189,21 +190,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="html_tags.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="134">
-              <caret line="93" column="0" lean-forward="false" selection-start-line="93" selection-start-column="0" selection-end-line="93" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="copo_data.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_data.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="300">
-              <caret line="518" column="52" lean-forward="true" selection-start-line="518" selection-start-column="52" selection-end-line="518" selection-end-column="52" />
+              <caret line="518" column="52" lean-forward="false" selection-start-line="518" selection-start-column="52" selection-end-line="518" selection-end-column="52" />
               <folding>
                 <element signature="e#18819#19246#0" expanded="true" />
                 <element signature="e#18930#19230#0" expanded="true" />
@@ -251,8 +242,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>stage_content</find>
-      <find>d</find>
       <find>data_</find>
       <find>data_w</find>
       <find>data_wi</find>
@@ -281,9 +270,12 @@
       <find>get_existing_study_options</find>
       <find>&quot;</find>
       <find>'</find>
+      <find>REPO</find>
+      <find>conv_dir</find>
     </findStrings>
     <replaceStrings>
       <replace>&quot;</replace>
+      <replace>xml_dir</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/web/src/static/copo/css</dir>
@@ -354,8 +346,8 @@
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/test_page.html" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/ena_stages_ant.json" />
-        <option value="$PROJECT_DIR$/web/src/submission/enaSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/dal/copo_da.py" />
+        <option value="$PROJECT_DIR$/web/src/submission/enaSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/submission/ena_xml_util.py" />
       </list>
     </option>
@@ -504,7 +496,7 @@
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
-    <property name="SearchEverywhereHistoryKey" value="test&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/test_page.html&#10;lookup&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/lookup/lookup.py&#10;ajax&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;copo_form&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_form_handlers.js&#10;copo_&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;test_submission&#9;null&#9;null&#10;urls&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/urls.py&#10;submission&#9;null&#9;null&#10;submi&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/submission/enaSubmission.py&#10;copo_sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;views&#9;null&#9;null&#10;VIEWS&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/wizard_views.py&#10;rest&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;copo_f&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_form_handlers.js&#10;aja&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;copo&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_form_handlers.js&#10;wizard&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py&#10;gene&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/generic_handlers.js&#10;forward_to&#9;null&#9;null&#10;middle&#9;null&#9;null&#10;wizard_vi&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/wizard_views.py&#10;ena&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/submission/enaSubmission.py&#10;setting&#9;FILE&#9;file:///Users/fshaw/Documents/dev/environments/django10/lib/python3.4/site-packages/chunked_upload/settings.py&#10;req&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt&#10;rest_ur&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;copo_s&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;enar&#9;null&#9;null&#10;copo_da&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/dal/copo_da.py&#10;url&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;submiss&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;giti&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;annotat&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_annotations.html&#10;git&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;gitignore&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;base&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/base.html&#10;style&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/css/copo/style.css&#10;error&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/error_page.html&#10;annotation&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/css/copo/copo_annotations.css&#10;rat&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/schemas/utils/metadata_rating_templates/rating_template_v1.json&#10;api/a&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/api/annotate_views.py&#10;require&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt&#10;gener&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/generic_handlers.js&#10;copo_forms&#9;null&#9;null&#10;figsha&#9;null&#9;null&#10;figshare&#9;null&#9;null&#10;person&#9;FILE&#9;file:///Users/etuka/Dropbox/Dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/person.json&#10;copo_a&#9;FILE&#9;file:///Users/etuka/Dropbox/Dev/COPO/web/src/static/copo/js/copo_annotations.js&#10;html&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templatetags/html_tags.py&#10;copo_An&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_annotations.js&#10;copo_d&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/dal/copo_da.py" />
+    <property name="SearchEverywhereHistoryKey" value="lookup&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/lookup/lookup.py&#10;test&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/test_page.html&#10;ajax&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;copo_form&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_form_handlers.js&#10;copo_&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_submission.js&#10;test_submission&#9;null&#9;null&#10;urls&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/urls.py&#10;submission&#9;null&#9;null&#10;submi&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/submission/enaSubmission.py&#10;copo_sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;views&#9;null&#9;null&#10;VIEWS&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/wizard_views.py&#10;rest&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;copo_f&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_form_handlers.js&#10;aja&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;copo&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_form_handlers.js&#10;wizard&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py&#10;gene&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/generic_handlers.js&#10;forward_to&#9;null&#9;null&#10;middle&#9;null&#9;null&#10;wizard_vi&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/wizard_views.py&#10;ena&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/submission/enaSubmission.py&#10;setting&#9;FILE&#9;file:///Users/fshaw/Documents/dev/environments/django10/lib/python3.4/site-packages/chunked_upload/settings.py&#10;req&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt&#10;rest_ur&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;copo_s&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;enar&#9;null&#9;null&#10;copo_da&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/dal/copo_da.py&#10;url&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/rest_urls.py&#10;submiss&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission.html&#10;giti&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;annotat&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/copo_annotations.html&#10;git&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;gitignore&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/.gitignore&#10;base&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/base.html&#10;style&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/css/copo/style.css&#10;error&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templates/copo/error_page.html&#10;annotation&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/css/copo/copo_annotations.css&#10;rat&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/schemas/utils/metadata_rating_templates/rating_template_v1.json&#10;api/a&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/api/annotate_views.py&#10;require&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/annotator-2.0.0-alpha.3/doc/requirements.txt&#10;gener&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/generic_handlers.js&#10;copo_forms&#9;null&#9;null&#10;figsha&#9;null&#9;null&#10;figshare&#9;null&#9;null&#10;person&#9;FILE&#9;file:///Users/etuka/Dropbox/Dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/person.json&#10;copo_a&#9;FILE&#9;file:///Users/etuka/Dropbox/Dev/COPO/web/src/static/copo/js/copo_annotations.js&#10;html&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/web/apps/web_copo/templatetags/html_tags.py&#10;copo_An&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/static/copo/js/copo_annotations.js&#10;copo_d&#9;FILE&#9;file:///Users/fshaw/Dropbox/tgac_dev/prototypes/COPO/web/src/dal/copo_da.py" />
     <property name="add_unversioned_files" value="$PROJECT_DIR$/web/src/exceptions_and_logging/logs/2017-03-29.log&#10;true" />
     <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
   </component>
@@ -1694,7 +1686,14 @@
       <option name="project" value="LOCAL" />
       <updated>1505923166440</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="create xml utils">
+      <created>1506611266593</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1506611266593</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1818,10 +1817,18 @@
     <MESSAGE value="fixing missing rows crash in annotation of spreadsheets, adding skip rows option when loading to account for data not starting from row 1 of the spreadsheet, and fix for ols lookup returns sometimes displaying undefined" />
     <MESSAGE value="fixing bug in views where missing datafile_id in views causes page crash on datafile page load" />
     <MESSAGE value="create wizard for omics annotations" />
-    <option name="LAST_COMMIT_MESSAGE" value="create wizard for omics annotations" />
+    <MESSAGE value="create xml utils" />
+    <option name="LAST_COMMIT_MESSAGE" value="create xml utils" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/web/src/submission/enaSubmission.py</url>
+          <line>326</line>
+          <option name="timeStamp" value="320" />
+        </line-breakpoint>
+      </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
@@ -1832,7 +1839,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="320" />
+      <option name="time" value="321" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -2146,14 +2153,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4270">
-          <caret line="143" column="51" lean-forward="false" selection-start-line="143" selection-start-column="51" selection-end-line="143" selection-end-column="51" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="134">
@@ -2173,7 +2172,7 @@
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="123">
-          <caret line="102" column="0" lean-forward="true" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
+          <caret line="102" column="0" lean-forward="false" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
           <folding>
             <element signature="e#4724#5175#0" expanded="true" />
           </folding>
@@ -2193,7 +2192,7 @@
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_data.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="300">
-          <caret line="518" column="52" lean-forward="true" selection-start-line="518" selection-start-column="52" selection-end-line="518" selection-end-column="52" />
+          <caret line="518" column="52" lean-forward="false" selection-start-line="518" selection-start-column="52" selection-end-line="518" selection-end-column="52" />
           <folding>
             <element signature="e#18819#19246#0" expanded="true" />
             <element signature="e#18930#19230#0" expanded="true" />
@@ -2237,55 +2236,61 @@
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/ena_stages_ant.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="416">
-          <caret line="175" column="36" lean-forward="true" selection-start-line="175" selection-start-column="36" selection-end-line="175" selection-end-column="36" />
+          <caret line="175" column="36" lean-forward="false" selection-start-line="175" selection-start-column="36" selection-end-line="175" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="243">
+          <caret line="279" column="0" lean-forward="false" selection-start-line="279" selection-start-column="0" selection-end-line="279" selection-end-column="0" />
+          <folding>
+            <element signature="e#2736#2799#0" expanded="true" />
+            <element signature="e#2840#3027#0" expanded="true" />
+            <element signature="e#8468#8518#0" expanded="true" />
+            <element signature="e#8566#8719#0" expanded="true" />
+            <element signature="e#9787#9837#0" expanded="true" />
+            <element signature="e#14182#14280#0" expanded="true" />
+            <element signature="e#14318#14438#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="155">
+          <caret line="413" column="32" lean-forward="false" selection-start-line="413" selection-start-column="32" selection-end-line="413" selection-end-column="32" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="318" column="22" lean-forward="true" selection-start-line="318" selection-start-column="22" selection-end-line="318" selection-end-column="22" />
+        <state relative-caret-position="259">
+          <caret line="317" column="24" lean-forward="false" selection-start-line="317" selection-start-column="24" selection-end-line="317" selection-end-column="24" />
           <folding>
             <element signature="e#51#92#0" expanded="true" />
             <element signature="e#915#1161#0" expanded="true" />
             <element signature="e#1216#2527#0" expanded="true" />
-            <element signature="e#2719#9000#0" expanded="true" />
-            <element signature="e#9090#14435#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="285" column="19" lean-forward="false" selection-start-line="285" selection-start-column="19" selection-end-line="285" selection-end-column="19" />
-          <folding>
-            <element signature="e#2736#2799#0" expanded="true" />
-            <element signature="e#2840#3027#0" expanded="true" />
-            <element signature="e#8468#8518#0" expanded="true" />
-            <element signature="e#8566#8719#0" expanded="true" />
-            <element signature="e#8762#9707#0" expanded="true" />
-            <element signature="e#9853#9939#0" expanded="true" />
-            <element signature="e#10018#10068#0" expanded="true" />
-            <element signature="e#14413#14511#0" expanded="true" />
-            <element signature="e#14549#14669#0" expanded="true" />
+            <element signature="e#2719#9028#0" expanded="true" />
+            <element signature="e#9118#14463#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/submission/ena_xml_util.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="222" column="26" lean-forward="true" selection-start-line="222" selection-start-column="26" selection-end-line="222" selection-end-column="26" />
+        <state relative-caret-position="61">
+          <caret line="208" column="37" lean-forward="true" selection-start-line="208" selection-start-column="37" selection-end-line="208" selection-end-column="37" />
           <folding>
             <element signature="e#47#119#0" expanded="true" />
-            <element signature="e#274#1847#0" expanded="true" />
-            <element signature="e#1881#4219#0" expanded="true" />
-            <element signature="e#4255#6574#0" expanded="true" />
-            <element signature="e#8436#8626#0" expanded="true" />
-            <element signature="e#8653#8982#0" expanded="true" />
-            <element signature="e#9013#9087#0" expanded="true" />
+            <element signature="e#274#1857#0" expanded="true" />
+            <element signature="e#1891#4239#0" expanded="true" />
+            <element signature="e#4275#6604#0" expanded="true" />
+            <element signature="e#8466#8656#0" expanded="true" />
+            <element signature="e#8683#9012#0" expanded="true" />
+            <element signature="e#9043#9117#0" expanded="true" />
           </folding>
         </state>
       </provider>
