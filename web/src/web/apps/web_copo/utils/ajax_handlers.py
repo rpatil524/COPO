@@ -130,8 +130,9 @@ def get_samples_for_study(request):
     output = list()
     for s in samples:
         source = Source().get_record(s['derivesFrom'][0])
-        s.update(source)
-        output.append(s)
+        #s.update(source)
+        d = {"organism": source["organism"], "_id": s["_id"], "name": s["name"]}
+        output.append(d)
     return HttpResponse(json_util.dumps(output))
 
 def set_session_variable(request):

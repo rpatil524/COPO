@@ -6,6 +6,7 @@ from tools import resolve_env
 from django.conf import settings
 from dal.copo_da import DataFile
 from dal.copo_da import RemoteDataFile, Submission, Profile
+from django.http import HttpResponse
 
 from web.apps.web_copo.lookup.copo_enums import *
 
@@ -26,6 +27,7 @@ BASE_DIR = settings.BASE_DIR
 lg = settings.LOGGER
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
+import submission.ena_xml_util as xml
 
 
 class EnaSubmit(object):
@@ -91,7 +93,7 @@ class EnaSubmit(object):
             cmd = "./ascp -d -QT -l700M -L- {f_str!s} {user_name!s}:{remote_path!s}".format(**locals())
             lg.log(cmd, level=Loglvl.INFO, type=Logtype.FILE)
             os.chdir(path2library)
-
+            '''
             try:
                 thread = pexpect.spawn(cmd, timeout=None)
                 thread.expect(["assword:", pexpect.EOF])
@@ -167,7 +169,7 @@ class EnaSubmit(object):
                                             estimated_completion += eta_token + t_u[indx] + " "
                                         fields['estimated_completion'] = estimated_completion
                             RemoteDataFile().update_transfer(transfer_token, fields)
-
+                
                 kwargs = dict(target_id=sub_id, completed_on=datetime.now())
                 Submission().save_record(dict(), **kwargs)
                 # close thread
@@ -179,11 +181,25 @@ class EnaSubmit(object):
                                 message='There appears to be an issue with EBI.')
             finally:
                 pass
+            '''
 
+        if self.submission['repository'] == 'ena-seq':
+            self.do_seq_reads_submission(sub_id, remote_path, transfer_token)
+        elif self.submission['repository'] == 'ena-ant':
+            xmlvar = self.do_annotation_submission(sub_id, remote_path, transfer_token)
+            with open('/Users/fshaw/Desktop/output.xml', 'w+') as f:
+                #return xmlvar
+                f.write(xmlvar)
+
+
+
+
+
+    def do_seq_reads_submission(self, sub_id, remote_path, transfer_token):
         # # setup paths for conversion directories
         conv_dir = os.path.join(self._dir, sub_id)
         if not os.path.exists(os.path.join(conv_dir, 'json')):
-             os.makedirs(os.path.join(conv_dir, 'json'))
+            os.makedirs(os.path.join(conv_dir, 'json'))
         json_file_path = os.path.join(conv_dir, 'json', 'isa_json.json')
         xml_dir = conv_dir
         xml_path = os.path.join(xml_dir, 'run_set.xml')
@@ -209,7 +225,7 @@ class EnaSubmit(object):
         sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
         datafilehashes = conv.get_datafilehashes()
         json2sra.convert(json_fp=open(json_file_path), path=conv_dir, sra_settings=sra_settings,
-                          datafilehashes=datafilehashes, validate_first=False)
+                         datafilehashes=datafilehashes, validate_first=False)
 
         # finally submit to SRA
         lg.log('Submitting XMLS to ENA via CURL', level=Loglvl.INFO, type=Logtype.FILE)
@@ -228,12 +244,11 @@ class EnaSubmit(object):
             **locals())
 
         curl_cmd = 'curl -k -F "SUBMISSION=@' + submission_file + '" \
-         -F "PROJECT=@' + os.path.join(remote_path, project_file) + '" \
-         -F "SAMPLE=@' + os.path.join(remote_path, sample_file) + '" \
-         -F "EXPERIMENT=@' + os.path.join(remote_path, experiment_file) + '" \
-         -F "RUN=@' + os.path.join(remote_path, run_file) + '"' \
+                 -F "PROJECT=@' + os.path.join(remote_path, project_file) + '" \
+                 -F "SAMPLE=@' + os.path.join(remote_path, sample_file) + '" \
+                 -F "EXPERIMENT=@' + os.path.join(remote_path, experiment_file) + '" \
+                 -F "RUN=@' + os.path.join(remote_path, run_file) + '"' \
                    + '   "' + ena_uri + '"'
-
 
         output = subprocess.check_output(curl_cmd, shell=True)
         lg.log(output, level=Loglvl.INFO, type=Logtype.FILE)
@@ -295,3 +310,11 @@ class EnaSubmit(object):
         Submission().save_record(dict(), **s)
         RemoteDataFile().delete_transfer(transfer_token)
         return True
+
+
+    def do_annotation_submission(self, sub_id, remote_path, transfer_token):
+        study = xml.do_study_xml(sub_id)
+        sample = xml.do_sample_xml(sub_id)
+        analysis = xml.do_analysis_xml(sub_id)
+        submission = xml.do_submission_xml(sub_id)
+        return submission

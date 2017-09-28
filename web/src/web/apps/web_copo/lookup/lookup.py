@@ -789,3 +789,11 @@ ISA_SCHEMAS = {
     'protocol_schema': '/schemas/copo/dbmodels/protocol_schema.json',
     'protocol_parameter_schema': '/schemas/copo/dbmodels/protocol_parameter_schema.json',
 }
+
+REPO_NAME_LOOKUP = {
+    'ena-ant': 'Sequence Annotation',
+    'ena-asm': 'Sequence Assembly',
+    'ena-seq': 'Sequence Reads',
+    'figshare': 'Figshare',
+    'dcterms': 'Dataverse'
+}

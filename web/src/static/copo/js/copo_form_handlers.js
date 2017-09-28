@@ -1400,10 +1400,7 @@ var dispatchFormControl = {
     do_dataverse_author: function do_dataverse_author(formElem) {
         alert('abc')
     },
-    do_label: function (formElem, elemValue) {
-        alert(formElem)
-        alert(elemValue)
-    }
+
 };
 
 

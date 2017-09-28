@@ -133,7 +133,7 @@ def get_figshare_publish_options():
 
 def get_existing_study_options():
     from dal.copo_da import Submission
-    subs = Submission().get_all_records()
+    subs = Submission().get_complete()
     out = list()
     out.append({
         "value": "required",
@@ -144,6 +144,7 @@ def get_existing_study_options():
         "label": "Not in COPO"
     })
     for s in subs:
+
         out.append(
             {
                 "value": s['profile_id'],

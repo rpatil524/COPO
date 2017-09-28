@@ -243,6 +243,13 @@ class Person(DAComponent):
     def __init__(self, profile_id=None):
         super(Person, self).__init__(profile_id, "person")
 
+    def get_people_for_profile(self):
+        docs = self.get_collection_handle().find({'profile_id': self.profile_id})
+        if docs:
+            return docs
+        else:
+            return False
+
     def create_sra_person(self):
         """
         creates an (SRA) person record and attach to profile
@@ -272,6 +279,16 @@ class Person(DAComponent):
             self.save_record(auto_fields, **kwargs)
 
         return
+
+    
+    def has_inform_on_status_role(self):
+        sra_roles = list()
+        return all()
+
+
+    def has_inform_on_error_role(self):
+        sra_roles = list()
+        return all(x in sra_roles for x in ['SRA Inform On Error'])
 
 
 class Source(DAComponent):
@@ -412,6 +429,13 @@ class Submission(DAComponent):
         return self.get_collection_handle().find_one({'accessions.mongo_file_id': mongo_file_id},
                                                      {'_id': 0, 'accessions.$': 1})
 
+    def get_complete(self):
+        complete_subs = self.get_collection_handle().find({'complete': True})
+        return complete_subs
+
+    def get_ena_type(self):
+        subs = self.get_collection_handle().find({'repository': {'$in': ['ena-ant', 'ena-seq', 'ena-asm']}})
+        return subs
 
 class DataFile(DAComponent):
     def __init__(self, profile_id=None):

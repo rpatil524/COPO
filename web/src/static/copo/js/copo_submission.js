@@ -127,7 +127,7 @@ function build_submission_table() {
 
 
             var row = $('<tr class="submission_row" data-submission_id="' + element._id.$oid + '"></tr>')
-            $(row).append('<td class="repo_cell"">' + element.repository + '</td>')
+            $(row).append('<td class="repo_cell"">' + element.display_name + '</td>')
             $(row).append('<td style="cursor: pointer"><a data-toggle="modal" data-target="#accessionModal">Files / Accessions <span style="vertical-align: middle" class="fa fa-info-circle fa-2x"></span></a></td>')
             $(row).append('<td>' + element.date_created + '</td>')
             $(row).append('<td class="status">' + element.status + '</td>')
@@ -665,6 +665,4 @@ function get_accession_info(e) {
             }
         }
     })
-
-
 }

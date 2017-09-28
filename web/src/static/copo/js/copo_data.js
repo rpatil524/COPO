@@ -507,15 +507,17 @@ $(document).ready(function () {
     function handle_wizard_study_dropdown_onchange(event) {
         var val = $(event.currentTarget).val()
         if (val == "none") {
+            $('#sample_copo').find('option').remove().end().append('<option value="none"></option>')
             $('#sample_copo').attr('disabled', 'disabled')
             $('#study_ena').removeAttr('disabled')
             $('#sample_ena').removeAttr('disabled')
         }
         else {
+
             $('#study_ena').attr('disabled', 'disabled')
             $('#sample_ena').attr('disabled', 'disabled')
             $('#sample_copo').removeAttr('disabled')
-            // now get samples in stufy
+            // now get samples in study
             var csrftoken = $.cookie('csrftoken');
             $.ajax(
                 {
@@ -526,11 +528,13 @@ $(document).ready(function () {
                     method: 'POST'
                 }
             ).done(function(data){
+                $('#sample_copo').find('option').remove()
                 $(data).each(function(idx, element){
                     var option = $('<option/>',{
                         html: element['name'] + ' (' + element['organism']['annotationValue'] + ')',
-                        value: element['_id']
+                        value: element['_id']['$oid']
                     })
+
                     $('#sample_copo').append(option)
                 })
 

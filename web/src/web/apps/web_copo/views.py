@@ -20,7 +20,7 @@ from allauth.account.forms import LoginForm
 from dal.copo_da import Annotation
 from bson import json_util as j
 from dal.figshare_da import Figshare
-from web.apps.web_copo.lookup.lookup import FIGSHARE_API_URLS
+from web.apps.web_copo.lookup.lookup import FIGSHARE_API_URLS, REPO_NAME_LOOKUP
 import requests
 import ast
 import web.apps.web_copo.lookup.lookup as lkup
@@ -282,11 +282,13 @@ def copo_submissions(request, profile_id):
 
 @login_required
 def copo_get_submission_table_data(request):
+
     profile_id = request.POST.get('profile_id')
     submission = Submission(profile_id=profile_id).get_all_records()
     for s in submission:
         s['date_created'] = s['date_created'].strftime('%d %b %Y - %I:%M %p')
         s['date_modified'] = s['date_modified'].strftime('%d %b %Y - %I:%M %p')
+        s['display_name'] = REPO_NAME_LOOKUP[s['repository']]
         if s['complete'] == 'false' or s['complete'] == False:
             s['status'] = 'Pending'
         else:
