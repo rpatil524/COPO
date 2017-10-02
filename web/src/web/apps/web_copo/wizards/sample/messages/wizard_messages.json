@@ -7,7 +7,7 @@
       "text_class": "text-default"
     },
     "confirm_initial_sample_generation": {
-      "title": "Confirm Sample Generation",
+      "title": "Sample Generation",
       "text": "The specified number of samples will now be generated using the sample attributes you've entered. <br/><br/>Click <strong>Continue</strong> if you are happy to go ahead and generate the samples. <br/>Note: In the next stage, you will be able to modify attribute values for individual samples. <br/>Click <strong>Review</strong> to modify the attributes entries you've so far made.",
       "text_class": "text-default"
     },
@@ -24,8 +24,8 @@
       "text_class": "text-default"
     },
     "exit_wizard_message": {
-      "title": "Confirm Wizard Exit",
-      "text": "Are you sure you want to exit the wizard?",
+      "title": "Discard Description",
+      "text": "Are you sure you want to discard the current description?",
       "text_class": "text-default"
     },
     "discard_description_message": {

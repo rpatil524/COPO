@@ -39,12 +39,14 @@
 {% endblock browse_header_block %}
 
 {% block page_tile %}
-    <div class="row" style="margin-bottom:30px;">
-        <div class="col-sm-12 col-md-12 col-lg-12 copo-page-headers"></div>
+    <div class="row" style="margin-bottom:70px;">
+        <div class="col-sm-5 col-md-5 col-lg-5 copo-page-headers"></div>
+        <div class="col-sm-7 col-md-7 col-lg-7 copo-page-icons"></div>
     </div>
 {% endblock page_tile %}
 
 {% block content %}
+
     <!-- test -->
 
     <!-- end test -->
@@ -64,10 +66,14 @@
                                     <strong>COPO Profile: </strong>
                                     <p>The first step to getting work done in COPO is to create a work profile. A
                                         profile is a collection of 'research objects' or components that form part of
-                                        your research project or study. Use the <span class='fa-stack text-primary'><i
-                                                class='fa fa-circle fa-stack-2x'></i><i
-                                                class='fa fa-plus fa-stack-1x fa-inverse'></i></span> button on the page
-                                        to create a new profile.</p></li>
+                                        your research project or study. Use the
+                                        <button class="circular mini ui icon primary button">
+                                            <i class="icon add sign"></i>
+                                        </button>
+                                        button on the page
+                                        to create a new profile.
+                                    </p>
+                                </li>
                                 <li>
                                     <strong>Profile Components: </strong>
                                     <p>Once you have created a work profile, you can start creating components within
@@ -77,11 +83,14 @@
                                 <li>
                                     <strong>Quick Tour: </strong>
                                     <p>Finally, if you've not done so already, take some time to explore the various
-                                        controls available on the page. Click the <span class='fa-stack'
-                                                                                        style='color:#e68a00;'><i
-                                                class='fa fa-circle fa-stack-2x'></i><i
-                                                class='fa fa-lightbulb-o fa-stack-1x fa-inverse'></i></span> icon on the
-                                        page to activate the quick tour agent.</p></li>
+                                        controls available on the page. Click the
+                                        <button class="circular mini ui icon orange button">
+                                            <i class="icon lightbulb"></i>
+                                        </button>
+                                        icon on the
+                                        page to activate the quick tour agent.
+                                    </p>
+                                </li>
                             </ol>
                         </div>
                     </div>
@@ -91,9 +100,10 @@
     </div>
 
     <!-- profile table -->
-    <div data-copo-tour-id="profile_table"></div> <!-- div used by the quick tour agent -->
+    <div id="component_table_loader" class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5" data-copo-tour-id="profile_table"></div>
+    <!-- div used by the quick tour agent -->
     <div id="profile_table_div">
-        <table id="copo_profiles_table" class="table hover table-striped table-bordered copo-noborders-table"
+        <table id="copo_profiles_table" class="ui celled table copo-noselect-table copo-noborders-table"
                cellspacing="0" width="100%">
         </table>
     </div>
@@ -102,9 +112,7 @@
 
 {% block help_section %}
 
-    <!-- placeholder for contextual help -->
-    <div class="context-help-request">fndndnnd</div>
-
+    <!-- sidebar -->
 
 {% endblock %}
 

@@ -43,11 +43,11 @@
       "text_class": "text-default"
     },
     "exit_wizard_message": {
-      "text": "You have opted to exit the wizard. Your current description will be saved, and you can carry on describing at a later time. <br/><br/>Are you sure you want to exit the wizard?",
+      "text": "You have opted to exit the current description. Your entries will be saved, and you can carry on describing the datafiles at a later time. <br/><br/>Are you sure you want to exit the description?",
       "text_class": "text-default"
     },
     "confirm_bundling_action": {
-      "text": "The selected datafiles will be described as a bundle, and may potentially be submitted as a bundle to the same repository. <br/><br/>Do you want to go ahead with the description?",
+      "text": "The selected datafiles will be described as a 'bundle', and may potentially be submitted together to the same repository. <br/><br/>Do you want to go ahead with the description?",
       "text_class": "text-default"
     },
     "inherit_metadata_message": {
@@ -63,11 +63,11 @@
       "text_class": "text-default"
     },
     "discard_description_message": {
-      "text": "You have selected to discard description. Please note that all description metadata associated with bundle items will be permanently removed from the system. <br/><br/>Are you sure you want to discard description?",
+      "text": "You have selected to discard the current description. Please note that all description metadata associated with bundle items will be deleted if you choose to proceed. <br/><br/>Are you sure you want to discard the current description?",
       "text_class": "text-default"
     },
     "delete_description_message": {
-      "text": "Are you sure you want to go ahead and delete description metadata for the selected files? <br/><div style='color:red; margin-top:20px;'>Please note that files currently being described will not be affected by this action.</div>",
+      "text": "Are you sure you want to go ahead and delete description metadata for the selected files?",
       "text_class": "text-default"
     },
     "stage_dependency_message": {
@@ -75,7 +75,8 @@
       "text_class": "text-default"
     },
     "empty_bundle_message": {
-      "text": "You are about to remove the last item in the description bundle. Please note that this action will cause the wizard to be cleared as well. Do you want to continue? ",
+      "title": "Remove Bundle Item",
+      "text": "You are about to remove an item from the description bundle. <br/><br/>If this is the last item in the bundle, then removing it will automatically exit the wizard. <br/><br/>Do you want to go ahead and remove the bundle item? ",
       "text_class": "text-warning"
     },
     "no_metadata_bundle_items": {
@@ -93,7 +94,7 @@
       ]
     },
     "no_metadata_selected_bundle_items": {
-      "text": "There are items in the bundle with no assigned metadata for this description stage! <br/><br/> Do you want to continue without describing the affected items?",
+      "text": "There are items in the bundle with no assigned metadata for the current description stage! <br/><br/> Do you want to move on to the next stage without supplying metadata for the affected items?",
       "text_class": "text-warning"
     },
     "metadata_selected_bundle_items": {
@@ -111,7 +112,7 @@
       ]
     },
     "metadata_bundle_items": {
-      "text": "Are you sure you want to overwrite existing metadata, with the new entry, for items in the description bundle?",
+      "text": "Existing metadata may have changed for items in the description bundle. <br/> How do you want to proceed?",
       "text_class": "text-warning",
       "text_options": [
         {
@@ -129,7 +130,7 @@
       "text_class": "text-info"
     },
     "description_bundle_select_message": {
-      "text": "You have chosen 'to apply to selected'. Please be aware that any metadata supplied in this stage will apply only to selected items in the description bundle: <ol> <li>Select the items in the bundle for which this description applies</li> <li>Click the apply button to save your entries</li> <li>Repeat steps 1. and 2. for as many subsets of items in the description bundle as required</li> </ol> Click <b>Next</b>, when done, to proceed.",
+      "text": "Please supply metadata for individual or group of files in the description bundle. You can click <span class='fa-stack' style='color:green; font-size:12px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> beside a record to enter metadata, and click 'Apply to item' to commit the changes. If there are more records in the bundle, the next record will be automatically highlighted. You can also: <ol> <li>Select one or more datafiles in the bundle</li><li> Using the main form, enter metadata for the selected files</li> <li>Click the apply button to save your entries</li> <li>Repeat steps 1 - 3 for as many subsets of items in the description bundle as required</li> </ol> Click <b>Next</b>, when done, to proceed.",
       "text_class": "text-info"
     },
     "singular_stage_message": {

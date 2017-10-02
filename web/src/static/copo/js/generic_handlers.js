@@ -3,7 +3,7 @@ var AnnotationEventAdded = false;
 var selectizeObjects = Object(); //stores reference to selectize objects initialised on the page
 var copoVisualsURL = "/copo/copo_visualize/";
 var csrftoken = $.cookie('csrftoken');
-var quickTourMessages = Object(); //holds quick tour messages
+var quickTourMessages = quick_tour_messages(); //holds quick tour messages
 var quickTourArray = []; //holds quick tour elements
 var quickTourFlag = true; //flag to decide whether or not to display quick tour
 
@@ -11,9 +11,6 @@ $(document).ready(function () {
     var componentName = $("#nav_component_name").val();
 
     setup_autocomplete()
-
-    //set up help tips events
-    do_help_tips_event();
 
     //set up copo-multi-search component lookup
     do_multi_search_lookup();
@@ -23,6 +20,12 @@ $(document).ready(function () {
 
     //global_help_call
     do_global_help(componentName);
+
+    //context help event
+    do_context_help_event();
+
+    //input fields help tips event
+    set_inputs_help();
 
 });
 
@@ -39,7 +42,6 @@ function setup_autocomplete() {
             auto_complete();
             AnnotationEventAdded = true;
         }
-
     })
     auto_complete();
 }
@@ -184,7 +186,7 @@ function do_render_table(data) {
                         rndHTML += '<a data-action-target="row" data-record-action="' +
                             bTns[i].btnAction + '" data-record-id="' +
                             rdata[rdata.length - 1] +
-                            '" data-toggle="tooltip" style="display: inline-block; white-space: normal;" title="' +
+                            '" data-toggle="tooltip" data-container="body" style="display: inline-block; white-space: normal;" title="' +
                             bTns[i].text + '" class="' + bTns[i].className + ' btn-xs"><i class="' +
                             bTns[i].iconClass + '"> </i><span></span></a>&nbsp;';
                     }
@@ -426,8 +428,6 @@ function refresh_tool_tips() {
 
     refresh_range_slider();
     auto_complete();
-
-    do_help_tips_event();
 
     setup_datepicker();
 
@@ -874,6 +874,78 @@ function get_data_list_panel(itemData, link) {
     return $('<div/>').append(containerFuild).html();
 }
 
+
+function deconvulate_column_data(itemData, link) {
+    if (!itemData) {
+        return "";
+    }
+
+    if (Object.prototype.toString.call(itemData) === '[object String]') {
+        return itemData;
+    }
+
+    var resolvedDiv = $('<table/>');
+
+    var itemData = [itemData];
+
+    itemData.forEach(function (entry) {
+        var iRow = $('<tr/>').css("background-color", "transparent");
+
+        resolvedDiv.append(iRow);
+
+        var labelCol = $('<td/>');
+
+        var valueCol = $('<td/>');
+
+        iRow.append('');
+        iRow.append(valueCol);
+
+        // labelCol.append(entry.title);
+
+        var valueNode = [];
+        if (Object.prototype.toString.call(entry) === '[object String]') {
+            valueNode.push(entry);
+        } else if (Object.prototype.toString.call(entry) === '[object Array]') {
+            entry.forEach(function (item) {
+                if (Object.prototype.toString.call(item) === '[object String]') {
+                    valueNode.push(item);
+                } else {
+                    var valueNode_sub = [];
+                    item.forEach(function (item_sub) {
+                        if (Object.prototype.toString.call(item_sub) === '[object String]') {
+                            valueNode.push(item_sub);
+                        } else if (Object.prototype.toString.call(item_sub) === '[object Object]') {
+                            $.each(item_sub, function (key, val) {
+                                valueNode_sub.push(format_camel_case(key) + ":  " + val);
+                            });
+                        }
+                    });
+
+                    if (valueNode_sub.length > 0) {
+                        valueNode.push(valueNode_sub.join("<br/>"));
+                    }
+                }
+
+            });
+        }
+
+        var breakr = $('<div/>', {
+            style: "border-top: 1px solid rgba(34, 36, 38, 0.1);"
+        });
+
+        if (valueNode.length > 1) {
+            valueCol.append(valueNode[0]);
+            for (var i = 1; i < valueNode.length; ++i) {
+                valueCol.append(breakr.clone().append(valueNode[i]));
+            }
+        } else {
+            valueCol.append(valueNode.join("<br/>"));
+        }
+    });
+
+    return resolvedDiv;
+}
+
 function get_data_item_collapse(link, itemData, itemCount) {
     // create badge
     var badgeSpan = $('<span/>', {
@@ -934,24 +1006,75 @@ function format_camel_case(xter) {
 
 }
 
+function build_description_display(data) {
+    //this is a specialised counterpart to the function 'build_attributes_display()',
+    // but handles datafile description metadata
+
+    var resolvedTable = $('<table/>');
+
+    for (var j = 0; j < data.description.length; ++j) {
+        var Ddata = data.description[j];
+
+        var i = 0; //need to change this to reflect stage index...actually suppressing that on purpose for now
+
+        var iRow = $('<tr/>');
+
+        var labelCol = $('<td/>').attr('colspan', 2).append(Ddata.title);
+        iRow.append(labelCol);
+
+        var valueCol = $('<div/>');
+        labelCol.append(valueCol);
+
+        for (var k = 0; k < Ddata.data.length; ++k) {
+            var Mdata = Ddata.data[k];
+
+            var mDataDiv = $('<tr/>', {
+                //class: "row"
+            });
+
+            var mDataDivLabel = $('<td/>', {
+                //class: "col-sm-5 col-md-5 col-lg-5",
+                html: Mdata.label
+            });
+
+            var mDataDivData = $('<td/>', {
+                //class: "col-sm-7 col-md-7 col-lg-7",
+            });
+
+            mDataDiv.append(mDataDivLabel).append(mDataDivData);
+
+            var displayedValue = "";
+
+            if (Object.prototype.toString.call(Mdata.data) === '[object Array]') {
+                Mdata.data.forEach(function (vv) {
+                    displayedValue += "<div>" + vv + "</div>";
+                });
+            } else if (Object.prototype.toString.call(Mdata.data) === '[object String]') {
+                displayedValue = String(Mdata.data);
+            }
+
+            mDataDivData.append(displayedValue);
+
+            valueCol.append(mDataDiv);
+        }
+
+        resolvedTable.append(iRow);
+    }
+
+    return resolvedTable;
+}
+
 function build_attributes_display(data) {
-    var resolvedDiv = $('<div/>');
+    var resolvedTable = $('<table/>');
 
     data.component_attributes.forEach(function (entry) {
-        var iRow = $('<div/>', {
-            class: "row",
-            style: "border-bottom: 1px solid #ddd;"
-        });
+        var iRow = $('<tr/>');
 
-        resolvedDiv.append(iRow);
+        resolvedTable.append(iRow);
 
-        var labelCol = $('<div/>', {
-            class: "col-sm-5 col-md-5 col-lg-5"
-        });
+        var labelCol = $('<td/>');
 
-        var valueCol = $('<div/>', {
-            class: "col-sm-7 col-md-7 col-lg-7"
-        });
+        var valueCol = $('<td/>');
 
         iRow.append(labelCol);
         iRow.append(valueCol);
@@ -982,7 +1105,7 @@ function build_attributes_display(data) {
 
 
         var breakr = $('<div/>', {
-            style: "border-top: 1px solid #f4f7fc;"
+            style: "border-top: 1px solid rgba(34, 36, 38, 0.1);"
         });
 
         if (valueNode.length > 1) {
@@ -995,7 +1118,7 @@ function build_attributes_display(data) {
         }
     });
 
-    return resolvedDiv;
+    return resolvedTable;
 }
 
 function get_collapsible_panel(panelType) {
@@ -1074,21 +1197,18 @@ function get_panel(panelType) {
     return $('<div/>').append(panel).clone();
 }
 
-function get_reusable_messages(messageKey) {
-    var globalUIMessages = {
-        "select_records_task": "No records selected! Please select one or more records to perform a task.",
-        "no_defined_task_record": "No task defined for the selected record!",
-        "no_defined_task_records": "No task defined for the selected records!",
-        "task_to_perform_record": "What task do you want to perform on the selected record?",
-        "task_to_perform_records": "What task do you want to perform on the selected records?",
-    }
+function get_component_meta(component) {
+    var componentMeta = null;
+    var components = get_profile_components();
 
-    var message = '';
-    if (globalUIMessages.hasOwnProperty(messageKey)) {
-        message = globalUIMessages[messageKey];
-    }
+    components.forEach(function (comp) {
+        if (comp.component == component) {
+            componentMeta = comp;
+            return false;
+        }
+    });
 
-    return message;
+    return componentMeta
 }
 
 function get_profile_components() {
@@ -1096,56 +1216,95 @@ function get_profile_components() {
         {
             component: 'profile',
             title: 'Work Profiles',
-            buttons: ["quick-tour-template", "new-profile-template"],
-            panels: ["help-panel-template"]
-        },
-        {
-            component: 'datafile',
-            title: 'Datafiles',
-            iconClass: "fa fa-database",
-            countsKey: "num_data",
-            buttons: ["quick-tour-template"],
-            colorClass: "data_color" //specifies the color
+            buttons: ["quick-tour-template", "new-component-template"],
+            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
+            tableID: 'copo_profiles_table',
+            visibleColumns: 3,
+            recordActions: ["add_record_all", "edit_record_single", "delete_record_multi", "summarise_record_single"] //specifies action buttons for records manipulation
         },
         {
             component: 'sample',
             title: 'Samples',
             iconClass: "fa fa-filter",
+            semanticIcon: "filter", //semantic UI equivalence of fontawesome icon
             countsKey: "num_sample",
+            buttons: ["quick-tour-template", "new-samples-template"],
+            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
+            colorClass: "samples_color",
+            color: "olive",
+            tableID: 'sample_table',
+            recordActions: ["describe_record_all", "edit_record_single", "delete_record_multi"],
+            visibleColumns: 3 //no of columns to be displayed, if tabular data is required. remaining columns will be displayed in a sub-table
+        },
+        {
+            component: 'datafile',
+            title: 'Datafiles',
+            iconClass: "fa fa-database",
+            semanticIcon: "database",
+            countsKey: "num_data",
+            colorClass: "data_color",
+            color: "black",
             buttons: ["quick-tour-template"],
-            colorClass: "samples_color"
+            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
+            tableID: 'datafile_table',
+            recordActions: ["describe_record_multi", "undescribe_record_multi", "edit_record_single", "delete_record_multi"],
+            visibleColumns: 3
         },
         {
             component: 'submission',
             title: 'Submissions',
             iconClass: "fa fa-envelope",
+            semanticIcon: "mail outline",
             countsKey: "num_submission",
             buttons: ["quick-tour-template"],
-            colorClass: "submissions_color"
+            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
+            colorClass: "submissions_color",
+            color: "green",
+            tableID: 'submission_table',
+            recordActions: ["summarise_record_single"],
+            visibleColumns: 3
         },
         {
             component: 'publication',
             title: 'Publications',
             iconClass: "fa fa-paperclip",
+            semanticIcon: "attach",
             countsKey: "num_pub",
-            buttons: ["quick-tour-template"],
-            colorClass: "pubs_color"
+            buttons: ["quick-tour-template", "new-component-template"],
+            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
+            colorClass: "pubs_color",
+            color: "orange",
+            tableID: 'publication_table',
+            recordActions: ["add_record_all", "edit_record_single", "delete_record_multi"],
+            visibleColumns: 4
         },
         {
             component: 'person',
             title: 'People',
             iconClass: "fa fa-users",
+            semanticIcon: "users",
             countsKey: "num_person",
-            buttons: ["quick-tour-template"],
-            colorClass: "people_color"
+            buttons: ["quick-tour-template", "new-component-template"],
+            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
+            colorClass: "people_color",
+            color: "red",
+            tableID: 'person_table',
+            recordActions: ["add_record_all", "edit_record_single", "delete_record_multi"],
+            visibleColumns: 5
         },
         {
             component: 'annotation',
             title: 'Annotations',
             iconClass: "fa fa-pencil",
+            semanticIcon: "write",
             countsKey: "num_annotation",
-            buttons: ["quick-tour-template",],
-            colorClass: "annotations_color"
+            buttons: ["quick-tour-template", "new-component-template"],
+            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help", "copo-sidebar-annotate"],
+            colorClass: "annotations_color",
+            color: "violet",
+            tableID: 'annotation_table',
+            recordActions: ["delete_record_multi"],
+            visibleColumns: 10000
         }
     ];
 
@@ -1170,7 +1329,9 @@ function do_page_controls(componentName) {
     }
 
 
-    var pageHeaders = $(".copo-page-headers"); //holds page and global buttons
+    var pageHeaders = $(".copo-page-headers"); //page header/icons
+    var pageIcons = $(".copo-page-icons"); //profile component icons
+    var sideBar = $(".copo-sidebar"); //sidebar panels
 
     var PageTitle = $('<span/>', {
         class: "page-title-custom",
@@ -1180,61 +1341,61 @@ function do_page_controls(componentName) {
 
     pageHeaders.append(PageTitle);
 
-    return;
+
+    //create panels
+    if (component.sidebarPanels) {
+        var sidebarPanels = $(".copo-sidebar-templates").clone();
+        var sidebarPanels2 = sidebarPanels.clone();
+        sidebarPanels.find(".nav-tabs").html('');
+        sidebarPanels.find(".tab-content").html('');
+        $(".copo-sidebar-templates").remove();
 
 
-    //create other buttons types for lhcolumn; component buttons group goes in the right hand side
+        component.sidebarPanels.forEach(function (item) {
+            sidebarPanels.find(".nav-tabs").append(sidebarPanels2.find(".nav-tabs").find("." + item));
+            sidebarPanels.find(".tab-content").append(sidebarPanels2.find(".tab-content").find("." + item));
+        });
 
+        sideBar
+            .append(sidebarPanels.find(".nav-tabs"))
+            .append(sidebarPanels.find(".tab-content"));
+
+
+    }
+
+    //create buttons
     component.buttons.forEach(function (item) {
-        // if (item == "components_quick_nav") {
-        //     // add right hand side buttons
-        //     var componentsDIV = $('<div/>', {
-        //         class: "pull-right"
-        //     });
-        //
-        //     rhColumn.append(componentsDIV);
-        //
-        //     var components = get_profile_components();
-        //     components.forEach(function (comp) {
-        //         if (comp.component == component.component || comp.component == "profile") {
-        //             return false;
-        //         }
-        //
-        //         var componentBTN = $('<a/>', {
-        //             class: "btn btn-sm copo-btn-grps " + comp.colorClass,
-        //             style: "margin-right: 3px; font-size: 10px;",
-        //             href: $("#" + comp.component + "_url").val(),
-        //             title: "Navigate to " + comp.title + " page"
-        //         });
-        //
-        //         var componentICON = $('<i/>', {
-        //             class: "copo-components-icons " + comp.iconClass,
-        //             style: "color: rgb(255, 255, 255);",
-        //         });
-        //
-        //         var componentTXT = $('<span/>', {
-        //             class: "icon_text",
-        //             style: "color: #ffffff; padding-left: 3px;",
-        //             html: comp.title
-        //         });
-        //
-        //         componentBTN.append(componentICON).append(componentTXT);
-        //
-        //
-        //         componentsDIV.append(componentBTN);
-        //
-        //     });
-        //
-        // } else {
-        //     try {
-        //         var liButton = $("#" + item).find(".list-inline-item").clone();
-        //         lULElem.append(liButton);
-        //     } catch (e) {
-        //         ;
-        //     }
-        // }
+        if (component.buttons) {
+            component.buttons.forEach(function (item) {
+                pageHeaders.append($("." + item)).append("<span>&nbsp;</span>");
+            });
+        }
     });
 
+    //...and profile component buttons
+    if (componentName != "profile") {
+        var pcomponentHTML = $(".pcomponents-icons-templates").clone().removeClass("pcomponents-icons-templates");
+        var pcomponentAnchor = pcomponentHTML.find(".pcomponents-anchor").clone().removeClass("pcomponents-anchor");
+        pcomponentHTML.find(".pcomponents-anchor").remove();
+
+        pageIcons.append(pcomponentHTML);
+
+        for (var i = 1; i < components.length; ++i) {
+            var comp = components[i];
+            if ((comp.component == componentName) || (comp.component == "profile")) {
+                continue;
+            }
+
+            var newAnchor = pcomponentAnchor.clone();
+            pcomponentHTML.append(newAnchor);
+
+            newAnchor.attr("title", "Navigate to " + comp.title);
+            newAnchor.attr("href", $("#" + comp.component + "_url").val());
+            newAnchor.find("i")
+                .addClass(comp.color)
+                .addClass(comp.semanticIcon);
+        }
+    }
 
     //refresh components...
     quick_tour_event();
@@ -1274,47 +1435,11 @@ function refresh_webpop(elem, title, content, exrta_meta) {
 function toggle_display_help_tips(state, parentElement) {
     if (!state) {
         parentElement.find(".copo-form-group").webuiPopover('destroy');
+        parentElement.find(".copo-form-group").attr("data-helptip", "no");
     } else {
-        do_help_tips_event();
+        parentElement.find(".copo-form-group").attr("data-helptip", "yes");
     }
 }
-
-function do_help_tips_event() {
-    //help tips events
-
-    $(document).find(".copo-form-group").each(function () {
-        var elem = $(this);
-
-        var title = elem.find("label").html();
-        var content = "";
-        if (elem.find(".form-input-help").length) {
-            content = (elem.find(".form-input-help").html());
-        }
-
-        var refresh = true; //flag for instantiating popover on element
-
-        if (!(content || title)) { //only display if element has a content or title
-            refresh = false;
-        }
-
-        //also, check for help display button
-        if (elem.closest(".formDivRow").length && elem.closest(".formDivRow").siblings(".helpDivRow").length) {
-            var toolTipCtrl = elem.closest(".formDivRow").siblings(".helpDivRow").find(".copo-help-chk");
-
-            if (toolTipCtrl.length) {
-                //helptip check control present, get its state if it's been initialised
-                if (elem.closest(".formDivRow").siblings(".helpDivRow").find(".bootstrap-switch-container").length) {
-                    refresh = toolTipCtrl.bootstrapSwitch('state');
-                }
-            }
-        }
-
-        if (refresh) {
-            refresh_webpop(elem, title, content, {});
-        }
-
-    });
-} //end of func
 
 function do_multi_search_lookup() {
     //handle hover info for copo-select control types
@@ -1384,31 +1509,6 @@ function get_spinner_image() {
     return loaderObject.clone();
 }
 
-function build_help_pane_menu(helpObject, parentObject) {
-    $.each(helpObject, function (key, val) {
-        var liElem = $('<li/>', {
-            class: "component-help",
-            "data-component": key
-        });
-
-        var aElem = $('<a/>', {
-            href: "#",
-            style: "padding-left: 10px",
-        });
-
-        var divElem = $('<div/>', {
-            style: "padding: 5px 5px 0px 0px;",
-            html: '<span><i style="padding-right: 5px;" class="fa fa-circle-o" aria-hidden="true"></i>' + val.title + '</span>'
-        });
-
-        aElem.append(divElem);
-
-        liElem.append(aElem);
-
-        parentObject.append(liElem);
-    });
-}
-
 function sanitise_help_list(contextHelpList) {
     var dataSet = [];
 
@@ -1421,6 +1521,9 @@ function sanitise_help_list(contextHelpList) {
             option["title"] = dtd[i].title;
             option["content"] = dtd[i].content;
             option["context"] = dtd[i].context;
+            var helpID = Math.random() + Math.random() + Math.random();
+            helpID = helpID.toString();
+            option["help_id"] = "context_help_" + i + "_" + helpID.replace(".", "_");
             dataSet.push(option);
         }
     }
@@ -1430,54 +1533,112 @@ function sanitise_help_list(contextHelpList) {
 
 function do_context_help(data) {
     //does current page request context help?
+    var tableID = 'page-context-help';
+    var helpComponent = $("#" + tableID);
 
-    //context-help-request test: if true then page requests context help control to be added
-    if (!$(".context-help-request").length) {
+    //if true then page requests context help control to be added
+    if (!helpComponent.length) {
         return false;
     }
 
 
-    $(".context-help-request").append($("#ctrl_contextual_help_component").children(":first").clone());
-
-
     var dtd = sanitise_help_list(data);
-    var elem = $('.context-help-ctrl');
+
+    //set data
+    var table = null;
+
+    if ($.fn.dataTable.isDataTable('#' + tableID)) {
+        //if table instance already exists, then do refresh
+        table = $('#' + tableID).DataTable();
+    }
+
+    if (table) {
+        //clear old, set new data
+        table
+            .clear()
+            .draw();
+        table
+            .rows
+            .add(dataSet);
+        table
+            .columns
+            .adjust()
+            .draw();
+        table
+            .search('')
+            .columns()
+            .search('')
+            .draw();
+    } else {
+        table = $('#' + tableID).DataTable({
+            data: dtd,
+            searchHighlight: true,
+            "lengthChange": false,
+            order: [
+                [0, "asc"]
+            ],
+            pageLength: 5,
+            language: {
+                "info": " _START_ to _END_ of _TOTAL_ topics",
+                "lengthMenu": "_MENU_ tips",
+                "search": " ",
+            },
+            columns: [
+                {
+                    "data": "id",
+                    "visible": false
+                },
+                {
+                    "orderable": false,
+                    "width": "2%",
+                    "data": null,
+                    "render": function (data, type, row, meta) {
+                        var iconSpan = '<span data-target="' + data.help_id + '" class="side-help-trigger" aria-hidden="true" title="View help content"></span>';
+
+                        var parentDiv = $('<div></div>');
+                        parentDiv.append(iconSpan);
+
+                        return $('<div></div>').append(parentDiv).html();
+                    }
+                },
+                {
+                    "data": null,
+                    "title": "Help Topics",
+                    "render": function (data, type, row, meta) {
+                        var helpTopicID = data.help_id;
+
+                        var helpTitleDiv = $('<div></div>')
+                            .attr("id", "title_" + helpTopicID)
+                            .html('<div>' + data.title + '</div>');
+
+                        var helpContentDiv = $('<div></div>')
+                            .attr("id", helpTopicID)
+                            .attr("class", "collapse context-help-collapse")
+                            .css("margin-top", "10px")
+                            .html('<div>' + data.content + '</div>');
 
 
-    elem.selectize({
-        maxItems: 1,
-        valueField: 'id',
-        labelField: 'title',
-        searchField: ['title', 'content', 'context'],
-        onChange: function (value) {
-            if (value) {
-                var result = $.grep(dtd, function (e) {
-                    return e.id == value;
-                });
-
-                if (result.length) {
-                    elem.closest(".panel-body").find(".context-help-display").html(result[0].content);
+                        return $('<div></div>').append(helpTitleDiv).append(helpContentDiv).html();
+                    }
+                },
+                {
+                    "data": "content",
+                    "visible": false
                 }
-            } else {
-                elem.closest(".panel-body").find(".context-help-display").html('');
-            }
-        },
-        options: dtd,
-        create: false
-    });
+            ],
+            dom: 'lft<"row">rip',
+            "columnDefs": [{
+                "orderData": 0,
+            }]
+        });
+    }
 
-    //add events
-    elem.closest(".panel").find(".panel-details-control").click(function (e) {
-        var triggerElem = $(this);
-        if (elem.closest(".panel").find(".panel-body").is(':visible')) {
-            triggerElem.closest("div").removeClass("shown");
-            elem.closest(".panel").find(".panel-body").css("display", "none");
-        } else {
-            triggerElem.closest("div").addClass("shown");
-            elem.closest(".panel").find(".panel-body").css("display", "block");
-        }
-    });
-
+    $('#' + tableID + '_wrapper')
+        .find(".dataTables_filter")
+        .find("input")
+        .removeClass("input-sm")
+        .attr("placeholder", "Search Help")
+        .attr("size", 30);
 }
 
 function do_global_help(component) {
@@ -1497,7 +1658,6 @@ function do_global_help(component) {
             //set quick tour message and trigger display event
             try {
                 do_context_help(data.context_help);
-                quickTourMessages = data.quick_tour_messages;
                 quickTourFlag = data.quick_tour_flag;
 
                 if (quickTourFlag && data.user_has_email) {
@@ -1604,7 +1764,7 @@ function set_component_help(helpEntryKey, tableID, helpJSON) {
                             .html(data.title);
 
                         panelVar.find(".panel-collapse").attr("id", collapseId);
-                        panelVar.find(".panel-collapse").find(".panel-body").html('<div class="webpop-content-div" ">' + data.content + '</div>');
+                        panelVar.find(".panel-collapse").find(".panel-body").html('<div class="webpop-content-div">' + data.content + '</div>');
 
                         return $('<div></div>').append(panelVar).html();
                     }
@@ -1625,10 +1785,62 @@ function set_component_help(helpEntryKey, tableID, helpJSON) {
         .css("color", "#fff");
 }
 
+function do_context_help_event() {
+    //handles collapsing of help topics
+
+    $(document).on('click', '.side-help-trigger', function (e) {
+        var dataTargetID = $(this).attr('data-target');
+
+        if ($(this).parent().hasClass("shown")) {
+            $(this).parent().removeClass("shown");
+            $("#" + dataTargetID).collapse("hide");
+        } else {
+            $(this).parent().addClass("shown");
+            $("#" + dataTargetID).collapse("show");
+        }
+    });
+}
+
+function set_inputs_help() {
+    $(document).on("focus", ".copo-form-group", function (event) {
+        var elem = $(this);
+
+        if (elem.attr("data-helptip") == "no") { //help turned off
+            return false;
+        }
+
+        if (!(elem.find(".form-input-help").length)) {
+            return false;
+        }
+
+        var title = elem.find("label").html();
+        var content = elem.find(".form-input-help").html();
+
+        elem.webuiPopover('destroy');
+
+        elem.webuiPopover({
+            title: title,
+            content: '<div class="webpop-content-div">' + content + '</div>',
+            trigger: 'sticky',
+            width: 300,
+            arrow: true,
+            closeable: true,
+            animation: 'fade',
+            placement: 'right',
+        });
+
+    });
+
+    $(document).on("blur", ".copo-form-group", function (event) {
+        $(this).webuiPopover('destroy');
+    });
+}
+
+
 function dialog_display(dialog, dTitle, dMessage, dType) {
     var dTypeObject = {
-        "warning": "fa fa-exclamation-circle copo-icon-warning",
-        "danger": "fa fa-times-circle copo-icon-danger",
+        "warning": '<div class="circular ui large basic red icon button"><i class="large icon remove"></i></div>',
+        "danger": '<div class=" ui  basic red icon button"><i class=" icon remove"></i></div>',
         "info": "fa fa-exclamation-circle copo-icon-info"
     };
 
@@ -1638,9 +1850,7 @@ function dialog_display(dialog, dTitle, dMessage, dType) {
         dTypeClass = dTypeObject[dType];
     }
 
-    var iconElement = $('<div/>', {
-        class: dTypeClass + " wizard-alert-icon"
-    });
+    var iconElement = $(dTypeClass);
 
 
     var messageDiv = $('<div/>', {
@@ -1653,7 +1863,7 @@ function dialog_display(dialog, dTitle, dMessage, dType) {
     $dialogContent.append('<div class="copo-custom-modal-message">' + messageDiv.html() + '</div>');
     dialog.realize();
     dialog.setClosable(false);
-    dialog.setSize(BootstrapDialog.SIZE_NORMAL);
+    dialog.setSize(BootstrapDialog.SIZE_SMALL);
     dialog.getModalHeader().hide();
     dialog.setTitle(dTitle);
     dialog.setMessage($dialogContent);
@@ -1702,7 +1912,7 @@ function quick_tour_event() {
             '</i>&nbsp; Take Tour</a>';
 
 
-        var messageContent = 'Do you want to take a quick tour of the page? <br/><span style="color: #35637e;">Please note that your screen will go dim, and regular page elements might be rendered temporarily inactive in the quick tour mode.</span>' + '<hr/>' + takeTour + dismissTour;
+        var messageContent = 'Do you want to take a quick tour of the page? <br/><br/><span style="color: #35637e;">Please note that your screen will be dimmed, and regular page elements inaccessible in the quick tour mode.</span>' + '<hr/>' + takeTour + dismissTour;
 
         $(this).webuiPopover('destroy');
 
@@ -1796,3 +2006,73 @@ function quick_tour_select() {
         }
     }
 } //end of func
+
+function quick_tour_messages() {
+    var qt = {
+        "description": "Provides messages for creating quick tour of system components/elements:",
+        "properties": {
+            "new_profile_button": {
+                "title": "Create New Profile",
+                "content": "Click here to create a new Profile. A COPO Profile is a collection of 'research objects' or components that form part of a research project or study."
+            },
+            "documentation_button": {
+                "title": "Documentation",
+                "content": "Click here to access COPO's documentation."
+            },
+            "global_notification_button": {
+                "title": "Notification Component",
+                "content": "Click this button to view system notifications."
+            },
+            "global_user_authenticated_button": {
+                "title": "Authenticated User",
+                "content": "Click here to access the following tasks: <ul><li>View your ORCiD profile</li><li>View obtained tokens</li><li>Logout of the system</li></ul>"
+            },
+            "profile_links_button_group": {
+                "title": "Profile Links",
+                "content": "Shortcut buttons for accessing profile components."
+            },
+            "copo_data_upload_tab": {
+                "title": "File Upload Tab",
+                "content": "Select this tab to access the file upload view. <br/>For more information about this control, including a demonstration of its usage, please use the help component."
+            },
+            "copo_data_inspect_tab": {
+                "title": "File Inspect Tab",
+                "content": "Select this tab to view files uploaded to COPO. <br/>For more information about this control, including a demonstration of its usage, please use the help component."
+            },
+            "copo_data_describe_tab": {
+                "title": "File Describe Tab",
+                "content": "Select this tab to view the file description wizard and files currently being described. <br/>For more information about this control, including a demonstration of its usage, please use the help component."
+            },
+            "copo_data_upload_file_button": {
+                "title": "Upload File Button",
+                "content": "Click this button to upload files to COPO. Multiple files can be selected and uploaded at once. <p>Uploaded files are displayed in the <strong>Inspect</strong> pane. "
+            },
+            "datafile_table_describe": {
+                "title": "Describe Button",
+                "content": "Use this button to activate the datafile description wizard. Please note that one or more files must be selected before clicking the describe button. Once clicked, the view will change to display the wizard, where the target datafiles may be described."
+            },
+            "profile_details_panel": {
+                "title": "Profile Details",
+                "content": "View a profile details here having selected a profile record."
+            },
+            "page_context_help_panel": {
+                "title": "Help",
+                "content": "Interact with the help pane to find help topics relevant to the page and/or current task."
+            },
+            "profile_table": {
+                "title": "Profile Records",
+                "content": "Profile records list.<ol><li>Click the <span class='fa-stack' style='color:green; font-size:10px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> button beside a record to view details</li><li>Click on a column header to sort by the column</li><li>Use the table search tool to filter the displayed list based on matched terms</li></ol>"
+            },
+            "new_publication_button": {
+                "title": "Create New Publication",
+                "content": "Click here to create a new Publication. You will be provided with the following options: <ol><li>Manually enter a new publication record using the publication form</li><li>Resolve a Digital Object Identifier (DOI) to retrieve a target publication record from an external service</li><li>Resolve a PubMed ID to retrieve a target publication record from an external service</li></ol>"
+            },
+            "page_activity_panel": {
+                "title": "Task",
+                "content": "Interact with the task pane to perform available tasks on selected records. <ol><li>Select one or more records by clicking on target rows</li><li>Select the required task from available tasks to perform</li></ol>"
+            }
+        }
+    }
+
+    return qt.properties;
+}

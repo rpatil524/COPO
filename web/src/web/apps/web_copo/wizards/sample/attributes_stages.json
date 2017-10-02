@@ -5,7 +5,7 @@
     {
       "ref": "sample_attributes",
       "title": "Sample Attributes",
-      "message": "Enter the attributes that describe your sample(s). <br/><span style='color:#a94442;'>Please note: cloned sample attributes may not completely capture your metadata requirement. Please check carefully to ensure that you are happy with the presented attributes and that they meet your metadata requirement!</span>",
+      "message": "Enter the attributes that describe your sample(s). <br/><span style='color:#a94442;'>Note: Cloned sample attributes may not entirely capture your intended metadata attribution. Please check carefully to ensure that you are happy with the presented attributes, and that they meet your metadata requirement!</span>",
       "items": [
 
       ]

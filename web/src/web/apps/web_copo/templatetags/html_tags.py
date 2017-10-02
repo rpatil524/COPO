@@ -224,41 +224,31 @@ def generate_table_records(profile_id=str(), component=str()):
 
     data_set = list()
     columns = list()
-    col_flag = True
 
+    # get columns
+    for f in schema:
+        if f.get("show_in_table", True):
+            columns.append(dict(data=f["id"].split(".")[-1],
+                                title=f.get("label", str())))
+
+    # add record id column
+    columns.append(dict(data="record_id"))
+
+    # get records
     for pr in records:
         option = dict()
 
         for f in schema:
             if f.get("show_in_table", True):
-
                 # add data
                 option[f["id"].split(".")[-1]] = resolve_control_output(pr, f)
-
-                # add column
-                if col_flag:
-                    columns.append(dict(data=f["id"].split(".")[-1],
-                                        title=f.get("label", str())))
 
         # add record id
         option["record_id"] = str(pr["_id"])
 
         data_set.append(option)
-        col_flag = False
-
-    # add record id column
-    columns.append(dict(data="record_id"))
-
-    # define action buttons
-
-    button_templates = d_utils.get_button_templates()
-    action_buttons = [button_templates["edit_record_single"],
-                      button_templates["delete_record_multi"],
-                      button_templates["summarise_record_single"]
-                      ]
 
     return_dict = dict(dataSet=data_set,
-                       action_buttons=action_buttons,
                        columns=columns,
                        )
 
@@ -369,20 +359,7 @@ def generate_copo_profiles_data(profiles=list()):
 
         data_set.append(temp_set)
 
-    # include action buttons that would be applied to records of this component.
-    # Action buttons are divided into categories:
-    # (1) 'single' - if the button's action is intended to impact a single record
-    # (2) 'multi' - if the buttons's action is intended to impact multiple records
-
-    button_templates = d_utils.get_button_templates()
-    action_buttons = [button_templates["edit_record_single"],
-                      button_templates["delete_record_multi"],
-                      button_templates["summarise_record_single"]
-                      ]
-
-    return_dict = dict(dataSet=data_set,
-                       action_buttons=action_buttons
-                       )
+    return_dict = dict(dataSet=data_set)
 
     return return_dict
 
@@ -484,6 +461,7 @@ def get_resolver(data, elem):
     func_map["copo-multi-select"] = resolve_copo_multi_select_data
     func_map["copo-multi-search"] = resolve_copo_multi_search_data
     func_map["select"] = resolve_select_data
+    func_map["copo-button-list"] = resolve_select_data
     func_map["ontology term"] = resolve_ontology_term_data
     func_map["copo-select"] = resolve_copo_select_data
     func_map["datetime"] = resolve_datetime_data

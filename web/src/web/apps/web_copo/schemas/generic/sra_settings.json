@@ -3,7 +3,7 @@
   "title": "SRA Settings",
   "properties": {
     "sra_center": "TGAC",
-    "sra_broker": "TGAC",
+    "sra_broker": "COPO",
     "sra_action": "ADD",
     "sra_broker_contact_name": "COPO support",
     "sra_broker_inform_on_status": "support@copo.org",

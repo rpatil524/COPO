@@ -29,6 +29,7 @@ $(document).ready(function () {
     $(document).on('click', '#annotations_table tbody tr', select_from_annotation_list)
     $(document).on('click', '.delete_annotation', delete_annotation)
     $('.ajax_loading_div').css('visibility', 'hidden')
+    $('.copo-sidebar-tabs.nav-tabs a[href="#copo-sidebar-annotate"]').tab('show');
 
     //******************************Event Handlers Block*************************//
     // get table data to display via the DataTables API
@@ -56,6 +57,11 @@ $(document).ready(function () {
         }
     });
 
+    //add new component button
+    $(document).on("click", ".new-component-template", function (event) {
+        initiate_annotation_call();
+    });
+
     // handle/attach events to table buttons
     $('body').on('addbuttonevents', function (event) {
         tableID = event.tableID;
@@ -69,6 +75,7 @@ $(document).ready(function () {
 
     //******************************Functions Block******************************//
     function do_record_task(elem) {
+        console.log(elem);
         var task = elem.attr('data-record-action').toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
         var taskTarget = elem.attr('data-action-target'); //is the task targeting a single 'row' or group of 'rows'?
         var ids = [];
@@ -134,23 +141,23 @@ function show_help() {
 
 function show_controls() {
     $('#help_tips').hide()
-    $('#annotation_panel').show()
+    // $('#annotation_panel').show()
     $('#annotation_list').show()
     auto_complete();
 }
 
-function show_annotation_list(){
+function show_annotation_list() {
     $('#help_tips').hide()
     $('#annotation_list').show()
 }
 
 function hide_controls() {
-    $('#annotation_panel').hide()
+    // $('#annotation_panel').hide()
     $('#help_tips').hide()
     $('#annotation_list').hide()
 }
 
-function remove_ss_controls(){
+function remove_ss_controls() {
     $('#annotation_panel').hide()
 }
 
@@ -227,10 +234,10 @@ function load_ss_data(e) {
 function _beforeOnCellMouseDown(event, coords, element) {
     // prevent clicks in the leftmost column doing anything
     /*
-    if (coords.col == 0) {
-        event.stopImmediatePropagation();
-    }
-    */
+     if (coords.col == 0) {
+     event.stopImmediatePropagation();
+     }
+     */
 }
 
 
@@ -353,10 +360,10 @@ function add_line_to_annotation_table(line_data) {
 function delete_annotation(e, replacement) {
     // function called when delete button is clicked on annotation list
     var tr;
-    if ('currentTarget' in e){
+    if ('currentTarget' in e) {
         tr = $(e.currentTarget).closest('tr')
     }
-    else{
+    else {
         tr = e;
     }
 

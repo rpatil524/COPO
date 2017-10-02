@@ -116,12 +116,14 @@ def get_accession_data(request):
     sub_id = request.GET.get('sub_id')
     sub = Submission().get_file_accession(sub_id)
 
-
-
     return HttpResponse(json_util.dumps({'sub': sub}))
 
+
 def set_session_variable(request):
-    key = request.POST['key']
-    value = request.POST['value']
-    request.session[key] = value
+    try:
+        key = request.POST['key']
+        value = request.POST['value']
+        request.session[key] = value
+    except:
+        pass
     return HttpResponse(True)

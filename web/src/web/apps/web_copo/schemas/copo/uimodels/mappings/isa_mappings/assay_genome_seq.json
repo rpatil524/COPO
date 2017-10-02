@@ -24,7 +24,7 @@
       "control": "text"
     },
     {
-      "help_tip": "",
+      "help_tip": "Enter the name and version of the quality scoring software",
       "required": "false",
       "default_value": "",
       "control_meta": {},
@@ -43,7 +43,7 @@
       "ontology_names": []
     },
     {
-      "help_tip": "",
+      "help_tip": "Enter the name and version of the base or color calling software",
       "required": "false",
       "default_value": "",
       "control_meta": {},
@@ -80,7 +80,7 @@
       "control": "file"
     },
     {
-      "help_tip": "",
+      "help_tip": "Specify whether to expect single, paired, or other configuration of reads",
       "required": "false",
       "default_value": "",
       "control_meta": {},
@@ -156,7 +156,7 @@
       "control": "text"
     },
     {
-      "help_tip": "",
+      "help_tip": "Select the sequencing technique intended for this library",
       "required": "false",
       "default_value": "",
       "control_meta": {},
@@ -198,7 +198,7 @@
       "control": "text"
     },
     {
-      "help_tip": "",
+      "help_tip": "Select the sequencing technique intended for this library",
       "required": "false",
       "default_value": "",
       "control_meta": {},
@@ -227,7 +227,7 @@
       ]
     },
     {
-      "help_tip": "",
+      "help_tip": "Select the method that was used to select for or against, enrich, or screen the material being sequenced",
       "required": "false",
       "default_value": "",
       "control_meta": {},
@@ -293,7 +293,7 @@
       "control": "text"
     },
     {
-      "help_tip": "",
+      "help_tip": "Specify the sequencing instrument model and make",
       "required": "false",
       "default_value": "",
       "control_meta": {},

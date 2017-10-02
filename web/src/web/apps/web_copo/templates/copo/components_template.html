@@ -1,77 +1,274 @@
 <div id="components_templates" style="display: none;">
-    <!-- Panel template -->
-    <div class="panel-template">
-        <div class="panel panel-info">
-            <div class="panel-heading">Panel Heading</div>
+
+    <!-- Alert templates -->
+    <div class="alert-templates">
+        <div class="alert alert-success alert-dismissable fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <span class="webpop-content-div alert-message"></span>
+        </div>
+        <div class="alert alert-info alert-dismissable fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <span class="webpop-content-div alert-message"></span>
+        </div>
+        <div class="alert alert-warning alert-dismissable fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <span class="webpop-content-div alert-message"></span>
+        </div>
+        <div class="alert alert-danger alert-dismissable fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <span class="webpop-content-div alert-message"></span>
+        </div>
+    </div>
+
+    <!-- Record actions templates to be placed alongside data tables
+     "description": "Provides templates for composing reusable buttons. 'btnType' can either be: "
+                   "(1) 'single' - if the button's action is intended to impact just a single record (e.g., edit), "
+                   "(2) 'multi' - if the buttons's action is intended to impact one or more records,"
+                   "(3) 'all' - always true, and none dependent of row selections e.g., add button",
+    -->
+    <div class="record-action-templates">
+        <div class="add_record_all tiny ui basic dtables-dbuttons  blue button copo-dt"
+             data-toggle="tooltip"
+             data-container="body"
+             data-action="add"
+             data-error-message=""
+             data-btntype="all"
+             title="Add new record"
+             tabindex="0">
+            <i class=" fa fa-plus"></i>
+            <span class="action-label" style="padding-left: 3px;">Add</span>
+        </div>
+
+        <div class="describe_record_all tiny ui basic dtables-dbuttons  blue button copo-dt"
+             data-toggle="tooltip"
+             data-container="body"
+             data-action="describe"
+             data-error-message=""
+             data-btntype="all"
+             title="Describe"
+             tabindex="0">
+            <i class=" fa fa-tags"></i>
+            <span class="action-label" style="padding-left: 3px;">Describe</span>
+        </div>
+
+        <div class="describe_record_multi tiny ui basic dtables-dbuttons  blue button copo-dt"
+             data-toggle="tooltip"
+             data-container="body"
+             data-action="describe"
+             data-error-message="Please select one or more records to describe"
+             data-btntype="multi"
+             title="Describe datafiles"
+             tabindex="0">
+            <i class=" fa fa-tags"></i>
+            <span class="action-label" style="padding-left: 3px;">Describe</span>
+        </div>
+
+        <div class="undescribe_record_multi tiny ui basic dtables-dbuttons red button copo-dt"
+             data-toggle="tooltip"
+             data-container="body"
+             data-action="discard"
+             data-error-message="Please select one or more records to discard metadata"
+             data-btntype="multi"
+             title="Discard description metadata"
+             tabindex="0">
+            <i class=" fa fa-times"></i>
+            <span class="action-label" style="padding-left: 3px;">Discard</span>
+        </div>
+
+        <div class="edit_record_single tiny ui basic dtables-dbuttons  green button copo-dt"
+             data-toggle="tooltip"
+             data-container="body"
+             data-action="edit"
+             data-error-message="Please select a single record to edit"
+             data-btntype="single"
+             title="Edit record"
+             tabindex="0">
+            <i class=" fa fa-pencil-square-o"></i>
+            <span class="action-label" style="padding-left: 3px;">Edit</span>
+        </div>
+
+        <div class="delete_record_multi tiny ui basic dtables-dbuttons  red button copo-dt"
+             data-toggle="tooltip"
+             data-container="body"
+             data-action="delete"
+             data-error-message="Please select one or more records to delete"
+             data-btntype="multi"
+             title="Delete records"
+             tabindex="0">
+            <i class=" fa fa-trash-o"></i>
+            <span class="action-label" style="padding-left: 3px;">Delete</span>
+        </div>
+
+        <div class="summarise_record_single tiny ui basic dtables-dbuttons  teal button copo-dt"
+             data-toggle="tooltip"
+             data-container="body"
+             data-action="summarise"
+             data-error-message="Please select a single record to summarise"
+             data-btntype="single"
+             title="Summarise record"
+             tabindex="0">
+            <i class=" fa fa-info"></i>
+            <span class="action-label" style="padding-left: 3px;">Summarise</span>
+        </div>
+    </div>
+
+    <!-- Datatables row Panel template -->
+    <div class="datatables-panel-template">
+        <div class="panel panel-default" style="border: none;">
+            <div class="panel-heading" style="background-image: none; border: none;">
+                <div class="row">
+                    <div class="col-sm-10 col-md-10 col-lg-10 row-title">
+                    </div>
+                    <div class="col-sm-2 col-md-2 col-lg-2">
+                        <div class="pull-right row-select-icon">
+                            <i class="fa fa-square-o" title="Toggle record selection"
+                               style="cursor: pointer; font-size: 16px; display: block;"
+                               aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="panel-body">Panel Content</div>
         </div>
     </div>
 
     <!-- Quick tour button template -->
-    <div class="quick-tour-template">
-        <li class="list-inline-item" data-toggle="tooltip" title="Quick Tour" style="padding: 0px;">
-            <a class="takeatour" style="text-decoration: none;" href="#" role="button"
-               aria-haspopup="true"
-               aria-expanded="false">
-            <span class="fa-stack" style="color:rgba(230, 138, 0,1.0);">
-                <i class="fa fa-circle fa-stack-2x"></i>
-                <i class="fa fa-lightbulb-o fa-stack-1x fa-inverse copo-cbtns"></i>
-            </span>
-            </a>
-        </li>
+    <button data-toggle="tooltip" title="Quick tour"
+            class="circular ui icon orange button takeatour quick-tour-template">
+        <i class="icon lightbulb"></i>
+    </button>
+
+    <!-- New component button template -->
+    <button data-toggle="tooltip" title="Add new record" class="circular ui icon primary button new-component-template">
+        <i class="icon add sign"></i>
+    </button>
+
+    <!-- describe sample button template -->
+    <button data-toggle="tooltip" title="Describe samples" class="circular ui icon primary button new-samples-template">
+        <i class="icon tags sign"></i>
+    </button>
+
+
+    <!-- record tasks button -->
+    <button data-toggle="tooltip" title="Record tasks" class="circular mini ui icon button record-tasks-template">
+        <i class="icon tasks"></i>
+    </button>
+
+
+    <!-- profile components button template -->
+    <a data-toggle="tooltip" class="mini ui labeled button pcomponent-button" tabindex="0" style="margin: 3px;">
+        <div class="mini ui button pcomponent-color">
+            <i class="pcomponent-icon "></i>
+            <span class="pcomponent-name" style="padding-left: 3px;"></span>
+        </div>
+        <div class="mini ui basic pcomponent-color left pointing label">
+            <span class="pcomponent-count"><i class='fa fa-spinner fa-pulse' style="font-size: 10px;"></i></span>
+        </div>
+    </a>
+
+    <div class="ui right floated main menu pcomponents-icons-templates">
+        <a class="icon item pcomponents-anchor" data-toggle="tooltip" title="" href="">
+            <i class="ui icon"></i>
+        </a>
     </div>
 
-    <!-- New profile button template -->
-    <div class="new-profile-template">
-        <li class="list-inline-item" data-toggle="tooltip" title="Add new profile" style="padding: 0px;">
-            <a class="new-form-call" style="text-decoration: none;" href="#" role="button"
-               data-copo-tour-id="new_profile_button"
-               data-component="profile">
-            <span class="fa-stack text-primary">
-                <i class="fa fa-circle fa-stack-2x"></i>
-                <i class="fa fa-plus fa-stack-1x fa-inverse copo-cbtns"></i>
-            </span>
-            </a>
-        </li>
-    </div>
+    <!-- sidebar tabs -->
+    <div class="copo-sidebar-templates">
+        <ul class="nav nav-tabs copo-sidebar-tabs">
+            <li class=" copo-sidebar-info"><a data-toggle="tab" href="#copo-sidebar-info"
+                                                    data-copo-tour-id="page_alert_panel">Info</a></li>
+            <li class="active copo-sidebar-help"><a data-toggle="tab" href="#copo-sidebar-help"
+                                             data-copo-tour-id="page_context_help_panel">Help</a></li>
+            <li class="copo-sidebar-annotate"><a data-toggle="tab" href="#copo-sidebar-annotate"
+                                                 data-copo-tour-id="copo_annotation_panel">Annotate</a></li>
+        </ul>
 
-    <!-- New publication button template -->
-    <div class="new-publication-template">
-        <li data-copo-tour-id="new_publication_button" class="list-inline-item" data-toggle="tooltip"
-            title="Add new publication" style="padding: 0px;">
-            <a style="text-decoration: none;" href="#" role="button" data-toggle="collapse" data-target="#pub_options">
-            <span class="fa-stack text-primary">
-                <i class="fa fa-circle fa-stack-2x"></i>
-                <i class="fa fa-plus fa-stack-1x fa-inverse copo-cbtns"></i>
-            </span>
-            </a>
-        </li>
-    </div>
-
-    <!-- Help panel template - sidebar component -->
-    <div class="help-panel-template">
-        <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-12">
-                <div class="panel panel-info">
-                    <div class="panel-heading" data-copo-tour-id="page_context_help_panel"
-                         style="background-image:none;">
-                        <div class="row">
-                            <div class="col-sm-10 col-md-10 col-lg-10">
-                                <strong>Help</strong>
-                            </div>
-                            <div class="col-sm-2 col-md-2 col-lg-2 shown">
-                                <span class="pull-right panel-details-control"></span>
+        <div class="tab-content">
+            <div id="copo-sidebar-info" class="tab-pane fade copo-sidebar-info">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="panel panel-dtables">
+                            <div class="panel-body collapse in" id="page_alert_panel"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="copo-sidebar-help" class="tab-pane fade in active  copo-sidebar-help">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="panel panel-dtables">
+                            <div class="panel-body collapse in" id="page_context_help_panel">
+                                <table id="page-context-help" class="table hover copo-noborders-table"
+                                       cellspacing="0"
+                                       width="100%"></table>
                             </div>
                         </div>
                     </div>
-                    <div class="panel-body panel-content-div">
-                        <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12">
-                                <select class="context-help-ctrl" placeholder="Select a help topic..."></select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12 context-help-display">
+                </div>
+            </div>
+            <div id="copo-sidebar-annotate" class="tab-pane fade copo-sidebar-annotate">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="panel panel-dtables">
+                            <div class="panel-body collapse in" id="copo_annotation_panel">
+                                <div id="annotation_panel">
+                                    Type in the box below to see possible ontological descriptors for the column
+                                    selected.
+                                    <h3 class="h3">Selected Column:&nbsp <span class="label label-primary"
+                                                                               id="selected_column_name">None Selected</span>
+                                    </h3>
+
+
+                                    <label for="ontology_filter_button">Choose Ontology</label>
+                                    <div class="dropdown ontology_dropdown">
+                                        <div class="medium ui basic button dropdown-toggle"
+                                                id="ontology_filter_button"
+                                                data-toggle="dropdown"
+                                                aria-haspopup="true" aria-expanded="true">
+                                            <span class="ontology_label">All Ontologies</span>
+                                            <span class="caret"></span>
+                                        </div>
+                                        <ul class="dropdown-menu" id="ontology_dropdown_filter"
+                                            aria-labelledby="dropdownMenu1">
+                                            <a>
+                                                <li class="ontology_dd_item" data-name="All Ontologies" data-id="">
+                                <span class="h5">
+                                    <span class="ontology_dd_name">All Ontologies</span>
+                                    <br/>
+                                    <small class="ontology_dd_description">Search all ontologies for terms.</small>
+                                </span>
+                                                </li>
+                                            </a>
+                                        </ul>
+                                    </div>
+
+                                    <input type="text" class="form-control ontology-field form-control-file"
+                                           id="an-column"
+                                           aria-describedby="fileHelp"
+                                           data-autocomplete="/copo/ajax_search_ontology/999/"/>
+                                </div>
+
+
+                                <div id="annotation_list">
+
+                                    <hr/>
+                                    Current Annotations
+                                    <table id="annotations_table">
+                                        <thead>
+                                        <tr>
+                                            <th>Column</th>
+                                            <th>Annotation</th>
+                                            <th>Ontology</th>
+                                            <th>Reference</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -79,4 +276,5 @@
             </div>
         </div>
     </div>
+
 </div>

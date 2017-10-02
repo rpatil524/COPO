@@ -83,6 +83,25 @@
       "required": "false",
       "default_value": "",
       "control_meta": {},
+      "control": "Ontology term",
+      "versions": [
+        "roles"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "id": "copo.person.roles",
+      "label": "Roles",
+      "show_in_form": true,
+      "ref": "Investigation Person Roles",
+      "type": "array",
+      "show_in_table": true,
+      "ontology_names": []
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
       "versions": [
         "phone"
       ],
@@ -150,25 +169,6 @@
       "type": "string",
       "show_in_table": true,
       "control": "text"
-    },
-    {
-      "help_tip": "",
-      "required": "false",
-      "default_value": "",
-      "control_meta": {},
-      "control": "Ontology term",
-      "versions": [
-        "roles"
-      ],
-      "deprecated": false,
-      "hidden": "false",
-      "id": "copo.person.roles",
-      "label": "Roles",
-      "show_in_form": true,
-      "ref": "Investigation Person Roles",
-      "type": "array",
-      "show_in_table": true,
-      "ontology_names": []
     },
     {
       "help_tip": "",

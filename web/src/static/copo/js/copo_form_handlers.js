@@ -43,63 +43,11 @@ $(document).ready(function () {
             console.log(err);
         }
 
-        var errorMsg = "Couldn't build " + component + " form!";
-
         if (component == 'annotation') {
-            $('#processing_div').hide()
-            $('#file_picker_modal').modal('show')
-            $("#form_submit_btn").on('click', function () {
-                var formData = new FormData();
-                formData.append('file', $('#InputFile')[0].files[0]);
-                formData.append('file_type', $('#file_type_dropdown').val())
-                var csrftoken = $.cookie('csrftoken');
-                var url = "/api/upload_annotation_file/"
-                $.ajax({
-                    url: url,
-                    type: "POST",
-                    headers: {'X-CSRFToken': csrftoken},
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'json'
-                }).done(function (e) {
-                    // add mongo id to document data
-                    $(document).data('mongo_id', e._id.$oid)
-                    $('#annotation_table_wrapper').hide()
-                    $('#annotation_content').show()
-
-                    if (e.type == 'PDF Document') {
-                        $(document).data('annotator_type', 'txt')
-                        load_txt_data(e)
-                    }
-                    else if (e.type == 'Spreadsheet') {
-                        $(document).data('annotator_type', 'ss')
-                        load_ss_data(e)
-                    }
-
-                    setup_annotator()
-                    $('#file_picker_modal').modal('hide')
-                });
-            })
+            initiate_annotation_call();
         }
         else {
-
-            $.ajax({
-                url: copoFormsURL,
-                type: "POST",
-                headers: {'X-CSRFToken': csrftoken},
-                data: {
-                    'task': 'form',
-                    'component': component
-                },
-                success: function (data) {
-                    json2HtmlForm(data);
-                    componentData = data;
-                },
-                error: function () {
-                    alert(errorMsg);
-                }
-            });
+            initiate_form_call(component);
         }
     });
 
@@ -130,12 +78,70 @@ var controlsMapping = {
     "copo-resolver": "do_copo_resolver_ctrl"
 };
 
+function initiate_form_call(component) {
+    var errorMsg = "Couldn't build " + component + " form!";
+
+    $.ajax({
+        url: copoFormsURL,
+        type: "POST",
+        headers: {'X-CSRFToken': csrftoken},
+        data: {
+            'task': 'form',
+            'component': component
+        },
+        success: function (data) {
+            json2HtmlForm(data);
+            componentData = data;
+        },
+        error: function () {
+            alert(errorMsg);
+        }
+    });
+}
+
+function initiate_annotation_call() {
+    $('#processing_div').hide()
+    $('#file_picker_modal').modal('show')
+    $("#form_submit_btn").on('click', function () {
+        var formData = new FormData();
+        formData.append('file', $('#InputFile')[0].files[0]);
+        formData.append('file_type', $('#file_type_dropdown').val())
+        var csrftoken = $.cookie('csrftoken');
+        var url = "/api/upload_annotation_file/"
+        $.ajax({
+            url: url,
+            type: "POST",
+            headers: {'X-CSRFToken': csrftoken},
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json'
+        }).done(function (e) {
+            // add mongo id to document data
+            $(document).data('mongo_id', e._id.$oid)
+            $('#annotation_table_wrapper').hide()
+            $('#annotation_content').show()
+
+            if (e.type == 'PDF Document') {
+                $(document).data('annotator_type', 'txt')
+                load_txt_data(e)
+            }
+            else if (e.type == 'Spreadsheet') {
+                $(document).data('annotator_type', 'ss')
+                load_ss_data(e)
+            }
+
+            setup_annotator()
+            $('#file_picker_modal').modal('hide')
+        });
+    })
+}
+
 function json2HtmlForm(data) {
 
     //tidy up before closing the modal
     var doTidyClose = {
         closeIt: function (dialogRef) {
-            $(document).find(".copo-form-group").webuiPopover('destroy');
             refresh_tool_tips();
 
             htmlForm.empty(); //clear form
@@ -153,7 +159,6 @@ function json2HtmlForm(data) {
         animate: true,
         draggable: true,
         onhide: function (dialogRef) {
-            $(document).find(".copo-form-group").webuiPopover('destroy');
             refresh_tool_tips();
         },
         onshown: function (dialogRef) {
@@ -177,7 +182,6 @@ function json2HtmlForm(data) {
                     e.preventDefault();
 
                     save_form(data.form);
-                    $(document).find(".copo-form-group").webuiPopover('destroy');
                     refresh_tool_tips();
                     dialogRef.close();
                 }
@@ -188,14 +192,14 @@ function json2HtmlForm(data) {
         buttons: [
             {
                 label: 'Cancel',
+                cssClass: 'tiny ui basic button',
                 action: function (dialogRef) {
                     doTidyClose["closeIt"](dialogRef);
                 }
             },
             {
-                icon: 'glyphicon glyphicon-save',
-                label: 'Save',
-                cssClass: 'btn-primary',
+                label: '<i class="copo-components-icons glyphicon glyphicon-save"></i> Save',
+                cssClass: 'tiny ui basic primary button',
                 action: function (dialogRef) {
                     validate_forms(htmlForm.find("form"));
                 }
@@ -592,13 +596,19 @@ var dispatchFormControl = {
             });
 
         var metaDiv = $('<div/>');
+        var readonly = false;
+
+        if (formElem.readonly) {
+            readonly = formElem.readonly;
+        }
 
         var txt = $('<input/>',
             {
                 type: "text",
                 class: "input-copo form-control copo-text-control",
                 id: formElem.id,
-                name: formElem.id
+                name: formElem.id,
+                readonly: readonly
             });
 
         //set validation markers
@@ -1076,7 +1086,12 @@ var dispatchFormControl = {
                 class: "ctrlDIV"
             });
 
-        var radioGroup = $('<div/>');
+        // var radioGroup = $('<div/>');
+
+        var radioGroup = $('<div/>',
+            {
+                class: "ui grid",
+            });
 
         var hiddenCtrl = $('<input/>',
             {
@@ -1084,6 +1099,19 @@ var dispatchFormControl = {
                 name: formElem.id,
                 id: formElem.id
             });
+
+        //holds previous value for this control before any change occurs
+        var hiddenCtrlPreviousValue = $('<input/>',
+            {
+                type: "hidden",
+                name: formElem.id + "_previousValue",
+                id: formElem.id + "_previousValue"
+            });
+
+        var columnClass = "six"; //defines how wide the options will be
+        if (formElem.option_values.length > 3) {
+            columnClass = "five";
+        }
 
 
         for (var i = 0; i < formElem.option_values.length; ++i) {
@@ -1100,7 +1128,9 @@ var dispatchFormControl = {
                     "data-value": option.value,
                     change: function (evt) {
                         if ($(this).is(':checked')) {
-                            hiddenCtrl.val($(this).val());
+                            hiddenCtrlPreviousValue.val(hiddenCtrl.val());
+                            hiddenCtrl.val($(this).val())
+                                .trigger('change');
                         }
                     }
                 });
@@ -1120,34 +1150,26 @@ var dispatchFormControl = {
                 style: "font-weight: normal; cursor:pointer;",
             }).append(radioCtrl).append(radioCtrlTxt);
 
+            var descriptionDiv = $('<div/>',
+                {
+                    style: "padding: 5px; border-left: 6px solid #D4E4ED; color:#4d4d4d; margin-bottom:4px; line-height:1.7;",
+                    class: "copo-radio-description",
+                    html: option.description
+                });
+
             var radioCtrlDiv = $('<div/>',
                 {
                     style: "position: relative; display: block; margin-top: 10px; margin-bottom: 5px;",
-                    class: "radioCtrlDiv"
+                    class: "radioCtrlDiv "+columnClass+" wide column"
 
-                }).append(radioCtrlLabel);
-
-            radioCtrlDiv.mouseenter(function () {
-                if ($(this).find(".copo-radio-option").attr("data-desc") && !$(this).find(".copo-radio-description").length) {
-                    var descriptionDiv = $('<div/>',
-                        {
-                            style: "padding: 5px; border-left: 6px solid #D4E4ED; font-size:12px; color:#4d4d4d; max-width:400px; margin-bottom:4px; line-height:1.7;",
-                            class: "copo-radio-description",
-                        });
-
-                    descriptionDiv.append($(this).find(".copo-radio-option").attr("data-desc"));
-                    $(this).append(descriptionDiv);
-                }
-            });
-
-            radioCtrlDiv.mouseout(function () {
-                //$(this).find(".copo-radio-description").remove();
-            });
+                })
+                .append(radioCtrlLabel)
+                .append(descriptionDiv);
 
             radioGroup.append(radioCtrlDiv);
         }
 
-        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append(radioGroup).append(hiddenCtrl);
+        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append(radioGroup).append(hiddenCtrl).append(hiddenCtrlPreviousValue);
 
         return form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
@@ -1440,7 +1462,6 @@ function create_attachable_component(formElem) {
         animate: true,
         draggable: false,
         onhide: function (dialogRef) {
-            $(document).find(".copo-form-group").webuiPopover('destroy');
             refresh_tool_tips();
         },
         onshown: function (dialogRef) {
@@ -1500,7 +1521,6 @@ function create_attachable_component(formElem) {
                                 refresh_tool_tips();
                             }
 
-                            $(document).find(".copo-form-group").webuiPopover('destroy');
                             refresh_tool_tips();
 
                             dialogRef.close();
@@ -1524,16 +1544,15 @@ function create_attachable_component(formElem) {
         buttons: [
             {
                 label: 'Cancel',
+                cssClass: 'tiny ui basic button',
                 action: function (dialogRef) {
-                    $(document).find(".copo-form-group").webuiPopover('destroy');
                     refresh_tool_tips();
                     dialogRef.close();
                 }
             },
             {
-                icon: 'glyphicon glyphicon-save',
-                label: 'Save',
-                cssClass: 'btn-primary',
+                label: '<i class="copo-components-icons glyphicon glyphicon-save"></i> Save',
+                cssClass: 'tiny ui basic primary button',
                 action: function (dialogRef) {
                     validate_forms(formCtrl);
                 }
@@ -1627,7 +1646,7 @@ function form_help_ctrl(tip) {
 function form_div_ctrl() {
     return $('<div/>',
         {
-            style: "padding-bottom:5px;",
+            style: "padding-bottom:5px; outline: 0;",
             class: "form-group copo-form-group",
             tabindex: -1
         });
@@ -2102,21 +2121,12 @@ function save_form(formJSON) {
             if (data.table_data) {
                 var event = jQuery.Event("refreshtable");
                 $('body').trigger(event);
-                // if (data.component && data.component == "profile") {
-                //     var event = jQuery.Event("refreshprofiles");
-                //     $('body').trigger(event);
-                // } else {
-                //     do_render_table(data);
-                // }
 
-            } else if (data.profiles_counts) {
-                var event = jQuery.Event("refreshprofilescounts");
-                $('body').trigger(event);
-            } else if (data.profile_count) {
-                var event = jQuery.Event("getprofilecount");
-                $('body').trigger(event);
+                //feedback
+                if (data.action_feedback) {
+                    do_crud_action_feedback(data.action_feedback);
+                }
             }
-
         },
         error: function () {
             alert(error_msg);

@@ -5,90 +5,80 @@
 $(document).ready(function () {
 
     //******************************Event Handlers Block*************************//
-
-    // get table data to display via the DataTables API
-    var tableID = null;
     var component = "person";
     var copoFormsURL = "/copo/copo_forms/";
-    var copoVisualsURL = "/copo/copo_visualize/";
+    var csrftoken = $.cookie('csrftoken');
 
-    csrftoken = $.cookie('csrftoken');
+    //get component metadata
+    var componentMeta = get_component_meta(component);
 
-    $.ajax({
-        url: copoVisualsURL,
-        type: "POST",
-        headers: {'X-CSRFToken': csrftoken},
-        data: {
-            'task': 'table_data',
-            'component': component
-        },
-        success: function (data) {
-            do_render_table(data);
-        },
-        error: function () {
-            alert("Couldn't retrieve "+component+" data!");
-        }
-    });
-
-    // handle/attach events to table buttons
-    $('body').on('addbuttonevents', function (event) {
-        tableID = event.tableID;
-
-        $(document).on("click", ".copo-dt", function (event) {
-            do_record_task($(this));
-        });
-
-    });
+    //load records
+    load_records(componentMeta);
 
     //instantiate/refresh tooltips
     refresh_tool_tips();
 
+    //trigger refresh of profiles list
+    $('body').on('refreshtable', function (event) {
+        do_render_component_table(globalDataBuffer, componentMeta);
+    });
+
+    //handle task button event
+    $('body').on('addbuttonevents', function (event) {
+        do_record_task(event);
+    });
+
+    //add new component button
+    $(document).on("click", ".new-component-template", function (event) {
+        initiate_form_call(component);
+    });
+
+    //details button hover
+    $(document).on("mouseover", ".detail-hover-message", function (event) {
+        $(this).prop('title', 'Click to view ' + component + ' details');
+    });
+
 
     //******************************Functions Block******************************//
 
-    function do_record_task(elem) {
-        var task = elem.attr('data-record-action').toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
-        var taskTarget = elem.attr('data-action-target'); //is the task targeting a single 'row' or group of 'rows'?
+    function do_record_task(event) {
+        var task = event.task.toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
+        var tableID = event.tableID; //get target table
 
-        var ids = [];
+        //retrieve target records and execute task
+        var table = $('#' + tableID).DataTable();
+        var records = []; //
+        $.map(table.rows('.selected').data(), function (item) {
+            records.push(item);
+        });
 
-        if (taskTarget == 'row') {
-            ids = [elem.attr('data-record-id')];
-        } else if (taskTarget == 'rows') {
-            //get reference to table, and retrieve selected rows
-            if ($.fn.dataTable.isDataTable('#' + tableID)) {
-                var table = $('#' + tableID).DataTable();
-
-                ids = $.map(table.rows('.selected').data(), function (item) {
-                    return item[item.length - 1];
-                });
-            }
+        //add task
+        if (task == "add") {
+            initiate_form_call(component);
+            return false;
         }
 
-        //handle button actions
-        if (ids.length > 0) {
-            if (task == "edit") {
-                $.ajax({
-                    url: copoFormsURL,
-                    type: "POST",
-                    headers: {'X-CSRFToken': csrftoken},
-                    data: {
-                        'task': 'form',
-                        'component': component,
-                        'target_id': ids[0] //only allowing row action for edit, hence first record taken as target
-                    },
-                    success: function (data) {
-                        json2HtmlForm(data);
-                    },
-                    error: function () {
-                        alert("Couldn't build "+component+" form!");
-                    }
-                });
-            } else if (task == "delete") { //handles delete, allows multiple row delete
-                var deleteParams = {component: component, target_ids: ids};
-                do_component_delete_confirmation(deleteParams);
-            }
+        //edit task
+        if (task == "edit") {
+            $.ajax({
+                url: copoFormsURL,
+                type: "POST",
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    'task': 'form',
+                    'component': component,
+                    'target_id': records[0].record_id //only allowing row action for edit, hence first record taken as target
+                },
+                success: function (data) {
+                    json2HtmlForm(data);
+                },
+                error: function () {
+                    alert("Couldn't build person form!");
+                }
+            });
         }
+
+        //table.rows().deselect(); //deselect all rows
 
     }
 

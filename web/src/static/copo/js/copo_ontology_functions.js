@@ -51,7 +51,7 @@ function get_ontologies_for_filter() {
 
 function handle_ontology_filter_click(e) {
     var li = e.currentTarget
-    $('#ontology_filter_button').html(
+    $('#ontology_filter_button').find(".ontology_label").html(
         $(li).data('name')
     )
     $(document).data('search_ontology', $(li).data('id'))

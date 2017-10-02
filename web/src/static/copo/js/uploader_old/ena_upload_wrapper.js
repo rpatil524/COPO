@@ -50,22 +50,22 @@ $(document).ready(function () {
     });
 
 
-    $('body').on('click', '.file_info', function(data){
+    $('body').on('click', '.file_info', function (data) {
         resume_upload()
     })
 
     // get partial uploads
     /*
-    $.getJSON('/rest/get_partial_uploads/', function(result){
-        result = JSON.parse(result)
-        for(var k = 0; k < result.length; k++){
-            f = result[k].fields
-            html = make_upload_div(f.filename)
-            var insert_node = $('.file_status_label')
-            $(html).appendTo(insert_node);
-        }
-    })
-    */
+     $.getJSON('/rest/get_partial_uploads/', function(result){
+     result = JSON.parse(result)
+     for(var k = 0; k < result.length; k++){
+     f = result[k].fields
+     html = make_upload_div(f.filename)
+     var insert_node = $('.file_status_label')
+     $(html).appendTo(insert_node);
+     }
+     })
+     */
 
     $(function () {
         'use strict';
@@ -83,8 +83,9 @@ $(document).ready(function () {
                 sequentialUploads: true,
                 maxRetries: 100,
                 retryTimeout: 500,
-                fail: function(e, data){
+                fail: function (e, data) {
                     BootstrapDialog.show({
+                        type: BootstrapDialog.TYPE_DANGER,
                         title: 'Something Went Wrong',
                         message: 'For some reason this upload failed. Please try again. If you are using a laptop, make sure you leave the lid open and adjust your settings to prevent hibernation. If this problem persists please contact the administrator.',
                         buttons: [{
@@ -114,8 +115,8 @@ $(document).ready(function () {
                         var d_file = data.files[k];
                         $.ajax({
                             url: '/rest/resume_chunked/',
-                            data: {'filename':d_file.name},
-                            type:'GET',
+                            data: {'filename': d_file.name},
+                            type: 'GET',
                             contentType: false,
                             dataType: 'json'
                         }).done(function (result) {
@@ -151,7 +152,7 @@ $(document).ready(function () {
 
                     //add new value to array
                     var speeds = $(document).data(file_name)
-                    if(speeds == undefined){
+                    if (speeds == undefined) {
                         speeds = new Array()
                     }
                     speeds.push(data.bitrate)
@@ -159,7 +160,7 @@ $(document).ready(function () {
 
                     // calc mean bitrate
                     var tot = 0
-                    for(var x = 0; x < speeds.length; x++){
+                    for (var x = 0; x < speeds.length; x++) {
                         tot += speeds[x]
                     }
                     var bitrate = 1 / speeds.length * tot
@@ -277,7 +278,7 @@ $(document).ready(function () {
             }
         }).done(function (data) {
             //refresh datafiles table
-            do_render_table(data);
+            do_render_component_table(data, get_component_meta("datafile"));
 
             //check if the file needs compression; send request to server to gzip
             if (data.do_compress) {
@@ -300,6 +301,9 @@ $(document).ready(function () {
                         $(node).next().find('.file_size').html(new_size + ' MB');
                         //do hash
                         get_hash(file_id, tform)
+
+                        //update table data
+                        do_render_component_table(data, get_component_meta("datafile"));
 
                     },
                     error: function (data) {
@@ -333,28 +337,30 @@ function get_hash(id, tform) {
         $d.children('ul').append(html);
         $("input[value='" + id + "']").parent().next().children('.hash-image').hide();
 
+        do_render_component_table(data, get_component_meta("datafile"));
+
     });
 
 }
 
-function make_progress_bar(file_name, size){
+function make_progress_bar(file_name, size) {
     html = '<div id="progress_info_' + file_name + '" class="progress_info">' +
-    '<input type="hidden" id="upload_id_' + file_name + '" value="" />' +
-    '<span id="progress_label"></span>' +
-    '<span id="total_label"> of ' + size + '</span>' +
-    '<span id="bitrate"></span>' +
-    '</div>' +
-    '<div id="progress_' + file_name + '" class="progress">' +
-    '<div style="width: 0%;height: 20px;background: green" class="bar"></div>' +
-    '<div class="progress-bar progress-bar-success"></div>' +
-    '</div>';
+        '<input type="hidden" id="upload_id_' + file_name + '" value="" />' +
+        '<span id="progress_label"></span>' +
+        '<span id="total_label"> of ' + size + '</span>' +
+        '<span id="bitrate"></span>' +
+        '</div>' +
+        '<div id="progress_' + file_name + '" class="progress">' +
+        '<div style="width: 0%;height: 20px;background: green" class="bar"></div>' +
+        '<div class="progress-bar progress-bar-success"></div>' +
+        '</div>';
     return html
 }
 
-function make_upload_div(file_name){
+function make_upload_div(file_name) {
     //check if div with same name already exists
-    $('.file_info').each(function(index, value){
-        if($(value).text() == file_name){
+    $('.file_info').each(function (index, value) {
+        if ($(value).text() == file_name) {
             $(this).remove()
             $('#progress_info_' + $(value).text()).remove()
             $('#progress_' + $(value).text()).remove()
@@ -363,6 +369,6 @@ function make_upload_div(file_name){
     return $('<div/>').addClass('alert alert-warning file_info').attr('id', 'id_' + file_name).html("<strong>" + file_name + "</strong><i class='fa fa-upload pull-right' aria-hidden='true'></i>")
 }
 
-function resume_upload(e, data){
+function resume_upload(e, data) {
 
 }

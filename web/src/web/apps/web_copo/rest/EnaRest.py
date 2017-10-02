@@ -150,10 +150,23 @@ def hash_upload(request):
     auto_fields = dict()
     auto_fields[DataFile().get_qualified_field("file_hash")] = file_obj.hash
 
+    profile_id = request.session['profile_id']
+    component = "datafile"
+
     BrokerDA(target_id=str(record_object.get("_id", str())),
-             component="datafile",
+             component=component,
              auto_fields=auto_fields
              ).do_save_edit()
+
+    # do visualise
+    table_data = BrokerVisuals(
+        profile_id=profile_id,
+        context=output_dict,
+        component=component,
+        record_object=record_object
+    ).do_row_data().get("table_data", dict())
+
+    output_dict['table_data'] = table_data
 
     out = jsonpickle.encode(output_dict)
     print('hash complete ' + file_id)
@@ -294,10 +307,23 @@ def zip_file(request):
     auto_fields[DataFile().get_qualified_field("name")] = output_file_name
     auto_fields[DataFile().get_qualified_field("file_location")] = new_file_name
 
+    profile_id = request.session['profile_id']
+    component = "datafile"
+
     BrokerDA(target_id=str(record_object.get("_id", str())),
-             component="datafile",
+             component=component,
              auto_fields=auto_fields
              ).do_save_edit()
 
+    # do visualise
+    table_data = BrokerVisuals(
+        profile_id=profile_id,
+        context=out,
+        component=component,
+        record_object=record_object
+    ).do_row_data().get("table_data", dict())
+
+    out['table_data'] = table_data
+
     out = jsonpickle.encode(out)
-    return HttpResponse(out, content_type='text/plain')
+    return HttpResponse(out, content_type='json')

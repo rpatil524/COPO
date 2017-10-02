@@ -5,10 +5,6 @@
 {% load html_tags %}
 
 {% block stylesheet_block %}
-    <link rel="stylesheet" href="{% static 'copo/css/copo/datafile.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_wizard.css' %}">
-
-
     <!-- blueimp Gallery styles -->
     <link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
     <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
@@ -22,6 +18,9 @@
         <link rel="stylesheet"
               href="{% static 'copo/jQuery-File-Upload-master/css/jquery.fileupload-ui-noscript.css' %}">
     </noscript>
+
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_wizard.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/datafile.css' %}">
 
 {% endblock %}
 
@@ -45,35 +44,11 @@
     {% include "component_navbar.html" %}
 {% endblock page_tile %}
 
-{% block help_section %}
-    <div id="datafileDataHelp">
-        <div class="panel panel-default" style="border-radius: 0px;">
-            <div class="panel-heading" style="padding: 0px 0px;">
-                <div class="dropdown">
-                    <button class="btn btn-lg btn-default dropdown-toggle" type="button" id="helpCentreMenu"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i> Information Panel
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu componentHelpList" aria-labelledby="helpCentreMenu">
-                    </ul>
-                </div>
-            </div>
-            <div class="panel-body">
-                <div id="copo_instant_info"></div>
-                <div id="helptipsDiv" style="display: block;">
-                    <table id="datafile_help_table" cellspacing="0" width="100%">
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock help_section %}
-
 
 {% block content %}
 
     <!--test ends -->
+
     <!--test ends -->
 
     <div class="row">
@@ -82,23 +57,23 @@
                 <li>
                     <a data-toggle="tab" href="#fileUploadComponent"
                        data-component="fileUploadComponent">
-                        <span class="copo-data-panel-title">
-                            <i class="fa fa-upload"></i>
-                            <span class="icon_text" data-copo-tour-id="copo_data_upload_tab">Upload</span>
-                        </span>
+                <span class="copo-data-panel-title">
+                    <i class="fa fa-upload"></i>
+                    <span class="icon_text" data-copo-tour-id="copo_data_upload_tab">Upload</span>
+                </span>
                     </a>
                 </li>
                 <li class="active"><a data-toggle="tab" href="#fileListComponent" data-component="fileListComponent">
-                    <span class="copo-data-panel-title">
-                        <i class="fa fa-file"></i>
-                        <span class="icon_text" data-copo-tour-id="copo_data_inspect_tab">Inspect</span>
-                    </span>
+            <span class="copo-data-panel-title">
+                <i class="fa fa-file"></i>
+                <span class="icon_text" data-copo-tour-id="copo_data_inspect_tab">Inspect</span>
+            </span>
                 </a></li>
                 <li><a data-toggle="tab" href="#descriptionWizardComponent" data-component="descriptionWizardComponent">
-                    <span class="copo-data-panel-title">
-                        <i class="fa fa-tags"></i>
-                        <span class="icon_text" data-copo-tour-id="copo_data_describe_tab">Describe</span>
-                    </span>
+            <span class="copo-data-panel-title">
+                <i class="fa fa-tags"></i>
+                <span class="icon_text" data-copo-tour-id="copo_data_describe_tab">Describe</span>
+            </span>
                 </a></li>
                 <li><a data-toggle="tab" href="#emptyTab" data-component="emptyTab"
                        style="border-color: transparent; background: none !important; cursor:default;">
@@ -114,75 +89,232 @@
                               style="margin-right:40px">
                             {% csrf_token %}
                             <span data-copo-tour-id="copo_data_upload_file_button" id="upload_files_button"
-                                  class="btn btn-primary fileinput-button"
+                                  class="tiny ui basic teal button fileinput-button"
                                   style="background-image: none; border-color:transparent;">
-                                    <span>Select files...</span>
-                                        <input type="file" name="file"
-                                               onchange="get_chunk_size(event)" multiple/>
-                                        <input type="hidden" name="upload_id" value=""/>
-                                        <input type="hidden" name="panel_ordering"
-                                               value="0"/>
-                                        <input type="hidden" name="exp_id" value=""/>
-                                    </span>
+            <span>Select files...</span>
+            <input type="file" name="file"
+                   onchange="get_chunk_size(event)" multiple/>
+            <input type="hidden" name="upload_id" value=""/>
+            <input type="hidden" name="panel_ordering"
+                   value="0"/>
+            <input type="hidden" name="exp_id" value=""/>
+        </span>
                         </form>
                         <div class="file_status_label" style="margin-top: 8px;"></div>
                     </div>
                 </div>
                 <div id="fileListComponent" class="tab-pane fade in active">
-                    <div id="data_all_data" style="margin-top: 15px;">
+                    <div style="margin-top: 15px;">
+                        <!-- getting started section -->
+                        <div class="row">
+                            <div class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-0 page-welcome-message"
+                                 style="display: none;">
+                                <div class="copo-webui-popover">
+                                    <div class="webui-popover-inner">
+                                        <h3 class="copo-webui-popover-title">Datafiles - Getting started</h3>
+                                        <div class="copo-webui-popover-content">
+                                            <div class="webpop-content-div">
+                                                The datafiles component enables the user to upload datafiles to COPO,
+                                                and also attribute metadata to the uploaded files.
+                                                <br/><br/>
+                                                Specifically, three main processes can be identified within this page,
+                                                which are in turn represented by the following user-interface tabs:
+                                                <ol>
+                                                    <li>
+                                                        <div><strong><i class="fa fa-upload"></i> Upload: </strong>
+                                                            The first step in the sequence of tasks is to upload
+                                                            datafiles to COPO.
+                                                            Click on this tab to
+                                                            access the file upload button.
+                                                            Select one or multiple files to upload.
+                                                            COPO will attempt to compress (larger files) and hash the
+                                                            uploaded files.
+                                                            <br/>
+                                                            <span style="color:red;">For better user experience,
+                                            we advise that large files (e.g., size >=1GB)
+                                            be compressed ('gzipped') before attempting an
+                                            upload to COPO.
+                                        </span>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div><strong><i class="fa fa-file"></i> Inspect: </strong>
+                                                            All uploaded files can be viewed or inspected under this
+                                                            tab.
+                                                            The inspect tab also provides action buttons, such as
+                                                            'Describe', for manipulating files in COPO.
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div><strong><i class="fa fa-tags"></i> Describe: </strong>
+                                                            The description wizard can
+                                                            be initiated by highlighting or selecting one or more target
+                                                            files under the inspect tab, and clicking the 'Describe'
+                                                            button.
+                                                            The wizard will then guide the user through a sequence of
+                                                            steps of metadata attribution.
+                                                        </div>
+                                                    </li>
+                                                </ol>
+                                                <div><strong>Quick Tour: </strong>To explore the various
+                                                    controls available on this page, click the
+                                                    <button class="circular mini ui icon orange button">
+                                                        <i class="icon lightbulb"></i>
+                                                    </button>
+                                                    icon.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- datafile table -->
+                        <div id="component_table_loader" class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"
+                             data-copo-tour-id="datafile_table"></div> <!-- div used by the quick tour agent -->
                         <table id="datafile_table"
-                               class="table table-striped table-bordered order-column hover copo-datatable copo-table-header"
+                               class="ui celled table hover copo-noborders-table"
                                cellspacing="0" width="100%">
                         </table>
+
                     </div>
                 </div>
                 <div id="descriptionWizardComponent" class="tab-pane fade">
                     <div id="data_wizard_data" style="margin-top: 15px;">
+                        <div class="wizard-loader col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"></div>
+                        <!-- description wizard getting started section -->
                         <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12">
-                                <div class="pull-right" id="wizard_steps_buttons">
+                            <div class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-0 page-wizard-message"
+                                 style="display: block;">
+                                <div class="copo-webui-popover">
+                                    <div class="webui-popover-inner">
+                                        <h3 class="copo-webui-popover-title">Description - Getting started</h3>
+                                        <div class="copo-webui-popover-content">
+                                            <div class="webpop-content-div">
+                                                Select one or more files
+                                                under the <strong><i class="fa fa-file"></i> Inspect </strong> tab,
+                                                and click the <span class=" mini ui basic blue button">
+                                                            <i class="copo-components-icons fa fa-tags"></i>
+                                                            <span style="padding-left: 3px;">Describe</span>
+                                                        </span> button. The view should switch to
+                                                <strong><i class="fa fa-tags"></i> Describe </strong> tab, with the
+                                                description wizard initialised.
+                                                Follow the sequence of steps presented by the wizard to add your
+                                                metadata.
+                                                <br/><br/>
+                                                <ol>
+                                                    <li>
+                                                        <span class=" mini ui basic red button">
+                                                            <i class="copo-components-icons fa fa-times"></i>
+                                                            <span style="padding-left: 3px;">Discard</span>
+                                                        </span>
+                                                        You can discard the current description at any time by
+                                                        clicking the discard button.
+                                                        <br/>
+                                                        <span style="color:red;">If followed through, the current
+                                                                description will be terminated, and all metadata
+                                                                associated with datafiles in the description bundle
+                                                                will be permanently removed.
+                                                            </span>
+                                                    </li>
+                                                    <li>
+                                                       <span class=" mini ui basic orange button">
+                                                            <i class="copo-components-icons fa fa-power-off"></i>
+                                                            <span style="padding-left: 3px;">Exit</span>
+                                                        </span>
+                                                        Use this button to exit the current description. The current
+                                                        description will be terminated, however, metadata attributed to
+                                                        datafiles in the course of the description will be retained.
+
+                                                    </li>
+                                                    <li>
+                                                        <span class=" mini ui basic blue button">
+                                                            <i class="copo-components-icons fa fa-info"></i>
+                                                            <span style="padding-left: 3px;">Info</span>
+                                                        </span>
+                                                        Use the info (information) button to access relevant
+                                                        messages in each stage of the description.
+
+                                                    </li>
+                                                </ol>
+                                                The <strong>'Info'</strong> side pane will be employed to display
+                                                relevant messages through different stages of a description.
+                                                <br/>
+                                                Use the <strong>'Help'</strong> side pane to access more information
+                                                on describing datafiles.
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <br/>
 
-                        <div class="fuelux" style="margin-bottom: 5px;">
-                            <div class="wizard" data-initialize="wizard" id="dataFileWizard"
-                                 style="display: none;"
-                                 tabindex="0">
-                                <div class="steps-container">
-                                    <ul class="steps">
+                        <!-- Description wizard-->
+                        <div id="description_panel" style="display: none;">
+                            <div class="row action-rw">
+                                <!-- Discard description button -->
+                                <div id="discard_act" class=" tiny ui basic red button"
+                                     data-toggle="tooltip"
+                                     title="Discard description"
+                                     tabindex="0">
+                                    <i class="copo-components-icons fa fa-times"></i>
+                                    <span style="padding-left: 3px;">Discard</span>
+                                </div>
 
-                                    </ul>
+                                <!-- Exit description button -->
+                                <div id="exit_act" class=" tiny ui basic orange button"
+                                     data-toggle="tooltip"
+                                     title="Exit description"
+                                     tabindex="0">
+                                    <i class="copo-components-icons fa fa-power-off"></i>
+                                    <span style="padding-left: 3px;">Exit</span>
                                 </div>
-                                <div class="actions">
-                                    <button type="button" class="btn btn-default btn-prev">
-                                        <span class="glyphicon glyphicon-arrow-left"></span>Prev
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-next" data-last="Finish!">
-                                        Next
-                                        <span class="glyphicon glyphicon-arrow-right"></span>
-                                    </button>
+
+                                <!-- Info button -->
+                                <div id="info_act" class=" tiny ui basic blue button"
+                                     data-toggle="tooltip"
+                                     title="Wizard stage information"
+                                     tabindex="0">
+                                    <i class="copo-components-icons fa fa-info"></i>
+                                    <span style="padding-left: 3px;">Info</span>
                                 </div>
-                                <div class="step-content">
+
+                            </div>
+
+                            <div class="panel panel-dtables">
+                                <div class="panel-body" style="padding: 0px;">
+                                    <div class="fuelux" style="margin-bottom: 5px;">
+                                        <div class="wizard" data-initialize="wizard" id="dataFileWizard"
+                                             style="display: block; background-color: #fff !important;">
+                                            <div class="steps-container">
+                                                <ul class="steps">
+
+                                                </ul>
+                                            </div>
+                                            <div class="actions">
+                                                <button type="button" class="ui left labeled icon button btn-prev">
+                                                    <i class="left arrow icon"></i>
+                                                    Prev
+                                                </button>
+                                                <button type="button"
+                                                        class="ui primary right labeled icon button btn-next"
+                                                        data-last="Finish!">
+                                                    <i class="right arrow icon"></i>
+                                                    Next
+                                                </button>
+                                            </div>
+{#                                            <div class="row">#}
+{#                                                <div class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5">#}
+                                                    <div class="step-content">
+                                                    </div>
+{#                                                </div>#}
+{#                                            </div>#}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-8" style="display: none;">
-                            <button data-toggle="tooltip" title="Save this description and exit "
-                                    id="remove_act"
-                                    class="btn btn-sm btn-primary" type="button">Exit Description
-                            </button>
-                            <button data-toggle="tooltip" title="Cancel this description and exit "
-                                    id="discard_act"
-                                    class="btn btn-sm btn-danger" type="button">Cancel Description
-                            </button>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top: 10px;">
-                        &nbsp;
                     </div>
                 </div>
                 <div id="emptyTab" class="tab-pane fade"></div>
@@ -192,8 +324,14 @@
 
 {% endblock %}
 
+{% block help_section %}
+
+{% endblock %}
+
+
 {% block js_block %}
     <script src="{% static 'copo/js/generic_handlers.js' %}"></script>
+    <script src="{% static 'copo/js/generic_handlers_ext2.js' %}"></script>
     <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
     <script src="{% static 'copo/js/copo_data.js' %}"></script>
     <script src="{% static 'copo/js/jquery.form.js' %}"></script>

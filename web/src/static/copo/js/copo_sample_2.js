@@ -5,15 +5,15 @@ var stagesFormValues = {};
 var formEditableElements = {};
 var validateSetter = {};
 var negotiatedStages = []; //holds info about stages resolved to be rendered
-var sampleHowtos = null;
 var currentIndx = 0;
 var generatedSamples = [];
-var tableID = null; //rendered table handle
+var activeDescription = false; //whether there's an active description
 var stepIntercept = false; //flag indicates if activation of the last stage of the wizard has been intercepted
 var descriptionWizSummary = {}; //wizard summary stage content
-var tempWizStore = null; // for holding wizard-related data pending wizard load event
 var initialSampleAttributes = {}; //holds initial attributes shared by all samples before editing
 var dataTableDataSource = []; // the data-source used for sample table generation
+var displayedMessages = {}; //holds stage messages already displayed
+var tabShownStore = Object();
 
 $(document).ready(function () {
         //****************************** Event Handlers Block *************************//
@@ -22,119 +22,79 @@ $(document).ready(function () {
         var csrftoken = $.cookie('csrftoken');
         var component = "sample";
         var wizardURL = "/rest/sample_wiz/";
-        var copoVisualsURL = "/copo/copo_visualize/";
         var copoFormsURL = "/copo/copo_forms/";
-
         var resolvedAccessionData = null; //holds data from sample accession resolution
 
+        //get component metadata
+        var componentMeta = get_component_meta(component);
 
-        //test
-        //end test
-
-        //on the fly info element
-        var onTheFlyElem = $("#copo_instant_info");
-
-        //help table
-        var pageHelpTable = "sample_help_table"; //help pane table handle
+        //load records
+        load_records(componentMeta);
 
 
-        //handle inspect, describe - tabs
-        $('#sample-display-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
-            var componentSelected = $(event.target).attr("data-component"); // active tab
-
-            $("#sampleHelpSection").find(".component-help").removeClass("disabled");
-            $("#sampleHelpSection").find(".component-help[data-component='" + componentSelected + "']").addClass("disabled");
-
-            set_component_help($(this).attr("data-component"), pageHelpTable, sampleHowtos);
-
-            //check for temp data
-            if (componentSelected == "descriptionWizardComponent" && tempWizStore) {
-                do_post_stage_retrieval2(tempWizStore);
-                tempWizStore = null;
-            }
+        // handle/attach events to table buttons
+        $('body').on('addbuttonevents', function (event) {
+            do_record_task(event);
         });
 
-        //set help context
-        $(document).on("click", ".component-help", function () {
-            $(this).closest("ul").find(".component-help").removeClass("disabled");
-            $(this).addClass("disabled");
-
-            set_component_help($(this).attr("data-component"), pageHelpTable, sampleHowtos);
+        //trigger refresh of table
+        $('body').on('refreshtable', function (event) {
+            do_render_component_table(globalDataBuffer, componentMeta);
         });
 
-        //handle add sample button
-        $('#wizard_fire_button').on('click', function (event) {
-            $(this).closest("div").hide();
-            var target_button_action = "new_samples"
-            $(document).find(".copo-dt[data-record-action='" + target_button_action + "']").addClass("disabled");
+        //add new component button
+        $(document).on("click", ".new-samples-template", function (event) {
             add_new_samples();
         });
 
+        //details button hover
+        $(document).on("mouseover", ".detail-hover-message", function (event) {
+            $(this).prop('title', 'Click to view ' + component + ' details');
+        });
 
-        // get table data to display via the DataTables API
-        var tableLoader = get_spinner_image();
-        $("#data_all_data").append(tableLoader);
+        //description tab loading event
+        $('#sample-display-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
+            if ($(event.target).attr("href") == "#descriptionWizardComponent") {
+                if (!$.isEmptyObject(tabShownStore)) {
+                    if(tabShownStore.method == "do_post_stage_retrieval2") {
+                        $("#description_panel").css("display", "block");
+                        do_post_stage_retrieval2(tabShownStore.data);
 
-        //call for table data
-        $.ajax({
-            url: copoVisualsURL,
-            type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
-            data: {
-                'task': 'table_data',
-                'component': component
-            },
-            success: function (data) {
-                do_render_table(data);
-                tableLoader.remove();
-            },
-            error: function () {
-                alert("Couldn't retrieve samples!");
+                        tabShownStore = Object();
+                    }
+                }
             }
         });
 
-        //call for help...
 
-        //loader image for help pane
-        var helpLoader = get_spinner_image();
-        $("#helptipsDiv").append(helpLoader);
+        //test
 
-        $.ajax({
-            url: copoVisualsURL,
-            type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
-            data: {
-                'task': 'help_messages',
-                'component': component
-            },
-            success: function (data) {
-                sampleHowtos = data.help_messages;
-                build_help_pane_menu(sampleHowtos, $("#sampleHelpSection").find(".componentHelpList"));
-                set_component_help('', pageHelpTable, sampleHowtos);
-                helpLoader.remove();
-            },
-            error: function () {
-                alert("Couldn't retrieve page help!");
-            }
-        });
+        //end test
 
 
         //******************************* wizard events *******************************//
 
-        //handle event for exiting current description...
+        //handle event for discarding current description...
         $('#remove_act').on('click', function (event) {
             //confirm user decision
-            var dialog = new BootstrapDialog({
+            BootstrapDialog.show({
+                title: wizardMessages.exit_wizard_message.title,
+                message: wizardMessages.exit_wizard_message.text,
+                cssClass: 'copo-modal2',
+                closable: false,
+                animate: true,
+                type: BootstrapDialog.TYPE_DANGER,
                 buttons: [
                     {
                         label: 'Cancel',
+                        cssClass: 'tiny ui basic button',
                         action: function (dialogRef) {
                             dialogRef.close();
                         }
                     },
                     {
-                        label: 'Exit Wizard',
-                        cssClass: 'btn-danger',
+                        label: '<i class="copo-components-icons fa fa-times"></i> Discard',
+                        cssClass: 'tiny ui basic red button',
                         action: function (dialogRef) {
                             dialogRef.close();
                             window.location.reload();
@@ -143,8 +103,45 @@ $(document).ready(function () {
                 ]
             });
 
-            dialog_display(dialog, wizardMessages.exit_wizard_message.title, wizardMessages.exit_wizard_message.text, "danger");
+        });
 
+        $('#info_act').on('click', function (event) {
+            //user wants information on current stage
+            var item = $(this);
+            var activeStageIndx = $('#sampleWizard').wizard('selectedItem').step; //active stage index
+
+            var messageTitle = "Undocumented stage";
+            var messageContent = "There is currently no information for this stage";
+
+            var reviewElem = $('.steps li:last-child');
+            if (reviewElem.hasClass('active')) {
+                //last stage of the wizard
+                messageTitle = "Review";
+                messageContent = "Review and modify your samples as appropriate. Click 'Finish!' when done.";
+            } else {
+                var current_stage = $('#wizard_form_' + activeStageIndx).find("#current_stage").val();
+                if (current_stage) {
+                    for (var i = 0; i < negotiatedStages.length; ++i) {
+                        if (negotiatedStages[i].ref == current_stage) {
+                            messageTitle = negotiatedStages[i].title;
+                            messageContent = negotiatedStages[i].message;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            item.webuiPopover('destroy');
+            item.webuiPopover({
+                title: messageTitle,
+                content: '<div class="webpop-content-div">' + messageContent + '</div>',
+                trigger: 'sticky',
+                width: 300,
+                arrow: true,
+                closeable: true,
+                placement: 'auto-right',
+                backdrop: true,
+            });
         });
 
 
@@ -166,6 +163,7 @@ $(document).ready(function () {
         //handle events for step change
         $('#sampleWizard').on('changed.fu.wizard', function (evt, data) {
             var currentStep = data.step;
+
             if (currentStep > 0
                 && $('#wizard_form_' + currentStep).length
                 && $('#wizard_form_' + currentStep).find("#current_stage").length) {
@@ -174,7 +172,7 @@ $(document).ready(function () {
 
                 for (var i = 0; i < negotiatedStages.length; ++i) {
                     if (current_stage == negotiatedStages[i].ref) {
-                        display_stage_message(negotiatedStages[i].message, negotiatedStages[i].title);
+                        display_stage_message(negotiatedStages[i].message, negotiatedStages[i].title, negotiatedStages[i].ref);
                         current_stage_object = negotiatedStages[i];
                         break;
                     }
@@ -229,17 +227,8 @@ $(document).ready(function () {
             }
         });
 
-        // handle/attach events to table buttons
-        $('body').on('addbuttonevents', function (event) {
-            tableID = event.tableID;
 
-            $(document).on("click", ".copo-dt", function (event) {
-                do_record_task($(this));
-            });
-
-        });
-
-        //clone route
+        //toggle show radio buttons corresponding input
         $(document).on("click", ".copo-radio-option", function (event) {
 
             if ($(this).attr("name") == "sample_clone_route_input") {
@@ -291,6 +280,11 @@ $(document).ready(function () {
             //get resolver component
             var resolverComponent = dataElem.attr("data-resolve-component");
 
+            parentElem.find(".resolver-feedback").remove(); //remove feedback element
+
+            var rFeedback = $('<i class="fa fa-commenting-o resolver-feedback" aria-hidden="true" style="padding-left: 5px; font-size: 20px;"></i>');
+            var meta_extra = {placement: "auto-right", height: 300};
+
             if (resolverComponent.toLowerCase() == "sample") {
                 $.ajax({
                     url: resolverURL,
@@ -303,9 +297,13 @@ $(document).ready(function () {
                         resolvedAccessionData = data;
                         var resolvedData = build_resolved_data(data);
                         parentElem.webuiPopover('destroy');
-                        var meta_extra = {placement: "auto-right", height: 300};
                         refresh_webpop(parentElem, "Resolved Sample [" + resolverValue + "]", resolvedData, meta_extra);
                         parentElem.webuiPopover('show');
+
+                        rFeedback.insertAfter(parentElem.find("label"));
+                        rFeedback.css("color", "green");
+
+                        refresh_webpop(rFeedback, "Resolved Sample [" + resolverValue + "]", resolvedData, meta_extra);
 
                         //remove visual cues
                         spinnerElem.remove();
@@ -316,6 +314,13 @@ $(document).ready(function () {
                         spinnerElem.remove();
                         parentElem.addClass("has-error has-danger");
                         parentElem.find(".help-block").html("Couldn't resolve " + resolverValue + "!");
+                        resolvedAccessionData = null;
+
+                        rFeedback.insertAfter(parentElem.find("label"));
+                        rFeedback.css("color", "red");
+                        meta_extra.height = 100;
+
+                        refresh_webpop(rFeedback, "Sample [" + resolverValue + "]", "Couldn't resolve the target sample accession!", meta_extra);
                     }
                 });
             }//end of sample resolver
@@ -344,8 +349,6 @@ $(document).ready(function () {
         function stage_navigate(evt, data) {
 
             if (data.direction == 'next') {
-                // empty info element
-                onTheFlyElem.html('');
 
                 //trigger form validation
                 if ($("#wizard_form_" + data.step).length) {
@@ -483,25 +486,31 @@ $(document).ready(function () {
                 });
 
 
-                var dialog = new BootstrapDialog({
+                BootstrapDialog.show({
+                    title: wizardMessages.confirm_initial_sample_generation.title,
+                    message: wizardMessages.confirm_initial_sample_generation.text,
+                    cssClass: 'copo-modal2',
+                    closable: false,
+                    animate: true,
+                    type: BootstrapDialog.TYPE_INFO,
                     buttons: [
                         {
                             label: 'Review',
+                            cssClass: 'tiny ui basic button',
                             action: function (dialogRef) {
                                 dialogRef.close();
                                 return false;
                             }
                         },
                         {
-                            label: 'Continue',
-                            cssClass: 'btn-primary',
+                            label: '<i class="copo-components-icons fa fa-check"></i> Continue',
+                            cssClass: 'tiny ui basic teal button',
                             action: function (dialogRef) {
                                 $('#sampleWizard').wizard('selectedItem', {
                                     step: currentIndx
                                 });
 
                                 elem.show();
-                                onTheFlyElem.html('');
 
                                 set_generated_samples();
                                 samplesGenerated = true;
@@ -510,9 +519,6 @@ $(document).ready(function () {
                         }
                     ]
                 });
-
-                dialog_display(dialog, wizardMessages.confirm_initial_sample_generation.title, wizardMessages.confirm_initial_sample_generation.text, "info");
-
             } else {
                 elem.hide();
             }
@@ -527,12 +533,28 @@ $(document).ready(function () {
         function do_post_stage_retrieval(data) {
             //update items with data
 
-            if (($('#sampleWizard').is(":visible")) || $('#sample-display-tabs.nav-tabs .active').text().trim() == "Describe") {
+            if (($('#sampleWizard').is(":visible"))) {
                 do_post_stage_retrieval2(data);
             } else {
-                //store data pending tab shown
-                tempWizStore = data;
-                $('#sample-display-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show');
+                var tabShown = false; //check if describe tab is already visible
+                $('#sample-display-tabs > li').each(function () {
+                    if ($(this).hasClass("active") && $(this).find('a:first').attr("href") == "#descriptionWizardComponent") {
+                        tabShown = true;
+                        return false;
+                    }
+                });
+
+                //hide wizard getting started
+                $(".page-wizard-message").hide();
+
+                if (tabShown) {//tab already shown, go ahead and display display wizard
+                    $("#description_panel").css("display", "block");
+                    do_post_stage_retrieval2(data);
+                } else {//display tab, add loader, and go ahead to display wizard
+                    $('#sample-display-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show');
+                    tabShownStore.data = data;
+                    tabShownStore.method = "do_post_stage_retrieval2";
+                }
             }
 
 
@@ -553,7 +575,6 @@ $(document).ready(function () {
 
                 $('#sampleWizard').wizard('addSteps', currentIndx, [
                     {
-                        badge: ' ',
                         label: '<span class=wiz-title>' + stage.title + '</span>',
                         pane: stage_pane
                     }
@@ -922,16 +943,13 @@ $(document).ready(function () {
 
             //form controls
             var formPanel = $('<div/>', {
-                class: "panel panel-copo-data",
                 style: "margin-top: 5px; font-size: 14px;"
             });
 
 
             stageHTML.append(formPanel);
 
-            var formPanelBody = $('<div/>', {
-                class: "panel-body"
-            });
+            var formPanelBody = $('<div/>');
 
             formPanel.append(formPanelBody);
 
@@ -1004,6 +1022,13 @@ $(document).ready(function () {
         function add_new_samples() {
             //set in motion the wizard process...
 
+            if (activeDescription) {
+                $('#sample-display-tabs a[href="#descriptionWizardComponent"]').tab('show');
+                return false;
+            }
+
+            activeDescription = true;
+
             // retrieve wizard messages
             $.ajax({
                 url: wizardURL,
@@ -1028,46 +1053,25 @@ $(document).ready(function () {
 
 
         //handles button events on a record or group of records
-        function do_record_task(elem) {
-            var task = elem.attr('data-record-action').toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
-            var taskTarget = elem.attr('data-action-target'); //is the task targeting a single 'row' or group of 'rows'?
+        function do_record_task(event) {
+            var task = event.task.toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
+            var tableID = event.tableID; //get target table
 
-            var ids = [];
-            var records = [];
-            var table = null;
+            //retrieve target records and execute task
+            var table = $('#' + tableID).DataTable();
+            var records = []; //
+            $.map(table.rows('.selected').data(), function (item) {
+                records.push(item);
+            });
 
-
-            //retrieve event targets
-            if ($.fn.dataTable.isDataTable('#' + tableID)) {
-                table = $('#' + tableID).DataTable();
-
-                if (taskTarget == 'row') {
-                    ids = [elem.attr('data-record-id')];
-                } else {
-                    ids = $.map(table.rows('.selected').data(), function (item) {
-                        return item[item.length - 1];
-                    });
-                }
-
-                var records = []; //richer information context, retained for other purposes, e.g., description batch
-                $.map(table.rows('.selected').data(), function (item) {
-                    records.push(item);
-                });
-
+            //add task
+            if (task == "describe") {
+                add_new_samples();
+                return false;
             }
 
-            //handle button action
-            if (task == "new_samples") {//event for creating new sample(s)
-                //disable the add buttons
-                elem.addClass("disabled");
-                $("#wizard_fire_button").closest("div").hide();
-                add_new_samples();
-
-            } else if (task == "delete" && ids.length > 0) { //handles delete, allows multiple row delete
-                var deleteParams = {component: component, target_ids: ids};
-                do_component_delete_confirmation(deleteParams);
-
-            } else if (task == "edit" && ids.length > 0) { //handles edit
+            //edit task
+            if (task == "edit") {
                 $.ajax({
                     url: copoFormsURL,
                     type: "POST",
@@ -1075,51 +1079,19 @@ $(document).ready(function () {
                     data: {
                         'task': 'form',
                         'component': component,
-                        'target_id': ids[0] //only allowing row action for edit, hence first record taken as target
+                        'target_id': records[0].record_id //only allowing row action for edit, hence first record taken as target
                     },
                     success: function (data) {
                         json2HtmlForm(data);
                     },
                     error: function () {
-                        alert("Couldn't build " + component + " form!");
+                        alert("Couldn't build sample form!");
                     }
                 });
-
             }
-            else if (task == "info" && ids.length > 0) {
-                var tr = elem.closest('tr');
-                var row = table.row(tr);
 
-                if (row.child.isShown()) {
-                    //row is already open - close it
-                    row.child.hide();
-                } else {
-                    var contentHtml = "<div style='text-align: center'><i class='fa fa-spinner fa-pulse fa-2x'></i></div>";
-                    row.child(contentHtml).show();
+            //table.rows().deselect(); //deselect all rows
 
-                    $.ajax({
-                        url: copoVisualsURL,
-                        type: "POST",
-                        headers: {'X-CSRFToken': csrftoken},
-                        data: {
-                            'task': 'attributes_display',
-                            'component': component,
-                            'target_id': ids[0]
-                        },
-                        success: function (data) {
-                            var panel = get_panel("info");
-                            panel.find(".panel-heading").append(data.component_label + " Attributes");
-                            panel.find(".panel-body").append(build_attributes_display(data));
-                            row.child(panel.html()).show();
-
-                        },
-                        error: function () {
-                            alert("Couldn't retrieve sample attributes!");
-                            return '';
-                        }
-                    });
-                }
-            }
 
         } //end of func
 
@@ -1207,13 +1179,12 @@ $(document).ready(function () {
 
         function set_wizard_summary() {
             descriptionWizSummary = {
-                badge: ' ',
                 label: '<span class=wiz-title>Review</span>',
                 pane: '<div class="alert alert-default">' +
                 '<div style="line-height: 150%;" class="' + wizardMessages.review_message.text_class + '">' +
                 wizardMessages.review_message.text + '</div><div id="summary_stage_loader"></div>' +
                 '<div style="margin-top: 10px; max-width: 100%; overflow-x: auto;">' +
-                '<table id="generated_samples_table" class="table table-striped table-bordered order-column hover copo-datatable copo-table-header" width="100%"></table>' +
+                '<table id="generated_samples_table" class="ui celled table hover copo-noborders-table" cellspacing="0" width="100%"></table>' +
                 '</div></div>'
             };
         }
@@ -1813,33 +1784,12 @@ $(document).ready(function () {
 
         }
 
-        function display_stage_message(stageMessage, stageTitle) {
-            onTheFlyElem.empty();
-
-            if (stageMessage) {
-                var attributesPanel = $('<div/>', {
-                    class: "panel panel-info",
-                    style: "margin-top: 5px; font-size: 12px;"
-                });
-
-                var attributesPanelHeading = $('<div/>', {
-                    class: "panel-heading",
-                    style: "background-image: none; font-weight: 600;",
-                    html: stageTitle
-                });
-
-                attributesPanel.append(attributesPanelHeading);
-
-
-                var attributesPanelBody = $('<div/>', {
-                    class: "panel-body"
-                });
-
-                attributesPanelBody.append('<span style="line-height: 1.7;">' + stageMessage + '</span>');
-
-                attributesPanel.append(attributesPanelBody);
-
-                onTheFlyElem.append(attributesPanel);
+        function display_stage_message(stageMessage, stageTitle, stageRef) {
+            if (stageMessage && !displayedMessages.hasOwnProperty(stageRef)) {
+                var alertType = "info";
+                var alertMessage = "<div style='margin-bottom: 10px;'><strong>" + stageTitle + "</strong></div><div>" + stageMessage + "</div>";
+                display_copo_alert(alertType, alertMessage, 20000);
+                displayedMessages[stageRef] = 1;
             }
         }
 

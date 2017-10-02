@@ -28,7 +28,7 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{% static 'copo/css/font-awesome/css/font-awesome.min.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/css/awesome/css/awesome-bootstrap-checkbox.css' %}">
+    {#    <link rel="stylesheet" href="{% static 'copo/css/awesome/css/awesome-bootstrap-checkbox.css' %}">#}
 
     <!-- Selectize Components -->
     <link rel="stylesheet" href="{% static 'copo/selectize/selectize.bootstrap3.css' %}">
@@ -43,6 +43,10 @@
     <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/search_highlight/dataTables.searchHighlight.css' %}">
     <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.css' %}">
+
+    <!-- Semantic UI -->
+    <link rel="stylesheet" href="{% static 'copo/semantic_ui/semantic.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/semantic_ui/icon.css' %}">
 
     <!-- Google Fonts -->
     <link href='https://fonts.googleapis.com/css?family=Quattrocento+Sans' rel='stylesheet' type='text/css'>
@@ -66,6 +70,7 @@
     <script src="{% static 'copo/fuelux/js/fuelux.js' %}"></script>
     <script src="{% static 'copo/validator1000hz/validator.min.js' %}"></script>
     <script src="{% static 'copo/rangeslider/rangeslider.min.js' %}"></script>
+    <script src="{% static 'copo/js/jquery.alterclass.js' %}"></script>
 
     <script src="{% static 'copo/js/base.js' %}"></script>
 
@@ -81,7 +86,6 @@
     <script src="{% static 'copo/webui_popover/jquery.webui-popover.js' %}"></script>
 
 
-
     <!-- Additional javascripts -->
     {% block js_block %}{% endblock %}
 
@@ -90,11 +94,6 @@
     <link rel="stylesheet" href="{% static 'copo/css/datepicker/jquery.datepick.css' %}">
     <script src="{% static 'copo/js/datepicker/jquery.plugin.js' %}"></script>
     <script src="{% static 'copo/js/datepicker/jquery.datepick.js' %}"></script>
-
-    <!-- EasyUI components -->
-    <link rel="stylesheet" href="{% static 'copo/css/easyui/themes/default/easyui.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/css/easyui/themes/icon.css' %}">
-    <script src="{% static 'copo/js/easyui/jquery.easyui.min.js' %}"></script>
 
     <!-- PAGE LEVEL STYLES -->
     {% block stylesheet_block %}{% endblock %}
@@ -218,6 +217,7 @@
 {% include "components_template.html" %}
 <!-- end template components -->
 
+
 <nav id="copo-global-nav" class="navbar navbar-default navbar-fixed-top" style="background: rgba(38, 38, 38, 0.95);">
     <div class="container-fluid">
         <div class="navbar-header">
@@ -256,9 +256,6 @@
                     {% if user.is_authenticated %}
                         <span data-copo-tour-id="global_user_authenticated_button">{{ user }}<span
                                 class="caret" style="margin-left: 5px;"></span></span>
-                        {#                        <i data-copo-tour-id="global_user_authenticated_button" class="fa fa-user copo-header-icons"#}
-                        {#                           aria-hidden="true" data-toggle="tooltip"#}
-                        {#                           title="{{ user }}"></i>#}
                         {% if not user.email %}
                             <script type="text/javascript">
                                 do_email_form();

@@ -64,7 +64,31 @@ class BrokerDA:
         kwargs = dict()
         kwargs["target_id"] = self.param_dict.get("target_id", str())
 
+        # set report parameter
+        status = "success"  # 'success', 'warning', 'info', 'danger' - modelled after bootstrap alert classes
+        action_type = "add"
+
+        report_metadata = dict()
+
+        if self.param_dict.get("target_id", str()):
+            action_type = "edit"
+
         record_object = self.da_object.save_record(self.auto_fields, **kwargs)
+
+        if not record_object:
+            status = "danger"
+
+        if action_type == "add":
+            report_metadata["message"] = "New " + self.component + " record created!"
+            if status != "success":
+                report_metadata["message"] = "There was a problem creating the " + self.component + " record!"
+        elif action_type == "edit":
+            report_metadata["message"] = "Record updated!"
+            if status != "success":
+                report_metadata["message"] = "There was a problem updating the " + self.component + " record!"
+
+        report_metadata["status"] = status
+        self.context["action_feedback"] = report_metadata
 
         # process visualisation context,
 
@@ -90,9 +114,15 @@ class BrokerDA:
     def do_delete(self):
         target_ids = [ObjectId(i) for i in self.param_dict.get("target_ids")]
 
-        self.da_object.get_collection_handle().update_many(
-            {"_id": {"$in": target_ids}}, {"$set": {"deleted": d_utils.get_deleted_flag()}}
-        )
+        # if ever it was needed to re-implement 'soft' delete uncomment the following lines and
+        # comment out the 'hard' delete query
+
+        # self.da_object.get_collection_handle().update_many(
+        #     {"_id": {"$in": target_ids}}, {"$set": {"deleted": d_utils.get_deleted_flag()}}
+        # )
+
+        # hard delete
+        self.da_object.get_collection_handle().remove({'_id': {'$in': target_ids}})
 
         self.context = self.broker_visuals.do_table_data()
         return self.context
@@ -164,9 +194,9 @@ class BrokerVisuals:
         table_data_dict = dict(
             annotation=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
             publication=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
-            person=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
-            datafile=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
-            sample=(htags.generate_copo_table_data, dict(profile_id=self.profile_id, component=self.component)),
+            person=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
+            datafile=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
+            sample=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_for_user())),
         )
 
@@ -184,10 +214,10 @@ class BrokerVisuals:
 
         table_data_dict = dict(
             publication=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
-            person=(htags.get_record_data, dict(record_object=record_object, component=self.component)),
-            sample=(htags.get_record_data, dict(record_object=record_object, component=self.component)),
+            person=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
+            sample=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_for_user())),
-            datafile=(htags.get_record_data, dict(record_object=record_object, component=self.component))
+            datafile=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
         )
 
         # NB: in table_data_dict, use an empty dictionary as a parameter to functions that define zero arguments
@@ -258,17 +288,11 @@ class BrokerVisuals:
     def get_component_help_messages(self):
         self.context['context_help'] = dict()
         self.context['help_messages'] = dict()
-        self.context['quick_tour_messages'] = dict()
 
         paths_dict = lkup.MESSAGES_LKUPS['HELP_MESSAGES']
 
         if self.component in paths_dict:
             self.context['help_messages'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS['HELP_MESSAGES'][self.component])
-
-        # get quick tour
-        if "quick_tour" in paths_dict:
-            quick_tour_dict = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS['HELP_MESSAGES']["quick_tour"])
-            self.context['quick_tour_messages'] = quick_tour_dict.get("properties", dict())
 
         # context help
         if "context_help" in paths_dict:

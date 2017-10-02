@@ -31,39 +31,35 @@
 
 {% block content %}
     <!-- publication entry options -->
-    <div id="pub_options" class="panel panel-default collapse" style="border-color: #fff; box-shadow: none;">
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-sm-3 col-md-3 col-lg-3">
-                    <button type="button" style="background-image:none;"
-                            class="btn btn-sm btn-primary new-form-call"
-                            data-component="publication">Publication Form (Manual Entry)
-                    </button>
-                </div>
-                <div class="col-sm-3 col-md-3 col-lg-3">
-                    <div class="input-group">
-                        <input type="text" class="form-control input-sm resolver-data" data-resolver="doi"
-                               placeholder="Enter a DOI">
-                        <span class="input-group-btn">
+    <div id="pub_options" class="row collapse" style="margin-bottom: 20px;">
+        <div class="col-sm-3 col-md-3 col-lg-3">
+            <button type="button" style="background-image:none;"
+                    class="btn btn-sm btn-primary new-form-call"
+                    data-component="publication">Publication Form (Manual Entry)
+            </button>
+        </div>
+        <div class="col-sm-3 col-md-3 col-lg-3">
+            <div class="input-group">
+                <input type="text" class="form-control input-sm resolver-data" data-resolver="doi"
+                       placeholder="Enter a DOI">
+                <span class="input-group-btn">
                             <button class="btn btn-sm btn-primary resolver-submit" type="button"
                                     style="background-image:none;">Resolve</button>
                         </span>
-                    </div>
-                </div>
-                <div class="col-sm-3 col-md-3 col-lg-3">
-                    <div class="input-group">
-                        <input type="text" class="form-control input-sm resolver-data" data-resolver="pmid"
-                               placeholder="Enter a PubMed ID">
-                        <span class="input-group-btn">
+            </div>
+        </div>
+        <div class="col-sm-3 col-md-3 col-lg-3">
+            <div class="input-group">
+                <input type="text" class="form-control input-sm resolver-data" data-resolver="pmid"
+                       placeholder="Enter a PubMed ID">
+                <span class="input-group-btn">
                             <button class="btn btn-sm btn-primary resolver-submit"
                                     type="button"
                                     style="background-image:none;">Resolve</button>
                         </span>
-                    </div>
-                </div>
-                <div class="col-sm-3 col-md-3 col-lg-3"></div>
             </div>
         </div>
+        <div class="col-sm-3 col-md-3 col-lg-3"></div>
     </div>
 
     <!-- getting started section -->
@@ -75,11 +71,11 @@
                     <div class="copo-webui-popover-content">
                         <div class="webpop-content-div">
                             The publications component of a profile associates relevant literature with
-                            the work profile. This can provide better context and reference for the piece of
-                            research captured by the profile. <br/><br/>Click the
-                            <span class='fa-stack text-primary'><i
-                                    class='fa fa-circle fa-stack-2x'></i><i
-                                    class='fa fa-plus fa-stack-1x fa-inverse'></i></span> button to access available
+                            the current work profile. <br/><br/>Click the
+                            <button class="circular mini ui icon primary button">
+                                <i class="icon add sign"></i>
+                            </button>
+                            button to access available
                             options for entering publication records:
                             <ol>
                                 <li><strong>Manual Entry: </strong>
@@ -107,10 +103,11 @@
                                 </li>
                             </ol>
                             <div><strong>Quick Tour: </strong>To explore the various
-                                controls available on this page, click the <span class='fa-stack'
-                                                                                 style='color:#e68a00;'><i
-                                        class='fa fa-circle fa-stack-2x'></i><i
-                                        class='fa fa-lightbulb-o fa-stack-1x fa-inverse'></i></span> icon.
+                                controls available on this page, click the
+                                <button class="circular mini ui icon orange button">
+                                    <i class="icon lightbulb"></i>
+                                </button>
+                                icon.
                             </div>
                         </div>
                     </div>
@@ -120,9 +117,9 @@
     </div>
 
     <!-- publication_table -->
-    <div data-copo-tour-id="publication_table"></div> <!-- div used by the quick tour agent -->
+    <div id="component_table_loader" class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5" data-copo-tour-id="publication_table"></div> <!-- div used by the quick tour agent -->
     <div class="table-parent-div">
-        <table id="publication_table" class="table table-striped table-bordered copo-noborders-table"
+        <table id="publication_table" class="ui celled table hover copo-noborders-table"
                cellspacing="0" width="100%">
         </table>
     </div>
@@ -131,8 +128,6 @@
 
 {% block help_section %}
 
-    <!-- placeholder for contextual help -->
-    <div class="context-help-request"></div>
 
 {% endblock %}
 

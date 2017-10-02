@@ -1,29 +1,29 @@
 var wizardMessages;
-var datafileHowtos = null;
 var currentIndx = 0;
 var descriptionBundle = [];
 var descriptionToken = null;
-var tableID = null; //rendered table handle
 var stage_objects = {}; //retains info about rendered stages
 var stepIntercept = false; //flag indicates if activation of the last stage of the wizard has been intercepted
 var silenceAlert = false; //use to temporary suppress stage alerts
 var descriptionWizSummary = {}; //wizard summary stage content
-var tempWizStore = null; // for holding wizard-related data pending wizard load event
 var onGoingDescription = false; //informs wizard state refresh/exit
 var setStageIndx = null; //moves the wizard to stage index specified
+var displayedMessages = {}; //holds stage messages already displayed
+var tabShownStore = Object();
 
 
 $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
+
 
     // firstly, if the url contains Figshare oauth return params and the selected_datafile is set, we are dealing with a
     // return from a Figshare oauth login, so attempt to load the datafile into the wizard
 
     // get url
     var url = window.location.search
-    if( url.includes('state') && url.includes('code')){
+    if (url.includes('state') && url.includes('code')) {
         // now check for selected_datafile
-        if ($('#selected_datafile').val() != '' || $('#selected_datafile').val() != undefined){
+        if ($('#selected_datafile').val() != '' || $('#selected_datafile').val() != undefined) {
             alert('ask toni how we can load file ' + $('#selected_datafile').val() + ' into his wizard')
         }
     }
@@ -34,38 +34,29 @@ $(document).ready(function () {
     var copoFormsURL = "/copo/copo_forms/";
     var copoVisualsURL = "/copo/copo_visualize/";
 
+    //get component metadata
+    var componentMeta = get_component_meta(component);
+
+    //load records
+    load_records(componentMeta);
 
 
-    //on the fly info element
-    var onTheFlyElem = $("#copo_instant_info");
-
-    //help table
-    var pageHelpTable = "datafile_help_table"; //help pane table handle
-
-    //handle UID - upload inspect describe - tabs
-    $('#copo-datafile-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
-        var componentSelected = $(event.target).attr("data-component"); // active tab
-
-
-        $("#datafileDataHelp").find(".component-help").removeClass("disabled");
-        $("#datafileDataHelp").find(".component-help[data-component='" + componentSelected + "']").addClass("disabled");
-
-        set_component_help($(this).attr("data-component"), pageHelpTable, datafileHowtos);
-
-        //check for temp data
-        if (componentSelected == "descriptionWizardComponent" && tempWizStore) {
-            do_post_stage_retrieval2(tempWizStore);
-            tempWizStore = null;
-        }
+    // handle/attach events to table buttons
+    $('body').on('addbuttonevents', function (event) {
+        do_record_task(event);
     });
 
-    //set help context
-    $(document).on("click", ".component-help", function () {
-        $(this).closest("ul").find(".component-help").removeClass("disabled");
-        $(this).addClass("disabled");
-
-        set_component_help($(this).attr("data-component"), pageHelpTable, datafileHowtos);
+    //trigger refresh of table
+    $('body').on('refreshtable', function (event) {
+        do_render_component_table(globalDataBuffer, componentMeta);
     });
+
+
+    //details button hover
+    $(document).on("mouseover", ".detail-hover-message", function (event) {
+        $(this).prop('title', 'Click to view ' + component + ' details');
+    });
+
 
     //review-to-stage
     $(document).on("click", ".review-to-stage", function (event) {
@@ -76,149 +67,68 @@ $(document).ready(function () {
         });
     });
 
-    //dismiss alerts
-    $(document).on("click", ".control-message-trigger", function (event) {
-        $(this).closest(".wizard-message-panel").find(".message-pane-collapse").collapse('toggle');
-    });
-
-
-    //show alerts
-
-    $(document).on("click", ".close-stage-alert", function (event) {
-        $(this).closest(".collapse").collapse('hide');
-    });
-
-    //metadata rating
-    $(document).on("click", ".itemMetadata-flag", function (event) {
-        update_itemMetadata_flag();
-    });
-
-    //disable alerts
-    $(document).on("click", ".stage-alerts", function (event) {
-        if ($(this).attr("data-alert-status") == "disable") {
-            silenceAlert = true;
-
-            $('.stage-alerts').each(function () {
-                $(this).removeClass("btn-warning");
-                $(this).addClass("btn-success");
-                $(this).attr("data-alert-status", "enable");
-                $(this).prop("title", wizardMessages.enable_alert_message.text);
-                $(this).html("Enable");
-            });
-
-        } else {
-            silenceAlert = false;
-
-            $('.stage-alerts').each(function () {
-                $(this).removeClass("btn-success");
-                $(this).addClass("btn-warning");
-                $(this).attr("data-alert-status", "disable");
-                $(this).prop("title", wizardMessages.disable_alert_message.text);
-                $(this).html("Disable");
-            });
-        }
-
-        $('.wizard-message-panel').each(function () {
-            $(this).find(".collapse").collapse('hide');
-        });
-
-    });
-
     //refresh metadata rating after table redraw
-    $('body').on('refreshmetadataevents', function (event) {
+    $('body').on('posttablerefresh', function (event) {
         update_itemMetadata_flag();
 
         //check and refresh stage control if items are currently being described
-        if (descriptionBundle.length > 0) {
-            var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
-            refresh_inDescription_flag(activeStageIndx);
-        } else {
-            refresh_inDescription_flag(0);
-        }
+        refresh_inDescription_flag();
 
     });
 
-    // get table data to display via the DataTables API
-    var loaderObject = $('<div>',
-        {
-            style: 'text-align: center',
-            html: "<span class='fa fa-spinner fa-pulse fa-3x'></span>"
-        });
+    //stop automatic form submit
+    $(document).on("submit", "form", function (event) {
+        event.preventDefault();
 
-
-    // get table data to display via the DataTables API
-    var tLoader = loaderObject.clone();
-    $("#data_all_data").append(tLoader);
-
-    $.ajax({
-        url: copoVisualsURL,
-        type: "POST",
-        headers: {'X-CSRFToken': csrftoken},
-        data: {
-            'task': 'table_data',
-            'component': component
-        },
-        success: function (data) {
-            do_render_table(data);
-            tLoader.remove();
-        },
-        error: function () {
-            alert("Couldn't retrieve datafiles!");
-        }
-    });
-
-    //call for help...
-
-    //loader image for help pane
-    var helpLoader = get_spinner_image();
-    $("#helptipsDiv").append(helpLoader);
-
-    $.ajax({
-        url: copoVisualsURL,
-        type: "POST",
-        headers: {'X-CSRFToken': csrftoken},
-        data: {
-            'task': 'help_messages',
-            'component': component
-        },
-        success: function (data) {
-            datafileHowtos = data.help_messages;
-            build_help_pane_menu(datafileHowtos, $("#datafileDataHelp").find(".componentHelpList"));
-            set_component_help('', pageHelpTable, datafileHowtos);
-            helpLoader.remove();
-        },
-        error: function () {
-            alert("Couldn't retrieve page help!");
-        }
+        return false;
     });
 
 
     // inform session of currently selected datafile id
-    $(document).on('click', '.copo-dt', function(e){
+    //check this with Felix...
+    $(document).on('click', '.copo-dt', function (e) {
         var datafile_id = $(e.currentTarget).attr("data-record-id")
-        $.ajax(
-            {
-                url: '/rest/set_session_variable/',
-                type: "POST",
-                headers: {'X-CSRFToken': csrftoken},
-                data:{
-                    "key": "datafile_id",
-                    "value": datafile_id
-                },
-                success: function(data){
-                    console.log("sent data to session " + data)
-                }
-            })
+        $.ajax({
+            url: '/rest/set_session_variable/',
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                "key": "datafile_id",
+                "value": datafile_id
+            },
+            success: function (data) {
+                console.log("sent data to session " + data)
+            }
         })
+    })
 
 
     //******************************* wizard events *******************************//
+
+    //description tab loading event
+    $('#copo-datafile-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
+        if ($(event.target).attr("href") == "#descriptionWizardComponent") {
+            if (!$.isEmptyObject(tabShownStore)) {
+                if (tabShownStore.method == "do_post_stage_retrieval2") {
+                    $("#description_panel").css("display", "block");
+                    do_post_stage_retrieval2(tabShownStore.data);
+
+                    tabShownStore = Object();
+                }
+            }
+        }
+    });
+
 
     // retrieve wizard messages
     $.ajax({
         url: copoVisualsURL,
         type: "POST",
-        headers: {'X-CSRFToken': csrftoken},
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
         data: {
             'task': 'wizard_messages',
             'component': component
@@ -248,74 +158,117 @@ $(document).ready(function () {
     });
 
 
-    //handle event for exiting current description...
-    $('#remove_act').on('click', function (event) {
+    //handle event for exiting current description...this will retain already added metadata
+    $('#exit_act').on('click', function (event) {
         //confirm user decision
-        var dialog = new BootstrapDialog({
-            buttons: [
-                {
-                    label: 'Continue Describing',
-                    action: function (dialogRef) {
-                        dialogRef.close();
-                    }
-                },
-                {
-                    label: 'Exit Description',
-                    cssClass: 'btn-primary',
-                    action: function (dialogRef) {
-                        dialogRef.close();
-                        clear_wizard();
-                    }
+
+        BootstrapDialog.show({
+            title: "Exit Description",
+            message: wizardMessages.exit_wizard_message.text,
+            cssClass: 'copo-modal2',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_WARNING,
+            buttons: [{
+                label: 'Cancel',
+                cssClass: 'tiny ui basic button',
+                action: function (dialogRef) {
+                    dialogRef.close();
                 }
-            ]
+            }, {
+                label: '<i class="copo-components-icons fa fa-power-off"></i> Exit',
+                cssClass: 'tiny ui basic orange button',
+                action: function (dialogRef) {
+                    dialogRef.close();
+                    clear_wizard();
+                }
+            }]
         });
 
-        dialog_display(dialog, "Exit Description", wizardMessages.exit_wizard_message.text, "warning");
+    });
 
+    $('#info_act').on('click', function (event) {
+        //user wants information on current stage
+        var item = $(this);
+        var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+
+        var messageTitle = "Undocumented stage";
+        var messageContent = "There is currently no information for this stage";
+
+        var reviewElem = $('.steps li:last-child');
+        if (reviewElem.hasClass('active')) {
+            //last stage of the wizard
+            messageTitle = "Review";
+            messageContent = "Review and modify your entries as required. Click 'Finish!' when done.";
+        } else {
+            var current_stage = $('#wizard_form_' + activeStageIndx).find("#current_stage").val();
+            messageTitle = stage_objects[activeStageIndx].title;
+            messageContent = stage_objects[activeStageIndx].message;
+            if (current_stage) {
+                messageTitle = stage_objects[activeStageIndx].title;
+                messageContent = stage_objects[activeStageIndx].message;
+            }
+        }
+
+        item.webuiPopover('destroy');
+        item.webuiPopover({
+            title: messageTitle,
+            content: '<div class="webpop-content-div">' + messageContent + '</div>',
+            trigger: 'sticky',
+            width: 300,
+            arrow: false,
+            closeable: true,
+            placement: 'auto-right',
+            backdrop: true,
+        });
     });
 
     //handle event for discarding description...
     $('#discard_act').on('click', function (event) {
         //this, basically, if seen through, will remove all description metadata from affected items
-        var dialog = new BootstrapDialog({
-            buttons: [
-                {
-                    label: 'Continue Describing',
-                    action: function (dialogRef) {
-                        dialogRef.close();
-                    }
-                },
-                {
-                    label: 'Cancel Description',
-                    cssClass: 'btn-danger',
-                    action: function (dialogRef) {
-                        dialogRef.close();
-
-                        var request_params = {
-                            'request_action': 'discard_description',
-                            'description_token': descriptionToken,
-                            'description_targets': JSON.stringify(descriptionBundle)
-                        };
-
-                        $.ajax({
-                            url: wizardURL,
-                            type: "POST",
-                            headers: {'X-CSRFToken': csrftoken},
-                            data: request_params,
-                            success: function (data) {
-                                clear_wizard();
-                                update_itemMetadata_flag();
-                            },
-                            error: function () {
-                                alert("Couldn't update metadata for targets!");
-                            }
-                        });
-                    }
+        BootstrapDialog.show({
+            title: "Discard Description",
+            message: wizardMessages.discard_description_message.text,
+            cssClass: 'copo-modal2',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_DANGER,
+            buttons: [{
+                label: 'Cancel',
+                cssClass: 'tiny ui basic button',
+                action: function (dialogRef) {
+                    dialogRef.close();
                 }
-            ]
-        });
+            }, {
+                label: '<i class="copo-components-icons fa fa-times"></i> Discard',
+                cssClass: 'tiny ui basic red button',
+                action: function (dialogRef) {
+                    dialogRef.close();
 
-        dialog_display(dialog, "Cancel Description", wizardMessages.discard_description_message.text, "danger");
+                    var request_params = {
+                        'request_action': 'discard_description',
+                        'description_token': descriptionToken,
+                        'description_targets': JSON.stringify(descriptionBundle)
+                    };
+
+                    $.ajax({
+                        url: wizardURL,
+                        type: "POST",
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
+                        data: request_params,
+                        success: function (data) {
+                            clear_wizard();
+                            update_itemMetadata_flag();
+                        },
+                        error: function () {
+                            alert("Couldn't discard description metadata!");
+                        }
+                    });
+                }
+            }]
+        });
 
     });
 
@@ -327,7 +280,9 @@ $(document).ready(function () {
         if ($.fn.dataTable.isDataTable('#description_target_table_' + activeStageIndx)) {
             var table = $('#description_target_table_' + activeStageIndx).DataTable();
 
-            var selectedRows = table.rows({selected: true}).data();
+            var selectedRows = table.rows({
+                selected: true
+            }).data();
 
             if (selectedRows.length > 0) {
                 var deTargs = [];
@@ -346,7 +301,9 @@ $(document).ready(function () {
                 $.ajax({
                     url: wizardURL,
                     type: "POST",
-                    headers: {'X-CSRFToken': csrftoken},
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
                     data: stage_data,
                     success: function (data) {
                         //remove previous selections
@@ -425,16 +382,6 @@ $(document).ready(function () {
         stage_navigate(evt, data);
     });
 
-    // handle/attach events to table buttons
-    $('body').on('addbuttonevents', function (event) {
-        tableID = event.tableID;
-
-        $(document).on("click", ".copo-dt", function (event) {
-            do_record_task($(this));
-        });
-
-    });
-
 
     //instantiate/refresh tooltips
     refresh_tool_tips();
@@ -445,42 +392,41 @@ $(document).ready(function () {
         var targetId = $(this).attr("data-record-id");
 
         if (task == "delete") {
-            if (descriptionBundle.length == 1) {//trying to remove last item from description bundle
-                BootstrapDialog.show({
-                    title: 'Description Action Required!',
-                    message: wizardMessages.empty_bundle_message.text,
-                    type: BootstrapDialog.TYPE_PRIMARY,
-                    animate: true,
-                    buttons: [
-                        {
-                            label: 'Cancel',
-                            action: function (dialogRef) {
-                                dialogRef.close();
-                            }
-                        },
-                        {
-                            label: 'Continue',
-                            cssClass: 'btn-primary',
-                            action: function (dialogRef) {
-                                $(this).tooltip('destroy');
+            BootstrapDialog.show({
+                title: wizardMessages.empty_bundle_message.title,
+                message: wizardMessages.empty_bundle_message.text,
+                cssClass: 'copo-modal2',
+                closable: false,
+                animate: true,
+                type: BootstrapDialog.TYPE_DANGER,
+                buttons: [{
+                    label: 'Cancel',
+                    cssClass: 'tiny ui basic button',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                    }
+                }, {
+                    label: '<i class="copo-components-icons fa fa-trash-o"></i> Remove',
+                    cssClass: 'tiny ui basic red button',
+                    action: function (dialogRef) {
+                        $(this).tooltip('destroy');
 
-                                clear_wizard();
-
-                                dialogRef.close();
+                        if (descriptionBundle.length == 1) { //trying to remove last item from description bundle
+                            clear_wizard();
+                        } else {
+                            for (i = 0; i < descriptionBundle.length; ++i) {
+                                if (targetId == descriptionBundle[i].recordID) {
+                                    do_deque(descriptionBundle[i]);
+                                    break;
+                                }
                             }
                         }
-                    ]
-                });
-            } else {
-                $(this).tooltip('destroy');
-                for (i = 0; i < descriptionBundle.length; ++i) {
-                    if (targetId == descriptionBundle[i].recordID) {
-                        do_deque(descriptionBundle[i]);
-                        break;
-                    }
-                }
-            }
 
+                        dialogRef.close();
+
+                    }
+                }]
+            });
         }
     });
 
@@ -506,8 +452,8 @@ $(document).ready(function () {
         //if no data, just go ahead and retrieve stage
         if (!stage_data) {
             retrieve_stage(retrieval_params);
-        } else {//verify what needs to be saved here...
-            if (!get_apply_check_state(activeStageIndx)) {//apply-to-selected:
+        } else { //verify what needs to be saved here...
+            if (!get_apply_check_state(activeStageIndx)) { //apply-to-selected:
                 // saving of data is handled per sub items in the bundle,
                 // only check that all items have metadata for this stage
                 var countMetadata = 0;
@@ -520,37 +466,38 @@ $(document).ready(function () {
                 if (descriptionBundle.length != countMetadata) {
                     //some items in bundle may be lacking metadata
 
-                    var dialog = new BootstrapDialog({
-                        buttons: [
-                            {
-                                label: 'Describe',
-                                cssClass: 'btn-primary',
-                                action: function (dialogRef) {
-                                    dialogRef.close();
-                                    $('#dataFileWizard').wizard('selectedItem', {
-                                        step: activeStageIndx
-                                    });
-                                }
-                            },
-                            {
-                                label: 'Continue',
-                                cssClass: 'btn-default',
-                                action: function (dialogRef) {
-                                    retrieve_stage(retrieval_params);
-                                    dialogRef.close();
-                                }
+                    BootstrapDialog.show({
+                        title: "Unassigned Metadata",
+                        message: wizardMessages.no_metadata_selected_bundle_items.text,
+                        cssClass: 'copo-modal2',
+                        closable: false,
+                        animate: true,
+                        type: BootstrapDialog.TYPE_WARNING,
+                        buttons: [{
+                            label: 'Describe',
+                            cssClass: 'tiny ui basic button',
+                            action: function (dialogRef) {
+                                dialogRef.close();
+                                $('#dataFileWizard').wizard('selectedItem', {
+                                    step: activeStageIndx
+                                });
                             }
-                        ]
+                        }, {
+                            label: 'Next Stage',
+                            cssClass: 'tiny ui basic orange button',
+                            action: function (dialogRef) {
+                                retrieve_stage(retrieval_params);
+                                dialogRef.close();
+                            }
+                        }]
                     });
-
-                    dialog_display(dialog, "Description Alert", wizardMessages.no_metadata_selected_bundle_items.text, "warning");
 
                 } else {
                     //make call to retrieve stage
                     retrieve_stage(retrieval_params);
                 }
 
-            } else {//apply-to-all:
+            } else { //apply-to-all:
                 //ascertain any mismatch between items' metadata and current stage description
 
                 //but first, if no metadata for all bundle items, continue rather silently
@@ -561,7 +508,7 @@ $(document).ready(function () {
                     }
                 });
 
-                if (countMetadata == 0) {//no metadata for all bundle items, save and load next stage...
+                if (countMetadata == 0) { //no metadata for all bundle items, save and load next stage...
 
                     //display dialog for stage save
                     var dialogHandle = processing_request_dialog('Saving Stage Data...');
@@ -569,7 +516,9 @@ $(document).ready(function () {
                     $.ajax({
                         url: wizardURL,
                         type: "POST",
-                        headers: {'X-CSRFToken': csrftoken},
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
                         data: stage_data,
                         success: function (data) {
                             //make call to retrieve stage
@@ -587,7 +536,9 @@ $(document).ready(function () {
                     $.ajax({
                         url: wizardURL,
                         type: "POST",
-                        headers: {'X-CSRFToken': csrftoken},
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
                         data: stage_data,
                         success: function (data) {
                             if (data.state) {
@@ -599,7 +550,7 @@ $(document).ready(function () {
                                 var checked;
                                 opts.forEach(function (opt) {
                                     checked = "";
-                                    if (opt.value == "overwrite") {//do overwrite, if entries change, by default
+                                    if (opt.value == "overwrite") { //do overwrite, if entries change, by default
                                         checked = " checked";
                                     }
                                     displayHTML += '<div class="radio wizard-alert-radio">';
@@ -609,43 +560,48 @@ $(document).ready(function () {
                                 displayHTML += '</div>';
                                 displayHTML += '</div>';
 
-                                var dialog = new BootstrapDialog({
-                                    buttons: [
-                                        {
-                                            label: 'OK',
-                                            cssClass: 'btn-primary',
-                                            action: function (dialogRef) {
-                                                var selectedOption = $('input[name=metadata_bundle_items]:checked').val();
-                                                if (selectedOption == "donotoverwrite") {//do not overwrite
-                                                    retrieve_stage(retrieval_params);
-                                                } else {
-                                                    stage_data.request_action = 'save_stage_data';
-                                                    //display dialog for stage save
-                                                    var dialogHandle = processing_request_dialog('Saving Stage Data...');
 
-                                                    $.ajax({
-                                                        url: wizardURL,
-                                                        type: "POST",
-                                                        headers: {'X-CSRFToken': csrftoken},
-                                                        data: stage_data,
-                                                        success: function (data) {
-                                                            //make call to retrieve stage
-                                                            retrieve_stage(retrieval_params);
-                                                            dialogHandle.close();
-                                                        },
-                                                        error: function () {
-                                                            alert("Couldn't save some entries!");
-                                                        }
-                                                    });
-                                                }
+                                BootstrapDialog.show({
+                                    title: "Description Action Required",
+                                    message: displayHTML,
+                                    cssClass: 'copo-modal2',
+                                    closable: false,
+                                    animate: true,
+                                    type: BootstrapDialog.TYPE_WARNING,
+                                    buttons: [{
+                                        label: 'OK',
+                                        cssClass: 'tiny ui orange basic button',
+                                        action: function (dialogRef) {
+                                            var selectedOption = $('input[name=metadata_bundle_items]:checked').val();
+                                            if (selectedOption == "donotoverwrite") { //do not overwrite
+                                                retrieve_stage(retrieval_params);
+                                            } else {
+                                                stage_data.request_action = 'save_stage_data';
+                                                //display dialog for stage save
+                                                var dialogHandle = processing_request_dialog('Saving Stage Data...');
 
-                                                dialogRef.close();
+                                                $.ajax({
+                                                    url: wizardURL,
+                                                    type: "POST",
+                                                    headers: {
+                                                        'X-CSRFToken': csrftoken
+                                                    },
+                                                    data: stage_data,
+                                                    success: function (data) {
+                                                        //make call to retrieve stage
+                                                        retrieve_stage(retrieval_params);
+                                                        dialogHandle.close();
+                                                    },
+                                                    error: function () {
+                                                        alert("Couldn't save some entries!");
+                                                    }
+                                                });
                                             }
-                                        }
-                                    ]
-                                });
 
-                                dialog_display(dialog, "Description Action Required", displayHTML, "warning");
+                                            dialogRef.close();
+                                        }
+                                    }]
+                                });
 
                             } else {
                                 //no mismatch, just go ahead and load next stage
@@ -701,7 +657,9 @@ $(document).ready(function () {
                 $.ajax({
                     url: copoVisualsURL,
                     type: "POST",
-                    headers: {'X-CSRFToken': csrftoken},
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
                     data: {
                         'task': 'metadata_ratings',
                         'component': component,
@@ -727,10 +685,17 @@ $(document).ready(function () {
                             //display dialog based on validation result
 
                             if (isAllValid) {
-                                var dialog = new BootstrapDialog({
+                                BootstrapDialog.show({
+                                    title: "Initiate Submission",
+                                    message: wizardMessages.confirm_initiate_submission.text,
+                                    cssClass: 'copo-modal2',
+                                    closable: false,
+                                    animate: true,
+                                    type: BootstrapDialog.TYPE_INFO,
                                     buttons: [
                                         {
-                                            label: 'Exit Wizard',
+                                            label: '<i class="copo-components-icons fa fa-power-off"></i> Exit',
+                                            cssClass: 'tiny ui basic orange button',
                                             action: function (dialogRef) {
                                                 clear_wizard();
                                                 dialogRef.close();
@@ -738,42 +703,54 @@ $(document).ready(function () {
                                         },
                                         {
                                             label: 'Initiate',
-                                            cssClass: 'btn-primary',
+                                            cssClass: 'tiny ui basic primary button',
                                             action: function (dialogRef) {
-
                                                 dialogRef.getModalFooter().hide();
-                                                dialogRef.getModalBody().find(".copo-custom-modal-message").html('<div class="loading">Redirecting</div>');
+                                                dialogRef.getModalBody().find(".bootstrap-dialog-message").html("Initiating submission...");
+                                                dialogRef.getModalBody().find(".bootstrap-dialog-message").append($('<div style="margin-left: 40%; margin-top: 30px;" class="copo-i-loader"></div>'));
 
-                                                $.ajax({
-                                                    url: copoFormsURL,
-                                                    type: "POST",
-                                                    headers: {'X-CSRFToken': csrftoken},
-                                                    data: {
-                                                        'task': 'initiate_submission',
-                                                        'component': "submission",
-                                                        'datafile_ids': JSON.stringify(datafile_ids)
-                                                    },
-                                                    success: function (data) {
-                                                        //if successful, redirect to submissions
-                                                        var locus = $("#submission_url").val();
-                                                        window.location.replace(locus);
-                                                    },
-                                                    error: function () {
-                                                        alert("Couldn't initiate submission!");
-                                                    }
-                                                });
+                                                setTimeout(function () {
+                                                    $.ajax({
+                                                        url: copoFormsURL,
+                                                        type: "POST",
+                                                        headers: {
+                                                            'X-CSRFToken': csrftoken
+                                                        },
+                                                        data: {
+                                                            'task': 'initiate_submission',
+                                                            'component': "submission",
+                                                            'datafile_ids': JSON.stringify(datafile_ids)
+                                                        },
+                                                        success: function (data) {
+                                                            //if successful, redirect to submissions
+                                                            var locus = $("#submission_url").val();
+                                                            window.location.replace(locus);
+                                                        },
+                                                        error: function () {
+                                                            alert("Couldn't initiate submission!");
+                                                            window.location.reload();
+                                                        }
+                                                    });
+                                                }, 500);
+
+
                                             }
                                         }
                                     ]
                                 });
 
-                                dialog_display(dialog, "Initiate Submission", wizardMessages.confirm_initiate_submission.text, "info");
-
                             } else {
-                                var dialog = new BootstrapDialog({
+                                BootstrapDialog.show({
+                                    title: "Metadata Validation",
+                                    message: wizardMessages.metadata_validation_failed.text,
+                                    cssClass: 'copo-modal2',
+                                    closable: false,
+                                    animate: true,
+                                    type: BootstrapDialog.TYPE_WARNING,
                                     buttons: [
                                         {
-                                            label: 'Exit Wizard',
+                                            label: '<i class="copo-components-icons fa fa-power-off"></i> Exit',
+                                            cssClass: 'tiny ui basic orange button',
                                             action: function (dialogRef) {
                                                 clear_wizard();
                                                 dialogRef.close();
@@ -781,16 +758,13 @@ $(document).ready(function () {
                                         },
                                         {
                                             label: 'Describe',
-                                            cssClass: 'btn-primary',
+                                            cssClass: 'tiny ui basic primary button',
                                             action: function (dialogRef) {
                                                 dialogRef.close();
                                             }
                                         }
                                     ]
                                 });
-
-                                dialog_display(dialog, "Description Alert", wizardMessages.metadata_validation_failed.text, "warning");
-
                             }
                         }
                     },
@@ -821,13 +795,12 @@ $(document).ready(function () {
 
     function processing_request_dialog(message) {
         var $textAndPic = $('<div></div>');
-        $textAndPic.append("<div style='text-align: center'><i class='fa fa-spinner fa-pulse fa-2x'></i></div>");
+        $textAndPic.append($('<div style="margin-left: 40%; margin-top: 30px;" class="copo-i-loader"></div>'));
 
-        var dialogInstance = new BootstrapDialog()
+        var dialogInstance = new BootstrapDialog({cssClass: 'copo-modal2'})
             .setTitle(message)
             .setMessage($textAndPic)
             .setType(BootstrapDialog.TYPE_INFO)
-            .setSize(BootstrapDialog.SIZE_NORMAL)
             .setClosable(false)
             .open();
 
@@ -838,20 +811,19 @@ $(document).ready(function () {
         return array.indexOf(value) > -1;
     }
 
-    function get_apply_check_state(activeStageIndx) {//function returns the state of the apply-to-all control
+    function get_apply_check_state(activeStageIndx) { //function returns the state of the apply-to-all control
         var chkState; //apply-to-all checkbox state
 
         try {
             chkState = $("[name='apply-scope-chk-" + activeStageIndx + "']").bootstrapSwitch('state');
-        }
-        catch (err) {
+        } catch (err) {
             chkState = true;
         }
 
         return chkState;
     }
 
-    function set_apply_check_state(activeStageIndx) {//function determines whether all items in the bundle have same metadata
+    function set_apply_check_state(activeStageIndx) { //function determines whether all items in the bundle have same metadata
         if (activeStageIndx == -1) {
             return true;
         }
@@ -866,7 +838,9 @@ $(document).ready(function () {
         $.ajax({
             url: wizardURL,
             type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
             data: request_params,
             success: function (data) {
                 var btnState = false;
@@ -904,7 +878,9 @@ $(document).ready(function () {
         $.ajax({
             url: wizardURL,
             type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
             data: retrieval_params,
             success: function (data) {
                 do_post_stage_retrieval(data);
@@ -934,13 +910,9 @@ $(document).ready(function () {
         // wizard 'staging' process
         if (!($('#dataFileWizard').is(":visible"))) {
 
-
             $('#dataFileWizard').show();
 
             $('.steps li:last-child').hide(); //hide the last (static) stage of the wizard
-
-            //show wizard exit button
-            $('#remove_act').parent().show();
         }
 
         process_wizard_stage(data);
@@ -970,17 +942,17 @@ $(document).ready(function () {
             refresh_targets_data(data.targets_data);
         }
 
-
         if (($('#dataFileWizard').is(":visible"))) {
             do_post_stage_retrieval2(data);
         } else {
-            //store data pending tab shown
-            tempWizStore = data;
-
             $('#copo-datafile-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show');
+
+            //hide wizard getting started
+            $(".page-wizard-message").hide();
+
+            tabShownStore.data = data;
+            tabShownStore.method = "do_post_stage_retrieval2";
         }
-
-
     }
 
     function process_wizard_stage(data) {
@@ -991,9 +963,8 @@ $(document).ready(function () {
                 if (data.stages[i].stage.title) {
                     stage_objects[currentIndx] = data.stages[i].stage;
                     panes.push({
-                        badge: ' ',
                         label: '<span class=wiz-title>' + data.stages[i].stage.title + '</span>',
-                        pane: get_pane_content(wizardStagesForms(data.stages[i].stage), currentIndx)
+                        pane: get_pane_content(data.stages[i].stage, currentIndx)
                     });
 
                     ++currentIndx;
@@ -1024,13 +995,10 @@ $(document).ready(function () {
 
         } else if (data.stage.stage) {
             stage_objects[currentIndx] = data.stage.stage;
-            $('#dataFileWizard').wizard('addSteps', currentIndx, [
-                {
-                    badge: ' ',
-                    label: '<span class=wiz-title>' + data.stage.stage.title + '</span>',
-                    pane: get_pane_content(wizardStagesForms(data.stage.stage), currentIndx)
-                }
-            ]);
+            $('#dataFileWizard').wizard('addSteps', currentIndx, [{
+                label: '<span class=wiz-title>' + data.stage.stage.title + '</span>',
+                pane: get_pane_content(data.stage.stage, currentIndx)
+            }]);
 
             //give focus to the added step
             $('#dataFileWizard').wizard('selectedItem', {
@@ -1054,142 +1022,124 @@ $(document).ready(function () {
 
     } //end of func
 
-    function get_pane_content(stage_content, currentIndx) {
+    function get_pane_content(stage, currentIndx) {
+        var stage_content = wizardStagesForms(stage);
+
         var stageHTML = $('<div/>', {
             id: "stage-controls-div-" + currentIndx
         });
 
+        //form row
+        var formRow = $('<div/>', {
+            class: "row",
+        });
+
+        //description bundle row
+        var descriptionBundleRow = $('<div/>', {
+            class: "row",
+        });
+
+        //description bundle row
+        var applyToAllRow = $('<div/>', {
+            class: "row",
+        });
+
+        stageHTML.append(applyToAllRow).append(formRow).append(descriptionBundleRow);
+
+
         //'apply to all', alert trigger controls, and description context message
+        var applyToAllPanel = get_panel("dtables");
+        applyToAllPanel.attr("id", "alert_placeholder_" + currentIndx);
+        applyToAllPanel.find(".panel-body").addClass("webpop-content-div");
 
-        var panelGroup = $('<div/>', {
-            class: "panel-group wizard-message-panel",
-            id: "alert_placeholder_" + currentIndx
+        applyToAllPanel.find(".panel-heading").remove();
+
+        var applyToAllMessageDiv = $('<div/>', {
+            style: "margin-top: 15px;",
+            class: "apply-to-all-message",
         });
 
-        stageHTML.append(panelGroup);
+        var applyToHeader = $('<div/>');
 
-        var panelPrimary = $('<div/>', {
-            class: "panel panel-primary",
-            style: "border: 2px solid #3278b4;"
-        });
-
-        var panelHeading = $('<div/>', {
-            class: "panel-heading",
-            style: "background-image: none; padding: 5px 15px;"
-        });
-
-        var headerRow = $('<div/>', {
-            class: "row"
-        });
+        var noticeIcon = $('<i class="fa fa-info-circle text-primary" style="padding-right: 10px; vertical-align: middle; font-size: 24px"></i>');
 
         var spanMessage = $('<span/>', {
-            html: "<strong>Apply this description to all items in the description bundle?</strong>"
+            style: "font-weight: bold; font-size: 14px; vertical-align: middle;",
+            class: "text-info",
+            html: 'Do you want to apply the same metadata in this stage to all the items in the description bundle?'
         });
+
 
         var showApplyTo = "";
 
         if (stage_objects[currentIndx].is_singular_stage) {
-            spanMessage = $('<span/>', {
-                html: "<strong>This description will apply to all items in the description bundle</strong>"
-            });
-
+            spanMessage.html('The metadata supplied in this stage will apply to all the items in the description bundle');
             showApplyTo = " display: none;";
         }
+
 
         var spanInput = $('<span/>', {
             style: "font-weight: bold; margin-left: 5px;" + showApplyTo,
             html: '<input type="checkbox" name="apply-scope-chk-' + currentIndx + '" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">'
         });
 
-        var leftColumn = $('<div/>', {
-            class: "col-sm-11 col-md-11 col-lg-11"
+        applyToHeader.append(noticeIcon).append(spanMessage).append(spanInput);
+
+        applyToAllPanel.find(".panel-body").append(applyToHeader).append(applyToAllMessageDiv);
+
+
+        var formColumn = $('<div/>', {
+            class: "col-sm-12 col-md-12 col-lg-12"
         });
 
-        leftColumn.append(spanMessage).append(spanInput);
+        //'apply-to-all controls placement
+        var applyToColumn = $('<div/>', {
+            class: "col-sm-12 col-md-12 col-lg-12",
+        }).append(applyToAllPanel);
 
-        var rightColumn = $('<div/>', {
-            class: "col-sm-1 col-md-1 col-lg-1",
-            html: '<a data-toggle="collapse" href="#collapseAlert" title="Toggle display" class="fa fa-bell pull-right control-message-trigger" style="text-decoration: none; color: white; font-weight: 800;"></a>'
+        applyToAllRow.append(applyToColumn);
+        formRow.append(formColumn);
+
+        var formCtrl = $('<form/>', {
+            id: "wizard_form_" + currentIndx
         });
-
-        headerRow.append(leftColumn).append(rightColumn);
-        panelHeading.append(headerRow);
-
-        var panelCollapse = $('<div/>', {
-            class: "panel-collapse collapse message-pane-collapse",
-            id: "collapseAlert"
-        });
-
-        var panelBody = $('<div/>', {
-            class: "panel-body wizard-control-message",
-        });
-
-        var panelFooter = $('<div/>', {
-            class: "panel-footer"
-        });
-
-        panelCollapse.append(panelBody).append(panelFooter);
-        panelPrimary.append(panelHeading).append(panelCollapse);
-        panelGroup.append(panelPrimary);
-
-
-        //form controls
-        var formPanel = $('<div/>', {
-            class: "panel panel-copo-data",
-            style: "margin-top: 5px; font-size: 12px;"
-        });
-
-        stageHTML.append(formPanel);
-
-        var formPanelBody = $('<div/>', {
-            class: "panel-body"
-        });
-
-        formPanel.append(formPanelBody);
-
-        var formDiv = $('<div/>', {
-            style: "margin-top: 20px;"
-        });
-
-        formPanelBody.append(formDiv);
-
-        var formCtrl = $('<form/>',
-            {
-                id: "wizard_form_" + currentIndx
-            });
 
         formCtrl.append(stage_content);
 
-        var formButton = $('<button/>',
-            {
-                id: "apply_to_btn_" + currentIndx,
-                class: "apply-to-selected-btn btn btn-sm btn-primary",
-                html: "Apply to selected items in bundle",
-                "data-stage-indx": currentIndx
-            });
+        var formButton = $('<button/>', {
+            id: "apply_to_btn_" + currentIndx,
+            class: "apply-to-selected-btn btn btn-sm btn-primary",
+            html: "Apply to selected items in bundle",
+            "data-stage-indx": currentIndx
+        });
 
-        formDiv.append(formCtrl).append(formButton);
+        var formControlsPanel = get_panel("primary");
+        formControlsPanel.find(".panel-heading").append("<strong>Description Metadata</strong>");
+        formControlsPanel.find(".panel-body").append(formCtrl).append(formButton);
+        formControlsPanel.find(".panel-heading");
+
+        formColumn.append(formControlsPanel);
+
 
         //description bundle
-        var descriptionBundlePanel = $('<div/>', {
-            class: "panel panel-copo-data",
-            style: "margin-top: 25px; font-size: 12px;"
+
+        var descriptionBundleCol = $('<div/>', {
+            class: "col-sm-12 col-md-12 col-lg-12",
         });
 
-        stageHTML.append(descriptionBundlePanel);
-
-        var descriptionBundlePanelBody = $('<div/>', {
-            class: "panel-body"
-        });
-
-        descriptionBundlePanel.append(descriptionBundlePanelBody);
+        descriptionBundleRow.append(descriptionBundleCol);
 
         var descriptionBundleTableHTML = "";
-        descriptionBundleTableHTML += '<table id="description_target_table_' + currentIndx + '" class="display copo-datatable copo-table-header" cellspacing="0" width="100%">';
-        descriptionBundleTableHTML += '<thead><tr><th></th><th>Description Bundle</th><th>&nbsp;</th>';
+        descriptionBundleTableHTML += '<table id="description_target_table_' + currentIndx + '" class="ui celled table hover copo-noborders-table" cellspacing="0" width="100%">';
+        descriptionBundleTableHTML += '<thead><tr><th></th><th>Datafiles</th><th>&nbsp;</th>';
         descriptionBundleTableHTML += '</tr> </thead></table>';
 
-        descriptionBundlePanelBody.html(descriptionBundleTableHTML);
+        var bundlePanel = get_panel("primary");
+        bundlePanel.find(".panel-heading").append("<strong>Description Bundle</strong>");
+        bundlePanel.find(".panel-body").html(descriptionBundleTableHTML);
+        bundlePanel.find(".panel-heading");
+
+        descriptionBundleCol.html(bundlePanel);
 
         return stageHTML;
     }
@@ -1209,29 +1159,18 @@ $(document).ready(function () {
         $('#dataFileWizard').wizard('removeSteps', 1, currentIndx + 1);
         $('#dataFileWizard').hide();
 
+
+        //reset wizard parameters
         descriptionBundle = []; //clear bundle
-        descriptionToken = "";//discard description token
+        descriptionToken = ""; //discard description token
         stage_objects = {}; //clear stage objects
 
-        //reset inDescription flag
-        $('.inDescription-flag').each(function () { //main datafile table
-            $(this).hide();
-        });
-
+        refresh_inDescription_flag(); //refresh description flag
         silenceAlert = false;
-
-        //clear wizard buttons
-        $('#wizard_steps_buttons').html('');
-
+        displayedMessages = {};
 
         //reset index
         currentIndx = 0;
-
-        //hide discard button
-        $('#remove_act').parent().hide();
-
-        //switch from wizard panel
-        tempWizStore = null;
 
         if (onGoingDescription) {
             $('#copo-datafile-tabs.nav-tabs a[href="#emptyTab"]').tab('show');
@@ -1240,17 +1179,12 @@ $(document).ready(function () {
         }
 
         onGoingDescription = false;
-
-        //clear stage message on help centre
-        onTheFlyElem.empty();
-
+        $("#description_panel").css("display", "none");
+        $(".page-wizard-message").show();
     }
 
-    function reset_wizard() {//resets wizard without all the hassle of clear_wizard()
+    function reset_wizard() { //resets wizard without all the hassle of clear_wizard()
         $('#dataFileWizard').wizard('removeSteps', 1, currentIndx + 1);
-
-        //clear wizard buttons
-        $('#wizard_steps_buttons').html('');
 
         //add review step, then other steps
         $('#dataFileWizard').wizard('addSteps', -1, [
@@ -1305,7 +1239,7 @@ $(document).ready(function () {
 
 
         var stage_data = collate_stage_data();
-        if (!stage_data) {//if no data, just go ahead and display stage
+        if (!stage_data) { //if no data, just go ahead and display stage
             $('#dataFileWizard').wizard('selectedItem', {
                 step: proposedState
             });
@@ -1313,7 +1247,9 @@ $(document).ready(function () {
             $.ajax({
                 url: wizardURL,
                 type: "POST",
-                headers: {'X-CSRFToken': csrftoken},
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
                 data: stage_data,
                 success: function (data) {
                     //update batch with data
@@ -1332,59 +1268,66 @@ $(document).ready(function () {
         }
     }
 
-    function do_undescribe_confirmation(targetIds) {
-        //Impose number of constraints here...
+    function do_undescribe_confirmation(records) {
+        //Impose a number of constraints here...
         //1. items currently being described
         //2. items already submitted? not sure of this, relaxed for the time being
 
         var candidates = [];
-        targetIds.forEach(function (item) {
-            if (!isIn_descriptionBundle_Id(item)) {
-                candidates.push(item);
-            }
-        });
+
+        for (var i = 0; i < records.length; ++i) {
+            candidates.push(records[i].record_id);
+        }
 
         if (candidates.length == 0) {
             return false;
         }
 
-        var dialog = new BootstrapDialog({
-            buttons: [
-                {
-                    label: 'Cancel',
-                    action: function (dialogRef) {
-                        dialogRef.close();
-                    }
-                },
-                {
-                    label: 'Discard',
-                    cssClass: 'btn-danger',
-                    action: function (dialogRef) {
-                        dialogRef.close();
-
-                        var request_params = {
-                            'task': 'un_describe',
-                            'datafile_ids': JSON.stringify(candidates)
-                        };
-
-                        $.ajax({
-                            url: copoVisualsURL,
-                            type: "POST",
-                            headers: {'X-CSRFToken': csrftoken},
-                            data: request_params,
-                            success: function (data) {
-                                update_itemMetadata_flag();
-                            },
-                            error: function () {
-                                alert("Couldn't update metadata for targets!");
-                            }
-                        });
-                    }
+        BootstrapDialog.show({
+            title: "Discard Description",
+            message: wizardMessages.delete_description_message.text,
+            cssClass: 'copo-modal2',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_DANGER,
+            buttons: [{
+                label: 'Cancel',
+                cssClass: 'tiny ui basic button',
+                action: function (dialogRef) {
+                    dialogRef.close();
                 }
-            ]
-        });
+            }, {
+                label: '<i class="copo-components-icons fa fa-times"></i> Discard',
+                cssClass: 'tiny ui basic red button',
+                action: function (dialogRef) {
+                    dialogRef.close();
 
-        dialog_display(dialog, "Discard Description", wizardMessages.delete_description_message.text, "danger");
+                    var request_params = {
+                        'task': 'un_describe',
+                        'datafile_ids': JSON.stringify(candidates)
+                    };
+
+                    $.ajax({
+                        url: copoVisualsURL,
+                        type: "POST",
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
+                        data: request_params,
+                        success: function (data) {
+                            display_copo_alert("info", "Description metadata discarded", 20000);
+                            update_itemMetadata_flag();
+                            refresh_inDescription_flag();
+
+                            deselect_records(componentMeta.tableID);
+                        },
+                        error: function () {
+                            alert("Couldn't discard description for selected records!");
+                        }
+                    });
+                }
+            }]
+        });
     }
 
     function add_to_batch(batchTargets, silence) {
@@ -1418,220 +1361,262 @@ $(document).ready(function () {
 
         var dialogHandle = processing_request_dialog('Validating description targets...');
 
-        $.ajax({
-            url: wizardURL,
-            type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
-            data: request_params,
-            success: function (data) {
-                if (data.description_token) {
-                    descriptionToken = data.description_token;
-                }
+        setTimeout(function () {
+            $.ajax({
+                url: wizardURL,
+                type: "POST",
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                data: request_params,
+                success: function (data) {
+                    if (data.description_token) {
+                        descriptionToken = data.description_token;
+                    }
 
-                dialogHandle.close();
+                    dialogHandle.close();
 
-                if (data.validatation_results.validation_code == "100") {
-                    // Targets are compatible, and may be described as a bundle!
-                    if (descriptionBundle.length > 0) {
-                        candidates.forEach(function (item) {
-                            descriptionBundle.push(item);
-                        });
+                    if (data.validatation_results.validation_code == "100") {
+                        //  compatible description targets which can be described as a bundle!
+                        do_validate_100(candidates, data, silence);
 
-                        //update added items with data
-                        refresh_targets_data(data.validatation_results.extra_information.candidates_data);
+                    } else if (data.validatation_results.validation_code == "101") {
+                        //some candidates are ahead of others! inherit metadata?
+                        do_validate_101(candidates, data);
 
+                    } else if (data.validatation_results.validation_code == "102") {
+                        //candidates have incompatible metadata
+                        do_validate_102();
+                    } else if (data.validatation_results.validation_code == "103") {
+                        //some candidates are ahead of items in the description bundle! inherit metadata?
+                        do_validate_103(candidates, data);
                     } else {
-                        if (candidates.length > 1) {
-                            if (silence) {
+                        refresh_batch_display();
+                    }
+                },
+                error: function () {
+                    alert("Couldn't retrieve data for targets!");
+                }
+            });
+        }, 500);
+
+    }
+
+
+    function do_validate_100(candidates, data, silence) { // compatible description targets which can be described as a bundle!
+        if (descriptionBundle.length > 0) {
+            candidates.forEach(function (item) {
+                descriptionBundle.push(item);
+            });
+
+            //update added items with data
+            refresh_targets_data(data.validatation_results.extra_information.candidates_data);
+
+        } else {
+            if (candidates.length > 1) {
+                if (silence) {
+                    descriptionBundle = candidates;
+                    //update added items with data
+                    refresh_targets_data(data.validatation_results.extra_information.candidates_data);
+                    do_post_stage_retrieval(data);
+                    refresh_batch_display();
+
+                } else {
+                    BootstrapDialog.show({
+                        title: "Description Information",
+                        message: wizardMessages.confirm_bundling_action.text,
+                        cssClass: 'copo-modal2',
+                        closable: false,
+                        animate: true,
+                        type: BootstrapDialog.TYPE_INFO,
+                        buttons: [{
+                            label: 'Cancel',
+                            cssClass: 'tiny ui basic button',
+                            action: function (dialogRef) {
+                                dialogRef.close();
+                            }
+                        }, {
+                            label: '<i class="copo-components-icons fa fa-check"></i> Continue',
+                            cssClass: 'tiny ui basic teal button',
+                            action: function (dialogRef) {
                                 descriptionBundle = candidates;
                                 //update added items with data
                                 refresh_targets_data(data.validatation_results.extra_information.candidates_data);
                                 do_post_stage_retrieval(data);
                                 refresh_batch_display();
-
-                            } else {
-                                var dialog = new BootstrapDialog({
-                                    buttons: [
-                                        {
-                                            label: 'Cancel',
-                                            action: function (dialogRef) {
-                                                descriptionToken = null;
-                                                dialogRef.close();
-                                            }
-                                        },
-                                        {
-                                            label: 'Continue',
-                                            cssClass: 'btn-primary',
-                                            action: function (dialogRef) {
-                                                descriptionBundle = candidates;
-                                                //update added items with data
-                                                refresh_targets_data(data.validatation_results.extra_information.candidates_data);
-                                                do_post_stage_retrieval(data);
-                                                refresh_batch_display();
-                                                dialogRef.close();
-                                            }
-                                        }
-                                    ]
-                                });
-
-                                dialog_display(dialog, "Description Information", wizardMessages.confirm_bundling_action.text, "info");
+                                dialogRef.close();
                             }
-
-                        } else {
-                            //set bundle to candidates
-                            descriptionBundle = candidates;
-                            refresh_targets_data(data.validatation_results.extra_information.candidates_data);
-                            do_post_stage_retrieval(data);
-                            refresh_batch_display();
-                        }
-                    }
-
-                } else if (data.validatation_results.validation_code == "101") {
-                    //some candidates are ahead of others! inherit metadata?
-
-                    var dialog = new BootstrapDialog({
-                        buttons: [
-                            {
-                                label: 'No ',
-                                action: function (dialogRef) {
-                                    descriptionToken = null;
-                                    dialogRef.close();
-                                }
-                            },
-                            {
-                                label: 'Yes ',
-                                cssClass: 'btn-primary',
-                                action: function (dialogRef) {
-                                    var request_action = "inherit_metadata";
-                                    if (descriptionBundle.length == 0) {
-                                        request_action = "inherit_metadata_refresh";
-                                    }
-
-                                    $.ajax({
-                                        url: wizardURL,
-                                        type: "POST",
-                                        headers: {'X-CSRFToken': csrftoken},
-                                        data: {
-                                            'request_action': request_action,
-                                            'target_id': data.validatation_results.extra_information.target.recordID,
-                                            'description_token': descriptionToken,
-                                            'description_targets': JSON.stringify(candidates),
-                                            'description_bundle': JSON.stringify(candidates)
-                                        },
-                                        success: function (data) {
-                                            if (descriptionBundle.length > 0) {
-                                                candidates.forEach(function (item) {
-                                                    descriptionBundle.push(item);
-                                                });
-
-                                                //update added items with data
-                                                if (data.targets_data) {
-                                                    refresh_targets_data(data.targets_data);
-                                                }
-
-                                            } else {
-                                                descriptionBundle = candidates;
-                                                do_post_stage_retrieval(data);
-                                            }
-
-                                            refresh_batch_display();
-
-                                            dialogRef.close();
-                                        },
-                                        error: function () {
-                                            alert("Couldn't inherit metadata!");
-                                            return '';
-                                        }
-                                    });
-                                }
-                            }
-                        ]
+                        }]
                     });
-
-                    var dialog_message = wizardMessages.inherit_metadata_message.text;
-                    dialog_message += '<div class="radio wizard-alert-radio">' + show_description_metadata(data.validatation_results.extra_information.summary) + '</div>';
-
-                    dialog_display(dialog, "Description Information", dialog_message, "warning");
-
-                } else if (data.validatation_results.validation_code == "102") {
-                    var dialog = new BootstrapDialog({
-                        buttons: [
-                            {
-                                label: 'OK',
-                                cssClass: 'btn-primary',
-                                action: function (dialogRef) {
-                                    descriptionToken = null;
-                                    dialogRef.close();
-                                }
-                            }
-                        ]
-                    });
-
-                    dialog_display(dialog, "Description Information", wizardMessages.incompatible_metadata_message.text, "danger");
-                } else if (data.validatation_results.validation_code == "103") {
-                    //some candidates are ahead of items in the description bundle! inherit metadata?
-
-                    var dialog = new BootstrapDialog({
-                        buttons: [
-                            {
-                                label: 'No ',
-                                action: function (dialogRef) {
-                                    descriptionToken = null;
-                                    dialogRef.close();
-                                }
-                            },
-                            {
-                                label: 'Yes ',
-                                cssClass: 'btn-primary',
-                                action: function (dialogRef) {
-                                    candidates.forEach(function (item) {
-                                        descriptionBundle.push(item);
-                                    });
-
-                                    var tempDescriptionBundle = descriptionBundle;
-
-                                    $.ajax({
-                                        url: wizardURL,
-                                        type: "POST",
-                                        headers: {'X-CSRFToken': csrftoken},
-                                        data: {
-                                            'request_action': "inherit_metadata_refresh",
-                                            'target_id': data.validatation_results.extra_information.target.recordID,
-                                            'description_token': descriptionToken,
-                                            'description_targets': JSON.stringify(descriptionBundle),
-                                            'description_bundle': JSON.stringify(descriptionBundle)
-                                        },
-                                        success: function (data) {
-                                            clear_wizard();
-                                            descriptionBundle = tempDescriptionBundle;
-                                            do_post_stage_retrieval(data);
-                                            refresh_batch_display();
-
-                                            dialogRef.close();
-                                        },
-                                        error: function () {
-                                            alert("Couldn't inherit metadata!");
-                                            return '';
-                                        }
-                                    });
-                                }
-                            }
-                        ]
-                    });
-
-                    var dialog_message = wizardMessages.inherit_metadata_103_message.text;
-                    dialog_message += '<div class="radio wizard-alert-radio">' + show_description_metadata(data.validatation_results.extra_information.summary) + '</div>';
-
-                    dialog_display(dialog, "Description Information", dialog_message, "warning");
                 }
 
-
+            } else {
+                //set bundle to candidates
+                descriptionBundle = candidates;
+                refresh_targets_data(data.validatation_results.extra_information.candidates_data);
+                do_post_stage_retrieval(data);
                 refresh_batch_display();
-            },
-            error: function () {
-                alert("Couldn't retrieve data for targets!");
             }
+        }
+
+        refresh_batch_display();
+    }
+
+    function do_validate_101(candidates, data) { //some description candidates are ahead of others! inherit metadata?
+        var dialog_message = wizardMessages.inherit_metadata_message.text;
+        dialog_message += '<div class="radio wizard-alert-radio">' + show_description_metadata(data.validatation_results.extra_information.summary) + '</div>';
+
+        BootstrapDialog.show({
+            title: "Inherit Metadata",
+            message: dialog_message,
+            cssClass: 'copo-modal2',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_WARNING,
+            buttons: [{
+                label: 'No',
+                cssClass: 'tiny ui basic button',
+                action: function (dialogRef) {
+                    descriptionToken = null;
+                    dialogRef.close();
+                }
+            }, {
+                label: '<i class="copo-components-icons fa fa-check"></i> Yes',
+                cssClass: 'tiny ui basic orange button',
+                action: function (dialogRef) {
+                    var request_action = "inherit_metadata";
+                    if (descriptionBundle.length == 0) {
+                        request_action = "inherit_metadata_refresh";
+                    }
+
+                    $.ajax({
+                        url: wizardURL,
+                        type: "POST",
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
+                        data: {
+                            'request_action': request_action,
+                            'target_id': data.validatation_results.extra_information.target.recordID,
+                            'description_token': descriptionToken,
+                            'description_targets': JSON.stringify(candidates),
+                            'description_bundle': JSON.stringify(candidates)
+                        },
+                        success: function (data) {
+                            if (descriptionBundle.length > 0) {
+                                candidates.forEach(function (item) {
+                                    descriptionBundle.push(item);
+                                });
+
+                                //update added items with data
+                                if (data.targets_data) {
+                                    refresh_targets_data(data.targets_data);
+                                }
+
+                            } else {
+                                descriptionBundle = candidates;
+                                do_post_stage_retrieval(data);
+                            }
+
+                            refresh_batch_display();
+
+                            dialogRef.close();
+                        },
+                        error: function () {
+                            alert("Couldn't inherit metadata!");
+                            return '';
+                        }
+                    });
+                }
+            }]
         });
+
+        refresh_batch_display();
+    }
+
+    function do_validate_102() { //candidates have incompatible metadata
+        BootstrapDialog.show({
+            title: "Incompatible Metadata",
+            message: wizardMessages.incompatible_metadata_message.text,
+            cssClass: 'copo-modal2',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_DANGER,
+            buttons: [{
+                label: 'OK',
+                cssClass: 'tiny ui basic button',
+                action: function (dialogRef) {
+                    descriptionToken = null;
+                    dialogRef.close();
+                }
+            }]
+        });
+
+        refresh_batch_display();
+    }
+
+    function do_validate_103(candidates, data) { //candidates ahead of items in the description bundle! inherit metadata?
+        var dialog_message = wizardMessages.inherit_metadata_103_message.text;
+        dialog_message += '<div class="radio wizard-alert-radio">' + show_description_metadata(data.validatation_results.extra_information.summary) + '</div>';
+
+        $('#copo-datafile-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show'); //switch back to description pane
+
+        BootstrapDialog.show({
+            title: "Inherit Metadata",
+            message: dialog_message,
+            cssClass: 'copo-modal2',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_WARNING,
+            buttons: [{
+                label: 'No',
+                cssClass: 'tiny ui basic button',
+                action: function (dialogRef) {
+                    descriptionToken = null;
+                    dialogRef.close();
+                }
+            }, {
+                label: '<i class="copo-components-icons fa fa-check"></i> Yes',
+                cssClass: 'tiny ui basic orange button',
+                action: function (dialogRef) {
+                    candidates.forEach(function (item) {
+                        descriptionBundle.push(item);
+                    });
+
+                    var tempDescriptionBundle = descriptionBundle;
+
+                    $.ajax({
+                        url: wizardURL,
+                        type: "POST",
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
+                        data: {
+                            'request_action': "inherit_metadata_refresh",
+                            'target_id': data.validatation_results.extra_information.target.recordID,
+                            'description_token': descriptionToken,
+                            'description_targets': JSON.stringify(descriptionBundle),
+                            'description_bundle': JSON.stringify(descriptionBundle)
+                        },
+                        success: function (data2) {
+                            clear_wizard();
+                            descriptionBundle = tempDescriptionBundle;
+                            dialogRef.close();
+                            setTimeout(function () {
+                                do_post_stage_retrieval(data2);
+                                refresh_batch_display();
+                            }, 500);
+                        },
+                        error: function () {
+                            alert("Couldn't inherit metadata!");
+                            return '';
+                        }
+                    });
+                }
+            }]
+        });
+
+        refresh_batch_display();
     }
 
     function show_description_metadata(data) {
@@ -1762,210 +1747,109 @@ $(document).ready(function () {
     }
 
     //handles button events on a record or group of records
-    function do_record_task(elem) {
-        var task = elem.attr('data-record-action').toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
-        var taskTarget = elem.attr('data-action-target'); //is the task targeting a single 'row' or group of 'rows'?
+    function do_record_task(event) {
+        var task = event.task.toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
+        var tableID = event.tableID; //get target table
 
-        var ids = [];
-        var records = [];
-        var table = null;
+        //records currently being described will be locked from receiving other tasks.
+        //they must be unlocked (i.e., removed from the active description ) before once again
+        //becoming available to receiving tasks.
+        var disallowed = [];
 
-
-        //retrieve event targets
-        if ($.fn.dataTable.isDataTable('#' + tableID)) {
-            table = $('#' + tableID).DataTable();
-
-            if (taskTarget == 'row') {
-                ids = [elem.attr('data-record-id')];
-            } else {
-                ids = $.map(table.rows('.selected').data(), function (item) {
-                    return item[item.length - 1];
-                });
-            }
-
-            var records = []; //richer information context, retained for other purposes, e.g., description batch
-            $.map(table.rows('.selected').data(), function (item) {
+        //retrieve target records and execute task
+        var table = $('#' + tableID).DataTable();
+        var records = []; //
+        $.map(table.rows('.selected').data(), function (item) {
+            if (!isIn_descriptionBundle_Id(item.record_id)) {
                 records.push(item);
-            });
+            } else {
+                disallowed.push(item);
+            }
+        });
 
+        if (records.length == 0 && disallowed == 0) {
+            return false;
         }
 
-        //handle button action
-        if (task == "describe" && records.length > 0) {
-            //remove highlight from selected rows
-            table.rows('.selected').deselect();
+        if (disallowed.length > 0) {
+            var disallowedMessage = "Please note that records currently being described will be excluded from the current task. <br/><br/> No. of records to be excluded: " + disallowed.length;
 
+            BootstrapDialog.show({
+                title: "Action Review",
+                message: disallowedMessage,
+                cssClass: 'copo-modal2',
+                closable: false,
+                animate: true,
+                type: BootstrapDialog.TYPE_WARNING,
+                buttons: [{
+                    label: 'OK',
+                    cssClass: 'tiny ui basic orange button',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                        realise_record_task(records, task, table);
+                    }
+                }]
+            });
+        } else {
+            realise_record_task(records, task, table);
+        }
+
+
+        //table.rows().deselect(); //deselect all rows
+
+    } //end of func
+
+    function realise_record_task(records, task, table) {
+        refresh_inDescription_flag();
+
+        if (records.length == 0) {
+            return false;
+        }
+
+
+        if (task == "describe") {
             //append to batch
             var batchTargets = [];
             for (var i = 0; i < records.length; ++i) {
                 var item = records[i];
                 var option = {};
-                option["recordLabel"] = item[0];
-                option["recordID"] = item[item.length - 1];
+                option["recordLabel"] = item.name;
+                option["recordID"] = item.record_id;
                 option["attributes"] = {};
                 batchTargets.push(option);
             }
 
             add_to_batch(batchTargets, false);
+            table.rows().deselect();
 
-
-        } else if (task == "delete" && ids.length > 0) { //handles delete, allows multiple row delete
-            var deleteParams = {component: component, target_ids: ids};
-            do_component_delete_confirmation(deleteParams);
-
-        } else if (task == "undescribe" && ids.length > 0) { //handles description metadata delete
-            do_undescribe_confirmation(ids);
-
+        } else if (task == "discard") {
+            do_undescribe_confirmation(records);
+        } else if (task == "edit") {
+            $.ajax({
+                url: copoFormsURL,
+                type: "POST",
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                data: {
+                    'task': 'form',
+                    'component': component,
+                    'target_id': records[0].record_id //only allowing row action for edit, hence first record taken as target
+                },
+                success: function (data) {
+                    json2HtmlForm(data);
+                },
+                error: function () {
+                    alert("Couldn't build datafile form!");
+                }
+            });
+        } else if (task == "delete") {
+            //...
         }
-        else if (task == "info" && ids.length > 0) {
-            var tr = elem.closest('tr');
-            var row = table.row(tr);
-
-            if (row.child.isShown()) {
-                //row is already open - close it
-                row.child.hide();
-            } else {
-                var contentHtml = "<div style='text-align: center'><i class='fa fa-spinner fa-pulse fa-2x'></i></div>";
-                row.child(contentHtml).show();
-
-                $.ajax({
-                    url: copoVisualsURL,
-                    type: "POST",
-                    headers: {'X-CSRFToken': csrftoken},
-                    data: {
-                        'task': 'description_summary',
-                        'component': "datafile",
-                        'target_id': ids[0]
-                    },
-                    success: function (data) {
-                        var descriptionDiv = $('<div></div>');
-
-                        for (var j = 0; j < data.description.length; ++j) {
-                            var Ddata = data.description[j];
-
-                            var i = 0; //need to change this to reflect stage index...
-
-                            var level1Div = $('<div/>', {
-                                style: 'padding: 5px; border: 1px solid #ddd; border-radius:2px; margin-bottom:3px;'
-                            });
-
-                            var level2Anchor = $('<a/>', {
-                                class: "review-to-stage",
-                                "data-stage-indx": i,
-                                "data-sel-target": ids[0],
-                                style: "cursor: pointer; cursor: hand;",
-                                html: Ddata.title
-                            });
-
-                            var level2Div = $('<div/>', {
-                                style: 'padding-bottom: 5px;'
-                            }).append($('<span></span>').append(level2Anchor));
-
-                            level1Div.append(level2Div);
-
-                            for (var k = 0; k < Ddata.data.length; ++k) {
-                                var Mdata = Ddata.data[k];
-
-                                var mDataDiv = $('<div/>', {
-                                    style: 'padding-bottom: 5px;'
-                                });
-
-                                var mDataLabelSpan = $('<span/>', {
-                                    style: 'margin-right: 10px;',
-                                    html: Mdata.label + ":"
-                                });
-
-                                var displayedValue = "";
-
-                                if (Object.prototype.toString.call(Mdata.data) === '[object Array]') {
-                                    Mdata.data.forEach(function (vv) {
-                                        displayedValue += "<div style='padding-left: 25px; padding-top: 3px;'>" + vv + "</div>";
-                                    });
-                                } else if (Object.prototype.toString.call(Mdata.data) === '[object String]') {
-                                    displayedValue = String(Mdata.data);
-                                }
-
-                                var mDataDataSpan = $('<span/>', {
-                                    html: displayedValue
-                                });
-
-                                mDataDiv.append(mDataLabelSpan).append(mDataDataSpan);
-                                level1Div.append(mDataDiv)
-                            }
-
-                            descriptionDiv.append(level1Div);
-                        }
-
-                        var descriptionHtml = "No description!";
-
-                        if (data.description.length) {
-                            descriptionHtml = descriptionDiv.html();
-                        }
-
-                        var descriptionInfoPanel = $('<div/>', {
-                            class: "panel panel-default",
-                            style: 'margin-top:1px;'
-                        });
-
-                        var headingRow = $('<div/>', {
-                            class: "row"
-                        });
-
-                        var headingRowTxt = $('<div/>', {
-                            class: "col-sm-11 col-md-11 col-lg-11",
-                            html: '<span style="font-weight: bold; margin-left: 5px;">Description Metadata</span>'
-                        });
-
-                        var metadataClass = 'itemMetadata-flag-ind poor';
-
-                        if (tr.find('.itemMetadata-flag').find('.meta-active').length) {
-                            metadataClass = tr.find('.itemMetadata-flag').find('.meta-active').attr("class");
-                        }
-
-                        var headingRowIconSpan = $('<span/>', {
-                            class: "pull-right " + metadataClass,
-                            style: "width: 15px; height: 15px; border: 1px solid #ddd;"
-                        });
-
-                        var headingRowIconDiv = $('<div/>', {
-                            class: "itemMetadata-flag",
-                            title: "Metadata Rating"
-                        }).append(headingRowIconSpan);
-
-                        var headingRowIcon = $('<div/>', {
-                            class: "col-sm-1 col-md-1 col-lg-1",
-                            style: "padding-left: 5px;"
-                        }).append(headingRowIconDiv);
-
-                        headingRow.append(headingRowTxt).append(headingRowIcon);
-
-                        var descriptionInfoPanelPanelHeading = $('<div/>', {
-                            class: "panel-heading",
-                            style: "background-image: none;"
-                        }).append(headingRow);
-
-                        var descriptionInfoPanelPanelBody = $('<div/>', {
-                            class: "panel-body",
-                            style: "overflow:scroll",
-                            html: descriptionHtml
-                        });
-
-                        descriptionInfoPanel.append(descriptionInfoPanelPanelHeading).append(descriptionInfoPanelPanelBody);
-
-                        row.child($('<div></div>').append(descriptionInfoPanel).html()).show();
-                    },
-                    error: function () {
-                        alert("Couldn't retrieve description attributes!");
-                        return '';
-                    }
-                });
-            }
-        }
-
-    } //end of func
+    }
 
 
-    function do_deque(item) {//removes item from the batch
+    function do_deque(item) { //removes item from the batch
         var position = -1;
 
         for (i = 0; i < descriptionBundle.length; ++i) {
@@ -2017,8 +1901,7 @@ $(document).ready(function () {
 
             try {
                 formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
-            }
-            catch (err) {
+            } catch (err) {
                 formDiv.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + formElem.label + '): Cannot resolve form control!</div>');
             }
 
@@ -2026,21 +1909,19 @@ $(document).ready(function () {
             if (formElem.trigger) {
                 try {
                     dispatchEventHandler[formElem.trigger.callback.function](formElem);
-                }
-                catch (err) {
+                } catch (err) {
                 }
             }
 
         }
 
         //add current stage to form
-        var hiddenCtrl = $('<input/>',
-            {
-                type: "hidden",
-                id: "current_stage",
-                name: "current_stage",
-                value: stage.ref
-            });
+        var hiddenCtrl = $('<input/>', {
+            type: "hidden",
+            id: "current_stage",
+            name: "current_stage",
+            value: stage.ref
+        });
 
         formDiv.append(hiddenCtrl);
 
@@ -2048,69 +1929,75 @@ $(document).ready(function () {
     }
 
     function element_value_change(formElem, elemValue, messageTitle) {
-        var dialog = new BootstrapDialog({
-            buttons: [
-                {
-                    label: 'Cancel',
-                    cssClass: 'btn-default',
-                    action: function (dialogRef) {
-                        //set back to previous value
-                        $("#" + formElem.id).val(elemValue);
-
-                        dialogRef.close();
-                    }
-                },
-                {
-                    label: 'Continue',
-                    cssClass: 'btn-primary',
-                    action: function (dialogRef) {
-                        setTimeout(function () {
-                            //reset the wizard...
-                            var batchTargets = [];
-                            descriptionBundle.forEach(function (item) {
-                                batchTargets.push(item);
-                            });
-                            //call to save
-                            var stage_data = collate_stage_data();
-                            //remember user's choice for alerts
-                            var silnAlert = silenceAlert;
-                            if (stage_data) {
-                                $.ajax({
-                                    url: wizardURL,
-                                    type: "POST",
-                                    headers: {'X-CSRFToken': csrftoken},
-                                    data: stage_data,
-                                    success: function (data) {
-                                        onGoingDescription = true;
-                                        clear_wizard();
-                                        silenceAlert = silnAlert;
-                                        setStageIndx = $('#dataFileWizard').wizard('selectedItem').step;
-                                        add_to_batch(batchTargets, true);
-                                    },
-                                    error: function () {
-                                        alert("Couldn't save entries!");
-                                    }
-                                });
-                            }
-
-                        }, 1000);
-
-                        dialogRef.close();
-                    }
-                }
-            ]
-        });
-
         var triggerMessage = '';
 
         try {
             triggerMessage = formElem.trigger.message;
-        }
-        catch (err) {
+        } catch (err) {
             ;
         }
 
-        dialog_display(dialog, messageTitle, triggerMessage, "warning");
+
+        BootstrapDialog.show({
+            title: messageTitle,
+            message: triggerMessage,
+            cssClass: 'copo-modal2',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_WARNING,
+            buttons: [{
+                label: 'Cancel',
+                cssClass: 'tiny ui basic button',
+                action: function (dialogRef) {
+                    //set back to previous value
+                    $("#" + formElem.id).val(elemValue);
+
+                    dialogRef.close();
+                }
+            }, {
+                label: 'Continue',
+                cssClass: 'tiny ui basic orange button',
+                action: function (dialogRef) {
+                    setTimeout(function () {
+                        //reset the wizard...
+                        var batchTargets = [];
+                        descriptionBundle.forEach(function (item) {
+                            batchTargets.push(item);
+                        });
+
+                        //call to save
+                        var stage_data = collate_stage_data();
+
+                        //remember user's choice for alerts
+                        var silnAlert = silenceAlert;
+                        if (stage_data) {
+                            $.ajax({
+                                url: wizardURL,
+                                type: "POST",
+                                headers: {
+                                    'X-CSRFToken': csrftoken
+                                },
+                                data: stage_data,
+                                success: function (data) {
+                                    onGoingDescription = true;
+                                    clear_wizard();
+                                    silenceAlert = silnAlert;
+                                    setStageIndx = $('#dataFileWizard').wizard('selectedItem').step;
+                                    add_to_batch(batchTargets, true);
+                                },
+                                error: function () {
+                                    alert("Couldn't save entries!");
+                                }
+                            });
+                        }
+
+                    }, 1000);
+
+                    dialogRef.close();
+                }
+            }]
+        });
+
     }
 
     var dispatchEventHandler = {
@@ -2128,16 +2015,81 @@ $(document).ready(function () {
                 });
         },
         target_repo_change: function (formElem) {
-            var previousValue = null;
-            $(document)
-                .off("focus", "#" + formElem.id)
-                .on("focus", "#" + formElem.id, function () {
-                    previousValue = this.value;
-                });
             $(document)
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
-                    element_value_change(formElem, previousValue, formElem.label + " Change");
+                    var elemValue = $("#" + formElem.id + "_previousValue").val();
+                    var messageTitle = formElem.label + " Change"
+
+                    var triggerMessage = '';
+
+                    try {
+                        triggerMessage = formElem.trigger.message;
+                    } catch (err) {
+                        ;
+                    }
+
+
+                    BootstrapDialog.show({
+                        title: messageTitle,
+                        message: triggerMessage,
+                        cssClass: 'copo-modal2',
+                        closable: false,
+                        animate: true,
+                        type: BootstrapDialog.TYPE_WARNING,
+                        buttons: [{
+                            label: 'Cancel',
+                            cssClass: 'tiny ui basic button',
+                            action: function (dialogRef) {
+                                //set back to previous value
+                                $('input[name=' + formElem.id + '_input][value=' + elemValue + ']').prop('checked', true);
+                                $("#" + formElem.id).val(elemValue);
+
+                                dialogRef.close();
+                            }
+                        }, {
+                            label: 'Continue',
+                            cssClass: 'tiny ui basic orange button',
+                            action: function (dialogRef) {
+                                setTimeout(function () {
+                                    //reset the wizard...
+                                    var batchTargets = [];
+                                    descriptionBundle.forEach(function (item) {
+                                        batchTargets.push(item);
+                                    });
+
+                                    //call to save
+                                    var stage_data = collate_stage_data();
+
+                                    //remember user's choice for alerts
+                                    var silnAlert = silenceAlert;
+                                    if (stage_data) {
+                                        $.ajax({
+                                            url: wizardURL,
+                                            type: "POST",
+                                            headers: {
+                                                'X-CSRFToken': csrftoken
+                                            },
+                                            data: stage_data,
+                                            success: function (data) {
+                                                onGoingDescription = true;
+                                                clear_wizard();
+                                                silenceAlert = silnAlert;
+                                                setStageIndx = $('#dataFileWizard').wizard('selectedItem').step;
+                                                add_to_batch(batchTargets, true);
+                                            },
+                                            error: function () {
+                                                alert("Couldn't save entries!");
+                                            }
+                                        });
+                                    }
+
+                                }, 1000);
+
+                                dialogRef.close();
+                            }
+                        }]
+                    });
                 });
         },
         growth_facility_change: function (formElem) {
@@ -2170,14 +2122,13 @@ $(document).ready(function () {
 
     function set_wizard_summary() {
         descriptionWizSummary = {
-            badge: ' ',
             label: '<span class=wiz-title>Review</span>',
             pane: '<div class="alert alert-default">' +
             '<div style="line-height: 150%;" class="' + wizardMessages.review_message.text_class + '">' +
             wizardMessages.review_message.text + '</div>' +
             '<div style="margin-top: 10px; max-width: 100%; overflow-x: auto;">' +
-            '<table id="description_summary_table" class="display copo-datatable copo-table-header" cellspacing="0" width="100%">' +
-            '<thead><tr><th></th><th>File</th><th>Rating</th>' +
+            '<table id="description_summary_table" class="ui celled table hover copo-noborders-table" cellspacing="0" width="100%">' +
+            '<thead><tr><th></th><th>Datafiles</th><th>Rating</th>' +
             '</tr> </thead></table>' +
             '</div></div>'
         };
@@ -2222,7 +2173,9 @@ $(document).ready(function () {
                         "data": null,
                         "defaultContent": ''
                     },
-                    {"data": "target"},
+                    {
+                        "data": "target"
+                    },
                     {
                         "orderable": false,
                         data: "target_id",
@@ -2246,9 +2199,16 @@ $(document).ready(function () {
                             return $('<div></div>').append(headingRowIconDiv).html();
 
                         }
-                    }
-                ]
+                    }],
+                dom: 'fr<"row"><"row description-rw" i>tlp'
             });
+
+            $('#description_summary_table_wrapper')
+                .find(".dataTables_filter")
+                .find("input")
+                .removeClass("input-sm")
+                .attr("placeholder", "Search Datafiles")
+                .attr("size", 25);
 
 
             // handle opening and closing summary details
@@ -2260,8 +2220,7 @@ $(document).ready(function () {
                     // This row is already open - close it
                     row.child.hide();
                     tr.removeClass('shown');
-                }
-                else {
+                } else {
                     // expand row
                     var contentHtml = "<div style='text-align: center'><i class='fa fa-spinner fa-pulse fa-2x'></i></div>";
                     row.child(contentHtml).show();
@@ -2270,7 +2229,9 @@ $(document).ready(function () {
                     $.ajax({
                         url: copoVisualsURL,
                         type: "POST",
-                        headers: {'X-CSRFToken': csrftoken},
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
                         data: {
                             'task': 'description_summary',
                             'component': component,
@@ -2291,7 +2252,9 @@ $(document).ready(function () {
         $.ajax({
             url: copoVisualsURL,
             type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
             data: {
                 'task': 'metadata_ratings',
                 'component': component,
@@ -2324,7 +2287,7 @@ $(document).ready(function () {
         });
 
 
-    }//end of func
+    } //end of func
 
     function summary_format(data, target_id) {
         var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index, which, in this context is the summary (final) stage
@@ -2432,8 +2395,6 @@ $(document).ready(function () {
     function refresh_batch_display() {
         var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
 
-        //clear stage message
-        onTheFlyElem.empty();
 
         //get last stage index
         var lastElementIndx = $('.steps li').last().index() + 1;
@@ -2451,32 +2412,12 @@ $(document).ready(function () {
 
         //set stage message
         if (stage_objects && stage_objects[activeStageIndx].hasOwnProperty("message")) {
-            onTheFlyElem.empty();
 
-            if (stage_objects[activeStageIndx].message) {
-                var attributesPanel = $('<div/>', {
-                    class: "panel panel-info",
-                    style: "margin-top: 5px; font-size: 12px;"
-                });
-
-                var attributesPanelHeading = $('<div/>', {
-                    class: "panel-heading",
-                    style: "background-image: none; font-weight: 600;",
-                    html: stage_objects[activeStageIndx].title
-                });
-
-                attributesPanel.append(attributesPanelHeading);
-
-
-                var attributesPanelBody = $('<div/>', {
-                    class: "panel-body"
-                });
-
-                attributesPanelBody.append('<span style="line-height: 1.5;">' + stage_objects[activeStageIndx].message + '</span>');
-
-                attributesPanel.append(attributesPanelBody);
-
-                onTheFlyElem.append(attributesPanel);
+            if (!displayedMessages.hasOwnProperty(stage_objects[activeStageIndx].ref)) {
+                var alertType = "info";
+                var alertMessage = "<div style='margin-bottom: 10px;'><strong>" + stage_objects[activeStageIndx].title + "</strong></div><div>" + stage_objects[activeStageIndx].message + "</div>";
+                display_copo_alert(alertType, alertMessage, 20000);
+                displayedMessages[stage_objects[activeStageIndx].ref] = 1;
             }
         }
 
@@ -2501,45 +2442,47 @@ $(document).ready(function () {
             'btnAction': 'delete'
         });
 
-        var colDefs = [
-            {
-                targets: -1,
-                data: null,
-                searchable: false,
-                orderable: false,
-                render: function (rdata) {
-                    var rndHTML = "";
+        var colDefs = [{
+            targets: -1,
+            width: "5%",
+            data: null,
+            searchable: false,
+            orderable: false,
+            render: function (rdata) {
+                var rndHTML = "";
 
-                    var bTns = buttons;
-                    rndHTML = '<span style="white-space: nowrap;">';
-                    for (var i = 0; i < bTns.length; ++i) {
-                        rndHTML += '<a data-action-target="row" data-record-action="'
-                            + bTns[i].btnAction + '" data-record-id="'
-                            + rdata
-                            + '" data-toggle="tooltip" style="display: inline-block; white-space: normal;" title="'
-                            + bTns[i].text + '" class="' + bTns[i].className + ' btn-xs"><i class="'
-                            + bTns[i].iconClass + '"> </i><span></span></a>&nbsp;';
-                    }
-                    rndHTML += '</span>';
-
-                    return rndHTML;
+                var bTns = buttons;
+                rndHTML = '<span style="white-space: nowrap;">';
+                for (var i = 0; i < bTns.length; ++i) {
+                    rndHTML += '<a data-action-target="row" data-record-action="' +
+                        bTns[i].btnAction + '" data-record-id="' +
+                        rdata +
+                        '" data-toggle="tooltip" style="display: inline-block; white-space: normal; background-image: none; border: none;" title="' +
+                        bTns[i].text + '" class="' + bTns[i].className + ' btn-xs"><i class="' +
+                        bTns[i].iconClass + '"> </i><span></span></a>&nbsp;';
                 }
-            },
-            {
-                targets: 1,
-                data: null,
-                render: function (rdata) {
-                    var rndHTML = rdata[0] + '<span data-toggle="tooltip" ' +
-                        'style="white-space: nowrap; display: none;" ' +
-                        'class="inDescription-flag-1" ' +
-                        'title="Has metadata" ' +
-                        'data-record-id="' + rdata[1] + '">' +
-                        '<i style="padding-left: 5px;" class="fa fa-tags"></i><span>';
-                    return rndHTML;
-                }
+                rndHTML += '</span>';
 
+                return rndHTML;
             }
-        ];
+        }, {
+            targets: 1,
+            data: null,
+            render: function (rdata) {
+                var rndHTML = rdata[0] + '<span data-toggle="tooltip" ' +
+                    'style="white-space: nowrap; display: none;" ' +
+                    'class="inDescription-flag-1" ' +
+                    'title="Has metadata" ' +
+                    'data-record-id="' + rdata[1] + '">' +
+                    '<i style="padding-left: 5px;" class="fa fa-tags"></i><span>';
+                return rndHTML;
+            }
+
+        },
+            {
+                "width": "5%",
+                "targets": 0
+            }];
 
         //set data
         var table = null;
@@ -2558,7 +2501,7 @@ $(document).ready(function () {
             var tableElem = $('#description_target_table_' + activeStageIndx);
             var table = tableElem.DataTable({
                 "data": dtd,
-                "lengthChange": false,
+                "lengthChange": true,
                 buttons: [
                     'selectAll',
                     'selectNone'
@@ -2566,26 +2509,26 @@ $(document).ready(function () {
                 language: {
                     buttons: {
                         selectAll: "Select all",
-                        selectNone: "Deselect all"
+                        selectNone: "Select none"
                     },
                     select: {
                         rows: {
-                            _: "Current description will apply to %d files in bundle ",
-                            0: "Click a row to select it",
-                            1: "Current description will apply to 1 file in bundle"
+                            _: "Current description will apply to %d files in bundle <span style='padding-left: 10px;'>Click <span class='fa-stack' style='color:green; font-size:11px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> beside a datafile to view details</span>",
+                            0: "Click a row to select it <span style='padding-left: 10px;'>Click <span class='fa-stack' style='color:green; font-size:11px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> beside a datafile to view details</span>",
+                            1: "Current description will apply to 1 file in bundle <span style='padding-left: 10px;'>Click <span class='fa-stack' style='color:green; font-size:11px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> beside a datafile to view details</span>"
                         }
                     }
                 },
-                "columns": [
-                    {
-                        "className": 'summary-details-control',
-                        "orderable": false,
-                        "data": null,
-                        "defaultContent": ''
-                    },
-                    {"data": "target"},
-                    {"data": "buttons"}
-                ],
+                "columns": [{
+                    "className": 'summary-details-control',
+                    "orderable": false,
+                    "data": null,
+                    "defaultContent": ''
+                }, {
+                    "data": "target"
+                }, {
+                    "data": "buttons"
+                }],
                 "fnDrawCallback": function (oSettings) {
                     refresh_tool_tips();
 
@@ -2608,17 +2551,19 @@ $(document).ready(function () {
                 select: {
                     style: 'multi'
                 },
-                dom: 'r<"top description-bundle-table"i>ftp'
+                dom: 'Bfr<"row"><"row description-rw" i>tlp'
             });
+
+            $(table.buttons().container()).insertBefore(filterDivObject);
 
             table
                 .buttons()
                 .nodes()
                 .each(function (value) {
-                    $(this).addClass(' btn-sm');
+                    $(this)
+                        .removeClass("btn btn-default")
+                        .addClass('tiny ui button');
                 });
-
-            $(table.buttons().container()).insertBefore(filterDivObject);
 
 
             // handle opening and closing summary details
@@ -2645,8 +2590,7 @@ $(document).ready(function () {
                     row.child('');
                     row.child.hide();
                     tr.removeClass('shown');
-                }
-                else {
+                } else {
                     // expand row
                     var contentHtml = "<div style='text-align: center'><i class='fa fa-spinner fa-pulse fa-2x'></i></div>";
                     row.child(contentHtml).show();
@@ -2687,7 +2631,9 @@ $(document).ready(function () {
                     $.ajax({
                         url: requestURL,
                         type: "POST",
-                        headers: {'X-CSRFToken': csrftoken},
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
                         data: request_params,
                         success: function (data) {
                             //display stage metadata for item
@@ -2695,7 +2641,7 @@ $(document).ready(function () {
                             contentHtml = '';
 
                             if (!appliedToAllFlag) {
-                                var applyToItemBtn = '<button type="button" data-stage-indx="' + activeStageIndx + '" data-description-target="' + row.data().target_id + '"  class="apply-to-item-btn btn btn-sm btn-primary">Apply to item</button><span style="margin-left: 4px; font-weight: 600;" class="text-default">[CTRL + ENTR]</span>';
+                                var applyToItemBtn = '<button tabindex="0" type="button" data-stage-indx="' + activeStageIndx + '" data-description-target="' + row.data().target_id + '"  class="apply-to-item-btn btn btn-sm btn-primary">Apply to item</button><span style="margin-left: 4px; font-weight: 600;" class="text-default"></span>';
                                 if (stage_objects[activeStageIndx].is_singular_stage || get_apply_check_state(activeStageIndx)) {
                                     applyToItemBtn = '';
                                 }
@@ -2782,7 +2728,7 @@ $(document).ready(function () {
                     }
                 });
 
-                if (!state) {//when the apply-to button is set to false, reset form
+                if (!state) { //when the apply-to button is set to false, reset form
                     var request_params = {
                         'request_action': 'get_item_stage_display',
                         'stage_id': stage_objects[activeStageIndx].ref,
@@ -2792,7 +2738,9 @@ $(document).ready(function () {
                     $.ajax({
                         url: wizardURL,
                         type: "POST",
-                        headers: {'X-CSRFToken': csrftoken},
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
                         data: request_params,
                         success: function (data) {
                             //display stage
@@ -2819,7 +2767,9 @@ $(document).ready(function () {
                     $.ajax({
                         url: wizardURL,
                         type: "POST",
-                        headers: {'X-CSRFToken': csrftoken},
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
                         data: request_params,
                         success: function (data) {
                             if (data.state) {
@@ -2833,7 +2783,9 @@ $(document).ready(function () {
                                 $.ajax({
                                     url: wizardURL,
                                     type: "POST",
-                                    headers: {'X-CSRFToken': csrftoken},
+                                    headers: {
+                                        'X-CSRFToken': csrftoken
+                                    },
                                     data: request_params,
                                     success: function (data) {
                                         //display stage
@@ -2868,11 +2820,20 @@ $(document).ready(function () {
             });
         }
 
+        $('#description_target_table_' + activeStageIndx + '_wrapper')
+            .find(".dataTables_filter")
+            .find("input")
+            .removeClass("input-sm")
+            .attr("placeholder", "Search bundle")
+            .attr("size", 25);
+
         //'disable' row selection for cases where is-singular-stage and apply-to-all
         if (table) {
 
             table.on('select', function (e, dt, type, indexes) {
-                var selectedRows = table.rows({selected: true}).count();
+                var selectedRows = table.rows({
+                    selected: true
+                }).count();
 
                 //apply to button toggle enable
                 if ($('#apply_to_btn_' + activeStageIndx).is(":visible")) {
@@ -2885,7 +2846,9 @@ $(document).ready(function () {
             });
 
             table.on('deselect', function (e, dt, type, indexes) {
-                var selectedRows = table.rows({selected: true}).count();
+                var selectedRows = table.rows({
+                    selected: true
+                }).count();
 
                 //apply to button toggle enable
                 if ($('#apply_to_btn_' + activeStageIndx).is(":visible")) {
@@ -2900,8 +2863,8 @@ $(document).ready(function () {
                 var allRows = table.rows().count();
 
                 //row selection
-                if ((stage_objects[activeStageIndx].is_singular_stage || get_apply_check_state(activeStageIndx))
-                    && (selectedRows != allRows)) {
+                if ((stage_objects[activeStageIndx].is_singular_stage || get_apply_check_state(activeStageIndx)) &&
+                    (selectedRows != allRows)) {
                     table.rows('.selected').deselect();
                     table.rows().select();
                 }
@@ -2948,7 +2911,9 @@ $(document).ready(function () {
         $.ajax({
             url: wizardURL,
             type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
             data: request_params,
             success: function (data) {
                 //refresh bundle
@@ -2998,80 +2963,121 @@ $(document).ready(function () {
 
     function update_itemMetadata_flag() {
         //function sets/updates metadata flag for datafiles
-        var datafile_ids = [];
-        $('.itemMetadata-flag').each(function () {
-            if ($(this).attr("data-record-id")) {
-                datafile_ids.push($(this).attr("data-record-id"));
+        var tableID = componentMeta.tableID;
+        var table = $('#' + tableID).DataTable();
+
+        var datafile_ids = []; //
+        $.map(table.rows({page: 'current'}).data(), function (item) {
+            datafile_ids.push(item.record_id);
+        });
+
+        if (datafile_ids.length == 0) {
+            return false;
+        }
+
+
+        $.ajax({
+            url: copoVisualsURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'task': 'metadata_ratings',
+                'component': component,
+                'datafile_ids': JSON.stringify(datafile_ids)
+            },
+            success: function (data) {
+                if (!data.metadata_ratings) {
+                    return false;
+                }
+
+                for (var i = 0; i < data.metadata_ratings.length; ++i) {
+                    var rating_object = data.metadata_ratings[i];
+
+                    if ($('#' + tableID).find('.' + tableID + rating_object.item_id).length) {
+                        var targetObject = $('#' + tableID).find('.' + tableID + rating_object.item_id).find(".metadata-rating");
+                        targetObject.removeClass("uncertain poor fair good");
+
+
+                        var metadataDescription = "";
+                        if (rating_object.item_rating.hasOwnProperty("rating_level")) {
+                            targetObject.addClass(rating_object.item_rating.rating_level);
+                            metadataDescription = rating_object.item_rating.rating_level_description;
+                        } else {
+                            targetObject.addClass("uncertain");
+                            metadataDescription = "Couldn't resolve metadata rating!";
+                        }
+
+                        targetObject.webuiPopover('destroy');
+                        targetObject.webuiPopover({
+                            title: "Metadata Rating",
+                            content: '<div class="webpop-content-div">' + metadataDescription + '</div>',
+                            trigger: 'hover',
+                            width: 300,
+                            arrow: true,
+                            closeable: true,
+                            placement: 'auto',
+                            backdrop: false,
+                        });
+
+                    }
+                }
+
+            },
+            error: function () {
+                alert("Couldn't resolve metadata ratings!");
             }
         });
 
-        if (datafile_ids.length) {
-            $.ajax({
-                url: copoVisualsURL,
-                type: "POST",
-                headers: {'X-CSRFToken': csrftoken},
-                data: {
-                    'task': 'metadata_ratings',
-                    'component': component,
-                    'datafile_ids': JSON.stringify(datafile_ids)
-                },
-                success: function (data) {
-                    if (data.metadata_ratings) {
-                        for (var i = 0; i < data.metadata_ratings.length; ++i) {
-                            $('.itemMetadata-flag').each(function () {
-                                if ($(this).attr("data-record-id")) {
-                                    var rating_object = data.metadata_ratings[i];
-                                    if (rating_object.item_id == $(this).attr("data-record-id")) {
-                                        $(this).find(".itemMetadata-flag-ind").removeClass("meta-active");
-
-                                        var metadataDescription = "Couldn't resolve metadata rating!";
-
-                                        if (rating_object.item_rating.hasOwnProperty("rating_level")) {
-                                            $(this).find("." + rating_object.item_rating.rating_level).addClass("meta-active");
-                                        }
-
-                                        if (rating_object.item_rating.hasOwnProperty("rating_level_description")) {
-                                            metadataDescription = rating_object.item_rating.rating_level_description;
-                                        }
-
-                                        metadataDescription += '<div style="margin-top: 10px;">Click the <span class="btn btn-info btn-xs"><i class="fa fa-info-circle"> </i></span> button on the right for more details.</div>';
-
-
-                                        $(this).webuiPopover('destroy');
-                                        refresh_webpop($(this), 'Metadata Rating', metadataDescription, {width: 300});
-
-                                        return false;
-                                    }
-                                }
-                            });
-                        }
-                    }
-                },
-                error: function () {
-                    alert("Couldn't resolve metadata ratings!");
-                }
-            });
-        }
     }
 
-    function refresh_inDescription_flag(activeStageIndx) {
+    function refresh_inDescription_flag() {
+        var activeStageIndx = 0;
+
+        if (descriptionBundle.length > 0) {
+            activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+        }
+
+
+        var tableID = componentMeta.tableID;
+        var table = $('#' + tableID).DataTable();
+
+        //highlight currently described records
+
+        table
+            .rows('.row-describing-highlight')
+            .nodes()
+            .to$()
+            .removeClass('row-describing-highlight')
+            .attr("title", "");
+
+
+        descriptionBundle.forEach(function (item) {
+            table
+                .rows('.' + tableID + item.recordID)
+                .nodes()
+                .to$()
+                .addClass('row-describing-highlight')
+                .attr("title", "Currently being described");
+        });
+
+        $(".description-count").remove();
+
+        if (descriptionBundle.length > 0) {
+            $('<span class="description-count row-describing-highlight badge" style="margin-left: 10px; color: #000;">' + descriptionBundle.length + ' record(s) currently being described</span>').insertAfter('.extra-table-info');
+        }
+
+
         //reset inDescription flag
         $('.inDescription-flag').each(function () { //main datafile table
             $(this).hide();
         });
 
-        $('.inDescription-flag-1').each(function () {//description bundle
+        $('.inDescription-flag-1').each(function () { //description bundle
             $(this).hide();
         });
 
-        descriptionBundle.forEach(function (item) {
-            //set inDescription flag
-            $('.inDescription-flag').each(function () {
-                if ($(this).attr("data-record-id") == item.recordID) {
-                    $(this).show();
-                }
-            });
-        });
 
         descriptionBundle.forEach(function (item) {
             $('.inDescription-flag-1').each(function () {
@@ -3089,7 +3095,7 @@ $(document).ready(function () {
     }
 
     function show_hide_stage_ctrl(applyToAll, activeStageIndx) {
-        refresh_inDescription_flag(activeStageIndx);
+        refresh_inDescription_flag();
 
         //get table reference
         var table = null;
@@ -3119,7 +3125,7 @@ $(document).ready(function () {
         }
 
 
-        if (showChk) {//apply to all check button activated
+        if (showChk) { //apply to all check button activated
             $("[name='apply-scope-chk-" + activeStageIndx + "']").bootstrapSwitch('readonly', false);
             if (get_apply_check_state(activeStageIndx)) {
                 set_apply_check_state(activeStageIndx);
@@ -3146,7 +3152,7 @@ $(document).ready(function () {
 
         new_stage_alert();
 
-    }//end of func
+    } //end of func
 
     function new_stage_alert() {
         var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
@@ -3165,10 +3171,13 @@ $(document).ready(function () {
             return false;
         }
 
-        if (stage_objects[activeStageIndx].is_singular_stage) {//singular stage
-            set_stage_alerts(wizardMessages.singular_stage_message, activeStageIndx);
-        } else if (descriptionBundle.length == 1) {//only one item being described
+        $('#alert_placeholder_' + activeStageIndx).show();
+
+        if (descriptionBundle.length == 1) { //only one item being described
             set_stage_alerts(wizardMessages.singleton_item_alert_message, activeStageIndx);
+            $('#alert_placeholder_' + activeStageIndx).hide();
+        } else if (stage_objects[activeStageIndx].is_singular_stage) { //singular stage
+            set_stage_alerts(wizardMessages.singular_stage_message, activeStageIndx);
         } else {
             if (get_apply_check_state(activeStageIndx)) {
                 set_stage_alerts(wizardMessages.apply_to_all_message, activeStageIndx);
@@ -3182,33 +3191,8 @@ $(document).ready(function () {
 
     function set_stage_alerts(message_object, activeStageIndx) {
         var elem = $('#alert_placeholder_' + activeStageIndx);
-        var contentHtml = '<i class="fa fa-exclamation-circle fa-3x fa-pull-left copo-icon-info"></i><span class="' + message_object.text_class + '">' + message_object.text + '</span>';
-        var footerHtml = '<div style="text-align: right;">';
-        footerHtml += '<span style="margin-right: 5px;" title="' + wizardMessages.dismiss_alert_message.text + '" class="btn btn-primary btn-xs close-stage-alert">Dismiss</span>';
-
-        var btnClass = " btn-warning ";
-        var alertStatus = "disable";
-        var alertHtml = "Disable";
-        var alertTitle = wizardMessages.disable_alert_message.text;
-
-        if (silenceAlert) {
-            btnClass = "btn-success";
-            alertStatus = "enable";
-            alertHtml = "Enable";
-            alertTitle = wizardMessages.enable_alert_message.text;
-        }
-
-        footerHtml += '<span title="' + alertTitle + '" data-alert-status="' + alertStatus + '" class="btn ' + btnClass + ' btn-xs stage-alerts">' + alertHtml + '</span>';
-        footerHtml += '</div>';
-
-        elem.find(".panel-body").html(contentHtml);
-        elem.find(".panel-footer").html(footerHtml);
-
-        if (silenceAlert) {
-            return false;
-        }
-
-        elem.find(".collapse").collapse('show');
+        var contentHtml = '<span class="' + message_object.text_class + '">' + message_object.text + '</span>';
+        elem.find(".apply-to-all-message").html(contentHtml);
     }
 
-})//end document ready
+}) //end document ready

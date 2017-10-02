@@ -7,7 +7,7 @@ import web.apps.web_copo.schemas.utils.data_utils as d_utils
 
 class MetadataRater:
     """
-    class handles rating of metadata, for a designated set of items (e.g., datafiles), against different repositories
+    class handles rating of metadata for a designated set of items (e.g., datafiles), against different repositories
     """
 
     def __init__(self, item_ids=list()):
@@ -36,7 +36,7 @@ class MetadataRater:
 
         for level in rating_template:
             set_level = []
-            for k, v in level["matching_rules"][repo].items():
+            for k, v in level["matching_rules"].get(repo, dict()).items():
                 if v:
                     set_level.append(getattr(MetadataRater, "validate_" + k)(self, v, item_meta))
 

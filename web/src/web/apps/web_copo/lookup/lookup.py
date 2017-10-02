@@ -342,16 +342,34 @@ DROP_DOWNS = {
     "REPOSITORIES": [
         {
             'value': 'ena',
-            'label': 'European Nucleotide Archive (ENA)'
+            'label': 'ENA - Sequence Reads',
+            'description': 'This repository option defines metadata for submission of <strong>raw sequence reads</strong> to the European Nucleotide Archive (ENA).'
+        },
+        {
+            'value': 'ena-ant',
+            'label': 'ENA - Sequence Annotations',
+            'description': 'This repository option defines metadata for submission of <strong>sequence annotations</strong> to the European Nucleotide Archive (ENA).'
+        },
+        {
+            'value': 'ena-asm',
+            'label': 'ENA - Sequence Assemblies',
+            'description': 'This repository option defines metadata for submission of <strong>sequence assemblies</strong> to the European Nucleotide Archive (ENA).'
         },
         {
             'value': 'figshare',
-            'label': 'Figshare'
+            'label': 'Figshare',
+            'description': 'Figshare accepts many file formats, and can be used to submit file types including PDFs, image, audio, and video files.'
         },
         {
             'value': 'miappe',
-            'label': 'MIAPPE Compliant'
+            'label': 'MIAPPE Compliant',
+            'description': 'MIAPPE is a Minimum Information (MI) standard for plant phenotyping. This repository option defines a list of attributes for describing a phenotyping experiment.'
         },
+        {
+            'value': 'dcterms',
+            'label': 'Dataverse',
+            'description': 'The Dataverse repository option defines metadata for submissions to a Dataverse.'
+        }
         # {
         #     'value': 'MetaboLights',
         #     'label': 'MetaboLights'
@@ -365,7 +383,7 @@ DROP_DOWNS = {
         {
             "value": "biosample",
             "label": "Simple",
-            "description": "Simple samples are based on <a href='https://www.ebi.ac.uk/biosamples/' target='_blank'>BioSamples</a>. They are <strong>repository agnostic</strong>, and are better suited for describing samples in a generic manner or in contexts where the target repository isn't known <i>a priori</i>."
+            "description": "Simple samples are based on <a href='https://www.ebi.ac.uk/biosamples/' target='_blank'>BioSamples</a>. They are <strong>repository agnostic</strong>, and are better suited for describing samples in a generic manner or in contexts where the target repository isn't known in advance."
         },
         {
             "value": "isasample",
@@ -563,7 +581,6 @@ MESSAGES_LKUPS = {
         'datafile': os.path.join(RESOLVER['lookup'], 'help_messages', 'datafile_help.json'),
         'sample': os.path.join(RESOLVER['lookup'], 'help_messages', 'sample_help.json'),
         'global': os.path.join(RESOLVER['lookup'], 'help_messages', 'global_help.json'),
-        'quick_tour': os.path.join(RESOLVER['lookup'], 'help_messages', 'quick_tour.json'),
         'context_help': os.path.join(RESOLVER['lookup'], 'help_messages', 'context_help.json'),
     },
     'datafile_wizard': os.path.join(RESOLVER['wizards_datafile'], 'messages', 'wizard_messages.json'),
@@ -607,39 +624,45 @@ ISA_SCHEMAS = {
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
-# templates for composing reusable UI buttons
+# templates for composing reusable UI buttons - This is getting deprecated!!! Moved to components_templates.html
 BUTTON_TEMPLATES = {
     "title": "Button templates",
     "description": "Provides templates for composing reusable buttons. 'btnType' can either be: "
-                   "(1) 'single' - if the button's action is intended to impact just a single record (e.g., edit), or "
-                   "(2) 'multi' - if the buttons's action is intended to impact one or more records",
+                   "(1) 'single' - if the button's action is intended to impact just a single record (e.g., edit), "
+                   "(2) 'multi' - if the buttons's action is intended to impact one or more records,"
+                   "(3) 'all' - always true, and none dependent of row selections e.g., add button",
     "templates": {
         "edit_record_single": {
             "text": "Edit",
-            "className": "copo-dt",
+            "className": " green button copo-dt",
             "iconClass": "fa fa-pencil-square-o",
-            "btnColor": "#5cb85c",
             "btnAction": "edit",
             "btnType": "single",
             "btnMessage": "Edit selected"
         },
         "delete_record_multi": {
             "text": "Delete",
-            "className": "copo-dt",
+            "className": " red button copo-dt",
             "iconClass": "fa fa-trash-o",
-            "btnColor": "#d9534f",
             "btnAction": "delete",
             "btnType": "multi",
             "btnMessage": "Delete selected"
         },
         "summarise_record_single": {
             "text": "Summarise",
-            "className": "copo-dt",
+            "className": " teal button copo-dt",
             "iconClass": "fa fa-info",
-            "btnColor": "#0086b3",
             "btnAction": "summarise",
             "btnType": "single",
-            "btnMessage": "View record summary"
+            "btnMessage": "Summarise selected"
+        },
+        "add_record_single": {
+            "text": "Add",
+            "className": " blue button copo-dt",
+            "iconClass": "fa fa-plus",
+            "btnAction": "add",
+            "btnType": "all",
+            "btnMessage": "Add new record"
         },
         "edit_row": {
             "text": "Edit",

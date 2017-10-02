@@ -6,7 +6,6 @@
 
 {% block stylesheet_block %}
     <link rel="stylesheet" href="{% static 'copo/css/copo/copo_wizard.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/css/copo/sample_2.css' %}">
 {% endblock %}
 
 
@@ -30,49 +29,25 @@
     {% include "component_navbar.html" %}
 {% endblock page_tile %}
 
-{% block help_section %}
-    <div id="sampleHelpSection">
-        <div class="panel panel-default" style="border-radius: 0px;">
-            <div class="panel-heading" style="padding: 0px 0px;">
-                <div class="dropdown">
-                    <button class="btn btn-lg btn-default dropdown-toggle" type="button" id="helpCentreMenu"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i> Information Panel
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu componentHelpList" aria-labelledby="helpCentreMenu">
-                    </ul>
-                </div>
-            </div>
-            <div class="panel-body">
-                <div id="copo_instant_info"></div>
-                <div id="helptipsDiv" style="display: block;">
-                    <table id="sample_help_table"
-                           class="table table-striped table-bordered order-column hover copo-datatable copo-table-header"
-                           width="100%">
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock help_section %}
-
 
 {% block content %}
 
     <!--test ends -->
+
     <!--test ends -->
 
     <div class="row">
         <div class="col-sm-12 col-md-12 col-lg-12" style="padding-right: 0px !important;">
             <ul id="sample-display-tabs" class="nav nav-tabs copo-tab-navs">
-                <li class="active"><a data-toggle="tab" href="#fileListComponent" data-component="fileListComponent">
+                <li class="active"><a data-toggle="tab" href="#sampleListComponent"
+                                      data-component="sampleListComponent">
                     <span class="copo-data-panel-title">
                         <i class="fa fa-file"></i>
                         <span class="icon_text">Inspect</span>
                     </span>
                 </a></li>
-                <li><a data-toggle="tab" href="#descriptionWizardComponent" data-component="descriptionWizardComponent">
+                <li><a class="description-Wizard-Component" data-toggle="tab" href="#descriptionWizardComponent"
+                       data-component="descriptionWizardComponent">
                     <span class="copo-data-panel-title">
                         <i class="fa fa-tags"></i>
                         <span class="icon_text">Describe</span>
@@ -85,59 +60,165 @@
             </ul>
 
             <div class="tab-content">
-                <div id="fileListComponent" class="tab-pane fade in active">
-                    <div id="data_all_data" style="margin-top: 15px;">
+                <div id="sampleListComponent" class="tab-pane fade in active">
+                    <div style="margin-top: 15px;">
+                        <!-- getting started section -->
+                        <div class="row">
+                            <div class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-0 page-welcome-message"
+                                 style="display: none;">
+                                <div class="copo-webui-popover">
+                                    <div class="webui-popover-inner">
+                                        <h3 class="copo-webui-popover-title">Samples - Getting started</h3>
+                                        <div class="copo-webui-popover-content">
+                                            <div class="webpop-content-div">
+                                                The samples page provides a platform for describing and managing
+                                                biological samples,
+                                                obtained as part of a project.
+                                                <br/><br/>The description functionality presents a wizard that guides
+                                                the user through a step-by-step
+                                                process of sample metadata attribution.
+                                                <br/><br/>
+                                                Use the
+                                                <button class="circular mini ui icon primary button">
+                                                    <i class="icon tags"></i>
+                                                </button>
+                                                to initiate sample description and follow the steps presented by the
+                                                wizard.
+
+                                                <br/><br/>
+                                                <div><strong>Quick Tour: </strong>To explore the various
+                                                    controls available on this page, click the
+                                                    <button class="circular mini ui icon orange button">
+                                                        <i class="icon lightbulb"></i>
+                                                    </button>
+                                                    icon.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- sample table -->
+                        <div id="component_table_loader" class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"
+                             data-copo-tour-id="sample_table"></div> <!-- div used by the quick tour agent -->
                         <table id="sample_table"
-                               class="table table-striped table-bordered order-column hover copo-datatable copo-table-header"
+                               class="ui celled table hover copo-noborders-table"
                                cellspacing="0" width="100%">
                         </table>
+
                     </div>
                 </div>
                 <div id="descriptionWizardComponent" class="tab-pane fade">
                     <div id="data_wizard_data" style="margin-top: 15px;">
+
+                        <div class="wizard-loader col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"></div>
+                        <!-- description wizard getting started section -->
                         <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12">
-                                <div>
-                                    <button id="wizard_fire_button" type="button" class="btn btn-success">
-                                        <i class="fa fa-plus-circle">&nbsp;</i><span>Add New Samples</span>
-                                    </button>
+                            <div class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-0 page-wizard-message"
+                                 style="display: block;">
+                                <div class="copo-webui-popover">
+                                    <div class="webui-popover-inner">
+                                        <h3 class="copo-webui-popover-title">Sample Description - Getting started</h3>
+                                        <div class="copo-webui-popover-content">
+                                            <div class="webpop-content-div">
+                                                To start descrbing your samples, click on the
+                                                <button class="circular mini ui icon primary button">
+                                                    <i class="icon tags"></i>
+                                                </button>
+                                                icon
+                                                or, under the <strong><i class="fa fa-file"></i> Inspect </strong> tab,
+                                                click the 'Describe' button. The view should change to the
+                                                <strong><i class="fa fa-tags"></i> Describe </strong> tab, with the
+                                                description wizard initialised.
+                                                Follow the sequence of steps presented by the wizard to describe your
+                                                samples.
+                                                <br/><br/>
+                                                <ol>
+                                                    <li>
+                                                        <span class=" mini ui basic red button">
+                                                            <i class="copo-components-icons fa fa-times"></i>
+                                                            <span style="padding-left: 3px;">Discard</span>
+                                                        </span>
+                                                        You can discard the current description,
+                                                        and exit the wizard, at any time by
+                                                        clicking the discard button.
+                                                    </li>
+                                                    <li>
+                                                        <span class=" mini ui basic blue button">
+                                                            <i class="copo-components-icons fa fa-info"></i>
+                                                            <span style="padding-left: 3px;">Info</span>
+                                                        </span>
+                                                        Use the info (information) button to access relevant
+                                                        messages in each stage of the description.
+
+                                                    </li>
+                                                </ol>
+                                                The <strong>'Info'</strong> side pane will be employed to display
+                                                relevant messages through different stages of a description.
+                                                <br/>
+                                                Use the <strong>'Help'</strong> side pane to access more information
+                                                on describing samples.
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <br/>
 
-                        <div class="fuelux" style="margin-bottom: 5px;">
-                            <div class="wizard" data-initialize="wizard" id="sampleWizard"
-                                 style="display: none;">
-                                <div class="steps-container">
-                                    <ul class="steps">
+                        <!-- Description wizard-->
+                        <div id="description_panel" style="display: none;">
+                            <div class="row action-rw">
+                                <!-- Discard description button -->
+                                <div id="remove_act" class=" tiny ui basic red button"
+                                     data-toggle="tooltip"
+                                     title="Discard description"
+                                     tabindex="0">
+                                    <i class="copo-components-icons fa fa-times"></i>
+                                    <span style="padding-left: 3px;">Discard</span>
+                                </div>
 
-                                    </ul>
+                                <!-- Info button -->
+                                <div id="info_act" class=" tiny ui basic blue button"
+                                     data-toggle="tooltip"
+                                     title="Wizard stage information"
+                                     tabindex="0">
+                                    <i class="copo-components-icons fa fa-info"></i>
+                                    <span style="padding-left: 3px;">Info</span>
                                 </div>
-                                <div class="actions">
-                                    <button type="button" class="btn btn-default btn-prev">
-                                        <span class="glyphicon glyphicon-arrow-left"></span>Prev
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-next" data-last="Finish!">
-                                        Next
-                                        <span class="glyphicon glyphicon-arrow-right"></span>
-                                    </button>
-                                </div>
-                                <div class="step-content">
+
+                            </div>
+
+                            <div class="panel panel-dtables">
+                                <div class="panel-body" style="padding: 0px;">
+                                    <div class="fuelux" style="margin-bottom: 5px;">
+                                        <div class="wizard" data-initialize="wizard" id="sampleWizard"
+                                             style="display: none; background-color: #fff !important;">
+                                            <div class="steps-container">
+                                                <ul class="steps">
+
+                                                </ul>
+                                            </div>
+                                            <div class="actions">
+                                                <button type="button" class="ui left labeled icon button btn-prev">
+                                                    <i class="left arrow icon"></i>
+                                                    Prev
+                                                </button>
+                                                <button type="button"
+                                                        class="ui primary right labeled icon button btn-next"
+                                                        data-last="Finish!">
+                                                    <i class="right arrow icon"></i>
+                                                    Next
+                                                </button>
+                                            </div>
+                                            <div class="step-content">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-8" style="display: none;">
-                            <button data-toggle="tooltip" title="Exit Description "
-                                    id="remove_act"
-                                    class="btn btn-danger" type="button">Exit Sample Description
-                            </button>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top: 10px;">
-                        &nbsp;
                     </div>
                 </div>
                 <div id="emptyTab" class="tab-pane fade"></div>
@@ -147,8 +228,13 @@
 
 {% endblock %}
 
+{% block help_section %}
+
+{% endblock %}
+
 {% block js_block %}
     <script src="{% static 'copo/js/generic_handlers.js' %}"></script>
+    <script src="{% static 'copo/js/generic_handlers_ext2.js' %}"></script>
     <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
     <script src="{% static 'copo/js/copo_sample_2.js' %}"></script>
 {% endblock %}

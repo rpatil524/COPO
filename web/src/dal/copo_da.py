@@ -154,7 +154,7 @@ class DAComponent:
             if not target_id and f_id not in fields:
                 fields[f_id] = data_utils.default_jsontype(f.type)
 
-        # if True, then the database action (to save/update) is never performed, but validated 'fields' is returned
+        # if True, then the database action (to save/update) is never performed, but validated 'fields' are returned
         validate_only = kwargs.pop("validate_only", False)
 
         # use the equality (==) test to save-guard against all sorts of value the 'validate_only' can assume

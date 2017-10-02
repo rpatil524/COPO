@@ -11,12 +11,12 @@
       "items": [
         {
           "id": "deposition_context",
-          "help_tip": "Select the target repository from the drop-down list",
+          "help_tip": "Select a target repository",
           "label": "Target Repository",
           "hidden": "false",
           "required": "true",
-          "control": "select",
-          "default_value": "",
+          "control": "copo-button-list",
+          "default_value": "ena",
           "option_values": {
             "callback": {
               "function": "get_repository_options",
