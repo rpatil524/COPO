@@ -76,8 +76,6 @@ class EnaSubmit(object):
         # check submission status
         submission_status = Submission().isComplete(sub_id)
 
-
-
         if not submission_status or submission_status == 'false':
 
             lg.log('Starting aspera transfer', level=Loglvl.INFO, type=Logtype.FILE)
@@ -93,7 +91,7 @@ class EnaSubmit(object):
             cmd = "./ascp -d -QT -l700M -L- {f_str!s} {user_name!s}:{remote_path!s}".format(**locals())
             lg.log(cmd, level=Loglvl.INFO, type=Logtype.FILE)
             os.chdir(path2library)
-            '''
+
             try:
                 thread = pexpect.spawn(cmd, timeout=None)
                 thread.expect(["assword:", pexpect.EOF])
@@ -169,32 +167,27 @@ class EnaSubmit(object):
                                             estimated_completion += eta_token + t_u[indx] + " "
                                         fields['estimated_completion'] = estimated_completion
                             RemoteDataFile().update_transfer(transfer_token, fields)
-                
+
                 kwargs = dict(target_id=sub_id, completed_on=datetime.now())
                 Submission().save_record(dict(), **kwargs)
                 # close thread
                 thread.close()
                 lg.log('Aspera Transfer completed', level=Loglvl.INFO, type=Logtype.FILE)
-                return true
+
 
             except OSError:
                 return redirect('web.apps.web_copo.views.goto_error', request=HttpRequest(),
                                 message='There appears to be an issue with EBI.')
             finally:
                 pass
-            '''
 
         if self.submission['repository'] == 'ena-seq':
             self.do_seq_reads_submission(sub_id, remote_path, transfer_token)
         elif self.submission['repository'] == 'ena-ant':
             xmlvar = self.do_annotation_submission(sub_id, remote_path, transfer_token)
             with open('/Users/fshaw/Desktop/output.xml', 'w+') as f:
-                #return xmlvar
+                # return xmlvar
                 f.write(xmlvar)
-
-
-
-
 
     def do_seq_reads_submission(self, sub_id, remote_path, transfer_token):
         # # setup paths for conversion directories
@@ -312,9 +305,8 @@ class EnaSubmit(object):
         RemoteDataFile().delete_transfer(transfer_token)
         return True
 
-
     def do_annotation_submission(self, sub_id, remote_path, transfer_token):
-
+        from submission import ena_xml_util as xml
         study = xml.do_study_xml(sub_id)
         sample = xml.do_sample_xml(sub_id)
         analysis = xml.do_analysis_xml(sub_id)
@@ -326,5 +318,30 @@ class EnaSubmit(object):
 
         with open(os.path.join(xml_dir, 'study.xml'), "w+") as ff:
             ff.write(study)
-        
+        with open(os.path.join(xml_dir, 'sample.xml'), "w+") as ff:
+            ff.write(sample)
+        with open(os.path.join(xml_dir, 'analysis.xml'), "w+") as ff:
+            ff.write(analysis)
+        with open(os.path.join(xml_dir, 'submission.xml'), "w+") as ff:
+            ff.write(submission)
+
+        pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
+        user_token = resolve_env.get_env('WEBIN_USER')
+        user_token = user_token.split("@")[0]
+        ena_uri = "https://www-test.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20{user_token!s}%20{pass_word!s}".format(
+            **locals())
+
+        curl_cmd = 'curl -k -F "SUBMISSION=@' + os.path.join(xml_dir, 'submission.xml') + '" -F "SAMPLE=@' + os.path.join(xml_dir, 'sample.xml') + '" -F "ANALYSIS=@' + os.path.join(xml_dir, 'analysis.xml') + '" -F "STUDY=@' + os.path.join(xml_dir, 'study.xml') + '" "' + ena_uri + '"'
+
+        receipt = subprocess.check_output(curl_cmd, shell=True)
+
+        with open(os.path.join("/Users/fshaw/Desktop/", 'receipt.xml'), "w+") as ff:
+
+            ff.write(receipt.decode('utf-8'))
+
+
+        lg.log(receipt, level=Loglvl.INFO, type=Logtype.FILE)
+        lg.log("Extracting fields from receipt", level=Loglvl.INFO, type=Logtype.FILE)
+
+        xml = ET.fromstring(receipt)
         return submission

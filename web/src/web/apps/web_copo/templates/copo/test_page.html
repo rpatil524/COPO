@@ -76,12 +76,10 @@
     <script>
 
         $(document).ready(function () {
-
-
             $('#test_id').on('click', function (e) {
                 $.ajax({
                     url: "/rest/submit_to_repo/",
-                    data: {'sub_id': '59cbb2b768236b33092b1da7'},
+                    data: {'sub_id': '59ce1dd468236b10eade7503'},
                     headers: {'X-CSRFToken': $.cookie('csrftoken')},
                     method: 'POST',
                     dataType: 'json'

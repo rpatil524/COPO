@@ -3,6 +3,8 @@ from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from xml.dom import minidom
 from dal.copo_da import Submission, DataFile, Profile, Sample, Source, Person
 import datetime
+import web.apps.web_copo.lookup.lookup as lkup
+from django_tools.middlewares.ThreadLocal import get_current_user
 
 
 def do_study_xml(sub_id):
@@ -24,14 +26,18 @@ def do_study_xml(sub_id):
     # Do STUDY
     study = Element("STUDY")
     study.set("alias", str(sub["_id"]))
-    study.set("centre_name", df["description"]["attributes"]["study_type"]["study_analysis_center_name"])
+    study.set("center_name", df["description"]["attributes"]["study_type"]["study_analysis_center_name"])
     study_set.append(study)
 
     # Do DESCRIPTOR
     descriptor = Element("DESCRIPTOR")
     # create element, append to parent and add text
     SubElement(descriptor, "STUDY_TITLE").text = p["title"]
-    SubElement(descriptor, "STUDY_TYPE").text = df["description"]["attributes"]["study_type"]["study_type"]
+    study_type = Element("STUDY_TYPE")
+    es = get_study_type_enumeration(df["description"]["attributes"]["study_type"]["study_type"])
+    #es = df["description"]["attributes"]["study_type"]["study_type"]
+    study_type.set("existing_study_type", es)
+    descriptor.append(study_type)
     SubElement(descriptor, "STUDY_ABSTRACT").text = p["description"]
     study.append(descriptor)
 
@@ -40,7 +46,7 @@ def do_study_xml(sub_id):
     # do attribute for date
     study_attribute = Element("STUDY_ATTRIBUTE")
     SubElement(study_attribute, "TAG").text = "Submission Date"
-    SubElement(study_attribute, "VALUE").text = str(datetime.datetime.now())
+    SubElement(study_attribute, "VALUE").text = datetime.datetime.now().strftime('%Y-%m-%d')
     study_attributes.append(study_attribute)
 
     # here we can loop to add other STUDY_ATTRIBUTES
@@ -79,7 +85,9 @@ def do_sample_xml(sub_id):
     # get Source object for organism
     s = Source().get_record(smp["derivesFrom"][0])
     taxon_id = Element("TAXON_ID")
-    taxon_id.text = s["organism"]["termAccession"]
+    # get integer portion of NCBI taxon id
+    taxon_id_content = s["organism"]["termAccession"].split('_')[1]
+    taxon_id.text = taxon_id_content
     sample_name.append(taxon_id)
     scientific_name = Element("SCIENTIFIC_NAME")
     scientific_name.text = s["organism"]["annotationValue"]
@@ -136,8 +144,10 @@ def do_analysis_xml(sub_id):
     broker_name = df["description"]["attributes"]["study_type"]["study_broker"]
     analysis.set("broker_name", broker_name)
     analysis_date = df["description"]["attributes"]["study_type"]["study_analysis_date"]
-    analysis.set("anlalysis_date", analysis_date)
-    analysis_set.append(analysis)
+    #ad = analysis_date.split('/')
+    #d = datetime.date(int(ad[2]), int(ad[1]), int(ad[0]))
+    #analysis.set("anlalysis_date", d)
+    #analysis_set.append(analysis)
 
     title = Element("TITLE")
     title.text = df["description"]["attributes"]["study_type"]["study_title"]
@@ -165,7 +175,9 @@ def do_analysis_xml(sub_id):
     filename = df["name"]
     file_hash = df["file_hash"]
 
-    file.set("filename", filename)
+    fqfn = str(sub_id) + '/' + get_current_user().username + '/' + filename
+
+    file.set("filename", fqfn)
     file.set("filetype", "tab")
     file.set("checksum_method", "MD5")
     file.set("checksum", file_hash)
@@ -186,7 +198,7 @@ def do_analysis_xml(sub_id):
 
     analysis.append(attrs)
 
-    return prettify(analysis_set)
+    return prettify(analysis)
 
 
 def do_submission_xml(sub_id):
@@ -201,7 +213,8 @@ def do_submission_xml(sub_id):
     submission.set("alias", str(sub["_id"]))
     submission.set("broker_name", df["description"]["attributes"]["study_type"]["study_broker"])
     submission.set("center_name", df["description"]["attributes"]["study_type"]["study_analysis_center_name"])
-    submission.set("submission_date", df["description"]["attributes"]["study_type"]["study_analysis_date"])
+    submission_date = datetime.datetime.now().isoformat()
+    submission.set("submission_date", submission_date)
     submission.set("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
     submission.set("xsi:noNamespaceSchemaLocation", "ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.submission.xsd")
     
@@ -256,3 +269,10 @@ def get_sample(df):
 def get_sample_ref(df):
     smp = get_sample(df)
     return str(smp["_id"]) + ":sample:" + smp["name"]
+
+
+def get_study_type_enumeration(value):
+    li = lkup.DROP_DOWNS['STUDY_TYPES']
+    for l in li:
+        if l['value'] == value:
+            return l["label"]
