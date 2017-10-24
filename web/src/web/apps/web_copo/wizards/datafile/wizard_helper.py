@@ -468,15 +468,10 @@ class WizardHelper:
         # get target stage dictionary
         stage = self.get_batch_stage(current_stage)
 
-        aggregate_data = list()
-
         # extract and save values for items in the description target
 
         # build data dictionary and apply to all targets
         data = DecoupleFormSubmission(auto_fields, d_utils.json_to_object(stage).items).get_schema_fields_updated()
-
-        # aggregate target's data to aggregate
-        aggregate_data.append(data)
 
         for target in self.description_targets:
             # 'focus' on target
@@ -631,6 +626,29 @@ class WizardHelper:
                 # and finally...a little stage housekeeping...and we are good!
                 self.set_items_type(stage)
 
+    def confirm_pairing(self):
+        """
+        function determines if the pairing of datafiles should be performed given the 'library_layout' value
+        :return:
+        """
+
+        # the test to be carried out will return True, if at least one of the description targets has a value 'PAIRED'
+        do_pairing = False
+
+        # if no accompanying description targets, then we can't do a confirmatory test.
+
+        if len(self.description_targets) == 0:
+            return True
+
+        self.refresh_targets_data()
+        for target in self.description_targets:
+            if target.get('attributes', dict()).get('library_construction', dict()).get('library_layout',
+                                                                                        str()) == 'PAIRED':
+                do_pairing = True
+                break
+
+        return do_pairing
+
     def study_type_change(self, item_id, old_value, new_value):
         """
         function reacts to a change in the study type (ENA repo-specific), and alters the stages accordingly
@@ -719,6 +737,7 @@ class WizardHelper:
         """
 
         reference_description = DataFile().get_record(reference_target_id).get("description", dict())
+        reference_description = self.remove_suppressed_stages(reference_description)
 
         reference_attributes = reference_description.get("attributes", dict())
         reference_stages = reference_description.get("stages", list())
@@ -730,7 +749,7 @@ class WizardHelper:
             # use batch stages to update targets
             self.update_datafile_stage(reference_stages)
 
-            # find and attributes from the reference
+            # add attributes from the reference datafile
             for k, v in reference_attributes.items():
                 if k not in self.get_datafile_attributes():
                     self.update_datafile_attributes({'ref': k, 'data': v})
@@ -738,9 +757,71 @@ class WizardHelper:
         self.update_targets_datafiles()
         return
 
+    def datafile_pairing(self):
+        """
+        pair datafiles - in the context of an ENA description. file to be paired must
+        satisfy the following constraints:
+            1. mutually exclusive - isn't already paired to another file
+            2. symmetric - given two files 'file1', 'file2'. if file1 is paired to file2, file2 must be paired to file1
+        :return:
+        """
+
+        cleared_for_pairing = True
+
+        # first test - are both files unpaired?
+        paired_files = list()
+        for target in self.description_targets:
+            # set 'focus' to target
+            self.set_datafile_id(target["recordID"])
+
+            paired_file = self.get_datafile_attributes().get("datafiles_pairing", dict()).get("paired_file", str())
+            paired_files.append(paired_file)
+
+        if len(set(paired_files)) == 1 and list(set(paired_files))[0] == str():  # cleared for pairing
+            # do pairing
+            self.set_datafile_id(self.description_targets[0]["recordID"])
+            description = self.get_datafile_description()
+
+            description['attributes']["datafiles_pairing"] = dict(paired_file=self.description_targets[1]["recordID"])
+            self.update_description(description)
+
+            self.set_datafile_id(self.description_targets[1]["recordID"])
+            description = self.get_datafile_description()
+
+            description['attributes']["datafiles_pairing"] = dict(paired_file=self.description_targets[0]["recordID"])
+            self.update_description(description)
+
+            self.update_targets_datafiles()
+        else:
+            cleared_for_pairing = False
+
+        return cleared_for_pairing
+
+    def datafile_unpairing(self):
+        """
+        performs unpairing of datafiles in the context of an ENA description.
+        :return:
+        """
+
+        unpaired = True
+
+        # first test, are both files free of previous pairing?
+        paired_files = list()
+        for target in self.description_targets:
+            # set 'focus' to target
+            self.set_datafile_id(target["recordID"])
+            description = self.get_datafile_description()
+            del description['attributes']["datafiles_pairing"]
+
+            self.update_description(description)
+
+        self.update_targets_datafiles()
+
+        return unpaired
+
     def validate_bundle_candidates(self, description_bundle):
         """
-        validates candidates to be added to description bundle to ascertain compatibility between
+        validates candidates to be added to description bundle to ascertain comvalidate_bundle_candidatespatibility between
         new description targets and already existing items in the description bundle
         :param description_bundle:
         :return: validation result
@@ -749,11 +830,11 @@ class WizardHelper:
         # maintain a copy of the original targets
         original_targets = list(self.description_targets)
 
-        # validating targets against one another
+        # validate targets against one another
         result_dict = self.validate_prospective_targets()
 
         if description_bundle:
-            # validating targets against one another as well as existing items in the bundle
+            # validate targets against one another as well as existing items in the bundle
             validation_code = result_dict["validation_code"]
             if validation_code in ["100", "101"]:
                 # targets are compatible with one another/there may be some ahead in description metadata,
@@ -778,10 +859,11 @@ class WizardHelper:
                 if result_dict["validation_code"] == "100" and validation_code == "101":
                     result_dict = self.get_validation_result("101")
                     self.set_datafile_id(selected_target["recordID"])
-                    result_dict["extra_information"] = dict(
-                        summary=htags.resolve_description_data(self.get_datafile_description(),
-                                                               dict()),
-                        target=selected_target)
+
+                    reference_description = self.remove_suppressed_stages(self.get_datafile_description())
+                    summary = htags.resolve_description_data(reference_description, dict())
+
+                    result_dict["extra_information"] = dict(summary=summary, target=selected_target)
                 elif result_dict["validation_code"] == "101":
                     local_target = result_dict["extra_information"]["target"]
                     if local_target["recordID"] == selected_target["recordID"]:
@@ -790,10 +872,11 @@ class WizardHelper:
                         result_dict = self.get_validation_result("101")
 
                     self.set_datafile_id(local_target["recordID"])
-                    result_dict["extra_information"] = dict(
-                        summary=htags.resolve_description_data(self.get_datafile_description(),
-                                                               dict()),
-                        target=local_target)
+
+                    reference_description = self.remove_suppressed_stages(self.get_datafile_description())
+                    summary = htags.resolve_description_data(reference_description, dict())
+
+                    result_dict["extra_information"] = dict(summary=summary, target=local_target)
 
         # set data for candidates
         self.set_description_targets(original_targets)
@@ -801,6 +884,21 @@ class WizardHelper:
         result_dict["extra_information"]["candidates_data"] = self.description_targets
 
         return result_dict
+
+    def remove_suppressed_stages(self, description_object):
+        """
+        function removes stage data, not to be cloned, from description_object
+        :param description_object: description dictionary comprising of stages and attributes
+        :return:
+        """
+        stages = list(description_object.get("stages", list()))
+
+        for indx, stage in enumerate(stages):
+            ref = stage.get("ref", str())
+            if not stage.get("is_clonable", True):
+                description_object.get("attributes", dict()).pop(ref, None)
+
+        return description_object
 
     def get_validation_result(self, code):
         validation_codes = {
@@ -868,12 +966,108 @@ class WizardHelper:
                 # there is at least one target with metadata ahead of the rest
                 result_dict = self.get_validation_result("101")
                 self.set_datafile_id(benchmark_target["recordID"])
-                result_dict["extra_information"] = dict(
-                    summary=htags.resolve_description_data(self.get_datafile_description(),
-                                                           dict()),
-                    target=benchmark_target)
+
+                reference_description = self.remove_suppressed_stages(self.get_datafile_description())
+                summary = htags.resolve_description_data(reference_description, dict())
+
+                result_dict["extra_information"] = dict(summary=summary, target=benchmark_target)
 
         return result_dict
+
+    def is_target_member(self, datafile_id):
+        """
+        function checks if datafile_id is in the description target
+        :param datafile_id:
+        :return:
+        """
+
+        in_target = False
+
+        l = [x for x in self.description_targets if x["recordID"] == datafile_id]
+
+        if len(l) != 0:
+            in_target = True
+
+        return in_target
+
+    def negotiate_datafile_pairing(self):
+        """
+        separate description targets into paired, need to be paired, don't pair groupings
+        :return:
+        """
+        unpaired_list = list()  # datafiles that need to be paired
+        paired_in_bundle_list = list()  # already paired and the pair is in bundle
+        paired_not_in_bundle_list = list()  # paired, but one of the pair isn't in the bundle
+        do_not_pair_list = list()  # not to be paired
+        targets_record_ids = list()
+        add_to_bundle = list()  # will be used to dynamically update bundle
+        self.refresh_targets_data()  # update with current db state
+        for target in self.description_targets:
+            targets_record_ids.append(target.get('recordID'))
+            if target.get('attributes', dict()).get('library_construction', dict()).get('library_layout',
+                                                                                        str()) != 'PAIRED':
+                do_not_pair_list.append(target)
+            else:
+                # paired or needs to be paired
+                paired_file = target.get('attributes', dict()).get('datafiles_pairing', dict()).get('paired_file',
+                                                                                                    str())
+                if paired_file == str():
+                    # not yet paired, needs to be paired
+                    unpaired_list.append(target.get('recordID'))
+                else:
+                    # paired...keep unique pairs (pairing is commutative)
+                    temp_list = [target.get('recordID'), paired_file]
+
+                    if self.is_target_member(paired_file):
+                        temp_list.sort()  # sort here for uniqueness test
+                        paired_in_bundle_list.append(temp_list) if temp_list not in paired_in_bundle_list else ''
+                    else:
+                        paired_not_in_bundle_list.append(temp_list)
+
+        # are there any paired but not in bundle?
+        if paired_not_in_bundle_list:
+            pass
+            # here we will attempt to validate pairs in the list:
+            # i.e., where possible, add missing pair member to the bundle
+            # (if they can be found, and are not paired to another file).
+            # where we can't validate a pair, we unpair the member which is part of the description target.
+
+            for pnb in paired_not_in_bundle_list:
+                paired_member_0_id = pnb[0]  # datafile in description targets
+                paired_member_1_id = pnb[1]  # datafile not in description targets, needs to be resolved
+                try:
+                    paired_member_1 = DataFile().get_record(paired_member_1_id)
+                    paired_file = paired_member_1.get("description", dict()).get('attributes', dict()).get(
+                        'datafiles_pairing', dict()).get('paired_file',
+                                                         str())
+                    if paired_file and paired_file == paired_member_0_id:  # paired, add to description bundle
+                        option = dict(recordLabel=paired_member_1.get("name", str()),
+                                      recordID=str(paired_member_1.get("_id", str())),
+                                      attributes=paired_member_1.get("description", dict()).get("attributes", dict())
+                                      )
+                        add_to_bundle.append(option)
+                        # also, add to paired list
+                        pnb.sort()
+                        paired_in_bundle_list.append(pnb) if pnb not in paired_in_bundle_list else ''
+                    else:  # paired to another, or not at all
+                        #  add the file to unpaired list, making it available for pairing
+                        unpaired_list.append(paired_member_0_id)
+                except:
+                    # can't resolve, add member to unpaired list
+                    unpaired_list.append(paired_member_0_id)
+
+
+        self.description_targets.extend(add_to_bundle)  # update description targets with new members
+        self.set_description_targets(list(self.description_targets))  # set and refresh targets data
+        self.refresh_targets_data()
+        pairing_dict = dict(
+            unpaired_list=[x for x in self.description_targets if x["recordID"] in unpaired_list],
+            paired_list=[[y for y in self.description_targets if y["recordID"] in x] for x in paired_in_bundle_list],
+            add_to_bundle=add_to_bundle,
+            do_not_pair_list=do_not_pair_list
+        )
+
+        return pairing_dict
 
     def is_description_mismatch(self, auto_fields):
         """

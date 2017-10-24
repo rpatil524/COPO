@@ -1220,7 +1220,7 @@ function get_profile_components() {
             sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
             tableID: 'copo_profiles_table',
             visibleColumns: 3,
-            recordActions: ["add_record_all", "edit_record_single", "delete_record_multi", "summarise_record_single"] //specifies action buttons for records manipulation
+            recordActions: ["add_record_all", "edit_record_single", "delete_record_multi"] //specifies action buttons for records manipulation
         },
         {
             component: 'sample',
@@ -1247,7 +1247,7 @@ function get_profile_components() {
             buttons: ["quick-tour-template"],
             sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
             tableID: 'datafile_table',
-            recordActions: ["describe_record_multi", "undescribe_record_multi", "edit_record_single", "delete_record_multi"],
+            recordActions: ["describe_record_multi", "undescribe_record_multi", "delete_datafiles_multi"],
             visibleColumns: 3
         },
         {
@@ -1485,7 +1485,12 @@ function resolve_element_view(recordId, associatedComponent, eventTarget) {
             'target_id': recordId
         },
         success: function (data) {
-            var gAttrib = build_attributes_display(data);
+            var gAttrib = Object();
+            if (associatedComponent == "datafile") { //datafile component rendered differently
+                gAttrib = build_description_display(data);
+            } else {
+                gAttrib = build_attributes_display(data);
+            }
             var attribDiv = $('<div/>', {
                 style: "max-height:300px; overflow-y: scroll;"
             });

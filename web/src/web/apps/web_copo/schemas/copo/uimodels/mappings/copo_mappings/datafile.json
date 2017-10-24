@@ -22,7 +22,8 @@
       "id": "copo.datafile.name",
       "type": "string",
       "show_in_table": true,
-      "control": "text"
+      "control": "text",
+      "show_as_attribute": true
     },
     {
       "help_tip": "You can update this field to provide a more accurate representation of the file type",

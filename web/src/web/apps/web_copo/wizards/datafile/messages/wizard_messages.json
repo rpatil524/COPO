@@ -67,7 +67,7 @@
       "text_class": "text-default"
     },
     "delete_description_message": {
-      "text": "Are you sure you want to go ahead and delete description metadata for the selected files?",
+      "text": "Are you sure you want to go ahead and discard description metadata for the selected files?",
       "text_class": "text-default"
     },
     "stage_dependency_message": {
@@ -131,6 +131,10 @@
     },
     "description_bundle_select_message": {
       "text": "Please supply metadata for individual or group of files in the description bundle. You can click <span class='fa-stack' style='color:green; font-size:12px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> beside a record to enter metadata, and click 'Apply to item' to commit the changes. If there are more records in the bundle, the next record will be automatically highlighted. You can also: <ol> <li>Select one or more datafiles in the bundle</li><li> Using the main form, enter metadata for the selected files</li> <li>Click the apply button to save your entries</li> <li>Repeat steps 1 - 3 for as many subsets of items in the description bundle as required</li> </ol> Click <b>Next</b>, when done, to proceed.",
+      "text_class": "text-info"
+    },
+    "datafiles_pairing_message": {
+      "text": "<ol><li>Click on any two datafiles in the datafiles bundle you wish to pair, and confirm the pairing action</li> <li>All paired files are displayed in the 'Paired Datafiles' table</li><li>You can unpair datafiles by clicking the 'unpair' button beside a paired entry</li> Click <b>Next</b>, when done pairing all datafiles, to proceed.<br/><span style='color:#a94442;'>Please note: The description bundle has been temporarily modified to display only those datafiles that may be paired.</span> ",
       "text_class": "text-info"
     },
     "singular_stage_message": {

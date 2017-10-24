@@ -158,7 +158,8 @@ def get_isasamples_json():
                     label_field: sd["name"],
                     secondary_label_field[0]: sd["name"],
                     "sample_type": sd.get("sample_type", str())
-                })
+                }
+            )
 
     return elem_json
 
@@ -231,6 +232,41 @@ def get_samples_json(target_id=None):
                 label_field: sd["name"],
                 secondary_label_field[0]: sd["name"],
                 "sample_type": sd.get("sample_type", str())
+            })
+
+    return elem_json
+
+def get_datafiles_json(target_id=None):
+    """
+    returns all datafile record
+    :return:
+    """
+    from dal.copo_da import DataFile
+    profile_id = ThreadLocal.get_current_request().session['profile_id']
+
+    if target_id:
+        datafiles = list()
+        datafiles.append(DataFile().get_record(target_id))
+    else:
+        datafiles = DataFile(profile_id).get_all_records()
+
+    value_field = str("id")
+    label_field = str("datafile_name")
+    search_field = ["id", "datafile_name"]
+    secondary_label_field = ["meta_datafile_name"]
+
+    elem_json = dict(value_field=value_field,
+                     label_field=label_field,
+                     secondary_label_field=secondary_label_field,
+                     search_field=search_field,
+                     options=list())
+
+    for sd in datafiles:
+        elem_json.get("options").append(
+            {
+                value_field: str(sd["_id"]),
+                label_field: sd["name"],
+                secondary_label_field[0]: sd["name"]
             })
 
     return elem_json
@@ -377,6 +413,7 @@ def get_ena_remote_path(submission_token):
     remote_path = os.path.join(submission_token, str(ThreadLocal.get_current_user()))
     return remote_path
 
+
 def get_ena_submission_url(user_name, password):
     """
     function builds the submission url to point to the specified (test or live box) ENA service
@@ -384,7 +421,6 @@ def get_ena_submission_url(user_name, password):
     :param password:
     :return:
     """
-
 
 
 def get_copo_schema(component, as_object=False):

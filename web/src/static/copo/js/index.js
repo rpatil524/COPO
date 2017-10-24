@@ -248,7 +248,7 @@ $(document).ready(function () {
 
         $('#' + tableID + ' tbody').find('tr').each(function () {
             $(this).find(".panel:first").find(".row-select-icon").children('i').eq(0).removeClass("fa fa-check-square-o");
-            $(this).find(".copo-records-panel").children('.panel').eq(0).removeClass("panel-dtables");
+            $(this).find(".copo-records-panel").children('.panel').eq(0).removeClass("panel-primary");
 
             $(this).find(".panel:first").find(".row-select-icon").children('i').eq(0).addClass("fa fa-square-o");
             $(this).find(".copo-records-panel").children('.panel').eq(0).addClass("panel-default");
@@ -258,7 +258,7 @@ $(document).ready(function () {
                 $(this).find(".copo-records-panel").children('.panel').eq(0).removeClass("panel-default");
 
                 $(this).find(".panel:first").find(".row-select-icon").children('i').eq(0).addClass("fa fa-check-square-o");
-                $(this).find(".copo-records-panel").children('.panel').eq(0).addClass("panel-dtables");
+                $(this).find(".copo-records-panel").children('.panel').eq(0).addClass("panel-primary");
             }
         });
     }

@@ -579,7 +579,16 @@ div[class*=" col-"] {
 }
 
 .row-describing-highlight {
-    background-color: rgba(214, 214, 194, 0.5) !important;
+    background-color: #d9edf7;
+    color: #000 !important;
+}
+
+span.describing-flag:before {
+    /*position: absolute;*/
+    font-family: 'FontAwesome';
+    content: "\f02c";
+    color: #000;
+    font-size: 14px;
 }
 
 /*class for help tips switch displayed on forms*/

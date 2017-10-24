@@ -1,6 +1,6 @@
 var wizardMessages;
-var currentIndx = 0;
-var descriptionBundle = [];
+var currentIndx = 0; //holds index of the current stage
+var descriptionBundle = []; //datafiles currently being described
 var descriptionToken = null;
 var stage_objects = {}; //retains info about rendered stages
 var stepIntercept = false; //flag indicates if activation of the last stage of the wizard has been intercepted
@@ -70,10 +70,7 @@ $(document).ready(function () {
     //refresh metadata rating after table redraw
     $('body').on('posttablerefresh', function (event) {
         update_itemMetadata_flag();
-
-        //check and refresh stage control if items are currently being described
         refresh_inDescription_flag();
-
     });
 
     //stop automatic form submit
@@ -103,6 +100,12 @@ $(document).ready(function () {
             }
         })
     })
+
+
+    //form control events
+    $(document).on('change', '.copo-select-control', function (e) {
+        do_handle_select_events(e);
+    });
 
 
     //******************************* wizard events *******************************//
@@ -218,14 +221,15 @@ $(document).ready(function () {
             width: 300,
             arrow: false,
             closeable: true,
-            placement: 'auto-right',
-            backdrop: true,
+            placement: 'right',
+            backdrop: false,
         });
     });
 
     //handle event for discarding description...
     $('#discard_act').on('click', function (event) {
         //this, basically, if seen through, will remove all description metadata from affected items
+
         BootstrapDialog.show({
             title: "Discard Description",
             message: wizardMessages.discard_description_message.text,
@@ -277,62 +281,63 @@ $(document).ready(function () {
         event.preventDefault();
         var activeStageIndx = $(this).attr('data-stage-indx');
 
-        if ($.fn.dataTable.isDataTable('#description_target_table_' + activeStageIndx)) {
-            var table = $('#description_target_table_' + activeStageIndx).DataTable();
+        var table = $('#description_target_table_' + activeStageIndx).DataTable();
+        var selectedRows = [];
 
-            var selectedRows = table.rows({
-                selected: true
-            }).data();
+        selectedRows = table.rows({
+            selected: true
+        }).data();
 
-            if (selectedRows.length > 0) {
-                var deTargs = [];
-                for (var i = 0; i < selectedRows.length; ++i) {
-                    descriptionBundle.forEach(function (item) {
-                        if (selectedRows[i].target_id == item.recordID) {
-                            deTargs.push(item);
-                        }
-                    });
+        if (selectedRows.length == 0) {
+            return false;
+        }
+
+        var deTargs = [];
+        for (var i = 0; i < selectedRows.length; ++i) {
+            descriptionBundle.forEach(function (item) {
+                if (selectedRows[i].target_id == item.recordID) {
+                    deTargs.push(item);
+                }
+            });
+        }
+
+        var stage_data = collate_stage_data();
+        stage_data.description_targets = JSON.stringify(deTargs);
+        //also, get back empty stage form
+        stage_data["default_stage_form"] = true;
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: stage_data,
+            success: function (data) {
+                //remove previous selections
+                table.rows('.selected').deselect();
+
+                //refresh batch data
+                if (data.targets_data) {
+                    refresh_targets_data(data.targets_data);
+
+                    //refresh description batch display
+                    refresh_batch_display();
                 }
 
-                var stage_data = collate_stage_data();
-                stage_data.description_targets = JSON.stringify(deTargs);
-                //also, get back empty stage form
-                stage_data["default_stage_form"] = true;
-                $.ajax({
-                    url: wizardURL,
-                    type: "POST",
-                    headers: {
-                        'X-CSRFToken': csrftoken
-                    },
-                    data: stage_data,
-                    success: function (data) {
-                        //remove previous selections
-                        table.rows('.selected').deselect();
+                //refresh stage form, iff apply-to-all control is false
+                if (!get_apply_check_state(activeStageIndx)) {
+                    $('#wizard_form_' + activeStageIndx).html(wizardStagesForms(data.stage.stage).html());
 
-                        //refresh batch data
-                        if (data.targets_data) {
-                            refresh_targets_data(data.targets_data);
+                    refresh_tool_tips();
 
-                            //refresh description batch display
-                            refresh_batch_display();
-                        }
-
-                        //refresh stage form, iff apply-to-all control is false
-                        if (!get_apply_check_state(activeStageIndx)) {
-                            $('#wizard_form_' + activeStageIndx).html(wizardStagesForms(data.stage.stage).html());
-
-                            refresh_tool_tips();
-
-                            //ontology autocomplete
-                            auto_complete();
-                        }
-                    },
-                    error: function () {
-                        alert("Couldn't save some entries!");
-                    }
-                });
+                    //ontology autocomplete
+                    auto_complete();
+                }
+            },
+            error: function () {
+                alert("Couldn't save some entries!");
             }
-        }
+        });
 
     });
 
@@ -359,6 +364,20 @@ $(document).ready(function () {
         save_bundle_item_form(activeStageIndx, descriptionTarget);
     });
 
+    //event for pairing datafiles
+    $(document).on("click", ".datafile-pairing-action", function (event) {
+        event.preventDefault();
+
+        do_datafile_pairing($(this));
+    });
+
+    //event for unpairing datafiles
+    $(document).on("click", ".unpair-datafiles", function (event) {
+        event.preventDefault();
+
+        do_datafile_unpairing($(this));
+    });
+
     //handle event for clicking an previously visited step, intercept here to save entries
     $('#dataFileWizard').on('stepclicked.fu.wizard', function (evt, data) {
         evt.preventDefault();
@@ -368,7 +387,7 @@ $(document).ready(function () {
     });
 
     $('#dataFileWizard').on('changed.fu.wizard', function (evt, data) {
-        //negotiate alert for stage
+        //display alert for stage
         new_stage_alert();
 
         //refresh description batch display
@@ -414,7 +433,7 @@ $(document).ready(function () {
                         if (descriptionBundle.length == 1) { //trying to remove last item from description bundle
                             clear_wizard();
                         } else {
-                            for (i = 0; i < descriptionBundle.length; ++i) {
+                            for (var i = 0; i < descriptionBundle.length; ++i) {
                                 if (targetId == descriptionBundle[i].recordID) {
                                     do_deque(descriptionBundle[i]);
                                     break;
@@ -453,9 +472,10 @@ $(document).ready(function () {
         if (!stage_data) {
             retrieve_stage(retrieval_params);
         } else { //verify what needs to be saved here...
-            if (!get_apply_check_state(activeStageIndx)) { //apply-to-selected:
-                // saving of data is handled per sub items in the bundle,
-                // only check that all items have metadata for this stage
+            if (!get_apply_check_state(activeStageIndx)) { //apply-to-selected button is unchecked:
+                // saving of data is handled per item in the bundle,
+                // check that all items in the bundle have metadata for this stage
+
                 var countMetadata = 0;
                 descriptionBundle.forEach(function (item) {
                     if (item["attributes"][stage_objects[activeStageIndx].ref]) {
@@ -500,7 +520,7 @@ $(document).ready(function () {
             } else { //apply-to-all:
                 //ascertain any mismatch between items' metadata and current stage description
 
-                //but first, if no metadata for all bundle items, continue rather silently
+                //...but first, if no metadata for all bundle items, continue rather silently
                 var countMetadata = 0;
                 descriptionBundle.forEach(function (item) {
                     if (item["attributes"][stage_objects[activeStageIndx].ref]) {
@@ -870,7 +890,7 @@ $(document).ready(function () {
             }
         }
 
-        //refresh visual cues for items' metadata
+        //refresh items' metadata flags
         update_itemMetadata_flag();
     }
 
@@ -1077,6 +1097,12 @@ $(document).ready(function () {
             showApplyTo = " display: none;";
         }
 
+        //pairing message
+        if (stage_objects[currentIndx].ref == "datafiles_pairing") {
+            spanMessage.html('Please define datafile pairing for items in the description bundle');
+            showApplyTo = " display: none;";
+        }
+
 
         var spanInput = $('<span/>', {
             style: "font-weight: bold; margin-left: 5px;" + showApplyTo,
@@ -1108,12 +1134,13 @@ $(document).ready(function () {
 
         var formButton = $('<button/>', {
             id: "apply_to_btn_" + currentIndx,
-            class: "apply-to-selected-btn btn btn-sm btn-primary",
+            class: "apply-to-selected-btn tiny ui primary button",
             html: "Apply to selected items in bundle",
             "data-stage-indx": currentIndx
         });
 
         var formControlsPanel = get_panel("primary");
+        formControlsPanel.attr("id", "stage_form_panel_" + currentIndx);
         formControlsPanel.find(".panel-heading").append("<strong>Description Metadata</strong>");
         formControlsPanel.find(".panel-body").append(formCtrl).append(formButton);
         formControlsPanel.find(".panel-heading");
@@ -1135,9 +1162,43 @@ $(document).ready(function () {
         descriptionBundleTableHTML += '</tr> </thead></table>';
 
         var bundlePanel = get_panel("primary");
-        bundlePanel.find(".panel-heading").append("<strong>Description Bundle</strong>");
+        bundlePanel.attr("id", "bundlepanel_" + currentIndx);
+        bundlePanel.find(".panel-heading").html("<strong>Description Bundle</strong>");
         bundlePanel.find(".panel-body").html(descriptionBundleTableHTML);
         bundlePanel.find(".panel-heading");
+
+        //render datafiles pairing table differently
+        if (stage_objects[currentIndx].ref == "datafiles_pairing") {
+            descriptionBundleTableHTML = "";
+            descriptionBundleTableHTML += '<table id="description_target_table_' + currentIndx + '" class="ui celled table hover copo-noborders-table" cellspacing="0" width="100%">';
+            descriptionBundleTableHTML += '<thead><tr><th>Description Bundle</th><th>&nbsp;</th>';
+            descriptionBundleTableHTML += '</tr> </thead></table>';
+
+            var datafilePairTableHTML = "";
+            datafilePairTableHTML += '<table id="datafile_pairing_table_' + currentIndx + '" class="ui celled table hover copo-noborders-table" cellspacing="0" width="100%">';
+            datafilePairTableHTML += '<thead><tr><th>Paired Datafiles</th>';
+            datafilePairTableHTML += '</tr> </thead></table>';
+
+            var pairingLeft = $('<div/>', {
+                class: "col-sm-6 col-md-6 col-lg-6",
+                html: descriptionBundleTableHTML
+            });
+
+            var pairingRight = $('<div/>', {
+                class: "col-sm-6 col-md-6 col-lg-6",
+                html: datafilePairTableHTML
+            });
+
+            var pairingRow = $('<div/>', {
+                class: "row",
+            });
+
+            pairingRow.append(pairingLeft).append(pairingRight);
+
+            bundlePanel.find(".panel-heading").html("<strong>Description Bundle & Datafiles Pairing</strong>");
+            bundlePanel.find(".panel-body").html('').append(pairingRow);
+        }
+
 
         descriptionBundleCol.html(bundlePanel);
 
@@ -1172,15 +1233,19 @@ $(document).ready(function () {
         //reset index
         currentIndx = 0;
 
-        if (onGoingDescription) {
-            $('#copo-datafile-tabs.nav-tabs a[href="#emptyTab"]').tab('show');
-        } else {
-            $('#copo-datafile-tabs.nav-tabs a[href="#fileListComponent"]').tab('show');
-        }
+        setTimeout(function () {
+            if (onGoingDescription) {
+                $('#copo-datafile-tabs.nav-tabs a[href="#emptyTab"]').tab('show');
+            } else {
+                $('#copo-datafile-tabs.nav-tabs a[href="#fileListComponent"]').tab('show');
+            }
 
-        onGoingDescription = false;
-        $("#description_panel").css("display", "none");
-        $(".page-wizard-message").show();
+            onGoingDescription = false;
+            $("#description_panel").css("display", "none");
+            $(".page-wizard-message").show();
+
+        }, 500);
+
     }
 
     function reset_wizard() { //resets wizard without all the hassle of clear_wizard()
@@ -1226,8 +1291,9 @@ $(document).ready(function () {
 
     }
 
-    //trigger save action before navigating back a stage
+
     function before_step_back(proposedState) {
+        //trigger save action before navigating back a stage
         $('#dataFileWizard').wizard('selectedItem', {
             step: proposedState
         });
@@ -1268,10 +1334,8 @@ $(document).ready(function () {
         }
     }
 
-    function do_undescribe_confirmation(records) {
-        //Impose a number of constraints here...
-        //1. items currently being described
-        //2. items already submitted? not sure of this, relaxed for the time being
+    function do_undescribe_confirmation(records, describedRecords) {
+        //alert the user to items currently being described
 
         var candidates = [];
 
@@ -1283,9 +1347,22 @@ $(document).ready(function () {
             return false;
         }
 
+        var describedAlert = '';
+
+        if (describedRecords.length > 0) {
+            //make sure focus is given to wizard view to avoid conflict if eventually removing wizard
+            $('#copo-datafile-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show');
+            var describedAlert = $('<div/>', {
+                style: "margin-top: 15px; color:red;",
+                html: "Please note: " + describedRecords.length + " of the selected datafile(s) are currently being described and will be affected by this action. What do you want to do?"
+            });
+        }
+
+        var taskMessage = '<div>' + wizardMessages.delete_description_message.text + '</div>' + $('<div/>').append(describedAlert).html();
+
         BootstrapDialog.show({
-            title: "Discard Description",
-            message: wizardMessages.delete_description_message.text,
+            title: "Discard Description Metadata",
+            message: taskMessage,
             cssClass: 'copo-modal2',
             closable: false,
             animate: true,
@@ -1294,6 +1371,7 @@ $(document).ready(function () {
                 label: 'Cancel',
                 cssClass: 'tiny ui basic button',
                 action: function (dialogRef) {
+                    $('#copo-datafile-tabs.nav-tabs a[href="#fileListComponent"]').tab('show');
                     dialogRef.close();
                 }
             }, {
@@ -1315,11 +1393,28 @@ $(document).ready(function () {
                         },
                         data: request_params,
                         success: function (data) {
+                            //update description bundle
+                            if (describedRecords.length > 0) {
+                                describedRecords.forEach(function (item) {
+                                    for (var i = 0; i < descriptionBundle.length; ++i) {
+                                        if (item.record_id == descriptionBundle[i].recordID) {
+                                            do_deque(descriptionBundle[i]);
+                                            break;
+                                        }
+                                    }
+                                });
+                            }
+
                             display_copo_alert("info", "Description metadata discarded", 20000);
                             update_itemMetadata_flag();
-                            refresh_inDescription_flag();
 
                             deselect_records(componentMeta.tableID);
+
+                            if (describedRecords.length > 0 && descriptionBundle.length == 0) {
+                                clear_wizard();
+                                update_itemMetadata_flag();
+                            }
+
                         },
                         error: function () {
                             alert("Couldn't discard description for selected records!");
@@ -1331,9 +1426,9 @@ $(document).ready(function () {
     }
 
     function add_to_batch(batchTargets, silence) {
-        // validate items in batchTargets before adding them.
+        // validate items in batchTargets before adding them to the description bundle.
         // one reason is to avoid duplication of items in the description bundle.
-        // but also, can the items be bundled together (e.g., going to same repo)?
+        // but also, can the items be bundled together (e.g., having similar metadata (stages), and going to same repo)?
         // what of inheriting metadata from already existing bundle items?
 
         // one can also 'silence' if you are only refreshing the wizard without necessarily
@@ -1342,8 +1437,8 @@ $(document).ready(function () {
 
 
         var candidates = [];
-        batchTargets.forEach(function (item) {
-            if (!isIn_descriptionBundle(item)) {
+        batchTargets.forEach(function (item) { //candidates are items not already in the description bundle
+            if (!isInList(item, descriptionBundle)) {
                 candidates.push(item);
             }
         });
@@ -1559,7 +1654,7 @@ $(document).ready(function () {
         var dialog_message = wizardMessages.inherit_metadata_103_message.text;
         dialog_message += '<div class="radio wizard-alert-radio">' + show_description_metadata(data.validatation_results.extra_information.summary) + '</div>';
 
-        $('#copo-datafile-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show'); //switch back to description pane
+        $('#copo-datafile-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show'); //display to description pane
 
         BootstrapDialog.show({
             title: "Inherit Metadata",
@@ -1706,11 +1801,11 @@ $(document).ready(function () {
         return $('<div></div>').append(descriptionInfoPanel).html();
     }
 
-    function isIn_descriptionBundle(candidate) {
+    function isInList(candidate, theList) {//checks if a datafile (candidate) is in a list of datafiles
         var isInBundle = false;
 
-        for (var i = 0; i < descriptionBundle.length; ++i) {
-            if (descriptionBundle[i].recordID == candidate.recordID) {
+        for (var i = 0; i < theList.length; ++i) {
+            if (theList[i].recordID == candidate.recordID) {
                 isInBundle = true;
                 break;
             }
@@ -1750,62 +1845,24 @@ $(document).ready(function () {
     function do_record_task(event) {
         var task = event.task.toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
         var tableID = event.tableID; //get target table
+        var taskLabel = event.title;
 
-        //records currently being described will be locked from receiving other tasks.
-        //they must be unlocked (i.e., removed from the active description ) before once again
-        //becoming available to receiving tasks.
-        var disallowed = [];
+        //holds selected records that are also currently being described
+        var describedRecords = [];
 
         //retrieve target records and execute task
         var table = $('#' + tableID).DataTable();
         var records = []; //
         $.map(table.rows('.selected').data(), function (item) {
-            if (!isIn_descriptionBundle_Id(item.record_id)) {
-                records.push(item);
-            } else {
-                disallowed.push(item);
+            records.push(item);
+            if (isIn_descriptionBundle_Id(item.record_id)) {
+                describedRecords.push(item);
             }
         });
-
-        if (records.length == 0 && disallowed == 0) {
-            return false;
-        }
-
-        if (disallowed.length > 0) {
-            var disallowedMessage = "Please note that records currently being described will be excluded from the current task. <br/><br/> No. of records to be excluded: " + disallowed.length;
-
-            BootstrapDialog.show({
-                title: "Action Review",
-                message: disallowedMessage,
-                cssClass: 'copo-modal2',
-                closable: false,
-                animate: true,
-                type: BootstrapDialog.TYPE_WARNING,
-                buttons: [{
-                    label: 'OK',
-                    cssClass: 'tiny ui basic orange button',
-                    action: function (dialogRef) {
-                        dialogRef.close();
-                        realise_record_task(records, task, table);
-                    }
-                }]
-            });
-        } else {
-            realise_record_task(records, task, table);
-        }
-
-
-        //table.rows().deselect(); //deselect all rows
-
-    } //end of func
-
-    function realise_record_task(records, task, table) {
-        refresh_inDescription_flag();
 
         if (records.length == 0) {
             return false;
         }
-
 
         if (task == "describe") {
             //append to batch
@@ -1823,7 +1880,7 @@ $(document).ready(function () {
             table.rows().deselect();
 
         } else if (task == "discard") {
-            do_undescribe_confirmation(records);
+            do_undescribe_confirmation(records, describedRecords);
         } else if (task == "edit") {
             $.ajax({
                 url: copoFormsURL,
@@ -1846,8 +1903,10 @@ $(document).ready(function () {
         } else if (task == "delete") {
             //...
         }
-    }
 
+        //table.rows().deselect(); //deselect all rows
+
+    } //end of func
 
     function do_deque(item) { //removes item from the batch
         var position = -1;
@@ -1926,6 +1985,16 @@ $(document).ready(function () {
         formDiv.append(hiddenCtrl);
 
         return formDiv;
+    }
+
+    function do_handle_select_events(event) {
+        var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+
+        if (stage_objects && stage_objects[activeStageIndx] && stage_objects[activeStageIndx].ref == "library_construction" && $(event.target).attr("id") == "library_layout") {
+            //refresh wizard to normalise stages display
+
+            alert(1);
+        }
     }
 
     function element_value_change(formElem, elemValue, messageTitle) {
@@ -2212,7 +2281,8 @@ $(document).ready(function () {
 
 
             // handle opening and closing summary details
-            $('#description_summary_table tbody').on('click', 'td.summary-details-control', function () {
+            $('#description_summary_table tbody').on('click', 'td.summary-details-control', function (event) {
+                event.preventDefault();
                 var tr = $(this).closest('tr');
                 var row = table.row(tr);
 
@@ -2393,7 +2463,14 @@ $(document).ready(function () {
 
 
     function refresh_batch_display() {
+
         var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+
+        //render differently for some stages
+        if (stage_objects && stage_objects[activeStageIndx] && stage_objects[activeStageIndx].ref == "datafiles_pairing") {
+            refresh_paired_files_display();
+            return false;
+        }
 
 
         //get last stage index
@@ -2408,17 +2485,6 @@ $(document).ready(function () {
         //if no stage...
         if (activeStageIndx == -1) {
             return false;
-        }
-
-        //set stage message
-        if (stage_objects && stage_objects[activeStageIndx].hasOwnProperty("message")) {
-
-            if (!displayedMessages.hasOwnProperty(stage_objects[activeStageIndx].ref)) {
-                var alertType = "info";
-                var alertMessage = "<div style='margin-bottom: 10px;'><strong>" + stage_objects[activeStageIndx].title + "</strong></div><div>" + stage_objects[activeStageIndx].message + "</div>";
-                display_copo_alert(alertType, alertMessage, 20000);
-                displayedMessages[stage_objects[activeStageIndx].ref] = 1;
-            }
         }
 
         //set up data source
@@ -2641,13 +2707,13 @@ $(document).ready(function () {
                             contentHtml = '';
 
                             if (!appliedToAllFlag) {
-                                var applyToItemBtn = '<button tabindex="0" type="button" data-stage-indx="' + activeStageIndx + '" data-description-target="' + row.data().target_id + '"  class="apply-to-item-btn btn btn-sm btn-primary">Apply to item</button><span style="margin-left: 4px; font-weight: 600;" class="text-default"></span>';
+                                var applyToItemBtn = '<button tabindex="0" type="button" data-stage-indx="' + activeStageIndx + '" data-description-target="' + row.data().target_id + '"  class="apply-to-item-btn tiny ui primary button">Apply to item</button><span style="margin-left: 4px; font-weight: 600;" class="text-default"></span>';
                                 if (stage_objects[activeStageIndx].is_singular_stage || get_apply_check_state(activeStageIndx)) {
                                     applyToItemBtn = '';
                                 }
 
-                                contentHtml += '<div class="panel panel-default" style="margin-top: 5px;">';
-                                contentHtml += '<div class="panel-heading" style="background-image: none;"><strong></strong></div>';
+                                contentHtml += '<div class="panel panel-primary" style="margin-top: 5px;">';
+                                contentHtml += '<div class="panel-heading" style="background-image: none;"><strong>Metadata</strong></div>';
                                 contentHtml += '<div class="panel-body">';
                                 contentHtml += '<div class="item-form-controls"><form class="wizard-items-form" data-description-target="' + row.data().target_id + '" data-stage-indx="' + activeStageIndx + '" role="form" id="wizard_item_form_' + activeStageIndx + '">';
                                 contentHtml += wizardStagesForms(data.stage.stage).html();
@@ -2874,10 +2940,386 @@ $(document).ready(function () {
 
         show_hide_stage_ctrl(get_apply_check_state(activeStageIndx), activeStageIndx);
 
+        if (activeStageIndx >= 1 && !(($('#dataFileWizard').is(":visible")))) {
+            $('#copo-datafile-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show'); //set display to description pane
+        }
+
     } //end of func
 
+    function update_paired_display(data) {
+        var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+        var unpaired_list = data.pairing_info.unpaired_list; //pairable candidates - will make up the description bundle
+        var paired_list = data.pairing_info.paired_list; //already paired - will make up the pairedTable
+        var add_to_bundle = data.pairing_info.add_to_bundle; //used to update description bundle to satisfy existing pairing
+        var do_not_pair_list = data.pairing_info.do_not_pair_list; //not to be paired (i.e., having library layout!='PAIRED')
+
+
+        if (add_to_bundle.length > 0 || do_not_pair_list.length > 0) {
+            var message = '<span style="margin-bottom: 10px;">A few modifications have been made to facilitate datafiles pairing.</span>';
+            var alertElem = $('#bundlepanel_' + activeStageIndx);
+            alertElem.webuiPopover('destroy');
+
+
+            if (add_to_bundle.length > 0) {
+                var tempMessage = "<div>" + add_to_bundle.length + " datafile(s) have been added to the description bundle to satisfy existing pairing:";
+
+                tempMessage += '<ol>';
+                for (var i = 0; i < add_to_bundle.length; ++i) {
+                    tempMessage += '<li>' + add_to_bundle[i].recordLabel + '</li>';
+                }
+
+                tempMessage += '</ol></div>';
+
+                message += tempMessage;
+
+            }
+
+            if (do_not_pair_list.length > 0) {
+                var tempMessage = "<div>" + do_not_pair_list.length + " datafile(s) that do not require pairing have been temporary removed from the description bundle: ";
+
+                tempMessage += '<ol>';
+                for (var i = 0; i < do_not_pair_list.length; ++i) {
+                    tempMessage += '<li>' + do_not_pair_list[i].recordLabel + '</li>';
+                }
+
+                tempMessage += '</ol></div>';
+
+                message += tempMessage;
+
+            }
+
+            if (unpaired_list.length > 0 && unpaired_list.length % 2 != 0) {
+                var tempMessage = '<div><i class="fa fa-exclamation-circle" aria-hidden="true" style="color: red; font-size: 15px !important; padding-right: 10px;"></i> Please ensure you have an even number of datafiles in the bundle in order to successfully conduct datafiles pairing.';
+
+                message += tempMessage;
+            }
+
+            var okButton = '<div class="text-center alertdismissOK" style="margin-top: 15px;"><button class="mini ui orange basic button">OK</button></div>';
+
+            var pop_title = 'Bundle Modifications';
+            var pop_content = '<i class="fa fa-exclamation-circle" aria-hidden="true" style="color: darkorange; font-size: 15px !important; padding-right: 10px;"></i>' + message;
+            pop_content += okButton;
+            var meta_extra = {
+                width: 300,
+                placement: 'auto',
+                trigger: 'sticky',
+                backdrop: true,
+                style: '',
+                closeable: false
+            };
+
+            refresh_webpop(alertElem, pop_title, pop_content, meta_extra);
+        }
+
+
+        //set up data source
+        var dtd = []; //description bundle data source (datafiles not yet paired)
+        var dtdPaired = []; //define pairedTable data source
+
+        //compose pairedTable data source
+        for (var i = 0; i < paired_list.length; ++i) { //paired data source
+            var pair = paired_list[i];
+            var option = {};
+            option["target"] = [pair[0].recordLabel, pair[1].recordLabel];
+            option["target_id"] = [pair[0].recordID, pair[1].recordID];
+
+            dtdPaired.push(option);
+        }
+
+        //compose bundle data source
+        for (var i = 0; i < unpaired_list.length; ++i) {
+            var item = unpaired_list[i];
+            var option = {};
+            option["target"] = [item.recordLabel, item.recordID];
+            option["target_id"] = item.recordID;
+            option["attributes"] = item.attributes;
+            option["buttons"] = item.recordID;
+            dtd.push(option);
+        }
+
+
+        var buttons = [];
+        buttons.push({
+            'text': 'Remove from description bundle',
+            'className': 'wiz-batch-item btn btn-danger',
+            'iconClass': 'fa fa-trash-o',
+            'btnAction': 'delete'
+        });
+
+        var colDefs = [{
+            targets: -1,
+            width: "5%",
+            data: null,
+            searchable: false,
+            orderable: false,
+            render: function (rdata) {
+                var rndHTML = "";
+
+                var bTns = buttons;
+                rndHTML = '<span style="white-space: nowrap;">';
+                for (var i = 0; i < bTns.length; ++i) {
+                    rndHTML += '<a data-action-target="row" data-record-action="' +
+                        bTns[i].btnAction + '" data-record-id="' +
+                        rdata +
+                        '" data-toggle="tooltip" style="display: inline-block; white-space: normal; background-image: none; border: none;" title="' +
+                        bTns[i].text + '" class="' + bTns[i].className + ' btn-xs"><i class="' +
+                        bTns[i].iconClass + '"> </i><span></span></a>&nbsp;';
+                }
+                rndHTML += '</span>';
+
+                return rndHTML;
+            }
+        }, {
+            targets: 0,
+            data: null,
+            render: function (rdata) {
+                var rndHTML = rdata[0];
+                return rndHTML;
+            }
+
+        }];
+
+        //set data
+        var table = null;
+        if ($.fn.dataTable.isDataTable('#description_target_table_' + activeStageIndx)) {
+            //if table instance already exists, then do refresh
+            table = $('#description_target_table_' + activeStageIndx).DataTable();
+        }
+
+        if (table) {
+            //clear old, set new data
+            table.clear().draw();
+            table.rows.add(dtd);
+            table.columns.adjust().draw();
+        } else {
+            var tableElem = $('#description_target_table_' + activeStageIndx);
+            table = tableElem.DataTable({
+                "data": dtd,
+                "lengthChange": true,
+                "columns": [{
+                    "data": "target"
+                }, {
+                    "data": "buttons"
+                }],
+                "fnDrawCallback": function (oSettings) {
+                    refresh_tool_tips();
+
+                    // refresh show hide stage controls
+                    var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step;
+                    $("[name='apply-scope-chk-" + activeStageIndx + "']").bootstrapSwitch('state', false);
+
+                    $("#stage_form_panel_" + activeStageIndx).hide();
+                    set_stage_alerts(wizardMessages.datafiles_pairing_message, activeStageIndx);
+                    refresh_inDescription_flag();
+                },
+                columnDefs: colDefs,
+                //scrollY: "200px",
+                scrollCollapse: true,
+                select: {
+                    style: 'multi'
+                },
+                dom: 'fr<"row"><"row description-rw" i>tlp'
+            });
+        }
+
+        $('#description_target_table_' + activeStageIndx + '_wrapper')
+            .find(".dataTables_filter")
+            .find("input")
+            .removeClass("input-sm")
+            .attr("placeholder", "Search bundle")
+            .attr("size", 25);
+
+        if (table) {
+            table.on('select', function (e, dt, type, indexes) {
+                var selectedRows = table.rows({
+                    selected: true
+                }).count();
+
+                if (selectedRows == 2) {//pair selected datafiles
+                    var alertElem = $('#description_target_table_' + activeStageIndx + '_info');
+                    alertElem.webuiPopover('destroy');
+
+                    var okButton = $('<button/>',
+                        {
+                            type: "button",
+                            class: "mini ui primary basic button datafile-pairing-action",
+                            "data-action": "pair",
+                            style: "margin-right: 5px;",
+                            html: '<i class="fa fa-link text-primary" aria-hidden="true" style=" font-size: 12px !important; padding-right: 5px;"></i> Pair'
+                        });
+
+                    var cancelButton = $('<button/>',
+                        {
+                            type: "button",
+                            class: "mini ui basic button datafile-pairing-action",
+                            "data-action": "cancel",
+                            html: "Cancel"
+                        });
+
+                    var alertMessage = $('<div/>',
+                        {
+                            html: '<span>Do you want to pair the selected datafiles?</span>'
+                        });
+
+                    var buttonDiv = $('<div style="margin-top: 15px;"></div>');
+                    buttonDiv.append(cancelButton).append(okButton);
+
+                    var displayMessage = $('<div class="text-center"></div>');
+                    displayMessage.append(alertMessage).append(buttonDiv);
+
+
+                    var pop_title = '';
+                    var pop_content = $('<div/>').append(displayMessage).html();
+
+                    var meta_extra = {
+                        width: 250,
+                        placement: 'auto',
+                        trigger: 'sticky',
+                        backdrop: true,
+                        style: '',
+                        closeable: false
+                    };
+
+                    refresh_webpop(alertElem, pop_title, pop_content, meta_extra);
+
+                }
+            });
+
+        }
+
+        if (activeStageIndx >= 1 && !(($('#dataFileWizard').is(":visible")))) {
+            $('#copo-datafile-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show'); //set display to description pane
+        }
+
+
+        //initialise paired datafile table
+
+        var pairedTable = null;
+        if ($.fn.dataTable.isDataTable('#datafile_pairing_table_' + activeStageIndx)) {
+            //if table instance already exists, then do refresh
+            pairedTable = $('#datafile_pairing_table_' + activeStageIndx).DataTable();
+        }
+
+        if (pairedTable) {
+            //clear old, set new data
+            pairedTable.clear().draw();
+            pairedTable.rows.add(dtdPaired);
+            pairedTable.columns.adjust().draw();
+        } else {
+            var tableElem = $('#datafile_pairing_table_' + activeStageIndx);
+            pairedTable = tableElem.DataTable({
+                "data": dtdPaired,
+                "lengthChange": true,
+                "columns": [
+                    {
+                        "data": "target",
+                        "render": function (rdata) {
+                            var rowObject = $('<div/>',
+                                {
+                                    style: "display: table; width: 100%; border: 1px solid rgba(229, 239, 255, 1.0); border-radius: 4px; background: rgba(229, 239, 255, 0.3);"
+                                });
+
+                            var col1Object = $('<div/>',
+                                {
+                                    style: "display: table-cell; vertical-align: middle; padding: 5px;"
+                                }).append('<ol><li>' + rdata[0] + '</li><li>' + rdata[1] + '</li></ol>');
+
+                            rowObject.append(col1Object);
+
+                            var unpairButton = $('<a/>',
+                                {
+                                    href: "#",
+                                    class: "btn btn-xs btn-danger unpair-datafiles",
+                                    style: "display: inline-block; white-space: normal; background-image: none; border: none;",
+                                    title: "Unpair datafiles",
+                                    "data-toggle": "tooltip",
+                                    html: '<i class="fa fa-chain-broken" aria-hidden="true" style=" font-size: 12px !important;"></i>'
+                                });
+
+                            var col2Object = $('<div/>',
+                                {
+                                    style: "display: table-cell; vertical-align: middle; padding: 5px; width: 2%; text-align: right; border-left: 1px solid rgba(229, 239, 255, 1.0);"
+                                }).append(unpairButton);
+
+                            rowObject.append(col2Object);
+
+                            return $('<div/>').append(rowObject).html();
+                        }
+                    },
+                    {
+                        "data": "target_id",
+                        "visible": false
+                    },
+                ],
+                "fnDrawCallback": function (oSettings) {
+                    refresh_tool_tips();
+                },
+                scrollCollapse: true,
+                selectable: true,
+                dom: 'fr<"row"><"row description-rw" i>tlp'
+            });
+        }
+
+        $('#datafile_pairing_table_' + activeStageIndx + '_wrapper')
+            .find(".dataTables_filter")
+            .find("input")
+            .removeClass("input-sm")
+            .attr("placeholder", "Search paired")
+            .attr("size", 25);
+
+        refresh_inDescription_flag();
+        set_stage_message();
+    } //end update_paired_display
+
+    function refresh_paired_files_display() {
+        var request_params = {
+            'request_action': 'negotiate_datafile_pairing',
+            'description_token': descriptionToken,
+            'description_targets': JSON.stringify(descriptionBundle)
+        };
+
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: request_params,
+            success: function (data) {
+                var new_addition = null;
+                try {
+                    new_addition = data.pairing_info.add_to_bundle;
+                } catch (err) {
+                    ;
+                }
+                if (new_addition && new_addition.length > 0) {
+                    //update description bundle
+                    for (var i = 0; i < new_addition.length; ++i) {
+                        descriptionBundle.push(new_addition[i]);
+                    }
+                }
+
+                if (data.targets_data) {
+                    refresh_targets_data(data.targets_data);
+                }
+                update_paired_display(data);
+            },
+            error: function () {
+                alert("Couldn't obtain pairing information!");
+            }
+        });
+    }
+
+
     function save_bundle_item_form(activeStageIndx, descriptionTarget) {
-        var deTargs = [];
+        //get form elements for item
+        var form_values = Object();
+
+        $('#wizard_item_form_' + activeStageIndx).find(":input").each(function () {
+            form_values[this.id] = $(this).val();
+        });
+
+        var deTargs = []; //description targets
 
         descriptionBundle.forEach(function (item) {
             if (descriptionTarget == item.recordID) {
@@ -2886,19 +3328,12 @@ $(document).ready(function () {
             }
         });
 
-
-        //get form elements for item
-        var form_values = Object();
-
-        $('#wizard_item_form_' + activeStageIndx).find(":input").each(function () {
-            form_values[this.id] = $(this).val();
-        });
-
         var auto_fields = JSON.stringify(form_values);
 
         if (auto_fields == '{}') {
             return false;
         }
+
 
         var request_params = {
             'request_action': 'save_stage_data',
@@ -2924,35 +3359,33 @@ $(document).ready(function () {
                     refresh_batch_display();
 
                     //get the next item in line
-                    if ($.fn.dataTable.isDataTable('#description_target_table_' + activeStageIndx)) {
-                        var table = $('#description_target_table_' + activeStageIndx).DataTable();
+                    var table = $('#description_target_table_' + activeStageIndx).DataTable();
 
-                        var foundCurrentRow = false;
+                    var foundCurrentRow = false;
 
-                        $('#description_target_table_' + activeStageIndx + ' tbody').find('tr').each(function () {
-                            var row_ll = table.row($(this));
+                    $('#description_target_table_' + activeStageIndx + ' tbody').find('tr').each(function () {
+                        var row_ll = table.row($(this));
 
-                            if (row_ll.data()) {
-                                if (foundCurrentRow) {
-                                    $(this).find('td.summary-details-control').trigger("click");
-                                    return false;
-                                }
-
+                        if (row_ll.data()) {
+                            if (foundCurrentRow) {
+                                $(this).find('td.summary-details-control').trigger("click");
+                                return false;
                             }
+                        }
 
-                            if (row_ll.data()) {
-                                if (row_ll.data().target_id == descriptionTarget) {
-                                    foundCurrentRow = true;
-                                    row_ll.child('');
-                                    row_ll.child.hide();
-                                    $(this).removeClass('shown');
-                                    table.rows('.selected').deselect();
-                                }
+                        if (row_ll.data()) {
+                            if (row_ll.data().target_id == descriptionTarget) {
+                                foundCurrentRow = true;
+                                row_ll.child('');
+                                row_ll.child.hide();
+                                $(this).removeClass('shown');
+                                table.rows('.selected').deselect();
                             }
+                        }
 
-                        });
+                    });
 
-                    }
+
                 }
             },
             error: function () {
@@ -2960,6 +3393,121 @@ $(document).ready(function () {
             }
         });
     }
+
+    function do_datafile_pairing(elem) {
+        var elemAction = elem.attr("data-action");
+
+        var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+        var table = $('#description_target_table_' + activeStageIndx).DataTable();
+
+        var selectedRows = [];
+
+        selectedRows = table.rows({
+            selected: true
+        }).data();
+
+        table.rows('.selected').deselect();
+        WebuiPopovers.hideAll();
+
+        if (elemAction == "cancel") {
+            return false;
+        }
+
+        var deTargs = [];
+        for (var i = 0; i < selectedRows.length; ++i) {
+            descriptionBundle.forEach(function (item) {
+                if (selectedRows[i].target_id == item.recordID) {
+                    deTargs.push(item);
+                }
+            });
+        }
+
+        if (deTargs.length != 2) {//two files needed for pairing
+            return false;
+        }
+
+
+        var request_params = {
+            'request_action': 'datafile_pairing',
+            'description_token': descriptionToken,
+            'description_targets': JSON.stringify(deTargs),
+            'description_bundle': JSON.stringify(descriptionBundle)
+        };
+
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: request_params,
+            success: function (data) {
+                if (data.result == true) {
+                    if (data.targets_data) {
+                        refresh_targets_data(data.targets_data);
+                    }
+                    refresh_paired_files_display();
+                } else {
+                    ;
+                }
+            },
+            error: function () {
+                alert("Couldn't pair datafiles!");
+            }
+        });
+    }
+
+    function do_datafile_unpairing(elem) {
+        //function unpair paired datafiles
+        var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+        var table = $('#datafile_pairing_table_' + activeStageIndx).DataTable();
+        var tr = elem.closest('tr');
+        var row = table.row(tr);
+
+
+        var deTargs = [];
+
+        descriptionBundle.forEach(function (item) {
+            if ((item.recordID == row.data().target_id[0]) || (item.recordID == row.data().target_id[1])) {
+                deTargs.push(item);
+            }
+        });
+
+
+        if (deTargs.length != 2) {//two files needed for pairing
+            return false;
+        }
+
+        var request_params = {
+            'request_action': 'datafile_unpairing',
+            'description_token': descriptionToken,
+            'description_targets': JSON.stringify(deTargs),
+            'description_bundle': JSON.stringify(descriptionBundle)
+        };
+
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: request_params,
+            success: function (data) {
+                if (data.result == true) {
+                    if (data.targets_data) {
+                        refresh_targets_data(data.targets_data);
+                    }
+                    refresh_paired_files_display();
+                } else {
+                    ;
+                }
+            },
+            error: function () {
+                alert("Couldn't unpair datafiles!");
+            }
+        });
+    }
+
 
     function update_itemMetadata_flag() {
         //function sets/updates metadata flag for datafiles
@@ -3043,29 +3591,28 @@ $(document).ready(function () {
         var tableID = componentMeta.tableID;
         var table = $('#' + tableID).DataTable();
 
+        //remove previous highlights
+        table.columns('.describe-status').every(function () {
+            var node = this.nodes();
+            $(node)
+                .removeClass('row-describing-highlight')
+                .attr("title", "");
+        });
+
         //highlight currently described records
-
-        table
-            .rows('.row-describing-highlight')
-            .nodes()
-            .to$()
-            .removeClass('row-describing-highlight')
-            .attr("title", "");
-
-
         descriptionBundle.forEach(function (item) {
-            table
-                .rows('.' + tableID + item.recordID)
-                .nodes()
-                .to$()
-                .addClass('row-describing-highlight')
-                .attr("title", "Currently being described");
+            table.rows('.' + tableID + item.recordID).every(function (rowIdx, tableLoop, rowLoop) {
+                var node = this.node();
+                $(node).find('.describe-status')
+                    .addClass('row-describing-highlight')
+                    .attr("title", "Currently being described");
+            });
         });
 
         $(".description-count").remove();
 
         if (descriptionBundle.length > 0) {
-            $('<span class="description-count row-describing-highlight badge" style="margin-left: 10px; color: #000;">' + descriptionBundle.length + ' record(s) currently being described</span>').insertAfter('.extra-table-info');
+            $('<span class="description-count row-describing-highlight badge" style="margin-left: 10px; font-size: 13px; padding: 5px;">' + descriptionBundle.length + ' record(s) currently being described</span>').insertAfter('.extra-table-info');
         }
 
 
@@ -3095,7 +3642,6 @@ $(document).ready(function () {
     }
 
     function show_hide_stage_ctrl(applyToAll, activeStageIndx) {
-        refresh_inDescription_flag();
 
         //get table reference
         var table = null;
@@ -3151,8 +3697,27 @@ $(document).ready(function () {
         }
 
         new_stage_alert();
+        refresh_inDescription_flag();
+        set_stage_message();
+
 
     } //end of func
+
+    function set_stage_message() {
+        var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+        //set stage message
+        if (activeStageIndx != -1) {
+            if (stage_objects && stage_objects[activeStageIndx] && stage_objects[activeStageIndx].hasOwnProperty("message")) {
+
+                if (!displayedMessages.hasOwnProperty(stage_objects[activeStageIndx].ref)) {
+                    var alertType = "info";
+                    var alertMessage = "<div style='margin-bottom: 10px;'><strong>" + stage_objects[activeStageIndx].title + "</strong></div><div>" + stage_objects[activeStageIndx].message + "</div>";
+                    display_copo_alert(alertType, alertMessage, 20000);
+                    displayedMessages[stage_objects[activeStageIndx].ref] = 1;
+                }
+            }
+        }
+    }
 
     function new_stage_alert() {
         var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
@@ -3168,6 +3733,11 @@ $(document).ready(function () {
 
 
         if (activeStageIndx == -1) {
+            return false;
+        }
+
+        //handle custom cases e.g., datafiles pairing
+        if (stage_objects && stage_objects[activeStageIndx] && stage_objects[activeStageIndx].ref == "datafiles_pairing") {
             return false;
         }
 

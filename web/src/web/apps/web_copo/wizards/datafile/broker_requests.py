@@ -36,7 +36,10 @@ class BrokerRequests:
                             get_item_stage_display=self.do_get_item_stage_display,
                             is_same_metadata=self.do_is_same_metadata,
                             is_description_mismatch=self.do_is_description_mismatch,
-                            discard_description=self.do_discard_description
+                            discard_description=self.do_discard_description,
+                            negotiate_datafile_pairing=self.do_negotiate_datafile_pairing,
+                            datafile_pairing=self.do_datafile_pairing,
+                            datafile_unpairing=self.do_datafile_unpairing,
                             )
 
         return request_dict
@@ -135,5 +138,24 @@ class BrokerRequests:
     def do_discard_description(self):
         # remove all description metadata from targets
         self.wizard_helper.discard_description()
+
+        return
+
+    def do_negotiate_datafile_pairing(self):
+        # call to get datafile pairing information within the ENA deposition context
+        self.context['pairing_info'] = self.wizard_helper.negotiate_datafile_pairing()
+
+        return
+
+    def do_datafile_pairing(self):
+        # call to pair datafiles - having library layout set to 'PAIRED'
+        self.context['result'] = self.wizard_helper.datafile_pairing()
+
+        return
+
+
+    def do_datafile_unpairing(self):
+        # call to unpair datafiles
+        self.context['result'] = self.wizard_helper.datafile_unpairing()
 
         return

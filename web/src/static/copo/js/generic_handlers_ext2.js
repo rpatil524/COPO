@@ -15,20 +15,20 @@ function set_empty_component_message(dataRows) {
     //decides, based on presence of record, to display table or getting started info
 
     if (dataRows.length == 0) {
-        if($(".table-parent-div").length) {
+        if ($(".table-parent-div").length) {
             $(".table-parent-div").hide();
         }
 
-        if($(".page-welcome-message").length) {
+        if ($(".page-welcome-message").length) {
             $(".page-welcome-message").show();
         }
 
     } else {
-        if($(".table-parent-div").length) {
+        if ($(".table-parent-div").length) {
             $(".table-parent-div").show();
         }
 
-        if($(".page-welcome-message").length) {
+        if ($(".page-welcome-message").length) {
             $(".page-welcome-message").hide();
         }
     }
@@ -111,11 +111,12 @@ function do_table_buttons_events() {
             var event = jQuery.Event("addbuttonevents");
             event.tableID = tableID;
             event.task = task;
+            event.title = title;
             $('body').trigger(event);
         } else {
             //alert user
 
-            var okButton = '<div class="text-center alertdismissOK" style="margin-top: 5px;"><button class="mini ui orange basic button">OK</button></div>';
+            var okButton = '<div class="text-center alertdismissOK" style="margin-top: 15px;"><button class="mini ui orange basic button">OK</button></div>';
 
             var pop_title = '';
             var pop_content = '<i class="fa fa-exclamation-circle" aria-hidden="true" style="color: darkorange; font-size: 15px !important; padding-right: 10px;"></i>' + message;
@@ -202,6 +203,7 @@ function do_render_component_table(data, componentMeta) {
         columns.push({
             "orderable": false,
             "data": null,
+            "className": "describe-status",
             "title": "",
             "defaultContent": '<span style="cursor: pointer;" class="metadata-rating uncertain"><i class="fa fa-square" aria-hidden="true"></i></span>'
         });
@@ -236,7 +238,6 @@ function do_render_component_table(data, componentMeta) {
 
         columns.push(col);
     }
-
 
     //set data
     var table = null;
@@ -305,7 +306,7 @@ function do_render_component_table(data, componentMeta) {
                 $('body').trigger(event);
             },
             createdRow: function (row, data, index) {
-                //add class to row 
+                //add class to row for ease of selection later
                 var recordId = index;
                 try {
                     recordId = data.record_id

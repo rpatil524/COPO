@@ -279,6 +279,9 @@ class BrokerVisuals:
         return self.context
 
     def do_attributes_display(self):
+        if self.component == "datafile": # datafile attributes are rendered differently
+            return self.do_description_summary()
+
         target_id = self.param_dict.get("target_id", str())
         self.context['component_attributes'] = htags.generate_attributes(self.component, target_id)
         self.context['component_label'] = htags.get_labels().get(self.component, dict()).get("label", str())
