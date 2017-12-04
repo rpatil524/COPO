@@ -51,6 +51,5 @@ WORKDIR /copo
 
 COPY src/requirements /copo/requirements
 RUN pip install -r requirements/dev.txt
-RUN pip install git+https://github.com/ISA-tools/isa-api.git@d7d95541e4a713e5605ce200f1ff1a329b54187f
 
 COPY src /copo/

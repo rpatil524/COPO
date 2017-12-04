@@ -30,7 +30,7 @@ Genshi==0.7
 gunicorn==19.6.0
 hurry.filesize==0.9
 idna==2.6
-isatools==0.9.2
+-e git+http://github.com/ISA-tools/isa-api@d7d95541e4a713e5605ce200f1ff1a329b54187f#egg=isatools
 iso8601==0.1.12
 isodate==0.5.4
 isort==4.2.15
