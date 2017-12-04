@@ -3,6 +3,9 @@ __author__ = 'etuka'
 from bson import ObjectId
 from dal import cursor_to_list
 
+import difflib
+from operator import itemgetter
+
 from django_tools.middlewares import ThreadLocal
 
 import web.apps.web_copo.lookup.lookup as lkup
@@ -22,6 +25,18 @@ class WizardHelper:
         self.description_targets = description_targets
         self.targets_datafiles = self.set_targets_datafiles()
         self.profile_id = ThreadLocal.get_current_request().session['profile_id']
+        self.rendered_stages = list()
+
+    def set_rendered_stages(self, rendered_stages=list()):
+        """
+        sets stages rendered on the UI
+        :param rendered_stages:
+        :return:
+        """
+        self.rendered_stages = rendered_stages
+
+    def get_rendered_stages(self):
+        return self.rendered_stages
 
     def set_targets_datafiles(self):
         targets_datafiles = dict()
@@ -122,6 +137,21 @@ class WizardHelper:
         stages[listed_stage[0]] = elem
         self.set_batch_stages(stages)
 
+    def deactivate_stage(self, elem):
+        """
+        function indicates that stage has been treated for rendering (by the wizard)
+        :param elem: stage to be activated
+        :return:
+        """
+        stages = self.get_batch_stages()
+        listed_stage = [indx for indx, stage in enumerate(stages) if stage['ref'] == elem['ref']]
+
+        if 'activated' in elem:
+            del elem['activated']
+
+        stages[listed_stage[0]] = elem
+        self.set_batch_stages(stages)
+
     def is_activated(self, elem):
         """
         function checks if stage has previously been activated
@@ -187,7 +217,8 @@ class WizardHelper:
         function decides if a stage should be displayed or not. it assumes that conditional stages have
         callbacks defined in order to resolve the validity of the condition.
         however, if no callback is defined, function defaults to a decision
-        to display the stage (i.e., True), except in the case where the said stage is a 'stub', in that case function
+        to display the stage (i.e., True), except in the case where the said stage is a 'stub' (stage used
+        to generate other stages, but not themselves displayable), in that case function
         will always default to a False.
         :param elem: is the dictionary that captures the stage metadata
         :return: is a boolean; if true stage is displayed
@@ -365,6 +396,7 @@ class WizardHelper:
 
         # create a description instance, hence token
         # but first, sort out the pooled attributes
+
         batch_attributes = dict()
         for attribute in targets_attributes:
             for key, value in attribute.items():
@@ -373,15 +405,28 @@ class WizardHelper:
 
                 batch_attributes[key].append(value)
 
-        self.description_token = str(
-            Description(self.profile_id).create_description(batch_stages, batch_attributes)['_id'])
+        description_token = self.get_description_token()  # if there is a valid description token, use it -
+        # ...it might well be a call to re-invalidate displayed stages
 
-        if batch_stages:  # load all previously activated stages
-            process['process_name'] = 'stages'
-            process['process_data'] = self.get_stages_display()
+        if description_token:
+            Description().edit_description(self.description_token, dict(attributes=batch_attributes))
+            Description().edit_description(self.description_token, dict(stages=batch_stages))
         else:
-            process['process_name'] = 'stage'
-            process['process_data'] = self.stage_description(current_stage=str())
+            self.description_token = str(
+                Description(self.profile_id).create_description(batch_stages, batch_attributes)['_id'])
+
+        self.refresh_description_stages()  # refresh previously stored stages to pick up any schema changes
+
+        current_stage = str()
+
+        # load all previously activated stages to determine UI display 'take-off' point
+        stages = self.get_stages_display()
+        if stages:
+            current_stage = stages[-1].get("stage", dict()).get("ref", str())
+
+        self.stage_description(current_stage)
+        process['process_name'] = 'stages'
+        process['process_data'] = self.get_stages_display()
 
         return process
 
@@ -445,7 +490,7 @@ class WizardHelper:
                     self.set_batch_stages(stage_list)
                     elem = stage_list[stage_gap]  # refresh elem
 
-                # determine whether stage should be displayed based on the satisfaction of certain condition(s)
+                # determine whether stage should be displayed based on satisfaction of defined constraints
                 if self.display_stage(elem):
                     self.activate_stage(elem)
                     stage_dict = self.get_stage_display(elem)
@@ -454,6 +499,85 @@ class WizardHelper:
                     self.fire_on_create_triggers(elem)
 
         return stage_dict
+
+    def refresh_description_stages(self):
+        """
+        function refreshes description stages in order to pick up eventual schema updates
+        :return:
+        """
+
+        batch_stages = self.get_batch_stages()
+
+        if not batch_stages:
+            return
+
+        # update the start stages
+        new_stage_list = d_utils.json_to_pytype(lkup.WIZARD_FILES["start"])['properties']
+
+        for update_stage in new_stage_list:
+            listed_stage = [indx for indx, stage in enumerate(batch_stages) if stage['ref'] == update_stage['ref']]
+
+            if listed_stage:
+                temp_stage = update_stage
+                temp_stage["activated"] = batch_stages[listed_stage[0]].get("activated", False)
+                batch_stages[listed_stage[0]] = update_stage
+
+        # update other stages that may be resolved
+        for elem in list(batch_stages):
+            new_stage_list = self.resolve_stage_stub(elem)
+            for update_stage in new_stage_list:
+                listed_stage = [indx for indx, stage in enumerate(batch_stages) if stage['ref'] == update_stage['ref']]
+
+                if listed_stage:
+                    temp_stage = update_stage
+                    temp_stage["activated"] = batch_stages[listed_stage[0]].get("activated", False)
+                    batch_stages[listed_stage[0]] = update_stage
+
+        self.set_batch_stages(batch_stages)
+
+        return
+
+    def revalidate_stage_display(self):
+        """
+        function re-validates stage to verify front-end to backend description stages alignment
+        :param elem: the requested stage to be displayed
+        :return:
+        """
+
+        is_valid_stage_sequence = True
+
+        validation_dict = dict()
+
+        rendered_stages = self.get_rendered_stages()
+        display_stages = list()
+
+        for stage in list(self.get_stages_display()):
+            stage_ref = stage.get("stage", dict()).get("ref", str())
+            stage_items = stage.get("stage", dict()).get("items", list())
+
+            items = list()
+
+            for item in stage_items:
+                items.append(item.get("id", str()))
+
+            display_stages.append(dict(ref=stage_ref, items=items))
+
+        # first check, are the lengths same? - if not, it reflects a non-synchronisation between backend and frontend?
+        is_valid_stage_sequence = len(rendered_stages) == len(display_stages)
+
+        if is_valid_stage_sequence:
+            # todo: other tests here...for instance, are the actual stages the same? -
+            # todo: examine the stage refs; activation status; items list etc.
+            pass
+
+        if not is_valid_stage_sequence:
+            # resolve valid stage sequence
+            process = self.initiate_process()
+            validation_dict["stages"] = process['process_data']
+
+        validation_dict["is_valid_stage_sequence"] = is_valid_stage_sequence
+
+        return validation_dict
 
     def save_stage_data(self, auto_fields):
         """
@@ -521,17 +645,27 @@ class WizardHelper:
         if old_value == new_value or not old_value or not new_value:  # no change in target repository
             return False
 
-        # reset batch stages
-        if self.get_batch_attributes():
-            stage_list = d_utils.json_to_pytype(lkup.WIZARD_FILES["start"])['properties']
-            self.set_batch_stages(stage_list)
-            self.set_batch_attributes(dict())
-
-        # discard description for datafile
         description = self.get_datafile_description()
-        description['stages'] = list()
-        description['attributes'] = dict()
 
+        # reset batch stages
+        Description().edit_description(self.description_token, dict(attributes=dict()))
+        Description().edit_description(self.description_token, dict(stages=list()))
+
+        stage_list = d_utils.json_to_pytype(lkup.WIZARD_FILES["start"])['properties']
+
+        # activate the target repository stage
+        listed_stage = [indx for indx, stage in enumerate(stage_list) if stage['ref'] == "target_repository"]
+        stage_list[listed_stage[0]]['activated'] = True
+
+        description['stages'] = stage_list
+        retained_attributes = dict()
+
+        for stage in list(description['stages']):
+            if stage['ref'] in description['attributes']:
+                retained_attributes[stage['ref']] = description['attributes'][stage['ref']]
+                del description['attributes'][stage['ref']]
+
+        description['attributes'] = retained_attributes
         self.update_description(description)
 
     def growth_facility_change(self, item_id, new_value, stage):
@@ -629,6 +763,7 @@ class WizardHelper:
     def confirm_pairing(self):
         """
         function determines if the pairing of datafiles should be performed given the 'library_layout' value
+        also function has the task of cleaning up unpaired targets with dangling metadata (from previous description)
         :return:
         """
 
@@ -636,16 +771,20 @@ class WizardHelper:
         do_pairing = False
 
         # if no accompanying description targets, then we can't do a confirmatory test.
-
-        if len(self.description_targets) == 0:
-            return True
+        # if len(self.description_targets) == 0:
+        #     return True # need to think through this again!!!
 
         self.refresh_targets_data()
         for target in self.description_targets:
             if target.get('attributes', dict()).get('library_construction', dict()).get('library_layout',
-                                                                                        str()) == 'PAIRED':
+                                                                                        str()).upper() == 'PAIRED':
                 do_pairing = True
                 break
+
+        # deactivate dependent stage if not pairing
+        if not do_pairing:
+            stages = self.get_batch_stages()
+            elem = [stage for stage in self.get_batch_stages() if stage['ref'] == "datafiles_pairing"]
 
         return do_pairing
 
@@ -676,20 +815,48 @@ class WizardHelper:
             # remove blacklisted elements from description stages...
             description['stages'] = [stage for stage in description['stages'] if stage['ref'] not in blacklist]
 
+            # also, update the batch stages
+            batch_stages = [stage for stage in description['stages'] if stage['ref'] not in blacklist]
+
             # ...and from description
             for bkl in blacklist:
                 if bkl in description['attributes']:
                     del description['attributes'][bkl]
 
-            # reset stubs
+            # reset batch description object
+            Description().edit_description(self.description_token, dict(attributes=dict()))
+            Description().edit_description(self.description_token, dict(stages=list()))
+
+            # reset from the first stage stub onward to force re-entry into stage activation process
             stubs = set(stubs)
             for stage_ref in stubs:
                 listed_stage = [indx for indx, stage in enumerate(description['stages']) if stage['ref'] == stage_ref]
                 if listed_stage:
-                    description['stages'][listed_stage[0]]['activated'] = False
+                    for i in range(listed_stage[0], len(description['stages'])):
+                        description['stages'][i]['activated'] = False
 
             # ...and update the db
             self.update_description(description)
+
+    def library_layout_change(self, item_id, old_value, new_value):
+        """
+        function reacts to a change in the library layout: basically to clean up metadata
+        :param item_id: the item giving rise to the trigger
+        :param old_value:
+        :param new_value:
+        :return:
+        """
+
+        if old_value == new_value or not old_value or not new_value:  # no change in library layout
+            return False
+
+        if new_value.upper() == 'SINGLE':
+            description = self.get_datafile_description()
+            if "datafiles_pairing" in description.get("attributes", dict()):
+                del description['attributes']["datafiles_pairing"]
+                self.update_description(description)
+
+        return
 
     def discard_description(self):
         object_list = [ObjectId(target["recordID"]) for target in self.description_targets]
@@ -763,39 +930,44 @@ class WizardHelper:
         satisfy the following constraints:
             1. mutually exclusive - isn't already paired to another file
             2. symmetric - given two files 'file1', 'file2'. if file1 is paired to file2, file2 must be paired to file1
+            3. must have the same metadata
         :return:
         """
 
-        cleared_for_pairing = True
+        paired_list = list()
+        for pairing_target in self.description_targets:
+            paired_list.append(pairing_target)
+            if len(paired_list) == 2:
+                # first test - are both files unpaired?
+                paired_files = list()
+                for target in paired_list:
+                    # set 'focus' to target
+                    self.set_datafile_id(target["recordID"])
 
-        # first test - are both files unpaired?
-        paired_files = list()
-        for target in self.description_targets:
-            # set 'focus' to target
-            self.set_datafile_id(target["recordID"])
+                    paired_file = self.get_datafile_attributes().get("datafiles_pairing", dict()).get("paired_file", str())
+                    paired_files.append(paired_file)
 
-            paired_file = self.get_datafile_attributes().get("datafiles_pairing", dict()).get("paired_file", str())
-            paired_files.append(paired_file)
+                if len(set(paired_files)) == 1 and list(set(paired_files))[0] == str():  # i.e., no previous pairing
+                    # do pairing
+                    self.set_datafile_id(paired_list[0]["recordID"])
+                    description = self.get_datafile_description()
 
-        if len(set(paired_files)) == 1 and list(set(paired_files))[0] == str():  # cleared for pairing
-            # do pairing
-            self.set_datafile_id(self.description_targets[0]["recordID"])
-            description = self.get_datafile_description()
+                    description['attributes']["datafiles_pairing"] = dict(paired_file=paired_list[1]["recordID"])
+                    self.update_description(description)
 
-            description['attributes']["datafiles_pairing"] = dict(paired_file=self.description_targets[1]["recordID"])
-            self.update_description(description)
+                    self.set_datafile_id(paired_list[1]["recordID"])
+                    description = self.get_datafile_description()
 
-            self.set_datafile_id(self.description_targets[1]["recordID"])
-            description = self.get_datafile_description()
+                    description['attributes']["datafiles_pairing"] = dict(paired_file=paired_list[0]["recordID"])
+                    self.update_description(description)
 
-            description['attributes']["datafiles_pairing"] = dict(paired_file=self.description_targets[0]["recordID"])
-            self.update_description(description)
+                    # paired files must have the same metadata too...
 
-            self.update_targets_datafiles()
-        else:
-            cleared_for_pairing = False
+                paired_list = list()
 
-        return cleared_for_pairing
+        self.update_targets_datafiles()
+
+        return True
 
     def datafile_unpairing(self):
         """
@@ -821,7 +993,7 @@ class WizardHelper:
 
     def validate_bundle_candidates(self, description_bundle):
         """
-        validates candidates to be added to description bundle to ascertain comvalidate_bundle_candidatespatibility between
+        validates candidates to be added to description bundle to ascertain 'compatibility' between
         new description targets and already existing items in the description bundle
         :param description_bundle:
         :return: validation result
@@ -837,7 +1009,8 @@ class WizardHelper:
             # validate targets against one another as well as existing items in the bundle
             validation_code = result_dict["validation_code"]
             if validation_code in ["100", "101"]:
-                # targets are compatible with one another/there may be some ahead in description metadata,
+                # targets are compatible with one another, also there may be some datafiles ahead
+                # in description metadata,
                 # it should now be sufficient only to verify that
                 # at least one of the targets is compatible with at least one item in the bundle
 
@@ -846,7 +1019,7 @@ class WizardHelper:
 
                 if validation_code == "101":
                     # "101": "Some targets are ahead of others! Inherit metadata?"
-                    # item with most metadata is preferred here for obvious reason
+                    # item with the most metadata is preferred here for obvious reason
 
                     selected_target = result_dict["extra_information"]["target"]
 
@@ -992,7 +1165,7 @@ class WizardHelper:
 
     def negotiate_datafile_pairing(self):
         """
-        separate description targets into paired, need to be paired, don't pair groupings
+        separate description targets groups of into paired, need to be paired, don't pair
         :return:
         """
         unpaired_list = list()  # datafiles that need to be paired
@@ -1056,7 +1229,6 @@ class WizardHelper:
                     # can't resolve, add member to unpaired list
                     unpaired_list.append(paired_member_0_id)
 
-
         self.description_targets.extend(add_to_bundle)  # update description targets with new members
         self.set_description_targets(list(self.description_targets))  # set and refresh targets data
         self.refresh_targets_data()
@@ -1066,6 +1238,31 @@ class WizardHelper:
             add_to_bundle=add_to_bundle,
             do_not_pair_list=do_not_pair_list
         )
+
+        # can we try to suggest potential pairings for files in the unpaired list?
+
+        suggested_pairings = list()
+        copied_unpaired_list = list(pairing_dict["unpaired_list"])
+
+        #  let's assume 'R1.fastq.gz' and 'R2.fastq.gz' naming convention, then ordinary 'sort' should suffice
+        new_sorted_list = sorted(copied_unpaired_list, key=itemgetter('recordLabel'))
+
+        if len(new_sorted_list) > 1:
+            if len(new_sorted_list) % 2 != 0:
+                # uneven number of files to be paired
+                # we might have to remove a file from the start or end of the list before suggesting pairing
+                # to do that, we compute how similar the top three files are and use that metric to decide
+                d01 = difflib.SequenceMatcher(None, new_sorted_list[0]["recordLabel"], new_sorted_list[1]["recordLabel"]).ratio()
+                d12 = difflib.SequenceMatcher(None, new_sorted_list[1]["recordLabel"], new_sorted_list[2]["recordLabel"]).ratio()
+                if d01 > d12:
+                    new_sorted_list = new_sorted_list[:-1]
+                else:
+                    new_sorted_list = new_sorted_list[1:]
+
+            while len(new_sorted_list) >= 2:
+                suggested_pairings.append([new_sorted_list.pop(0), new_sorted_list.pop(0)])
+
+            pairing_dict["suggested_pairings"] = suggested_pairings
 
         return pairing_dict
 
@@ -1142,6 +1339,18 @@ class WizardHelper:
                             elem["id"] = elem['id'].strip(".").rsplit(".", 1)[1]
                             del elem['ref']
                             stage_dict.get("items").append(elem)
+
+                            # define trigger for library layout: better to maintain in here than in multiple assay files
+                            if elem["id"] == "library_layout":
+                                elem["trigger"] = {
+                                    "type": "change",
+                                    "message": "Changing the library layout will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
+                                    "callback": {
+                                        "function": "library_layout_change",
+                                        "parameter": "item_id,old_value,new_value"
+                                    }
+                                }
+
                 dynamic_stages.append(stage_dict)
 
         return dynamic_stages

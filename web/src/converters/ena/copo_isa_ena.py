@@ -563,14 +563,21 @@ class Assay:
         process_sequence = list()
 
         # get datafiles
-        for indx, datafile in enumerate(copo_isa_records.get("datafile"), start=1):
+        indx = 0  # process sequence index
+        processed_datafiles = list()  # datafiles already seen through the process sequence
+        for datafile in copo_isa_records.get("datafile"):
 
-            # modify to reflect actual saved name, in case of any obfuscation to the file name
+            # modify to reflect actual saved name, in case of any obfuscation of the file name
             datafile["name"] = os.path.split(datafile["file_location"])[-1]
+
+            if str(datafile["_id"]) in processed_datafiles:  # file already processed (especially in a PAIRED context)
+                continue
 
             # get description attributes
             attributes = datafile.get("description", dict()).get("attributes", dict())
             datafile_samples = attributes.get("attach_samples", dict()).get("study_samples", list())
+
+            indx = indx + 1
 
             samples = list()
             materials = list()
@@ -613,6 +620,21 @@ class Assay:
                 # set datafile output
                 if revised_name in ["nucleic_acid_sequencing"]:
                     outputs.append({"@id": ISAHelpers().get_id_field("datafile", datafile)})
+
+                    # is this a paired read?
+                    if attributes.get('library_construction', dict()).get('library_layout',
+                                                                          str()) == 'PAIRED':
+                        # get paired file
+                        paired_datafile = attributes.get('datafiles_pairing', dict()).get('paired_file', str())
+                        processed_datafiles.append(paired_datafile)
+
+                        copo_isa_records_temp = copy.deepcopy(self.copo_isa_records)
+                        paired_datafile = [pairedfile for pairedfile in copo_isa_records_temp.get("datafile") if
+                                           str(pairedfile["_id"]) == paired_datafile]
+                        if paired_datafile:
+                            paired_datafile = paired_datafile[0]
+                            paired_datafile["name"] = os.path.split(paired_datafile["file_location"])[-1]
+                            outputs.append({"@id": ISAHelpers().get_id_field("datafile", paired_datafile)})
 
                 if protocol_list[pr_indx - 1].get("name", str()).replace(" ", "_") == "nucleic_acid_extraction":
                     inputs = materials

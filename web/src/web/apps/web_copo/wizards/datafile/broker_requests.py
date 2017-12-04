@@ -49,7 +49,7 @@ class BrokerRequests:
 
         request_action = request_action.split(",")
 
-        if not self.verify_token():
+        if not self.verify_token():  # a token is needed for every description. If not available (re)initiate wizard
             request_action = list(["initiate_wizard"] + request_action)
 
         seen_list = list()
@@ -93,7 +93,15 @@ class BrokerRequests:
         return
 
     def do_get_next_stage(self):
-        self.context['stage'] = self.wizard_helper.stage_description(self.auto_fields.get("current_stage", str()))
+        rendered_stages = self.param_dict.get("rendered_stages", list())  # stages currently rendered on UI
+        self.wizard_helper.set_rendered_stages(rendered_stages)
+
+        validation_dict = self.wizard_helper.revalidate_stage_display()
+
+        self.context['validation_dict'] = validation_dict
+
+        if validation_dict.get("is_valid_stage_sequence", True):
+            self.context['stage'] = self.wizard_helper.stage_description(self.auto_fields.get("current_stage", str()))
 
         return
 
@@ -152,7 +160,6 @@ class BrokerRequests:
         self.context['result'] = self.wizard_helper.datafile_pairing()
 
         return
-
 
     def do_datafile_unpairing(self):
         # call to unpair datafiles

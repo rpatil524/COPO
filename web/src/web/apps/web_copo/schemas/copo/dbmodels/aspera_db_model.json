@@ -12,5 +12,6 @@
   "bytes_transferred": "",
   "estimated_completion": "",
   "deleted": "0",
-  "datafile_id":""
+  "datafile_id":"",
+  "error":""
 }

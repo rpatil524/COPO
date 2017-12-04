@@ -1,5 +1,8 @@
 $(document).ready(function () {
 
+    // test
+    // test ends
+
     //******************************Event Handlers Block*************************//
     // get table data to display via the DataTables API
     var component = "profile";
@@ -30,6 +33,8 @@ $(document).ready(function () {
     $(document).on("click", ".new-component-template", function (event) {
         initiate_form_call(component);
     });
+
+    refresh_tool_tips();
 
 
     //******************************Functions Block******************************//
@@ -248,17 +253,17 @@ $(document).ready(function () {
 
         $('#' + tableID + ' tbody').find('tr').each(function () {
             $(this).find(".panel:first").find(".row-select-icon").children('i').eq(0).removeClass("fa fa-check-square-o");
-            $(this).find(".copo-records-panel").children('.panel').eq(0).removeClass("panel-primary");
+            // $(this).find(".copo-records-panel").children('.panel').eq(0).removeClass("panel-primary");
 
             $(this).find(".panel:first").find(".row-select-icon").children('i').eq(0).addClass("fa fa-square-o");
-            $(this).find(".copo-records-panel").children('.panel').eq(0).addClass("panel-default");
+            // $(this).find(".copo-records-panel").children('.panel').eq(0).addClass("panel-default");
 
             if ($(this).hasClass('selected')) {
                 $(this).find(".panel:first").find(".row-select-icon").children('i').eq(0).removeClass("fa fa-square-o");
-                $(this).find(".copo-records-panel").children('.panel').eq(0).removeClass("panel-default");
+                // $(this).find(".copo-records-panel").children('.panel').eq(0).removeClass("panel-default");
 
                 $(this).find(".panel:first").find(".row-select-icon").children('i').eq(0).addClass("fa fa-check-square-o");
-                $(this).find(".copo-records-panel").children('.panel').eq(0).addClass("panel-primary");
+                // $(this).find(".copo-records-panel").children('.panel').eq(0).addClass("panel-primary");
             }
         });
     }

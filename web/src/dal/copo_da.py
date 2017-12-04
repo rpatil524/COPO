@@ -85,7 +85,7 @@ class DAComponent:
         count = 0
         if self.get_collection_handle():
             count = self.get_collection_handle().count(
-                        {'profile_id': self.profile_id, 'deleted': data_utils.get_not_deleted_flag()})
+                {'profile_id': self.profile_id, 'deleted': data_utils.get_not_deleted_flag()})
 
         return count
 
@@ -309,6 +309,17 @@ class Submission(DAComponent):
             datafile_ids = kwargs.get("datafile_ids")
             kwargs["bundle"] = datafile_ids
 
+            bundle_meta = list()
+
+            # store bundle metadata also, this will be used to capture richer context e.g., upload status
+            for file_id in datafile_ids:
+                datafile = DataFile().get_record(file_id)
+                if datafile:
+                    bundle_meta.append(
+                        dict(file_id=file_id, file_path=datafile.get("file_location", str()), upload_status=False))
+
+            kwargs["bundle_meta"] = bundle_meta
+
             # get the target repository from one of the files
             repo = DataFile().get_record_property(datafile_ids[0], "target_repository")
             for k, v in dict(
@@ -522,6 +533,11 @@ class RemoteDataFile:
         return doc
 
     def create_transfer(self, submission_id, file_path=None):
+        # before creating a new transfer record for this submission, remove all others
+        remote_record = self.get_by_sub_id(submission_id)
+        if remote_record:
+            self.delete_transfer(str(remote_record["_id"]))
+
         fields = data_utils.json_to_pytype(DB_TEMPLATES['REMOTE_FILE_COLLECTION'])
         fields['submission_id'] = submission_id
         fields['profile_id'] = self.profile_id
@@ -529,7 +545,7 @@ class RemoteDataFile:
         transfer_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         fields["commenced_on"] = transfer_time
         fields["current_time"] = transfer_time
-        fields["transfer_rate"] = []
+        fields["transfer_rate"] = ""
 
         if file_path:
             d = DataFile().GET(submission_id)
@@ -549,14 +565,14 @@ class RemoteDataFile:
 
         fields["deleted"] = delete
         if 'transfer_rate' in fields:
-            speed = fields.pop("transfer_rate")
+            # speed = fields.pop("transfer_rate")
 
             self.RemoteFileCollection.update(
                 {
                     "_id": ObjectId(transfer_id)
                 },
                 {
-                    '$push': {"transfer_rate": float(speed)},
+                    # '$push': {"transfer_rate": float(speed)},
                     '$set': fields
                 }
             )

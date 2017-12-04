@@ -7,9 +7,9 @@ var stepIntercept = false; //flag indicates if activation of the last stage of t
 var silenceAlert = false; //use to temporary suppress stage alerts
 var descriptionWizSummary = {}; //wizard summary stage content
 var onGoingDescription = false; //informs wizard state refresh/exit
-var setStageIndx = null; //moves the wizard to stage index specified
 var displayedMessages = {}; //holds stage messages already displayed
 var tabShownStore = Object();
+var setTargetStageRef = ''; //if loading batch stages, set current stage to 'setTargetStageRef'
 
 
 $(document).ready(function () {
@@ -24,7 +24,7 @@ $(document).ready(function () {
     if (url.includes('state') && url.includes('code')) {
         // now check for selected_datafile
         if ($('#selected_datafile').val() != '' || $('#selected_datafile').val() != undefined) {
-            alert('ask toni how we can load file ' + $('#selected_datafile').val() + ' into his wizard')
+            //alert('ask toni how we can load file ' + $('#selected_datafile').val() + ' into his wizard')
         }
     }
 
@@ -204,12 +204,10 @@ $(document).ready(function () {
             messageTitle = "Review";
             messageContent = "Review and modify your entries as required. Click 'Finish!' when done.";
         } else {
-            var current_stage = $('#wizard_form_' + activeStageIndx).find("#current_stage").val();
-            messageTitle = stage_objects[activeStageIndx].title;
-            messageContent = stage_objects[activeStageIndx].message;
-            if (current_stage) {
-                messageTitle = stage_objects[activeStageIndx].title;
-                messageContent = stage_objects[activeStageIndx].message;
+            var current_stage_object = get_current_stage_object();
+            if (current_stage_object) {
+                messageTitle = current_stage_object.title;
+                messageContent = current_stage_object.message;
             }
         }
 
@@ -233,7 +231,7 @@ $(document).ready(function () {
         BootstrapDialog.show({
             title: "Discard Description",
             message: wizardMessages.discard_description_message.text,
-            cssClass: 'copo-modal2',
+            cssClass: 'copo-modal3',
             closable: false,
             animate: true,
             type: BootstrapDialog.TYPE_DANGER,
@@ -364,13 +362,6 @@ $(document).ready(function () {
         save_bundle_item_form(activeStageIndx, descriptionTarget);
     });
 
-    //event for pairing datafiles
-    $(document).on("click", ".datafile-pairing-action", function (event) {
-        event.preventDefault();
-
-        do_datafile_pairing($(this));
-    });
-
     //event for unpairing datafiles
     $(document).on("click", ".unpair-datafiles", function (event) {
         event.preventDefault();
@@ -460,181 +451,216 @@ $(document).ready(function () {
             'description_token': descriptionToken,
             'auto_fields': auto_fields,
             'description_targets': JSON.stringify(descriptionBundle),
-            'description_bundle': JSON.stringify(descriptionBundle)
+            'description_bundle': JSON.stringify(descriptionBundle),
+            'rendered_stages': get_rendered_stages()
         };
 
         var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
 
         //first, make call to resolve the active stage data
         var stage_data = collate_stage_data();
+        var current_stage_object = get_current_stage_object();
 
         //if no data, just go ahead and retrieve stage
         if (!stage_data) {
             retrieve_stage(retrieval_params);
-        } else { //verify what needs to be saved here...
-            if (!get_apply_check_state(activeStageIndx)) { //apply-to-selected button is unchecked:
-                // saving of data is handled per item in the bundle,
-                // check that all items in the bundle have metadata for this stage
+            return false;
+        }
 
-                var countMetadata = 0;
-                descriptionBundle.forEach(function (item) {
-                    if (item["attributes"][stage_objects[activeStageIndx].ref]) {
-                        ++countMetadata;
-                    }
-                });
+        //next, notify user of the potential changes to be made, and give opportunity to retract
 
-                if (descriptionBundle.length != countMetadata) {
-                    //some items in bundle may be lacking metadata
+        // record the number of bundle items that have metadata for this stage
+        var countMetadata = 0;
+        descriptionBundle.forEach(function (item) {
+            if (current_stage_object && item["attributes"][current_stage_object.ref]) {
+                ++countMetadata;
+            }
+        });
 
-                    BootstrapDialog.show({
-                        title: "Unassigned Metadata",
-                        message: wizardMessages.no_metadata_selected_bundle_items.text,
-                        cssClass: 'copo-modal2',
-                        closable: false,
-                        animate: true,
-                        type: BootstrapDialog.TYPE_WARNING,
-                        buttons: [{
-                            label: 'Describe',
-                            cssClass: 'tiny ui basic button',
-                            action: function (dialogRef) {
-                                dialogRef.close();
-                                $('#dataFileWizard').wizard('selectedItem', {
-                                    step: activeStageIndx
-                                });
-                            }
-                        }, {
-                            label: 'Next Stage',
-                            cssClass: 'tiny ui basic orange button',
-                            action: function (dialogRef) {
-                                retrieve_stage(retrieval_params);
-                                dialogRef.close();
-                            }
-                        }]
-                    });
+        if (!get_apply_check_state(activeStageIndx)) { //if apply-to-selected button is unchecked ('unbundled'):
+            // saving of data is handled per item in the bundle,
 
-                } else {
-                    //make call to retrieve stage
-                    retrieve_stage(retrieval_params);
-                }
+            if (descriptionBundle.length != countMetadata) {
+                //some items in bundle may be lacking metadata
 
-            } else { //apply-to-all:
-                //ascertain any mismatch between items' metadata and current stage description
-
-                //...but first, if no metadata for all bundle items, continue rather silently
-                var countMetadata = 0;
-                descriptionBundle.forEach(function (item) {
-                    if (item["attributes"][stage_objects[activeStageIndx].ref]) {
-                        ++countMetadata;
-                    }
-                });
-
-                if (countMetadata == 0) { //no metadata for all bundle items, save and load next stage...
-
-                    //display dialog for stage save
-                    var dialogHandle = processing_request_dialog('Saving Stage Data...');
-
-                    $.ajax({
-                        url: wizardURL,
-                        type: "POST",
-                        headers: {
-                            'X-CSRFToken': csrftoken
-                        },
-                        data: stage_data,
-                        success: function (data) {
-                            //make call to retrieve stage
+                BootstrapDialog.show({
+                    title: "Unassigned Metadata",
+                    message: wizardMessages.no_metadata_selected_bundle_items.text,
+                    cssClass: 'copo-modal2',
+                    closable: false,
+                    animate: true,
+                    type: BootstrapDialog.TYPE_WARNING,
+                    buttons: [{
+                        label: 'Describe',
+                        cssClass: 'tiny ui basic button',
+                        action: function (dialogRef) {
+                            dialogRef.close();
+                            $('#dataFileWizard').wizard('selectedItem', {
+                                step: activeStageIndx
+                            });
+                        }
+                    }, {
+                        label: 'Next Stage',
+                        cssClass: 'tiny ui basic orange button',
+                        action: function (dialogRef) {
                             retrieve_stage(retrieval_params);
-                            dialogHandle.close();
-                        },
-                        error: function () {
-                            alert("Couldn't save description entries!");
+                            dialogRef.close();
                         }
-                    });
-                } else if (descriptionBundle.length == countMetadata) {
-                    //all items have metadata, but is there a mismatch with the current stage entries
+                    }]
+                });
 
-                    stage_data.request_action = 'is_description_mismatch';
-                    $.ajax({
-                        url: wizardURL,
-                        type: "POST",
-                        headers: {
-                            'X-CSRFToken': csrftoken
-                        },
-                        data: stage_data,
-                        success: function (data) {
-                            if (data.state) {
-                                //there is a mismatch, confirm user's action
-                                var opts = wizardMessages.metadata_bundle_items.text_options;
-                                var displayHTML = '<div class="list-group">';
-                                displayHTML += '<div class="list-group-item">';
-                                displayHTML += '<div class="wizard-alert-options">' + wizardMessages.metadata_bundle_items.text + '</div>';
-                                var checked;
-                                opts.forEach(function (opt) {
-                                    checked = "";
-                                    if (opt.value == "overwrite") { //do overwrite, if entries change, by default
-                                        checked = " checked";
-                                    }
-                                    displayHTML += '<div class="radio wizard-alert-radio">';
-                                    displayHTML += '<label><input type="radio" name="metadata_bundle_items" value="' + opt.value + '"' + checked + '>' + opt.label + '</label>';
-                                    displayHTML += '</div>';
-                                });
+            } else {
+                //make call to retrieve stage
+                retrieve_stage(retrieval_params);
+            }
+
+        } else { //apply-to-all:
+            //ascertain any mismatch between items' metadata and current stage description
+
+            //but..., if no metadata for all bundle items, continue rather silently
+            if (countMetadata == 0) { //no metadata for all bundle items, save and load next stage...
+
+                //display dialog for stage save
+                var dialogHandle = processing_request_dialog('Saving stage data...');
+
+                $.ajax({
+                    url: wizardURL,
+                    type: "POST",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    data: stage_data,
+                    success: function (data) {
+                        //make call to retrieve stage
+                        retrieve_stage(retrieval_params);
+                        dialogHandle.close();
+                    },
+                    error: function () {
+                        alert("Couldn't save description entries!");
+                    }
+                });
+            } else if (descriptionBundle.length == countMetadata) {
+                //all items have metadata, but is there a mismatch with the current stage entries
+
+                stage_data.request_action = 'is_description_mismatch';
+                $.ajax({
+                    url: wizardURL,
+                    type: "POST",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    data: stage_data,
+                    success: function (data) {
+                        if (data.state) {
+                            //there is a mismatch, confirm user's action
+                            var opts = wizardMessages.metadata_bundle_items.text_options;
+                            var displayHTML = '<div class="list-group">';
+                            displayHTML += '<div class="list-group-item">';
+                            displayHTML += '<div class="wizard-alert-options">' + wizardMessages.metadata_bundle_items.text + '</div>';
+                            var checked;
+                            opts.forEach(function (opt) {
+                                checked = "";
+                                if (opt.value == "overwrite") { //do overwrite, if entries change, by default
+                                    checked = " checked";
+                                }
+                                displayHTML += '<div class="radio wizard-alert-radio">';
+                                displayHTML += '<label><input type="radio" name="metadata_bundle_items" value="' + opt.value + '"' + checked + '>' + opt.label + '</label>';
                                 displayHTML += '</div>';
-                                displayHTML += '</div>';
+                            });
+                            displayHTML += '</div>';
+                            displayHTML += '</div>';
 
 
-                                BootstrapDialog.show({
-                                    title: "Description Action Required",
-                                    message: displayHTML,
-                                    cssClass: 'copo-modal2',
-                                    closable: false,
-                                    animate: true,
-                                    type: BootstrapDialog.TYPE_WARNING,
-                                    buttons: [{
-                                        label: 'OK',
-                                        cssClass: 'tiny ui orange basic button',
-                                        action: function (dialogRef) {
-                                            var selectedOption = $('input[name=metadata_bundle_items]:checked').val();
-                                            if (selectedOption == "donotoverwrite") { //do not overwrite
-                                                retrieve_stage(retrieval_params);
-                                            } else {
-                                                stage_data.request_action = 'save_stage_data';
-                                                //display dialog for stage save
-                                                var dialogHandle = processing_request_dialog('Saving Stage Data...');
+                            BootstrapDialog.show({
+                                title: "Description Action Required",
+                                message: displayHTML,
+                                cssClass: 'copo-modal2',
+                                closable: false,
+                                animate: true,
+                                type: BootstrapDialog.TYPE_WARNING,
+                                buttons: [{
+                                    label: 'OK',
+                                    cssClass: 'tiny ui orange basic button',
+                                    action: function (dialogRef) {
+                                        var selectedOption = $('input[name=metadata_bundle_items]:checked').val();
+                                        if (selectedOption == "donotoverwrite") { //do not overwrite
+                                            retrieve_stage(retrieval_params);
+                                        } else {
+                                            stage_data.request_action = 'save_stage_data';
+                                            //display dialog for stage save
+                                            var dialogHandle = processing_request_dialog('Saving Stage Data...');
 
-                                                $.ajax({
-                                                    url: wizardURL,
-                                                    type: "POST",
-                                                    headers: {
-                                                        'X-CSRFToken': csrftoken
-                                                    },
-                                                    data: stage_data,
-                                                    success: function (data) {
-                                                        //make call to retrieve stage
-                                                        retrieve_stage(retrieval_params);
-                                                        dialogHandle.close();
-                                                    },
-                                                    error: function () {
-                                                        alert("Couldn't save some entries!");
-                                                    }
-                                                });
-                                            }
-
-                                            dialogRef.close();
+                                            $.ajax({
+                                                url: wizardURL,
+                                                type: "POST",
+                                                headers: {
+                                                    'X-CSRFToken': csrftoken
+                                                },
+                                                data: stage_data,
+                                                success: function (data) {
+                                                    //make call to retrieve stage
+                                                    retrieve_stage(retrieval_params);
+                                                    dialogHandle.close();
+                                                },
+                                                error: function () {
+                                                    alert("Couldn't save some entries!");
+                                                }
+                                            });
                                         }
-                                    }]
-                                });
 
-                            } else {
-                                //no mismatch, just go ahead and load next stage
-                                retrieve_stage(retrieval_params);
-                            }
-                        },
-                        error: function () {
-                            alert("Couldn't verify metadata mismatch!");
+                                        dialogRef.close();
+                                    }
+                                }]
+                            });
+
+                        } else {
+                            //no mismatch, just go ahead and load next stage
+                            retrieve_stage(retrieval_params);
                         }
-                    });
-                }
+                    },
+                    error: function () {
+                        alert("Couldn't verify metadata mismatch!");
+                    }
+                });
             }
         }
+
+
+    }
+
+    function get_rendered_stages() {
+        var rendered_stages = [];
+
+        var goOn = true;
+        var i = 1;
+
+        while (goOn) {
+            if ($('#wizard_form_' + i).length && $('#wizard_form_' + i).find("#current_stage").length) {
+                var current_stage = $('#wizard_form_' + i).find("#current_stage").val();
+                if (stage_objects.hasOwnProperty(current_stage)) {
+                    var stage = stage_objects[current_stage];
+
+                    var stage_items = [];
+                    stage.items.forEach(function (item) {
+                        stage_items.push(item.id);
+                    });
+
+                    var stage_object = {
+                        "ref": stage.ref,
+                        "item": stage_items
+                    };
+
+                    rendered_stages.push(stage_object);
+                }
+
+                goOn = true;
+                ++i;
+            } else {
+                break;
+            }
+        }
+
+        return JSON.stringify(rendered_stages);
     }
 
     function stage_navigate(evt, data) {
@@ -664,136 +690,7 @@ $(document).ready(function () {
             var reviewElem = $('.steps li:last-child');
 
             if (reviewElem.hasClass('active')) {
-                //validate description for completeness; get submission decision; and, consequently, initiate submission
-
-                //are all items in bundle good to go?
-                var datafile_ids = []; //for metadata rating
-                descriptionBundle.forEach(function (item) {
-                    datafile_ids.push(item.recordID);
-                });
-
-                var dialogHandle = processing_request_dialog('Validating description bundle...');
-
-                $.ajax({
-                    url: copoVisualsURL,
-                    type: "POST",
-                    headers: {
-                        'X-CSRFToken': csrftoken
-                    },
-                    data: {
-                        'task': 'metadata_ratings',
-                        'component': component,
-                        'datafile_ids': JSON.stringify(datafile_ids)
-                    },
-                    success: function (data) {
-                        if (data.metadata_ratings) {
-                            var currentMetadataRating = data.metadata_ratings;
-
-                            var isAllValid = true;
-
-                            for (var i = 0; i < currentMetadataRating.length; ++i) {
-                                if (currentMetadataRating[i].item_rating.hasOwnProperty("rating_level")) {
-                                    if (currentMetadataRating[i].item_rating.rating_level != "good") {
-                                        isAllValid = false;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            dialogHandle.close();
-
-                            //display dialog based on validation result
-
-                            if (isAllValid) {
-                                BootstrapDialog.show({
-                                    title: "Initiate Submission",
-                                    message: wizardMessages.confirm_initiate_submission.text,
-                                    cssClass: 'copo-modal2',
-                                    closable: false,
-                                    animate: true,
-                                    type: BootstrapDialog.TYPE_INFO,
-                                    buttons: [
-                                        {
-                                            label: '<i class="copo-components-icons fa fa-power-off"></i> Exit',
-                                            cssClass: 'tiny ui basic orange button',
-                                            action: function (dialogRef) {
-                                                clear_wizard();
-                                                dialogRef.close();
-                                            }
-                                        },
-                                        {
-                                            label: 'Initiate',
-                                            cssClass: 'tiny ui basic primary button',
-                                            action: function (dialogRef) {
-                                                dialogRef.getModalFooter().hide();
-                                                dialogRef.getModalBody().find(".bootstrap-dialog-message").html("Initiating submission...");
-                                                dialogRef.getModalBody().find(".bootstrap-dialog-message").append($('<div style="margin-left: 40%; margin-top: 30px;" class="copo-i-loader"></div>'));
-
-                                                setTimeout(function () {
-                                                    $.ajax({
-                                                        url: copoFormsURL,
-                                                        type: "POST",
-                                                        headers: {
-                                                            'X-CSRFToken': csrftoken
-                                                        },
-                                                        data: {
-                                                            'task': 'initiate_submission',
-                                                            'component': "submission",
-                                                            'datafile_ids': JSON.stringify(datafile_ids)
-                                                        },
-                                                        success: function (data) {
-                                                            //if successful, redirect to submissions
-                                                            var locus = $("#submission_url").val();
-                                                            window.location.replace(locus);
-                                                        },
-                                                        error: function () {
-                                                            alert("Couldn't initiate submission!");
-                                                            window.location.reload();
-                                                        }
-                                                    });
-                                                }, 500);
-
-
-                                            }
-                                        }
-                                    ]
-                                });
-
-                            } else {
-                                BootstrapDialog.show({
-                                    title: "Metadata Validation",
-                                    message: wizardMessages.metadata_validation_failed.text,
-                                    cssClass: 'copo-modal2',
-                                    closable: false,
-                                    animate: true,
-                                    type: BootstrapDialog.TYPE_WARNING,
-                                    buttons: [
-                                        {
-                                            label: '<i class="copo-components-icons fa fa-power-off"></i> Exit',
-                                            cssClass: 'tiny ui basic orange button',
-                                            action: function (dialogRef) {
-                                                clear_wizard();
-                                                dialogRef.close();
-                                            }
-                                        },
-                                        {
-                                            label: 'Describe',
-                                            cssClass: 'tiny ui basic primary button',
-                                            action: function (dialogRef) {
-                                                dialogRef.close();
-                                            }
-                                        }
-                                    ]
-                                });
-                            }
-                        }
-                    },
-                    error: function () {
-                        alert("Couldn't validate bundle!");
-                    }
-                });
-
-
+                do_last_stage();
                 return false;
 
             }
@@ -811,6 +708,137 @@ $(document).ready(function () {
 
         //setup steps fast navigation
         //steps_fast_nav();
+    }
+
+    function do_last_stage() {
+        //validate description for completeness; get submission decision; and, consequently, initiate submission
+
+        //are all items in bundle good to go?
+        var datafile_ids = []; //for metadata rating
+        descriptionBundle.forEach(function (item) {
+            datafile_ids.push(item.recordID);
+        });
+
+        var dialogHandle = processing_request_dialog('Validating description bundle...');
+
+        $.ajax({
+            url: copoVisualsURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'task': 'metadata_ratings',
+                'component': component,
+                'datafile_ids': JSON.stringify(datafile_ids)
+            },
+            success: function (data) {
+                if (data.metadata_ratings) {
+                    var currentMetadataRating = data.metadata_ratings;
+
+                    var isAllValid = true;
+
+                    for (var i = 0; i < currentMetadataRating.length; ++i) {
+                        if (currentMetadataRating[i].item_rating.hasOwnProperty("rating_level")) {
+                            if (currentMetadataRating[i].item_rating.rating_level != "good") {
+                                isAllValid = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    dialogHandle.close();
+
+                    //display dialog based on validation result
+
+                    if (isAllValid) {
+                        BootstrapDialog.show({
+                            title: "Initiate Submission",
+                            message: wizardMessages.confirm_initiate_submission.text,
+                            cssClass: 'copo-modal2',
+                            closable: false,
+                            animate: true,
+                            type: BootstrapDialog.TYPE_INFO,
+                            buttons: [
+                                {
+                                    label: '<i class="copo-components-icons fa fa-power-off"></i> Exit',
+                                    cssClass: 'tiny ui basic orange button',
+                                    action: function (dialogRef) {
+                                        clear_wizard();
+                                        dialogRef.close();
+                                    }
+                                },
+                                {
+                                    label: 'Initiate',
+                                    cssClass: 'tiny ui basic primary button',
+                                    action: function (dialogRef) {
+                                        dialogRef.getModalFooter().hide();
+                                        dialogRef.getModalBody().find(".bootstrap-dialog-message").html("Initiating submission...");
+                                        dialogRef.getModalBody().find(".bootstrap-dialog-message").append($('<div style="margin-left: 40%; margin-top: 30px;" class="copo-i-loader"></div>'));
+
+                                        setTimeout(function () {
+                                            $.ajax({
+                                                url: copoFormsURL,
+                                                type: "POST",
+                                                headers: {
+                                                    'X-CSRFToken': csrftoken
+                                                },
+                                                data: {
+                                                    'task': 'initiate_submission',
+                                                    'component': "submission",
+                                                    'datafile_ids': JSON.stringify(datafile_ids)
+                                                },
+                                                success: function (data) {
+                                                    //if successful, redirect to submissions
+                                                    var locus = $("#submission_url").val();
+                                                    window.location.replace(locus);
+                                                },
+                                                error: function () {
+                                                    alert("Couldn't initiate submission!");
+                                                    window.location.reload();
+                                                }
+                                            });
+                                        }, 500);
+
+
+                                    }
+                                }
+                            ]
+                        });
+
+                    } else {
+                        BootstrapDialog.show({
+                            title: "Metadata Validation",
+                            message: wizardMessages.metadata_validation_failed.text,
+                            cssClass: 'copo-modal2',
+                            closable: false,
+                            animate: true,
+                            type: BootstrapDialog.TYPE_WARNING,
+                            buttons: [
+                                {
+                                    label: '<i class="copo-components-icons fa fa-power-off"></i> Exit',
+                                    cssClass: 'tiny ui basic orange button',
+                                    action: function (dialogRef) {
+                                        clear_wizard();
+                                        dialogRef.close();
+                                    }
+                                },
+                                {
+                                    label: 'Describe',
+                                    cssClass: 'tiny ui basic primary button',
+                                    action: function (dialogRef) {
+                                        dialogRef.close();
+                                    }
+                                }
+                            ]
+                        });
+                    }
+                }
+            },
+            error: function () {
+                alert("Couldn't validate bundle!");
+            }
+        });
     }
 
     function processing_request_dialog(message) {
@@ -848,10 +876,16 @@ $(document).ready(function () {
             return true;
         }
 
+        var current_stage_object = get_current_stage_object();
+        var stage_ref = '';
+        if (current_stage_object) {
+            stage_ref = current_stage_object.ref;
+        }
+
         var request_params = {
             'request_action': 'is_same_metadata',
             'description_token': descriptionToken,
-            'stage_ref': stage_objects[activeStageIndx].ref,
+            'stage_ref': stage_ref,
             'description_targets': JSON.stringify(bundle_without_data())
         };
 
@@ -903,7 +937,55 @@ $(document).ready(function () {
             },
             data: retrieval_params,
             success: function (data) {
-                do_post_stage_retrieval(data);
+                //do we still have a valid stage sequence?
+                try {
+                    var validation_dict = data.validation_dict;
+                    if (validation_dict.is_valid_stage_sequence) {
+                        do_post_stage_retrieval(data);
+                    } else {
+                        //wizard stages need to be re-aligned to reflect current description sequence
+                        stage_objects = {}; //clear stage objects
+                        displayedMessages = {};
+
+                        //remove previously displayed stages
+                        $('#dataFileWizard').wizard('removeSteps', 1, 1000); //set to arbitrary large number of steps
+
+                        //reset index
+                        currentIndx = 1;
+                        $('#dataFileWizard').wizard();
+
+                        //add review step, then call to add other steps
+                        $('#dataFileWizard').wizard('addSteps', -1, [
+                            descriptionWizSummary
+                        ]);
+
+                        process_wizard_stage({"stages": data.validation_dict.stages});
+
+                        //refresh data
+                        if (data.targets_data) {
+                            refresh_targets_data(data.targets_data);
+                        }
+
+                        //toggle show 'Review' stage
+                        var elem = $('.steps li:last-child');
+
+                        if (elem.hasClass('active')) {
+                            //call to set description summary data
+
+                            set_summary_data();
+                            elem.show();
+                        } else {
+                            elem.hide();
+                        }
+
+                        refresh_tool_tips();
+
+                        //autocomplete
+                        auto_complete();
+                    }
+                } catch (err) {
+                    ;
+                }
             },
             error: function () {
                 alert("Couldn't retrieve wizard stage!");
@@ -978,34 +1060,36 @@ $(document).ready(function () {
     function process_wizard_stage(data) {
         if (data.stages) {
             var selStep = currentIndx;
+            var selectedStage = null; //stage to focus on
             var panes = [];
             for (var i = 0; i < data.stages.length; ++i) {
                 if (data.stages[i].stage.title) {
-                    stage_objects[currentIndx] = data.stages[i].stage;
+                    stage_objects[data.stages[i].stage.ref] = data.stages[i].stage;
                     panes.push({
                         label: '<span class=wiz-title>' + data.stages[i].stage.title + '</span>',
                         pane: get_pane_content(data.stages[i].stage, currentIndx)
                     });
 
                     ++currentIndx;
+
+                    if (setTargetStageRef && data.stages[i].stage.ref == setTargetStageRef) {
+                        selectedStage = currentIndx;
+                    }
                 }
             }
 
             $('#dataFileWizard').wizard('addSteps', selStep, panes);
+            setTargetStageRef = '';
+
+            var currentStep = currentIndx - 1;
+
+            if (selectedStage) {
+                currentStep = selectedStage - 1;
+            }
 
             $('#dataFileWizard').wizard('selectedItem', {
-                step: currentIndx - 1
+                step: currentStep
             });
-
-            //move wizard's focus to stage; usually called upon by a refresh action (e.g., value change)
-            if (setStageIndx) {
-
-                $('#dataFileWizard').wizard('selectedItem', {
-                    step: setStageIndx
-                });
-
-                setStageIndx = null;
-            }
 
             refresh_tool_tips();
 
@@ -1013,8 +1097,8 @@ $(document).ready(function () {
             //steps_fast_nav();
 
 
-        } else if (data.stage.stage) {
-            stage_objects[currentIndx] = data.stage.stage;
+        } else if (data.stage && data.stage.stage) {
+            stage_objects[data.stage.stage.ref] = data.stage.stage;
             $('#dataFileWizard').wizard('addSteps', currentIndx, [{
                 label: '<span class=wiz-title>' + data.stage.stage.title + '</span>',
                 pane: get_pane_content(data.stage.stage, currentIndx)
@@ -1092,13 +1176,13 @@ $(document).ready(function () {
 
         var showApplyTo = "";
 
-        if (stage_objects[currentIndx].is_singular_stage) {
+        if (stage.hasOwnProperty('is_singular_stage') && stage.is_singular_stage) {
             spanMessage.html('The metadata supplied in this stage will apply to all the items in the description bundle');
             showApplyTo = " display: none;";
         }
 
         //pairing message
-        if (stage_objects[currentIndx].ref == "datafiles_pairing") {
+        if (stage.ref == "datafiles_pairing") {
             spanMessage.html('Please define datafile pairing for items in the description bundle');
             showApplyTo = " display: none;";
         }
@@ -1168,7 +1252,8 @@ $(document).ready(function () {
         bundlePanel.find(".panel-heading");
 
         //render datafiles pairing table differently
-        if (stage_objects[currentIndx].ref == "datafiles_pairing") {
+        var current_stage_object = get_current_stage_object();
+        if (stage.ref == "datafiles_pairing") {
             descriptionBundleTableHTML = "";
             descriptionBundleTableHTML += '<table id="description_target_table_' + currentIndx + '" class="ui celled table hover copo-noborders-table" cellspacing="0" width="100%">';
             descriptionBundleTableHTML += '<thead><tr><th>Description Bundle</th><th>&nbsp;</th>';
@@ -1195,7 +1280,7 @@ $(document).ready(function () {
 
             pairingRow.append(pairingLeft).append(pairingRight);
 
-            bundlePanel.find(".panel-heading").html("<strong>Description Bundle & Datafiles Pairing</strong>");
+            bundlePanel.find(".panel-heading").html("<strong><span id='paired-message-" + currentIndx + "'></span>Description Bundle & Datafiles Pairing</strong>");
             bundlePanel.find(".panel-body").html('').append(pairingRow);
         }
 
@@ -1217,7 +1302,7 @@ $(document).ready(function () {
     //functions clears the wizard and either exits or loads next item in batch
     function clear_wizard() {
         //decommission wizard
-        $('#dataFileWizard').wizard('removeSteps', 1, currentIndx + 1);
+        $('#dataFileWizard').wizard('removeSteps', 1, 1000); //set to arbitrary large number of steps
         $('#dataFileWizard').hide();
 
 
@@ -1249,7 +1334,7 @@ $(document).ready(function () {
     }
 
     function reset_wizard() { //resets wizard without all the hassle of clear_wizard()
-        $('#dataFileWizard').wizard('removeSteps', 1, currentIndx + 1);
+        $('#dataFileWizard').wizard('removeSteps', 1, 1000); //set to arbitrary large number of steps
 
         //add review step, then other steps
         $('#dataFileWizard').wizard('addSteps', -1, [
@@ -1257,6 +1342,24 @@ $(document).ready(function () {
         ]);
 
         currentIndx = 1;
+    }
+
+    function get_current_stage_object() {
+        var stage = null;
+        //get active stage
+        var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+
+        if (activeStageIndx == -1) {
+            return stage;
+        }
+
+        var current_stage = $('#wizard_form_' + activeStageIndx).find("#current_stage").val();
+        if (stage_objects.hasOwnProperty(current_stage)) {
+            stage = stage_objects[current_stage];
+        }
+
+        return stage;
+
     }
 
     function collate_stage_data() {
@@ -1528,6 +1631,7 @@ $(document).ready(function () {
                             label: 'Cancel',
                             cssClass: 'tiny ui basic button',
                             action: function (dialogRef) {
+                                descriptionToken = null; //invalidate the description
                                 dialogRef.close();
                             }
                         }, {
@@ -1988,13 +2092,37 @@ $(document).ready(function () {
     }
 
     function do_handle_select_events(event) {
-        var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
+        var current_stage_object = get_current_stage_object();
 
-        if (stage_objects && stage_objects[activeStageIndx] && stage_objects[activeStageIndx].ref == "library_construction" && $(event.target).attr("id") == "library_layout") {
+        if (current_stage_object && current_stage_object.ref == "library_construction" && $(event.target).attr("id") == "library_layout") {
             //refresh wizard to normalise stages display
-
-            alert(1);
         }
+    }
+
+    function element_value_change_modified(formElem, messageTitle) {
+        var triggerMessage = '';
+
+        try {
+            triggerMessage = formElem.trigger.message;
+        } catch (err) {
+            ;
+        }
+
+        BootstrapDialog.show({
+            title: messageTitle,
+            message: '<div class=modal-content-div">' + triggerMessage + '</div>',
+            cssClass: 'copo-modal2',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_WARNING,
+            buttons: [{
+                label: 'OK',
+                cssClass: 'tiny ui basic orange button',
+                action: function (dialogRef) {
+                    dialogRef.close();
+                }
+            }]
+        });
     }
 
     function element_value_change(formElem, elemValue, messageTitle) {
@@ -2051,7 +2179,6 @@ $(document).ready(function () {
                                     onGoingDescription = true;
                                     clear_wizard();
                                     silenceAlert = silnAlert;
-                                    setStageIndx = $('#dataFileWizard').wizard('selectedItem').step;
                                     add_to_batch(batchTargets, true);
                                 },
                                 error: function () {
@@ -2080,85 +2207,14 @@ $(document).ready(function () {
             $(document)
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
-                    element_value_change(formElem, previousValue, formElem.label + " Change");
+                    element_value_change_modified(formElem, formElem.label + " Change");
                 });
         },
         target_repo_change: function (formElem) {
             $(document)
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
-                    var elemValue = $("#" + formElem.id + "_previousValue").val();
-                    var messageTitle = formElem.label + " Change"
-
-                    var triggerMessage = '';
-
-                    try {
-                        triggerMessage = formElem.trigger.message;
-                    } catch (err) {
-                        ;
-                    }
-
-
-                    BootstrapDialog.show({
-                        title: messageTitle,
-                        message: triggerMessage,
-                        cssClass: 'copo-modal2',
-                        closable: false,
-                        animate: true,
-                        type: BootstrapDialog.TYPE_WARNING,
-                        buttons: [{
-                            label: 'Cancel',
-                            cssClass: 'tiny ui basic button',
-                            action: function (dialogRef) {
-                                //set back to previous value
-                                $('input[name=' + formElem.id + '_input][value=' + elemValue + ']').prop('checked', true);
-                                $("#" + formElem.id).val(elemValue);
-
-                                dialogRef.close();
-                            }
-                        }, {
-                            label: 'Continue',
-                            cssClass: 'tiny ui basic orange button',
-                            action: function (dialogRef) {
-                                setTimeout(function () {
-                                    //reset the wizard...
-                                    var batchTargets = [];
-                                    descriptionBundle.forEach(function (item) {
-                                        batchTargets.push(item);
-                                    });
-
-                                    //call to save
-                                    var stage_data = collate_stage_data();
-
-                                    //remember user's choice for alerts
-                                    var silnAlert = silenceAlert;
-                                    if (stage_data) {
-                                        $.ajax({
-                                            url: wizardURL,
-                                            type: "POST",
-                                            headers: {
-                                                'X-CSRFToken': csrftoken
-                                            },
-                                            data: stage_data,
-                                            success: function (data) {
-                                                onGoingDescription = true;
-                                                clear_wizard();
-                                                silenceAlert = silnAlert;
-                                                setStageIndx = $('#dataFileWizard').wizard('selectedItem').step;
-                                                add_to_batch(batchTargets, true);
-                                            },
-                                            error: function () {
-                                                alert("Couldn't save entries!");
-                                            }
-                                        });
-                                    }
-
-                                }, 1000);
-
-                                dialogRef.close();
-                            }
-                        }]
-                    });
+                    element_value_change_modified(formElem, formElem.label + " Change");
                 });
         },
         growth_facility_change: function (formElem) {
@@ -2171,6 +2227,11 @@ $(document).ready(function () {
             $(document)
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
+                    var current_stage_object = get_current_stage_object();
+                    if (current_stage_object) {
+                        setTargetStageRef = current_stage_object.ref
+                    }
+
                     element_value_change(formElem, previousValue, formElem.label + " Change");
                 });
         },
@@ -2184,6 +2245,10 @@ $(document).ready(function () {
             $(document)
                 .off(formElem.trigger.type, "#" + formElem.id)
                 .on(formElem.trigger.type, "#" + formElem.id, function () {
+                    var current_stage_object = get_current_stage_object();
+                    if (current_stage_object) {
+                        setTargetStageRef = current_stage_object.ref
+                    }
                     element_value_change(formElem, previousValue, formElem.label + " Change");
                 });
         }
@@ -2467,7 +2532,8 @@ $(document).ready(function () {
         var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
 
         //render differently for some stages
-        if (stage_objects && stage_objects[activeStageIndx] && stage_objects[activeStageIndx].ref == "datafiles_pairing") {
+        var current_stage_object = get_current_stage_object();
+        if (current_stage_object && current_stage_object.ref == "datafiles_pairing") {
             refresh_paired_files_display();
             return false;
         }
@@ -2578,7 +2644,7 @@ $(document).ready(function () {
                         selectNone: "Select none"
                     },
                     select: {
-                        rows: {
+                        multi: {
                             _: "Current description will apply to %d files in bundle <span style='padding-left: 10px;'>Click <span class='fa-stack' style='color:green; font-size:11px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> beside a datafile to view details</span>",
                             0: "Click a row to select it <span style='padding-left: 10px;'>Click <span class='fa-stack' style='color:green; font-size:11px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> beside a datafile to view details</span>",
                             1: "Current description will apply to 1 file in bundle <span style='padding-left: 10px;'>Click <span class='fa-stack' style='color:green; font-size:11px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> beside a datafile to view details</span>"
@@ -2669,10 +2735,16 @@ $(document).ready(function () {
                         }
                     });
 
+                    var current_stage_object = get_current_stage_object();
+                    var stage_id = '';
+                    if (current_stage_object) {
+                        stage_id = current_stage_object.ref;
+                    }
+
                     var request_params = {
                         'request_action': 'get_item_stage_display',
                         'component': component,
-                        'stage_id': stage_objects[activeStageIndx].ref,
+                        'stage_id': stage_id,
                         'description_token': descriptionToken,
                         'description_targets': JSON.stringify([descripTarget]),
                         'description_bundle': JSON.stringify([])
@@ -2707,8 +2779,9 @@ $(document).ready(function () {
                             contentHtml = '';
 
                             if (!appliedToAllFlag) {
+                                var current_stage_object = get_current_stage_object();
                                 var applyToItemBtn = '<button tabindex="0" type="button" data-stage-indx="' + activeStageIndx + '" data-description-target="' + row.data().target_id + '"  class="apply-to-item-btn tiny ui primary button">Apply to item</button><span style="margin-left: 4px; font-weight: 600;" class="text-default"></span>';
-                                if (stage_objects[activeStageIndx].is_singular_stage || get_apply_check_state(activeStageIndx)) {
+                                if (current_stage_object && current_stage_object.hasOwnProperty("is_singular_stage") && current_stage_object.is_singular_stage || get_apply_check_state(activeStageIndx)) {
                                     applyToItemBtn = '';
                                 }
 
@@ -2743,10 +2816,15 @@ $(document).ready(function () {
                                 //ontology autocomplete
                                 auto_complete();
                             } else {
+                                var current_stage_object = get_current_stage_object();
+                                var stage_ref = '';
+                                if (current_stage_object) {
+                                    stage_ref = current_stage_object.ref;
+                                }
 
                                 if (data.description.length) {
                                     for (var i = 0; i < data.description.length; ++i) {
-                                        if (data.description[i].ref == stage_objects[activeStageIndx].ref) {
+                                        if (data.description[i].ref == stage_ref) {
                                             var Ddata = data.description[i].data;
                                             for (var j = 0; j < Ddata.length; ++j) {
                                                 contentHtml += '<tr>';
@@ -2757,7 +2835,6 @@ $(document).ready(function () {
                                             break;
                                         }
                                     }
-
                                 }
 
                                 if (!contentHtml) {
@@ -2795,9 +2872,15 @@ $(document).ready(function () {
                 });
 
                 if (!state) { //when the apply-to button is set to false, reset form
+                    var current_stage_object = get_current_stage_object();
+                    var stage_id = '';
+                    if (current_stage_object) {
+                        stage_id = current_stage_object.ref;
+                    }
+
                     var request_params = {
                         'request_action': 'get_item_stage_display',
-                        'stage_id': stage_objects[activeStageIndx].ref,
+                        'stage_id': stage_id,
                         'description_token': descriptionToken
                     };
 
@@ -2823,10 +2906,15 @@ $(document).ready(function () {
                         }
                     });
                 } else {
+                    var current_stage_object = get_current_stage_object();
+                    var stage_ref = '';
+                    if (current_stage_object) {
+                        stage_ref = current_stage_object.ref;
+                    }
                     var request_params = {
                         'request_action': 'is_same_metadata',
                         'description_token': descriptionToken,
-                        'stage_ref': stage_objects[activeStageIndx].ref,
+                        'stage_ref': stage_ref,
                         'description_targets': JSON.stringify(bundle_without_data())
                     };
 
@@ -2839,9 +2927,14 @@ $(document).ready(function () {
                         data: request_params,
                         success: function (data) {
                             if (data.state) {
+                                var current_stage_object = get_current_stage_object();
+                                var stage_id = '';
+                                if (current_stage_object) {
+                                    stage_id = current_stage_object.ref;
+                                }
                                 var request_params = {
                                     'request_action': 'get_item_stage_display',
-                                    'stage_id': stage_objects[activeStageIndx].ref,
+                                    'stage_id': stage_id,
                                     'description_token': descriptionToken,
                                     'description_targets': JSON.stringify([descriptionBundle[0]])
                                 };
@@ -2929,7 +3022,8 @@ $(document).ready(function () {
                 var allRows = table.rows().count();
 
                 //row selection
-                if ((stage_objects[activeStageIndx].is_singular_stage || get_apply_check_state(activeStageIndx)) &&
+                var current_stage_object = get_current_stage_object();
+                if (((current_stage_object && current_stage_object.hasOwnProperty("is_singular_stage") && current_stage_object.is_singular_stage) || (get_apply_check_state(activeStageIndx))) &&
                     (selectedRows != allRows)) {
                     table.rows('.selected').deselect();
                     table.rows().select();
@@ -2954,9 +3048,9 @@ $(document).ready(function () {
         var do_not_pair_list = data.pairing_info.do_not_pair_list; //not to be paired (i.e., having library layout!='PAIRED')
 
 
-        if (add_to_bundle.length > 0 || do_not_pair_list.length > 0) {
-            var message = '<span style="margin-bottom: 10px;">A few modifications have been made to facilitate datafiles pairing.</span>';
-            var alertElem = $('#bundlepanel_' + activeStageIndx);
+        if (add_to_bundle.length > 0 || do_not_pair_list.length > 0 || (unpaired_list.length > 0 && unpaired_list.length % 2 != 0)) {
+            var message = '<span style="margin-bottom: 10px;">Your attention is drawn to the following:</span>';
+            var alertElem = $('#paired-message-' + activeStageIndx);
             alertElem.webuiPopover('destroy');
 
 
@@ -2996,7 +3090,7 @@ $(document).ready(function () {
 
             var okButton = '<div class="text-center alertdismissOK" style="margin-top: 15px;"><button class="mini ui orange basic button">OK</button></div>';
 
-            var pop_title = 'Bundle Modifications';
+            var pop_title = 'Pairing Information';
             var pop_content = '<i class="fa fa-exclamation-circle" aria-hidden="true" style="color: darkorange; font-size: 15px !important; padding-right: 10px;"></i>' + message;
             pop_content += okButton;
             var meta_extra = {
@@ -3118,8 +3212,25 @@ $(document).ready(function () {
                 select: {
                     style: 'multi'
                 },
-                dom: 'fr<"row"><"row description-rw" i>tlp'
+                buttons: [
+                    {
+                        text: 'Suggest pairings',
+                        action: function (e, dt, node, config) {
+                            refresh_paired_files_display();
+                        }
+                    }
+                ],
+                dom: 'Bfr<"row"><"row description-rw" i>tlp'
             });
+
+            table
+                .buttons()
+                .nodes()
+                .each(function (value) {
+                    $(this)
+                        .removeClass("btn btn-default")
+                        .addClass('tiny ui basic primary button');
+                });
         }
 
         $('#description_target_table_' + activeStageIndx + '_wrapper')
@@ -3130,60 +3241,72 @@ $(document).ready(function () {
             .attr("size", 25);
 
         if (table) {
-            table.on('select', function (e, dt, type, indexes) {
-                var selectedRows = table.rows({
-                    selected: true
-                }).count();
 
-                if (selectedRows == 2) {//pair selected datafiles
-                    var alertElem = $('#description_target_table_' + activeStageIndx + '_info');
-                    alertElem.webuiPopover('destroy');
+            table
+                .off('select')
+                .on('select', function (e, dt, type, indexes) {
+                    var selectedRows = dt.rows({
+                        selected: true
+                    }).data();
 
-                    var okButton = $('<button/>',
-                        {
-                            type: "button",
-                            class: "mini ui primary basic button datafile-pairing-action",
-                            "data-action": "pair",
-                            style: "margin-right: 5px;",
-                            html: '<i class="fa fa-link text-primary" aria-hidden="true" style=" font-size: 12px !important; padding-right: 5px;"></i> Pair'
+                    if (selectedRows.length == 2) {//pair selected datafiles
+                        BootstrapDialog.show({
+                            title: "Datafiles pairing",
+                            message: 'Do you want to pair the selected datafiles?',
+                            cssClass: 'copo-modal3',
+                            closable: false,
+                            animate: true,
+                            type: BootstrapDialog.TYPE_PRIMARY,
+                            buttons: [{
+                                label: 'Cancel',
+                                cssClass: 'tiny ui basic button',
+                                action: function (dialogRef) {
+                                    table.rows('.selected').deselect();
+                                    dialogRef.close();
+                                }
+                            }, {
+                                label: '<i class="copo-components-icons fa fa-link"></i> Pair',
+                                cssClass: 'tiny ui basic primary button',
+                                action: function (dialogRef) {
+                                    dialogRef.close();
+                                    var deTargs = [];
+                                    for (var i = 0; i < selectedRows.length; ++i) {
+                                        descriptionBundle.forEach(function (item) {
+                                            if (selectedRows[i].target_id == item.recordID) {
+                                                deTargs.push(item);
+                                            }
+                                        });
+                                    }
+
+                                    var request_params = {
+                                        'request_action': 'datafile_pairing',
+                                        'description_token': descriptionToken,
+                                        'description_targets': JSON.stringify(deTargs),
+                                        'description_bundle': JSON.stringify(descriptionBundle)
+                                    };
+
+                                    $.ajax({
+                                        url: wizardURL,
+                                        type: "POST",
+                                        headers: {
+                                            'X-CSRFToken': csrftoken
+                                        },
+                                        data: request_params,
+                                        success: function (data) {
+                                            if (data.targets_data) {
+                                                refresh_targets_data(data.targets_data);
+                                            }
+                                            refresh_paired_files_display();
+                                        },
+                                        error: function () {
+                                            alert("Couldn't pair datafiles!");
+                                        }
+                                    });
+                                }
+                            }]
                         });
-
-                    var cancelButton = $('<button/>',
-                        {
-                            type: "button",
-                            class: "mini ui basic button datafile-pairing-action",
-                            "data-action": "cancel",
-                            html: "Cancel"
-                        });
-
-                    var alertMessage = $('<div/>',
-                        {
-                            html: '<span>Do you want to pair the selected datafiles?</span>'
-                        });
-
-                    var buttonDiv = $('<div style="margin-top: 15px;"></div>');
-                    buttonDiv.append(cancelButton).append(okButton);
-
-                    var displayMessage = $('<div class="text-center"></div>');
-                    displayMessage.append(alertMessage).append(buttonDiv);
-
-
-                    var pop_title = '';
-                    var pop_content = $('<div/>').append(displayMessage).html();
-
-                    var meta_extra = {
-                        width: 250,
-                        placement: 'auto',
-                        trigger: 'sticky',
-                        backdrop: true,
-                        style: '',
-                        closeable: false
-                    };
-
-                    refresh_webpop(alertElem, pop_title, pop_content, meta_extra);
-
-                }
-            });
+                    }
+                });
 
         }
 
@@ -3303,6 +3426,7 @@ $(document).ready(function () {
                     refresh_targets_data(data.targets_data);
                 }
                 update_paired_display(data);
+                suggest_pairing_action(data);
             },
             error: function () {
                 alert("Couldn't obtain pairing information!");
@@ -3390,69 +3514,6 @@ $(document).ready(function () {
             },
             error: function () {
                 alert("Couldn't save entries!");
-            }
-        });
-    }
-
-    function do_datafile_pairing(elem) {
-        var elemAction = elem.attr("data-action");
-
-        var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
-        var table = $('#description_target_table_' + activeStageIndx).DataTable();
-
-        var selectedRows = [];
-
-        selectedRows = table.rows({
-            selected: true
-        }).data();
-
-        table.rows('.selected').deselect();
-        WebuiPopovers.hideAll();
-
-        if (elemAction == "cancel") {
-            return false;
-        }
-
-        var deTargs = [];
-        for (var i = 0; i < selectedRows.length; ++i) {
-            descriptionBundle.forEach(function (item) {
-                if (selectedRows[i].target_id == item.recordID) {
-                    deTargs.push(item);
-                }
-            });
-        }
-
-        if (deTargs.length != 2) {//two files needed for pairing
-            return false;
-        }
-
-
-        var request_params = {
-            'request_action': 'datafile_pairing',
-            'description_token': descriptionToken,
-            'description_targets': JSON.stringify(deTargs),
-            'description_bundle': JSON.stringify(descriptionBundle)
-        };
-
-        $.ajax({
-            url: wizardURL,
-            type: "POST",
-            headers: {
-                'X-CSRFToken': csrftoken
-            },
-            data: request_params,
-            success: function (data) {
-                if (data.result == true) {
-                    if (data.targets_data) {
-                        refresh_targets_data(data.targets_data);
-                    }
-                    refresh_paired_files_display();
-                } else {
-                    ;
-                }
-            },
-            error: function () {
-                alert("Couldn't pair datafiles!");
             }
         });
     }
@@ -3625,12 +3686,16 @@ $(document).ready(function () {
             $(this).hide();
         });
 
-
+        var current_stage_object = get_current_stage_object();
+        var stage_ref = '';
+        if (current_stage_object) {
+            stage_ref = current_stage_object.ref;
+        }
         descriptionBundle.forEach(function (item) {
             $('.inDescription-flag-1').each(function () {
                 if ($(this).attr("data-record-id") == item.recordID) {
                     try {
-                        if (item["attributes"][stage_objects[activeStageIndx].ref]) {
+                        if (item["attributes"][stage_ref]) {
                             $(this).show();
                         }
                     } catch (err) {
@@ -3657,8 +3722,10 @@ $(document).ready(function () {
             showChk = false;
         }
 
-        if ((stage_objects[activeStageIndx] && stage_objects[activeStageIndx].is_singular_stage) || applyToAll) {
-            if ((stage_objects[activeStageIndx] && stage_objects[activeStageIndx].is_singular_stage)) {
+        var current_stage_object = get_current_stage_object();
+
+        if (((current_stage_object && current_stage_object.hasOwnProperty("is_singular_stage") && current_stage_object.is_singular_stage)) || applyToAll) {
+            if (current_stage_object && current_stage_object.hasOwnProperty("is_singular_stage") && current_stage_object.is_singular_stage) {
                 showChk = false;
             }
 
@@ -3706,14 +3773,15 @@ $(document).ready(function () {
     function set_stage_message() {
         var activeStageIndx = $('#dataFileWizard').wizard('selectedItem').step; //active stage index
         //set stage message
-        if (activeStageIndx != -1) {
-            if (stage_objects && stage_objects[activeStageIndx] && stage_objects[activeStageIndx].hasOwnProperty("message")) {
+        var current_stage_object = get_current_stage_object();
+        if (current_stage_object) {
+            if (current_stage_object && current_stage_object.hasOwnProperty("message")) {
 
-                if (!displayedMessages.hasOwnProperty(stage_objects[activeStageIndx].ref)) {
+                if (!displayedMessages.hasOwnProperty(current_stage_object.ref)) {
                     var alertType = "info";
-                    var alertMessage = "<div style='margin-bottom: 10px;'><strong>" + stage_objects[activeStageIndx].title + "</strong></div><div>" + stage_objects[activeStageIndx].message + "</div>";
+                    var alertMessage = "<div style='margin-bottom: 10px;'><strong>" + current_stage_object.title + "</strong></div><div>" + current_stage_object.message + "</div>";
                     display_copo_alert(alertType, alertMessage, 20000);
-                    displayedMessages[stage_objects[activeStageIndx].ref] = 1;
+                    displayedMessages[current_stage_object.ref] = 1;
                 }
             }
         }
@@ -3737,7 +3805,8 @@ $(document).ready(function () {
         }
 
         //handle custom cases e.g., datafiles pairing
-        if (stage_objects && stage_objects[activeStageIndx] && stage_objects[activeStageIndx].ref == "datafiles_pairing") {
+        var current_stage_object = get_current_stage_object();
+        if (current_stage_object && current_stage_object.ref == "datafiles_pairing") {
             return false;
         }
 
@@ -3746,7 +3815,7 @@ $(document).ready(function () {
         if (descriptionBundle.length == 1) { //only one item being described
             set_stage_alerts(wizardMessages.singleton_item_alert_message, activeStageIndx);
             $('#alert_placeholder_' + activeStageIndx).hide();
-        } else if (stage_objects[activeStageIndx].is_singular_stage) { //singular stage
+        } else if (current_stage_object && current_stage_object.hasOwnProperty("is_singular_stage") && current_stage_object.is_singular_stage) { //singular stage
             set_stage_alerts(wizardMessages.singular_stage_message, activeStageIndx);
         } else {
             if (get_apply_check_state(activeStageIndx)) {
@@ -3763,6 +3832,166 @@ $(document).ready(function () {
         var elem = $('#alert_placeholder_' + activeStageIndx);
         var contentHtml = '<span class="' + message_object.text_class + '">' + message_object.text + '</span>';
         elem.find(".apply-to-all-message").html(contentHtml);
+    }
+
+    function suggest_pairing_action(data) {
+        var suggested_pairings = data.pairing_info.suggested_pairings; //pairable candidates to be suggested
+
+        if (suggested_pairings.length == 0) {
+            return false;
+        }
+
+        var dtdPaired = []; //define suggestion table data source
+        for (var i = 0; i < suggested_pairings.length; ++i) { //suggestion data source
+            var pair = suggested_pairings[i];
+            var option = {};
+            option["target"] = [pair[0].recordLabel, pair[1].recordLabel];
+            option["target_id"] = [pair[0].recordID, pair[1].recordID];
+
+            dtdPaired.push(option);
+        }
+
+        var suggestionLoader = $('<div style="margin-left: 40%; margin-top: 30px;" class="copo-i-loader"></div>');
+        var suggestionTable = null;
+
+        BootstrapDialog.show({
+            title: "Suggested datafiles pairing",
+            message: $('<div></div>').append('<table id="datafiles_pairing_suggestion" class="ui celled stripe table hover copo-noborders-table" cellspacing="0" width="100%"></table>').append(suggestionLoader),
+            cssClass: 'copo-modal4',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_PRIMARY,
+            onshown: function (dialogRef) {
+                suggestionLoader.remove();
+                //display suggestions
+                var tableID = 'datafiles_pairing_suggestion';
+                if ($.fn.dataTable.isDataTable('#' + tableID)) {
+                    //if table instance already exists, then destroy in order to successfully re-initialise
+                    $('#' + tableID).destroy();
+                }
+
+                var dataSet = dtdPaired;
+                suggestionTable = $('#' + tableID).DataTable({
+                    data: dataSet,
+                    "columns": [
+                        {
+                            "data": "target",
+                            "title": "Suggested pair",
+                            "render": function (rdata) {
+                                var rowObject = $('<div/>');
+
+                                var col1Object = $('<div/>',
+                                    {
+                                        style: "padding: 5px;"
+                                    }).append('<div style="padding-bottom: 5px;">1. ' + rdata[0] + '</div><div>2. ' + rdata[1] + '</div>');
+
+                                rowObject.append(col1Object);
+
+                                return $('<div/>').append(rowObject).html();
+                            }
+                        },
+                        {
+                            "data": "target_id",
+                            "visible": false
+                        },
+                    ],
+                    language: {
+                        select: {
+                            rows: {
+                                _: "<strong>%d pairing suggestions selected. Click 'Apply' to confirm</strong>",
+                                0: "<strong>Click a row or the 'Select all' button to accept suggested pairings</strong>",
+                                1: "<strong>1 pairing suggestion selected. Click 'Apply' to confirm</strong>"
+                            }
+                        },
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                        refresh_tool_tips();
+                    },
+                    scrollCollapse: true,
+                    select: {
+                        style: 'multi', //os, multi, api
+                    },
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    dom: 'Bfr<"row"><"row description-rw" i>tlp'
+                });
+
+                suggestionTable
+                    .buttons()
+                    .nodes()
+                    .each(function (value) {
+                        $(this)
+                            .removeClass("btn btn-default")
+                            .addClass('tiny ui basic primary button');
+                    });
+
+                // suggestionTable.rows().select();
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    cssClass: 'tiny ui basic button',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                    }
+                },
+                {
+                    label: 'Apply',
+                    cssClass: 'tiny ui basic primary button',
+                    action: function (dialogRef) {
+                        var selectedRows = suggestionTable.rows({
+                            selected: true
+                        }).data();
+
+                        if (selectedRows.length > 0) {
+                            var description_targets = [];
+                            for (var i = 0; i < selectedRows.length; ++i) {
+                                var deTargs = [];
+                                var pair = selectedRows[i]
+                                descriptionBundle.forEach(function (item) {
+                                    if ((item.recordID == pair.target_id[0]) || (item.recordID == pair.target_id[1])) {
+                                        deTargs.push(item);
+                                    }
+                                });
+
+                                if (deTargs.length == 2) {//two files needed for pairing
+                                    var description_targets = description_targets.concat(deTargs);
+                                }
+                            }
+
+                            var request_params = {
+                                'request_action': 'datafile_pairing',
+                                'description_token': descriptionToken,
+                                'description_targets': JSON.stringify(description_targets),
+                                'description_bundle': JSON.stringify(descriptionBundle)
+                            };
+
+                            $.ajax({
+                                url: wizardURL,
+                                type: "POST",
+                                headers: {
+                                    'X-CSRFToken': csrftoken
+                                },
+                                data: request_params,
+                                success: function (data) {
+                                    if (data.targets_data) {
+                                        refresh_targets_data(data.targets_data);
+                                    }
+                                    refresh_paired_files_display();
+                                },
+                                error: function () {
+                                    alert("Couldn't pair datafiles!");
+                                }
+                            });
+
+                            dialogRef.close();
+                        }
+                    }
+                }
+            ]
+        });
     }
 
 }) //end document ready

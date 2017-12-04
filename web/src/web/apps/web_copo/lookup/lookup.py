@@ -194,7 +194,7 @@ DROP_DOWNS = {
         # },
         {
             'value': 'rNASeq',
-            'label': 'RNASeq',
+            'label': 'RNA-seq',
             'description': '',
             'config_source': 'transcription_seq.xml'
         },
@@ -345,16 +345,16 @@ DROP_DOWNS = {
             'label': 'ENA - Sequence Reads',
             'description': 'This repository option defines metadata for submission of <strong>raw sequence reads</strong> to the European Nucleotide Archive (ENA).'
         },
-        {
-            'value': 'ena-ant',
-            'label': 'ENA - Sequence Annotations',
-            'description': 'This repository option defines metadata for submission of <strong>sequence annotations</strong> to the European Nucleotide Archive (ENA).'
-        },
-        {
-            'value': 'ena-asm',
-            'label': 'ENA - Sequence Assemblies',
-            'description': 'This repository option defines metadata for submission of <strong>sequence assemblies</strong> to the European Nucleotide Archive (ENA).'
-        },
+        # {
+        #     'value': 'ena-ant',
+        #     'label': 'ENA - Sequence Annotations',
+        #     'description': 'This repository option defines metadata for submission of <strong>sequence annotations</strong> to the European Nucleotide Archive (ENA).'
+        # },
+        # {
+        #     'value': 'ena-asm',
+        #     'label': 'ENA - Sequence Assemblies',
+        #     'description': 'This repository option defines metadata for submission of <strong>sequence assemblies</strong> to the European Nucleotide Archive (ENA).'
+        # },
         {
             'value': 'figshare',
             'label': 'Figshare',

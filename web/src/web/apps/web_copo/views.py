@@ -183,6 +183,7 @@ def copo_visualize(request):
                      update_quick_tour_flag=broker_visuals.do_update_quick_tour_flag,
                      get_component_info=broker_visuals.do_get_component_info,
                      get_profile_info=broker_visuals.do_get_profile_info,
+                     get_submission_accessions=broker_visuals.do_get_submission_accessions
                      )
 
     if task in task_dict:
@@ -227,6 +228,7 @@ def copo_forms(request):
                      initiate_submission=broker_da.do_initiate_submission,
                      user_email=broker_da.do_user_email,
                      component_record=broker_da.do_component_record,
+                     sanitise_submissions=broker_da.do_sanitise_submissions
                      )
 
     if task in task_dict:
@@ -270,9 +272,8 @@ def copo_admin(request):
 def copo_submissions(request, profile_id):
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
-    submission = Submission(profile_id=profile_id).get_all_records()
-    return render(request, 'copo/copo_submission.html',
-                  {'profile_id': profile_id, 'submission': submission, 'profile': profile})
+
+    return render(request, 'copo/copo_submission_2.html', {'profile_id': profile_id, 'profile': profile})
 
 
 @login_required

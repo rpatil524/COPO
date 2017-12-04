@@ -1,6 +1,8 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 01/12/2015'
 # this python file is for small utility functions which will be called from Javascript
 import json
+import jsonpickle
+from datetime import datetime
 from bson import json_util, ObjectId
 
 import requests
@@ -11,7 +13,7 @@ from dateutil import parser
 
 import web.apps.web_copo.lookup.lookup as ol
 from django.conf import settings
-from dal.copo_da import ProfileInfo, RemoteDataFile, Submission
+from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
@@ -51,39 +53,83 @@ def test_ontology(request):
 
 
 def get_upload_information(request):
-    submission_ids = request.GET.get('ids')
-    ids = json.loads(submission_ids)
-    # tonietuk's intercept starts
-    if not submission_ids:
-        data = {'found': False}
-        return HttpResponse(json.dumps(data))
-    # tonietuk's intercept ends
+    context = dict()
 
-    output = list()
+    ids = json.loads(request.POST.get("ids", "[]"))
+    sub_info_list = list()
 
     for id in ids:
         # get submission collection and check status
         sub = Submission().get_record(id)
-        if sub:
-            if not sub['complete'] or sub['complete'] == 'false':
-                # we are dealing with an uploading submission
-                rem = RemoteDataFile().get_by_sub_id(id)
-                if rem:
-                    speeds = rem['transfer_rate'][-30:]
-                    complete = rem['pct_completed']
-                    data = {'speeds': speeds, 'complete': complete, 'finished': False, 'found': True, 'id': id}
-                    output.append(data)
-            else:
-                # our submission has finished
-                # elapsed = str(parser.parse(sub['completed_on']) - parser.parse(sub['commenced_on']))
-                # data = {'upload_time': str(elapsed), 'completed_on': sub['completed_on'], 'article_id': sub.get('article_id'), 'finished': True, 'found': True}
-                data = {'id': id, 'status': sub['status'], 'accessions': sub['accessions'],
-                        'repo': sub['repository'], 'completed_on': sub['completed_on'].strftime("%Y-%m-%d %H:%M:%S"),
-                        'article_id': sub.get('article_id'), 'finished': True, 'found': True}
-                output.append(data)
 
-    data = {'return': output}
-    return HttpResponse(json.dumps(data))
+        sub_info_dict = dict(submission_id=id, submission_status=False)
+
+        if sub:
+            # get bundle transfer status
+            sub_info_dict["bundle_meta"] = sub.get("bundle_meta", list())
+            sub_info_dict["bundle"] = sub.get("bundle", list())
+
+            if str(sub.get("complete", False)).lower() == 'false':
+                # could we be dealing with an uploading submission?
+                rem = RemoteDataFile().get_by_sub_id(id)
+
+                # summary of files uploaded
+                sub_info_dict["uploaded_summary"] = str()
+                if sub_info_dict["bundle_meta"]:
+                    uploaded_files = [x["file_id"] for x in sub_info_dict['bundle_meta'] if x["upload_status"]]
+                    sub_info_dict["uploaded_summary"] = str(len(uploaded_files)) + "/" + str(len(
+                        sub_info_dict["bundle"])) + " datafiles uploaded"
+
+                sub_info_dict["restart_submission"] = False  # flag for stalled submission needing a restart
+
+                if rem:
+                    sub_info_dict["active_submission"] = True
+                    sub_info_dict["pct_completed"] = rem['pct_completed']
+
+                    # summary of uploaded size and rate
+                    sub_info_dict["upload_sizerate_summary"] = str()
+                    if rem['bytes_transferred'] and rem['file_size_bytes'] and rem['transfer_rate']:
+                        sub_info_dict["upload_sizerate_summary"] = str(rem['bytes_transferred']) + "/" + str(
+                            rem['file_size_bytes']) + " uploaded @ " + str(rem['transfer_rate'])
+
+                    # get current file being transferred
+                    datafile_id = rem.get("datafile_id", str())
+                    if datafile_id:
+                        sub_info_dict["datafile"] = DataFile().get_record(datafile_id).get("name", str())
+
+                    # is the transfer still active or has it stalled?
+                    # to answer this question, calculate the delta between current time and last recorded activity
+                    current_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+                    fmt = "%d-%m-%Y %H:%M:%S"
+                    tdelta = datetime.strptime(current_time, fmt) - datetime.strptime(rem['current_time'], fmt)
+                    time_threshold = 4  # acceptable threshold, after perceived inactivity,
+                    # for the submission to be classified as valid
+                    if tdelta.seconds / 60 > time_threshold:  # i.e. elapsed time = 'time_threshold' minutes
+                        sub_info_dict["active_submission"] = False
+                        sub_info_dict["submission_error"] = "Possible timeout in submission."
+
+                    # check for error
+                    if rem.get("error", str()):
+                        sub_info_dict["active_submission"] = False
+                        sub_info_dict["submission_error"] = rem["error"]
+
+                    # has the actual upload of files concluded?
+                    sub_info_dict["transfer_status"] = rem['transfer_status']
+                else:
+                    # submission was never started, or something happened along the line but we can't tell
+                    sub_info_dict["active_submission"] = False
+            else:
+                # submission has finished
+                sub_info_dict["submission_status"] = True
+                sub_info_dict["accessions"] = sub['accessions']
+                sub_info_dict["completed_on"] = sub['completed_on'].strftime('%d %b, %Y, %H:%M')
+                sub_info_dict["article_id"] = sub['article_id']
+
+            sub_info_list.append(sub_info_dict)
+
+    context["submission_information"] = sub_info_list
+    out = jsonpickle.encode(context)
+    return HttpResponse(out, content_type='application/json')
 
 
 def publish_figshare(request):

@@ -9,7 +9,6 @@ import jsonpickle
 
 
 def delegate_submission(request):
-
     # get submission object
     sub_id = request.POST.get('sub_id')
     if not sub_id:
@@ -31,7 +30,6 @@ def delegate_submission(request):
         # check figshare credentials
         if figshareSubmission.FigshareSubmit(sub_id).isValidCredentials(user_id=request.user.id):
 
-
             figshareSubmission.FigshareSubmit(sub_id).submit(
                 sub_id=sub_id,
                 dataFile_ids=sub['bundle'],
@@ -43,7 +41,7 @@ def delegate_submission(request):
             # forward to control view
             return HttpResponse(jsonpickle.dumps({'status': 1, 'url': reverse('copo:authenticate_figshare')}))
 
-    ## Submit to ENA
+    # Submit to ENA
     elif repo == 'ena':
         result = enaSubmission.EnaSubmit().submit(
             sub_id=sub_id,

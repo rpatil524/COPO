@@ -126,7 +126,7 @@
 
     <!-- Datatables row Panel template -->
     <div class="datatables-panel-template">
-        <div class="panel panel-default" style="border: none;">
+        <div class="panel panel-dtables2">
             <div class="panel-heading" style="background-image: none; border: none;">
                 <div class="row">
                     <div class="col-sm-10 col-md-10 col-lg-10 row-title">
@@ -134,7 +134,26 @@
                     <div class="col-sm-2 col-md-2 col-lg-2">
                         <div class="pull-right row-select-icon">
                             <i class="fa fa-square-o" title="Toggle record selection"
-                               style="cursor: pointer; font-size: 16px; display: block;"
+                               style="cursor: pointer; font-size: 20px; font-weight: bold; display: block;"
+                               aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">Panel Content</div>
+        </div>
+    </div>
+
+    <div class="datatables3-panel-template">
+        <div class="panel panel-dtables3">
+            <div class="panel-heading" style="background-image: none; border: none;">
+                <div class="row">
+                    <div class="col-sm-10 col-md-10 col-lg-10 row-title">
+                    </div>
+                    <div class="col-sm-2 col-md-2 col-lg-2">
+                        <div class="pull-right row-select-icon">
+                            <i class="fa fa-square-o" title="Toggle record selection"
+                               style="cursor: pointer; font-size: 20px; font-weight: bold; display: block;"
                                aria-hidden="true"></i>
                         </div>
                     </div>
@@ -184,13 +203,23 @@
         </a>
     </div>
 
+    <!-- progress bars -->
+    <div class="submission-progess-wrapper" style="margin-bottom: 15px;">
+        <div class="submission-progress progress" style="height:30px; margin-bottom: 5px; background-image: none;">
+            <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                 aria-valuemax="100"
+                 style="width: 0%; padding-top: 5px;"></div>
+        </div>
+        <div class="submission-progress-status">Submission pending</div>
+    </div>
+
     <!-- sidebar tabs -->
     <div class="copo-sidebar-templates">
         <ul class="nav nav-tabs copo-sidebar-tabs">
             <li class=" copo-sidebar-info"><a data-toggle="tab" href="#copo-sidebar-info"
-                                                    data-copo-tour-id="page_alert_panel">Info</a></li>
+                                              data-copo-tour-id="page_alert_panel">Info</a></li>
             <li class="active copo-sidebar-help"><a data-toggle="tab" href="#copo-sidebar-help"
-                                             data-copo-tour-id="page_context_help_panel">Help</a></li>
+                                                    data-copo-tour-id="page_context_help_panel">Help</a></li>
             <li class="copo-sidebar-annotate"><a data-toggle="tab" href="#copo-sidebar-annotate"
                                                  data-copo-tour-id="copo_annotation_panel">Annotate</a></li>
         </ul>
@@ -234,9 +263,9 @@
                                     <label for="ontology_filter_button">Choose Ontology</label>
                                     <div class="dropdown ontology_dropdown">
                                         <div class="medium ui basic button dropdown-toggle"
-                                                id="ontology_filter_button"
-                                                data-toggle="dropdown"
-                                                aria-haspopup="true" aria-expanded="true">
+                                             id="ontology_filter_button"
+                                             data-toggle="dropdown"
+                                             aria-haspopup="true" aria-expanded="true">
                                             <span class="ontology_label">All Ontologies</span>
                                             <span class="caret"></span>
                                         </div>

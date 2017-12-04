@@ -9,7 +9,7 @@
       },
       {
         "title": "Describing Samples",
-        "content": "Click the 'Add New Samples' button on the 'Inspect' pane. The context will be switched to 'Describe', displaying the sample description wizard. Go ahead and follow the steps in the wizard, supplying requested metadata in each step presented. Relevant tips to sample description can be found under 'Description Tips' on the 'Information Panel'."
+        "content": "Click the 'Describe' button on the 'Inspect' pane. The context will be switched to 'Describe', displaying the sample description wizard. Go ahead and follow the steps in the wizard, supplying requested metadata in each step presented. Relevant tips to sample description can be found under 'Description Tips' on the 'Information Panel'."
       }
     ]
   },

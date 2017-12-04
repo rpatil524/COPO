@@ -116,21 +116,23 @@ function do_table_buttons_events() {
         } else {
             //alert user
 
-            var okButton = '<div class="text-center alertdismissOK" style="margin-top: 15px;"><button class="mini ui orange basic button">OK</button></div>';
+            BootstrapDialog.show({
+                title: "Record action",
+                message: message,
+                cssClass: 'copo-modal3',
+                closable: false,
+                animate: true,
+                type: BootstrapDialog.TYPE_WARNING,
+                buttons: [{
+                    label: 'OK',
+                    cssClass: 'tiny ui basic orange button',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                    }
+                }]
+            });
 
-            var pop_title = '';
-            var pop_content = '<i class="fa fa-exclamation-circle" aria-hidden="true" style="color: darkorange; font-size: 15px !important; padding-right: 10px;"></i>' + message;
-            pop_content += okButton;
-            var meta_extra = {
-                width: 300,
-                placement: 'auto',
-                trigger: 'sticky',
-                backdrop: true,
-                style: '',
-                closeable: false
-            };
 
-            refresh_webpop(elem, pop_title, pop_content, meta_extra);
         }
 
     });

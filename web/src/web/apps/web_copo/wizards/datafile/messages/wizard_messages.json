@@ -134,7 +134,7 @@
       "text_class": "text-info"
     },
     "datafiles_pairing_message": {
-      "text": "<ol><li>Click on any two datafiles in the datafiles bundle you wish to pair, and confirm the pairing action</li> <li>All paired files are displayed in the 'Paired Datafiles' table</li><li>You can unpair datafiles by clicking the 'unpair' button beside a paired entry</li> Click <b>Next</b>, when done pairing all datafiles, to proceed.<br/><span style='color:#a94442;'>Please note: The description bundle has been temporarily modified to display only those datafiles that may be paired.</span> ",
+      "text": "<ol><li>Select any two datafiles in the datafiles bundle and confirm the pairing action</li> <li>All paired files are displayed in the 'Paired Datafiles' table</li><li>You can unpair datafiles by clicking the 'unpair' button beside a paired entry</li> Click <b>Next</b>, when done pairing all datafiles, to proceed.<br/><span style='color:#a94442;'>Please note: The description bundle has been temporarily modified to display only those datafiles that may be paired.</span> ",
       "text_class": "text-info"
     },
     "singular_stage_message": {

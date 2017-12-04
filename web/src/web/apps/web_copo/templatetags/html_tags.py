@@ -364,6 +364,42 @@ def generate_copo_profiles_data(profiles=list()):
     return return_dict
 
 
+@register.filter("generate_submission_accessions_data")
+def generate_submission_accessions_data(submission_record):
+    """
+    method presents accession data in a tabular display friendly way
+    great care should be taken here to manipulate accessions from different repositories,
+    as they might be stored differently
+    :param submission_record:
+    :return:
+    """
+    columns = list()
+    data_set = list()
+    accessions = submission_record.get("accessions", dict())
+    repository = submission_record.get("repository", str())
+
+    if accessions:
+        if repository == "ena":
+            columns = [{"title": "Accession"}, {"title": "Alias"}, {"title": "Comment"}, {"title": "Type"}]
+
+            for key, value in accessions.items():
+                if isinstance(value, dict):  # single accession instance expected
+                    data_set.append([value["accession"], value["alias"], str(), key])
+                elif isinstance(value, list):  # multiple accession instances expected
+                    for v in value:
+                        if key == "sample":
+                            data_set.append([v["sample_accession"], v["sample_alias"], v["biosample_accession"], key])
+                        else:
+                            data_set.append([v["accession"], v["alias"], str(), key])
+
+    return_dict = dict(dataSet=data_set,
+                       columns=columns,
+                       repository=repository
+                       )
+
+    return return_dict
+
+
 @register.filter("generate_attributes")
 def generate_attributes(component, target_id):
     da_object = DAComponent(component=component)
@@ -468,6 +504,7 @@ def get_resolver(data, elem):
     func_map["datafile-description"] = resolve_description_data
     func_map["date-picker"] = resolve_datepicker_data
     func_map["copo-duration"] = resolve_copo_duration_data
+    func_map["copo-datafile-id"] = resolve_copo_datafile_id_data
 
     if elem["control"].lower() in func_map:
         resolved_data = func_map[elem["control"].lower()](data, elem)
@@ -674,7 +711,7 @@ def resolve_copo_select_data(data, elem):
 def resolve_datetime_data(data, elem):
     resolved_value = str()
     if data:
-        resolved_value = data.strftime('%d %b, %Y, %H:%M:%S')
+        resolved_value = data.strftime('%d %b, %Y, %H:%M')
     return resolved_value
 
 
@@ -696,6 +733,19 @@ def resolve_copo_duration_data(data, elem):
             if f["id"].split(".")[-1] in data:
                 # a[f["label"]] = data[f["id"].split(".")[-1]]
                 resolved_data.append(f["label"] + ": " + data[f["id"].split(".")[-1]])
+
+    return resolved_data
+
+
+def resolve_copo_datafile_id_data(data, elem):
+    resolved_data = dict()
+
+    da_object = DAComponent(component="datafile")
+
+    if data:
+        datafile = da_object.get_record(data)
+        resolved_data["recordLabel"] = datafile.get("name", str())
+        resolved_data["recordID"] = data
 
     return resolved_data
 

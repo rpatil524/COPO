@@ -41,7 +41,13 @@
       "ref": "",
       "type": "string",
       "show_in_table": true,
-      "control": "text"
+      "control": "select",
+      "option_values": {
+        "callback": {
+          "function": "get_repository_options",
+          "parameter": ""
+        }
+      }
     },
     {
       "help_tip": "",
@@ -51,10 +57,29 @@
       "versions": [
         "bundle"
       ],
-      "description": "A list of datafiles (ids) to be submitted.",
+      "description": "A list of datafiles making up a submission.",
       "deprecated": false,
       "hidden": "false",
       "id": "copo.submission.bundle",
+      "label": "Bundle Items",
+      "show_in_form": true,
+      "ref": "",
+      "type": "array",
+      "show_in_table": true,
+      "control": "copo-datafile-id"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "bundle_meta"
+      ],
+      "description": "A list of datafiles making up a submission - richer context alternative.",
+      "deprecated": false,
+      "hidden": "false",
+      "id": "copo.submission.bundle_meta",
       "label": "Bundle Items",
       "show_in_form": true,
       "ref": "",

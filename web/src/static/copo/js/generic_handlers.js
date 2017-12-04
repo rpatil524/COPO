@@ -1220,7 +1220,7 @@ function get_profile_components() {
             sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
             tableID: 'copo_profiles_table',
             visibleColumns: 3,
-            recordActions: ["add_record_all", "edit_record_single", "delete_record_multi"] //specifies action buttons for records manipulation
+            recordActions: ["add_record_all", "edit_record_single"] //specifies action buttons for records manipulation
         },
         {
             component: 'sample',
@@ -1233,7 +1233,7 @@ function get_profile_components() {
             colorClass: "samples_color",
             color: "olive",
             tableID: 'sample_table',
-            recordActions: ["describe_record_all", "edit_record_single", "delete_record_multi"],
+            recordActions: ["describe_record_all", "edit_record_single"],
             visibleColumns: 3 //no of columns to be displayed, if tabular data is required. remaining columns will be displayed in a sub-table
         },
         {
@@ -1247,7 +1247,7 @@ function get_profile_components() {
             buttons: ["quick-tour-template"],
             sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
             tableID: 'datafile_table',
-            recordActions: ["describe_record_multi", "undescribe_record_multi", "delete_datafiles_multi"],
+            recordActions: ["describe_record_multi", "undescribe_record_multi"],
             visibleColumns: 3
         },
         {
@@ -1261,7 +1261,7 @@ function get_profile_components() {
             colorClass: "submissions_color",
             color: "green",
             tableID: 'submission_table',
-            recordActions: ["summarise_record_single"],
+            recordActions: [],
             visibleColumns: 3
         },
         {
@@ -2066,7 +2066,7 @@ function quick_tour_messages() {
             },
             "profile_table": {
                 "title": "Profile Records",
-                "content": "Profile records list.<ol><li>Click the <span class='fa-stack' style='color:green; font-size:10px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> button beside a record to view details</li><li>Click on a column header to sort by the column</li><li>Use the table search tool to filter the displayed list based on matched terms</li></ol>"
+                "content": "Profile records list.<ol><li>Click on any component (e.g., Samples) within a profile to access any particular component's page</li><li>Use the action buttons (e.g., Select all, Add) to interact with profile records</li><li>Use the profile search control to display a filtered listing of records, based on matched terms</li></ol>"
             },
             "new_publication_button": {
                 "title": "Create New Publication",

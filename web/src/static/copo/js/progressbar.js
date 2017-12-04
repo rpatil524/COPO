@@ -1,13 +1,9 @@
-// ProgressBar.js 0.9.0
-// https://kimmobrunfeldt.github.io/progressbar.js
-// License: MIT
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ProgressBar = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-/*! shifty - v1.5.0 - 2015-05-31 - http://jeremyckahn.github.io/shifty */
-  (function () {
-    var root = this;
+/* shifty - v1.5.3 - 2016-11-29 - http://jeremyckahn.github.io/shifty */
+;(function () {
+  var root = this || Function('return this')();
 
-/*!
+/**
  * Shifty Core
  * By Jeremy Kahn - jeremyckahn@gmail.com
  */
@@ -49,12 +45,13 @@ var Tweenable = (function () {
     // NOOP!
   }
 
-  /*!
+  /**
    * Handy shortcut for doing a for-in loop. This is not a "normal" each
    * function, it is optimized for Shifty.  The iterator function only receives
    * the property name, not the value.
    * @param {Object} obj
    * @param {Function(string)} fn
+   * @private
    */
   function each (obj, fn) {
     var key;
@@ -65,11 +62,12 @@ var Tweenable = (function () {
     }
   }
 
-  /*!
+  /**
    * Perform a shallow copy of Object properties.
    * @param {Object} targetObject The object to copy into
    * @param {Object} srcObject The object to copy from
    * @return {Object} A reference to the augmented `targetObj` Object
+   * @private
    */
   function shallowCopy (targetObj, srcObj) {
     each(srcObj, function (prop) {
@@ -79,11 +77,12 @@ var Tweenable = (function () {
     return targetObj;
   }
 
-  /*!
+  /**
    * Copies each property from src onto target, but only if the property to
    * copy to target is undefined.
    * @param {Object} target Missing properties in this Object are filled in
    * @param {Object} src
+   * @private
    */
   function defaults (target, src) {
     each(src, function (prop) {
@@ -93,7 +92,7 @@ var Tweenable = (function () {
     });
   }
 
-  /*!
+  /**
    * Calculates the interpolated tween values of an Object for a given
    * timestamp.
    * @param {Number} forPosition The position to compute the state for.
@@ -106,6 +105,7 @@ var Tweenable = (function () {
    * @param {number} timestamp: The UNIX epoch time at which the tween began.
    * @param {Object} easing: This Object's keys must correspond to the keys in
    * targetState.
+   * @private
    */
   function tweenProps (forPosition, currentState, originalState, targetState,
     duration, timestamp, easing) {
@@ -135,7 +135,7 @@ var Tweenable = (function () {
     return currentState;
   }
 
-  /*!
+  /**
    * Tweens a single property.
    * @param {number} start The value that the tween started from.
    * @param {number} end The value that the tween should end at.
@@ -143,16 +143,18 @@ var Tweenable = (function () {
    * @param {number} position The normalized position (between 0.0 and 1.0) to
    * calculate the midpoint of 'start' and 'end' against.
    * @return {number} The tweened value.
+   * @private
    */
   function tweenProp (start, end, easingFunc, position) {
     return start + (end - start) * easingFunc(position);
   }
 
-  /*!
+  /**
    * Applies a filter to Tweenable instance.
    * @param {Tweenable} tweenable The `Tweenable` instance to call the filter
    * upon.
    * @param {String} filterName The name of the filter to apply.
+   * @private
    */
   function applyFilter (tweenable, filterName) {
     var filters = Tweenable.prototype.filter;
@@ -169,7 +171,7 @@ var Tweenable = (function () {
   var timeoutHandler_currentTime;
   var timeoutHandler_isEnded;
   var timeoutHandler_offset;
-  /*!
+  /**
    * Handles the update logic for one step of a tween.
    * @param {Tweenable} tweenable
    * @param {number} timestamp
@@ -183,6 +185,7 @@ var Tweenable = (function () {
    * @param {Function(Function,number)}} schedule
    * @param {number=} opt_currentTimeOverride Needed for accurate timestamp in
    * Tweenable#seek.
+   * @private
    */
   function timeoutHandler (tweenable, timestamp, delay, duration, currentState,
     originalState, targetState, easing, step, schedule,
@@ -199,38 +202,42 @@ var Tweenable = (function () {
     timeoutHandler_offset = duration - (
       timeoutHandler_endTime - timeoutHandler_currentTime);
 
-    if (tweenable.isPlaying() && !timeoutHandler_isEnded) {
-      tweenable._scheduleId = schedule(tweenable._timeoutHandler, UPDATE_TIME);
-
-      applyFilter(tweenable, 'beforeTween');
-
-      // If the animation has not yet reached the start point (e.g., there was
-      // delay that has not yet completed), just interpolate the starting
-      // position of the tween.
-      if (timeoutHandler_currentTime < (timestamp + delay)) {
-        tweenProps(1, currentState, originalState, targetState, 1, 1, easing);
+    if (tweenable.isPlaying()) {
+      if (timeoutHandler_isEnded) {
+        step(targetState, tweenable._attachment, timeoutHandler_offset);
+        tweenable.stop(true);
       } else {
-        tweenProps(timeoutHandler_currentTime, currentState, originalState,
-          targetState, duration, timestamp + delay, easing);
+        tweenable._scheduleId =
+          schedule(tweenable._timeoutHandler, UPDATE_TIME);
+
+        applyFilter(tweenable, 'beforeTween');
+
+        // If the animation has not yet reached the start point (e.g., there was
+        // delay that has not yet completed), just interpolate the starting
+        // position of the tween.
+        if (timeoutHandler_currentTime < (timestamp + delay)) {
+          tweenProps(1, currentState, originalState, targetState, 1, 1, easing);
+        } else {
+          tweenProps(timeoutHandler_currentTime, currentState, originalState,
+            targetState, duration, timestamp + delay, easing);
+        }
+
+        applyFilter(tweenable, 'afterTween');
+
+        step(currentState, tweenable._attachment, timeoutHandler_offset);
       }
-
-      applyFilter(tweenable, 'afterTween');
-
-      step(currentState, tweenable._attachment, timeoutHandler_offset);
-    } else if (tweenable.isPlaying() && timeoutHandler_isEnded) {
-      step(targetState, tweenable._attachment, timeoutHandler_offset);
-      tweenable.stop(true);
     }
   }
 
 
-  /*!
+  /**
    * Creates a usable easing Object from a string, a function or another easing
    * Object.  If `easing` is an Object, then this function clones it and fills
    * in the missing properties with `"linear"`.
    * @param {Object.<string|Function>} fromTweenParams
    * @param {Object|string|Function} easing
    * @return {Object.<string|Function>}
+   * @private
    */
   function composeEasingObject (fromTweenParams, easing) {
     var composedEasing = {};
@@ -344,9 +351,9 @@ var Tweenable = (function () {
     this._step = config.step || noop;
     this._finish = config.finish || noop;
     this._duration = config.duration || DEFAULT_DURATION;
-    this._currentState = shallowCopy({}, config.from) || this.get();
+    this._currentState = shallowCopy({}, config.from || this.get());
     this._originalState = this.get();
-    this._targetState = shallowCopy({}, config.to) || this.get();
+    this._targetState = shallowCopy({}, config.to || this.get());
 
     var self = this;
     this._timeoutHandler = function () {
@@ -550,9 +557,10 @@ var Tweenable = (function () {
     }
   };
 
-  /*!
+  /**
    * Filters are used for transforming the properties of a tween at various
    * points in a Tweenable's life cycle.  See the README for more info on this.
+   * @private
    */
   Tweenable.prototype.filter = {};
 
@@ -622,8 +630,9 @@ var Tweenable = (function () {
  *  Easing Equations (c) 2003 Robert Penner, all rights reserved.
  */
 
-(function () {
-      Tweenable.shallowCopy(Tweenable.prototype.formula, {
+;(function () {
+
+  Tweenable.shallowCopy(Tweenable.prototype.formula, {
     easeInQuad: function (pos) {
       return Math.pow(pos, 2);
     },
@@ -809,7 +818,7 @@ var Tweenable = (function () {
 }());
 
 // jshint maxlen:100
-/*!
+/**
  * The Bezier magic in this file is adapted/copied almost wholesale from
  * [Scripty2](https://github.com/madrobby/scripty2/blob/master/src/effects/transitions/cubic-bezier.js),
  * which was adapted from Apple code (which probably came from
@@ -817,7 +826,7 @@ var Tweenable = (function () {
  * Special thanks to Apple and Thomas Fuchs for much of this code.
  */
 
-/*!
+/**
  *  Copyright (c) 2006 Apple Computer, Inc. All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -846,8 +855,8 @@ var Tweenable = (function () {
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-    (function () {
-      // port of webkit cubic bezier handling by http://www.netzgesta.de/dev/
+;(function () {
+  // port of webkit cubic bezier handling by http://www.netzgesta.de/dev/
   function cubicBezierAtTime(t,p1x,p1y,p2x,p2y,duration) {
     var ax = 0,bx = 0,cx = 0,ay = 0,by = 0,cy = 0;
     function sampleCurveX(t) {
@@ -916,7 +925,7 @@ var Tweenable = (function () {
     ay = 1.0 - cy - by;
     return solve(t, solveEpsilon(duration));
   }
-  /*!
+  /**
    *  getCubicBezierTransition(x1, y1, x2, y2) -> Function
    *
    *  Generates a transition easing function that is compatible
@@ -931,6 +940,7 @@ var Tweenable = (function () {
    *  @param {number} x2
    *  @param {number} y2
    *  @return {function}
+   *  @private
    */
   function getCubicBezierTransition (x1, y1, x2, y2) {
     return function (pos) {
@@ -984,8 +994,9 @@ var Tweenable = (function () {
 
 })();
 
-(function () {
-      function getInterpolatedValues (
+;(function () {
+
+  function getInterpolatedValues (
     from, current, targetState, position, easing, delay) {
     return Tweenable.tweenProps(
       position, current, from, targetState, 1, delay, easing);
@@ -1202,13 +1213,14 @@ var Tweenable = (function () {
 // documentation and renders it.  It is never used, and is optimized away at
 // build time.
 
-(function (Tweenable) {
+;(function (Tweenable) {
 
-      /*!
+  /**
    * @typedef {{
    *   formatString: string
    *   chunkNames: Array.<string>
    * }}
+   * @private
    */
   var formatManifest;
 
@@ -1227,11 +1239,12 @@ var Tweenable = (function () {
 
   // HELPERS
 
-  /*!
+  /**
    * @param {Array.number} rawValues
    * @param {string} prefix
    *
    * @return {Array.<string>}
+   * @private
    */
   function getFormatChunksFrom (rawValues, prefix) {
     var accumulator = [];
@@ -1246,10 +1259,11 @@ var Tweenable = (function () {
     return accumulator;
   }
 
-  /*!
+  /**
    * @param {string} formattedString
    *
    * @return {string}
+   * @private
    */
   function getFormatStringFrom (formattedString) {
     var chunks = formattedString.match(R_FORMAT_CHUNKS);
@@ -1266,7 +1280,7 @@ var Tweenable = (function () {
     } else if (chunks.length === 1 ||
       // ...or if the string starts with a number component (".", "-", or a
       // digit)...
-    formattedString[0].match(R_NUMBER_COMPONENT)) {
+    formattedString.charAt(0).match(R_NUMBER_COMPONENT)) {
       // ...prepend an empty string here to make sure that the formatted number
       // is properly replaced by VALUE_PLACEHOLDER
       chunks.unshift('');
@@ -1275,12 +1289,13 @@ var Tweenable = (function () {
     return chunks.join(VALUE_PLACEHOLDER);
   }
 
-  /*!
+  /**
    * Convert all hex color values within a string to an rgb string.
    *
    * @param {Object} stateObject
    *
    * @return {Object} The modified obj
+   * @private
    */
   function sanitizeObjectForHexProps (stateObject) {
     Tweenable.each(stateObject, function (prop) {
@@ -1292,19 +1307,21 @@ var Tweenable = (function () {
     });
   }
 
-  /*!
+  /**
    * @param {string} str
    *
    * @return {string}
+   * @private
    */
   function  sanitizeHexChunksToRGB (str) {
     return filterStringChunks(R_HEX, str, convertHexToRGB);
   }
 
-  /*!
+  /**
    * @param {string} hexString
    *
    * @return {string}
+   * @private
    */
   function convertHexToRGB (hexString) {
     var rgbArr = hexToRGBArray(hexString);
@@ -1312,7 +1329,7 @@ var Tweenable = (function () {
   }
 
   var hexToRGBArray_returnArray = [];
-  /*!
+  /**
    * Convert a hexadecimal string to an array with three items, one each for
    * the red, blue, and green decimal values.
    *
@@ -1320,6 +1337,7 @@ var Tweenable = (function () {
    *
    * @returns {Array.<number>} The converted Array of RGB values if `hex` is a
    * valid string, or an Array of three 0's.
+   * @private
    */
   function hexToRGBArray (hex) {
 
@@ -1339,18 +1357,19 @@ var Tweenable = (function () {
     return hexToRGBArray_returnArray;
   }
 
-  /*!
+  /**
    * Convert a base-16 number to base-10.
    *
    * @param {Number|String} hex The value to convert
    *
    * @returns {Number} The base-10 equivalent of `hex`.
+   * @private
    */
   function hexToDec (hex) {
     return parseInt(hex, 16);
   }
 
-  /*!
+  /**
    * Runs a filter operation on all chunks of a string that match a RegExp
    *
    * @param {RegExp} pattern
@@ -1358,6 +1377,7 @@ var Tweenable = (function () {
    * @param {function(string)} filter
    *
    * @return {string}
+   * @private
    */
   function filterStringChunks (pattern, unfilteredString, filter) {
     var pattenMatches = unfilteredString.match(pattern);
@@ -1377,21 +1397,23 @@ var Tweenable = (function () {
     return filteredString;
   }
 
-  /*!
+  /**
    * Check for floating point values within rgb strings and rounds them.
    *
    * @param {string} formattedString
    *
    * @return {string}
+   * @private
    */
   function sanitizeRGBChunks (formattedString) {
     return filterStringChunks(R_RGB, formattedString, sanitizeRGBChunk);
   }
 
-  /*!
+  /**
    * @param {string} rgbChunk
    *
    * @return {string}
+   * @private
    */
   function sanitizeRGBChunk (rgbChunk) {
     var numbers = rgbChunk.match(R_UNFORMATTED_VALUES);
@@ -1407,11 +1429,12 @@ var Tweenable = (function () {
     return sanitizedString;
   }
 
-  /*!
+  /**
    * @param {Object} stateObject
    *
    * @return {Object} An Object of formatManifests that correspond to
    * the string properties of stateObject
+   * @private
    */
   function getFormatManifests (stateObject) {
     var manifestAccumulator = {};
@@ -1432,9 +1455,10 @@ var Tweenable = (function () {
     return manifestAccumulator;
   }
 
-  /*!
+  /**
    * @param {Object} stateObject
    * @param {Object} formatManifests
+   * @private
    */
   function expandFormattedProperties (stateObject, formatManifests) {
     Tweenable.each(formatManifests, function (prop) {
@@ -1450,9 +1474,10 @@ var Tweenable = (function () {
     });
   }
 
-  /*!
+  /**
    * @param {Object} stateObject
    * @param {Object} formatManifests
+   * @private
    */
   function collapseFormattedProperties (stateObject, formatManifests) {
     Tweenable.each(formatManifests, function (prop) {
@@ -1467,11 +1492,12 @@ var Tweenable = (function () {
     });
   }
 
-  /*!
+  /**
    * @param {Object} stateObject
    * @param {Array.<string>} chunkNames
    *
    * @return {Object} The extracted value chunks.
+   * @private
    */
   function extractPropertyChunks (stateObject, chunkNames) {
     var extractedValues = {};
@@ -1487,11 +1513,12 @@ var Tweenable = (function () {
   }
 
   var getValuesList_accumulator = [];
-  /*!
+  /**
    * @param {Object} stateObject
    * @param {Array.<string>} chunkNames
    *
    * @return {Array.<number>}
+   * @private
    */
   function getValuesList (stateObject, chunkNames) {
     getValuesList_accumulator.length = 0;
@@ -1504,11 +1531,12 @@ var Tweenable = (function () {
     return getValuesList_accumulator;
   }
 
-  /*!
+  /**
    * @param {string} formatString
    * @param {Array.<number>} rawValues
    *
    * @return {string}
+   * @private
    */
   function getFormattedValues (formatString, rawValues) {
     var formattedValueString = formatString;
@@ -1522,21 +1550,23 @@ var Tweenable = (function () {
     return formattedValueString;
   }
 
-  /*!
+  /**
    * Note: It's the duty of the caller to convert the Array elements of the
    * return value into numbers.  This is a performance optimization.
    *
    * @param {string} formattedString
    *
    * @return {Array.<string>|null}
+   * @private
    */
   function getValuesFrom (formattedString) {
     return formattedString.match(R_UNFORMATTED_VALUES);
   }
 
-  /*!
+  /**
    * @param {Object} easingObject
    * @param {Object} tokenData
+   * @private
    */
   function expandEasingObject (easingObject, tokenData) {
     Tweenable.each(tokenData, function (prop) {
@@ -1565,9 +1595,10 @@ var Tweenable = (function () {
     });
   }
 
-  /*!
+  /**
    * @param {Object} easingObject
    * @param {Object} tokenData
+   * @private
    */
   function collapseEasingObject (easingObject, tokenData) {
     Tweenable.each(tokenData, function (prop) {
@@ -1634,6 +1665,8 @@ var Circle = function Circle(container, options) {
         ' a {radius},{radius} 0 1 1 0,{2radius}' +
         ' a {radius},{radius} 0 1 1 0,-{2radius}';
 
+    this.containerAspectRatio = 1;
+
     Shape.apply(this, arguments);
 };
 
@@ -1660,7 +1693,7 @@ Circle.prototype._trailString = function _trailString(opts) {
 
 module.exports = Circle;
 
-},{"./shape":7,"./utils":8}],3:[function(require,module,exports){
+},{"./shape":7,"./utils":9}],3:[function(require,module,exports){
 // Line shaped progress bar
 
 var Shape = require('./shape');
@@ -1691,12 +1724,13 @@ Line.prototype._trailString = function _trailString(opts) {
 
 module.exports = Line;
 
-},{"./shape":7,"./utils":8}],4:[function(require,module,exports){
+},{"./shape":7,"./utils":9}],4:[function(require,module,exports){
 module.exports = {
     // Higher level API, different shaped progress bars
     Line: require('./line'),
     Circle: require('./circle'),
     SemiCircle: require('./semicircle'),
+    Square: require('./square'),
 
     // Lower level API to use any SVG path
     Path: require('./path'),
@@ -1710,7 +1744,7 @@ module.exports = {
     utils: require('./utils')
 };
 
-},{"./circle":2,"./line":3,"./path":5,"./semicircle":6,"./shape":7,"./utils":8}],5:[function(require,module,exports){
+},{"./circle":2,"./line":3,"./path":5,"./semicircle":6,"./shape":7,"./square":8,"./utils":9}],5:[function(require,module,exports){
 // Lower level API to animate any kind of svg path
 
 var Tweenable = require('shifty');
@@ -1723,6 +1757,11 @@ var EASING_ALIASES = {
 };
 
 var Path = function Path(path, opts) {
+    // Throw a better error if not initialized with `new` keyword
+    if (!(this instanceof Path)) {
+        throw new Error('Constructor was called without new keyword');
+    }
+
     // Default parameters for animation
     opts = utils.extend({
         duration: 800,
@@ -1865,7 +1904,6 @@ Path.prototype._calculateTo = function _calculateTo(progress, easing) {
 Path.prototype._stopTween = function _stopTween() {
     if (this._tweenable !== null) {
         this._tweenable.stop();
-        this._tweenable.dispose();
         this._tweenable = null;
     }
 };
@@ -1880,7 +1918,7 @@ Path.prototype._easing = function _easing(easing) {
 
 module.exports = Path;
 
-},{"./utils":8,"shifty":1}],6:[function(require,module,exports){
+},{"./utils":9,"shifty":1}],6:[function(require,module,exports){
 // Semi-SemiCircle shaped progress bar
 
 var Shape = require('./shape');
@@ -1894,6 +1932,8 @@ var SemiCircle = function SemiCircle(container, options) {
         'M 50,50 m -{radius},0' +
         ' a {radius},{radius} 0 1 1 {2radius},0';
 
+    this.containerAspectRatio = 2;
+
     Shape.apply(this, arguments);
 };
 
@@ -1904,20 +1944,20 @@ SemiCircle.prototype._initializeSvg = function _initializeSvg(svg, opts) {
     svg.setAttribute('viewBox', '0 0 100 50');
 };
 
-SemiCircle.prototype._initializeTextElement = function _initializeTextElement(
+SemiCircle.prototype._initializeTextContainer = function _initializeTextContainer(
     opts,
     container,
-    element
+    textContainer
 ) {
     if (opts.text.style) {
         // Reset top style
-        element.style.top = 'auto';
+        textContainer.style.top = 'auto';
+        textContainer.style.bottom = '0';
 
-        element.style.bottom = '0';
         if (opts.text.alignToBottom) {
-            utils.setStyle(element, 'transform', 'translate(-50%, 0)');
+            utils.setStyle(textContainer, 'transform', 'translate(-50%, 0)');
         } else {
-            utils.setStyle(element, 'transform', 'translate(-50%, 50%)');
+            utils.setStyle(textContainer, 'transform', 'translate(-50%, 50%)');
         }
     }
 };
@@ -1928,7 +1968,7 @@ SemiCircle.prototype._trailString = Circle.prototype._trailString;
 
 module.exports = SemiCircle;
 
-},{"./circle":2,"./shape":7,"./utils":8}],7:[function(require,module,exports){
+},{"./circle":2,"./shape":7,"./utils":9}],7:[function(require,module,exports){
 // Base object for different progress bar shapes
 
 var Path = require('./path');
@@ -1973,15 +2013,26 @@ var Shape = function Shape(container, opts) {
                     value: 'translate(-50%, -50%)'
                 }
             },
+            autoStyleContainer: true,
             alignToBottom: true,
-            value: '',
+            value: null,
             className: 'progressbar-text'
         },
         svgStyle: {
             display: 'block',
             width: '100%'
-        }
+        },
+        warnings: false
     }, opts, true);  // Use recursive extend
+
+    // If user specifies e.g. svgStyle or text style, the whole object
+    // should replace the defaults to make working with styles easier
+    if (utils.isObject(opts) && opts.svgStyle !== undefined) {
+        this._opts.svgStyle = opts.svgStyle;
+    }
+    if (utils.isObject(opts) && utils.isObject(opts.text) && opts.text.style !== undefined) {
+        this._opts.text.style = opts.text.style;
+    }
 
     var svgView = this._createSvgView(this._opts);
 
@@ -1998,28 +2049,29 @@ var Shape = function Shape(container, opts) {
 
     this._container = element;
     this._container.appendChild(svgView.svg);
+    if (this._opts.warnings) {
+        this._warnContainerAspectRatio(this._container);
+    }
 
     if (this._opts.svgStyle) {
         utils.setStyles(svgView.svg, this._opts.svgStyle);
-    }
-
-    this.text = null;
-    if (this._opts.text.value) {
-        this.text = this._createTextElement(this._opts, this._container);
-        this._container.appendChild(this.text);
     }
 
     // Expose public attributes before Path initialization
     this.svg = svgView.svg;
     this.path = svgView.path;
     this.trail = svgView.trail;
-    // this.text is also a public attribute
+    this.text = null;
 
     var newOpts = utils.extend({
         attachment: undefined,
         shape: this
     }, this._opts);
     this._progressPath = new Path(svgView.path, newOpts);
+
+    if (utils.isObject(this._opts.text) && this._opts.text.value !== null) {
+        this.setText(this._opts.text.value);
+    }
 };
 
 Shape.prototype.animate = function animate(progress, opts, cb) {
@@ -2081,20 +2133,24 @@ Shape.prototype.value = function value() {
     return this._progressPath.value();
 };
 
-Shape.prototype.setText = function setText(text) {
+Shape.prototype.setText = function setText(newText) {
     if (this._progressPath === null) {
         throw new Error(DESTROYED_ERROR);
     }
 
     if (this.text === null) {
         // Create new text node
-        this.text = this._createTextElement(this._opts, this._container);
+        this.text = this._createTextContainer(this._opts, this._container);
         this._container.appendChild(this.text);
     }
 
-    // Remove previous text node and add new
-    this.text.removeChild(this.text.firstChild);
-    this.text.appendChild(document.createTextNode(text));
+    // Remove previous text and add new
+    if (utils.isObject(newText)) {
+        utils.removeChildren(this.text);
+        this.text.appendChild(newText);
+    } else {
+        this.text.innerHTML = newText;
+    }
 };
 
 Shape.prototype._createSvgView = function _createSvgView(opts) {
@@ -2168,30 +2224,29 @@ Shape.prototype._createPathElement = function _createPathElement(pathString, opt
     return path;
 };
 
-Shape.prototype._createTextElement = function _createTextElement(opts, container) {
-    var element = document.createElement('p');
-    element.appendChild(document.createTextNode(opts.text.value));
+Shape.prototype._createTextContainer = function _createTextContainer(opts, container) {
+    var textContainer = document.createElement('div');
+    textContainer.className = opts.text.className;
 
     var textStyle = opts.text.style;
     if (textStyle) {
-        container.style.position = 'relative';
+        if (opts.text.autoStyleContainer) {
+            container.style.position = 'relative';
+        }
 
-        utils.setStyles(element, textStyle);
-
+        utils.setStyles(textContainer, textStyle);
         // Default text color to progress bar's color
         if (!textStyle.color) {
-            element.style.color = opts.color;
+            textContainer.style.color = opts.color;
         }
     }
 
-    element.className = opts.text.className;
-
-    this._initializeTextElement(opts, container, element);
-    return element;
+    this._initializeTextContainer(opts, container, textContainer);
+    return textContainer;
 };
 
 // Give custom shapes possibility to modify text element
-Shape.prototype._initializeTextElement = function _initializeTextElement(opts, container, element) {
+Shape.prototype._initializeTextContainer = function(opts, container, element) {
     // By default, no-op
     // Custom shapes should respect API options, such as text.style
 };
@@ -2204,12 +2259,93 @@ Shape.prototype._trailString = function _trailString(opts) {
     throw new Error('Override this function for each progress bar');
 };
 
+Shape.prototype._warnContainerAspectRatio = function _warnContainerAspectRatio(container) {
+    if (!this.containerAspectRatio) {
+        return;
+    }
+
+    var computedStyle = window.getComputedStyle(container, null);
+    var width = parseFloat(computedStyle.getPropertyValue('width'), 10);
+    var height = parseFloat(computedStyle.getPropertyValue('height'), 10);
+    if (!utils.floatEquals(this.containerAspectRatio, width / height)) {
+        console.warn(
+            'Incorrect aspect ratio of container',
+            '#' + container.id,
+            'detected:',
+            computedStyle.getPropertyValue('width') + '(width)',
+            '/',
+            computedStyle.getPropertyValue('height') + '(height)',
+            '=',
+            width / height
+        );
+
+        console.warn(
+            'Aspect ratio of should be',
+            this.containerAspectRatio
+        );
+    }
+};
+
 module.exports = Shape;
 
-},{"./path":5,"./utils":8}],8:[function(require,module,exports){
+},{"./path":5,"./utils":9}],8:[function(require,module,exports){
+// Square shaped progress bar
+// Note: Square is not core part of API anymore. It's left here
+//       for reference. square is not included to the progressbar
+//       build anymore
+
+var Shape = require('./shape');
+var utils = require('./utils');
+
+var Square = function Square(container, options) {
+    this._pathTemplate =
+        'M 0,{halfOfStrokeWidth}' +
+        ' L {width},{halfOfStrokeWidth}' +
+        ' L {width},{width}' +
+        ' L {halfOfStrokeWidth},{width}' +
+        ' L {halfOfStrokeWidth},{strokeWidth}';
+
+    this._trailTemplate =
+        'M {startMargin},{halfOfStrokeWidth}' +
+        ' L {width},{halfOfStrokeWidth}' +
+        ' L {width},{width}' +
+        ' L {halfOfStrokeWidth},{width}' +
+        ' L {halfOfStrokeWidth},{halfOfStrokeWidth}';
+
+    Shape.apply(this, arguments);
+};
+
+Square.prototype = new Shape();
+Square.prototype.constructor = Square;
+
+Square.prototype._pathString = function _pathString(opts) {
+    var w = 100 - opts.strokeWidth / 2;
+
+    return utils.render(this._pathTemplate, {
+        width: w,
+        strokeWidth: opts.strokeWidth,
+        halfOfStrokeWidth: opts.strokeWidth / 2
+    });
+};
+
+Square.prototype._trailString = function _trailString(opts) {
+    var w = 100 - opts.strokeWidth / 2;
+
+    return utils.render(this._trailTemplate, {
+        width: w,
+        strokeWidth: opts.strokeWidth,
+        halfOfStrokeWidth: opts.strokeWidth / 2,
+        startMargin: opts.strokeWidth / 2 - opts.trailWidth / 2
+    });
+};
+
+module.exports = Square;
+
+},{"./shape":7,"./utils":9}],9:[function(require,module,exports){
 // Utility functions
 
 var PREFIXES = 'Webkit Moz O ms'.split(' ');
+var FLOAT_COMPARISON_EPSILON = 0.001;
 
 // Copy all attributes from source object to destination object.
 // destination object is mutated.
@@ -2255,12 +2391,14 @@ function render(template, vars) {
 }
 
 function setStyle(element, style, value) {
+    var elStyle = element.style;  // cache for performance
+
     for (var i = 0; i < PREFIXES.length; ++i) {
         var prefix = PREFIXES[i];
-        element.style[prefix + capitalize(style)] = value;
+        elStyle[prefix + capitalize(style)] = value;
     }
 
-    element.style[style] = value;
+    elStyle[style] = value;
 }
 
 function setStyles(element, styles) {
@@ -2317,6 +2455,17 @@ function forEachObject(object, callback) {
     }
 }
 
+function floatEquals(a, b) {
+    return Math.abs(a - b) < FLOAT_COMPARISON_EPSILON;
+}
+
+// https://coderwall.com/p/nygghw/don-t-use-innerhtml-to-empty-dom-elements
+function removeChildren(el) {
+    while (el.firstChild) {
+        el.removeChild(el.firstChild);
+    }
+}
+
 module.exports = {
     extend: extend,
     render: render,
@@ -2326,7 +2475,9 @@ module.exports = {
     isString: isString,
     isFunction: isFunction,
     isObject: isObject,
-    forEachObject: forEachObject
+    forEachObject: forEachObject,
+    floatEquals: floatEquals,
+    removeChildren: removeChildren
 };
 
 },{}]},{},[4])(4)

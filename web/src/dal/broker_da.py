@@ -117,12 +117,12 @@ class BrokerDA:
         # if ever it was needed to re-implement 'soft' delete uncomment the following lines and
         # comment out the 'hard' delete query
 
-        # self.da_object.get_collection_handle().update_many(
-        #     {"_id": {"$in": target_ids}}, {"$set": {"deleted": d_utils.get_deleted_flag()}}
-        # )
+        self.da_object.get_collection_handle().update_many(
+            {"_id": {"$in": target_ids}}, {"$set": {"deleted": d_utils.get_deleted_flag()}}
+        )
 
         # hard delete
-        self.da_object.get_collection_handle().remove({'_id': {'$in': target_ids}})
+        # self.da_object.get_collection_handle().remove({'_id': {'$in': target_ids}})
 
         self.context = self.broker_visuals.do_table_data()
         return self.context
@@ -178,6 +178,35 @@ class BrokerDA:
 
         return self.context
 
+    def do_sanitise_submissions(self):
+        records = self.da_object.get_all_records()
+
+        for submission in records:
+            if "bundle_meta" not in submission:
+                bundle_meta = list()
+
+                for file_id in submission.get("bundle", list()):
+                    datafile = DataFile().get_record(file_id)
+                    if datafile:
+                        upload_status = False
+
+                        if str(submission.get("complete", False)).lower() == 'true':
+                            upload_status = True
+                        bundle_meta.append(
+                            dict(
+                                file_id=file_id,
+                                file_path=datafile.get("file_location", str()),
+                                upload_status=upload_status
+                            )
+                        )
+                submission["bundle_meta"] = bundle_meta
+                submission['target_id'] = str(submission.pop('_id'))
+                self.da_object.save_record(dict(), **submission)
+
+        self.context["sanitise_status"] = True
+
+        return self.context
+
 
 class BrokerVisuals:
     def __init__(self, **kwargs):
@@ -197,6 +226,7 @@ class BrokerVisuals:
             person=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             datafile=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             sample=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
+            submission=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_for_user())),
         )
 
@@ -227,6 +257,13 @@ class BrokerVisuals:
             self.context["table_data"] = table_data_dict[self.component][0](**kwargs)
 
         self.context["component"] = self.component
+        return self.context
+
+    def do_get_submission_accessions(self):
+        target_id = self.param_dict.get("target_id", str())
+        submission_record = Submission().get_record(target_id)
+
+        self.context["submission_accessions"] = htags.generate_submission_accessions_data(submission_record)
         return self.context
 
     def do_profiles_counts(self):
@@ -279,7 +316,7 @@ class BrokerVisuals:
         return self.context
 
     def do_attributes_display(self):
-        if self.component == "datafile": # datafile attributes are rendered differently
+        if self.component == "datafile":  # datafile attributes are rendered differently
             return self.do_description_summary()
 
         target_id = self.param_dict.get("target_id", str())
@@ -297,10 +334,15 @@ class BrokerVisuals:
         if self.component in paths_dict:
             self.context['help_messages'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS['HELP_MESSAGES'][self.component])
 
-        # context help
+        # context help, relevant to the current component (e.g., datafile)
         if "context_help" in paths_dict:
-            self.context['context_help'] = d_utils.json_to_pytype(
+            help_dict = d_utils.json_to_pytype(
                 lkup.MESSAGES_LKUPS['HELP_MESSAGES']["context_help"])
+            properties_temp = help_dict['properties']
+            v = [x for x in properties_temp if len(x['context']) > 0 and x['context'][0] == self.component]
+            if v:
+                help_dict['properties'] = v
+            self.context['context_help'] = help_dict
 
         # get user email
         self.context = self.do_user_has_email()

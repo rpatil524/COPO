@@ -46,6 +46,18 @@
     padding: 5px 5px 0px;
 }
 
+.info-rw2 {
+    background: rgba(180, 205, 228, 0.4);
+    margin-left: 0px;
+    margin-right: -2px;
+    margin-bottom: -5px;
+    /*border: 1px solid rgba(17, 70, 110, 0.3);*/
+    border-radius: 4px;
+    overflow: auto;
+    font-weight: normal;
+    padding: 5px 5px 0px;
+}
+
 .description-rw {
     background: rgba(229, 239, 255, 0.3);
     margin-left: 0px;
@@ -56,6 +68,12 @@
     overflow: auto;
     font-weight: normal;
     padding: 5px 5px 0px;
+}
+
+.submission-info-label {
+    font-size: 12px;
+    background-color: #fff;
+    color: #000;
 }
 
 div[class^="col-"],
@@ -413,6 +431,37 @@ div[class*=" col-"] {
     line-height: 1.7;
     font-size: 13px;
 }
+
+.copo-modal3 > .modal-dialog {
+    width: 330px;
+}
+
+.copo-modal3 > .modal-dialog > .modal-content > .modal-body {
+    min-height: 70px;
+    padding-bottom: 10px;
+}
+
+.copo-modal3 > .modal-dialog > .modal-content > .modal-body > .bootstrap-dialog-body > .bootstrap-dialog-message {
+    line-height: 1.7;
+    font-size: 13px;
+}
+
+
+/*modal4*/
+.copo-modal4 > .modal-dialog {
+    width: 70%;
+}
+
+.copo-modal4 > .modal-dialog > .modal-content > .modal-body {
+    min-height: 70px;
+    margin: 10px;
+}
+
+.copo-modal4 > .modal-dialog > .modal-content > .modal-body > .bootstrap-dialog-body > .bootstrap-dialog-message {
+    line-height: 1.7;
+    font-size: 13px;
+}
+
 
 .input-copo {
     height: 30px !important;
@@ -1223,6 +1272,11 @@ input[data-autocomplete] {
     font-size: 13px;
 }
 
+.modal-content-div {
+    line-height: 1.9;
+    font-size: 14px;
+}
+
 .webui-popover-title {
     background-color: #D4E4ED !important;
 }
@@ -1432,6 +1486,26 @@ div.shown span.side-help-trigger:before {
     border-color: rgba(229, 239, 255, 0.8) !important;
 }
 
+.panel-dtables2 > .panel-heading {
+    background-color: rgba(17, 70, 110, 1.0);
+    color: #fff;
+}
+
+.panel-dtables2 {
+    border-color: rgba(17, 70, 110, 0.1) !important;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+.panel-dtables3 > .panel-heading {
+    background-color: rgba(17, 70, 110, 1.0);
+    color: #fff;
+}
+
+.panel-dtables3 {
+    border-color: rgba(17, 70, 110, 0.1) !important;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
 /*end datatables row panels*/
 
 /*split button text*/
@@ -1472,3 +1546,27 @@ div.shown span.side-help-trigger:before {
         transform: rotate(360deg);
     }
 }
+
+/*ellipsis animated*/
+.copo-e-loading:after {
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: bottom;
+    -webkit-animation: ellipsis steps(4, end) 900ms infinite;
+    animation: ellipsis steps(4, end) 900ms infinite;
+    content: "\2026"; /* ascii code for the ellipsis character */
+    width: 0px;
+}
+
+@keyframes ellipsis {
+    to {
+        width: 20px;
+    }
+}
+
+@-webkit-keyframes ellipsis {
+    to {
+        width: 20px;
+    }
+}
+

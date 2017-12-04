@@ -80,7 +80,7 @@ $(document).ready(function () {
             BootstrapDialog.show({
                 title: wizardMessages.exit_wizard_message.title,
                 message: wizardMessages.exit_wizard_message.text,
-                cssClass: 'copo-modal2',
+                cssClass: 'copo-modal3',
                 closable: false,
                 animate: true,
                 type: BootstrapDialog.TYPE_DANGER,

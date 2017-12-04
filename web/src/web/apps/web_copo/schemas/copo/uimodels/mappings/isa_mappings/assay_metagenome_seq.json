@@ -30,6 +30,28 @@
       "control_meta": {},
       "control": "select",
       "versions": [
+        "library_layout"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "id": "copo.metagenomeSeq.library_layout",
+      "label": "Parameter Value[library layout]",
+      "show_in_form": true,
+      "ref": "Parameter Value[library layout]",
+      "type": "string",
+      "show_in_table": true,
+      "option_values": [
+        "SINGLE",
+        "PAIRED"
+      ]
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "control": "select",
+      "versions": [
         "library_strategy"
       ],
       "deprecated": false,
@@ -63,47 +85,6 @@
       "type": "string",
       "show_in_table": true,
       "ontology_names": []
-    },
-    {
-      "help_tip": "",
-      "required": "false",
-      "default_value": "",
-      "control_meta": {},
-      "control": "ontology term",
-      "versions": [
-        "base_caller"
-      ],
-      "deprecated": false,
-      "hidden": "false",
-      "id": "copo.metagenomeSeq.base_caller",
-      "label": "Parameter Value[base caller]",
-      "show_in_form": true,
-      "ref": "Parameter Value[base caller]",
-      "type": "string",
-      "show_in_table": true,
-      "ontology_names": []
-    },
-    {
-      "help_tip": "",
-      "required": "false",
-      "default_value": "",
-      "control_meta": {},
-      "control": "select",
-      "versions": [
-        "library_layout"
-      ],
-      "deprecated": false,
-      "hidden": "false",
-      "id": "copo.metagenomeSeq.library_layout",
-      "label": "Parameter Value[library layout]",
-      "show_in_form": true,
-      "ref": "Parameter Value[library layout]",
-      "type": "string",
-      "show_in_table": true,
-      "option_values": [
-        "SINGLE",
-        "PAIRED"
-      ]
     },
     {
       "help_tip": "",
@@ -272,6 +253,25 @@
         "Sanger sequencing instrument",
         "unspecified"
       ]
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "control": "ontology term",
+      "versions": [
+        "base_caller"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "id": "copo.metagenomeSeq.base_caller",
+      "label": "Parameter Value[base caller]",
+      "show_in_form": true,
+      "ref": "Parameter Value[base caller]",
+      "type": "string",
+      "show_in_table": true,
+      "ontology_names": []
     },
     {
       "help_tip": "",

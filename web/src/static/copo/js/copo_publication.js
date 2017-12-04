@@ -80,50 +80,6 @@ $(document).ready(function () {
         }
 
         //table.rows().deselect(); //deselect all rows
-
-
-        // var task = elem.attr('data-record-action').toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
-        // var taskTarget = elem.attr('data-action-target'); //is the task targeting a single 'row' or group of 'rows'?
-        //
-        // var ids = [];
-        //
-        // if (taskTarget == 'row') {
-        //     ids = [elem.attr('data-record-id')];
-        // } else if (taskTarget == 'rows') {
-        //     //get reference to table, and retrieve selected rows
-        //     if ($.fn.dataTable.isDataTable('#' + tableID)) {
-        //         var table = $('#' + tableID).DataTable();
-        //
-        //         ids = $.map(table.rows('.selected').data(), function (item) {
-        //             return item[item.length - 1];
-        //         });
-        //     }
-        // }
-        //
-        // //handle button actions
-        // if (ids.length > 0) {
-        //     if (task == "edit") {
-        //         $.ajax({
-        //             url: copoFormsURL,
-        //             type: "POST",
-        //             headers: {'X-CSRFToken': csrftoken},
-        //             data: {
-        //                 'task': 'form',
-        //                 'component': component,
-        //                 'target_id': ids[0] //only allowing row action for edit, hence first record taken as target
-        //             },
-        //             success: function (data) {
-        //                 json2HtmlForm(data);
-        //             },
-        //             error: function () {
-        //                 alert("Couldn't build publication form!");
-        //             }
-        //         });
-        //     } else if (task == "delete") { //handles delete, allows multiple row delete
-        //         var deleteParams = {component: component, target_ids: ids};
-        //         do_component_delete_confirmation(deleteParams);
-        //     }
-        // }
     }
 
 

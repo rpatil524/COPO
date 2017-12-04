@@ -25,7 +25,7 @@
           },
           "trigger": {
             "type": "change",
-            "message": "Changing the Study Type might impact certain stages in the description process! This might, in some cases, result in loss of previous entries. <br/><br/>Do you want to continue?",
+            "message": "Changing the study type will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
             "callback": {
               "function": "study_type_change",
               "parameter": "item_id,old_value,new_value"
