@@ -275,6 +275,16 @@ function do_render_component_table(data, componentMeta) {
             lengthChange: true,
             buttons: [
                 'selectAll',
+                {
+                    text: 'Select filtered',
+                    action: function (e, dt, node, config) {
+                        var filteredRows = dt.rows({order: 'index', search: 'applied'});
+                        if (filteredRows.count() > 0) {
+                            dt.rows().deselect();
+                            filteredRows.select();
+                        }
+                    }
+                },
                 'selectNone'
             ],
             select: {
@@ -293,7 +303,7 @@ function do_render_component_table(data, componentMeta) {
                 },
                 buttons: {
                     selectAll: "Select all",
-                    selectNone: "Select none"
+                    selectNone: "Select none",
                 }
             },
             order: [
@@ -338,6 +348,7 @@ function do_render_component_table(data, componentMeta) {
         .removeClass("input-sm")
         .attr("placeholder", "Search " + componentMeta.title)
         .attr("size", 30);
+
 
 } //end of func
 

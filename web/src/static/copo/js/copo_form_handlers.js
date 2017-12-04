@@ -1011,7 +1011,7 @@ var dispatchFormControl = {
                 {
                     style: "border-radius:0;",
                     type: "button",
-                    class: "btn btn-xs btn-primary copo-component-control",
+                    class: "btn btn-sm btn-primary copo-component-control",
                     "data-component": formElem.option_component,
                     "data-element-id": formElem.id,
                     html: '<i class="fa fa-plus-circle"></i> Create & Assign ' + formElem.label,

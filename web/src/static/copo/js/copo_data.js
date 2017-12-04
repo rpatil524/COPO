@@ -2636,6 +2636,16 @@ $(document).ready(function () {
                 "lengthChange": true,
                 buttons: [
                     'selectAll',
+                    {
+                        text: 'Select filtered',
+                        action: function (e, dt, node, config) {
+                            var filteredRows = dt.rows({order: 'index', search: 'applied'});
+                            if (filteredRows.count() > 0) {
+                                dt.rows().deselect();
+                                filteredRows.select();
+                            }
+                        }
+                    },
                     'selectNone'
                 ],
                 language: {
@@ -2694,7 +2704,7 @@ $(document).ready(function () {
                 .each(function (value) {
                     $(this)
                         .removeClass("btn btn-default")
-                        .addClass('tiny ui button');
+                        .addClass('tiny ui basic button');
                 });
 
 
