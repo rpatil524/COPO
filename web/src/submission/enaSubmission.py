@@ -197,6 +197,7 @@ class EnaSubmit(object):
 
                                             if not pending_files:  # we are all done!
                                                 transfer_fields["transfer_status"] = "completed"
+                                                transfer_fields["pct_completed"] = '100'
                                                 transfer_fields["current_time"] = datetime.now().strftime(
                                                     "%d-%m-%Y %H:%M:%S")
 
@@ -225,11 +226,24 @@ class EnaSubmit(object):
         else:  # no files to be uploaded
             transfer_fields = dict()
             transfer_fields["transfer_status"] = "completed"
+            transfer_fields["pct_completed"] = '100'
             transfer_fields["current_time"] = datetime.now().strftime(
                 "%d-%m-%Y %H:%M:%S")
 
             # save collected metadata to the transfer record
             RemoteDataFile().update_transfer(transfer_token, transfer_fields)
+
+        # if we get this far, then all files should have been uploaded
+        submission_record = Submission().get_record(sub_id)
+
+        # set all bundle items to true
+        bundle_meta = submission_record.get("bundle_meta", list())
+        for indx, b in enumerate(bundle_meta):
+            if not b['upload_status']:
+                bundle_meta[indx]['upload_status'] = True
+
+        kwargs = dict(target_id=sub_id, bundle_meta=bundle_meta)
+        Submission().save_record(dict(), **kwargs)
 
         # setup paths for conversion directories
         conv_dir = os.path.join(self._dir, sub_id)
@@ -364,13 +378,6 @@ class EnaSubmit(object):
         s['completed_on'] = datetime.now()
         s['target_id'] = str(s.pop('_id'))
 
-        # set all bundle items to true
-        bundle_meta = s.get("bundle_meta", list())
-        for indx, b in enumerate(bundle_meta):
-            if not b['upload_status']:
-                bundle_meta[indx]['upload_status'] = True
-
-        s['bundle_meta'] = bundle_meta
         Submission().save_record(dict(), **s)
 
         RemoteDataFile().delete_transfer(transfer_token)

@@ -15,11 +15,14 @@ from dal.copo_da import Submission, DataFile, DAComponent, Person, Sample
 class Investigation:
     def __init__(self, submission_token=str()):
         self.submission_token = submission_token
+        print("Retrieving relevant profile records...")
         self.copo_isa_records = ISAHelpers().broker_copo_records(submission_token)
+        print("Retrieved profile records.")
         self.profile_id = str(self.copo_isa_records.get("profile").get("_id"))
 
     def get_schema(self):
         component = "investigation"
+        print("Composing investigation schema...")
 
         properties = d_utils.get_db_json_schema(component)
 
@@ -110,6 +113,7 @@ class Study:
 
     def get_schema(self):
         component = "study"
+        print("Composing study schema...")
 
         schemas = list()
         properties = d_utils.get_db_json_schema(component)
@@ -468,6 +472,7 @@ class Assay:
 
     def get_schema(self):
         component = "assay"
+        print("Composing assay schema...")
 
         schemas = list()
         properties = d_utils.get_db_json_schema(component)
@@ -561,6 +566,7 @@ class Assay:
         copo_isa_records = copy.deepcopy(self.copo_isa_records)
 
         process_sequence = list()
+        print("Composing assay process sequence...")
 
         # get datafiles
         indx = 0  # process sequence index

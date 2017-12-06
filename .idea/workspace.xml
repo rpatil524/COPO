@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="completed submission view">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/Dockerfile" afterPath="$PROJECT_DIR$/web/Dockerfile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/requirements/base.txt" afterPath="$PROJECT_DIR$/web/src/requirements/base.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py" afterPath="$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/submission/enaSubmission.py" afterPath="$PROJECT_DIR$/web/src/submission/enaSubmission.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -70,19 +71,61 @@
       <file leaf-file-name="base.txt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/requirements/base.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
+            <state relative-caret-position="0">
               <caret line="23" column="20" lean-forward="false" selection-start-line="23" selection-start-column="20" selection-end-line="23" selection-end-column="20" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Dockerfile" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Dockerfile" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/Dockerfile">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="409">
-              <caret line="52" column="39" lean-forward="false" selection-start-line="52" selection-start-column="39" selection-end-line="52" selection-end-column="39" />
+            <state relative-caret-position="374">
+              <caret line="41" column="14" lean-forward="false" selection-start-line="41" selection-start-column="14" selection-end-line="41" selection-end-column="14" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="enaSubmission.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="175">
+              <caret line="192" column="56" lean-forward="true" selection-start-line="192" selection-start-column="56" selection-end-line="192" selection-end-column="56" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="copo_submission_2.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="183">
+              <caret line="400" column="97" lean-forward="false" selection-start-line="400" selection-start-column="97" selection-end-line="400" selection-end-column="97" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ajax_handlers.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-221">
+              <caret line="86" column="33" lean-forward="false" selection-start-line="86" selection-start-column="20" selection-end-line="86" selection-end-column="33" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="copo_isa_ena.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="175">
+              <caret line="773" column="16" lean-forward="false" selection-start-line="773" selection-start-column="16" selection-end-line="773" selection-end-column="16" />
+              <folding>
+                <element signature="e#22#31#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -101,7 +144,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>selectall</find>
       <find>anchor</find>
       <find>link</find>
       <find>paired_list</find>
@@ -122,7 +164,6 @@
       <find>apply</find>
       <find>Click a row or the 'Select all' button to accept suggested pairings</find>
       <find>create and assign</find>
-      <find>suggest</find>
       <find>seco</find>
       <find>buttons</find>
       <find>count</find>
@@ -131,6 +172,8 @@
       <find>create &amp; assign</find>
       <find>.removeClass(&quot;btn btn-default&quot;)</find>
       <find>isa</find>
+      <find>copo_records</find>
+      <find>pct_completed</find>
     </findStrings>
     <replaceStrings>
       <replace>context-help-ctrl</replace>
@@ -160,7 +203,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$USER_HOME$/Desktop/COPO/web/src/submission/enaSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_formats.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizard_views.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/broker_requests.py" />
@@ -172,7 +214,6 @@
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/assay_metagenome_seq.json" />
         <option value="$USER_HOME$/Desktop/luca/59ad5926286c69004295980e/run_set.xml" />
         <option value="$USER_HOME$/Desktop/luca/59ad5926286c69004295980e/json/isa_json.json" />
-        <option value="$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py" />
         <option value="$PROJECT_DIR$/web/src/submission/data/5a0ad23bd127fd1e657b0230/json/isa_json.json" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/generic/sra_settings.json" />
         <option value="$PROJECT_DIR$/web/src/submission/data/5a0c3443d127fd4fe3336c27/experiment_set.xml" />
@@ -200,7 +241,6 @@
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" />
-        <option value="$PROJECT_DIR$/web/src/submission/enaSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py" />
@@ -211,6 +251,9 @@
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" />
         <option value="$PROJECT_DIR$/web/src/requirements/base.txt" />
         <option value="$PROJECT_DIR$/web/Dockerfile" />
+        <option value="$PROJECT_DIR$/web/src/exceptions_and_logging/logs/2017-12-06.log" />
+        <option value="$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py" />
+        <option value="$PROJECT_DIR$/web/src/submission/enaSubmission.py" />
       </list>
     </option>
   </component>
@@ -230,9 +273,9 @@
     <handled-path value="$PROJECT_DIR$/web/src/static/copo/annotator-2.0.0-alpha.3/node_modules" />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="5" />
+    <option name="x" value="4" />
     <option name="y" value="23" />
-    <option name="width" value="1484" />
+    <option name="width" value="1519" />
     <option name="height" value="829" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
@@ -270,7 +313,6 @@
     </navigator>
     <panes>
       <pane id="Scratches" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -289,10 +331,33 @@
               <item name="web" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
+              <item name="COPO" type="462c0819:PsiDirectoryNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="exceptions_and_logging" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
+              <item name="COPO" type="462c0819:PsiDirectoryNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="exceptions_and_logging" type="462c0819:PsiDirectoryNode" />
+              <item name="logs" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
+              <item name="COPO" type="462c0819:PsiDirectoryNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="submission" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -1372,6 +1437,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="829" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.42276424" sideWeight="0.2825465" order="9" side_tool="true" content_ui="tabs" />
@@ -1379,12 +1445,12 @@
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32885906" sideWeight="0.49767134" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32887402" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23462088" sideWeight="0.49182117" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2360515" sideWeight="0.49182117" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25181347" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1315229" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12552084" sideWeight="0.50817883" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24320652" sideWeight="0.7174535" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32880434" sideWeight="0.7174535" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1467,27 +1533,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/web/src/exceptions_and_logging/logs/2017-09-06.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/exceptions_and_logging/logs/2017-11-14.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/exceptions_and_logging/logs/2017-09-12.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/exceptions_and_logging/logs/2017-07-12.log">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
@@ -1520,7 +1565,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
           <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1671,13 +1715,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2100">
-          <caret line="157" column="54" lean-forward="false" selection-start-line="157" selection-start-column="54" selection-end-line="157" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="147">
@@ -1717,7 +1754,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1732,7 +1768,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="114">
           <caret line="346" column="10" lean-forward="true" selection-start-line="346" selection-start-column="10" selection-end-line="346" selection-end-column="10" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1754,7 +1789,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="9" column="4" lean-forward="false" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1769,16 +1803,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="215">
           <caret line="52" column="42" lean-forward="false" selection-start-line="52" selection-start-column="42" selection-end-line="52" selection-end-column="42" />
-          <folding>
-            <marker date="1506951033000" expanded="true" signature="3543:3551" ph="..." />
-            <marker date="1506951033000" expanded="true" signature="3662:3680" ph="..." />
-            <marker date="1506951033000" expanded="true" signature="3726:3757" ph="..." />
-            <marker date="1506951033000" expanded="true" signature="4005:4020" ph="..." />
-            <marker date="1506951033000" expanded="true" signature="4107:4129" ph="..." />
-            <marker date="1506951033000" expanded="true" signature="4364:4380" ph="..." />
-            <marker date="1506951033000" expanded="true" signature="4623:4654" ph="..." />
-            <marker date="1506951033000" expanded="true" signature="12102:12139" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1786,27 +1810,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="176">
           <caret line="1255" column="118" lean-forward="false" selection-start-line="1255" selection-start-column="118" selection-end-line="1255" selection-end-column="118" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-124">
-          <caret line="644" column="67" lean-forward="true" selection-start-line="644" selection-start-column="67" selection-end-line="644" selection-end-column="67" />
-          <folding>
-            <marker date="1512125191342" expanded="true" signature="5170:5190" ph="..." />
-            <marker date="1512125191342" expanded="true" signature="5467:5487" ph="..." />
-            <marker date="1512125191342" expanded="true" signature="5604:5618" ph="..." />
-            <marker date="1512125191342" expanded="true" signature="5720:5755" ph="..." />
-            <marker date="1512125191342" expanded="true" signature="5892:5912" ph="..." />
-            <marker date="1512125191342" expanded="true" signature="6100:6138" ph="..." />
-            <marker date="1512125191342" expanded="true" signature="6383:6421" ph="..." />
-            <marker date="1512125191342" expanded="true" signature="13452:13483" ph="..." />
-            <marker date="1512125191342" expanded="true" signature="18947:18962" ph="..." />
-            <marker date="1512125191342" expanded="true" signature="24561:24579" ph="..." />
-            <marker date="1512125191342" expanded="true" signature="29146:29164" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1814,11 +1817,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="257">
           <caret line="287" column="28" lean-forward="true" selection-start-line="287" selection-start-column="28" selection-end-line="287" selection-end-column="28" />
-          <folding>
-            <marker date="1512416264076" expanded="true" signature="6314:6330" ph="..." />
-            <marker date="1512416264076" expanded="true" signature="9084:9112" ph="..." />
-            <marker date="1512416264076" expanded="true" signature="13985:14003" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1826,24 +1824,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
           <caret line="1015" column="51" lean-forward="false" selection-start-line="1015" selection-start-column="51" selection-end-line="1015" selection-end-column="51" />
-          <folding>
-            <marker date="1512412976248" expanded="true" signature="9731:9738" ph="×" />
-            <marker date="1512412976248" expanded="true" signature="9802:9820" ph="..." />
-            <marker date="1512412976248" expanded="true" signature="10523:10535" ph="..." />
-            <marker date="1512412976248" expanded="true" signature="39606:39640" ph="..." />
-            <marker date="1512412976248" expanded="true" signature="44755:44767" ph="..." />
-            <marker date="1512412976248" expanded="true" signature="59469:59485" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="244">
-          <caret line="238" column="26" lean-forward="false" selection-start-line="238" selection-start-column="26" selection-end-line="238" selection-end-column="26" />
-          <folding>
-            <element signature="e#51#92#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1851,53 +1831,38 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="338">
           <caret line="2648" column="32" lean-forward="false" selection-start-line="2648" selection-start-column="32" selection-end-line="2648" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/exceptions_and_logging/logs/2017-12-04.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/exceptions_and_logging/logs/2017-12-06.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="186">
+          <caret line="140" column="49" lean-forward="true" selection-start-line="140" selection-start-column="49" selection-end-line="140" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="773" column="16" lean-forward="false" selection-start-line="773" selection-start-column="16" selection-end-line="773" selection-end-column="16" />
           <folding>
-            <marker date="1512416759262" expanded="true" signature="29473:29508" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="32924:32959" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="43096:43156" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="46160:46166" ph=" " />
-            <marker date="1512416759262" expanded="true" signature="47033:47039" ph=" " />
-            <marker date="1512416759262" expanded="true" signature="70246:70283" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="83450:83468" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="83616:83668" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="87345:87363" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="92515:92552" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="95957:95977" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="96277:96358" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="96537:96543" ph=" " />
-            <marker date="1512416759262" expanded="true" signature="96851:96886" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="97082:97100" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="98921:98940" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="98978:99006" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="99218:99237" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="99275:99303" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="99541:99560" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="99598:99626" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="102582:102600" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="105162:105197" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="105614:105630" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="105717:105740" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="118200:118220" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="119615:119675" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="119932:119949" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="120160:120227" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="122141:122161" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="122461:122542" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="122721:122727" ph=" " />
-            <marker date="1512416759262" expanded="true" signature="131411:131439" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="142337:142356" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="142337:142372" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="142337:142386" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="146089:146109" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="148990:149025" ph="..." />
-            <marker date="1512416759262" expanded="true" signature="150595:150615" ph="..." />
+            <element signature="e#22#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/requirements/base.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
+        <state relative-caret-position="0">
           <caret line="23" column="20" lean-forward="false" selection-start-line="23" selection-start-column="20" selection-end-line="23" selection-end-column="20" />
           <folding />
         </state>
@@ -1905,8 +1870,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/Dockerfile">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="409">
-          <caret line="52" column="39" lean-forward="false" selection-start-line="52" selection-start-column="39" selection-end-line="52" selection-end-column="39" />
+        <state relative-caret-position="374">
+          <caret line="41" column="14" lean-forward="false" selection-start-line="41" selection-start-column="14" selection-end-line="41" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-221">
+          <caret line="86" column="33" lean-forward="false" selection-start-line="86" selection-start-column="20" selection-end-line="86" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="400" column="97" lean-forward="false" selection-start-line="400" selection-start-column="97" selection-end-line="400" selection-end-column="97" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="192" column="56" lean-forward="true" selection-start-line="192" selection-start-column="56" selection-end-line="192" selection-end-column="56" />
           <folding />
         </state>
       </provider>
