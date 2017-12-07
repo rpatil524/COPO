@@ -162,12 +162,11 @@ class Study:
         return sdd
 
     def _protocols(self, spec=dict()):
-        copo_isa_records = copy.deepcopy(self.copo_isa_records)
         # this property is contingent on the 'study type' associated with a datafile
         protocols = list()
 
         # get protocols
-        protocol_list = copo_isa_records["protocol_list"]
+        protocol_list = list(self.copo_isa_records["protocol_list"])
 
         for pr in protocol_list:
             # parameters
@@ -198,7 +197,7 @@ class Study:
             components = list()
             if pr.get("name", str()) == "nucleic acid sequencing":
                 # get sequencing instrument attached datafiles
-                seq_instruments = copo_isa_records["seq_instruments"]
+                seq_instruments = list(self.copo_isa_records["seq_instruments"])
 
                 for si in seq_instruments:
                     ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
@@ -250,10 +249,11 @@ class Study:
         return protocols
 
     def _materials(self, spec=dict()):
-        copo_isa_records = copy.deepcopy(self.copo_isa_records)
+        sources = list(self.copo_isa_records["treated_source"])
+        samples = list(self.copo_isa_records["treated_sample"])
 
-        materials_value_dict = dict(sources=copo_isa_records["treated_source"],
-                                    samples=copo_isa_records["treated_sample"]
+        materials_value_dict = dict(sources=sources,
+                                    samples=samples
                                     )
 
         materials_properties = spec.get("properties", dict())
@@ -265,11 +265,9 @@ class Study:
         return materials_properties
 
     def _processSequence(self, spec=dict()):
-        copo_isa_records = copy.deepcopy(self.copo_isa_records)
-
         process_sequence = list()
 
-        samples = copo_isa_records["treated_sample"]
+        samples = list(self.copo_isa_records["treated_sample"])
 
         # get executed protocol
         executes_protocol = [p for p in self._protocols(dict()) if "sample collection" in p.get("name")]
@@ -301,14 +299,13 @@ class Study:
         return process_sequence
 
     def _factors(self, spec=dict()):
-        copo_isa_records = copy.deepcopy(self.copo_isa_records)
-
         factors = list()
         seen_list = list()
         components = ["sample"]
 
         for component in components:
-            for rec in copo_isa_records.get(component):
+            component_list = list(self.copo_isa_records[component])
+            for rec in component_list:
                 for fv in rec.get("factorValues", list()):
                     cat_dict = fv.get("category", dict())
                     annotation_value = cat_dict.get("annotationValue", str())
@@ -339,14 +336,13 @@ class Study:
         return factors
 
     def _characteristicCategories(self, spec=dict()):
-        copo_isa_records = copy.deepcopy(self.copo_isa_records)
-
         characteristic_categories = list()
         seen_list = list()
         components = ["sample", "source"]
 
         for component in components:
-            for rec in copo_isa_records.get(component):
+            component_list = list(self.copo_isa_records[component])
+            for rec in component_list:
                 # get organism
                 if "organism" in rec and "organism" not in seen_list:
                     ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
@@ -396,14 +392,13 @@ class Study:
         return characteristic_categories
 
     def _unitCategories(self, spec=dict()):
-        copo_isa_records = copy.deepcopy(self.copo_isa_records)
-
         unit_categories = list()
         seen_list = list()
         components = ["sample", "source"]
 
         for component in components:
-            for rec in copo_isa_records.get(component):
+            component_list = list(self.copo_isa_records[component])
+            for rec in component_list:
                 # get units from both characteristics and factors
                 combined_list = rec.get("characteristics", list()) + rec.get("factorValues", list())
                 for ch in combined_list:
@@ -513,13 +508,11 @@ class Assay:
         return ISAHelpers().get_schema_key_type(spec)
 
     def _dataFiles(self, spec=dict()):
-        copo_isa_records = copy.deepcopy(self.copo_isa_records)
-
         component = "datafile"
+        datafiles = list(self.copo_isa_records["datafile"])
 
         # get datafiles from the submission record
-        datafiles = [ISAHelpers().refactor_datafiles(element) for element in
-                     copo_isa_records.get("datafile")]
+        datafiles = [ISAHelpers().refactor_datafiles(element) for element in datafiles]
         datafiles = ISAHelpers().get_isa_records(component, datafiles)
 
         df = pd.DataFrame(datafiles)
@@ -530,9 +523,7 @@ class Assay:
         return datafiles
 
     def _materials(self, spec=dict()):
-        copo_isa_records = copy.deepcopy(self.copo_isa_records)
-
-        samples = copo_isa_records.get("sample")
+        samples = list(self.copo_isa_records["sample"])
 
         samps = list()
         other_materials = list()
@@ -563,15 +554,15 @@ class Assay:
         return unitCategories
 
     def _processSequence(self, spec=dict()):
-        copo_isa_records = copy.deepcopy(self.copo_isa_records)
-
         process_sequence = list()
         print("Composing assay process sequence...")
 
         # get datafiles
         indx = 0  # process sequence index
         processed_datafiles = list()  # datafiles already seen through the process sequence
-        for datafile in copo_isa_records.get("datafile"):
+        datafiles_temp = list(self.copo_isa_records["datafile"])
+        datafiles = list(self.copo_isa_records["datafile"])
+        for datafile in datafiles:
 
             # modify to reflect actual saved name, in case of any obfuscation of the file name
             datafile["name"] = os.path.split(datafile["file_location"])[-1]
@@ -590,13 +581,15 @@ class Assay:
 
             if datafile_samples:
                 datafile_samples = datafile_samples.split(",")
-                df = pd.DataFrame(copo_isa_records.get("sample"))
+                copo_samples = list(self.copo_isa_records["sample"])
+                df = pd.DataFrame(copo_samples)
                 df = df[df['_id'].isin([ObjectId(element) for element in datafile_samples])]
                 samples = list(df['name'].apply(ISAHelpers().refactor_sample_reference))
                 materials = list(df['name'].apply(ISAHelpers().refactor_material_reference))
 
             # get relevant protocols
-            protocol_list = copo_isa_records.get("protocol_list")
+            copo_protocol_list = list(self.copo_isa_records["protocol_list"])
+            protocol_list = copo_protocol_list
             protocol_list[:] = [d for d in protocol_list if d.get('name') not in ["sample collection"]]
 
             lookup_list = list(protocol_list)
@@ -634,8 +627,7 @@ class Assay:
                         paired_datafile = attributes.get('datafiles_pairing', dict()).get('paired_file', str())
                         processed_datafiles.append(paired_datafile)
 
-                        copo_isa_records_temp = copy.deepcopy(self.copo_isa_records)
-                        paired_datafile = [pairedfile for pairedfile in copo_isa_records_temp.get("datafile") if
+                        paired_datafile = [pairedfile for pairedfile in datafiles_temp if
                                            str(pairedfile["_id"]) == paired_datafile]
                         if paired_datafile:
                             paired_datafile = paired_datafile[0]
@@ -734,6 +726,7 @@ class Assay:
 
                 process_sequence.append(process_schema)
 
+        print("Completed composing assay process sequence...")
         return process_sequence
 
 
@@ -761,7 +754,7 @@ class ISAHelpers:
 
         # sample... contingent on datafiles
         attach_samples = [DataFile().get_record_property(element, "attach_samples") for element in df_ids_list]
-        attach_samples = list(set(attach_samples))
+        attach_samples = list(set(attach_samples))  # get unique samples
         object_list = [ObjectId(sample_id) for sample_id in attach_samples]
 
         copo_records["sample"] = list()
@@ -798,7 +791,7 @@ class ISAHelpers:
         copo_records["datafile"] = cursor_to_list(
             DataFile().get_collection_handle().find({"_id": {"$in": df_ids_list}}))
 
-        copo_records["datafilehashes"] = self.get_datafilehashes(copy.deepcopy(copo_records)["datafile"],
+        copo_records["datafilehashes"] = self.get_datafilehashes(list(copo_records["datafile"]),
                                                                  submission_token)
 
         # technology_type
@@ -815,16 +808,16 @@ class ISAHelpers:
 
         # treated records...
         # sample
-        copo_records["isa_records_sample"] = self.get_isa_records("sample", copy.deepcopy(copo_records)["sample"])
+        copo_records["isa_records_sample"] = self.get_isa_records("sample", list(copo_records["sample"]))
         copo_records["treated_sample"] = self.treat_record_characteristics(
-            copy.deepcopy(copo_records)["isa_records_sample"],
-            copy.deepcopy(copo_records)["source"])
+            list(copo_records["isa_records_sample"]),
+            list(copo_records["source"]))
 
         # source
-        copo_records["isa_records_source"] = self.get_isa_records("source", copy.deepcopy(copo_records)["source"])
+        copo_records["isa_records_source"] = self.get_isa_records("source", list(copo_records["source"]))
         copo_records["treated_source"] = self.treat_record_characteristics(
-            copy.deepcopy(copo_records)["isa_records_source"],
-            copy.deepcopy(copo_records)["source"])
+            list(copo_records["isa_records_source"]),
+            list(copo_records["source"]))
 
         return copo_records
 
