@@ -30,7 +30,7 @@ Genshi==0.7
 gunicorn==19.6.0
 hurry.filesize==0.9
 idna==2.6
-isatools==0,9.4
+isatools==0.9.4
 iso8601==0.1.12
 isodate==0.5.4
 isort==4.2.15
