@@ -592,7 +592,6 @@ class Assay:
                 samples = list(df['name'].apply(ISAHelpers().refactor_sample_reference))
                 materials = list(df['name'].apply(ISAHelpers().refactor_material_reference))
 
-
             protocol_list = list(protocol_list_temp)
             lookup_list = list(protocol_list_temp)
             for pr_indx, pr in enumerate(protocol_list):
@@ -764,12 +763,13 @@ class ISAHelpers:
         if samples:
             df = pd.DataFrame(samples)
             df["name"] = df["name"].apply(self.rename_it, args=("sample",))
-            copo_records["sample"] = df.to_dict('records')
+            samples = df.to_dict('records')
+            copo_records["sample"] = list(samples)
 
         # source
         # sources are those from which samples are derived
         derived_list = list()
-        for s in copo_records.get("sample", list()):
+        for s in samples:
             derived_list = derived_list + s.get("derivesFrom", list())
 
         derived_list = list(set(derived_list))  # unique elements
@@ -780,7 +780,8 @@ class ISAHelpers:
         if sources:
             df = pd.DataFrame(sources)
             df["name"] = df["name"].apply(self.rename_it, args=("source",))
-            copo_records["source"] = df.to_dict('records')
+            sources = df.to_dict('records')
+            copo_records["source"] = list(sources)
 
         # study_type
         copo_records["study_type"] = self.get_study_type(df_ids_list)
@@ -790,10 +791,11 @@ class ISAHelpers:
         copo_records["seq_instruments"] = list(set(seq_instruments))
 
         df_ids_list = [ObjectId(element) for element in df_ids_list]
-        copo_records["datafile"] = cursor_to_list(
+        datafiles = cursor_to_list(
             DataFile().get_collection_handle().find({"_id": {"$in": df_ids_list}}))
+        copo_records["datafile"] = list(datafiles)
 
-        copo_records["datafilehashes"] = self.get_datafilehashes(list(copo_records["datafile"]),
+        copo_records["datafilehashes"] = self.get_datafilehashes(datafiles,
                                                                  submission_token)
 
         # technology_type
@@ -809,17 +811,21 @@ class ISAHelpers:
         copo_records["protocol_list"] = protocol_list
 
         # treated records...
+        # make a copy of the dictionary before embarking on this to preserve the state of some components
+        copo_records_temp = copy.deepcopy(copo_records)
         # sample
-        copo_records["isa_records_sample"] = self.get_isa_records("sample", list(copo_records["sample"]))
-        copo_records["treated_sample"] = self.treat_record_characteristics(
-            list(copo_records["isa_records_sample"]),
-            list(copo_records["source"]))
+        copo_records["isa_records_sample"] = self.get_isa_records("sample", samples)
+        isa_records_sample = list(copo_records["isa_records_sample"])
+        copo_records["treated_sample"] = self.treat_record_characteristics(isa_records_sample, sources)
 
         # source
-        copo_records["isa_records_source"] = self.get_isa_records("source", list(copo_records["source"]))
-        copo_records["treated_source"] = self.treat_record_characteristics(
-            list(copo_records["isa_records_source"]),
-            list(copo_records["source"]))
+        copo_records["isa_records_source"] = self.get_isa_records("source", sources)
+        isa_records_source = list(copo_records["isa_records_source"])
+        copo_records["treated_source"] = self.treat_record_characteristics(isa_records_source, sources)
+
+        copo_records["sample"] = copo_records_temp["sample"]
+        copo_records["source"] = copo_records_temp["source"]
+        copo_records["datafile"] = copo_records_temp["datafile"]
 
         return copo_records
 

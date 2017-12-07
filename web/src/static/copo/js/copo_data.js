@@ -3997,6 +3997,8 @@ $(document).ready(function () {
                             });
 
                             dialogRef.close();
+                        } else {
+                            alert("Please select one or more rows!");
                         }
                     }
                 }

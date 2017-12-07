@@ -23,7 +23,7 @@ RUN mkdir /code
 
 WORKDIR /copo
 
-COPY web/src /code/
+COPY src /code/
 RUN pip install -r /code/requirements/dev.txt
 
 ENTRYPOINT ["bash","-c","rsync -avhW --no-compress --progress /code/ /copo/ && rm -rf /code/ && python manage.py makemigrations rest && python manage.py makemigrations chunked_upload && python manage.py makemigrations && python manage.py migrate && python /copo/social.py && /usr/local/bin/gunicorn web.wsgi:application -w 4 -t 50000 -k 'eventlet' -b :8000"]
