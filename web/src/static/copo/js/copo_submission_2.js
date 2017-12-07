@@ -544,7 +544,7 @@ $(document).ready(function () {
                 update_submission_progress(data.submission_information);
             },
             error: function () {
-                alert("Couldn't retrieve submissions information!");
+                //alert("Couldn't retrieve submissions information!");
             }
         });
     }

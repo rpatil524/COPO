@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="completed submission view">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/Dockerfile" afterPath="$PROJECT_DIR$/web/Dockerfile" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py" afterPath="$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/requirements/base.txt" afterPath="$PROJECT_DIR$/web/src/requirements/base.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -68,40 +66,82 @@
     <fileColor scope="css" color="Yellow" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="base.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/requirements/base.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="32" column="15" lean-forward="false" selection-start-line="32" selection-start-column="15" selection-end-line="32" selection-end-column="15" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Dockerfile" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/web/Dockerfile">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="11" column="16" lean-forward="true" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="copo_isa_ena.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="324">
-              <caret line="1123" column="31" lean-forward="false" selection-start-line="1123" selection-start-column="23" selection-end-line="1123" selection-end-column="31" />
-              <folding>
-                <element signature="e#22#31#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <splitter split-orientation="vertical" split-proportion="0.5">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="base.txt" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/web/src/requirements/base.txt">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="150">
+                  <caret line="32" column="15" lean-forward="false" selection-start-line="32" selection-start-column="15" selection-end-line="32" selection-end-column="15" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="Dockerfile" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/web/Dockerfile">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="450">
+                  <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="copo_isa_ena.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="282">
+                  <caret line="567" column="62" lean-forward="false" selection-start-line="567" selection-start-column="62" selection-end-line="567" selection-end-column="62" />
+                  <folding>
+                    <element signature="e#22#31#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="copo_submission_2.js" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="360">
+                  <caret line="484" column="45" lean-forward="true" selection-start-line="484" selection-start-column="45" selection-end-line="484" selection-end-column="45" />
+                  <folding>
+                    <marker date="1512649099739" expanded="true" signature="5170:5190" ph="..." />
+                    <marker date="1512649099739" expanded="true" signature="5467:5487" ph="..." />
+                    <marker date="1512649099739" expanded="true" signature="5604:5618" ph="..." />
+                    <marker date="1512649099739" expanded="true" signature="5720:5755" ph="..." />
+                    <marker date="1512649099739" expanded="true" signature="5892:5912" ph="..." />
+                    <marker date="1512649099739" expanded="true" signature="6100:6138" ph="..." />
+                    <marker date="1512649099739" expanded="true" signature="6383:6421" ph="..." />
+                    <marker date="1512649099739" expanded="true" signature="13452:13483" ph="..." />
+                    <marker date="1512649099739" expanded="true" signature="18947:18962" ph="..." />
+                    <marker date="1512649099739" expanded="true" signature="24563:24581" ph="..." />
+                    <marker date="1512649099739" expanded="true" signature="29148:29166" ph="..." />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file leaf-file-name="copo_isa_ena.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="-2102">
+                  <caret line="569" column="20" lean-forward="false" selection-start-line="569" selection-start-column="12" selection-end-line="569" selection-end-column="20" />
+                  <folding>
+                    <element signature="e#22#31#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -115,10 +155,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>pairing su</find>
-      <find>datafile_pairing</find>
-      <find>unp</find>
-      <find>to acc</find>
       <find>sort</find>
       <find>itemgetter</find>
       <find>language</find>
@@ -145,6 +181,10 @@
       <find>copo_isa_records_temp</find>
       <find>datafiles_temp</find>
       <find>deepcopy</find>
+      <find>_processSequence</find>
+      <find>datafiles_list</find>
+      <find>couldn't</find>
+      <find>copo_protocol_list</find>
     </findStrings>
     <replaceStrings>
       <replace>context-help-ctrl</replace>
@@ -213,7 +253,6 @@
         <option value="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" />
@@ -224,6 +263,7 @@
         <option value="$PROJECT_DIR$/web/src/submission/enaSubmission.py" />
         <option value="$PROJECT_DIR$/web/Dockerfile" />
         <option value="$PROJECT_DIR$/web/src/requirements/base.txt" />
+        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" />
         <option value="$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py" />
       </list>
     </option>
@@ -1385,7 +1425,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1920" y="-94" width="1920" height="1057" extended-state="6" />
+    <frame x="-1921" y="-94" width="1920" height="1057" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1783,13 +1823,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="400" column="97" lean-forward="false" selection-start-line="400" selection-start-column="97" selection-end-line="400" selection-end-column="97" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-221">
@@ -1826,21 +1859,41 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py">
+    <entry file="file://$PROJECT_DIR$/web/Dockerfile">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="1123" column="31" lean-forward="false" selection-start-line="1123" selection-start-column="23" selection-end-line="1123" selection-end-column="31" />
+        <state relative-caret-position="450">
+          <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="484" column="45" lean-forward="true" selection-start-line="484" selection-start-column="45" selection-end-line="484" selection-end-column="45" />
           <folding>
-            <element signature="e#22#31#0" expanded="true" />
+            <marker date="1512649099739" expanded="true" signature="5170:5190" ph="..." />
+            <marker date="1512649099739" expanded="true" signature="5467:5487" ph="..." />
+            <marker date="1512649099739" expanded="true" signature="5604:5618" ph="..." />
+            <marker date="1512649099739" expanded="true" signature="5720:5755" ph="..." />
+            <marker date="1512649099739" expanded="true" signature="5892:5912" ph="..." />
+            <marker date="1512649099739" expanded="true" signature="6100:6138" ph="..." />
+            <marker date="1512649099739" expanded="true" signature="6383:6421" ph="..." />
+            <marker date="1512649099739" expanded="true" signature="13452:13483" ph="..." />
+            <marker date="1512649099739" expanded="true" signature="18947:18962" ph="..." />
+            <marker date="1512649099739" expanded="true" signature="24563:24581" ph="..." />
+            <marker date="1512649099739" expanded="true" signature="29148:29166" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/Dockerfile">
+    <entry file="file://$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="16" lean-forward="true" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
-          <folding />
+        <state relative-caret-position="-2102">
+          <caret line="569" column="20" lean-forward="false" selection-start-line="569" selection-start-column="12" selection-end-line="569" selection-end-column="20" />
+          <folding>
+            <element signature="e#22#31#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

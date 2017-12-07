@@ -561,8 +561,13 @@ class Assay:
         indx = 0  # process sequence index
         processed_datafiles = list()  # datafiles already seen through the process sequence
         datafiles_temp = list(self.copo_isa_records["datafile"])
-        datafiles = list(self.copo_isa_records["datafile"])
-        for datafile in datafiles:
+        datafiles_list = list(self.copo_isa_records["datafile"])
+
+        # get relevant protocols
+        protocol_list_temp = list(self.copo_isa_records["protocol_list"])
+        protocol_list_temp[:] = [d for d in protocol_list_temp if d.get('name') not in ["sample collection"]]
+
+        for datafile in datafiles_list:
 
             # modify to reflect actual saved name, in case of any obfuscation of the file name
             datafile["name"] = os.path.split(datafile["file_location"])[-1]
@@ -587,12 +592,9 @@ class Assay:
                 samples = list(df['name'].apply(ISAHelpers().refactor_sample_reference))
                 materials = list(df['name'].apply(ISAHelpers().refactor_material_reference))
 
-            # get relevant protocols
-            copo_protocol_list = list(self.copo_isa_records["protocol_list"])
-            protocol_list = copo_protocol_list
-            protocol_list[:] = [d for d in protocol_list if d.get('name') not in ["sample collection"]]
 
-            lookup_list = list(protocol_list)
+            protocol_list = list(protocol_list_temp)
+            lookup_list = list(protocol_list_temp)
             for pr_indx, pr in enumerate(protocol_list):
                 inputs = list()
                 outputs = list()
@@ -665,7 +667,7 @@ class Assay:
                     pv_value = attributes.get(revised_name, dict()).get(pv_revised_name)
 
                     if pv_value is not None:
-                        # represent string values as an ontology object...can't tell the difference
+                        # represent string values as an ontology object
                         if isinstance(pv_value, str):
                             pv_value = dict(annotationValue=pv_value
                                             )
