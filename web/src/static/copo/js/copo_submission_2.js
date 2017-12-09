@@ -600,7 +600,7 @@ $(document).ready(function () {
                                         ;
                                     },
                                     error: function () {
-                                        alert("Couldn't complete submission to the target repository!");
+                                        //alert("Couldn't complete submission to the target repository!");
                                     }
                                 });
                             }

@@ -465,6 +465,7 @@ class Assay:
     def __init__(self, copo_isa_records=str()):
         self.copo_isa_records = copo_isa_records
         self.profile_id = str(self.copo_isa_records.get("profile").get("_id"))
+        self.process_sequence = list()
 
     def get_schema(self):
         component = "assay"
@@ -555,7 +556,6 @@ class Assay:
         return unitCategories
 
     def _processSequence(self, spec=dict()):
-        process_sequence = list()
         print("Composing assay process sequence...")
 
         # get datafiles
@@ -566,26 +566,170 @@ class Assay:
         protocol_list_temp = list(self.copo_isa_records["protocol_list"])
         protocol_list_temp[:] = [d for d in protocol_list_temp if d.get('name') not in ["sample collection"]]
 
-        # dfile_list = [[str(x["_id"]),
-        #                x.get("description", dict()).get("attributes", dict()).get('datafiles_pairing', dict()).get(
-        #                    'paired_file', str())] for x
-        #               in self.copo_isa_records["datafile"]]
-
-        dfile_list = {[str(x["_id"]),
+        dfile_list = [[str(x["_id"]),
                        x.get("description", dict()).get("attributes", dict()).get('datafiles_pairing', dict()).get(
                            'paired_file', str())] for x
-                      in self.copo_isa_records["datafile"]}
+                      in self.copo_isa_records["datafile"]]
 
         dfile_list = [sorted(x) for x in dfile_list]
         dfile_set = set(tuple(x) for x in dfile_list)
         dfile_list = [list(x) for x in dfile_set]  # get unique pairs
 
         for indx, dfile in enumerate(dfile_list):
-            process_sequence = ISAHelpers().get_assay_process_sequence(self.copo_isa_records, process_sequence, dfile,
-                                                                       protocol_list_temp, indx)
+            self.get_assay_process_sequence(dfile, protocol_list_temp, indx)
 
         print("Completed composing assay process sequence...")
-        return process_sequence
+        return self.process_sequence
+
+    def get_assay_process_sequence(self, datafile_pair, protocol_list_temp, indx):
+        datafile = DataFile().get_record(datafile_pair[0])
+
+        # modify to reflect actual saved name, in case of any obfuscation of the file name
+        datafile["name"] = os.path.split(datafile["file_location"])[-1]
+
+        # get description attributes
+        attributes = datafile.get("description", dict()).get("attributes", dict())
+        datafile_samples = attributes.get("attach_samples", dict()).get("study_samples", list())
+
+        indx = indx + 1
+
+        samples = list()
+        materials = list()
+
+        if datafile_samples:
+            datafile_samples = datafile_samples.split(",")
+            copo_samples = self.copo_isa_records["sample"]
+            df = pd.DataFrame(copo_samples)
+            df = df[df['_id'].isin([ObjectId(element) for element in datafile_samples])]
+            samples = list(df['name'].apply(ISAHelpers().refactor_sample_reference))
+            materials = list(df['name'].apply(ISAHelpers().refactor_material_reference))
+
+        protocol_list = list(protocol_list_temp)
+        lookup_list = list(protocol_list_temp)
+        for pr_indx, pr in enumerate(protocol_list):
+            inputs = list()
+            outputs = list()
+            previous_process = dict()
+            next_process = dict()
+            comments = list()
+            parameter_values = list()
+            revised_name = pr.get("name", str()).replace(" ", "_")
+
+            # set sample and extracts
+            if revised_name in ["nucleic_acid_extraction"]:
+                inputs = samples
+                outputs = materials
+
+            # set export
+            if revised_name in ["nucleic_acid_sequencing", "library_construction"]:
+                comment_schema = d_utils.get_db_json_schema("comment")
+                for k in comment_schema:
+                    comment_schema = ISAHelpers().resolve_schema_key(comment_schema, k,
+                                                                     "comment",
+                                                                     dict(name="Export", value="yes"))
+                comments.append(comment_schema)
+
+            # set datafile output
+            if revised_name in ["nucleic_acid_sequencing"]:
+                outputs.append({"@id": ISAHelpers().get_id_field("datafile", datafile)})
+
+                # is this a paired read?
+                if datafile_pair[1]:
+                    paired_datafile = DataFile().get_record(datafile_pair[1])
+                    paired_datafile["name"] = os.path.split(paired_datafile["file_location"])[-1]
+                    outputs.append({"@id": ISAHelpers().get_id_field("datafile", paired_datafile)})
+
+            if protocol_list[pr_indx - 1].get("name", str()).replace(" ", "_") == "nucleic_acid_extraction":
+                inputs = materials
+
+            # set previous...
+            if pr_indx > 0:
+                previous_name = lookup_list[pr_indx - 1].get("name", str()).replace(" ", "_")
+                previous_process = {"@id": ISAHelpers().get_id_field("process",
+                                                                     dict(name=previous_name + str(indx)))}
+                # refine input
+                if previous_name == "nucleic_acid_extraction":
+                    inputs = materials
+
+            # ...and next processes
+            if (pr_indx + 1) < len(lookup_list):
+                next_name = lookup_list[pr_indx + 1].get("name", str()).replace(" ", "_")
+
+                if next_name == "nucleic_acid_sequencing":
+                    # expose the experiment name here
+                    next_name = "EXP"
+
+                next_process = {"@id": ISAHelpers().get_id_field("process",
+                                                                 dict(name=next_name + str(indx)))}
+
+            # set parameter values
+            for pv in pr.get("parameterValues", list()):
+                pv = htags.trim_parameter_value_label(pv).lower()
+                pv_revised_name = pv.replace(" ", "_")
+
+                pv_value = attributes.get(revised_name, dict()).get(pv_revised_name)
+
+                if pv_value is not None:
+                    # represent string values as an ontology object
+                    if isinstance(pv_value, str):
+                        pv_value = dict(annotationValue=pv_value
+                                        )
+
+                    if isinstance(pv_value, dict):
+                        ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
+                        for k in ontology_schema:
+                            ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, k,
+                                                                              "ontology_annotation",
+                                                                              pv_value)
+
+                        pv_value = ontology_schema
+
+                    pv_dict = dict(
+                        category={"@id": ISAHelpers().get_id_field("parameter", dict(name=pv_revised_name))},
+                        value=pv_value
+                    )
+
+                    pp_schema = d_utils.get_db_json_schema("process_parameter_value")
+
+                    for k in pp_schema:
+                        pp_schema[k] = pv_dict.get(k,
+                                                   ISAHelpers().get_schema_key_type(pp_schema.get(k, dict())))
+
+                    # remove 'unit' from schema
+                    if "unit" in pp_schema:
+                        del pp_schema["unit"]
+
+                    parameter_values.append(pp_schema)
+
+            # set name
+            name = pr.get("name", str()).replace(" ", "_") + str(indx)
+            if revised_name == "nucleic_acid_sequencing":
+                name = "EXP" + str(indx)
+
+            # set value dictionary
+            value_dict = dict(
+                executesProtocol={"@id": ISAHelpers().get_id_field("protocol",
+                                                                   dict(name=revised_name))},
+                inputs=inputs,
+                outputs=outputs,
+                previousProcess=previous_process,
+                nextProcess=next_process,
+                parameterValues=parameter_values,
+                comments=comments,
+                name=name
+            )
+
+            # get process schema
+            process_schema = d_utils.get_db_json_schema("process")
+            for k in process_schema:
+                if k == "@id":
+                    process_schema[k] = ISAHelpers().get_id_field("process", dict(
+                        name=name))
+                else:
+                    process_schema[k] = value_dict.get(k, ISAHelpers().get_schema_key_type(
+                        process_schema.get(k, dict())))
+
+            self.process_sequence.append(process_schema)
 
 
 class treatedRecordThread(threading.Thread):
@@ -911,158 +1055,6 @@ class ISAHelpers:
                     protocol_list[-1].get("parameterValues").append(child.attrib.get("header", str()))
 
         return protocol_list
-
-    def get_assay_process_sequence(self, copo_isa_records, process_sequence, datafile_pair, protocol_list_temp, indx):
-        datafile = DataFile().get_record(datafile_pair[0])
-
-        # modify to reflect actual saved name, in case of any obfuscation of the file name
-        datafile["name"] = os.path.split(datafile["file_location"])[-1]
-
-        # get description attributes
-        attributes = datafile.get("description", dict()).get("attributes", dict())
-        datafile_samples = attributes.get("attach_samples", dict()).get("study_samples", list())
-
-        indx = indx + 1
-
-        samples = list()
-        materials = list()
-
-        if datafile_samples:
-            datafile_samples = datafile_samples.split(",")
-            copo_samples = copo_isa_records["sample"]
-            df = pd.DataFrame(copo_samples)
-            df = df[df['_id'].isin([ObjectId(element) for element in datafile_samples])]
-            samples = list(df['name'].apply(ISAHelpers().refactor_sample_reference))
-            materials = list(df['name'].apply(ISAHelpers().refactor_material_reference))
-
-        protocol_list = list(protocol_list_temp)
-        lookup_list = list(protocol_list_temp)
-        for pr_indx, pr in enumerate(protocol_list):
-            inputs = list()
-            outputs = list()
-            previous_process = dict()
-            next_process = dict()
-            comments = list()
-            parameter_values = list()
-            revised_name = pr.get("name", str()).replace(" ", "_")
-
-            # set sample and extracts
-            if revised_name in ["nucleic_acid_extraction"]:
-                inputs = samples
-                outputs = materials
-
-            # set export
-            if revised_name in ["nucleic_acid_sequencing", "library_construction"]:
-                comment_schema = d_utils.get_db_json_schema("comment")
-                for k in comment_schema:
-                    comment_schema = ISAHelpers().resolve_schema_key(comment_schema, k,
-                                                                     "comment",
-                                                                     dict(name="Export", value="yes"))
-                comments.append(comment_schema)
-
-            # set datafile output
-            if revised_name in ["nucleic_acid_sequencing"]:
-                outputs.append({"@id": ISAHelpers().get_id_field("datafile", datafile)})
-
-                # is this a paired read?
-                if datafile_pair[1]:
-                    paired_datafile = DataFile().get_record(datafile_pair[1])
-                    paired_datafile["name"] = os.path.split(paired_datafile["file_location"])[-1]
-                    outputs.append({"@id": ISAHelpers().get_id_field("datafile", paired_datafile)})
-
-            if protocol_list[pr_indx - 1].get("name", str()).replace(" ", "_") == "nucleic_acid_extraction":
-                inputs = materials
-
-            # set previous...
-            if pr_indx > 0:
-                previous_name = lookup_list[pr_indx - 1].get("name", str()).replace(" ", "_")
-                previous_process = {"@id": ISAHelpers().get_id_field("process",
-                                                                     dict(name=previous_name + str(indx)))}
-                # refine input
-                if previous_name == "nucleic_acid_extraction":
-                    inputs = materials
-
-            # ...and next processes
-            if (pr_indx + 1) < len(lookup_list):
-                next_name = lookup_list[pr_indx + 1].get("name", str()).replace(" ", "_")
-
-                if next_name == "nucleic_acid_sequencing":
-                    # expose the experiment name here
-                    next_name = "EXP"
-
-                next_process = {"@id": ISAHelpers().get_id_field("process",
-                                                                 dict(name=next_name + str(indx)))}
-
-            # set parameter values
-            for pv in pr.get("parameterValues", list()):
-                pv = htags.trim_parameter_value_label(pv).lower()
-                pv_revised_name = pv.replace(" ", "_")
-
-                pv_value = attributes.get(revised_name, dict()).get(pv_revised_name)
-
-                if pv_value is not None:
-                    # represent string values as an ontology object
-                    if isinstance(pv_value, str):
-                        pv_value = dict(annotationValue=pv_value
-                                        )
-
-                    if isinstance(pv_value, dict):
-                        ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
-                        for k in ontology_schema:
-                            ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, k,
-                                                                              "ontology_annotation",
-                                                                              pv_value)
-
-                        pv_value = ontology_schema
-
-                    pv_dict = dict(
-                        category={"@id": ISAHelpers().get_id_field("parameter", dict(name=pv_revised_name))},
-                        value=pv_value
-                    )
-
-                    pp_schema = d_utils.get_db_json_schema("process_parameter_value")
-
-                    for k in pp_schema:
-                        pp_schema[k] = pv_dict.get(k,
-                                                   ISAHelpers().get_schema_key_type(pp_schema.get(k, dict())))
-
-                    # remove 'unit' from schema
-                    if "unit" in pp_schema:
-                        del pp_schema["unit"]
-
-                    parameter_values.append(pp_schema)
-
-            # set name
-            name = pr.get("name", str()).replace(" ", "_") + str(indx)
-            if revised_name == "nucleic_acid_sequencing":
-                name = "EXP" + str(indx)
-
-            # set value dictionary
-            value_dict = dict(
-                executesProtocol={"@id": ISAHelpers().get_id_field("protocol",
-                                                                   dict(name=revised_name))},
-                inputs=inputs,
-                outputs=outputs,
-                previousProcess=previous_process,
-                nextProcess=next_process,
-                parameterValues=parameter_values,
-                comments=comments,
-                name=name
-            )
-
-            # get process schema
-            process_schema = d_utils.get_db_json_schema("process")
-            for k in process_schema:
-                if k == "@id":
-                    process_schema[k] = ISAHelpers().get_id_field("process", dict(
-                        name=name))
-                else:
-                    process_schema[k] = value_dict.get(k, ISAHelpers().get_schema_key_type(
-                        process_schema.get(k, dict())))
-
-            process_sequence.append(process_schema)
-
-        return process_sequence
 
     def get_isa_records(self, component, records=list()):
         isa_records = list()
