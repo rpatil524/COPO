@@ -159,10 +159,6 @@ def copo_visualize(request):
 
     task = request.POST.get("task", str())
 
-    import converters.ena.copo_isa_ena as cnv
-    conv = cnv.Investigation(submission_token="5a2bdb30d127fd13aa1eaa3c")
-    meta = conv.get_schema()
-
     profile_id = request.session.get("profile_id", str())
 
     context["quick_tour_flag"] = request.session.get("quick_tour_flag", True)

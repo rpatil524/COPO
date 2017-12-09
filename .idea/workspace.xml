@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="completed submission view" />
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="completed submission view">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" />
+    </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -66,7 +68,7 @@
     <splitter split-orientation="vertical" split-proportion="0.4966533">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="copo_isa_ena.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="copo_isa_ena.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="-23">
@@ -120,11 +122,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="54">
-                  <caret line="161" column="45" lean-forward="true" selection-start-line="161" selection-start-column="45" selection-end-line="161" selection-end-column="45" />
+                <state relative-caret-position="24">
+                  <caret line="159" column="42" lean-forward="false" selection-start-line="159" selection-start-column="42" selection-end-line="159" selection-end-column="42" />
                   <folding>
                     <element signature="e#0#11#0" expanded="true" />
                   </folding>
@@ -339,8 +341,8 @@
         <option value="$PROJECT_DIR$/web/src/submission/enaSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/submission/data/5a2bd9ddd127fd0fee475bdf/json/isa_json.json" />
         <option value="$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" />
         <option value="$PROJECT_DIR$/web/Dockerfile" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" />
       </list>
     </option>
   </component>
@@ -2003,16 +2005,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="161" column="45" lean-forward="true" selection-start-line="161" selection-start-column="45" selection-end-line="161" selection-end-column="45" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/nginx/sites-enabled/django_project">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
@@ -2043,6 +2035,16 @@
           <caret line="566" column="0" lean-forward="false" selection-start-line="566" selection-start-column="0" selection-end-line="566" selection-end-column="0" />
           <folding>
             <element signature="e#22#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="24">
+          <caret line="159" column="42" lean-forward="false" selection-start-line="159" selection-start-column="42" selection-end-line="159" selection-end-column="42" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
