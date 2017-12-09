@@ -3059,7 +3059,7 @@ $(document).ready(function () {
 
 
         if (add_to_bundle.length > 0 || do_not_pair_list.length > 0 || (unpaired_list.length > 0 && unpaired_list.length % 2 != 0)) {
-            var message = '<span style="margin-bottom: 10px;">Your attention is drawn to the following:</span>';
+            var message = '';
             var alertElem = $('#paired-message-' + activeStageIndx);
             alertElem.webuiPopover('destroy');
 
@@ -3098,21 +3098,21 @@ $(document).ready(function () {
                 message += tempMessage;
             }
 
-            var okButton = '<div class="text-center alertdismissOK" style="margin-top: 15px;"><button class="mini ui orange basic button">OK</button></div>';
-
-            var pop_title = 'Pairing Information';
-            var pop_content = '<i class="fa fa-exclamation-circle" aria-hidden="true" style="color: darkorange; font-size: 15px !important; padding-right: 10px;"></i>' + message;
-            pop_content += okButton;
-            var meta_extra = {
-                width: 300,
-                placement: 'auto',
-                trigger: 'sticky',
-                backdrop: true,
-                style: '',
-                closeable: false
-            };
-
-            refresh_webpop(alertElem, pop_title, pop_content, meta_extra);
+            BootstrapDialog.show({
+                title: "Pairing Alert",
+                message: message,
+                cssClass: 'copo-modal2',
+                closable: false,
+                animate: true,
+                type: BootstrapDialog.TYPE_WARNING,
+                buttons: [{
+                    label: 'OK',
+                    cssClass: 'tiny ui basic orange button',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                    }
+                }]
+            });
         }
 
 

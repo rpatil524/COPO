@@ -19,9 +19,6 @@ import subprocess, os, pexpect
 
 from datetime import datetime
 
-from django.shortcuts import redirect
-from django.http import HttpRequest
-
 REPOSITORIES = settings.REPOSITORIES
 BASE_DIR = settings.BASE_DIR
 lg = settings.LOGGER
@@ -232,18 +229,6 @@ class EnaSubmit(object):
 
             # save collected metadata to the transfer record
             RemoteDataFile().update_transfer(transfer_token, transfer_fields)
-
-        # if we get this far, then all files should have been uploaded
-        submission_record = Submission().get_record(sub_id)
-
-        # set all bundle items to true
-        bundle_meta = submission_record.get("bundle_meta", list())
-        for indx, b in enumerate(bundle_meta):
-            if not b['upload_status']:
-                bundle_meta[indx]['upload_status'] = True
-
-        kwargs = dict(target_id=sub_id, bundle_meta=bundle_meta)
-        Submission().save_record(dict(), **kwargs)
 
         # setup paths for conversion directories
         conv_dir = os.path.join(self._dir, sub_id)

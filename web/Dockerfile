@@ -26,4 +26,4 @@ WORKDIR /copo
 COPY src /code/
 RUN pip install -r /code/requirements/dev.txt
 
-ENTRYPOINT ["bash","-c","rsync -avhW --no-compress --progress /code/ /copo/ && rm -rf /code/ && python manage.py makemigrations rest && python manage.py makemigrations chunked_upload && python manage.py makemigrations && python manage.py migrate && python /copo/social.py && /usr/local/bin/gunicorn web.wsgi:application -w 4 -t 50000 -k 'eventlet' -b :8000"]
+ENTRYPOINT ["bash","-c","rsync -avhW --no-compress --progress /code/ /copo/ && rm -rf /code/ && python manage.py makemigrations rest && python manage.py makemigrations chunked_upload && python manage.py makemigrations && python manage.py migrate && python /copo/social.py && /usr/local/bin/gunicorn web.wsgi:application -w 3 -t 300 -k 'gevent' -b :8000"]

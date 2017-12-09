@@ -365,11 +365,11 @@ DROP_DOWNS = {
             'label': 'MIAPPE Compliant',
             'description': 'MIAPPE is a Minimum Information (MI) standard for plant phenotyping. This repository option defines a list of attributes for describing a phenotyping experiment.'
         },
-        {
-            'value': 'dcterms',
-            'label': 'Dataverse',
-            'description': 'The Dataverse repository option defines metadata for submissions to a Dataverse.'
-        }
+        # {
+        #     'value': 'dcterms',
+        #     'label': 'Dataverse',
+        #     'description': 'The Dataverse repository option defines metadata for submissions to a Dataverse.'
+        # }
         # {
         #     'value': 'MetaboLights',
         #     'label': 'MetaboLights'
