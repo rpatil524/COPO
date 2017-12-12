@@ -156,6 +156,8 @@ class FigshareSubmit(object):
 
         # mark submission as complete
         Submission().mark_submission_complete(sub_id, article_id=article_id)
+        Submission().mark_submission_complete(sub_id)
+        Submission().mark_figshare_article_id(sub_id=sub_id, article_id=article_id)
 
 
     def publish_article(self, article_id):

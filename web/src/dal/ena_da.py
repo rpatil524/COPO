@@ -1,19 +1,17 @@
-__author__ = 'felix.shaw@tgac.ac.uk - 18/03/15'
-
 from datetime import date
 import difflib
 import string
 import uuid
 import ast
 import re
-
 import random
-import web.apps.web_copo.schemas.utils.data_utils as d_utils
+from web.apps.web_copo.schemas.utils import data_utils as d_utils
 from chunked_upload.models import ChunkedUpload
 from dal.mongo_util import get_collection_ref
 from dal.base_resource import Resource
 from dal import ObjectId
 from dal.copo_base_da import DataSchemas
+__author__ = 'felix.shaw@tgac.ac.uk - 18/03/15'
 
 EnaCollections = get_collection_ref("EnaCollections")
 

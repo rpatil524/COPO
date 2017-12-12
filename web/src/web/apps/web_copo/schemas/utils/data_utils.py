@@ -9,9 +9,7 @@ from bson.json_util import dumps
 from collections import namedtuple
 import xml.etree.ElementTree as ET
 from django_tools.middlewares import ThreadLocal
-
-from tools import resolve_env
-from api.copo_id import get_uid
+# from web.apps.web_copo.utils.ajax_handlers import get_continuation_studies
 import web.apps.web_copo.lookup.lookup as lookup
 from web.apps.web_copo.lookup.resolver import RESOLVER
 
@@ -118,6 +116,10 @@ def get_figshare_category_options():
     return output
 
 
+def get_dataverse_subject_dropdown():
+    return lookup.DROP_DOWNS['DATAVERSE_SUBJECTS']
+
+
 def get_figshare_article_options():
     return lookup.DROP_DOWNS['FIGSHARE_ARTICLE_TYPES']
 
@@ -128,6 +130,31 @@ def get_figshare_license_options():
 
 def get_figshare_publish_options():
     return lookup.DROP_DOWNS['YES_NO']
+
+
+def get_existing_study_options():
+    from dal.copo_da import Submission
+    subs = Submission().get_complete()
+    out = list()
+    out.append({
+        "value": "required",
+        "label": "-- select one --"
+    })
+    out.append({
+        "value": "none",
+        "label": "Not in COPO"
+    })
+    for s in subs:
+        try:
+            out.append(
+                {
+                    "value": s['profile_id'],
+                    "label": s['accessions']['project']['accession']
+                }
+            )
+        except:
+            pass
+    return out
 
 
 def get_isasamples_json():
@@ -282,6 +309,10 @@ def get_sample_type_options():
 
 def get_repository_options():
     return lookup.DROP_DOWNS['REPOSITORIES']
+
+
+def get_omics_type_options():
+    return lookup.DROP_DOWNS['OMICS_TYPE']
 
 
 def get_growth_area_options():
@@ -488,6 +519,15 @@ def default_jsontype(type):
         d_type = False
 
     return d_type
+
+
+def get_studies():
+    return lookup.DROP_DOWNS['OMICS_TYPE']
+    # data = {
+    #    "value": "na",
+    #    "label": "Not Applicable"
+    # }
+    # return data
 
 
 def get_args_from_parameter(parameter, param_value_dict):

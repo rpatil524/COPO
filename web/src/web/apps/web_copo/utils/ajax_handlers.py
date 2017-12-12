@@ -10,14 +10,15 @@ from django.http import HttpResponse
 from django_tools.middlewares import ThreadLocal
 from jsonpickle import encode
 from dateutil import parser
-
+from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
 from django.conf import settings
-from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile
+from dal.copo_da import ProfileInfo, RemoteDataFile, Submission
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
 from pandas import read_excel
+from submission.dataverseSubmission import DataverseSubmit
 
 
 def get_source_count(self):
@@ -165,6 +166,23 @@ def get_accession_data(request):
     return HttpResponse(json_util.dumps({'sub': sub}))
 
 
+def get_dataset_details(request):
+    profile_id = request.GET['profile_id']
+    resp = Profile().check_for_dataset_details(profile_id)
+    return HttpResponse(json.dumps(resp))
+
+def get_samples_for_study(request):
+    # get all samples which have corresponding profile_id number
+    profile_id = request.POST['profile_id']
+    samples = Sample().get_from_profile_id(profile_id=profile_id)
+    output = list()
+    for s in samples:
+        source = Source().get_record(s['derivesFrom'][0])
+        #s.update(source)
+        d = {"organism": source["organism"], "_id": s["_id"], "name": s["name"]}
+        output.append(d)
+    return HttpResponse(json_util.dumps(output))
+
 def set_session_variable(request):
     try:
         key = request.POST['key']
@@ -172,4 +190,26 @@ def set_session_variable(request):
         request.session[key] = value
     except:
         pass
+
+    key = request.POST['key']
+    try:
+        value = request.POST['value']
+    except:
+        value = None
+    request.session[key] = value
     return HttpResponse(True)
+
+
+
+def get_continuation_studies():
+    user = ThreadLocal.get_current_user()
+    profiles = Profile().get_for_user(user.id)
+    output = list()
+    for p in profiles:
+        output.append(
+            {
+                "value": p.title,
+                "label": p._id
+            }
+        )
+    return output

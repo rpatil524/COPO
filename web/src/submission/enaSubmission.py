@@ -6,6 +6,7 @@ from tools import resolve_env
 from django.conf import settings
 from dal.copo_da import DataFile
 from dal.copo_da import RemoteDataFile, Submission, Profile
+from django.http import HttpResponse
 
 from web.apps.web_copo.lookup.copo_enums import *
 
@@ -19,11 +20,15 @@ import subprocess, os, pexpect
 
 from datetime import datetime
 
+from django.shortcuts import redirect
+from django.http import HttpRequest
+
 REPOSITORIES = settings.REPOSITORIES
 BASE_DIR = settings.BASE_DIR
 lg = settings.LOGGER
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
+import submission.ena_xml_util as xml
 
 
 class EnaSubmit(object):
@@ -208,6 +213,7 @@ class EnaSubmit(object):
                 thread.close()
                 lg.log('Aspera Transfer completed', level=Loglvl.INFO, type=Logtype.FILE)
 
+
             except OSError:
                 transfer_fields = dict()
                 transfer_fields["error"] = "Encountered problems with file upload."
@@ -231,24 +237,33 @@ class EnaSubmit(object):
             RemoteDataFile().update_transfer(transfer_token, transfer_fields)
 
         # setup paths for conversion directories
+        if self.submission['repository'] == 'ena-seq':
+            return self.do_seq_reads_submission(sub_id, remote_path, transfer_token)
+        elif self.submission['repository'] == 'ena-ant':
+            return self.do_annotation_submission(sub_id, remote_path, transfer_token)
+
+
+    def do_seq_reads_submission(self, sub_id, remote_path, transfer_token):
+        # # setup paths for conversion directories
         conv_dir = os.path.join(self._dir, sub_id)
         if not os.path.exists(os.path.join(conv_dir, 'json')):
             os.makedirs(os.path.join(conv_dir, 'json'))
         json_file_path = os.path.join(conv_dir, 'json', 'isa_json.json')
         xml_dir = conv_dir
         xml_path = os.path.join(xml_dir, 'run_set.xml')
-
-        #  Convert COPO JSON to ISA JSON
-        lg.log('Obtaining ISA-JSON', level=Loglvl.INFO, type=Logtype.FILE)
+        #
+        # #  Convert COPO JSON to ISA JSON
+        # lg.log('Obtaining ISA-JSON', level=Loglvl.INFO, type=Logtype.FILE)
         conv = cnv.Investigation(submission_token=sub_id)
         meta = conv.get_schema()
         json_file = open(json_file_path, '+w')
-        # dump metadata to output file
+        # # dump metadata to output file
         json_file.write(dumps(meta))
         json_file.close()
 
         # Validate ISA_JSON
         lg.log('Validating ISA-JSON', level=Loglvl.INFO, type=Logtype.FILE)
+
         with open(json_file_path) as json_file:
             v = isajson.validate(json_file)
             lg.log(v, level=Loglvl.INFO, type=Logtype.FILE)
@@ -278,17 +293,85 @@ class EnaSubmit(object):
             **locals())
 
         curl_cmd = 'curl -k -F "SUBMISSION=@' + submission_file + '" \
-         -F "PROJECT=@' + os.path.join(remote_path, project_file) + '" \
-         -F "SAMPLE=@' + os.path.join(remote_path, sample_file) + '" \
-         -F "EXPERIMENT=@' + os.path.join(remote_path, experiment_file) + '" \
-         -F "RUN=@' + os.path.join(remote_path, run_file) + '"' \
+                 -F "PROJECT=@' + os.path.join(remote_path, project_file) + '" \
+                 -F "SAMPLE=@' + os.path.join(remote_path, sample_file) + '" \
+                 -F "EXPERIMENT=@' + os.path.join(remote_path, experiment_file) + '" \
+                 -F "RUN=@' + os.path.join(remote_path, run_file) + '"' \
                    + '   "' + ena_uri + '"'
 
         output = subprocess.check_output(curl_cmd, shell=True)
         lg.log(output, level=Loglvl.INFO, type=Logtype.FILE)
         lg.log("Extracting fields from receipt", level=Loglvl.INFO, type=Logtype.FILE)
 
-        xml = ET.fromstring(output)
+        accessions = self.get_accessions(output)
+
+        # save accessions to mongo profile record
+        s = Submission().get_record(sub_id)
+        s['accessions'] = accessions
+        s['complete'] = True
+        s['target_id'] = str(s.pop('_id'))
+        Submission().save_record(dict(), **s)
+        RemoteDataFile().delete_transfer(transfer_token)
+        return True
+
+    def do_annotation_submission(self, sub_id, remote_path, transfer_token):
+        from submission import ena_xml_util as xml
+        study = xml.do_study_xml(sub_id)
+        sample = xml.do_sample_xml(sub_id)
+        analysis = xml.do_analysis_xml(sub_id)
+        submission = xml.do_submission_xml(sub_id)
+
+        xml_dir = os.path.join(self._dir, sub_id)
+        if not os.path.exists(os.path.join(xml_dir)):
+            os.makedirs(os.path.join(xml_dir))
+
+        with open(os.path.join(xml_dir, 'study.xml'), "w") as ff:
+            ff.write(study)
+        with open(os.path.join(xml_dir, 'sample.xml'), "w") as ff:
+            ff.write(sample)
+        with open(os.path.join(xml_dir, 'analysis.xml'), "w") as ff:
+            ff.write(analysis)
+        with open(os.path.join(xml_dir, 'submission.xml'), "w") as ff:
+            ff.write(submission)
+
+        pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
+        user_token = resolve_env.get_env('WEBIN_USER')
+        user_token = user_token.split("@")[0]
+        ena_uri = "https://www-test.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20{user_token!s}%20{pass_word!s}".format(
+            **locals())
+
+        curl_cmd = 'curl -k -F "SUBMISSION=@' + os.path.join(xml_dir, 'submission.xml') + '" -F "ANALYSIS=@' + os.path.join(xml_dir, 'analysis.xml') + '" -F "STUDY=@' + os.path.join(xml_dir, 'study.xml') + '" "' + ena_uri + '"'
+
+        receipt = subprocess.check_output(curl_cmd, shell=True)
+
+        #TODO - this needs removing before deployment
+        with open(os.path.join("/Users/fshaw/Desktop/", 'receipt.xml'), "w+") as ff:
+            ff.write(receipt.decode('utf-8'))
+
+        accessions = self.get_accessions(receipt)
+
+        # save accessions to mongo profile record
+        s = Submission().get_record(sub_id)
+        s['accessions'] = accessions
+        s['complete'] = True
+        s['target_id'] = str(s.pop('_id'))
+        Submission().save_record(dict(), **s)
+        RemoteDataFile().delete_transfer(transfer_token)
+
+
+
+
+
+        lg.log(receipt, level=Loglvl.INFO, type=Logtype.FILE)
+        lg.log("Extracting fields from receipt", level=Loglvl.INFO, type=Logtype.FILE)
+
+        return True
+
+
+
+
+    def get_accessions(self, reciept):
+        xml = ET.fromstring(reciept)
 
         accessions = dict()
 
@@ -309,6 +392,11 @@ class EnaSubmit(object):
             return False
 
         # get project accessions
+        project = xml.find('./PROJECT')
+        if project is not None:
+            project_accession = project.get('accession', default='undefined')
+            project_alias = project.get('alias', default='undefined')
+            accessions['project'] = {'accession': project_accession, 'alias': project_alias}
         projects = xml.findall('./PROJECT')
         project_accessions = list()
         for project in projects:
@@ -319,42 +407,46 @@ class EnaSubmit(object):
 
         # get experiment accessions
         experiments = xml.findall('./EXPERIMENT')
-        experiment_accessions = list()
-        for experiment in experiments:
-            experiment_accession = experiment.get('accession', default='undefined')
-            experiment_alias = experiment.get('alias', default='undefined')
-            experiment_accessions.append(dict(accession=experiment_accession, alias=experiment_alias))
-        accessions['experiment'] = experiment_accessions
+        if experiment is not None:
+            experiment_accessions = list()
+            for experiment in experiments:
+                experiment_accession = experiment.get('accession', default='undefined')
+                experiment_alias = experiment.get('alias', default='undefined')
+                experiment_accessions.append(dict(accession=experiment_accession, alias=experiment_alias))
+            accessions['experiment'] = experiment_accessions
 
         # get submission accessions
         submissions = xml.findall('./SUBMISSION')
-        submission_accessions = list()
-        for submission in submissions:
-            submission_accession = submission.get('accession', default='undefined')
-            submission_alias = submission.get('alias', default='undefined')
-            submission_accessions.append(dict(accession=submission_accession, alias=submission_alias))
-        accessions['submission'] = submission_accessions
+        if submission is not None:
+            submission_accessions = list()
+            for submission in submissions:
+                submission_accession = submission.get('accession', default='undefined')
+                submission_alias = submission.get('alias', default='undefined')
+                submission_accessions.append(dict(accession=submission_accession, alias=submission_alias))
+            accessions['submission'] = submission_accessions
 
         # get run accessions
         runs = xml.findall('./RUN')
-        run_accessions = list()
-        for run in runs:
-            run_accession = run.get('accession', default='undefined')
-            run_alias = run.get('alias', default='undefined')
-            run_accessions.append(dict(accession=run_accession, alias=run_alias))
-        accessions['run'] = run_accessions
+        if run is not None:
+            run_accessions = list()
+            for run in runs:
+                run_accession = run.get('accession', default='undefined')
+                run_alias = run.get('alias', default='undefined')
+                run_accessions.append(dict(accession=run_accession, alias=run_alias))
+            accessions['run'] = run_accessions
 
         # get sample accessions
         samples = xml.findall('./SAMPLE')
-        sample_accessions = list()
-        for sample in samples:
-            sample_accession = sample.get('accession', default='undefined')
-            sample_alias = sample.get('alias', default='undefined')
-            s = {'sample_accession': sample_accession, 'sample_alias': sample_alias}
-            for bio_s in sample:
-                s['biosample_accession'] = bio_s.get('accession', default='undefined')
-            sample_accessions.append(s)
-        accessions['sample'] = sample_accessions
+        if samples is not None:
+            sample_accessions = list()
+            for sample in samples:
+                sample_accession = sample.get('accession', default='undefined')
+                sample_alias = sample.get('alias', default='undefined')
+                s = {'sample_accession': sample_accession, 'sample_alias': sample_alias}
+                for bio_s in sample:
+                    s['biosample_accession'] = bio_s.get('accession', default='undefined')
+                sample_accessions.append(s)
+            accessions['sample'] = sample_accessions
 
         # save accessions to mongo record
         s = Submission().get_record(sub_id)

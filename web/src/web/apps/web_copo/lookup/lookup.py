@@ -299,6 +299,64 @@ DROP_DOWNS = {
         }
 
     ],
+    "DATAVERSE_SUBJECTS": [
+        {
+            'value': 'Arts and Humanities',
+            'label': 'Arts and Humanities',
+        },
+        {
+            'value': 'Computer and Information Science',
+            'label': 'Computer and Information Science',
+        },
+        {
+            'value': 'Law',
+            'label': 'Law',
+        },
+        {
+            'value': 'Engineering',
+            'label': 'Engineering',
+        },
+        {
+            'value': 'Social Sciences',
+            'label': 'Social Sciences',
+        },
+        {
+            'value': 'Medicine, Health and Life Sciences',
+            'label': 'Medicine, Health and Life Sciences',
+        },
+        {
+            'value': 'Agricultural Sciences',
+            'label': 'Agricultural Sciences',
+        },
+        {
+            'value': 'Astronomy and Astrophysics',
+            'label': 'Astronomy and Astrophysics',
+        },
+        {
+            'value': 'Business and Management',
+            'label': 'Business and Management',
+        },
+        {
+            'value': 'Chemistry',
+            'label': 'Chemistry',
+        },
+        {
+            'value': 'Earth and Environmental Sciences',
+            'label': 'Earth and Environmental Sciences',
+        },
+        {
+            'value': 'Mathematical Sciences',
+            'label': 'Mathematical Sciences',
+        },
+        {
+            'value': 'Physics',
+            'label': 'Physics',
+        },
+        {
+            'value': 'Other',
+            'label': 'Other',
+        }
+    ],
     "LICENSE_TYPES": [
         {
             'value': 'Apache-2.0',
@@ -341,9 +399,17 @@ DROP_DOWNS = {
     ],
     "REPOSITORIES": [
         {
-            'value': 'ena',
+            'value': 'ena-seq',
             'label': 'ENA - Sequence Reads',
-            'description': 'This repository option defines metadata for submission of <strong>raw sequence reads</strong> to the European Nucleotide Archive (ENA).'
+            'description': 'This repository option defines metadata for submission of <strong>raw sequence reads</strong> to the European Nucleotide Archive (Sequence Reads)'
+        },
+        {
+            'value': 'ena-asm',
+            'label': 'European Nucleotide Archive (Sequence Assemblies)'
+        },
+        {
+            'value': 'ena-ant',
+            'label': 'European Nucleotide Archive (Sequence Annotations).'
         },
         # {
         #     'value': 'ena-ant',
@@ -365,11 +431,10 @@ DROP_DOWNS = {
             'label': 'MIAPPE Compliant',
             'description': 'MIAPPE is a Minimum Information (MI) standard for plant phenotyping. This repository option defines a list of attributes for describing a phenotyping experiment.'
         },
-        # {
-        #     'value': 'dcterms',
-        #     'label': 'Dataverse',
-        #     'description': 'The Dataverse repository option defines metadata for submissions to a Dataverse.'
-        # }
+        {
+            'value': 'dcterms',
+            'label': 'Dataverse'
+        }
         # {
         #     'value': 'MetaboLights',
         #     'label': 'MetaboLights'
@@ -378,6 +443,23 @@ DROP_DOWNS = {
         #     'value': 'unknown',
         #     'label': 'Unknown'
         # }
+    ],
+    "OMICS_TYPES": [
+        {
+            "value": 1,
+            "label": "Sequence Reads",
+            "description": "Use this option to submit raw data from various sequencing platforms"
+        },
+        {
+            "value": 2,
+            "label": "Sequence Assemblies",
+            "description": "Use this option to submit assembled scaffolds",
+        },
+        {
+            "value": 3,
+            "label": "Annotations",
+            "description": "Use this option to submit Annotations of objects already submitted"
+        }
     ],
     "SAMPLE_TYPES": [
         {
@@ -555,11 +637,14 @@ UI_INFO = {
 # specifies file paths holding the configs for wizard stages:
 WIZARD_FILES = {
     'start': os.path.join(RESOLVER['wizards_datafile'], 'start_stages.json'),
-    'ena': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages.json'),
+    'ena-seq': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages_seq.json'),
+    'ena-asm': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages_asm.json'),
+    'ena-ant': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages_ant.json'),
     'figshare': os.path.join(RESOLVER['wizards_datafile'], 'figshare_stages.json'),
     'miappe': os.path.join(RESOLVER['wizards_datafile'], 'miappe_stages.json'),
     'sample_start': os.path.join(RESOLVER['wizards_sample'], 'start_stages.json'),
-    'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json')
+    'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json'),
+    'dcterms': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
@@ -720,4 +805,11 @@ BUTTON_TEMPLATES = {
             "btnAction": "undescribe"
         }
     }
+}
+REPO_NAME_LOOKUP = {
+    'ena-ant': 'Sequence Annotation',
+    'ena-asm': 'Sequence Assembly',
+    'ena-seq': 'Sequence Reads',
+    'figshare': 'Figshare',
+    'dcterms': 'Dataverse'
 }

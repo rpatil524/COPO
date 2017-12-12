@@ -251,6 +251,13 @@ class Person(DAComponent):
     def __init__(self, profile_id=None):
         super(Person, self).__init__(profile_id, "person")
 
+    def get_people_for_profile(self):
+        docs = self.get_collection_handle().find({'profile_id': self.profile_id})
+        if docs:
+            return docs
+        else:
+            return False
+
     def create_sra_person(self):
         """
         creates an (SRA) person record and attach to profile
@@ -282,6 +289,7 @@ class Person(DAComponent):
         return
 
 
+
 class Source(DAComponent):
     def __init__(self, profile_id=None):
         super(Source, self).__init__(profile_id, "source")
@@ -290,6 +298,9 @@ class Source(DAComponent):
 class Sample(DAComponent):
     def __init__(self, profile_id=None):
         super(Sample, self).__init__(profile_id, "sample")
+
+    def get_from_profile_id(self, profile_id):
+        return self.get_collection_handle().find({'profile_id': profile_id})
 
 
 class Submission(DAComponent):
@@ -390,6 +401,20 @@ class Submission(DAComponent):
 
         )
 
+    def mark_figshare_article_id(self, sub_id, article_id):
+        if not type(article_id) is list:
+            article_id = [article_id]
+        doc = self.get_collection_handle().update_one(
+            {
+                '_id': ObjectId(sub_id)
+            },
+            {
+                "$set": {
+                    "accessions": article_id,
+                }
+            }
+        )
+
     def get_file_accession(self, sub_id):
         doc = self.get_collection_handle().find_one(
             {
@@ -408,8 +433,21 @@ class Submission(DAComponent):
             for file_id in doc['bundle']:
                 f = DataFile().get_by_file_name_id(file_id=file_id)
                 filenames.append(f['name'])
-            return {'accessions': doc, 'filenames': filenames, 'repo': doc['repository']}
+            if isinstance(doc['accessions'], str):
+                doc['accessions'] = None
+            return {'accessions': doc['accessions'], 'filenames': filenames, 'repo': doc['repository']}
 
+    def get_file_accession_for_dataverse_entry(self, mongo_file_id):
+        return self.get_collection_handle().find_one({'accessions.mongo_file_id': mongo_file_id},
+                                                     {'_id': 0, 'accessions.$': 1})
+
+    def get_complete(self):
+        complete_subs = self.get_collection_handle().find({'complete': True})
+        return complete_subs
+
+    def get_ena_type(self):
+        subs = self.get_collection_handle().find({'repository': {'$in': ['ena-ant', 'ena-seq', 'ena-asm']}})
+        return subs
 
 class DataFile(DAComponent):
     def __init__(self, profile_id=None):
@@ -511,8 +549,26 @@ class Profile(DAComponent):
         # trigger after save actions
         if not kwargs.get("target_id", str()):
             Person(profile_id=str(rec["_id"])).create_sra_person()
-
         return rec
+
+    def add_dataverse_details(self, profile_id, dataverse):
+        handle_dict['profile'].update_one({'_id': ObjectId(profile_id)}, {'$set': {'dataverse': dataverse}})
+
+    def check_for_dataverse_details(self, profile_id):
+        p = self.get_record(ObjectId(profile_id))
+        if 'dataverse' in p:
+            return p['dataverse']
+
+    def add_dataverse_dataset_details(self, profile_id, dataset):
+
+        handle_dict['profile'].update_one({'_id': ObjectId(profile_id)}, {'$push': {'dataverse.datasets': dataset}})
+        return [dataset]
+
+    def check_for_dataset_details(self, profile_id):
+        p = self.get_record(ObjectId(profile_id))
+        if 'dataverse' in p:
+            if 'datasets' in p['dataverse']:
+                return p['dataverse']['datasets']
 
 
 class RemoteDataFile:

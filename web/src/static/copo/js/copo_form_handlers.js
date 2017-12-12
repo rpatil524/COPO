@@ -99,28 +99,27 @@ function initiate_form_call(component) {
     });
 }
 
-function initiate_annotation_call() {
-    $('#processing_div').hide()
-    $('#file_picker_modal').modal('show')
-    $("#form_submit_btn").on('click', function () {
-        var formData = new FormData();
-        formData.append('file', $('#InputFile')[0].files[0]);
-        formData.append('file_type', $('#file_type_dropdown').val())
-        var csrftoken = $.cookie('csrftoken');
-        var url = "/api/upload_annotation_file/"
-        $.ajax({
-            url: url,
-            type: "POST",
-            headers: {'X-CSRFToken': csrftoken},
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json'
-        }).done(function (e) {
-            // add mongo id to document data
-            $(document).data('mongo_id', e._id.$oid)
-            $('#annotation_table_wrapper').hide()
-            $('#annotation_content').show()
+function initiate_annotation_call() {$('#processing_div').hide()
+            $('#file_picker_modal').modal('show')
+            $("#form_submit_btn").on('click', function () {
+                var formData = new FormData();
+                formData.append('file', $('#InputFile')[0].files[0]);
+                formData.append('file_type', $('#file_type_dropdown').val())
+                formData.append('skip_rows', $('#row_skip_dd').val())var csrftoken = $.cookie('csrftoken');
+                var url = "/api/upload_annotation_file/"
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json'
+                }).done(function (e) {
+                    // add mongo id to document data
+                    $(document).data('mongo_id', e._id.$oid)
+                    $('#annotation_table_wrapper').hide()
+                    $('#annotation_content').show()
 
             if (e.type == 'PDF Document') {
                 $(document).data('annotator_type', 'txt')
@@ -136,6 +135,61 @@ function initiate_annotation_call() {
         });
     })
 }
+                    setup_annotator()
+                    $('#file_picker_modal').modal('hide')
+                });
+            })
+        }
+        else {
+
+            $.ajax({
+                url: copoFormsURL,
+                type: "POST",
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    'task': 'form',
+                    'component': component
+                },
+                success: function (data) {
+                    json2HtmlForm(data);
+                    componentData = data;
+                },
+                error: function () {
+                    alert(errorMsg);
+                }
+            });
+        }
+    });
+
+
+}); //end of document ready
+
+//map controls to rendering functions
+var controlsMapping = {
+    "text": "do_text_ctrl",
+    "text_small": "do_small_text_ctrl",
+    "textarea": "do_textarea_ctrl",
+    "hidden": "do_hidden_ctrl",
+    "copo-select": "do_copo_select_ctrl",
+    "ontology term": "do_ontology_term_ctrl",
+    "select": "do_select_ctrl",
+    "copo-multi-search": "do_copo_multi_search_ctrl",
+    "copo-multi-select": "do_copo_multi_select_ctrl",
+    "copo-comment": "do_copo_comment_ctrl",
+    "copo-characteristics": "do_copo_characteristics_ctrl",
+    "copo-environmental-characteristics": "do_copo_characteristics_ctrl",
+    "copo-phenotypic-characteristics": "do_copo_characteristics_ctrl",
+    "oauth_required": "do_oauth_required",
+    "copo-button-list": "do_copo_button_list_ctrl",
+    "copo-item-count": "do_copo_item_count_ctrl",
+    "date-picker": "do_date_picker_ctrl",
+    "copo-duration": "do_copo_duration_ctrl",
+    "text-percent": "do_percent_text_box",
+    "copo-resolver": "do_copo_resolver_ctrl",
+    "text-percent": "do_percent_text_box",
+    "dataverse-author": "do_dataverse_author",
+    "label": "do_label",
+};
 
 function json2HtmlForm(data) {
 
@@ -729,8 +783,12 @@ var dispatchFormControl = {
                     lbl = option.label;
                     vl = option.value;
                 }
-
-                $('<option value="' + vl + '">' + lbl + '</option>').appendTo(selectCtrl);
+                if (vl == "required") {
+                    $('<option disabled selected value>' + lbl + '</option>').appendTo(selectCtrl)
+                }
+                else {
+                    $('<option value="' + vl + '">' + lbl + '</option>').appendTo(selectCtrl);
+                }
             }
         }
 
@@ -1410,7 +1468,11 @@ var dispatchFormControl = {
         return form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
-    }
+    },
+    do_dataverse_author: function do_dataverse_author(formElem) {
+        alert('abc')
+    },
+
 };
 
 

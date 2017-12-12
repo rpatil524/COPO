@@ -1,0 +1,182 @@
+{
+  "title": "ENA Datafile Description",
+  "description": "Definitions for elements that appear in different stages of a wizard targeted at submissions to the ENA (European Nucleotide Archive) repository. 'ref', id of stage; 'title',  header used for the stage; 'content', the function to call to generate stage html; items, actual form elements on the page; 'is_stage_stub', if the stage entry is a complete stage or a bootstrap; 'is_conditional_stage', displays a stage based on some condition being satisfied; 'is_singular_stage', if all items must have same value for this stage",
+  "properties": [
+    {
+      "ref": "study_type",
+      "title": "Study Information",
+      "is_singular_stage": true,
+      "message": "Enter general information about the annotation project here.",
+      "items": [
+        {
+          "id": "study_alias",
+          "help_tip": "",
+          "label": "",
+          "hidden": "true",
+          "required": "true",
+          "type": "string",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "study_title",
+          "help_tip": "Study Title",
+          "label": "Title",
+          "hidden": "false",
+          "required": "true",
+          "type": "string",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "study_description",
+          "help_tip": "Study Description",
+          "label": "Description",
+          "hidden": "false",
+          "required": "true",
+          "type": "string",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "study_center_name",
+          "help_tip": "Study Center Name",
+          "label": "Research Center Name",
+          "hidden": "false",
+          "required": "true",
+          "type": "string",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "study_analysis_center_name",
+          "help_tip": "Name of analysis centre if different from centre name.",
+          "label": "Center Analysis Name",
+          "hidden": "false",
+          "required": "false",
+          "type": "string",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "study_broker",
+          "help_tip": "Name of study broker / submitter.",
+          "label": "Study Broker / Submitter",
+          "hidden": "false",
+          "required": "false",
+          "type": "string",
+          "control": "text",
+          "default_value": "Earlham"
+        },
+        {
+          "id": "study_analysis_date",
+          "help_tip": "Date of Anaylsis",
+          "label": "Analysis Date",
+          "hidden": "false",
+          "required": "false",
+          "type": "string",
+          "control": "date-picker",
+          "default_value": ""
+        },
+        {
+          "id": "study_type",
+          "help_tip": "Select Study Type from the drop-down list",
+          "label": "Study Type",
+          "hidden": "false",
+          "required": "true",
+          "type": "string",
+          "control": "select",
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_study_type_options",
+              "parameter": ""
+            }
+          },
+          "trigger": {
+            "type": "change",
+            "message": "Changing the Study Type might impact certain stages in the description process! This might, in some cases, result in loss of previous entries. <br/><br/>Do you want to continue?",
+            "callback": {
+              "function": "study_type_change",
+              "parameter": "item_id,old_value,new_value"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ref": "attach_study_samples",
+      "title": "Study / Sample",
+
+      "message": "This annotation must be associated with an existing study and sample. If you have previously created these in COPO, please select them from the dropdowns. Otherwise if they already exists in ENA, please enter their accessions in the box.",
+      "items": [
+        {
+          "id": "study_copo",
+          "type": "string",
+          "help_tip": "If the study associated with this annotation was described in COPO, select it here.",
+          "label": "COPO Study",
+          "hidden": "false",
+          "required": "true",
+          "control": "select",
+          "option_component": "sample",
+          "data_maxItems": 1,
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_existing_study_options",
+              "parameter": ""
+            }
+          }
+        },
+        {
+          "id": "sample_copo",
+          "type": "string",
+          "help_tip": "If the sample associated with this annotation was described in COPO, select it here.",
+          "label": "COPO Sample",
+          "hidden": "false",
+          "required": "true",
+          "control": "select",
+          "option_component": "sample",
+          "data_maxItems": 1,
+          "default_value": "",
+          "option_values": {
+            "callback": {
+              "function": "get_isasamples_json",
+              "parameter": ""
+            }
+          }
+        },
+        {
+          "id": "study_ena",
+          "help_tip": "If the study associated with this annotation was deposited in ENA, enter its accession here.",
+          "label": "ENA Study Accession",
+          "hidden": "false",
+          "required": "true",
+          "type": "string",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "sample_ena",
+          "help_tip": "If the sample associated with this annotation was deposited in ENA, enter its accession here.",
+          "label": "ENA Sample Accession",
+          "hidden": "false",
+          "required": "true",
+          "type": "string",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "attributes",
+          "help_tip": "Add any key value pairs which better describe this analysis. These can be anything you like, to provide a richer context to the submission.",
+          "label": "Analysis Attributes",
+          "hidden": "false",
+          "required": "false",
+          "type": "array",
+          "control": "copo-comment",
+          "default_value": ""
+        }
+      ]
+    }
+  ]
+}

@@ -30,6 +30,7 @@ $(document).ready(function () {
     $(document).on('click', '.delete_annotation', delete_annotation)
     $('.ajax_loading_div').css('visibility', 'hidden')
     $('.copo-sidebar-tabs.nav-tabs a[href="#copo-sidebar-annotate"]').tab('show');
+    $(document).on('click', '#doc_type_select li', show_skip_dropdown)
 
     //******************************Event Handlers Block*************************//
     // get table data to display via the DataTables API
@@ -39,6 +40,9 @@ $(document).ready(function () {
     var copoVisualsURL = "/copo/copo_visualize/";
     var annotationURL = "/copo/get_annotation/";
     csrftoken = $.cookie('csrftoken');
+
+    //global_help_call
+    do_global_help(component);
 
 
     $.ajax({
@@ -133,6 +137,15 @@ $(document).ready(function () {
 
 // global variable for selected cell
 cell;
+
+function show_skip_dropdown(e){
+    if($('#file_type_dropdown_label').html() == 'Spreadsheet') {
+        $('#row_skip_div').css('visibility', 'visible')
+    }
+    else{
+        $('#row_skip_div').css('visibility', 'hidden')
+    }
+}
 
 function show_help() {
 

@@ -3,7 +3,7 @@ __author__ = 'felix.shaw@tgac.ac.uk - 27/05/2016'
 from django.http import HttpResponse
 from dal.copo_da import Submission
 import dal.figshare_da as fda
-from . import enaSubmission, figshareSubmission
+from . import enaSubmission, figshareSubmission, dataverseSubmission
 from django.core.urlresolvers import reverse
 import jsonpickle
 
@@ -42,10 +42,21 @@ def delegate_submission(request):
             return HttpResponse(jsonpickle.dumps({'status': 1, 'url': reverse('copo:authenticate_figshare')}))
 
     # Submit to ENA
-    elif repo == 'ena':
+    elif 'ena' in repo:
         result = enaSubmission.EnaSubmit().submit(
             sub_id=sub_id,
             dataFile_ids=sub['bundle'],
+        )
+        if result == True:
+            return HttpResponse(jsonpickle.dumps({'status': 1}))
+        else:
+            return HttpResponse(jsonpickle.dumps({'status': result}))
+
+    ## Submit to Dataverse
+    elif repo == 'dcterms':
+        result = dataverseSubmission.DataverseSubmit().submit(
+            sub_id=sub_id,
+            dataFile_ids=sub['bundle']
         )
         if result == True:
             return HttpResponse(jsonpickle.dumps({'status': 1}))

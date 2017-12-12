@@ -16,6 +16,18 @@ $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
 
 
+    var cyverse_files = $('#cyverse_file_data').val()
+    if (cyverse_files != "None") {
+        cyverse_files = JSON.parse(cyverse_files)
+        $('#cyverse_files_link').on('click', function (e) {
+            if (cyverse_files) {
+                $('#file_tree').treeview({data: cyverse_files, showCheckbox: true});
+                $('#file_tree').css('visibility', 'visible')
+                e.preventDefault()
+            }
+        })
+    }
+
     // firstly, if the url contains Figshare oauth return params and the selected_datafile is set, we are dealing with a
     // return from a Figshare oauth login, so attempt to load the datafile into the wizard
 
@@ -28,11 +40,14 @@ $(document).ready(function () {
         }
     }
 
+
+
     var csrftoken = $.cookie('csrftoken');
     var component = "datafile";
     var wizardURL = "/rest/data_wiz/";
     var copoFormsURL = "/copo/copo_forms/";
     var copoVisualsURL = "/copo/copo_visualize/";
+    var samples_from_study_url = "/rest/samples_from_study/"
 
     //get component metadata
     var componentMeta = get_component_meta(component);
@@ -440,8 +455,51 @@ $(document).ready(function () {
         }
     });
 
+    //handle annotation wizard study dropdown onchange
+    $(document).on('change', '#study_copo', handle_wizard_study_dropdown_onchange)
+
 
     //****************************** Functions Block ******************************//
+    function handle_wizard_study_dropdown_onchange(event) {
+        var val = $(event.currentTarget).val()
+        if (val == "none") {
+            $('#sample_copo').find('option').remove().end().append('<option value="none"></option>')
+            $('#sample_copo').attr('disabled', 'disabled')
+            $('#study_ena').removeAttr('disabled')
+            $('#sample_ena').removeAttr('disabled')
+        }
+        else {
+
+            $('#study_ena').attr('disabled', 'disabled')
+            $('#sample_ena').attr('disabled', 'disabled')
+            $('#sample_copo').removeAttr('disabled')
+            // now get samples in study
+            var csrftoken = $.cookie('csrftoken');
+            $.ajax(
+                {
+                    headers: {'X-CSRFToken': csrftoken},
+                    url: samples_from_study_url,
+                    data:{'profile_id': val},
+                    dataType: 'json',
+                    method: 'POST'
+                }
+            ).done(function(data){
+                $('#sample_copo').find('option').remove()
+                $(data).each(function(idx, element){
+                    var option = $('<option/>',{
+                        html: element['name'] + ' (' + element['organism']['annotationValue'] + ')',
+                        value: element['_id']['$oid']
+                    })
+
+                    $('#sample_copo').append(option)
+                })
+
+            }).fail(function(data){
+                console.log('error')
+            })
+        }
+    }
+
     function add_step(auto_fields) {
         //step being requested
         currentIndx += 1;
@@ -1048,6 +1106,7 @@ $(document).ready(function () {
             do_post_stage_retrieval2(data);
         } else {
             $('#copo-datafile-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show');
+        }
 
             //hide wizard getting started
             $(".page-wizard-message").hide();

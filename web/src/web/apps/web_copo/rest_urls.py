@@ -10,6 +10,8 @@ import submission.submissionDelegator as submit
 import web.apps.web_copo.utils.ajax_handlers as ajax
 from web.apps.web_copo.rest.EnaRest import CopoChunkedUploadCompleteView, CopoChunkedUploadView
 
+import submission.sword_utils as su
+
 urlpatterns = [
     url(r'^data_wiz/', wizard.data_wiz, name='data_wiz'),
     url(r'^sample_wiz/', wizard.sample_wiz, name='sample_wiz'),
@@ -33,5 +35,9 @@ urlpatterns = [
     url(r'^delete_ss_annotation/', a_views.delete_ss_annotation, name='delete_ss_annotation'),
     url(r'^copo_get_submission_table_data/', views.copo_get_submission_table_data, name='get_submissions'),
     url(r'^get_accession_data/', ajax.get_accession_data, name='get_accession_data'),
-    url(r'^set_session_variable/', ajax.set_session_variable, name='set_session_variable')
+    url(r'^set_session_variable/', ajax.set_session_variable, name='set_session_variable'),
+    url(r'^get_accession_data/', ajax.get_accession_data, name='get_accession_data'),
+    url(r'^test_sword/', su.test_module, name='test_module'),
+    url(r'^call_get_dataset_details/', ajax.get_dataset_details, name='call_get_dataset_details'),
+    url(r'^samples_from_study/', ajax.get_samples_for_study, name='get_samples_for_study')
 ]

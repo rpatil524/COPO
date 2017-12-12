@@ -6,7 +6,7 @@
       "rating_level": "good",
       "rating_level_description": "There is sufficient metadata for submission to {repo_name!s}",
       "matching_rules": {
-        "ena": {
+        "ena-seq": {
           "allOf": [
             "study_type",
             "attach_samples",
@@ -15,11 +15,13 @@
           ],
           "anyOf": []
         },
+        "ena-asm": {},
+        "ena-ant": {},
         "figshare": {
-
         },
-        "miappe":{
-
+        "miappe": {
+        },
+        "dcterms": {
         }
       }
     },
@@ -27,7 +29,7 @@
       "rating_level": "fair",
       "rating_level_description": "Insufficient metadata for submission to {repo_name!s}",
       "matching_rules": {
-        "ena": {
+        "ena-seq": {
           "anyOf": [
             "study_type",
             "attach_samples",
@@ -35,11 +37,13 @@
             "nucleic_acid_sequencing"
           ]
         },
+        "ena-asm": {},
+        "ena-ant": {},
         "figshare": {
-
         },
-        "miappe":{
-
+        "miappe": {
+        },
+        "dcterms": {
         }
       }
     },
@@ -47,7 +51,7 @@
       "rating_level": "poor",
       "rating_level_description": "No metadata for submission to a repository",
       "matching_rules": {
-        "ena": {
+        "ena-seq": {
           "not": [
             "study_type",
             "attach_samples",
@@ -55,11 +59,13 @@
             "nucleic_acid_sequencing"
           ]
         },
+        "ena-asm": {},
+        "ena-ant": {},
         "figshare": {
-
         },
-        "miappe":{
-
+        "miappe": {
+        },
+        "dcterms": {
         }
       }
     }
