@@ -414,7 +414,9 @@ class Submission(DAComponent):
             for file_id in doc['bundle']:
                 f = DataFile().get_by_file_name_id(file_id=file_id)
                 filenames.append(f['name'])
-            return {'accessions': doc, 'filenames': filenames, 'repo': doc['repository']}
+            if isinstance(doc['accessions'], str):
+                doc['accessions'] = None
+            return {'accessions': doc['accessions'], 'filenames': filenames, 'repo': doc['repository']}
 
     def get_file_accession_for_dataverse_entry(self, mongo_file_id):
         return self.get_collection_handle().find_one({'accessions.mongo_file_id': mongo_file_id},

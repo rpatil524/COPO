@@ -182,12 +182,10 @@ class EnaSubmit(object):
                 pass
 
         if self.submission['repository'] == 'ena-seq':
-            self.do_seq_reads_submission(sub_id, remote_path, transfer_token)
+            return self.do_seq_reads_submission(sub_id, remote_path, transfer_token)
         elif self.submission['repository'] == 'ena-ant':
-            xmlvar = self.do_annotation_submission(sub_id, remote_path, transfer_token)
-            with open('/Users/fshaw/Desktop/output.xml', 'w+') as f:
-                # return xmlvar
-                f.write(xmlvar)
+            return self.do_annotation_submission(sub_id, remote_path, transfer_token)
+
 
     def do_seq_reads_submission(self, sub_id, remote_path, transfer_token):
         # # setup paths for conversion directories
@@ -248,53 +246,7 @@ class EnaSubmit(object):
         lg.log(output, level=Loglvl.INFO, type=Logtype.FILE)
         lg.log("Extracting fields from receipt", level=Loglvl.INFO, type=Logtype.FILE)
 
-        xml = ET.fromstring(output)
-
-        accessions = dict()
-
-        # first check for errors
-        errors = xml.findall('*/ERROR')
-        if errors:
-            error_text = str()
-            for e in errors:
-                error_text = error_text + e.text
-            return error_text
-
-        # get project accessions
-        project = xml.find('./PROJECT')
-        project_accession = project.get('accession', default='undefined')
-        project_alias = project.get('alias', default='undefined')
-        accessions['project'] = {'accession': project_accession, 'alias': project_alias}
-
-        # get experiment accessions
-        experiment = xml.find('./EXPERIMENT')
-        experiment_accession = experiment.get('accession', default='undefined')
-        experiment_alias = experiment.get('alias', default='undefined')
-        accessions['experiment'] = {'accession': experiment_accession, 'alias': experiment_alias}
-
-        # get submission accessions
-        submission = xml.find('./SUBMISSION')
-        submission_accession = submission.get('accession', default='undefined')
-        submission_alias = submission.get('alias', default='undefined')
-        accessions['submission'] = {'accession': submission_accession, 'alias': submission_alias}
-
-        # get run accessions
-        run = xml.find('./RUN')
-        run_accession = run.get('accession', default='undefined')
-        run_alias = run.get('alias', default='undefined')
-        accessions['run'] = {'accession': run_accession, 'alias': run_alias}
-
-        # get sample accessions
-        samples = xml.findall('./SAMPLE')
-        sample_accessions = list()
-        for sample in samples:
-            sample_accession = sample.get('accession', default='undefined')
-            sample_alias = sample.get('alias', default='undefined')
-            s = {'sample_accession': sample_accession, 'sample_alias': sample_alias}
-            for bio_s in sample:
-                s['biosample_accession'] = bio_s.get('accession', default='undefined')
-            sample_accessions.append(s)
-        accessions['sample'] = sample_accessions
+        accessions = self.get_accessions(output)
 
         # save accessions to mongo profile record
         s = Submission().get_record(sub_id)
@@ -316,13 +268,13 @@ class EnaSubmit(object):
         if not os.path.exists(os.path.join(xml_dir)):
             os.makedirs(os.path.join(xml_dir))
 
-        with open(os.path.join(xml_dir, 'study.xml'), "w+") as ff:
+        with open(os.path.join(xml_dir, 'study.xml'), "w") as ff:
             ff.write(study)
-        with open(os.path.join(xml_dir, 'sample.xml'), "w+") as ff:
+        with open(os.path.join(xml_dir, 'sample.xml'), "w") as ff:
             ff.write(sample)
-        with open(os.path.join(xml_dir, 'analysis.xml'), "w+") as ff:
+        with open(os.path.join(xml_dir, 'analysis.xml'), "w") as ff:
             ff.write(analysis)
-        with open(os.path.join(xml_dir, 'submission.xml'), "w+") as ff:
+        with open(os.path.join(xml_dir, 'submission.xml'), "w") as ff:
             ff.write(submission)
 
         pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
@@ -331,17 +283,94 @@ class EnaSubmit(object):
         ena_uri = "https://www-test.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20{user_token!s}%20{pass_word!s}".format(
             **locals())
 
-        curl_cmd = 'curl -k -F "SUBMISSION=@' + os.path.join(xml_dir, 'submission.xml') + '" -F "SAMPLE=@' + os.path.join(xml_dir, 'sample.xml') + '" -F "ANALYSIS=@' + os.path.join(xml_dir, 'analysis.xml') + '" -F "STUDY=@' + os.path.join(xml_dir, 'study.xml') + '" "' + ena_uri + '"'
+        curl_cmd = 'curl -k -F "SUBMISSION=@' + os.path.join(xml_dir, 'submission.xml') + '" -F "ANALYSIS=@' + os.path.join(xml_dir, 'analysis.xml') + '" -F "STUDY=@' + os.path.join(xml_dir, 'study.xml') + '" "' + ena_uri + '"'
 
         receipt = subprocess.check_output(curl_cmd, shell=True)
 
+        #TODO - this needs removing before deployment
         with open(os.path.join("/Users/fshaw/Desktop/", 'receipt.xml'), "w+") as ff:
-
             ff.write(receipt.decode('utf-8'))
+
+        accessions = self.get_accessions(receipt)
+
+        # save accessions to mongo profile record
+        s = Submission().get_record(sub_id)
+        s['accessions'] = accessions
+        s['complete'] = True
+        s['target_id'] = str(s.pop('_id'))
+        Submission().save_record(dict(), **s)
+        RemoteDataFile().delete_transfer(transfer_token)
+
+
+
 
 
         lg.log(receipt, level=Loglvl.INFO, type=Logtype.FILE)
         lg.log("Extracting fields from receipt", level=Loglvl.INFO, type=Logtype.FILE)
 
-        xml = ET.fromstring(receipt)
-        return submission
+        return True
+
+
+
+
+    def get_accessions(self, reciept):
+        xml = ET.fromstring(reciept)
+
+        accessions = dict()
+
+        # first check for errors
+        errors = xml.findall('*/ERROR')
+        if errors:
+            error_text = str()
+            for e in errors:
+                error_text = error_text + e.text
+            return error_text
+
+        # get project accessions
+        project = xml.find('./PROJECT')
+        if project is not None:
+            project_accession = project.get('accession', default='undefined')
+            project_alias = project.get('alias', default='undefined')
+            accessions['project'] = {'accession': project_accession, 'alias': project_alias}
+
+        # get experiment accessions
+        experiment = xml.find('./EXPERIMENT')
+        if experiment is not None:
+            experiment_accession = experiment.get('accession', default='undefined')
+            experiment_alias = experiment.get('alias', default='undefined')
+            accessions['experiment'] = {'accession': experiment_accession, 'alias': experiment_alias}
+
+        # get submission accessions
+        submission = xml.find('./SUBMISSION')
+        if submission is not None:
+            submission_accession = submission.get('accession', default='undefined')
+            submission_alias = submission.get('alias', default='undefined')
+            accessions['submission'] = {'accession': submission_accession, 'alias': submission_alias}
+
+        # get run accessions
+        run = xml.find('./RUN')
+        if run is not None:
+            run_accession = run.get('accession', default='undefined')
+            run_alias = run.get('alias', default='undefined')
+            accessions['run'] = {'accession': run_accession, 'alias': run_alias}
+        analysis = xml.find('./ANALYSIS')
+
+        if analysis is not None:
+            analysis_accession = analysis.get('accession', default='undefined')
+            analysis_alias = analysis.get('alias', default='undefined')
+            accessions['analysis'] = {'accession': analysis_accession, 'alias': analysis_alias}
+
+        # get sample accessions
+        samples = xml.findall('./SAMPLE')
+        if samples is not None:
+            sample_accessions = list()
+            for sample in samples:
+                sample_accession = sample.get('accession', default='undefined')
+                sample_alias = sample.get('alias', default='undefined')
+                s = {'sample_accession': sample_accession, 'sample_alias': sample_alias}
+                for bio_s in sample:
+                    s['biosample_accession'] = bio_s.get('accession', default='undefined')
+                sample_accessions.append(s)
+            accessions['sample'] = sample_accessions
+
+        return accessions

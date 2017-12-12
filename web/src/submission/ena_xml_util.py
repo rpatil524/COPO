@@ -35,7 +35,7 @@ def do_study_xml(sub_id):
     SubElement(descriptor, "STUDY_TITLE").text = p["title"]
     study_type = Element("STUDY_TYPE")
     es = get_study_type_enumeration(df["description"]["attributes"]["study_type"]["study_type"])
-    #es = df["description"]["attributes"]["study_type"]["study_type"]
+    # es = df["description"]["attributes"]["study_type"]["study_type"]
     study_type.set("existing_study_type", es)
     descriptor.append(study_type)
     SubElement(descriptor, "STUDY_ABSTRACT").text = p["description"]
@@ -137,17 +137,17 @@ def do_analysis_xml(sub_id):
     p = Profile().get_record(df["profile_id"])
     analysis_set = Element("ANALYSIS_SET")
     analysis = Element("ANALYSIS")
-    alias = str(p["_id"]) + ":analysis:" + df["description"]["attributes"]["study_type"]["study_title"]
-    analysis.set("alias", alias)
+    alias = make_alias(sub)
+    analysis.set("alias", alias + "_anaysis")
     center_name = df["description"]["attributes"]["study_type"]["study_analysis_center_name"]
     analysis.set("analysis_center", center_name)
     broker_name = df["description"]["attributes"]["study_type"]["study_broker"]
     analysis.set("broker_name", broker_name)
     analysis_date = df["description"]["attributes"]["study_type"]["study_analysis_date"]
-    #ad = analysis_date.split('/')
-    #d = datetime.date(int(ad[2]), int(ad[1]), int(ad[0]))
-    #analysis.set("anlalysis_date", d)
-    #analysis_set.append(analysis)
+    # ad = analysis_date.split('/')
+    # d = datetime.date(int(ad[2]), int(ad[1]), int(ad[0]))
+    # analysis.set("anlalysis_date", d)
+    # analysis_set.append(analysis)
 
     title = Element("TITLE")
     title.text = df["description"]["attributes"]["study_type"]["study_title"]
@@ -161,10 +161,11 @@ def do_analysis_xml(sub_id):
     study_ref.set("refname", str(sub["_id"]))
     analysis.append(study_ref)
 
+    # TODO - Analysis is not required for annotation submissions....ENA documentation saying it is is not correct. Will remove these stages from the wizard at some point
     s_ref = get_sample_ref(df)
     sample_ref = Element("SAMPLE_REF")
     sample_ref.set("refname", s_ref)
-    analysis.append(sample_ref)
+    # analysis.append(sample_ref)
 
     analysis_type = Element("ANALYSIS_TYPE")
     SubElement(analysis_type, "SEQUENCE_ANNOTATION")
@@ -202,7 +203,6 @@ def do_analysis_xml(sub_id):
 
 
 def do_submission_xml(sub_id):
-
     sub = Submission().get_record(sub_id)
     dfs = list()
     for d in sub["bundle"]:
@@ -210,14 +210,17 @@ def do_submission_xml(sub_id):
     df = dfs[0]
 
     submission = Element("SUBMISSION")
-    submission.set("alias", str(sub["_id"]))
+    # get names of files in bundle and append here
+    # do alias
+    alias = make_alias(sub)
+    submission.set("alias", alias + "_sub")
     submission.set("broker_name", df["description"]["attributes"]["study_type"]["study_broker"])
     submission.set("center_name", df["description"]["attributes"]["study_type"]["study_analysis_center_name"])
     submission_date = datetime.datetime.now().isoformat()
     submission.set("submission_date", submission_date)
     submission.set("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
     submission.set("xsi:noNamespaceSchemaLocation", "ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.submission.xsd")
-    
+
     contacts = Element("CONTACTS")
     copo_contact = Element("CONTACT")
     copo_contact.set("inform_on_error", "support@copo.org")
@@ -253,6 +256,16 @@ def prettify(elem):
     rough_string = tostring(elem, "utf-8")
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
+
+
+def make_alias(sub):
+    bundle = sub['bundle']
+    filenames = ""
+    for b in bundle:
+        file = DataFile().get_record(b)
+        filenames = filenames + "-" + file['name']
+    alias = str(sub["_id"]) + ':' + sub['repository'] + ":" + filenames
+    return alias
 
 
 def get_sample(df):

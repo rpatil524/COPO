@@ -28,6 +28,7 @@ import requests
 import datetime
 from rauth import OAuth2Service
 from web.apps.web_copo.utils import EnaImports as eimp
+from submission.enaSubmission import EnaSubmit
 
 
 LOGGER = settings.LOGGER
@@ -65,8 +66,9 @@ def test(request):
         LOGGER.log('Test Error Message 123', type=Logtype.FILE, level=Loglvl.INFO)
     except CopoRuntimeError as l:
         return render(request, 'copo/error_page.html', {'message': str(l)})
-
-    return render(request, 'copo/test_page.html')
+    r = '<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="receipt.xsl"?><RECEIPT receiptDate="2017-12-11T17:26:27.444Z" submissionFile="submission.xml" success="true"><ANALYSIS accession="ERZ481434" alias="5a2ebfbc68236be08e208503:ena-ant:-small5_test.fastq.gz_anaysis" status="PRIVATE"/><STUDY accession="ERP105651" alias="5a2ebfbc68236be08e208503" status="PRIVATE" holdUntilDate="2019-12-11Z"><EXT_ID accession="PRJEB23872" type="Project"/></STUDY><SUBMISSION accession="ERA1153795" alias="5a2ebfbc68236be08e208503:ena-ant:-small5_test.fastq.gz_sub"/><MESSAGES><INFO>Submission has been committed.</INFO><INFO>This submission is a TEST submission and will be discarded within 24 hours</INFO></MESSAGES><ACTIONS>ADD</ACTIONS></RECEIPT>'
+    accessions = EnaSubmit().get_accessions(r)
+    return HttpResponse(accessions)
 
 
 def test_submission(request):

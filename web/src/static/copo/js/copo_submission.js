@@ -70,7 +70,7 @@ $(document).ready(function () {
         })
 
 
-    }, 100000)
+    }, 1000)
 
 });
 
@@ -79,7 +79,7 @@ function get_dataset_data() {
         if (data != 'null') {
             var output = 'Please select a Dataset to add to.<br/><br/>'
             output = output + '<div id="dataset_selector">'
-            $(data).each(function(idx, it){
+            $(data).each(function (idx, it) {
                 output = output + '<div style="margin-top: 10px"><label class="radio-inline"><input type="radio" name="optradio">' + it.title + '</label></div>'
             })
             output = output + '<div style="margin-top: 10px"><label class="radio-inline"><input type="radio" name="optradio">New Dataset</label></div>'
@@ -178,7 +178,7 @@ function handle_upload(e) {
     var submission_id = $(tr).data('submission_id')
 
     var message = $(document).data('message')
-    if ($(tr).find('.repo_cell').html() != 'dcterms'){
+    if ($(tr).find('.repo_cell').html() != 'dcterms') {
         message = 'Are you sure you want to upload this submission bundle.'
     }
 
@@ -555,8 +555,8 @@ function get_accession_info(e) {
                 $(panel_group).appendTo('#file_accession_panel');
             }
             else {
-                for (var key in data.sub.accessions.accessions) {
-                    if (data.sub.accessions.accessions instanceof Array) {
+                for (var key in data.sub.accessions) {
+                    if (data.sub.accessions instanceof Array) {
                         panel = jQuery('<div/>', {
                             class: 'panel panel-default',
                         });
@@ -586,13 +586,13 @@ function get_accession_info(e) {
 
                         ul = jQuery('<ul/>');
                         var ul = jQuery('<ul/>');
-                        d = data.sub.accessions.accessions[0]
+                        d = data.sub.accessions[0]
                         var allowed_keys = ['filesize', 'id', 'dataverse_title', 'dataset_doi']
 
-                        for (var key in d) {
-                            if ($.inArray(key, allowed_keys) > -1) {
+                        for (var kk in d) {
+                            if ($.inArray(kk, allowed_keys) > -1) {
                                 li2 = jQuery('<li/>', {
-                                    html: '<span>' + key + ' - <small>' + d[key] + '</small></span>'
+                                    html: '<span>' + kk + ' - <small>' + d[kk] + '</small></span>'
                                 });
                                 $(li2).appendTo(ul)
                             }
@@ -603,58 +603,58 @@ function get_accession_info(e) {
                         $(panel).appendTo(panel_group)
                     }
                     else {
-                        for (var key in data.sub.accessions.accessions) {
 
-                            panel = jQuery('<div/>', {
-                                class: 'panel panel-default',
-                            });
-                            panel_heading = jQuery('<div/>', {
-                                class: 'panel-heading'
-                            });
-                            panel_title = jQuery('<h4/>', {
-                                class: 'panel-title'
-                            });
 
-                            var a_key = key[0].toUpperCase() + key.slice(1);
-                            title = $.parseHTML('<a data-toggle="collapse" href="#collapse' + c + '">' + a_key + '</a>');
+                        panel = jQuery('<div/>', {
+                            class: 'panel panel-default',
+                        });
+                        panel_heading = jQuery('<div/>', {
+                            class: 'panel-heading'
+                        });
+                        panel_title = jQuery('<h4/>', {
+                            class: 'panel-title'
+                        });
 
-                            $(title).appendTo(panel_title);
-                            $(panel_title).appendTo(panel_heading);
-                            $(panel_heading).appendTo(panel);
+                        var a_key = key[0].toUpperCase() + key.slice(1);
+                        title = $.parseHTML('<a data-toggle="collapse" href="#collapse' + c + '">' + a_key + '</a>');
 
-                            collapse = jQuery('<div/>', {
-                                id: 'collapse' + c,
-                                class: 'panel-collapse collapse'
-                            });
-                            c = c + 1;
+                        $(title).appendTo(panel_title);
+                        $(panel_title).appendTo(panel_heading);
+                        $(panel_heading).appendTo(panel);
 
-                            panel_body = jQuery('<div/>', {
-                                class: 'panel-body'
-                            });
+                        collapse = jQuery('<div/>', {
+                            id: 'collapse' + c,
+                            class: 'panel-collapse collapse'
+                        });
+                        c = c + 1;
 
-                            ul = jQuery('<ul/>');
+                        panel_body = jQuery('<div/>', {
+                            class: 'panel-body'
+                        });
 
-                            var li2
-                            if (key == 'sample') {
-                                $(data.sub.accessions.accessions['sample']).each(function (count, smp) {
-                                    li2 = jQuery('<li/>', {
-                                        html: '<span title="Biosample Accession: ' + smp.biosample_accession + '">' + smp.sample_accession + ' - <small>' + smp.sample_alias + '</small></span>'
-                                    });
-                                    $(li2).appendTo(ul)
-                                })
-                            }
-                            else {
+                        ul = jQuery('<ul/>');
 
+                        var li2
+                        if (key == 'sample') {
+                            $(data.sub.accessions['sample']).each(function (count, smp) {
                                 li2 = jQuery('<li/>', {
-                                    html: data.sub.accessions.accessions[key].accession + ' - <small>' + data.sub.accessions.accessions[key].alias + '</small>'
+                                    html: '<span title="Biosample Accession: ' + smp.biosample_accession + '">' + smp.sample_accession + ' - <small>' + smp.sample_alias + '</small></span>'
                                 });
                                 $(li2).appendTo(ul)
-                            }
-                            $(ul).appendTo(panel_body);
-                            $(panel_body).appendTo(collapse);
-                            $(collapse).appendTo(panel);
-                            $(panel).appendTo(panel_group)
+                            })
                         }
+                        else {
+
+                            li2 = jQuery('<li/>', {
+                                html: data.sub.accessions[key].accession + ' - <small>' + data.sub.accessions[key].alias + '</small>'
+                            });
+                            $(li2).appendTo(ul)
+                        }
+                        $(ul).appendTo(panel_body);
+                        $(panel_body).appendTo(collapse);
+                        $(collapse).appendTo(panel);
+                        $(panel).appendTo(panel_group)
+
                     }
 
                     $(panel_group).appendTo('#file_accession_panel');

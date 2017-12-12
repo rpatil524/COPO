@@ -144,13 +144,15 @@ def get_existing_study_options():
         "label": "Not in COPO"
     })
     for s in subs:
-
-        out.append(
-            {
-                "value": s['profile_id'],
-                "label": s['accessions']['project']['accession']
-            }
-        )
+        try:
+            out.append(
+                {
+                    "value": s['profile_id'],
+                    "label": s['accessions']['project']['accession']
+                }
+            )
+        except:
+            pass
     return out
 
 
