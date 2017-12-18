@@ -379,7 +379,8 @@ def generate_submission_accessions_data(submission_record):
     repository = submission_record.get("repository", str())
 
     if accessions:
-        if repository == "ena":
+        # -----------COLLATE ACCESSIONS FOR ENA SEQUENCE READS----------
+        if repository == "ena-seq":
             columns = [{"title": "Accession"}, {"title": "Alias"}, {"title": "Comment"}, {"title": "Type"}]
 
             for key, value in accessions.items():
@@ -391,6 +392,28 @@ def generate_submission_accessions_data(submission_record):
                             data_set.append([v["sample_accession"], v["sample_alias"], v["biosample_accession"], key])
                         else:
                             data_set.append([v["accession"], v["alias"], str(), key])
+
+
+        elif repository == "ena-ant":
+            # -----------COLLATE ACCESSIONS FOR ENA ANNOTATIONS----------
+            columns = [{"title": "Accession"}, {"title": "Alias"}, {"title": "Comment"}, {"title": "Type"}]
+
+            for key, value in accessions.items():
+                if isinstance(value, dict):  # single accession instance expected
+                    data_set.append([value["accession"], value["alias"], str(), key])
+                elif isinstance(value, list):  # multiple accession instances expected
+                    for v in value:
+                        if key == "sample":
+                            try:
+                                data_set.append([v["sample_accession"], v["sample_alias"], v["biosample_accession"], key])
+                            except:
+                                pass
+                        else:
+                            try:
+                                data_set.append([v["accession"], v["alias"], str(), key])
+                            except:
+                                pass
+
 
     return_dict = dict(dataSet=data_set,
                        columns=columns,

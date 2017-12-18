@@ -17,7 +17,7 @@ $(document).ready(function () {
 
 
     var cyverse_files = $('#cyverse_file_data').val()
-    if (cyverse_files != "None") {
+    if (cyverse_files != "") {
         cyverse_files = JSON.parse(cyverse_files)
         $('#cyverse_files_link').on('click', function (e) {
             if (cyverse_files) {
@@ -39,7 +39,6 @@ $(document).ready(function () {
             //alert('ask toni how we can load file ' + $('#selected_datafile').val() + ' into his wizard')
         }
     }
-
 
 
     var csrftoken = $.cookie('csrftoken');
@@ -479,14 +478,14 @@ $(document).ready(function () {
                 {
                     headers: {'X-CSRFToken': csrftoken},
                     url: samples_from_study_url,
-                    data:{'profile_id': val},
+                    data: {'profile_id': val},
                     dataType: 'json',
                     method: 'POST'
                 }
-            ).done(function(data){
+            ).done(function (data) {
                 $('#sample_copo').find('option').remove()
-                $(data).each(function(idx, element){
-                    var option = $('<option/>',{
+                $(data).each(function (idx, element) {
+                    var option = $('<option/>', {
                         html: element['name'] + ' (' + element['organism']['annotationValue'] + ')',
                         value: element['_id']['$oid']
                     })
@@ -494,7 +493,7 @@ $(document).ready(function () {
                     $('#sample_copo').append(option)
                 })
 
-            }).fail(function(data){
+            }).fail(function (data) {
                 console.log('error')
             })
         }
@@ -1108,13 +1107,13 @@ $(document).ready(function () {
             $('#copo-datafile-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show');
         }
 
-            //hide wizard getting started
-            $(".page-wizard-message").hide();
+        //hide wizard getting started
+        $(".page-wizard-message").hide();
 
-            tabShownStore.data = data;
-            tabShownStore.method = "do_post_stage_retrieval2";
-        }
+        tabShownStore.data = data;
+        tabShownStore.method = "do_post_stage_retrieval2";
     }
+
 
     function process_wizard_stage(data) {
         if (data.stages) {
@@ -1358,7 +1357,7 @@ $(document).ready(function () {
         ]);
     }
 
-    //functions clears the wizard and either exits or loads next item in batch
+//functions clears the wizard and either exits or loads next item in batch
     function clear_wizard() {
         //decommission wizard
         $('#dataFileWizard').wizard('removeSteps', 1, 1000); //set to arbitrary large number of steps
@@ -2004,7 +2003,7 @@ $(document).ready(function () {
         return bundle;
     }
 
-    //handles button events on a record or group of records
+//handles button events on a record or group of records
     function do_record_task(event) {
         var task = event.task.toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
         var tableID = event.tableID; //get target table

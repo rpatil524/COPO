@@ -67,7 +67,13 @@ def do_sample_xml(sub_id):
     sample_set.set("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
     sample_set.set("xsi:noNamespaceSchemaLocation", "ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.sample.xsd")
 
-    smp = get_sample(df)
+
+    try:
+        smp = get_sample(df)
+    except:
+        # some submission types do not require samples such as annotation submissions
+        if sub["repository"] == "ena-ant":
+            return False
 
     # iterate samples to create xml
     sample = Element("SAMPLE")
@@ -161,7 +167,7 @@ def do_analysis_xml(sub_id):
     study_ref.set("refname", str(sub["_id"]))
     analysis.append(study_ref)
 
-    # TODO - Analysis is not required for annotation submissions....ENA documentation saying it is is not correct. Will remove these stages from the wizard at some point
+    # TODO - Sample is not required for annotation submissions....ENA documentation saying it is is not correct. Will remove these stages from the wizard at some point
     s_ref = get_sample_ref(df)
     sample_ref = Element("SAMPLE_REF")
     sample_ref.set("refname", s_ref)
@@ -280,7 +286,12 @@ def get_sample(df):
 
 
 def get_sample_ref(df):
-    smp = get_sample(df)
+    try:
+        smp = get_sample(df)
+    except:
+        smp = dict()
+        smp["_id"] = ""
+        smp["name"] = ""
     return str(smp["_id"]) + ":sample:" + smp["name"]
 
 

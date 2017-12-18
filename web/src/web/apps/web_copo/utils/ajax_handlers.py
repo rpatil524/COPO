@@ -13,7 +13,7 @@ from dateutil import parser
 from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
 from django.conf import settings
-from dal.copo_da import ProfileInfo, RemoteDataFile, Submission
+from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
@@ -45,6 +45,7 @@ def search_ontology_ebi(request, ontology_names):
     query = ol.ONTOLOGY_LKUPS['ebi_ols_autocomplete'].format(**locals())
     print(query)
     data = requests.get(query, timeout=1).text
+    # TODO - add return here for when OLS is down
     return HttpResponse(data)
 
 
@@ -122,9 +123,18 @@ def get_upload_information(request):
             else:
                 # submission has finished
                 sub_info_dict["submission_status"] = True
-                sub_info_dict["accessions"] = sub['accessions']
-                sub_info_dict["completed_on"] = sub['completed_on'].strftime('%d %b, %Y, %H:%M')
-                sub_info_dict["article_id"] = sub['article_id']
+                try:
+                    sub_info_dict["accessions"] = sub['accessions']
+                except:
+                    sub_info_dict["accessions"] = "unavailable"
+                try:
+                    sub_info_dict["completed_on"] = sub['completed_on'].strftime('%d %b, %Y, %H:%M')
+                except:
+                    sub_info_dict["completed_on"] = "unavailable"
+                try:
+                    sub_info_dict["article_id"] = sub['article_id']
+                except:
+                    sub_info_dict["article_id"] = "unavailable"
 
             sub_info_list.append(sub_info_dict)
 
@@ -171,6 +181,7 @@ def get_dataset_details(request):
     resp = Profile().check_for_dataset_details(profile_id)
     return HttpResponse(json.dumps(resp))
 
+
 def get_samples_for_study(request):
     # get all samples which have corresponding profile_id number
     profile_id = request.POST['profile_id']
@@ -182,6 +193,7 @@ def get_samples_for_study(request):
         d = {"organism": source["organism"], "_id": s["_id"], "name": s["name"]}
         output.append(d)
     return HttpResponse(json_util.dumps(output))
+
 
 def set_session_variable(request):
     try:
@@ -198,7 +210,6 @@ def set_session_variable(request):
         value = None
     request.session[key] = value
     return HttpResponse(True)
-
 
 
 def get_continuation_studies():

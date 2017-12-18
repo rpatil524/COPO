@@ -31,6 +31,7 @@ import web.apps.web_copo.schemas.utils.data_utils as d_utils
 import submission.ena_xml_util as xml
 
 
+
 class EnaSubmit(object):
     def __init__(self):
         self._dir = os.path.join(os.path.dirname(__file__), "data")
@@ -303,7 +304,7 @@ class EnaSubmit(object):
         lg.log(output, level=Loglvl.INFO, type=Logtype.FILE)
         lg.log("Extracting fields from receipt", level=Loglvl.INFO, type=Logtype.FILE)
 
-        accessions = self.get_accessions(output)
+        accessions = self.get_accessions(output, sub_id, transfer_token)
 
         # save accessions to mongo profile record
         s = Submission().get_record(sub_id)
@@ -328,7 +329,7 @@ class EnaSubmit(object):
         with open(os.path.join(xml_dir, 'study.xml'), "w") as ff:
             ff.write(study)
         with open(os.path.join(xml_dir, 'sample.xml'), "w") as ff:
-            ff.write(sample)
+            ff.write(str(sample))
         with open(os.path.join(xml_dir, 'analysis.xml'), "w") as ff:
             ff.write(analysis)
         with open(os.path.join(xml_dir, 'submission.xml'), "w") as ff:
@@ -348,15 +349,15 @@ class EnaSubmit(object):
         with open(os.path.join("/Users/fshaw/Desktop/", 'receipt.xml'), "w+") as ff:
             ff.write(receipt.decode('utf-8'))
 
-        accessions = self.get_accessions(receipt)
+        accessions = self.get_accessions(receipt, sub_id, transfer_token)
 
         # save accessions to mongo profile record
-        s = Submission().get_record(sub_id)
-        s['accessions'] = accessions
-        s['complete'] = True
-        s['target_id'] = str(s.pop('_id'))
-        Submission().save_record(dict(), **s)
-        RemoteDataFile().delete_transfer(transfer_token)
+        #s = Submission().get_record(sub_id)
+        #s['accessions'] = accessions
+        #s['complete'] = True
+        #s['target_id'] = str(s.pop('_id'))
+        #Submission().save_record(dict(), **s)
+        #RemoteDataFile().delete_transfer(transfer_token)
 
 
 
@@ -370,7 +371,7 @@ class EnaSubmit(object):
 
 
 
-    def get_accessions(self, reciept):
+    def get_accessions(self, reciept, sub_id, transfer_token=None):
         xml = ET.fromstring(reciept)
 
         accessions = dict()
@@ -407,7 +408,7 @@ class EnaSubmit(object):
 
         # get experiment accessions
         experiments = xml.findall('./EXPERIMENT')
-        if experiment is not None:
+        if experiments is not None:
             experiment_accessions = list()
             for experiment in experiments:
                 experiment_accession = experiment.get('accession', default='undefined')
@@ -417,7 +418,7 @@ class EnaSubmit(object):
 
         # get submission accessions
         submissions = xml.findall('./SUBMISSION')
-        if submission is not None:
+        if submissions is not None:
             submission_accessions = list()
             for submission in submissions:
                 submission_accession = submission.get('accession', default='undefined')
@@ -427,7 +428,7 @@ class EnaSubmit(object):
 
         # get run accessions
         runs = xml.findall('./RUN')
-        if run is not None:
+        if runs is not None:
             run_accessions = list()
             for run in runs:
                 run_accession = run.get('accession', default='undefined')

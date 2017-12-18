@@ -370,17 +370,17 @@ $(document).ready(function () {
                 $("#submission_progress_" + submissionRecord.submission_id).find(".progress-bar")
                     .attr(
                         {
-                            "class": "progress-bar progress-bar-striped active progress-bar-success",
+                            "class": "progress-bar progress-bar-success",
                             "aria-valuenow": "100"
                         }
                     )
                     .css({"min-width": "2em", "width": "100%"})
-                    .html("");
+                    .html("Complete");
 
                 var progressObject = $("#submission_progress_" + submissionRecord.submission_id).find('.submission-progress-status');
                 progressObject
                     .html('')
-                    .append('<div><span class=" submission-info-label">Submission completed! Please click \'View\' for accessions.</span></div>');
+                    .append('<div><span class=" submission-info-label">Click \'View\' for accessions.</span></div>');
                 actionButton = get_accession_action(submissionRecord.submission_id);
 
                 $("#submission_control_" + submissionRecord.submission_id)
