@@ -36,7 +36,7 @@
           "hidden": "false",
           "required": "true",
           "control": "copo-button-list",
-          "default_value": "yes",
+          "default_value": "no",
           "option_values": [
             {
               "value": "yes",

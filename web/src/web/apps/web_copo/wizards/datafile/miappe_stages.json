@@ -72,7 +72,7 @@
           "label": "Experiment Duration"
         },
         {
-          "type": "string",
+          "type": "array",
           "required": "false",
           "ref": "",
           "ontology_names": [

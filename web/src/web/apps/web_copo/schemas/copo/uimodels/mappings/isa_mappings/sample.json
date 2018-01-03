@@ -56,6 +56,37 @@
       ]
     },
     {
+      "help_tip": "Source from which this sample is derived",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "copo-multi-search",
+      "data_maxItems": 1,
+      "option_component": "source",
+      "show_create_button": true,
+      "versions": [
+        "derivesFrom"
+      ],
+      "specifications": [
+        "isasample"
+      ],
+      "deprecated": false,
+      "id": "copo.sample.derivesFrom",
+      "label": "Source",
+      "show_in_form": true,
+      "ref": "",
+      "type": "array",
+      "show_in_table": false,
+      "hidden": "false",
+      "option_values": {
+        "callback": {
+          "parameter": "",
+          "function": "generate_sources_json"
+        }
+      }
+    },
+    {
       "help_tip": "Characteristics of the sample e.g., height, sex",
       "required": "false",
       "default_value": "",
@@ -121,37 +152,6 @@
       "label": "Factors",
       "show_in_table": false,
       "control": "copo-characteristics"
-    },
-    {
-      "help_tip": "Source from which this sample is derived",
-      "required": "true",
-      "default_value": "",
-      "show_as_attribute": true,
-      "control_meta": {},
-      "control": "copo-multi-search",
-      "data_maxItems": 1,
-      "option_component": "source",
-      "show_create_button": true,
-      "versions": [
-        "derivesFrom"
-      ],
-      "specifications": [
-        "isasample"
-      ],
-      "deprecated": false,
-      "id": "copo.sample.derivesFrom",
-      "label": "Source",
-      "show_in_form": true,
-      "ref": "",
-      "type": "array",
-      "show_in_table": false,
-      "hidden": "false",
-      "option_values": {
-        "callback": {
-          "parameter": "",
-          "function": "generate_sources_json"
-        }
-      }
     },
     {
       "help_tip": "",

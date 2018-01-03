@@ -464,13 +464,13 @@ DROP_DOWNS = {
     "SAMPLE_TYPES": [
         {
             "value": "biosample",
-            "label": "Simple",
-            "description": "Simple samples are based on <a href='https://www.ebi.ac.uk/biosamples/' target='_blank'>BioSamples</a>. They are <strong>repository agnostic</strong>, and are better suited for describing samples in a generic manner or in contexts where the target repository isn't known in advance."
+            "label": "Biosample Standard",
+            "description": "Biosmaple samples are based on <a href='https://www.ebi.ac.uk/biosamples/' target='_blank'>BioSamples</a>. They are <strong>repository agnostic</strong>, and are better suited for describing samples in a generic manner or in contexts where the target repository isn't known in advance."
         },
         {
             "value": "isasample",
-            "label": "Extended",
-            "description": "Extended samples are based on the <a href='http://isa-tools.org/' target='_blank'>Investigation, Study and Assay </a> (ISA) specifications, and are better tailored for describing samples that will subsequently become part of data submissions to repositories such as <strong>ENA</strong> and <strong>Metabolights</strong>."
+            "label": "COPO Standard",
+            "description": "COPO samples are based on the <a href='http://isa-tools.org/' target='_blank'>Investigation, Study and Assay </a> (ISA) specifications, and are better tailored for describing samples that will subsequently become part of data submissions to repositories such as <strong>ENA</strong> and <strong>Metabolights</strong>."
         }
     ],
     "GROWTH_AREAS": [
