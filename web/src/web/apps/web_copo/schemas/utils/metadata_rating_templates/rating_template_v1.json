@@ -6,7 +6,7 @@
       "rating_level": "good",
       "rating_level_description": "There is sufficient metadata for submission to {repo_name!s}",
       "matching_rules": {
-        "ena-seq": {
+        "ena": {
           "allOf": [
             "study_type",
             "attach_samples",
@@ -29,7 +29,7 @@
       "rating_level": "fair",
       "rating_level_description": "Insufficient metadata for submission to {repo_name!s}",
       "matching_rules": {
-        "ena-seq": {
+        "ena": {
           "anyOf": [
             "study_type",
             "attach_samples",
@@ -51,7 +51,7 @@
       "rating_level": "poor",
       "rating_level_description": "No metadata for submission to a repository",
       "matching_rules": {
-        "ena-seq": {
+        "ena": {
           "not": [
             "study_type",
             "attach_samples",

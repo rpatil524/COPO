@@ -446,7 +446,7 @@ class Submission(DAComponent):
         return complete_subs
 
     def get_ena_type(self):
-        subs = self.get_collection_handle().find({'repository': {'$in': ['ena-ant', 'ena-seq', 'ena-asm']}})
+        subs = self.get_collection_handle().find({'repository': {'$in': ['ena-ant', 'ena', 'ena-asm']}})
         return subs
 
 class DataFile(DAComponent):

@@ -59,6 +59,14 @@ class FigshareSubmit(object):
             else:
                 data['categories'] = list()
             data['tags'] = sub.get('tags', dict()).get('keywords').split(',')
+            for idx, t in enumerate(data['tags']):
+                if len(t) < 3:
+                    if len(t) == 1:
+                        t = t + (2 * t)
+                    elif len(t) == 2:
+                        t = t + t
+                    data['tags'][idx] = t
+
             data['references'] = sub.get('tags', dict()).get('references').split(',')
             for idx, x in enumerate(data['references']):
                 if x != '':
@@ -68,7 +76,7 @@ class FigshareSubmit(object):
                         else:
                             data['references'][idx] = 'http://' + x
             if len(data['references']) == 1 and data['references'][0] == '':
-                #TODO - Be Better
+                # if blank ref, pop
                 data.pop('references')
             data['funding'] = sub.get('tags', dict()).get('funding')
             data['licenses'] = sub.get('tags', dict()).get('licenses')

@@ -73,7 +73,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware',
-    #'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth',
+    'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth',
     'web.apps.web_copo.copo_middleware.OrcidMiddleware.OrcidOAuth'
 )
 

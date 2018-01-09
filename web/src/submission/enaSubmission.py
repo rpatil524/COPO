@@ -238,7 +238,7 @@ class EnaSubmit(object):
             RemoteDataFile().update_transfer(transfer_token, transfer_fields)
 
         # setup paths for conversion directories
-        if self.submission['repository'] == 'ena-seq':
+        if self.submission['repository'] == 'ena':
             return self.do_seq_reads_submission(sub_id, remote_path, transfer_token)
         elif self.submission['repository'] == 'ena-ant':
             return self.do_annotation_submission(sub_id, remote_path, transfer_token)
@@ -306,13 +306,6 @@ class EnaSubmit(object):
 
         accessions = self.get_accessions(output, sub_id, transfer_token)
 
-        # save accessions to mongo profile record
-        s = Submission().get_record(sub_id)
-        s['accessions'] = accessions
-        s['complete'] = True
-        s['target_id'] = str(s.pop('_id'))
-        Submission().save_record(dict(), **s)
-        RemoteDataFile().delete_transfer(transfer_token)
         return True
 
     def do_annotation_submission(self, sub_id, remote_path, transfer_token):
@@ -346,8 +339,8 @@ class EnaSubmit(object):
         receipt = subprocess.check_output(curl_cmd, shell=True)
 
         #TODO - this needs removing before deployment
-        with open(os.path.join("/Users/fshaw/Desktop/", 'receipt.xml'), "w+") as ff:
-            ff.write(receipt.decode('utf-8'))
+        # with open(os.path.join("/Users/fshaw/Desktop/", 'receipt.xml'), "w+") as ff:
+        #     ff.write(receipt.decode('utf-8'))
 
         accessions = self.get_accessions(receipt, sub_id, transfer_token)
 
@@ -459,5 +452,3 @@ class EnaSubmit(object):
         Submission().save_record(dict(), **s)
 
         RemoteDataFile().delete_transfer(transfer_token)
-
-        return True

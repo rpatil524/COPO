@@ -380,7 +380,7 @@ def generate_submission_accessions_data(submission_record):
 
     if accessions:
         # -----------COLLATE ACCESSIONS FOR ENA SEQUENCE READS----------
-        if repository == "ena-seq":
+        if repository == "ena":
             columns = [{"title": "Accession"}, {"title": "Alias"}, {"title": "Comment"}, {"title": "Type"}]
 
             for key, value in accessions.items():
@@ -413,6 +413,14 @@ def generate_submission_accessions_data(submission_record):
                                 data_set.append([v["accession"], v["alias"], str(), key])
                             except:
                                 pass
+
+        elif repository == "figshare":
+            # -----------COLLATE ACCESSIONS FOR FIGSHARE REPO----------
+            columns = [{"title": "Accession"}, {"title": "Alias"}, {"title": "Comment"}, {"title": "Type"}]
+
+            for idx, value in enumerate(accessions):
+
+                data_set.append([value, "Figshare File: " + str(idx + 1), str(), str()])
 
 
     return_dict = dict(dataSet=data_set,

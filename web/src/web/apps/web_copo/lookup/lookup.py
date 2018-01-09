@@ -399,7 +399,7 @@ DROP_DOWNS = {
     ],
     "REPOSITORIES": [
         {
-            'value': 'ena-seq',
+            'value': 'ena',
             'label': 'ENA - Sequence Reads',
             'description': 'This repository option defines metadata for submission of <strong>raw sequence reads</strong> to the European Nucleotide Archive (Sequence Reads)'
         },
@@ -637,7 +637,7 @@ UI_INFO = {
 # specifies file paths holding the configs for wizard stages:
 WIZARD_FILES = {
     'start': os.path.join(RESOLVER['wizards_datafile'], 'start_stages.json'),
-    'ena-seq': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages_seq.json'),
+    'ena': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages_seq.json'),
     'ena-asm': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages_asm.json'),
     'ena-ant': os.path.join(RESOLVER['wizards_datafile'], 'ena_stages_ant.json'),
     'figshare': os.path.join(RESOLVER['wizards_datafile'], 'figshare_stages.json'),
@@ -809,7 +809,7 @@ BUTTON_TEMPLATES = {
 REPO_NAME_LOOKUP = {
     'ena-ant': 'Sequence Annotation',
     'ena-asm': 'Sequence Assembly',
-    'ena-seq': 'Sequence Reads',
+    'ena': 'Sequence Reads',
     'figshare': 'Figshare',
     'dcterms': 'Dataverse'
 }
