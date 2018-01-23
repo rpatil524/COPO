@@ -45,6 +45,7 @@ then
     printf "installing homebrew\n"
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     brew update
+    pac_man='brew'
   else
     # brew is installed now update
     pac_man='brew'
