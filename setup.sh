@@ -75,6 +75,9 @@ then
   # install redis
   $pac_man install redis
   $pac_man services start redis
+  # install postgres
+  $pac_man install postgresql
+  $pac_man services start postgresql
 elif [ $opsys == "Ubuntu" ]
 then
   $pac_man --allow-unauthenticated -y install python3
