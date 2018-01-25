@@ -96,7 +96,10 @@ then
   psql postgres $me -c "alter user $postgres_user with encrypted password '$postgres_pw';"
   psql postgres $me -c "grant all privileges on database $postgres_db to $postgres_user ;"
 
-
+  # install virtual env
+  pip3 install virtualenv
+  virtualenv -p python3 copo_env
+  source copo_env/bin/activate
 
 elif [ $opsys == "Ubuntu" ]
 then
@@ -126,6 +129,11 @@ then
   sudo -u postgres createdb $postgres_db
   sudo -u postgres psql -c "alter user $postgres_user with encrypted password '$postgres_pw';"
   sudo -u postgres psql -c "grant all privileges on database $postgres_db to $postgres_user;"
-
-
+  # install venv
+  $pac_man install -y python-setuptools
+  easy_install pip
+  $pac_man -y install python3-pip
+  pip3 install virtualenv
+  virtualenv -p python3 copo_env
+  source copo_env/bin/activate
 fi
