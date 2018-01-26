@@ -3,6 +3,7 @@
 postgres_user='postgres_user'
 postgres_db='copo'
 postgres_pw='Apple123'
+vmname="copo_env"
 
 python -c "exit"
 if [ "$?" -eq 127 ]
@@ -98,8 +99,8 @@ then
 
   # install virtual env
   pip3 install virtualenv
-  virtualenv -p python3 copo_env
-  source copo_env/bin/activate
+  virtualenv -p python3 $vmname
+  source $vmname/bin/activate
 
 elif [ $opsys == "Ubuntu" ]
 then
@@ -134,6 +135,6 @@ then
   easy_install pip
   $pac_man -y install python3-pip
   pip3 install virtualenv
-  virtualenv -p python3 copo_env
-  source copo_env/bin/activate
+  virtualenv -p python3 $vmname
+  source $vmname/bin/activate
 fi
