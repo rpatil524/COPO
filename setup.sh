@@ -75,7 +75,7 @@ $pac_man update
 os=check
 
 # now check dependencies are installed
-
+$pac_man install -y git
 if [ $opsys == "Darwin" ]
 then
   # install python3
@@ -96,12 +96,12 @@ then
   sudo -u $me createdb $postgres_db
   psql postgres $me -c "alter user $postgres_user with encrypted password '$postgres_pw';"
   psql postgres $me -c "grant all privileges on database $postgres_db to $postgres_user ;"
-
   # install virtual env
   pip3 install virtualenv
   virtualenv -p python3 $vmname
   source $vmname/bin/activate
-
+  pip3 install --upgrade setuptools
+  pip3 install -r /COPO/web/src/requirements/base.txt
 elif [ $opsys == "Ubuntu" ]
 then
   $pac_man --allow-unauthenticated install -y python3
@@ -113,11 +113,17 @@ then
   $pac_man update
   # install and start mongo
   $pac_man install -y mongodb-org
+  # need to start mongo without auth, make admin user and copo_user, then
+  # restart with auth
   mongod --fork --config /etc/mongod.conf
+  mongo --eval "db.createUser({user: 'admin', pwd: 'copo_admin', roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]});"
+  mongo --eval "db.createUser({user: 'copo_user', pwd: 'Apple123', roles:[{ role:'readWrite', db: 'copo_mongo' }]})"
+  mongo 127.0.0.1:27017/admin --eval "db.shutdownServer()"
+  mongod --fork --auth --config /etc/mongod.conf
   # install and start redis
   $pac_man install -y redis-server
   service redis-server start
-  $pac_man install -y postgresql postgresql-contrib
+  $pac_man install -y postgresql postgresql-contrib python-psycopg2 libpq-dev
   service postgresql start
   # install sudo for postgres setup
   $pac_man install -y sudo
@@ -137,4 +143,6 @@ then
   pip3 install virtualenv
   virtualenv -p python3 $vmname
   source $vmname/bin/activate
+  pip3 install --upgrade setuptools
+  pip3 install -r /COPO/web/src/requirements/base.txt
 fi
