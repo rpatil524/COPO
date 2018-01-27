@@ -1,5 +1,17 @@
 #!/bin/bash
 
+if [ $# -eq 0 ]
+then
+  printf "\nCOPO Setup: Missing Argument\n"
+  printf "Options are:\n"
+  printf "run - runs installed COPO instance\n"
+  printf "install - installs development instance of COPO on this machine along with all its dependencies\n\n"
+
+elif [ $1 == "run" ]
+then
+  printf "Starting COPO...\n"
+elif [ $1 == "install" ]
+then
 postgres_user='postgres_user'
 postgres_db='copo'
 postgres_pw='Apple123'
@@ -145,4 +157,5 @@ then
   source $vmname/bin/activate
   pip3 install --upgrade setuptools
   pip3 install -r /COPO/web/src/requirements/base.txt
+fi
 fi
