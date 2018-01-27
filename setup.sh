@@ -116,9 +116,9 @@ then
   # need to start mongo without auth, make admin user and copo_user, then
   # restart with auth
   mongod --fork --config /etc/mongod.conf
-  mongo --eval "db.createUser({user: 'admin', pwd: 'copo_admin', roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]});"
-  mongo --eval "db.createUser({user: 'copo_user', pwd: 'Apple123', roles:[{ role:'readWrite', db: 'copo_mongo' }]})"
-  mongo 127.0.0.1:27017/admin --eval "db.shutdownServer()"
+  mongo localhost/admin --eval "db.createUser({user: 'admin', pwd: 'copo_admin', roles:[{ role: 'userAdminAnyDatabase', db: 'admin' } ]});"
+  mongo localhost/admin --eval "db.createUser({user: 'copo_user', pwd: 'Apple123', roles:[{ role:'readWrite', db: 'copo_mongo' }]})"
+  mongo localhost/admin --eval "db.shutdownServer()"
   mongod --fork --auth --config /etc/mongod.conf
   # install and start redis
   $pac_man install -y redis-server
