@@ -1,5 +1,12 @@
 #!/bin/bash
+# get working location of this script....this is needed later
 
+postgres_user='postgres_user'
+postgres_db='copo'
+postgres_pw='Apple123'
+vmname="copo_env"
+
+local_dir=$(dirname $0)
 if [ $# -eq 0 ]
 then
   printf "\nCOPO Setup: Missing Argument\n"
@@ -9,13 +16,14 @@ then
 
 elif [ $1 == "run" ]
 then
+
   printf "Starting COPO...\n"
+  printf "To stop press Ctrl-C...\n"
+  source $vmname/bin/activate
+  /$local_dir/web/src/manage.py runserver
 elif [ $1 == "install" ]
 then
-postgres_user='postgres_user'
-postgres_db='copo'
-postgres_pw='Apple123'
-vmname="copo_env"
+
 
 python -c "exit"
 if [ "$?" -eq 127 ]
@@ -45,7 +53,12 @@ elif "Linux" in p:
 END
 }
 
-
+echo $MONGO_PORT
+if [ $MONGO_PORT -eq "" ]
+then
+  printf "Environment Variable not set\n"
+  exit
+fi
 # START
 printf 'Welcome to the installation program for COPO. This will install a development ready instance of COPO onto
 your machine along with all its dependencies. This script is only garanteed to work on OSX and Ubuntu installations'
@@ -74,7 +87,7 @@ then
   fi
 elif [ $opsys == "Ubuntu" ]
 then
-  pac_man='apt-get'
+  pac_man='apt-get -q'
 elif [ $opsys == "CentOS" ]
 then
   pac_man='yum'
@@ -141,13 +154,20 @@ then
   $pac_man install -y sudo
   # TODO change thse later for user input strings
   # create psql user and db
-  $pac_man install sed
-  # need to change postgres to password authentication
-  sed -i 's/peer/md5/g' /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf
+  # TODO - change authentication in pg_hba.conf to trust for setup and change
+  # back to md5 as last thing, this will stop auth errors from occuring if then
+  # installation is interupted for some reason.
   sudo -u postgres createuser $postgres_user
   sudo -u postgres createdb $postgres_db
   sudo -u postgres psql -c "alter user $postgres_user with encrypted password '$postgres_pw';"
   sudo -u postgres psql -c "grant all privileges on database $postgres_db to $postgres_user;"
+  $pac_man install sed
+  # need to change postgres to password authentication
+  sed -i 's/peer/md5/g' /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf
+  # setup pgpass file for later command access
+  echo *:*:copo:postgres_user:Apple123 > ~/.pgpass
+  chmod 0600 ~/.pgpass
+  service postgresql restart
   # install venv
   $pac_man install -y python-setuptools
   easy_install pip
@@ -156,6 +176,20 @@ then
   virtualenv -p python3 $vmname
   source $vmname/bin/activate
   pip3 install --upgrade setuptools
-  pip3 install -r /COPO/web/src/requirements/base.txt
+  pip3 install -r /$local_dir/web/src/requirements/base.txt
+  /$local_dir/web/src/manage.py makemigrations
+  /$local_dir/web/src/manage.py makemigrations chunked_upload
+  /$local_dir/web/src/manage.py makemigrations allauth
+  /$local_dir/web/src/manage.py migrate
+
+  # add social account records
+  psql copo postgres_user -c "DELETE FROM socialaccount_socialapp_sites"
+  psql copo postgres_user -c "DELETE FROM django_site"
+  psql copo postgres_user -c "DELETE FROM socialaccount_socialapp"
+  psql copo postgres_user -c "INSERT INTO django_site (id, domain, name) VALUES (1, 'www.copo-project.org', 'www.copo-project.org')"
+  psql copo postgres_user -c "INSERT INTO socialaccount_socialapp (id, provider, name, client_id, secret, key) VALUES (1, 'orcid', 'Orcid', 'APP-EGMH46B26C2OCJ9F', '$ORCID_SECRET', '')"
+  psql copo postgres_user -c "INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (1, 1, 1)"
 fi
+div
+printf "Finished Installing....type 'setup run' to run the COPO development server."
 fi
