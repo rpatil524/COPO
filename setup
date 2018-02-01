@@ -1,42 +1,14 @@
 #!/bin/bash
-# get working location of this script....this is needed later
 
 postgres_user='postgres_user'
+postgres_pw='postgres_user'
 postgres_db='copo'
-postgres_pw='Apple123'
+mongo_user='mongo_user'
+mongo_pw='mongo_user'
+
 vmname="copo_env"
 
-local_dir=$(dirname $0)
-if [ $# -eq 0 ]
-then
-  printf "\nCOPO Setup: Missing Argument\n"
-  printf "Options are:\n"
-  printf "run - runs installed COPO instance\n"
-  printf "install - installs development instance of COPO on this machine along with all its dependencies\n\n"
 
-elif [ $1 == "run" ]
-then
-
-  printf "Starting COPO...\n"
-  printf "To stop press Ctrl-C...\n"
-  source $vmname/bin/activate
-  /$local_dir/web/src/manage.py runserver
-elif [ $1 == "install" ]
-then
-
-
-python -c "exit"
-if [ "$?" -eq 127 ]
-then
-  echo "Python not found on this system. Please install any version of python and try again"
-  exit
-fi
-
-divider() {
-  s=$(printf "%-30s" "-")
-  echo "${s// /-}"
-}
-div=divider
 # embedded python function to get system info
 function check_os {
 python - <<END
@@ -53,25 +25,71 @@ elif "Linux" in p:
 END
 }
 
-echo $MONGO_PORT
-if [ $MONGO_PORT -eq "" ]
+# get working location of this script....this is needed later
+local_dir=$(dirname $0)
+# get os
+opsys=$(check_os)
+printf 'Determining OS: %s\n' "$opsys"
+# get current user
+me=$(whoami)
+printf 'Installing under user account: %s\n' "$me"
+printf 'Checking Package Manager\n'
+
+
+
+# check environment variables
+if [ -z "$MONGO_PORT" ]
 then
   printf "Environment Variable not set\n"
   exit
 fi
+
+
+if [ $# -eq 0 ]
+then
+  printf "\nCOPO Setup: Missing Argument\n"
+  printf "Options are:\n"
+  printf "run - runs installed COPO instance\n"
+  printf "install - installs development instance of COPO on this machine along with all its dependencies\n\n"
+elif [ $1 == "run" ]
+then
+  printf "Starting COPO...\n"
+  mongod --fork --auth --config /etc/mongod.conf
+  if [ "$opsys" == "Darwin" ]
+  then
+    brew services start postgres
+  else
+    service postgresql start
+  fi
+  printf "To stop press Ctrl-C...\n"
+  source $vmname/bin/activate
+  /$local_dir/web/src/manage.py runserver
+elif [ $1 == "install" ]
+then
+    python -c "exit"
+    if [ "$?" -eq 127 ]
+    then
+      echo "Python not found on this system. Please install any version of python and try again"
+      exit
+fi
+
+divider() {
+  s=$(printf "%-30s" "-")
+  echo "${s// /-}"
+}
+div=divider
+
+
+
 # START
 printf 'Welcome to the installation program for COPO. This will install a development ready instance of COPO onto
 your machine along with all its dependencies. This script is only garanteed to work on OSX and Ubuntu installations'
 
 $div
 
-opsys=$(check_os)
-printf 'Determining OS: %s\n' "$opsys"
-me=$(whoami)
-printf 'Installing under user accoutn: %s\n' "$me"
-printf 'Checking Package Manager\n'
 
-if [ $opsys == "Darwin" ]
+
+if [[ $opsys == "Darwin" ]]
 then
   brew info
   if [ "$?" -eq 127 ]
@@ -85,10 +103,10 @@ then
     # brew is installed now update
     pac_man='brew'
   fi
-elif [ $opsys == "Ubuntu" ]
+elif [[ $opsys == "Ubuntu" ]]
 then
   pac_man='apt-get -q'
-elif [ $opsys == "CentOS" ]
+elif [[ $opsys == "CentOS" ]]
 then
   pac_man='yum'
 fi
@@ -101,7 +119,7 @@ os=check
 
 # now check dependencies are installed
 $pac_man install -y git
-if [ $opsys == "Darwin" ]
+if [[ $opsys == "Darwin" ]]
 then
   # install python3
   $pac_man install -y python3
@@ -115,7 +133,8 @@ then
   $pac_man services start redis
   # install postgres
   $pac_man install postgresql
-  $pac_man services start postgresql
+  echo -e "local\t\tcopo\t\tall\t\ttrust\n$(cat /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf)" > /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf
+  $pac_man services restart postgresql
   # create psql user and db
   sudo -u $me createuser $postgres_user
   sudo -u $me createdb $postgres_db
@@ -127,7 +146,7 @@ then
   source $vmname/bin/activate
   pip3 install --upgrade setuptools
   pip3 install -r /COPO/web/src/requirements/base.txt
-elif [ $opsys == "Ubuntu" ]
+elif [[ $opsys == "Ubuntu" ]]
 then
   $pac_man --allow-unauthenticated install -y python3
   # import public key used by apt-get
@@ -141,8 +160,8 @@ then
   # need to start mongo without auth, make admin user and copo_user, then
   # restart with auth
   mongod --fork --config /etc/mongod.conf
-  mongo localhost/admin --eval "db.createUser({user: 'admin', pwd: 'copo_admin', roles:[{ role: 'userAdminAnyDatabase', db: 'admin' } ]});"
-  mongo localhost/admin --eval "db.createUser({user: 'copo_user', pwd: 'Apple123', roles:[{ role:'readWrite', db: 'copo_mongo' }]})"
+  mongo localhost/admin --eval "db.createUser({user: 'admin', pwd: 'password', roles:[{ role: 'userAdminAnyDatabase', db: 'admin' } ]});"
+  mongo localhost/admin --eval "db.createUser({user: '$mongo_user', pwd: '$mongo_pw', roles:[{ role:'readWrite', db: 'copo_mongo' }]})"
   mongo localhost/admin --eval "db.shutdownServer()"
   mongod --fork --auth --config /etc/mongod.conf
   # install and start redis
@@ -161,13 +180,10 @@ then
   sudo -u postgres createdb $postgres_db
   sudo -u postgres psql -c "alter user $postgres_user with encrypted password '$postgres_pw';"
   sudo -u postgres psql -c "grant all privileges on database $postgres_db to $postgres_user;"
-  $pac_man install sed
-  # need to change postgres to password authentication
-  sed -i 's/peer/md5/g' /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf
   # setup pgpass file for later command access
-  echo *:*:copo:postgres_user:Apple123 > ~/.pgpass
-  chmod 0600 ~/.pgpass
-  service postgresql restart
+  #echo *:*:copo:postgres_user:Apple123 > ~/.pgpass
+  #chmod 0600 ~/.pgpass
+  #service postgresql restart
   # install venv
   $pac_man install -y python-setuptools
   easy_install pip
