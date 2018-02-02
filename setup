@@ -291,6 +291,7 @@ then
       psql $POSTGRES_DB $POSTGRES_USER -c "INSERT INTO socialaccount_socialapp (id, provider, name, client_id, secret, key) VALUES (1, 'orcid', 'Orcid', '$ORCID_CLIENT_ID', '$ORCID_SECRET', '')"
       psql $POSTGRES_DB $POSTGRES_USER -c "INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (1, 1, 1)"
       div
+      sudo gem install sass
       printf "Finished Installing....type 'setup run' to run the COPO development server."
     elif [[ $opsys == "Ubuntu" ]]
     then
@@ -364,6 +365,8 @@ then
       psql $POSTGRES_DB $POSTGRES_USER -c "INSERT INTO socialaccount_socialapp (id, provider, name, client_id, secret, key) VALUES (1, 'orcid', 'Orcid', '$ORCID_CLIENT_ID', '$ORCID_SECRET', '')"
       psql $POSTGRES_DB $POSTGRES_USER -c "INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (1, 1, 1)"
       div
+      apt-get install ruby-full rubygems
+      gem install sass
       printf "Finished Installing....type 'setup run' to run the COPO development server.\n\n\n"
     fi
 
