@@ -46,11 +46,16 @@ div=divider
 
 get_user_envs(){
 # set other environment variables which may vary or need to be kept secret
-printf "In order to proceed you need to have created Apps for both ORCiD (https://orcid.org/developer-tools)
-and Figshare (https://figshare.com/account/applications). You will need the 'Client Key' and 'Secret Key'
-from the Apps you created to proceed. Additionally, if you have set an administrator account for PostgreSQL
+if [ $1 == "install" ]
+then
+printf "In order to proceed you need to have created an App for ORCiD (https://orcid.org/developer-tools).
+You will need the 'Client Key' and 'Secret Key'. Additionally, if you have set an administrator account for PostgreSQL
 different from the defaults, you will need to enter these as well. Press return to proceed or Ctrl-C to exit.
 If you already have these details exported in existing environment variables jus press enter at the prompt.\n"
+elif [[ $1 == "env" ]]
+then
+printf "Enter details at prompt...\n"
+fi
 
 # check if postgres admin user account supplied
 printf "Enter PostgreSQL admin user if different from default: ($POSTGRES_ADMIN_USER)\n"
@@ -75,7 +80,7 @@ else
 fi
 divider
 # check if MongoDB account supplied
-printf "Enter PostgreSQL admin user if different from default: ($MONGO_ADMIN_USER):\n"
+printf "Enter MongoDB admin user if different from default: ($MONGO_ADMIN_USER):\n"
 read input
 if [[ $input != "" ]]
 then
@@ -86,7 +91,7 @@ else
 fi
 divider
 # check if MongoDB password supplied
-printf "Enter PostgreSQL admin user if different from default: ($MONGO_ADMIN_PASSWORD):\n"
+printf "Enter MongoDB admin password if different from default: ($MONGO_ADMIN_PASSWORD):\n"
 read input
 if [[ $input != "" ]]
 then
@@ -97,7 +102,35 @@ else
 fi
 
 
-# TODO - add prompts for figshare and orcid
+divider
+# get ORCiD Client ID
+if [[ $ORCID_CLIENT_ID == "" ]]
+then
+    printf "Enter Orcid Client Key:\n"
+    read input
+    while [[ $input == "" ]]
+    do
+        printf "Enter Orcid Client Key:\n"
+        read input
+    done
+    export ORCID_CLIENT_ID=$input
+    printf "Using $input \n"
+
+    divider
+fi
+if [[ $ORCID_SECRET == "" ]]
+then
+    # get ORCiD secret key
+    printf "Enter Orcid Secret Key:\n"
+    read input
+    while [[ $input == "" ]]
+    do
+        printf "Enter Orcid Secret Key:\n"
+        read input
+    done
+    export ORCID_SECRET=$input
+    printf "Using $input \n"fi
+fi
 
 
 }
@@ -122,22 +155,33 @@ END
 local_dir=$(dirname $0)
 # get os
 opsys=$(check_os)
-printf '\nDetermining OS: %s\n\n' "$opsys"
+printf '\nDetermining OS: %s\n' "$opsys"
 # get current user
 me=$(whoami)
-printf 'Installing under user account: %s\n\n' "$me"
+printf 'Welcome: %s\n' "$me"
 
 if [ $# -eq 0 ]
 then
   printf "\nCOPO Setup: Missing Argument\n"
   printf "Options are:\n"
   printf "run - runs installed COPO instance\n"
-  printf "install - installs development instance of COPO on this machine along with all its dependencies\n\n"
+  printf "install - installs development instance of COPO on this machine along with all its dependencies\n"
+  printf "env <filepath> - export environment variables to <filepath>. Required to run COPO independently of this script.\n\n"
+elif [ $1 == "env" ]
+then
+  # first remove existing file at location
+  rm $2
+  set_envs
+  get_user_envs env
+  x=$(env | grep -E 'REDIS|MONGO|POSTGRES|COPO|ORCID|MEDIA|SECRET')
+  for line in $x ; do
+    echo export $line >> $2
+  done
 elif [ $1 == "run" ]
 then
   set_envs
   printf "Starting COPO...\n"
-  mongod --fork --auth --config /etc/mongod.conf
+  mongod --fork --config /etc/mongod.conf
   if [ "$opsys" == "Darwin" ]
   then
     brew services start postgres
@@ -161,7 +205,7 @@ then
 
     $div
     set_envs
-    get_user_envs
+    get_user_envs install
 
 
     if [[ $opsys == "Darwin" ]]
@@ -211,10 +255,10 @@ then
       echo -e "local\t\tcopo\t\tall\t\ttrust\n$(cat /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf)" > /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf
       $pac_man services restart postgresql
       # create psql user and db
-      sudo -u $me createuser $postgres_user
-      sudo -u $me createdb $postgres_db
-      psql postgres $me -c "alter user $postgres_user with encrypted password '$postgres_pw';"
-      psql postgres $me -c "grant all privileges on database $postgres_db to $postgres_user ;"
+      sudo -u $me createuser $POSTGRES_USER
+      sudo -u $me createdb $POSRGRES_DB
+      psql postgres $me -c "alter user $POSTGRES_USER with encrypted password '$POSTGRES_PASSWORD';"
+      psql postgres $me -c "grant all privileges on database $POSTGRES_DB to $POSTGRES_USER ;"
       # install virtual env
       pip3 install virtualenv
       virtualenv -p python3 $COPO_VM_NAME
@@ -249,10 +293,10 @@ then
       # need to start mongo without auth, make admin user and copo_user, then
       # restart with auth
       mongod --fork --config /etc/mongod.conf
-      mongo localhost/admin --eval "db.createUser({user: 'admin', pwd: 'password', roles:[{ role: 'userAdminAnyDatabase', db: 'admin' } ]});"
-      mongo localhost/admin --eval "db.createUser({user: '$mongo_user', pwd: '$mongo_pw', roles:[{ role:'readWrite', db: 'copo_mongo' }]})"
-      mongo localhost/admin --eval "db.shutdownServer()"
-      mongod --fork --auth --config /etc/mongod.conf
+      mongo localhost/admin --eval "db.createUser({user: '$MONGO_ADMIN_USER', pwd: '$MONGO_ADMIN_PASSWORD', roles:[{ role: 'userAdminAnyDatabase', db: 'admin' } ]});"
+      mongo localhost/admin --eval "db.createUser({user: '$MONGO_USER', pwd: '$MONGO_PASSWORD', roles:[{ role:'readWrite', db: 'copo_mongo' }]})"
+      #mongo localhost/admin --eval "db.shutdownServer()"
+      #mongod --fork --config /etc/mongod.conf
       # install and start redis
       $pac_man install -y redis-server
       service redis-server start
@@ -265,10 +309,12 @@ then
       # TODO - change authentication in pg_hba.conf to trust for setup and change
       # back to md5 as last thing, this will stop auth errors from occuring if then
       # installation is interupted for some reason.
-      sudo -u postgres createuser $postgres_user
-      sudo -u postgres createdb $postgres_db
-      sudo -u postgres psql -c "alter user $postgres_user with encrypted password '$postgres_pw';"
-      sudo -u postgres psql -c "grant all privileges on database $postgres_db to $postgres_user;"
+      echo -e "local\t\tcopo\t\tall\t\ttrust\n$(cat /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf)" > /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf
+      service postgresql restart
+      sudo -u postgres createuser $POSTGRES_USER
+      sudo -u postgres createdb $POSTGRES_DB
+      sudo -u postgres psql -c "alter user $POSTGRES_USER with encrypted password '$POSTGRES_PASSWORD';"
+      sudo -u postgres psql -c "grant all privileges on database $POSTGRES_DB to $POSTGRES_USER;"
       # setup pgpass file for later command access
       #echo *:*:copo:postgres_user:Apple123 > ~/.pgpass
       #chmod 0600 ~/.pgpass
@@ -288,14 +334,14 @@ then
       /$local_dir/web/src/manage.py migrate
 
       # add social account records
-      psql copo postgres_user -c "DELETE FROM socialaccount_socialapp_sites"
-      psql copo postgres_user -c "DELETE FROM django_site"
-      psql copo postgres_user -c "DELETE FROM socialaccount_socialapp"
-      psql copo postgres_user -c "INSERT INTO django_site (id, domain, name) VALUES (1, 'www.copo-project.org', 'www.copo-project.org')"
-      psql copo postgres_user -c "INSERT INTO socialaccount_socialapp (id, provider, name, client_id, secret, key) VALUES (1, 'orcid', 'Orcid', '$ORCID_CLIENT_ID', '$ORCID_SECRET', '')"
-      psql copo postgres_user -c "INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (1, 1, 1)"
+      psql $POSTGRES_DB $POSTGRES_USER -c "DELETE FROM socialaccount_socialapp_sites"
+      psql $POSTGRES_DB $POSTGRES_USER -c "DELETE FROM django_site"
+      psql $POSTGRES_DB $POSTGRES_USER -c "DELETE FROM socialaccount_socialapp"
+      psql $POSTGRES_DB $POSTGRES_USER -c "INSERT INTO django_site (id, domain, name) VALUES (1, 'www.copo-project.org', 'www.copo-project.org')"
+      psql $POSTGRES_DB $POSTGRES_USER -c "INSERT INTO socialaccount_socialapp (id, provider, name, client_id, secret, key) VALUES (1, 'orcid', 'Orcid', '$ORCID_CLIENT_ID', '$ORCID_SECRET', '')"
+      psql $POSTGRES_DB $POSTGRES_USER -c "INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (1, 1, 1)"
       div
-      printf "Finished Installing....type 'setup run' to run the COPO development server."
+      printf "Finished Installing....type 'setup run' to run the COPO development server.\n\n\n"
     fi
 
 fi
