@@ -131,9 +131,9 @@ then
     export ORCID_SECRET=$input
     printf "Using $input \n"fi
 fi
-
-
 }
+
+
 
 # embedded python function to get system info
 function check_os {
@@ -181,7 +181,7 @@ elif [ $1 == "run" ]
 then
   set_envs
   printf "Starting COPO...\n"
-  mongod --fork --config /etc/mongod.conf
+  mongod --fork
   if [ "$opsys" == "Darwin" ]
   then
     brew services start postgres
@@ -189,8 +189,8 @@ then
     service postgresql start
   fi
   printf "To stop press Ctrl-C...\n"
-  source $COPO_VM_NAME/bin/activate
-  /$local_dir/web/src/manage.py runserver
+  source $local_dir/$COPO_VM_NAME/bin/activate
+  $local_dir/web/src/manage.py runserver
 elif [ $1 == "install" ]
 then
     python -c "exit"
@@ -201,8 +201,8 @@ then
     fi
 
     # START
-    printf 'This script will install a development ready instance of COPO onto your machine along with all its dependencies. Only OSX and Ubuntu installations are currently supported. \n'
-
+    printf "This script will install a development ready instance of COPO onto your machine along with all its dependencies. Only OSX and Ubuntu installations are currently supported. \n"
+    printf "If you are asked for a password, it will be the password you use for sudo"
     $div
     set_envs
     get_user_envs install
@@ -252,8 +252,21 @@ then
       $pac_man services start redis
       # install postgres
       $pac_man install postgresql
-      echo -e "local\t\tcopo\t\tall\t\ttrust\n$(cat /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf)" > /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf
+      printf "Attempting to allow access to copo database on PostgreSQL. If this doesn't work, add the following line at the top of your pg_hba.conf file:\n
+      local     copo    all     trust\n
+      then restart PostgreSQL."
+      echo -e "local\t\tcopo\t\tall\t\ttrust\n$(cat /usr/local/var/postgres/pg_hba.conf)" > /usr/local/var/postgres/pg_hba.conf
       $pac_man services restart postgresql
+
+
+      printf "Attempting to add required users to PostgreSQL. If this fails, try adding a .pgpass file to your home directory
+      which should contain a line like:
+      \n *:*:*:<admin_username>:<admin_password>\n
+      remember to restart postgres"
+      printf "Press any key to continue\n"
+      read
+
+
       # create psql user and db
       sudo -u $me createuser $POSTGRES_USER
       sudo -u $me createdb $POSRGRES_DB
@@ -262,21 +275,21 @@ then
       # install virtual env
       pip3 install virtualenv
       virtualenv -p python3 $COPO_VM_NAME
-      source $COPO_VM_NAME/bin/activate
+      source $local_dir/$COPO_VM_NAME/bin/activate
       pip3 install --upgrade setuptools
-      pip3 install -r /COPO/web/src/requirements/base.txt
+      pip3 install -r $local_dir/web/src/requirements/base.txt
       /$local_dir/web/src/manage.py makemigrations
       /$local_dir/web/src/manage.py makemigrations chunked_upload
       /$local_dir/web/src/manage.py makemigrations allauth
       /$local_dir/web/src/manage.py migrate
 
       # add social account records
-      psql copo postgres_user -c "DELETE FROM socialaccount_socialapp_sites"
-      psql copo postgres_user -c "DELETE FROM django_site"
-      psql copo postgres_user -c "DELETE FROM socialaccount_socialapp"
-      psql copo postgres_user -c "INSERT INTO django_site (id, domain, name) VALUES (1, 'www.copo-project.org', 'www.copo-project.org')"
-      psql copo postgres_user -c "INSERT INTO socialaccount_socialapp (id, provider, name, client_id, secret, key) VALUES (1, 'orcid', 'Orcid', '$ORCID_CLIENT_ID', '$ORCID_SECRET', '')"
-      psql copo postgres_user -c "INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (1, 1, 1)"
+      psql $POSTGRES_DB $POSTGRES_USER -c "DELETE FROM socialaccount_socialapp_sites"
+      psql $POSTGRES_DB $POSTGRES_USER -c "DELETE FROM django_site"
+      psql $POSTGRES_DB $POSTGRES_USER -c "DELETE FROM socialaccount_socialapp"
+      psql $POSTGRES_DB $POSTGRES_USER -c "INSERT INTO django_site (id, domain, name) VALUES (1, 'www.copo-project.org', 'www.copo-project.org')"
+      psql $POSTGRES_DB $POSTGRES_USER -c "INSERT INTO socialaccount_socialapp (id, provider, name, client_id, secret, key) VALUES (1, 'orcid', 'Orcid', '$ORCID_CLIENT_ID', '$ORCID_SECRET', '')"
+      psql $POSTGRES_DB $POSTGRES_USER -c "INSERT INTO socialaccount_socialapp_sites (id, socialapp_id, site_id) VALUES (1, 1, 1)"
       div
       printf "Finished Installing....type 'setup run' to run the COPO development server."
     elif [[ $opsys == "Ubuntu" ]]
@@ -311,6 +324,16 @@ then
       # installation is interupted for some reason.
       echo -e "local\t\tcopo\t\tall\t\ttrust\n$(cat /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf)" > /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf
       service postgresql restart
+
+
+      printf "Attempting to add required users to PostgreSQL. If this fails, try adding a .pgpass file to your home directory
+      which should contain a line like:
+      \n *:*:*:<admin_username>:<admin_password>\n
+      remember to restart postgres"
+      printf "Press any key to continue\n"
+      read
+
+
       sudo -u postgres createuser $POSTGRES_USER
       sudo -u postgres createdb $POSTGRES_DB
       sudo -u postgres psql -c "alter user $POSTGRES_USER with encrypted password '$POSTGRES_PASSWORD';"
