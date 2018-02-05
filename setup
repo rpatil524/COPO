@@ -273,6 +273,8 @@ then
       sudo -u $me createdb $POSRGRES_DB
       psql postgres $me -c "alter user $POSTGRES_USER with encrypted password '$POSTGRES_PASSWORD';"
       psql postgres $me -c "grant all privileges on database $POSTGRES_DB to $POSTGRES_USER ;"
+      psql postgres $me -c "ALTER USER $POSTGRES_USER CREATEDB;"
+
       # install virtual env
       pip3 install virtualenv
       virtualenv -p python3 $COPO_VM_NAME
@@ -340,8 +342,9 @@ then
       sudo -u postgres createdb $POSTGRES_DB
       sudo -u postgres psql -c "alter user $POSTGRES_USER with encrypted password '$POSTGRES_PASSWORD';"
       sudo -u postgres psql -c "grant all privileges on database $POSTGRES_DB to $POSTGRES_USER;"
+      sudo -u postgres psql -c "ALTER USER $POSTGRES_USER CREATEDB;"
       # setup pgpass file for later command access
-      #echo *:*:copo:postgres_user:Apple123 > ~/.pgpass
+      #echo *:*:copo:postgres_user:postgres_user > ~/.pgpass
       #chmod 0600 ~/.pgpass
       #service postgresql restart
       # install venv
