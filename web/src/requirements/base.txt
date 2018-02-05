@@ -14,7 +14,7 @@ decorator==4.1.2
 deepdiff==3.3.0
 defusedxml==0.4.1
 dict.sorted==1.0.0
-Django==1.10.3
+Django==1.11
 django-allauth==0.28.0
 django-appconf==1.0.2
 django-chunked-upload==1.1.1

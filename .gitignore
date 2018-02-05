@@ -111,7 +111,7 @@ mongo/mongodata
 # add ignore for migrations
 0001_initial.py
 
-.idea/**
+web/src/.idea/**
 
 .gitignore.swp
 web/src/static/CACHE/
