@@ -3,6 +3,7 @@
 
 # function to set environmental vars
 set_envs(){
+export ENVIRONMENT_TYPE="dev"
 export COPO_VM_NAME="copo_env"
 # django secret key.....this must be changed before any public deployment
 export SECRET_KEY=f9834op2ji0ikaiowdu9hgcg-9iojla

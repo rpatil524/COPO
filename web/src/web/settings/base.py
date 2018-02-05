@@ -10,6 +10,7 @@ SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = resolve_env.get_env('SECRET_KEY')
 
