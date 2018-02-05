@@ -1,6 +1,7 @@
 import psycopg2
 from tools import resolve_env
 
+# TODO - this file is no longer needed since the install script is in place......we should delete this
 
 def main():
     db_host = resolve_env.get_env('POSTGRES_SERVICE')
