@@ -10,6 +10,7 @@ class Ena_Tests(TestCase):
     def setUp(self):
         self.client = get_client()
         self.db = self.client[self.db_name]
+        # this setting should redirect all dal activity to the test db
         settings.MONGO_CLIENT = self.client
 
     def test_can(self):
