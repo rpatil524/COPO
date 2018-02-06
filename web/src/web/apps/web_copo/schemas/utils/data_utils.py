@@ -333,7 +333,9 @@ def get_watering_control_options():
 
 def get_copo_id():
     # todo: remove this and uncomment the below try block!!!
-    return "0" * 13
+    import uuid
+    u = uuid.uuid4()
+    return int(str(u.time_low) + str(u.time_mid))
     # make unique copo id
     # try:
     #     return get_uid()
