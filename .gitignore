@@ -113,6 +113,8 @@ mongo/mongodata
 0001_initial.py
 
 .idea/**
+.idea
+
 
 .gitignore.swp
 web/src/static/CACHE/
