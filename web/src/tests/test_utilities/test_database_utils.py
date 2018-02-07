@@ -22,8 +22,13 @@ class Utils:
 
     def load_fixtures(self, file_location):
         # load test data from json file
+
+        # TODO - MongoIDs here are wrong. Either enter MongoIDs as static or return each new ID as the data is entered
         with open(file_location) as json_data:
             d = json.load(json_data)
             self.db.Profiles.insert_one(d['profile'])
             self.db.SourceCollection.insert_many(d['source'])
             self.db.SampleCollection.insert_many(d['sample'])
+            self.db.DescriptionCollection.insert_one(d['description'])
+            self.db.DatafileCollection.insert_many(d['file'])
+            self.db.PersonCollection.insert_one(d['person'])

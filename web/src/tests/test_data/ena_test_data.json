@@ -321,5 +321,1273 @@
             "deleted": "0",
             "date_modified": "2018-02-06T16:02:44.521+0000"
         }
-    ]
+    ],
+    "description": {
+        "stages": [
+            {
+                "ref": "target_repository",
+                "title": "Target Repo",
+                "content": "get_stage_html",
+                "is_singular_stage": true,
+                "message": "Select the target repository for which this description is intended.",
+                "items": [
+                    {
+                        "id": "deposition_context",
+                        "help_tip": "Select a target repository",
+                        "label": "Target Repository",
+                        "hidden": "false",
+                        "required": "true",
+                        "control": "copo-button-list",
+                        "default_value": "ena",
+                        "option_values": {
+                            "callback": {
+                                "function": "get_repository_options",
+                                "parameter": ""
+                            }
+                        },
+                        "trigger": {
+                            "type": "change",
+                            "message": "Changing the target repository will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
+                            "callback": {
+                                "function": "target_repo_change",
+                                "parameter": "old_value,new_value"
+                            }
+                        },
+                        "type": "string"
+                    }
+                ],
+                "activated": true
+            },
+            {
+                "ref": "description_stages",
+                "is_stage_stub": true,
+                "callback": {
+                    "function": "get_description_stages",
+                    "parameter": ""
+                },
+                "activated": true
+            },
+            {
+                "ref": "study_type",
+                "title": "Study Type",
+                "is_singular_stage": true,
+                "message": "Select the study type under which the datafiles were created. The study type presents a controlled vocabulary for expressing the overall purpose of the study.",
+                "items": [
+                    {
+                        "id": "study_type",
+                        "help_tip": "Select Study Type from the drop-down list",
+                        "label": "Study Type",
+                        "hidden": "false",
+                        "required": "true",
+                        "type": "string",
+                        "control": "select",
+                        "default_value": "",
+                        "option_values": {
+                            "callback": {
+                                "function": "get_study_type_options",
+                                "parameter": ""
+                            }
+                        },
+                        "trigger": {
+                            "type": "change",
+                            "message": "Changing the study type will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
+                            "callback": {
+                                "function": "study_type_change",
+                                "parameter": "item_id,old_value,new_value"
+                            }
+                        }
+                    }
+                ],
+                "activated": true
+            },
+            {
+                "ref": "attach_samples",
+                "title": "Sample",
+                "message": "Select and associate a sample to files in the bundle. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",
+                "items": [
+                    {
+                        "id": "study_samples",
+                        "type": "string",
+                        "help_tip": "Specify the sample you used in your study",
+                        "label": "Sample",
+                        "hidden": "false",
+                        "required": "true",
+                        "control": "copo-multi-search",
+                        "option_component": "sample",
+                        "data_maxItems": 1,
+                        "default_value": "",
+                        "option_values": {
+                            "callback": {
+                                "function": "get_isasamples_json",
+                                "parameter": ""
+                            }
+                        }
+                    }
+                ],
+                "activated": true
+            },
+            {
+                "ref": "protocol_refs",
+                "is_stage_stub": true,
+                "callback": {
+                    "function": "get_dynamic_elements_ena",
+                    "parameter": "stub_ref"
+                },
+                "activated": true
+            },
+            {
+                "title": "Library Construction",
+                "ref": "library_construction",
+                "message": "Specify the origin of the material that may have been sequenced, and any treatments that the material might have undergone that affect the sequencing result.",
+                "dependent_on": "study_type",
+                "stub_ref": "protocol_refs",
+                "items": [
+                    {
+                        "help_tip": "Specify whether to expect single, paired, or other configuration of reads",
+                        "required": "false",
+                        "default_value": "",
+                        "control_meta": {
+                        },
+                        "control": "select",
+                        "versions": [
+                            "library_layout"
+                        ],
+                        "deprecated": false,
+                        "hidden": "false",
+                        "id": "library_layout",
+                        "label": "Library layout",
+                        "show_in_form": true,
+                        "type": "string",
+                        "show_in_table": true,
+                        "option_values": [
+                            "SINGLE",
+                            "PAIRED"
+                        ],
+                        "trigger": {
+                            "type": "change",
+                            "message": "Changing the library layout will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
+                            "callback": {
+                                "function": "library_layout_change",
+                                "parameter": "item_id,old_value,new_value"
+                            }
+                        }
+                    },
+                    {
+                        "help_tip": "Select the sequencing technique intended for this library",
+                        "required": "false",
+                        "default_value": "",
+                        "control_meta": {
+                        },
+                        "control": "select",
+                        "versions": [
+                            "library_strategy"
+                        ],
+                        "deprecated": false,
+                        "hidden": "false",
+                        "id": "library_strategy",
+                        "label": "Library strategy",
+                        "show_in_form": true,
+                        "type": "string",
+                        "show_in_table": true,
+                        "option_values": [
+                            "AMPLICON",
+                            "CLONE",
+                            "WGS",
+                            "OTHER"
+                        ]
+                    },
+                    {
+                        "help_tip": "Select the sequencing technique intended for this library",
+                        "required": "false",
+                        "default_value": "",
+                        "control_meta": {
+                        },
+                        "control": "select",
+                        "versions": [
+                            "library_source"
+                        ],
+                        "deprecated": false,
+                        "hidden": "false",
+                        "id": "library_source",
+                        "label": "Library source",
+                        "show_in_form": true,
+                        "type": "string",
+                        "show_in_table": true,
+                        "option_values": [
+                            "GENOMIC",
+                            "GENOMIC SINGLE CELL",
+                            "TRANSCRIPTOMIC",
+                            "TRANSCRIPTOMIC SINGLE CELL",
+                            "METAGENOMIC",
+                            "METATRANSCRIPTOMIC",
+                            "SYNTHETIC",
+                            "VIRAL RNA",
+                            "OTHER"
+                        ]
+                    },
+                    {
+                        "help_tip": "Select the method that was used to select for or against, enrich, or screen the material being sequenced",
+                        "required": "false",
+                        "default_value": "",
+                        "control_meta": {
+                        },
+                        "control": "select",
+                        "versions": [
+                            "library_selection"
+                        ],
+                        "deprecated": false,
+                        "hidden": "false",
+                        "id": "library_selection",
+                        "label": "Library selection",
+                        "show_in_form": true,
+                        "type": "string",
+                        "show_in_table": true,
+                        "option_values": [
+                            "PCR",
+                            "RANDOM PCR",
+                            "HMPR",
+                            "MF",
+                            "repeat fractionation",
+                            "size fractionation",
+                            "MSLL",
+                            "cDNA",
+                            "cDNA_randomPriming",
+                            "cDNA_oligo_dT",
+                            "PolyA",
+                            "Oligo-dT",
+                            "Inverse rRNA",
+                            "Inverse rRNA selection",
+                            "ChIP",
+                            "MNase",
+                            "DNase",
+                            "Hybrid Selection",
+                            "Reduced Representation",
+                            "Restriction Digest",
+                            "5-methylcytidine antibody",
+                            "MBD2 protein methyl-CpG binding domain",
+                            "CAGE",
+                            "RACE",
+                            "MDA",
+                            "padlock probes capture method",
+                            "other",
+                            "unspecified"
+                        ]
+                    }
+                ],
+                "activated": true
+            },
+            {
+                "title": "Nucleic Acid Sequencing",
+                "ref": "nucleic_acid_sequencing",
+                "message": "Specify the sequencing technique used.",
+                "dependent_on": "study_type",
+                "stub_ref": "protocol_refs",
+                "items": [
+                    {
+                        "help_tip": "Enter the name and version of the quality scoring software",
+                        "required": "false",
+                        "default_value": "",
+                        "control_meta": {
+                        },
+                        "control": "ontology term",
+                        "versions": [
+                            "quality_scorer"
+                        ],
+                        "deprecated": false,
+                        "hidden": "true",
+                        "id": "quality_scorer",
+                        "label": "Quality scorer",
+                        "show_in_form": true,
+                        "type": "string",
+                        "show_in_table": true,
+                        "ontology_names": [
+                        ]
+                    },
+                    {
+                        "help_tip": "Specify the sequencing instrument model and make",
+                        "required": "false",
+                        "default_value": "",
+                        "control_meta": {
+                        },
+                        "control": "select",
+                        "versions": [
+                            "sequencing_instrument"
+                        ],
+                        "deprecated": false,
+                        "hidden": "false",
+                        "id": "sequencing_instrument",
+                        "label": "Sequencing Instrument",
+                        "show_in_form": true,
+                        "type": "string",
+                        "show_in_table": true,
+                        "option_values": [
+                            "454 GS",
+                            "454 GS 20",
+                            "454 GS FLX",
+                            "454 GS FLX Plus",
+                            "454 GS FLX Titanium",
+                            "454 GS Junior",
+                            "AB SOLiD System",
+                            "AB SOLiD System 2.0",
+                            "AB SOLiD System 3.0",
+                            "AB SOLiD 4 System",
+                            "AB SOLiD 4hq System",
+                            "AB SOLiD PI System",
+                            "AB SOLiD 5500",
+                            "AB SOLiD 5500xl",
+                            "AB 5500 Genetic Analyzer",
+                            "AB 5500xl Genetic analyzer",
+                            "Illumina Genome Analyzer",
+                            "Illumina Genome Analyzer II",
+                            "Illumina Genome Analyzer IIx",
+                            "Illumina HiSeq 1000",
+                            "Illumina HiSeq 2000",
+                            "Illumina HiSeq 2500",
+                            "Illumina HiScanSQ",
+                            "Illumina MiSeq",
+                            "Ion Torrent PGM",
+                            "Ion Torrent Proton",
+                            "Sanger sequencing instrument",
+                            "unspecified"
+                        ]
+                    }
+                ],
+                "activated": true
+            },
+            {
+                "ref": "datafiles_pairing",
+                "title": "Datafiles Pairing",
+                "message": "In this stage, you will be able to pair up datafiles in the description bundle for which the library layout has been set to 'PAIRED'.",
+                "is_conditional_stage": true,
+                "is_clonable": false,
+                "callback": {
+                    "function": "confirm_pairing",
+                    "parameter": ""
+                },
+                "items": [
+                    {
+                        "id": "paired_file",
+                        "type": "string",
+                        "help_tip": "Select a datafile to pair",
+                        "label": "Paired Datafile",
+                        "hidden": "false",
+                        "required": "true",
+                        "control": "copo-multi-search",
+                        "option_component": "datafile",
+                        "data_maxItems": 1,
+                        "default_value": "",
+                        "option_values": {
+                            "callback": {
+                                "function": "get_datafiles_json",
+                                "parameter": ""
+                            }
+                        }
+                    }
+                ],
+                "activated": true
+            }
+        ],
+        "attributes": {
+            "target_repository": [
+                {
+                    "deposition_context": "ena"
+                }
+            ],
+            "study_type": [
+                {
+                    "study_type": "genomeSeq"
+                }
+            ],
+            "attach_samples": [
+                {
+                    "study_samples": "5a79d1a419f1af43390bb5aa"
+                },
+                {
+                    "study_samples": "5a79d1a419f1af43390bb5ab"
+                }
+            ],
+            "library_construction": [
+                {
+                    "library_layout": "PAIRED",
+                    "library_strategy": "AMPLICON",
+                    "library_source": "GENOMIC",
+                    "library_selection": "PCR"
+                }
+            ],
+            "nucleic_acid_sequencing": [
+                {
+                    "quality_scorer": {
+                        "@id": "",
+                        "annotationValue": "",
+                        "termSource": "",
+                        "termAccession": "",
+                        "comments": [
+                        ]
+                    },
+                    "sequencing_instrument": "Illumina HiSeq 2500"
+                }
+            ]
+        },
+        "created_on": "2018-02-06T16:48:01.291+0000",
+        "user_id": 1
+    },
+    "file": [
+        {
+            "name": "small50.fastq.gz",
+            "file_type": "fastq",
+            "type": "Raw Data File",
+            "comments": [
+            ],
+            "file_id": "1",
+            "file_location": "/Users/fshaw/Dropbox/dev/COPO/web/src/media/chunked_uploads/1/16_47_51_941798/small50.fastq.gz",
+            "file_size": "217.00 B",
+            "date_created": "2018-02-06T16:47:52.047+0000",
+            "profile_id": "5a79cbaa453d9a13b2fa3baa",
+            "file_hash": "cf57b933b190852cc3a54e71b699f630",
+            "description": {
+                "stages": [
+                    {
+                        "ref": "target_repository",
+                        "title": "Target Repo",
+                        "content": "get_stage_html",
+                        "is_singular_stage": true,
+                        "message": "Select the target repository for which this description is intended.",
+                        "items": [
+                            {
+                                "id": "deposition_context",
+                                "help_tip": "Select a target repository",
+                                "label": "Target Repository",
+                                "hidden": "false",
+                                "required": "true",
+                                "control": "copo-button-list",
+                                "default_value": "ena",
+                                "option_values": {
+                                    "callback": {
+                                        "function": "get_repository_options",
+                                        "parameter": ""
+                                    }
+                                },
+                                "trigger": {
+                                    "type": "change",
+                                    "message": "Changing the target repository will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
+                                    "callback": {
+                                        "function": "target_repo_change",
+                                        "parameter": "old_value,new_value"
+                                    }
+                                },
+                                "type": "string"
+                            }
+                        ],
+                        "activated": true
+                    },
+                    {
+                        "ref": "description_stages",
+                        "is_stage_stub": true,
+                        "callback": {
+                            "function": "get_description_stages",
+                            "parameter": ""
+                        },
+                        "activated": true
+                    },
+                    {
+                        "ref": "study_type",
+                        "title": "Study Type",
+                        "is_singular_stage": true,
+                        "message": "Select the study type under which the datafiles were created. The study type presents a controlled vocabulary for expressing the overall purpose of the study.",
+                        "items": [
+                            {
+                                "id": "study_type",
+                                "help_tip": "Select Study Type from the drop-down list",
+                                "label": "Study Type",
+                                "hidden": "false",
+                                "required": "true",
+                                "type": "string",
+                                "control": "select",
+                                "default_value": "",
+                                "option_values": {
+                                    "callback": {
+                                        "function": "get_study_type_options",
+                                        "parameter": ""
+                                    }
+                                },
+                                "trigger": {
+                                    "type": "change",
+                                    "message": "Changing the study type will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
+                                    "callback": {
+                                        "function": "study_type_change",
+                                        "parameter": "item_id,old_value,new_value"
+                                    }
+                                }
+                            }
+                        ],
+                        "activated": true
+                    },
+                    {
+                        "ref": "attach_samples",
+                        "title": "Sample",
+                        "message": "Select and associate a sample to files in the bundle. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",
+                        "items": [
+                            {
+                                "id": "study_samples",
+                                "type": "string",
+                                "help_tip": "Specify the sample you used in your study",
+                                "label": "Sample",
+                                "hidden": "false",
+                                "required": "true",
+                                "control": "copo-multi-search",
+                                "option_component": "sample",
+                                "data_maxItems": 1,
+                                "default_value": "",
+                                "option_values": {
+                                    "callback": {
+                                        "function": "get_isasamples_json",
+                                        "parameter": ""
+                                    }
+                                }
+                            }
+                        ],
+                        "activated": true
+                    },
+                    {
+                        "ref": "protocol_refs",
+                        "is_stage_stub": true,
+                        "callback": {
+                            "function": "get_dynamic_elements_ena",
+                            "parameter": "stub_ref"
+                        },
+                        "activated": true
+                    },
+                    {
+                        "title": "Library Construction",
+                        "ref": "library_construction",
+                        "message": "Specify the origin of the material that may have been sequenced, and any treatments that the material might have undergone that affect the sequencing result.",
+                        "dependent_on": "study_type",
+                        "stub_ref": "protocol_refs",
+                        "items": [
+                            {
+                                "help_tip": "Specify whether to expect single, paired, or other configuration of reads",
+                                "required": "false",
+                                "default_value": "",
+                                "control_meta": {
+                                },
+                                "control": "select",
+                                "versions": [
+                                    "library_layout"
+                                ],
+                                "deprecated": false,
+                                "hidden": "false",
+                                "id": "library_layout",
+                                "label": "Library layout",
+                                "show_in_form": true,
+                                "type": "string",
+                                "show_in_table": true,
+                                "option_values": [
+                                    "SINGLE",
+                                    "PAIRED"
+                                ],
+                                "trigger": {
+                                    "type": "change",
+                                    "message": "Changing the library layout will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
+                                    "callback": {
+                                        "function": "library_layout_change",
+                                        "parameter": "item_id,old_value,new_value"
+                                    }
+                                }
+                            },
+                            {
+                                "help_tip": "Select the sequencing technique intended for this library",
+                                "required": "false",
+                                "default_value": "",
+                                "control_meta": {
+                                },
+                                "control": "select",
+                                "versions": [
+                                    "library_strategy"
+                                ],
+                                "deprecated": false,
+                                "hidden": "false",
+                                "id": "library_strategy",
+                                "label": "Library strategy",
+                                "show_in_form": true,
+                                "type": "string",
+                                "show_in_table": true,
+                                "option_values": [
+                                    "AMPLICON",
+                                    "CLONE",
+                                    "WGS",
+                                    "OTHER"
+                                ]
+                            },
+                            {
+                                "help_tip": "Select the sequencing technique intended for this library",
+                                "required": "false",
+                                "default_value": "",
+                                "control_meta": {
+                                },
+                                "control": "select",
+                                "versions": [
+                                    "library_source"
+                                ],
+                                "deprecated": false,
+                                "hidden": "false",
+                                "id": "library_source",
+                                "label": "Library source",
+                                "show_in_form": true,
+                                "type": "string",
+                                "show_in_table": true,
+                                "option_values": [
+                                    "GENOMIC",
+                                    "GENOMIC SINGLE CELL",
+                                    "TRANSCRIPTOMIC",
+                                    "TRANSCRIPTOMIC SINGLE CELL",
+                                    "METAGENOMIC",
+                                    "METATRANSCRIPTOMIC",
+                                    "SYNTHETIC",
+                                    "VIRAL RNA",
+                                    "OTHER"
+                                ]
+                            },
+                            {
+                                "help_tip": "Select the method that was used to select for or against, enrich, or screen the material being sequenced",
+                                "required": "false",
+                                "default_value": "",
+                                "control_meta": {
+                                },
+                                "control": "select",
+                                "versions": [
+                                    "library_selection"
+                                ],
+                                "deprecated": false,
+                                "hidden": "false",
+                                "id": "library_selection",
+                                "label": "Library selection",
+                                "show_in_form": true,
+                                "type": "string",
+                                "show_in_table": true,
+                                "option_values": [
+                                    "PCR",
+                                    "RANDOM PCR",
+                                    "HMPR",
+                                    "MF",
+                                    "repeat fractionation",
+                                    "size fractionation",
+                                    "MSLL",
+                                    "cDNA",
+                                    "cDNA_randomPriming",
+                                    "cDNA_oligo_dT",
+                                    "PolyA",
+                                    "Oligo-dT",
+                                    "Inverse rRNA",
+                                    "Inverse rRNA selection",
+                                    "ChIP",
+                                    "MNase",
+                                    "DNase",
+                                    "Hybrid Selection",
+                                    "Reduced Representation",
+                                    "Restriction Digest",
+                                    "5-methylcytidine antibody",
+                                    "MBD2 protein methyl-CpG binding domain",
+                                    "CAGE",
+                                    "RACE",
+                                    "MDA",
+                                    "padlock probes capture method",
+                                    "other",
+                                    "unspecified"
+                                ]
+                            }
+                        ],
+                        "activated": true
+                    },
+                    {
+                        "title": "Nucleic Acid Sequencing",
+                        "ref": "nucleic_acid_sequencing",
+                        "message": "Specify the sequencing technique used.",
+                        "dependent_on": "study_type",
+                        "stub_ref": "protocol_refs",
+                        "items": [
+                            {
+                                "help_tip": "Enter the name and version of the quality scoring software",
+                                "required": "false",
+                                "default_value": "",
+                                "control_meta": {
+                                },
+                                "control": "ontology term",
+                                "versions": [
+                                    "quality_scorer"
+                                ],
+                                "deprecated": false,
+                                "hidden": "true",
+                                "id": "quality_scorer",
+                                "label": "Quality scorer",
+                                "show_in_form": true,
+                                "type": "string",
+                                "show_in_table": true,
+                                "ontology_names": [
+                                ]
+                            },
+                            {
+                                "help_tip": "Specify the sequencing instrument model and make",
+                                "required": "false",
+                                "default_value": "",
+                                "control_meta": {
+                                },
+                                "control": "select",
+                                "versions": [
+                                    "sequencing_instrument"
+                                ],
+                                "deprecated": false,
+                                "hidden": "false",
+                                "id": "sequencing_instrument",
+                                "label": "Sequencing Instrument",
+                                "show_in_form": true,
+                                "type": "string",
+                                "show_in_table": true,
+                                "option_values": [
+                                    "454 GS",
+                                    "454 GS 20",
+                                    "454 GS FLX",
+                                    "454 GS FLX Plus",
+                                    "454 GS FLX Titanium",
+                                    "454 GS Junior",
+                                    "AB SOLiD System",
+                                    "AB SOLiD System 2.0",
+                                    "AB SOLiD System 3.0",
+                                    "AB SOLiD 4 System",
+                                    "AB SOLiD 4hq System",
+                                    "AB SOLiD PI System",
+                                    "AB SOLiD 5500",
+                                    "AB SOLiD 5500xl",
+                                    "AB 5500 Genetic Analyzer",
+                                    "AB 5500xl Genetic analyzer",
+                                    "Illumina Genome Analyzer",
+                                    "Illumina Genome Analyzer II",
+                                    "Illumina Genome Analyzer IIx",
+                                    "Illumina HiSeq 1000",
+                                    "Illumina HiSeq 2000",
+                                    "Illumina HiSeq 2500",
+                                    "Illumina HiScanSQ",
+                                    "Illumina MiSeq",
+                                    "Ion Torrent PGM",
+                                    "Ion Torrent Proton",
+                                    "Sanger sequencing instrument",
+                                    "unspecified"
+                                ]
+                            }
+                        ],
+                        "activated": true
+                    },
+                    {
+                        "ref": "datafiles_pairing",
+                        "title": "Datafiles Pairing",
+                        "message": "In this stage, you will be able to pair up datafiles in the description bundle for which the library layout has been set to 'PAIRED'.",
+                        "is_conditional_stage": true,
+                        "is_clonable": false,
+                        "callback": {
+                            "function": "confirm_pairing",
+                            "parameter": ""
+                        },
+                        "items": [
+                            {
+                                "id": "paired_file",
+                                "type": "string",
+                                "help_tip": "Select a datafile to pair",
+                                "label": "Paired Datafile",
+                                "hidden": "false",
+                                "required": "true",
+                                "control": "copo-multi-search",
+                                "option_component": "datafile",
+                                "data_maxItems": 1,
+                                "default_value": "",
+                                "option_values": {
+                                    "callback": {
+                                        "function": "get_datafiles_json",
+                                        "parameter": ""
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "attributes": {
+                    "target_repository": {
+                        "deposition_context": "ena"
+                    },
+                    "study_type": {
+                        "study_type": "genomeSeq"
+                    },
+                    "attach_samples": {
+                        "study_samples": "5a79d1a419f1af43390bb5aa"
+                    },
+                    "library_construction": {
+                        "library_layout": "PAIRED",
+                        "library_strategy": "AMPLICON",
+                        "library_source": "GENOMIC",
+                        "library_selection": "PCR"
+                    },
+                    "nucleic_acid_sequencing": {
+                        "quality_scorer": {
+                            "@id": "",
+                            "annotationValue": "",
+                            "termSource": "",
+                            "termAccession": "",
+                            "comments": [
+                            ]
+                        },
+                        "sequencing_instrument": "Illumina HiSeq 2500"
+                    },
+                    "datafiles_pairing": {
+                        "paired_file": "5a79dc38453d9a13b2fa3bae"
+                    }
+                }
+            },
+            "deleted": "0",
+            "date_modified": "2018-02-06T16:47:52.462+0000"
+        },
+        {
+            "_id": "5a79dc38453d9a13b2fa3bae",
+            "name": "small51.fastq.gz",
+            "file_type": "fastq",
+            "type": "Raw Data File",
+            "comments": [
+            ],
+            "file_id": "2",
+            "file_location": "/Users/fshaw/Dropbox/dev/COPO/web/src/media/chunked_uploads/1/16_47_52_003131/small51.fastq.gz",
+            "file_size": "217.00 B",
+            "date_created": "2018-02-06T16:47:52.136+0000",
+            "profile_id": "5a79cbaa453d9a13b2fa3baa",
+            "file_hash": "30af683fd5de4e26ea33cf16b311836f",
+            "description": {
+                "stages": [
+                    {
+                        "ref": "target_repository",
+                        "title": "Target Repo",
+                        "content": "get_stage_html",
+                        "is_singular_stage": true,
+                        "message": "Select the target repository for which this description is intended.",
+                        "items": [
+                            {
+                                "id": "deposition_context",
+                                "help_tip": "Select a target repository",
+                                "label": "Target Repository",
+                                "hidden": "false",
+                                "required": "true",
+                                "control": "copo-button-list",
+                                "default_value": "ena",
+                                "option_values": {
+                                    "callback": {
+                                        "function": "get_repository_options",
+                                        "parameter": ""
+                                    }
+                                },
+                                "trigger": {
+                                    "type": "change",
+                                    "message": "Changing the target repository will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
+                                    "callback": {
+                                        "function": "target_repo_change",
+                                        "parameter": "old_value,new_value"
+                                    }
+                                },
+                                "type": "string"
+                            }
+                        ],
+                        "activated": true
+                    },
+                    {
+                        "ref": "description_stages",
+                        "is_stage_stub": true,
+                        "callback": {
+                            "function": "get_description_stages",
+                            "parameter": ""
+                        },
+                        "activated": true
+                    },
+                    {
+                        "ref": "study_type",
+                        "title": "Study Type",
+                        "is_singular_stage": true,
+                        "message": "Select the study type under which the datafiles were created. The study type presents a controlled vocabulary for expressing the overall purpose of the study.",
+                        "items": [
+                            {
+                                "id": "study_type",
+                                "help_tip": "Select Study Type from the drop-down list",
+                                "label": "Study Type",
+                                "hidden": "false",
+                                "required": "true",
+                                "type": "string",
+                                "control": "select",
+                                "default_value": "",
+                                "option_values": {
+                                    "callback": {
+                                        "function": "get_study_type_options",
+                                        "parameter": ""
+                                    }
+                                },
+                                "trigger": {
+                                    "type": "change",
+                                    "message": "Changing the study type will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
+                                    "callback": {
+                                        "function": "study_type_change",
+                                        "parameter": "item_id,old_value,new_value"
+                                    }
+                                }
+                            }
+                        ],
+                        "activated": true
+                    },
+                    {
+                        "ref": "attach_samples",
+                        "title": "Sample",
+                        "message": "Select and associate a sample to files in the bundle. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",
+                        "items": [
+                            {
+                                "id": "study_samples",
+                                "type": "string",
+                                "help_tip": "Specify the sample you used in your study",
+                                "label": "Sample",
+                                "hidden": "false",
+                                "required": "true",
+                                "control": "copo-multi-search",
+                                "option_component": "sample",
+                                "data_maxItems": 1,
+                                "default_value": "",
+                                "option_values": {
+                                    "callback": {
+                                        "function": "get_isasamples_json",
+                                        "parameter": ""
+                                    }
+                                }
+                            }
+                        ],
+                        "activated": true
+                    },
+                    {
+                        "ref": "protocol_refs",
+                        "is_stage_stub": true,
+                        "callback": {
+                            "function": "get_dynamic_elements_ena",
+                            "parameter": "stub_ref"
+                        },
+                        "activated": true
+                    },
+                    {
+                        "title": "Library Construction",
+                        "ref": "library_construction",
+                        "message": "Specify the origin of the material that may have been sequenced, and any treatments that the material might have undergone that affect the sequencing result.",
+                        "dependent_on": "study_type",
+                        "stub_ref": "protocol_refs",
+                        "items": [
+                            {
+                                "help_tip": "Specify whether to expect single, paired, or other configuration of reads",
+                                "required": "false",
+                                "default_value": "",
+                                "control_meta": {
+                                },
+                                "control": "select",
+                                "versions": [
+                                    "library_layout"
+                                ],
+                                "deprecated": false,
+                                "hidden": "false",
+                                "id": "library_layout",
+                                "label": "Library layout",
+                                "show_in_form": true,
+                                "type": "string",
+                                "show_in_table": true,
+                                "option_values": [
+                                    "SINGLE",
+                                    "PAIRED"
+                                ],
+                                "trigger": {
+                                    "type": "change",
+                                    "message": "Changing the library layout will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
+                                    "callback": {
+                                        "function": "library_layout_change",
+                                        "parameter": "item_id,old_value,new_value"
+                                    }
+                                }
+                            },
+                            {
+                                "help_tip": "Select the sequencing technique intended for this library",
+                                "required": "false",
+                                "default_value": "",
+                                "control_meta": {
+                                },
+                                "control": "select",
+                                "versions": [
+                                    "library_strategy"
+                                ],
+                                "deprecated": false,
+                                "hidden": "false",
+                                "id": "library_strategy",
+                                "label": "Library strategy",
+                                "show_in_form": true,
+                                "type": "string",
+                                "show_in_table": true,
+                                "option_values": [
+                                    "AMPLICON",
+                                    "CLONE",
+                                    "WGS",
+                                    "OTHER"
+                                ]
+                            },
+                            {
+                                "help_tip": "Select the sequencing technique intended for this library",
+                                "required": "false",
+                                "default_value": "",
+                                "control_meta": {
+                                },
+                                "control": "select",
+                                "versions": [
+                                    "library_source"
+                                ],
+                                "deprecated": false,
+                                "hidden": "false",
+                                "id": "library_source",
+                                "label": "Library source",
+                                "show_in_form": true,
+                                "type": "string",
+                                "show_in_table": true,
+                                "option_values": [
+                                    "GENOMIC",
+                                    "GENOMIC SINGLE CELL",
+                                    "TRANSCRIPTOMIC",
+                                    "TRANSCRIPTOMIC SINGLE CELL",
+                                    "METAGENOMIC",
+                                    "METATRANSCRIPTOMIC",
+                                    "SYNTHETIC",
+                                    "VIRAL RNA",
+                                    "OTHER"
+                                ]
+                            },
+                            {
+                                "help_tip": "Select the method that was used to select for or against, enrich, or screen the material being sequenced",
+                                "required": "false",
+                                "default_value": "",
+                                "control_meta": {
+                                },
+                                "control": "select",
+                                "versions": [
+                                    "library_selection"
+                                ],
+                                "deprecated": false,
+                                "hidden": "false",
+                                "id": "library_selection",
+                                "label": "Library selection",
+                                "show_in_form": true,
+                                "type": "string",
+                                "show_in_table": true,
+                                "option_values": [
+                                    "PCR",
+                                    "RANDOM PCR",
+                                    "HMPR",
+                                    "MF",
+                                    "repeat fractionation",
+                                    "size fractionation",
+                                    "MSLL",
+                                    "cDNA",
+                                    "cDNA_randomPriming",
+                                    "cDNA_oligo_dT",
+                                    "PolyA",
+                                    "Oligo-dT",
+                                    "Inverse rRNA",
+                                    "Inverse rRNA selection",
+                                    "ChIP",
+                                    "MNase",
+                                    "DNase",
+                                    "Hybrid Selection",
+                                    "Reduced Representation",
+                                    "Restriction Digest",
+                                    "5-methylcytidine antibody",
+                                    "MBD2 protein methyl-CpG binding domain",
+                                    "CAGE",
+                                    "RACE",
+                                    "MDA",
+                                    "padlock probes capture method",
+                                    "other",
+                                    "unspecified"
+                                ]
+                            }
+                        ],
+                        "activated": true
+                    },
+                    {
+                        "title": "Nucleic Acid Sequencing",
+                        "ref": "nucleic_acid_sequencing",
+                        "message": "Specify the sequencing technique used.",
+                        "dependent_on": "study_type",
+                        "stub_ref": "protocol_refs",
+                        "items": [
+                            {
+                                "help_tip": "Enter the name and version of the quality scoring software",
+                                "required": "false",
+                                "default_value": "",
+                                "control_meta": {
+                                },
+                                "control": "ontology term",
+                                "versions": [
+                                    "quality_scorer"
+                                ],
+                                "deprecated": false,
+                                "hidden": "true",
+                                "id": "quality_scorer",
+                                "label": "Quality scorer",
+                                "show_in_form": true,
+                                "type": "string",
+                                "show_in_table": true,
+                                "ontology_names": [
+                                ]
+                            },
+                            {
+                                "help_tip": "Specify the sequencing instrument model and make",
+                                "required": "false",
+                                "default_value": "",
+                                "control_meta": {
+                                },
+                                "control": "select",
+                                "versions": [
+                                    "sequencing_instrument"
+                                ],
+                                "deprecated": false,
+                                "hidden": "false",
+                                "id": "sequencing_instrument",
+                                "label": "Sequencing Instrument",
+                                "show_in_form": true,
+                                "type": "string",
+                                "show_in_table": true,
+                                "option_values": [
+                                    "454 GS",
+                                    "454 GS 20",
+                                    "454 GS FLX",
+                                    "454 GS FLX Plus",
+                                    "454 GS FLX Titanium",
+                                    "454 GS Junior",
+                                    "AB SOLiD System",
+                                    "AB SOLiD System 2.0",
+                                    "AB SOLiD System 3.0",
+                                    "AB SOLiD 4 System",
+                                    "AB SOLiD 4hq System",
+                                    "AB SOLiD PI System",
+                                    "AB SOLiD 5500",
+                                    "AB SOLiD 5500xl",
+                                    "AB 5500 Genetic Analyzer",
+                                    "AB 5500xl Genetic analyzer",
+                                    "Illumina Genome Analyzer",
+                                    "Illumina Genome Analyzer II",
+                                    "Illumina Genome Analyzer IIx",
+                                    "Illumina HiSeq 1000",
+                                    "Illumina HiSeq 2000",
+                                    "Illumina HiSeq 2500",
+                                    "Illumina HiScanSQ",
+                                    "Illumina MiSeq",
+                                    "Ion Torrent PGM",
+                                    "Ion Torrent Proton",
+                                    "Sanger sequencing instrument",
+                                    "unspecified"
+                                ]
+                            }
+                        ],
+                        "activated": true
+                    },
+                    {
+                        "ref": "datafiles_pairing",
+                        "title": "Datafiles Pairing",
+                        "message": "In this stage, you will be able to pair up datafiles in the description bundle for which the library layout has been set to 'PAIRED'.",
+                        "is_conditional_stage": true,
+                        "is_clonable": false,
+                        "callback": {
+                            "function": "confirm_pairing",
+                            "parameter": ""
+                        },
+                        "items": [
+                            {
+                                "id": "paired_file",
+                                "type": "string",
+                                "help_tip": "Select a datafile to pair",
+                                "label": "Paired Datafile",
+                                "hidden": "false",
+                                "required": "true",
+                                "control": "copo-multi-search",
+                                "option_component": "datafile",
+                                "data_maxItems": 1,
+                                "default_value": "",
+                                "option_values": {
+                                    "callback": {
+                                        "function": "get_datafiles_json",
+                                        "parameter": ""
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "attributes": {
+                    "target_repository": {
+                        "deposition_context": "ena"
+                    },
+                    "study_type": {
+                        "study_type": "genomeSeq"
+                    },
+                    "attach_samples": {
+                        "study_samples": "5a79d1a419f1af43390bb5ab"
+                    },
+                    "library_construction": {
+                        "library_layout": "PAIRED",
+                        "library_strategy": "AMPLICON",
+                        "library_source": "GENOMIC",
+                        "library_selection": "PCR"
+                    },
+                    "nucleic_acid_sequencing": {
+                        "quality_scorer": {
+                            "@id": "",
+                            "annotationValue": "",
+                            "termSource": "",
+                            "termAccession": "",
+                            "comments": [
+                            ]
+                        },
+                        "sequencing_instrument": "Illumina HiSeq 2500"
+                    },
+                    "datafiles_pairing": {
+                        "paired_file": "5a79dc38453d9a13b2fa3bad"
+                    }
+                }
+            },
+            "deleted": "0",
+            "date_modified": "2018-02-06T16:47:52.595+0000"
+        }
+    ],
+    "person": {
+        "firstName": "Gordon",
+        "lastName": "Freeman",
+        "email": "gordon.freeman@blackmessa.hl.com",
+        "roles": [
+            {
+                "@id": "",
+                "annotationValue": "SRA Inform On Status",
+                "termSource": "",
+                "termAccession": "",
+                "comments": [
+                ]
+            },
+            {
+                "@id": "",
+                "annotationValue": "SRA Inform On Error",
+                "termSource": "",
+                "termAccession": "",
+                "comments": [
+                ]
+            }
+        ],
+        "comments": [
+        ],
+        "midInitials": "",
+        "phone": "",
+        "fax": "",
+        "address": "",
+        "affiliation": "",
+        "date_created": "2018-02-06T15:37:14.145+0000",
+        "profile_id": "5a79cbaa453d9a13b2fa3baa",
+        "deleted": "0",
+        "date_modified": "2018-02-06T15:37:14.145+0000"
+    }
 }
