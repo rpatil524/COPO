@@ -2,6 +2,7 @@
 from django.conf import settings
 from pymongo import MongoClient
 import json
+from bson import ObjectId
 
 
 class Utils:
@@ -26,9 +27,32 @@ class Utils:
         # TODO - MongoIDs here are wrong. Either enter MongoIDs as static or return each new ID as the data is entered
         with open(file_location) as json_data:
             d = json.load(json_data)
-            self.db.Profiles.insert_one(d['profile'])
-            self.db.SourceCollection.insert_many(d['source'])
-            self.db.SampleCollection.insert_many(d['sample'])
+
+            profile_id = self.db.Profiles.insert_one(d['profile']).inserted_id
+            source = d['source']
+            source['profile_id'] = str(profile_id)
+            source_id = self.db.SourceCollection.insert_one(source).inserted_id
+            samples = d['sample']
+            for s in samples:
+                s['derivesFrom'] = str(source_id)
+                s['profile_id'] = str(profile_id)
+            sample_ids = self.db.SampleCollection.insert_many(samples).inserted_ids
             self.db.DescriptionCollection.insert_one(d['description'])
-            self.db.DatafileCollection.insert_many(d['file'])
+
+            files = d['file']
+            for idx, f in enumerate(files):
+                f['profile_id'] = str(profile_id)
+                f['description']['attributes']['attach_samples']['study_samples'] = str(sample_ids[idx])
+            file_ids = self.db.DatafileCollection.insert_many(files).inserted_ids
             self.db.PersonCollection.insert_one(d['person'])
+
+            submission = d['submission']
+            submission['profile_id'] = str(profile_id)
+            for idx, f in enumerate(files):
+                submission['bundle'].append(str(file_ids[idx]))
+                meta = dict()
+                meta['file_id'] = str(file_ids[idx])
+                meta['file_path'] = str(f['file_location'])
+                meta['upload_status'] = False
+                submission['bundle_meta'].append(meta)
+            self.db.SubmissionCollection.insert_one(submission)
