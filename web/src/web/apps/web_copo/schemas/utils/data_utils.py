@@ -91,7 +91,7 @@ def json_to_pytype(path_to_json):
 
 def get_samples_options():
     from dal.copo_da import Sample
-    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    profile_id = get_current_request().session['profile_id']
     samples = Sample(profile_id).get_all_records()
 
     option_values = []
@@ -163,7 +163,7 @@ def get_isasamples_json():
     :return:
     """
     from dal.copo_da import Sample
-    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    profile_id = get_current_request().session['profile_id']
     samples = Sample(profile_id).get_all_records()
 
     value_field = str("id")
@@ -193,7 +193,7 @@ def get_isasamples_json():
 
 def generate_sources_json(target_id=None):
     from dal.copo_da import Source
-    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    profile_id = get_current_request().session['profile_id']
 
     if target_id:
         sources = list()
@@ -233,7 +233,7 @@ def get_samples_json(target_id=None):
     :return:
     """
     from dal.copo_da import Sample
-    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    profile_id = get_current_request().session['profile_id']
 
     if target_id:
         samples = list()
@@ -269,7 +269,7 @@ def get_datafiles_json(target_id=None):
     :return:
     """
     from dal.copo_da import DataFile
-    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    profile_id = get_current_request().session['profile_id']
 
     if target_id:
         datafiles = list()
@@ -345,6 +345,14 @@ def get_copo_id():
 
 def get_user_id():
     return ThreadLocal.get_current_user().id
+
+def get_current_user():
+    # TODO - check for testing setting and return dummy user if true
+    return ThreadLocal.get_current_user()
+
+
+def get_current_request():
+    return ThreadLocal.get_current_request()
 
 
 def get_datetime():
@@ -443,7 +451,7 @@ def get_ena_remote_path(submission_token):
     :param submission_token: the submission id
     :return:
     """
-    remote_path = os.path.join(submission_token, str(ThreadLocal.get_current_user()))
+    remote_path = os.path.join(submission_token, str(get_current_user()))
     return remote_path
 
 

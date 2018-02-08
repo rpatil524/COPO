@@ -7,7 +7,7 @@ from bson import ObjectId
 from dal.copo_da import Sample
 from dal import cursor_to_list
 import web.apps.web_copo.lookup.lookup as lkup
-from django_tools.middlewares import ThreadLocal
+from web.apps.web_copo.schemas.utils import data_utils
 from converters.ena.copo_isa_ena import ISAHelpers
 import web.apps.web_copo.templatetags.html_tags as htags
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
@@ -16,7 +16,7 @@ from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 
 class WizardHelper:
     def __init__(self):
-        self.profile_id = ThreadLocal.get_current_request().session['profile_id']
+        self.profile_id = data_utils.get_current_request().session['profile_id']
         self.schema = Sample().get_schema().get("schema_dict")
         self.sample_types = list()
 

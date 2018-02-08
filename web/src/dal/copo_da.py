@@ -1,7 +1,6 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 
 from datetime import datetime
-from django_tools.middlewares import ThreadLocal
 from bson import ObjectId
 from chunked_upload.models import ChunkedUpload
 from web.apps.web_copo.lookup.lookup import DB_TEMPLATES
@@ -263,7 +262,7 @@ class Person(DAComponent):
         creates an (SRA) person record and attach to profile
         Returns:
         """
-        user = ThreadLocal.get_current_user()
+        user = data_utils.get_current_user()
 
         auto_fields = {
             'copo.person.roles.annotationValue': 'SRA Inform On Status',
@@ -337,7 +336,7 @@ class Submission(DAComponent):
                     repository=repo,
                     status=False,
                     complete='false',
-                    user_id=ThreadLocal.get_current_user().id,
+                    user_id=data_utils.get_current_user().id,
             ).items():
                 auto_fields[self.get_qualified_field(k)] = v
 
@@ -526,7 +525,7 @@ class Profile(DAComponent):
 
     def get_for_user(self, user=None):
         if not user:
-            user = ThreadLocal.get_current_user().id
+            user = data_utils.get_current_user().id
 
         docs = self.get_collection_handle().find({"user_id": user, "deleted": data_utils.get_not_deleted_flag()}).sort(
             [['_id', -1]])
@@ -672,7 +671,7 @@ class Description:
             stages=stages,
             attributes=attributes,
             created_on=data_utils.get_datetime(),
-            user_id=ThreadLocal.get_current_user().id
+            user_id=data_utils.get_current_user().id
         )
         doc = self.DescriptionCollection.insert(fields)
 
@@ -703,7 +702,7 @@ class Description:
         :return:
         """
 
-        user_id = ThreadLocal.get_current_user().id
+        user_id = data_utils.get_current_user().id
 
         bulk = self.DescriptionCollection.initialize_unordered_bulk_op()
         bulk.find({'user_id': user_id}).remove()

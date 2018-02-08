@@ -1,6 +1,7 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from tools import resolve_env
+import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -181,3 +182,5 @@ DATAVERSE = {
     "HARVARD_TEST_API": "https://demo.dataverse.org/api/v1/",
     "HARVARD_TEST_TOKEN": "227bc74d-088f-423f-8f49-d8503f62f7de"
 }
+
+UNIT_TESTING = False

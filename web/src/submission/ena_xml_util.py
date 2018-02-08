@@ -4,8 +4,7 @@ from xml.dom import minidom
 from dal.copo_da import Submission, DataFile, Profile, Sample, Source, Person
 import datetime
 import web.apps.web_copo.lookup.lookup as lkup
-from django_tools.middlewares.ThreadLocal import get_current_user
-
+from web.apps.web_copo.schemas.utils import data_utils
 
 def do_study_xml(sub_id):
     # get submission object from mongo
@@ -182,7 +181,7 @@ def do_analysis_xml(sub_id):
     filename = df["name"]
     file_hash = df["file_hash"]
 
-    fqfn = str(sub_id) + '/' + get_current_user().username + '/' + filename
+    fqfn = str(sub_id) + '/' + data_utils.get_current_user().username + '/' + filename
 
     file.set("filename", fqfn)
     file.set("filetype", "tab")
