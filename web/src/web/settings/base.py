@@ -184,3 +184,4 @@ DATAVERSE = {
 }
 
 UNIT_TESTING = False
+TEST_USER = None

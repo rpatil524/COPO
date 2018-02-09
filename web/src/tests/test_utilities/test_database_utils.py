@@ -7,21 +7,15 @@ from bson import ObjectId
 
 class Utils:
 
-    def __init__(self, db_name, host=settings.MONGO_HOST, port=settings.MONGO_PORT):
+    def __init__(self):
         # GetDB - simple function to wrap getting a database
         # connection from the connection pool.
-        self.client = MongoClient(host=host,
-                                  port=port,
-                                  maxIdleTimeMS=1000 * 60)
-        self.db = self.client[db_name]
-
-    def get_pymongo_client(self):
-        return self.client
+        self.db = settings.MONGO_CLIENT
 
     def get_pymongo_db(self):
         return self.db
 
-    def load_fixtures(self, file_location):
+    def load_ena_fixtures(self, file_location):
         # load test data from json file
 
         # TODO - MongoIDs here are wrong. Either enter MongoIDs as static or return each new ID as the data is entered
@@ -55,4 +49,6 @@ class Utils:
                 meta['file_path'] = str(f['file_location'])
                 meta['upload_status'] = False
                 submission['bundle_meta'].append(meta)
-            self.db.SubmissionCollection.insert_one(submission)
+            sub_id = self.db.SubmissionCollection.insert_one(submission).inserted_id
+
+            return str(sub_id)

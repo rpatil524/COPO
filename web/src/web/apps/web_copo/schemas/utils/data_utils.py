@@ -12,6 +12,8 @@ from django_tools.middlewares import ThreadLocal
 # from web.apps.web_copo.utils.ajax_handlers import get_continuation_studies
 import web.apps.web_copo.lookup.lookup as lookup
 from web.apps.web_copo.lookup.resolver import RESOLVER
+from django.conf import settings
+from django.contrib.auth.models import User
 
 
 def pretty_print(data, path=None):
@@ -344,11 +346,16 @@ def get_copo_id():
 
 
 def get_user_id():
-    return ThreadLocal.get_current_user().id
+    if settings.UNIT_TESTING:
+        return settings.TEST_USER.id
+    else:
+        return ThreadLocal.get_current_user().id
 
 def get_current_user():
-    # TODO - check for testing setting and return dummy user if true
-    return ThreadLocal.get_current_user()
+    if settings.UNIT_TESTING:
+        return settings.TEST_USER
+    else:
+        return ThreadLocal.get_current_user()
 
 
 def get_current_request():
