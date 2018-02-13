@@ -1,12 +1,13 @@
 from django.test import TestCase
 from .test_utilities import test_database_utils
 from django.conf import settings
-from dal.copo_da import Profile, Submission
+from dal.copo_da import Profile, Submission, DataFile
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.test import Client
 from django_tools.middlewares import ThreadLocal
 from submission.enaSubmission import EnaSubmit
+from bson import ObjectId
 
 import os
 
@@ -18,17 +19,22 @@ class Ena_Tests(TestCase):
 
     def setUp(self):
         self.db_utils = test_database_utils.Utils()
-        self.db_utils.load_ena_fixtures('web/src/tests/test_data/ena_test_data.json')
+        # this method returns the submission_id of the submission record added
+        self.sub_id, self.profile_id = self.db_utils.load_ena_fixtures('web/src/tests/test_data/ena_test_data.json')
         # this setting should redirect all dal activity to the test db
         #settings.MONGO_CLIENT = self.db_utils.get_pymongo_db()
         settings.UNIT_TESTING = True
         settings.TEST_USER = User.objects.create_user('test_user')
 
-    def test_profile_recall(self):
+    def test_db_recall(self):
         p = Profile().get_all_records()
         self.assertEqual(1, len(p), "Profile Recall Failed")
 
-    def test_profile_update(self):
+    def test_df_recall(self):
+        dfs = DataFile().get_for_profile(self.profile_id)
+        self.assertEqual(2, dfs.count(), "Datafile Recall Failed")
+
+    def test_db_update(self):
         p_list = Profile().get_all_records()
         p = p_list[0]
         title = 'updated_test'
@@ -44,8 +50,8 @@ class Ena_Tests(TestCase):
         self.assertEqual(p, p_updated, "Profile Update Failed")
 
     def test_ena_submission(self):
-        pass
-        #EnaSubmit().submit()
+        s = Submission().get_record(self.sub_id)
+        EnaSubmit().submit(self.sub_id, s['bundle'])
 
     def tearDown(self):
         self.db_utils.db.client.drop_database(settings.MONGO_DB_TEST)

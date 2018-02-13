@@ -9,7 +9,7 @@ def get_collection_ref(collection_name):
     return settings.MONGO_CLIENT[collection_name]
 
 def get_mongo_client():
-    return pymongo.MongoClient(settings.MONGO_HOST, settings.MONGO_PORT)
+    return settings.MONGO_CLIENT
 
 def to_mongo_id(id):
     return ObjectId(id)

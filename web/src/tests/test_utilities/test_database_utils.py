@@ -37,7 +37,7 @@ class Utils:
             for idx, f in enumerate(files):
                 f['profile_id'] = str(profile_id)
                 f['description']['attributes']['attach_samples']['study_samples'] = str(sample_ids[idx])
-            file_ids = self.db.DatafileCollection.insert_many(files).inserted_ids
+            file_ids = self.db.DataFileCollection.insert_many(files).inserted_ids
             self.db.PersonCollection.insert_one(d['person'])
 
             submission = d['submission']
@@ -51,4 +51,4 @@ class Utils:
                 submission['bundle_meta'].append(meta)
             sub_id = self.db.SubmissionCollection.insert_one(submission).inserted_id
 
-            return str(sub_id)
+            return str(sub_id), str(profile_id)

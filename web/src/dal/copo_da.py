@@ -10,6 +10,7 @@ from dal.copo_base_da import DataSchemas
 from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
+from django.conf import settings
 
 PubCollection = 'PublicationCollection'
 PersonCollection = 'PersonCollection'
@@ -451,6 +452,12 @@ class Submission(DAComponent):
 class DataFile(DAComponent):
     def __init__(self, profile_id=None):
         super(DataFile, self).__init__(profile_id, "datafile")
+
+    def get_for_profile(self, profile_id):
+        docs = self.get_collection_handle().find({
+            "profile_id": profile_id
+        })
+        return docs
 
     def get_by_file_id(self, file_id=None):
         docs = None

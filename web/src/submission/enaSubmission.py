@@ -1,6 +1,7 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 03/05/2016'
 
 import converters.ena.copo_isa_ena as cnv
+from bson import ObjectId
 from bson.json_util import dumps
 from tools import resolve_env
 from django.conf import settings
@@ -65,7 +66,7 @@ class EnaSubmit(object):
         # get each file in the bundle
         file_path = []
         for idx, f_id in enumerate(dataFile_ids):
-            mongo_file = DataFile().get_record(f_id)
+            mongo_file = DataFile().get_record(ObjectId(f_id))
             self.d_files.append(mongo_file)
             file_path.append(mongo_file.get("file_location", str()))
 
