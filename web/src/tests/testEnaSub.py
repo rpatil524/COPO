@@ -1,7 +1,7 @@
 from django.test import TestCase
 from .test_utilities import test_database_utils
 from django.conf import settings
-from dal.copo_da import Profile, Submission, DataFile
+from dal.copo_da import Profile, Submission, DataFile, Sample, Source
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.test import Client
@@ -16,13 +16,13 @@ class Ena_Tests(TestCase):
     webpage = Client()
     sub_id = None
     user = None
+    db_json = None
 
     def setUp(self):
         self.db_utils = test_database_utils.Utils()
         # this method returns the submission_id of the submission record added
         self.sub_id, self.profile_id = self.db_utils.load_ena_fixtures('web/src/tests/test_data/ena_test_data.json')
         # this setting should redirect all dal activity to the test db
-        #settings.MONGO_CLIENT = self.db_utils.get_pymongo_db()
         settings.UNIT_TESTING = True
         settings.TEST_USER = User.objects.create_user('test_user')
 
@@ -53,6 +53,9 @@ class Ena_Tests(TestCase):
         s = Submission().get_record(self.sub_id)
         EnaSubmit().submit(self.sub_id, s['bundle'])
 
+        # TODO - change from paired to non-paired in test data
+
+        self.assertEqual(1, 1)
     def tearDown(self):
         self.db_utils.db.client.drop_database(settings.MONGO_DB_TEST)
         self.db_utils.db.client.close()

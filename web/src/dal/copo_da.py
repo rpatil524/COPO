@@ -294,6 +294,9 @@ class Source(DAComponent):
     def __init__(self, profile_id=None):
         super(Source, self).__init__(profile_id, "source")
 
+    def get_from_profile_id(self, profile_id):
+        return self.get_collection_handle().find({'profile_id': profile_id})
+
 
 class Sample(DAComponent):
     def __init__(self, profile_id=None):

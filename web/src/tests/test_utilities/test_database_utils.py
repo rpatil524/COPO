@@ -15,6 +15,11 @@ class Utils:
     def get_pymongo_db(self):
         return self.db
 
+    def get_ena_fixtures_json(self, file_location):
+        with open(file_location) as json_data:
+            d = json.load(json_data)
+            return d
+
     def load_ena_fixtures(self, file_location):
         # load test data from json file
 
@@ -28,7 +33,8 @@ class Utils:
             source_id = self.db.SourceCollection.insert_one(source).inserted_id
             samples = d['sample']
             for s in samples:
-                s['derivesFrom'] = str(source_id)
+                s['derivesFrom'] = list()
+                s['derivesFrom'].append(str(source_id))
                 s['profile_id'] = str(profile_id)
             sample_ids = self.db.SampleCollection.insert_many(samples).inserted_ids
             self.db.DescriptionCollection.insert_one(d['description'])
