@@ -49,6 +49,7 @@ export ENA_SERVICE=https://www-test.ebi.ac.uk
 export ASPERA_PLUGIN_DIRECTORY=aspera_mac_plugin
 }
 
+
 divider() {
       s=$(printf "%-30s" "-")
       echo "${s// /-}"
