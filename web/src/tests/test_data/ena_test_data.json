@@ -1117,7 +1117,7 @@
                         "study_samples": "5a79d1a419f1af43390bb5aa"
                     },
                     "library_construction": {
-                        "library_layout": "PAIRED",
+                        "library_layout": "SINGLE",
                         "library_strategy": "AMPLICON",
                         "library_source": "GENOMIC",
                         "library_selection": "PCR"
@@ -1528,7 +1528,7 @@
                         "study_samples": "5a79d1a419f1af43390bb5ab"
                     },
                     "library_construction": {
-                        "library_layout": "PAIRED",
+                        "library_layout": "SINGLE",
                         "library_strategy": "AMPLICON",
                         "library_source": "GENOMIC",
                         "library_selection": "PCR"

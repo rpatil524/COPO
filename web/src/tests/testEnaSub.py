@@ -49,13 +49,19 @@ class Ena_Tests(TestCase):
         p.pop('target_id')
         self.assertEqual(p, p_updated, "Profile Update Failed")
 
-    def test_ena_submission(self):
+    def test_ena_seq_submission(self):
         s = Submission().get_record(self.sub_id)
         EnaSubmit().submit(self.sub_id, s['bundle'])
+        # now get submission again and check accessions are present
+        s = Submission().get_record(self.sub_id)
+        accessions = s['accessions']
+        self.assertIsNotNone(accessions['project'], "Sequence Submission Failed")
+        self.assertIsNotNone(accessions['experiment'], "Sequence Submission Failed")
+        self.assertIsNotNone(accessions['submission'], "Sequence Submission Failed")
+        self.assertIsNotNone(accessions['run'], "Sequence Submission Failed")
+        self.assertIsNotNone(accessions['sample'], "Sequence Submission Failed")
 
-        # TODO - change from paired to non-paired in test data
 
-        self.assertEqual(1, 1)
     def tearDown(self):
         self.db_utils.db.client.drop_database(settings.MONGO_DB_TEST)
         self.db_utils.db.client.close()
