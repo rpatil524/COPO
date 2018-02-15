@@ -737,7 +737,7 @@
             "comments": [
             ],
             "file_id": "1",
-            "file_location": "/Users/fshaw/Dropbox/dev/COPO/web/src/media/chunked_uploads/1/16_47_51_941798/small50.fastq.gz",
+            "file_location": "/small50.fastq.gz",
             "file_size": "217.00 B",
             "date_created": "2018-02-06T16:47:52.047+0000",
             "profile_id": "5a79cbaa453d9a13b2fa3baa",
@@ -1148,7 +1148,7 @@
             "comments": [
             ],
             "file_id": "2",
-            "file_location": "/Users/fshaw/Dropbox/dev/COPO/web/src/media/chunked_uploads/1/16_47_52_003131/small51.fastq.gz",
+            "file_location": "/small51.fastq.gz",
             "file_size": "217.00 B",
             "date_created": "2018-02-06T16:47:52.136+0000",
             "profile_id": "5a79cbaa453d9a13b2fa3baa",

@@ -38,15 +38,15 @@ export ORCID_REDIRECT=http://127.0.0.1/accounts/orcid/login/callback/
 export MEDIA_PATH=media/
 
 # settings for ENA
-export WEBIN_USER=your_webin_user
-export WEBIN_USER_PASSWORD=your_webin_password
+export WEBIN_USER=Webin-39233@webin.ebi.ac.uk
+export WEBIN_USER_PASSWORD=vnZB4gxU7
 # note this is the test service....url for live service can be found at
 # https://www.ebi.ac.uk/ena/submit/programmatic-submission....USE WITH CAUTION!
 export ENA_SERVICE=https://www-test.ebi.ac.uk
 # settings for aspera
 # choose from 'aspera_mac_plugin' or 'aspera_linux_plugin'
 # TODO - this can be infered from user questions
-export ASPERA_PLUGIN_DIRECTORY=aspera_mac_plugin
+export ASPERA_PLUGIN_DIRECTORY=aspera_linux_plugin
 }
 
 
@@ -202,8 +202,25 @@ then
     service postgresql start
   fi
   printf "To stop press Ctrl-C...\n"
-  source $local_dir/$COPO_VM_NAME/bin/activate
+  source $COPO_VM_NAME/bin/activate
   $local_dir/web/src/manage.py runserver
+
+elif [ $1 == "test" ]
+
+  set_envs
+  printf "Testing...\n"
+  mongod --fork
+  if [ "$opsys" == "Darwin" ]
+  then
+    brew services start postgres
+  else
+    service postgresql start
+  fi
+  printf "To stop press Ctrl-C...\n"
+  source $COPO_VM_NAME/bin/activate
+  $local_dir/web/src/manage.py test tests
+then
+    echo test
 elif [ $1 == "install" ]
 then
     python -c "exit"
@@ -327,6 +344,7 @@ then
       #mongo localhost/admin --eval "db.shutdownServer()"
       #mongod --fork --config /etc/mongod.conf
       # install and start redis
+      $pac_man install -y curl
       $pac_man install -y redis-server
       service redis-server start
       $pac_man install -y postgresql postgresql-contrib python-psycopg2 libpq-dev

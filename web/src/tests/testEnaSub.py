@@ -9,9 +9,10 @@ from django_tools.middlewares import ThreadLocal
 from submission.enaSubmission import EnaSubmit
 from bson import ObjectId
 
+
 import os
 
-
+# TODO - need to place test files in test directory and reference in test code....relative referencing needed
 class Ena_Tests(TestCase):
     webpage = Client()
     sub_id = None
@@ -21,7 +22,11 @@ class Ena_Tests(TestCase):
     def setUp(self):
         self.db_utils = test_database_utils.Utils()
         # this method returns the submission_id of the submission record added
-        self.sub_id, self.profile_id = self.db_utils.load_ena_fixtures('web/src/tests/test_data/ena_test_data.json')
+
+        p = os.path.join(settings.BASE_DIR, 'tests/test_data/ena_test_data.json')
+        print(settings.BASE_DIR)
+
+        self.sub_id, self.profile_id = self.db_utils.load_ena_fixtures(p)
         # this setting should redirect all dal activity to the test db
         settings.UNIT_TESTING = True
         settings.TEST_USER = User.objects.create_user('test_user')
