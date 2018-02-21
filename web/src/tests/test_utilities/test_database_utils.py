@@ -1,9 +1,7 @@
 # Created by fshaw at 05/02/2018
 from django.conf import settings
-from pymongo import MongoClient
 import json
-from bson import ObjectId
-
+import os
 
 class Utils:
 
@@ -43,6 +41,8 @@ class Utils:
             for idx, f in enumerate(files):
                 f['profile_id'] = str(profile_id)
                 f['description']['attributes']['attach_samples']['study_samples'] = str(sample_ids[idx])
+                loc = os.path.join(settings.BASE_DIR, 'tests', 'test_data', 'small' + str(idx + 1) + '.fastq.gz')
+                f['file_location'] = loc
             file_ids = self.db.DataFileCollection.insert_many(files).inserted_ids
             self.db.PersonCollection.insert_one(d['person'])
 
