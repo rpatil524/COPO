@@ -1,4 +1,4 @@
-{% extends 'copo/base_1col.html' %}
+{% extends 'copo/base_2col.html' %}
 
 {% load staticfiles %}
 {% load web_tags_orcid %}
@@ -20,7 +20,9 @@
 
 {% block content %}
 
-    CONTENT
+    {{ request }}
+    {{ group_list }}
+    {{ profile_list }}
 
 {% endblock %}
 

@@ -23,6 +23,7 @@ RemoteFileCollection = 'RemoteFileCollection'
 DescriptionCollection = 'DescriptionCollection'
 ProfileCollection = 'Profiles'
 AnnotationReference = 'AnnotationCollection'
+GroupCollection = 'GroupCollection'
 
 handle_dict = dict(publication=get_collection_ref(PubCollection),
                    person=get_collection_ref(PersonCollection),
@@ -31,7 +32,8 @@ handle_dict = dict(publication=get_collection_ref(PubCollection),
                    profile=get_collection_ref(ProfileCollection),
                    submission=get_collection_ref(SubmissionCollection),
                    datafile=get_collection_ref(DataFileCollection),
-                   annotation=get_collection_ref(AnnotationReference)
+                   annotation=get_collection_ref(AnnotationReference),
+                   group=get_collection_ref(GroupCollection)
                    )
 
 
@@ -289,7 +291,6 @@ class Person(DAComponent):
         return
 
 
-
 class Source(DAComponent):
     def __init__(self, profile_id=None):
         super(Source, self).__init__(profile_id, "source")
@@ -452,6 +453,7 @@ class Submission(DAComponent):
         subs = self.get_collection_handle().find({'repository': {'$in': ['ena-ant', 'ena', 'ena-asm']}})
         return subs
 
+
 class DataFile(DAComponent):
     def __init__(self, profile_id=None):
         super(DataFile, self).__init__(profile_id, "datafile")
@@ -578,6 +580,27 @@ class Profile(DAComponent):
         if 'dataverse' in p:
             if 'datasets' in p['dataverse']:
                 return p['dataverse']['datasets']
+
+
+class Group(DAComponent):
+    def __init__(self):
+        super(Group, self).__init__(None, "group")
+        self.Group = get_collection_ref(GroupCollection)
+
+    def get_by_owner(self, owner_id):
+        doc = self.Group.find({'owner_id': owner_id})
+        if not doc:
+            return list()
+        return doc
+
+    def create_group(self, description, owner_id=None):
+        group_fields = data_utils.json_to_pytype(DB_TEMPLATES['COPO_GROUP'])
+        if not owner_id:
+            owner_id = data_utils.get_user_id()
+        group_fields['owner_id'] = owner_id
+        group_fields['description'] = description
+        group_fields['data_created'] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        self.Group.insert(group_fields)
 
 
 class RemoteDataFile:

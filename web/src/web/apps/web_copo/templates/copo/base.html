@@ -253,13 +253,13 @@
             </li>
             <li class="dropdown" style="margin-left: 15px;" title="Documentation" >
                 <a href="/docs/">
-                    <span data-copo-tour-id="documentation_button"><i class="fa fa-book fa-2x" aria-hidden="true"></i></span>
+                    <span data-copo-tour-id="documentation_button"><i class="fa fa-book" aria-hidden="true"></i></span>
                 </a>
             </li>
             <li class="dropdown" title="Settings">
                 <a href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
                    aria-expanded="false">
-                    {% if user.is_authenticated %}<i class="fa fa-gear fa-2x" aria-hidden="true"></i>
+                    {% if user.is_authenticated %}<i class="fa fa-gear" aria-hidden="true"></i>
                         <!--<span data-copo-tour-id="global_user_authenticated_button">{{ user }}<span
                                 class="caret" style="margin-left: 5px;"></span></span>-->
                         {% if not user.email %}
@@ -278,7 +278,7 @@
                     {% if user.is_authenticated %}
 
                         <li>
-                            <a href="{% url 'copo:view_groups' %}" role="menuitem" tabindex="-1">
+                            <a href="{% url 'copo:groups' %}" role="menuitem" tabindex="-1">
                                 <div class="custom-nav-items">
                                     <i class="fa fa-users" aria-hidden="true"></i>
                                     <span class="icon_text">View Groups</span>

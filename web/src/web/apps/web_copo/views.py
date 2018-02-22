@@ -8,15 +8,15 @@ from jsonpickle import encode
 from submission.submissionDelegator import delegate_submission
 from dal.orcid_da import Orcid
 from api.handlers.general import *
-from dal.copo_da import ProfileInfo, Profile, Submission
+from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, Group
 from dal.OAuthTokens import OAuthToken
 from dal.broker_da import BrokerDA, BrokerVisuals
+from dal import cursor_to_list
 from .lookup.lookup import HTML_TAGS
 from exceptions_and_logging.logger import Logtype, Loglvl
 from exceptions_and_logging.CopoRuntimeError import CopoRuntimeError
 from django.conf import settings
 from allauth.account.forms import LoginForm
-from dal.copo_da import Annotation
 from bson import json_util as j
 from web.apps.web_copo.lookup.lookup import REPO_NAME_LOOKUP
 import requests
@@ -444,4 +444,8 @@ def import_ena_accession(request):
 
 
 def view_groups(request):
-    return render(request, 'copo/copo_groups.html', {'request': request})
+    Group().create_group(owner_id=request.user.id, description='de')
+    profile_list = cursor_to_list(Profile().get_for_user())
+    group_list = cursor_to_list(Group().get_by_owner(request.user.id))
+    print(group_list)
+    return render(request, 'copo/copo_groups.html', {'request': request, 'profile_list': profile_list, 'group_list': group_list})

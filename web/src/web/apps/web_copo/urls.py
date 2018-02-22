@@ -45,5 +45,5 @@ urlpatterns = [url(r'^$', views.index, name='index'),
                url(r'^agave_oauth/$', views.agave_oauth, name='agave_oauth'),
                url(r'^import_ena_accession/$', views.import_ena_accession,
                    name='import_ena_accession'),
-               url(r'^view_groups/$', views.view_groups, name='view_groups')
+               url(r'^groups/$', views.view_groups, name='groups')
                ]
