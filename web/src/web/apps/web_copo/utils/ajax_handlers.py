@@ -6,14 +6,14 @@ from datetime import datetime
 from bson import json_util, ObjectId
 
 import requests
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from web.apps.web_copo.schemas.utils import data_utils
 from jsonpickle import encode
 from dateutil import parser
 from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
 from django.conf import settings
-from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source
+from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, Group
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
@@ -224,3 +224,12 @@ def get_continuation_studies():
             }
         )
     return output
+
+def create_group(request):
+    name = request.GET['group_name']
+    description = request.GET['description']
+    uid = Group().create_group(name=name, description=description)
+    if uid:
+        return HttpResponse({'id': uid})
+    else:
+        return HttpResponseBadRequest('Error Creating Group - Try Again')

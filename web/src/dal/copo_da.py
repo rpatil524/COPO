@@ -593,14 +593,19 @@ class Group(DAComponent):
             return list()
         return doc
 
-    def create_group(self, description, owner_id=None):
+    def create_group(self, name, description, owner_id=None):
         group_fields = data_utils.json_to_pytype(DB_TEMPLATES['COPO_GROUP'])
         if not owner_id:
             owner_id = data_utils.get_user_id()
         group_fields['owner_id'] = owner_id
+        group_fields['name'] = name
         group_fields['description'] = description
         group_fields['data_created'] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-        self.Group.insert(group_fields)
+        uid = self.Group.insert(group_fields)
+        if uid:
+            return uid
+        else:
+            return False
 
 
 class RemoteDataFile:

@@ -89,5 +89,16 @@
         "content": "..."
       }
     ]
+  },
+  "group":{
+    "title": "Group Help",
+    "description": "",
+    "properties": [
+      {
+        "title": "main help",
+        "content": "..."
+      }
+    ]
+
   }
 }

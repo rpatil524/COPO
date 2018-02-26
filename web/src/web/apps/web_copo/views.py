@@ -144,7 +144,7 @@ def copo_people(request, profile_id):
 def copo_samples(request, profile_id):
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
-    return render(request, 'copo/copo_sample_2.html', {'profile_id': profile_id, 'profile': profile})
+    return render(request, 'copo/copo_sample.html', {'profile_id': profile_id, 'profile': profile})
 
 
 @login_required
@@ -444,8 +444,8 @@ def import_ena_accession(request):
 
 
 def view_groups(request):
-    Group().create_group(owner_id=request.user.id, description='de')
+    #g = Group().create_group(description="test descrition")
     profile_list = cursor_to_list(Profile().get_for_user())
     group_list = cursor_to_list(Group().get_by_owner(request.user.id))
     print(group_list)
-    return render(request, 'copo/copo_groups.html', {'request': request, 'profile_list': profile_list, 'group_list': group_list})
+    return render(request, 'copo/copo_group.html', {'request': request, 'profile_list': profile_list, 'group_list': group_list})

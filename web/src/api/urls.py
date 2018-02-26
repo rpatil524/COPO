@@ -3,6 +3,7 @@ from .annotate_views import search_all, post_annotations, handle_upload
 from django.conf.urls import url
 from .handlers import sample, person
 
+
 urlpatterns = [url(r'person/get/(?P<id>[a-z0-9]+)', person.get, name='person/get'),
                url(r'person/get/', person.get_all, name='person/get/all'),
                url(r'sample/get/(?P<id>[a-z0-9]+)', sample.get, name='sample/get'),

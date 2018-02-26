@@ -3,6 +3,7 @@
     "member_ids": [],
     "submission_workflow_ids":[],
     "shared_profile_ids":[],
+    "name":"",
     "description":"",
     "data_created": ""
 }
