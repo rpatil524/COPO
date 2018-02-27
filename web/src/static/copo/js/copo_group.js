@@ -6,10 +6,14 @@ $(document).ready(function () {
 
     $(document).on('click', ".dropdown-menu li a", function (e) {
         $(this).parents(".btn-group").find('.selection').text($(this).text() + ' ');
-        alert(el)
+        $('#selected_group').html($(this).text())
+        $('#selected_group').data('selected_group_id', $(this).data('group-id'))
+        $('#delete_group_button').css('visibility', 'visible')
+        $('.in,.open').removeClass('in open');
     })
 
     $(document).on('click', '#submit_group', validate_group_form)
+    $(document).on('click', '#delete_group_button', show_delete_dialog)
 
 
     //******************************Event Handlers Block*************************//
@@ -124,12 +128,54 @@ $(document).ready(function () {
                     "description": description
                 },
                 dataType: "json"
+            }).done(function (data) {
+                var li = $("<li>").html("<a href='#' data-group-id='" + data._id + "'>" + data.name + "</a>")
+                $('#group_dropdown_ul').append(li)
+                $('#group_name_button').text(data.name + ' ');
+                $('#selected_group').html(data.name)
+                $('#selected_group').data('selected_group_id', data._id)
+                $('#add_group_modal').modal('hide')
             })
-                .done(function (data) {
-                    console.log(data)
-                })
         }
     })
+
+    function show_delete_dialog(e) {
+        BootstrapDialog.show({
+            title: "Delete Group",
+            message: "Do you really want to delete this group?",
+            cssClass: 'copo-modal1',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_WARNING,
+            buttons: [{
+                label: 'Cancel',
+                cssClass: 'tiny ui basic button',
+                action: function (dialogRef) {
+                    dialogRef.close();
+                }
+            }, {
+                label: '<i class="copo-components-icons fa fa-trash"></i> Delete',
+                cssClass: 'tiny ui basic orange button',
+                action: function (dialogRef) {
+                    $.ajax({
+                        url: "/copo/delete_group/",
+                        data: {
+                            "group_id": $('#selected_group').data('selected_group_id')
+                        },
+                        dataType: "json"
+                    }).done(function (data) {
+                        var el = $("a[data-group-id='" + $('#selected_group').data('selected_group_id') + "']")
+                        el.remove()
+                        $('#group_name_button').text("Select Group" + ' ');
+                        $('#selected_group').html("Select Group")
+                        $('#selected_group').data('selected_group_id', undefined)
+                        $('#delete_group_button').css('visibility', 'hidden')
+                    })
+                    dialogRef.close();
+                }
+            }]
+        });
+    }
 
 
 });

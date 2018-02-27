@@ -230,6 +230,14 @@ def create_group(request):
     description = request.GET['description']
     uid = Group().create_group(name=name, description=description)
     if uid:
-        return HttpResponse({'id': uid})
+        return HttpResponse(json.dumps({'id': str(uid), 'name': name}))
     else:
         return HttpResponseBadRequest('Error Creating Group - Try Again')
+
+def delete_group(request):
+    id = request.GET['group_id']
+    deleted = Group().delete_group(group_id=id)
+    if deleted:
+        return HttpResponse(json.dumps({'deleted': True}))
+    else:
+        return HttpResponseBadRequest('Error Deleting Group - Try Again')

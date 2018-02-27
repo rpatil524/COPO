@@ -47,4 +47,5 @@ urlpatterns = [url(r'^$', views.index, name='index'),
                    name='import_ena_accession'),
                url(r'^groups/$', views.view_groups, name='groups'),
                url(r'^create_group/$', ajax_handlers.create_group, name='create_group'),
+               url(r'^delete_group/$', ajax_handlers.delete_group, name='delete_group'),
                ]

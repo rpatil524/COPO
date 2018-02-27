@@ -607,6 +607,10 @@ class Group(DAComponent):
         else:
             return False
 
+    def delete_group(self, group_id):
+        result = self.Group.delete_one({'_id': ObjectId(group_id)})
+        return result.deleted_count > 0
+
 
 class RemoteDataFile:
     def __init__(self, profile_id=None):
