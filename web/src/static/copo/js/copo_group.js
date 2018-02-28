@@ -11,10 +11,15 @@ $(document).ready(function () {
         $('#delete_group_button').css('visibility', 'visible')
         $('.in,.open').removeClass('in open');
     })
-
+    //toggle_profile_in_group
     $(document).on('click', '#submit_group', validate_group_form)
     $(document).on('click', '#delete_group_button', show_delete_dialog)
-
+    $('#profiles_in_group').multiSelect({
+        selectableHeader: "<div class='custom-header'>Your Profiles</div>",
+        selectionHeader: "<div class='custom-header'>Added to Group</div>",
+        dblClick: true,
+        afterSelect: profile_in_group_handler
+    })
 
     //******************************Event Handlers Block*************************//
     var component = "group";
@@ -129,12 +134,13 @@ $(document).ready(function () {
                 },
                 dataType: "json"
             }).done(function (data) {
-                var li = $("<li>").html("<a href='#' data-group-id='" + data._id + "'>" + data.name + "</a>")
+                var li = $("<li>").html("<a href='#' data-group-id='" + data.id + "'>" + data.name + "</a>")
                 $('#group_dropdown_ul').append(li)
                 $('#group_name_button').text(data.name + ' ');
                 $('#selected_group').html(data.name)
-                $('#selected_group').data('selected_group_id', data._id)
+                $('#selected_group').data('selected_group_id', data.id)
                 $('#add_group_modal').modal('hide')
+                $('#delete_group_button').css('visibility', 'visible')
             })
         }
     })
@@ -177,6 +183,9 @@ $(document).ready(function () {
         });
     }
 
+    function profile_in_group_handler(values) {
+        console.log(values)
+    }
 
 });
 
