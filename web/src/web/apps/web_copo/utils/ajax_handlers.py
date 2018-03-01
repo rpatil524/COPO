@@ -241,3 +241,21 @@ def delete_group(request):
         return HttpResponse(json.dumps({'deleted': True}))
     else:
         return HttpResponseBadRequest('Error Deleting Group - Try Again')
+
+def add_profile_to_group(request):
+    group_id = request.GET['group_id']
+    profile_id = request.GET['profile_id']
+    resp = Group().add_profile(group_id=group_id, profile_id=profile_id)
+    if resp:
+        return HttpResponse(json.dumps({'resp':'Added to Group'}))
+    else:
+        return HttpResponseBadRequest(json.dumps({'resp':'Server Error - Try again'}))
+
+def remove_profile_from_group(request):
+    group_id = request.GET['group_id']
+    profile_id = request.GET['profile_id']
+    resp = Group().remove_profile(group_id=group_id, profile_id=profile_id)
+    if resp:
+        return HttpResponse(json.dumps({'resp':'Removed from Group'}))
+    else:
+        return HttpResponseBadRequest(json.dumps({'resp':'Server Error - Try again'}))

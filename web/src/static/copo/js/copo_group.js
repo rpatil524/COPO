@@ -1,15 +1,13 @@
-/**
- * Created by etuka on 06/11/15.
- */
-
 $(document).ready(function () {
 
+    $(document).data('profiles_in_group', [])
     $(document).on('click', ".dropdown-menu li a", function (e) {
         $(this).parents(".btn-group").find('.selection').text($(this).text() + ' ');
         $('#selected_group').html($(this).text())
         $('#selected_group').data('selected_group_id', $(this).data('group-id'))
         $('#delete_group_button').css('visibility', 'visible')
         $('.in,.open').removeClass('in open');
+        $('#tool_window').css('visibility', 'visible')
     })
     //toggle_profile_in_group
     $(document).on('click', '#submit_group', validate_group_form)
@@ -18,7 +16,8 @@ $(document).ready(function () {
         selectableHeader: "<div class='custom-header'>Your Profiles</div>",
         selectionHeader: "<div class='custom-header'>Added to Group</div>",
         dblClick: true,
-        afterSelect: profile_in_group_handler
+        afterSelect: add_profile_in_group_handler,
+        afterDeselect: remove_profile_in_group_handler
     })
 
     //******************************Event Handlers Block*************************//
@@ -141,6 +140,7 @@ $(document).ready(function () {
                 $('#selected_group').data('selected_group_id', data.id)
                 $('#add_group_modal').modal('hide')
                 $('#delete_group_button').css('visibility', 'visible')
+                $('#tool_window').css('visibility', 'visible')
             })
         }
     })
@@ -176,6 +176,7 @@ $(document).ready(function () {
                         $('#selected_group').html("Select Group")
                         $('#selected_group').data('selected_group_id', undefined)
                         $('#delete_group_button').css('visibility', 'hidden')
+                        $('#tool_window').css('visibility', 'hidden')
                     })
                     dialogRef.close();
                 }
@@ -183,8 +184,33 @@ $(document).ready(function () {
         });
     }
 
-    function profile_in_group_handler(values) {
+    function add_profile_in_group_handler(values) {
+        var group_id = $('#selected_group').data('selected_group_id')
+        $.ajax({
+            url: '/copo/add_profile_to_group/',
+            method: 'GET',
+            dataType: 'json',
+            data: {'profile_id': values[0], 'group_id': group_id}
+        }).done(function(d){
+            console.log(d.resp)
+        }).fail(function(e, d){
+            console.error(e.responseJSON.resp)
+        })
+    }
+
+    function remove_profile_in_group_handler(values) {
         console.log(values)
+        var group_id = $('#selected_group').data('selected_group_id')
+        $.ajax({
+            url: '/copo/remove_profile_from_group/',
+            method: 'GET',
+            dataType: 'json',
+            data: {'profile_id': values[0], 'group_id': group_id}
+        }).done(function(d){
+            console.log(d.resp)
+        }).fail(function(e, d){
+            console.error(e.responseJSON.resp)
+        })
     }
 
 });

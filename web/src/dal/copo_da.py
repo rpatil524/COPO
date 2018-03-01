@@ -611,6 +611,16 @@ class Group(DAComponent):
         result = self.Group.delete_one({'_id': ObjectId(group_id)})
         return result.deleted_count > 0
 
+    def add_profile(self, group_id, profile_id):
+        return self.Group.update({'_id': ObjectId(group_id)}, {'$push': {'shared_profile_ids': ObjectId(profile_id)}})
+
+    def remove_profile(self, group_id, profile_id):
+        return self.Group.update(
+            {'_id': ObjectId(group_id)},
+            {'$pull': {'shared_profile_ids': ObjectId(profile_id)}}
+        )
+
+
 
 class RemoteDataFile:
     def __init__(self, profile_id=None):
