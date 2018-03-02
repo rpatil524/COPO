@@ -49,5 +49,8 @@ urlpatterns = [url(r'^$', views.index, name='index'),
                url(r'^create_group/$', ajax_handlers.create_group, name='create_group'),
                url(r'^delete_group/$', ajax_handlers.delete_group, name='delete_group'),
                url(r'^add_profile_to_group/$', ajax_handlers.add_profile_to_group, name='add_profile_to_group'),
-               url(r'^remove_profile_from_group/$', ajax_handlers.remove_profile_from_group, name='remove_profile_from_group')
+               url(r'^remove_profile_from_group/$', ajax_handlers.remove_profile_from_group,
+                   name='remove_profile_from_group'),
+               url(r'^get_profiles_in_group/$', ajax_handlers.get_profiles_in_group,
+                   name='get_profiles_in_group')
                ]

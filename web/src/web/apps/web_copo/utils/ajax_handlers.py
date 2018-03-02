@@ -259,3 +259,8 @@ def remove_profile_from_group(request):
         return HttpResponse(json.dumps({'resp':'Removed from Group'}))
     else:
         return HttpResponseBadRequest(json.dumps({'resp':'Server Error - Try again'}))
+
+def get_profiles_in_group(request):
+    group_id = request.GET['group_id']
+    grp_info = Group().get_profiles_for_group_info(group_id=group_id)
+    return HttpResponse(json_util.dumps({'resp': grp_info}))

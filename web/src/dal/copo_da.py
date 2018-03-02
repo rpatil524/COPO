@@ -620,6 +620,17 @@ class Group(DAComponent):
             {'$pull': {'shared_profile_ids': ObjectId(profile_id)}}
         )
 
+    def get_profiles_for_group_info(self, group_id):
+        p_list = cursor_to_list(Profile().get_for_user(data_utils.get_user_id()))
+        group = Group().get_record(ObjectId(group_id))
+        for p in p_list:
+            if p['_id'] in group['shared_profile_ids']:
+                p['selected'] = True
+            else:
+                p['selected'] = False
+        return p_list
+
+
 
 
 class RemoteDataFile:

@@ -1,6 +1,5 @@
 $(document).ready(function () {
 
-    $(document).data('profiles_in_group', [])
     $(document).on('click', ".dropdown-menu li a", function (e) {
         $(this).parents(".btn-group").find('.selection').text($(this).text() + ' ');
         $('#selected_group').html($(this).text())
@@ -8,6 +7,7 @@ $(document).ready(function () {
         $('#delete_group_button').css('visibility', 'visible')
         $('.in,.open').removeClass('in open');
         $('#tool_window').css('visibility', 'visible')
+        get_profiles_in_group_data(e)
     })
     //toggle_profile_in_group
     $(document).on('click', '#submit_group', validate_group_form)
@@ -141,6 +141,7 @@ $(document).ready(function () {
                 $('#add_group_modal').modal('hide')
                 $('#delete_group_button').css('visibility', 'visible')
                 $('#tool_window').css('visibility', 'visible')
+                get_profiles_in_group_data()
             })
         }
     })
@@ -191,9 +192,9 @@ $(document).ready(function () {
             method: 'GET',
             dataType: 'json',
             data: {'profile_id': values[0], 'group_id': group_id}
-        }).done(function(d){
+        }).done(function (d) {
             console.log(d.resp)
-        }).fail(function(e, d){
+        }).fail(function (e, d) {
             console.error(e.responseJSON.resp)
         })
     }
@@ -206,12 +207,32 @@ $(document).ready(function () {
             method: 'GET',
             dataType: 'json',
             data: {'profile_id': values[0], 'group_id': group_id}
-        }).done(function(d){
+        }).done(function (d) {
             console.log(d.resp)
-        }).fail(function(e, d){
+        }).fail(function (e, d) {
             console.error(e.responseJSON.resp)
         })
     }
+
+    function get_profiles_in_group_data() {
+        var group_id = $('#selected_group').data('selected_group_id')
+        $.ajax({
+            url: '/copo/get_profiles_in_group/',
+            method: 'GET',
+            data: {'group_id': group_id},
+            dataType: 'json'
+        }).done(function (data) {
+            $('#profiles_in_group option').remove()
+            $(data.resp).each(function (idx, el) {
+                $('#profiles_in_group').multiSelect('addOption', { value: el._id.$oid, text: el.title});
+                if(el.selected){
+                    $('#profiles_in_group').multiSelect('select', el._id.$oid);
+                }
+            })
+            $('#profiles_in_group').multiSelect('refresh');
+        })
+    }
+
 
 });
 
