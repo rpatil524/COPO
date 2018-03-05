@@ -528,6 +528,44 @@ $(document).ready(function () {
         });
     }
 
+    function treat_ena_status(status, targetID) {
+        //submission to ena has been divided into several callable micro-tasks,
+        // and this function enables iteration through the submission micro-tasks,
+        // making server calls to actually fulfill them
+
+        if (status != 'completed' || status != 'error') {
+            //move on to next stage of the submission
+
+            var request_params = {
+                'sub_id': targetID,
+                'ena_status':status
+            };
+            $.ajax({
+                url: "/rest/submit_to_repo/",
+                type: "POST",
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                data: request_params,
+                success: function (data) {
+                    try {
+                        data = JSON.parse(data);
+                        if (data.status.hasOwnProperty("ena_status")) {
+                            console.log(data.status.ena_status);
+                            treat_ena_status(data.status.ena_status, targetID);
+                            return;
+                        }
+                    } catch (err) {
+                        console.log(err)
+                    }
+                },
+                error: function () {
+                    console.log("Couldn't complete submission to the target repository!");
+                }
+            });
+        }
+    }
+
     function get_submission_information() {
         var request_params = {
             'ids': JSON.stringify(submissionIDS)
@@ -597,10 +635,17 @@ $(document).ready(function () {
                                     },
                                     data: request_params,
                                     success: function (data) {
-                                        ;
+                                        try {
+                                            data = JSON.parse(data);
+                                            if (data.status.hasOwnProperty("ena_status")) {
+                                                treat_ena_status(data.status.ena_status, targetID);
+                                            }
+                                        } catch (err) {
+                                            console.log(err)
+                                        }
                                     },
                                     error: function () {
-                                        //alert("Couldn't complete submission to the target repository!");
+                                        console.log("Couldn't complete submission to the target repository!");
                                     }
                                 });
                             }

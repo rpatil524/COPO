@@ -19,7 +19,6 @@ def delegate_submission(request):
         return HttpResponse({'status': 0})
     # tonietuk's intercept ends
 
-
     sub = Submission().get_record(sub_id)
 
     repo = sub['repository']
@@ -40,6 +39,12 @@ def delegate_submission(request):
         else:
             # forward to control view
             return HttpResponse(jsonpickle.dumps({'status': 1, 'url': reverse('copo:authenticate_figshare')}))
+
+    # Submit to ENA Sequence reads - splits the submission task to micro-tasks to overcome the timeout issues observed
+    elif repo == 'ena':
+        ena_status = request.POST.get("ena_status", "commenced")
+        result = enaSubmission.EnaSubmit4Reads(submission_id=sub_id, status=ena_status).submit()
+        return HttpResponse(jsonpickle.dumps({'status': result}))
 
     # Submit to ENA
     elif 'ena' in repo:

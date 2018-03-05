@@ -1565,7 +1565,7 @@ function do_context_help(data) {
             .draw();
         table
             .rows
-            .add(dataSet);
+            .add(dtd);
         table
             .columns
             .adjust()
@@ -1677,118 +1677,6 @@ function do_global_help(component) {
             alert("Couldn't retrieve page help!");
         }
     });
-}
-
-function set_component_help(helpEntryKey, tableID, helpJSON) {
-    if (!helpJSON) {
-        return;
-    }
-
-    if (!helpJSON.hasOwnProperty(helpEntryKey)) {
-        helpEntryKey = Object.keys(helpJSON)[0];
-    }
-
-    var dataSet = []; //datafileHowtos[component].properties;
-
-    $.each(helpJSON[helpEntryKey].properties, function (key, val) {
-        var option = {};
-        option["rank"] = key + 1;
-        option["title"] = val.title;
-        option["content"] = val.content;
-        var helpID = Math.random() + Math.random() + Math.random();
-        helpID = helpID.toString();
-        option["help_id"] = helpID.replace(".", "_");
-        dataSet.push(option);
-    });
-
-
-    //set data
-    var table = null;
-
-    if ($.fn.dataTable.isDataTable('#' + tableID)) {
-        //if table instance already exists, then do refresh
-        table = $('#' + tableID).DataTable();
-    }
-
-    if (table) {
-        //clear old, set new data
-        table
-            .clear()
-            .draw();
-        table
-            .rows
-            .add(dataSet);
-        table
-            .columns
-            .adjust()
-            .draw();
-        table
-            .search('')
-            .columns()
-            .search('')
-            .draw();
-    } else {
-        table = $('#' + tableID).DataTable({
-            data: dataSet,
-            searchHighlight: true,
-            "lengthChange": false,
-            order: [
-                [0, "asc"]
-            ],
-            language: {
-                "info": " _START_ to _END_ of _TOTAL_ help tips",
-                "lengthMenu": "_MENU_ tips",
-            },
-            columns: [{
-                "data": "rank",
-                "visible": false
-            },
-                {
-                    "data": null,
-                    "title": "Tips",
-                    "render": function (data, type, row, meta) {
-                        var panelVar = get_collapsible_panel("default");
-
-                        //restructure some default styling
-                        panelVar.find(".panel-title").css({
-                            "font-size": "13px",
-                            "font-weight": "500"
-                        });
-                        panelVar.find(".panel-group").css("margin-bottom", "0px");
-                        panelVar.find(".panel").css({
-                            "border-color": "rgba(51, 102, 153, 0.1)"
-                        });
-                        panelVar.find(".panel-heading").css({
-                            "background-image": "none",
-                            "background-color": "rgba(51, 102, 153, 0.1)"
-                        });
-
-                        var collapseId = "helpcentretips" + meta.row + data.help_id;
-
-                        panelVar.find(".panel-title").find("a")
-                            .attr("href", "#" + collapseId)
-                            .html(data.title);
-
-                        panelVar.find(".panel-collapse").attr("id", collapseId);
-                        panelVar.find(".panel-collapse").find(".panel-body").html('<div class="webpop-content-div">' + data.content + '</div>');
-
-                        return $('<div></div>').append(panelVar).html();
-                    }
-                },
-                {
-                    "data": "content",
-                    "visible": false
-                }
-            ],
-            "columnDefs": [{
-                "orderData": 0,
-            }]
-        });
-    }
-
-    $('#' + tableID + ' tr:eq(0) th:eq(0)')
-        .text(helpJSON[helpEntryKey].title)
-        .css("color", "#fff");
 }
 
 function do_context_help_event() {

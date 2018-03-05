@@ -367,21 +367,22 @@ function refresh_sub_table(componentMeta, columns) {
 
             var tr = $(this).closest('tr');
             var row = table.row(tr);
+            row.deselect(); // remove selection on row
 
             //close other rows
-            $('#' + tableID + ' tbody').find('tr').each(function () {
-
-                var row_all = table.row($(this));
-
-                if (row_all.child.isShown()) {
-                    // This row is already open - close it
-                    if (row_all.data().record_id != row.data().record_id) {
-                        row_all.child('');
-                        row_all.child.hide();
-                        $(this).removeClass('shown');
-                    }
-                }
-            });
+            // $('#' + tableID + ' tbody').find('tr').each(function () {
+            //
+            //     var row_all = table.row($(this));
+            //
+            //     if (row_all.child.isShown()) {
+            //         // This row is already open - close it
+            //         if (row_all.data().record_id != row.data().record_id) {
+            //             row_all.child('');
+            //             row_all.child.hide();
+            //             $(this).removeClass('shown');
+            //         }
+            //     }
+            // });
 
             if (row.child.isShown()) {
                 // This row is already open - close it
