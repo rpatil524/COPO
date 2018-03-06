@@ -27,6 +27,9 @@ $(document).ready(function () {
     //input fields help tips event
     set_inputs_help();
 
+    //add event for ontology field change
+    ontology_value_change();
+
 });
 
 function setup_autocomplete() {
@@ -44,6 +47,16 @@ function setup_autocomplete() {
         }
     })
     auto_complete();
+}
+
+function ontology_value_change() {
+    //handles 'change of mind by user while entering value to clear associated fields'
+    $(document).on('keyup', '.ontology-field', function (e) {
+        var elem = $(this);
+        elem.siblings(".ontology-field-hidden").each(function () {
+            $(this).val('');
+        });
+    });
 }
 
 

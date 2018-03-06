@@ -1165,7 +1165,7 @@ var dispatchFormControl = {
             var radioCtrlDiv = $('<div/>',
                 {
                     style: "position: relative; display: block; margin-top: 10px; margin-bottom: 5px;",
-                    class: "radioCtrlDiv "+columnClass+" wide column"
+                    class: "radioCtrlDiv " + columnClass + " wide column"
 
                 })
                 .append(radioCtrlLabel)
@@ -1893,11 +1893,13 @@ function get_ontology_span(ontologySpan, formElem) {
             ontologySpan.append($('<input/>',
                 {
                     type: "hidden",
+                    class: "ontology-field-hidden",
                     id: fv,
                     name: fv
                 }));
         }
     }
+
 
     return ontologySpan;
 }
