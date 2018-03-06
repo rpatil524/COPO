@@ -236,3 +236,70 @@ $(document).ready(function () {
 
 });
 
+var auto_complete = function () {
+    // remove all previous autocomplete divs
+    $('.autocomplete').remove()
+    AutoComplete({
+        EmptyMessage: "No Users Found",
+        Url: "/rest/get_users/",
+        _Select: do_select,
+        _Render: do_post,
+        _Position: do_position,
+    }, '.user_search_field')
+
+    function do_select(item) {
+        if ($(document).data('annotator_type') == 'txt') {
+            $('#annotator-field-0').val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
+        } else if ($(document).data('annotator_type') == 'ss') {
+            // this function defined in copo_annotations.js
+            append_to_annotation_list(item)
+        } else {
+            $(this.Input).val($(item).data('annotation_value'));
+            $(this.Input).siblings("[id*='termSource']").val($(item).data('term_source'));
+            $(this.Input).siblings("[id*='termAccession']").val($(item).data('term_accession'));
+        }
+    }
+
+    function do_position(a, b, c) {
+        console.log(a, b, c)
+    }
+
+
+    function do_post(response) {
+        response = JSON.parse(response);
+
+
+        var empty,
+            length = response.length,
+            li = document.createElement("li"),
+            ul = document.createElement("ul");
+
+
+        for (var item in response) {
+
+            try {
+
+                li.innerHTML = '<span class="label label-info"><span>HERE</span></span>';
+
+
+                //$(li).attr('data-id', doc.id);
+                var styles = {
+                    margin: "2px",
+                    marginTop: '4px',
+                    fontSize: "large",
+                };
+                $(li).css(styles);
+
+                ul.appendChild(li);
+                li = document.createElement("li");
+            } catch (err) {
+                console.log(err);
+                li = document.createElement("li");
+            }
+        }
+        $(this.DOMResults).empty()
+        this.DOMResults.append(ul)
+    }
+
+} //end of function
+

@@ -1553,6 +1553,8 @@ function do_context_help(data) {
     //set data
     var table = null;
 
+    console.log(dtd)
+
     if ($.fn.dataTable.isDataTable('#' + tableID)) {
         //if table instance already exists, then do refresh
         table = $('#' + tableID).DataTable();

@@ -264,3 +264,10 @@ def get_profiles_in_group(request):
     group_id = request.GET['group_id']
     grp_info = Group().get_profiles_for_group_info(group_id=group_id)
     return HttpResponse(json_util.dumps({'resp': grp_info}))
+
+def get_users(request):
+    term = request.GET['q']
+    x = list()
+    x.append({'firstname': 'Felix', 'lastname':'Shaw', 'username': 'fshaw'})
+    x.append({'firstname': 'Kurt', 'lastname': 'Cobain', 'username': 'kcobain'})
+    return HttpResponse(json.dumps(x))
