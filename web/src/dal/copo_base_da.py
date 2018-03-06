@@ -4,7 +4,7 @@ __author__ = 'felixshaw'
 
 import bson.objectid as o
 from django_tools.middlewares import ThreadLocal
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from web.apps.web_copo.vocab.status_vocab import STATUS_CODES
 from web.apps.web_copo.schemas.utils.data_formats import DataFormats

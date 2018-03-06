@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from dal.copo_da import Submission
 import dal.figshare_da as fda
 from . import enaSubmission, figshareSubmission, dataverseSubmission
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 import jsonpickle
 
 

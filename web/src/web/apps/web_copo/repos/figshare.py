@@ -5,7 +5,7 @@ from urllib.parse import parse_qs
 
 import requests
 from requests_oauthlib import OAuth1, OAuth1Session
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from os import path
 import shutil
 from django_tools.middlewares import ThreadLocal

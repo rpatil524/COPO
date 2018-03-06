@@ -4,7 +4,7 @@ import json
 import copy
 from uuid import uuid4
 from django import template
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django_tools.middlewares import ThreadLocal
 from web.apps.web_copo.lookup.lookup import HTML_TAGS
 import web.apps.web_copo.lookup.lookup as lkup
@@ -25,7 +25,7 @@ table_id_dict = dict(publication="publication_table",
                      )
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_providers_orcid_first():
     """
     Returns a list of social authentication providers with Orcid as the first entry

@@ -3,7 +3,7 @@ __author__ = 'felix.shaw@tgac.ac.uk - 31/03/2016'
 import pdb
 from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory, Client
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 import web.apps.web_copo.views as v
 from dal.copo_da import Profile
 from dal.copo_da import Publication, Person, Source, Sample

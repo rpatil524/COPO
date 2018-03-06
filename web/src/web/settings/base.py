@@ -65,7 +65,20 @@ SOCIALACCOUNT_PROVIDERS = \
          {'SCOPE': ['profile', 'email'],
           'AUTH_PARAMS': {'access_type': 'online'}}}
 
-MIDDLEWARE_CLASSES = (
+# MIDDLEWARE_CLASSES = (
+#     'django.contrib.sessions.middleware.SessionMiddleware',
+#     'django.middleware.common.CommonMiddleware',
+#     'django.middleware.csrf.CsrfViewMiddleware',
+#     'django.contrib.auth.middleware.AuthenticationMiddleware',
+#     'django.contrib.messages.middleware.MessageMiddleware',
+#     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+#     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware',
+#     'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth',
+#     'web.apps.web_copo.copo_middleware.OrcidMiddleware.OrcidOAuth'
+# )
+
+
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -73,9 +86,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware',
-    'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth',
-    'web.apps.web_copo.copo_middleware.OrcidMiddleware.OrcidOAuth'
-)
+    # 'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth',
+    # 'web.apps.web_copo.copo_middleware.OrcidMiddleware.OrcidOAuth',
+]
+
 
 AUTHENTICATION_BACKENDS = (
     # Needed to auth by username in Django admin, regardless of `allauth`

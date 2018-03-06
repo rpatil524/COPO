@@ -1,6 +1,6 @@
 __author__ = 'fshaw'
 import re
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 import os
 import pysam
