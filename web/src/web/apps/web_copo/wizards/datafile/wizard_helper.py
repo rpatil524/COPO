@@ -5,9 +5,6 @@ from dal import cursor_to_list
 
 import difflib
 from operator import itemgetter
-
-from django_tools.middlewares import ThreadLocal
-
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 import web.apps.web_copo.templatetags.html_tags as htags
@@ -16,6 +13,7 @@ from dal.copo_base_da import DataSchemas
 from dal.copo_da import DataFile, Description
 from dal.figshare_da import Figshare
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
+from web.apps.web_copo.schemas.utils import data_utils
 
 
 class WizardHelper:
@@ -24,7 +22,7 @@ class WizardHelper:
         self.description_token = description_token
         self.description_targets = description_targets
         self.targets_datafiles = self.set_targets_datafiles()
-        self.profile_id = ThreadLocal.get_current_request().session['profile_id']
+        self.profile_id = data_utils.get_current_request().session['profile_id']
         self.rendered_stages = list()
 
     def set_rendered_stages(self, rendered_stages=list()):
@@ -1356,7 +1354,7 @@ class WizardHelper:
         return dynamic_stages
 
     def validate_figshare_token(self):
-        t = Figshare().get_token_for_user(user_id=ThreadLocal.get_current_user().id)
+        t = Figshare().get_token_for_user(user_id=data_utils.get_current_user().id)
         if t:
             return False
         else:

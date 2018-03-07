@@ -3,7 +3,7 @@ __author__ = 'felix.shaw@tgac.ac.uk - 29/01/2016'
 from dal.mongo_util import get_collection_ref
 import datetime
 import requests
-from django_tools.middlewares import ThreadLocal
+from web.apps.web_copo.schemas.utils import data_utils
 import json
 
 OAuthCollectionName = 'OAuthToken'
@@ -33,7 +33,7 @@ class OAuthToken:
 
     def cyverse_update_token(self, old_token, new_token):
         return self.OAuthToken.replace_one({'_id': old_token['_id']},
-                                           {'service': 'cyverse', 'user': ThreadLocal.get_current_user().user,
+                                           {'service': 'cyverse', 'user': data_utils.get_user().user,
                                             'token': new_token,
                                             'issued': datetime.datetime.now()})
 

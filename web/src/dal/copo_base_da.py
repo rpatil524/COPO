@@ -3,7 +3,7 @@
 __author__ = 'felixshaw'
 
 import bson.objectid as o
-from django_tools.middlewares import ThreadLocal
+from web.apps.web_copo.schemas.utils import data_utils
 from django.urls import reverse
 
 from web.apps.web_copo.vocab.status_vocab import STATUS_CODES
@@ -61,7 +61,7 @@ class Profile_Status_Info(Resource):
         issue_id = []
         issues_count = 0
         try:
-            user_id = ThreadLocal.get_current_user().id
+            user_id = data_utils.get_current_user().id
             prof = Profiles.find({"user_id": user_id})
         except AttributeError as e:
             prof = []

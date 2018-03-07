@@ -12,6 +12,8 @@ from django_tools.middlewares import ThreadLocal
 # from web.apps.web_copo.utils.ajax_handlers import get_continuation_studies
 import web.apps.web_copo.lookup.lookup as lookup
 from web.apps.web_copo.lookup.resolver import RESOLVER
+from django.conf import settings
+from django.contrib.auth.models import User
 
 
 def pretty_print(data, path=None):
@@ -91,7 +93,7 @@ def json_to_pytype(path_to_json):
 
 def get_samples_options():
     from dal.copo_da import Sample
-    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    profile_id = get_current_request().session['profile_id']
     samples = Sample(profile_id).get_all_records()
 
     option_values = []
@@ -163,7 +165,7 @@ def get_isasamples_json():
     :return:
     """
     from dal.copo_da import Sample
-    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    profile_id = get_current_request().session['profile_id']
     samples = Sample(profile_id).get_all_records()
 
     value_field = str("id")
@@ -193,7 +195,7 @@ def get_isasamples_json():
 
 def generate_sources_json(target_id=None):
     from dal.copo_da import Source
-    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    profile_id = get_current_request().session['profile_id']
 
     if target_id:
         sources = list()
@@ -233,7 +235,7 @@ def get_samples_json(target_id=None):
     :return:
     """
     from dal.copo_da import Sample
-    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    profile_id = get_current_request().session['profile_id']
 
     if target_id:
         samples = list()
@@ -269,7 +271,7 @@ def get_datafiles_json(target_id=None):
     :return:
     """
     from dal.copo_da import DataFile
-    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    profile_id = get_current_request().session['profile_id']
 
     if target_id:
         datafiles = list()
@@ -333,7 +335,9 @@ def get_watering_control_options():
 
 def get_copo_id():
     # todo: remove this and uncomment the below try block!!!
-    return "0" * 13
+    import uuid
+    u = uuid.uuid4()
+    return int(str(u.time_low) + str(u.time_mid))
     # make unique copo id
     # try:
     #     return get_uid()
@@ -342,7 +346,20 @@ def get_copo_id():
 
 
 def get_user_id():
-    return ThreadLocal.get_current_user().id
+    if settings.UNIT_TESTING:
+        return settings.TEST_USER.id
+    else:
+        return ThreadLocal.get_current_user().id
+
+def get_current_user():
+    if settings.UNIT_TESTING:
+        return settings.TEST_USER
+    else:
+        return ThreadLocal.get_current_user()
+
+
+def get_current_request():
+    return ThreadLocal.get_current_request()
 
 
 def get_datetime():
@@ -441,7 +458,7 @@ def get_ena_remote_path(submission_token):
     :param submission_token: the submission id
     :return:
     """
-    remote_path = os.path.join(submission_token, str(ThreadLocal.get_current_user()))
+    remote_path = os.path.join(submission_token, str(get_current_user()))
     return remote_path
 
 

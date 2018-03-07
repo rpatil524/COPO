@@ -8,7 +8,7 @@ from requests_oauthlib import OAuth1, OAuth1Session
 from django.urls import reverse
 from os import path
 import shutil
-from django_tools.middlewares import ThreadLocal
+from web.apps.web_copo.schemas.utils import data_utils
 from django.http import HttpResponse
 import jsonpickle
 from django.conf import settings
@@ -40,7 +40,7 @@ def submit_to_figshare(article_id):
         token_object = retrieve_token()
         collection = FigshareCollection().get_collection_head_from_article(article_id)
         article = FigshareCollection().get_article(article_id)
-        request = ThreadLocal.get_current_request()
+        request = data_utils.get_current_request()
         # get file path
         p = path.join(article['path'], article['hashed_name'])
         new_name = path.join(settings['MEDIA_ROOT'], article['original_name'])
@@ -136,7 +136,7 @@ def get_authorize_url():
     authorization_url = 'http://api.figshare.com/v1/pbl/oauth/authorize'
 
     #Obtain request token
-    request = ThreadLocal.get_current_request()
+    request = data_utils.get_current_request()
     domain = request.META['HTTP_HOST']
     callback_uri = 'http://' + domain + reverse('rest:set_figshare_credentials')
     oauth = OAuth1Session(client_key, client_secret=client_secret, callback_uri=callback_uri)

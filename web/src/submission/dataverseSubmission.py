@@ -8,7 +8,7 @@ import requests
 from requests.compat import urlencode, urljoin
 import json
 from dal.copo_da import Submission, DataFile
-from django_tools.middlewares.ThreadLocal import get_current_user, get_current_request
+from web.apps.web_copo.schemas.utils import data_utils
 from dal.copo_da import Profile
 import datetime
 from bson import ObjectId
@@ -25,7 +25,7 @@ class DataverseSubmit(object):
 
     def submit(self, sub_id, dataFile_ids):
 
-        profile_id = get_current_request().session.get('profile_id')
+        profile_id = data_utils.get_current_request().session.get('profile_id')
         dataverse = self._get_dataverse(profile_id=profile_id)
         dataset = self._get_dataset(profile_id=profile_id, dataFile_ids=dataFile_ids, dataverse=dataverse)
 
@@ -40,7 +40,7 @@ class DataverseSubmit(object):
 
         # create new dataverse if none already exists
 
-        u = get_current_user()
+        u = data_utils.get_current_user()
         # create new dataverse if none exists already
         dv_details = Profile().check_for_dataverse_details(profile_id)
 
@@ -58,7 +58,7 @@ class DataverseSubmit(object):
         # load dataverse scaffold
         pth = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'blanks', 'dataverse_scaffold.json')
         with open(pth, 'r') as f:
-            user = get_current_user()
+            user = data_utils.get_current_user()
             email = user.email
             dv_scaf = json.loads(f.read())
             dv_scaf['name'] = profile['title']
@@ -88,7 +88,7 @@ class DataverseSubmit(object):
         pth = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'blanks', 'dataset_scaffold.json')
         with open(pth, 'r') as f:
             ds_scaf = json.loads(f.read())
-            user = get_current_user()
+            user = data_utils.get_current_user()
             email = user.email
 
             for n_dict in ds_scaf["datasetVersion"]["metadataBlocks"]["citation"]["fields"]:

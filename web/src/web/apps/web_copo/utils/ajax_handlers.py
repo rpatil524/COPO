@@ -7,7 +7,7 @@ from bson import json_util, ObjectId
 
 import requests
 from django.http import HttpResponse
-from django_tools.middlewares import ThreadLocal
+from web.apps.web_copo.schemas.utils import data_utils
 from jsonpickle import encode
 from dateutil import parser
 from dal.copo_da import Profile
@@ -22,7 +22,7 @@ from submission.dataverseSubmission import DataverseSubmit
 
 
 def get_source_count(self):
-    profile_id = ThreadLocal.get_current_request().session['profile_id']
+    profile_id = data_utils.get_current_request().session['profile_id']
     num_sources = ProfileInfo(profile_id).source_count()
     return HttpResponse(encode({'num_sources': num_sources}))
 
@@ -152,7 +152,7 @@ def publish_figshare(request):
 
 
 def get_tokens_for_user(request):
-    user = ThreadLocal.get_current_user().id
+    user = data_utils.get_current_user().id
     # get Figshare Tokens
     t = util.cursor_to_list(Figshare().get_figshare_tokens_for_user(user))
     return HttpResponse(json_util.dumps({'figshare_tokens': t}))
@@ -213,7 +213,7 @@ def set_session_variable(request):
 
 
 def get_continuation_studies():
-    user = ThreadLocal.get_current_user()
+    user = data_utils.get_current_user()
     profiles = Profile().get_for_user(user.id)
     output = list()
     for p in profiles:

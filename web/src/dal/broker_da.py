@@ -4,14 +4,13 @@ __date__ = '13 May 2016'
 import ast
 from bson import ObjectId
 from django.contrib.auth.models import User
-from django_tools.middlewares import ThreadLocal
-
 import web.apps.web_copo.lookup.lookup as lkup
 from api.doi_metadata import DOI2Metadata
 import web.apps.web_copo.templatetags.html_tags as htags
 from dal.copo_da import Profile, Publication, Source, Person, Sample, Submission, DataFile, DAComponent, Annotation
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.metadata_rater import MetadataRater
+from web.apps.web_copo.schemas.utils import data_utils
 
 
 class BrokerDA:
@@ -350,7 +349,7 @@ class BrokerVisuals:
         return self.context
 
     def do_user_has_email(self):
-        req = ThreadLocal.get_current_request()
+        req = data_utils.get_current_request()
         user = User.objects.get(pk=int(req.user.id))
 
         self.context['user_has_email'] = bool(user.email.strip())
@@ -358,7 +357,7 @@ class BrokerVisuals:
         return self.context
 
     def do_update_quick_tour_flag(self):
-        req = ThreadLocal.get_current_request()
+        req = data_utils.get_current_request()
         quick_tour_flag = self.param_dict.get("quick_tour_flag", "false")
 
         if quick_tour_flag == "false":

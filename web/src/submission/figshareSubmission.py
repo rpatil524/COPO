@@ -10,7 +10,7 @@ import threading
 import datetime
 from dal.copo_da import RemoteDataFile
 from dal.figshare_da import Figshare
-from django_tools.middlewares import ThreadLocal
+from web.apps.web_copo.schemas.utils import data_utils
 from dal.figshare_da import Figshare
 
 
@@ -19,7 +19,7 @@ class FigshareSubmit(object):
 
     def __init__(self, sub_id):
         self.BASE_URL = FIGSHARE_API_URLS['base_url']
-        request = ThreadLocal.get_current_request()
+        request = data_utils.get_current_request()
         self.TOKEN = Figshare().get_token_for_user(request.user.id)['token']
         self.HEADERS = {'Authorization': 'token ' + self.TOKEN}
         self.MEDIA_ROOT = settings.MEDIA_ROOT
@@ -180,7 +180,7 @@ class FigshareSubmit(object):
     def isValidCredentials(self, user_id):
 
         # check if token exists for user
-        token = Figshare().get_token_for_user(user_id=ThreadLocal.get_current_user().id)
+        token = Figshare().get_token_for_user(user_id=data_utils.get_current_user().id)
         if token:
             # now check if token works
             headers = {'Authorization': 'token ' + token['token']}

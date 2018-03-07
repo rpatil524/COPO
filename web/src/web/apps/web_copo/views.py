@@ -3,13 +3,11 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
-from django.shortcuts import render, render_to_response, redirect
-from django.template import RequestContext
+from django.shortcuts import render, redirect
 from jsonpickle import encode
 from submission.submissionDelegator import delegate_submission
 from dal.orcid_da import Orcid
 from api.handlers.general import *
-from django_tools.middlewares import ThreadLocal
 from dal.copo_da import ProfileInfo, Profile, Submission
 from dal.OAuthTokens import OAuthToken
 from dal.broker_da import BrokerDA, BrokerVisuals
@@ -20,16 +18,14 @@ from django.conf import settings
 from allauth.account.forms import LoginForm
 from dal.copo_da import Annotation
 from bson import json_util as j
-from dal.figshare_da import Figshare
-from web.apps.web_copo.lookup.lookup import FIGSHARE_API_URLS, REPO_NAME_LOOKUP
-import requests
-import ast
-import web.apps.web_copo.lookup.lookup as lkup
+from web.apps.web_copo.lookup.lookup import REPO_NAME_LOOKUP
 import requests
 import datetime
 from rauth import OAuth2Service
 from web.apps.web_copo.utils import EnaImports as eimp
 from submission.enaSubmission import EnaSubmit
+from web.apps.web_copo.schemas.utils import data_utils
+
 
 
 LOGGER = settings.LOGGER
@@ -352,7 +348,7 @@ def copo_register(request):
 
 @login_required
 def view_orcid_profile(request):
-    user = ThreadLocal.get_current_user()
+    user = data_utils.get_current_user()
     op = Orcid().get_orcid_profile(user)
     data_dict = {'op': op}
     # data_dict = jsonpickle.encode(data_dict)

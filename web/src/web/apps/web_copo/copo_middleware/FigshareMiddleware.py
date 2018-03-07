@@ -4,7 +4,7 @@ from dal.figshare_da import Figshare
 from web.apps.web_copo.lookup.lookup import FIGSHARE_API_URLS
 import requests
 from dal.copo_da import Submission
-from django_tools.middlewares import ThreadLocal
+from web.apps.web_copo.schemas.utils import data_utils
 import ast
 import web.apps.web_copo.lookup.lookup as lkup
 
@@ -58,7 +58,7 @@ class SetFigshareOauth:
                             r = requests.post(token_url, data)
                             data_dict = ast.literal_eval(r.content.decode('utf-8'))
                             token = data_dict['token']
-                            t = Figshare().put_token_for_user(user_id=ThreadLocal.get_current_user().id, token=token)
+                            t = Figshare().put_token_for_user(user_id=data_utils.get_current_user().id, token=token)
                             if t:
                                 # mark fighshare submissions for this user as token obtained
                                 Submission().mark_all_token_obtained(user_id=request.user.id)
@@ -69,7 +69,7 @@ class SetFigshareOauth:
 
                     else:
                         # retrieve token
-                        token = Figshare().get_token_for_user(user_id=ThreadLocal.get_current_user().id)
+                        token = Figshare().get_token_for_user(user_id=data_utils.get_current_user().id)
 
                         # request.session['partial_submissions'] = doc
             else:

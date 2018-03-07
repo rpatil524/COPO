@@ -1,3 +1,6 @@
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -112,8 +115,6 @@ mongo/mongodata
 # add ignore for migrations
 0001_initial.py
 
-.idea/**
-.idea
 
 
 .gitignore.swp

@@ -68,7 +68,6 @@ def handle_upload(request):
     file_name = os.path.splitext(f.name)[0]
     file_type = request.POST['file_type']
     skip_rows = request.POST['skip_rows']
-
     if file_type == "Spreadsheet":
         # load spreadsheet data and return to backend
         s = read_excel(f, skiprows=int(skip_rows))

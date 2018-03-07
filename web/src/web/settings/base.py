@@ -1,6 +1,7 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from tools import resolve_env
+import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -9,6 +10,7 @@ SCHEMA_DIR = os.path.join(BASE_DIR, 'web', 'apps', 'web_cop', 'schemas')
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = resolve_env.get_env('SECRET_KEY')
@@ -64,18 +66,6 @@ SOCIALACCOUNT_PROVIDERS = \
     {'google':
          {'SCOPE': ['profile', 'email'],
           'AUTH_PARAMS': {'access_type': 'online'}}}
-
-# MIDDLEWARE_CLASSES = (
-#     'django.contrib.sessions.middleware.SessionMiddleware',
-#     'django.middleware.common.CommonMiddleware',
-#     'django.middleware.csrf.CsrfViewMiddleware',
-#     'django.contrib.auth.middleware.AuthenticationMiddleware',
-#     'django.contrib.messages.middleware.MessageMiddleware',
-#     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-#     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware',
-#     'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth',
-#     'web.apps.web_copo.copo_middleware.OrcidMiddleware.OrcidOAuth'
-# )
 
 
 MIDDLEWARE = [
@@ -194,3 +184,6 @@ DATAVERSE = {
     "HARVARD_TEST_API": "https://demo.dataverse.org/api/v1/",
     "HARVARD_TEST_TOKEN": "227bc74d-088f-423f-8f49-d8503f62f7de"
 }
+
+UNIT_TESTING = False
+TEST_USER = None

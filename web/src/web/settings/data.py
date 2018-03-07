@@ -2,6 +2,13 @@
 
 from pymongo import MongoClient
 from tools import resolve_env
+import sys
+
+
+# this value tells COPO whether we are in Development or Production environment
+ENVIRONMENT_TYPE = resolve_env.get_env('ENVIRONMENT_TYPE')
+if ENVIRONMENT_TYPE=="":
+    sys.exit('ENVIRONMENT_TYPE environment variable not set. Value should be either "prod" or "dev"')
 
 # settings for postgres
 DATABASES = {
@@ -22,11 +29,17 @@ MONGO_USER = resolve_env.get_env('MONGO_USER')
 MONGO_USER_PASSWORD = resolve_env.get_env('MONGO_USER_PASSWORD')
 MONGO_PORT = int(resolve_env.get_env('MONGO_PORT'))
 MONGO_MAX_POOL_SIZE = int(resolve_env.get_env('MONGO_MAX_POOL_SIZE'))
+MONGO_DB_TEST = "testing_copo"
+
 
 
 # this is the global DB connection, either use get_collection_ref in dal.mongo_util.py or refer to this setting
-MONGO_CLIENT = MongoClient(host=MONGO_HOST, maxPoolSize=MONGO_MAX_POOL_SIZE)[MONGO_DB]
-# MONGO_CLIENT.authenticate(MONGO_USER, MONGO_USER_PASSWORD, source='admin')
+
+if ENVIRONMENT_TYPE=="prod":
+    MONGO_CLIENT = MongoClient(host=MONGO_HOST, maxPoolSize=MONGO_MAX_POOL_SIZE)[MONGO_DB]
+    MONGO_CLIENT.authenticate(MONGO_USER, MONGO_USER_PASSWORD, source='admin')
+else:
+    MONGO_CLIENT = MongoClient(host=MONGO_HOST, maxPoolSize=MONGO_MAX_POOL_SIZE)[MONGO_DB_TEST]
 
 # uri = 'mongodb://' + MONGO_USER + ':' + MONGO_USER_PASSWORD + '@' + MONGO_HOST
 # MONGO_CLIENT = pymongo.MongoClient(uri, maxPoolSize=MONGO_MAX_POOL_SIZE)[MONGO_DB]

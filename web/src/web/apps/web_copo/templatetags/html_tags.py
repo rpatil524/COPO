@@ -5,7 +5,7 @@ import copy
 from uuid import uuid4
 from django import template
 from django.urls import reverse
-from django_tools.middlewares import ThreadLocal
+from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.lookup.lookup import HTML_TAGS
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
@@ -824,10 +824,10 @@ def generate_figshare_oauth_html():
 
 
 def get_ols_url():
-    req = ThreadLocal.get_current_request()
+    req = data_utils.get_current_request()
     protocol = req.META['wsgi.url_scheme']
     r = req.build_absolute_uri()
-    ols_url = protocol + '://' + ThreadLocal.get_current_request().META['HTTP_HOST'] + reverse(
+    ols_url = protocol + '://' + data_utils.get_current_request().META['HTTP_HOST'] + reverse(
         'copo:ajax_search_ontology')
 
     return ols_url
