@@ -492,7 +492,10 @@ class EnaSubmit4Reads(object):
         try:
             next_stage_indx = self.submission_sequence.index(self.status)
         except:
-            pass
+            # no valid stage, flag error and terminate
+            self.update_process_time()
+            self.context["ena_status"] = "error"
+            return self.context
 
         # check for completed stage
         if self.submission_sequence[next_stage_indx] == "completed":
@@ -672,6 +675,9 @@ class EnaSubmit4Reads(object):
                  -F "RUN=@' + os.path.join(remote_path, run_file) + '"' \
                    + '   "' + ena_uri + '"'
 
+        lg.log("CURL command", level=Loglvl.INFO, type=Logtype.FILE)
+        lg.log(curl_cmd, level=Loglvl.INFO, type=Logtype.FILE)
+
         output = subprocess.check_output(curl_cmd, shell=True)
         lg.log(output, level=Loglvl.INFO, type=Logtype.FILE)
         lg.log("Extracting fields from receipt", level=Loglvl.INFO, type=Logtype.FILE)
@@ -695,6 +701,9 @@ class EnaSubmit4Reads(object):
 
             self.context["ena_status"] = "error"
             self.context["error_text"] = error_text
+
+            lg.log(error_text, level=Loglvl.INFO, type=Logtype.FILE)
+            lg.log('Submission error! Submission ID: ' + self.submission_id, level=Loglvl.ERROR, type=Logtype.FILE)
 
             return
 
@@ -899,6 +908,7 @@ class EnaSubmit4Reads(object):
             transfer_fields["error"] = "Encountered problems with file upload."
             transfer_fields["current_time"] = datetime.now().strftime(
                 "%d-%m-%Y %H:%M:%S")
+            lg.log('File upload error! Submission ID: ' + self.submission_id, level=Loglvl.ERROR, type=Logtype.FILE)
 
             # save error to transfer record
             RemoteDataFile().update_transfer(self.transfer_token, transfer_fields)

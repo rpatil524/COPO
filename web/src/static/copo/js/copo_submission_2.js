@@ -533,12 +533,16 @@ $(document).ready(function () {
         // and this function enables iteration through the submission micro-tasks,
         // making server calls to actually fulfill them
 
-        if (status != 'completed' || status != 'error') {
+        if (status.trim().toLowerCase() == "completed") {
+            ; //submission completed, this will be picked up and reported elsewhwere
+        } else if (status.trim().toLowerCase() == "error") {
+            ; //submission error, this will be picked up and reported elsewhwere
+        } else {
             //move on to next stage of the submission
 
             var request_params = {
                 'sub_id': targetID,
-                'ena_status':status
+                'ena_status': status
             };
             $.ajax({
                 url: "/rest/submit_to_repo/",
