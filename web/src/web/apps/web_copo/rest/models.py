@@ -4,8 +4,6 @@ from django.conf import settings
 from web.apps.web_copo.schemas.utils import data_utils
 import datetime
 
-AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
-
 
 def generate_filename2(instance, filename):
     partition = datetime.datetime.now().strftime("%H_%M_%S_%f")
