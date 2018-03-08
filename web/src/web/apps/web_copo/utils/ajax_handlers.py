@@ -19,6 +19,8 @@ from dal.figshare_da import Figshare
 from dal import mongo_util as util
 from pandas import read_excel
 from submission.dataverseSubmission import DataverseSubmit
+from django.contrib.auth.models import User
+from django.db.models import Q
 
 
 def get_source_count(self):
@@ -189,7 +191,7 @@ def get_samples_for_study(request):
     output = list()
     for s in samples:
         source = Source().get_record(s['derivesFrom'][0])
-        #s.update(source)
+        # s.update(source)
         d = {"organism": source["organism"], "_id": s["_id"], "name": s["name"]}
         output.append(d)
     return HttpResponse(json_util.dumps(output))
@@ -225,6 +227,7 @@ def get_continuation_studies():
         )
     return output
 
+
 def create_group(request):
     name = request.GET['group_name']
     description = request.GET['description']
@@ -234,6 +237,7 @@ def create_group(request):
     else:
         return HttpResponseBadRequest('Error Creating Group - Try Again')
 
+
 def delete_group(request):
     id = request.GET['group_id']
     deleted = Group().delete_group(group_id=id)
@@ -242,32 +246,36 @@ def delete_group(request):
     else:
         return HttpResponseBadRequest('Error Deleting Group - Try Again')
 
+
 def add_profile_to_group(request):
     group_id = request.GET['group_id']
     profile_id = request.GET['profile_id']
     resp = Group().add_profile(group_id=group_id, profile_id=profile_id)
     if resp:
-        return HttpResponse(json.dumps({'resp':'Added to Group'}))
+        return HttpResponse(json.dumps({'resp': 'Added to Group'}))
     else:
-        return HttpResponseBadRequest(json.dumps({'resp':'Server Error - Try again'}))
+        return HttpResponseBadRequest(json.dumps({'resp': 'Server Error - Try again'}))
+
 
 def remove_profile_from_group(request):
     group_id = request.GET['group_id']
     profile_id = request.GET['profile_id']
     resp = Group().remove_profile(group_id=group_id, profile_id=profile_id)
     if resp:
-        return HttpResponse(json.dumps({'resp':'Removed from Group'}))
+        return HttpResponse(json.dumps({'resp': 'Removed from Group'}))
     else:
-        return HttpResponseBadRequest(json.dumps({'resp':'Server Error - Try again'}))
+        return HttpResponseBadRequest(json.dumps({'resp': 'Server Error - Try again'}))
+
 
 def get_profiles_in_group(request):
     group_id = request.GET['group_id']
     grp_info = Group().get_profiles_for_group_info(group_id=group_id)
     return HttpResponse(json_util.dumps({'resp': grp_info}))
 
+
 def get_users(request):
-    term = request.GET['q']
-    x = list()
-    x.append({'firstname': 'Felix', 'lastname':'Shaw', 'username': 'fshaw'})
-    x.append({'firstname': 'Kurt', 'lastname': 'Cobain', 'username': 'kcobain'})
+    q = request.GET['q']
+    x = list(User.objects.filter(Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).exclude(is_superuser=True).values_list('id', 'first_name', 'last_name', 'email', 'username'))
+    if not x:
+        return HttpResponse()
     return HttpResponse(json.dumps(x))

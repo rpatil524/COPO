@@ -1,5 +1,5 @@
 $(document).ready(function () {
-
+    user_lookup()
     $(document).on('click', ".dropdown-menu li a", function (e) {
         $(this).parents(".btn-group").find('.selection').text($(this).text() + ' ');
         $('#selected_group').html($(this).text())
@@ -236,18 +236,18 @@ $(document).ready(function () {
 
 });
 
-var auto_complete = function () {
+var user_lookup = function () {
     // remove all previous autocomplete divs
     $('.autocomplete').remove()
     AutoComplete({
         EmptyMessage: "No Users Found",
         Url: "/rest/get_users/",
-        _Select: do_select,
-        _Render: do_post,
-        _Position: do_position,
+        _Select: do_user_select,
+        _Render: do_user_post,
+        _Position: do_user_position,
     }, '.user_search_field')
 
-    function do_select(item) {
+    function do_user_select(item) {
         if ($(document).data('annotator_type') == 'txt') {
             $('#annotator-field-0').val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
         } else if ($(document).data('annotator_type') == 'ss') {
@@ -260,12 +260,15 @@ var auto_complete = function () {
         }
     }
 
-    function do_position(a, b, c) {
+    function do_user_position(a, b, c) {
         console.log(a, b, c)
     }
 
 
-    function do_post(response) {
+    function do_user_post(response) {
+        if(response == ""){
+            response = '[]'
+        }
         response = JSON.parse(response);
 
 
@@ -279,7 +282,7 @@ var auto_complete = function () {
 
             try {
 
-                li.innerHTML = '<span class="label label-info"><span>HERE</span></span>';
+                li.innerHTML = '<div class="h5">' + response[item][1] + ' ' + response[item][2] + '</div><span class="h6">' + response[item][3] +'</span>';
 
 
                 //$(li).attr('data-id', doc.id);
