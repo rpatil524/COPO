@@ -2,7 +2,8 @@ from django.urls import path, re_path
 from . import views
 from web.apps.web_copo.utils import ajax_handlers
 
-app_name = 'web_copo'urlpatterns = [path('', views.index, name='index'),
+app_name = 'web_copo'
+urlpatterns = [path('', views.index, name='index'),
                path('dataverse_submit/', views.test_dataverse_submit, name='test_dataverse_submit'),
                path('test_submission/', views.test_submission, name='test_submission'),
                path('test_pdf/', views.test_pdf, name='test_pdf'),
