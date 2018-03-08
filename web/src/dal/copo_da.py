@@ -22,6 +22,7 @@ RemoteFileCollection = 'RemoteFileCollection'
 DescriptionCollection = 'DescriptionCollection'
 ProfileCollection = 'Profiles'
 AnnotationReference = 'AnnotationCollection'
+GroupCollection = 'GroupCollection'
 
 handle_dict = dict(publication=get_collection_ref(PubCollection),
                    person=get_collection_ref(PersonCollection),
@@ -30,7 +31,8 @@ handle_dict = dict(publication=get_collection_ref(PubCollection),
                    profile=get_collection_ref(ProfileCollection),
                    submission=get_collection_ref(SubmissionCollection),
                    datafile=get_collection_ref(DataFileCollection),
-                   annotation=get_collection_ref(AnnotationReference)
+                   annotation=get_collection_ref(AnnotationReference),
+                   group=get_collection_ref(GroupCollection)
                    )
 
 
@@ -288,7 +290,6 @@ class Person(DAComponent):
         return
 
 
-
 class Source(DAComponent):
     def __init__(self, profile_id=None):
         super(Source, self).__init__(profile_id, "source")
@@ -451,6 +452,7 @@ class Submission(DAComponent):
         subs = self.get_collection_handle().find({'repository': {'$in': ['ena-ant', 'ena', 'ena-asm']}})
         return subs
 
+
 class DataFile(DAComponent):
     def __init__(self, profile_id=None):
         super(DataFile, self).__init__(profile_id, "datafile")
@@ -577,6 +579,57 @@ class Profile(DAComponent):
         if 'dataverse' in p:
             if 'datasets' in p['dataverse']:
                 return p['dataverse']['datasets']
+
+
+class Group(DAComponent):
+    def __init__(self):
+        super(Group, self).__init__(None, "group")
+        self.Group = get_collection_ref(GroupCollection)
+
+    def get_by_owner(self, owner_id):
+        doc = self.Group.find({'owner_id': owner_id})
+        if not doc:
+            return list()
+        return doc
+
+    def create_group(self, name, description, owner_id=None):
+        group_fields = data_utils.json_to_pytype(DB_TEMPLATES['COPO_GROUP'])
+        if not owner_id:
+            owner_id = data_utils.get_user_id()
+        group_fields['owner_id'] = owner_id
+        group_fields['name'] = name
+        group_fields['description'] = description
+        group_fields['data_created'] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        uid = self.Group.insert(group_fields)
+        if uid:
+            return uid
+        else:
+            return False
+
+    def delete_group(self, group_id):
+        result = self.Group.delete_one({'_id': ObjectId(group_id)})
+        return result.deleted_count > 0
+
+    def add_profile(self, group_id, profile_id):
+        return self.Group.update({'_id': ObjectId(group_id)}, {'$push': {'shared_profile_ids': ObjectId(profile_id)}})
+
+    def remove_profile(self, group_id, profile_id):
+        return self.Group.update(
+            {'_id': ObjectId(group_id)},
+            {'$pull': {'shared_profile_ids': ObjectId(profile_id)}}
+        )
+
+    def get_profiles_for_group_info(self, group_id):
+        p_list = cursor_to_list(Profile().get_for_user(data_utils.get_user_id()))
+        group = Group().get_record(ObjectId(group_id))
+        for p in p_list:
+            if p['_id'] in group['shared_profile_ids']:
+                p['selected'] = True
+            else:
+                p['selected'] = False
+        return p_list
+
+
 
 
 class RemoteDataFile:
