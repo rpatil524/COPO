@@ -8,15 +8,15 @@ from jsonpickle import encode
 from submission.submissionDelegator import delegate_submission
 from dal.orcid_da import Orcid
 from api.handlers.general import *
-from dal.copo_da import ProfileInfo, Profile, Submission
+from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, Group
 from dal.OAuthTokens import OAuthToken
 from dal.broker_da import BrokerDA, BrokerVisuals
+from dal import cursor_to_list
 from .lookup.lookup import HTML_TAGS
 from exceptions_and_logging.logger import Logtype, Loglvl
 from exceptions_and_logging.CopoRuntimeError import CopoRuntimeError
 from django.conf import settings
 from allauth.account.forms import LoginForm
-from dal.copo_da import Annotation
 from bson import json_util as j
 from web.apps.web_copo.lookup.lookup import REPO_NAME_LOOKUP
 import requests
@@ -25,8 +25,6 @@ from rauth import OAuth2Service
 from web.apps.web_copo.utils import EnaImports as eimp
 from submission.enaSubmission import EnaSubmit
 from web.apps.web_copo.schemas.utils import data_utils
-
-
 
 LOGGER = settings.LOGGER
 
@@ -96,7 +94,6 @@ def authenticate_figshare(request):
 def test_dataverse_submit(request):
     from submission.dataverseSubmission import DataverseSubmit
 
-
     DataverseSubmit().submit(dataFile_ids=["592ee1e668236b82e40b4c56"], sub_id="592ee7f168236b85d16510ef")
     return render(request, 'copo/test_page.html', {})
 
@@ -147,7 +144,7 @@ def copo_people(request, profile_id):
 def copo_samples(request, profile_id):
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
-    return render(request, 'copo/copo_sample_2.html', {'profile_id': profile_id, 'profile': profile})
+    return render(request, 'copo/copo_sample.html', {'profile_id': profile_id, 'profile': profile})
 
 
 @login_required
@@ -296,7 +293,6 @@ def copo_submissions(request, profile_id):
 
 @login_required
 def copo_get_submission_table_data(request):
-
     profile_id = request.POST.get('profile_id')
     submission = Submission(profile_id=profile_id).get_all_records()
     for s in submission:
@@ -373,7 +369,6 @@ def annotate_data(request):
 
 
 def load_cyverse_files(request, url, token):
-
     # get file data and pass to copo_data view
     url_filesystem = 'https://agave.iplantc.org/terrain/v2/secured/filesystem/directory?path=/iplant/home/shared'
     headers = {"Authorization": "Bearer " + token['token']['access_token']}
@@ -384,8 +379,8 @@ def load_cyverse_files(request, url, token):
         fnames.append({'text': el['label']})
     return copo_data(request, request.session['profile_id'], json.dumps(fnames))
 
-def agave_oauth(request):
 
+def agave_oauth(request):
     # check for token
     token = OAuthToken().cyverse_get_token(request.user.id)
     if token:
@@ -437,8 +432,8 @@ def agave_oauth(request):
                 OAuthToken().cyverse_save_token(request.user.id, t)
                 return redirect(request.session['datafile_url'])
 
-def import_ena_accession(request):
 
+def import_ena_accession(request):
     if request.method == 'GET':
         profile_id = request.session['profile_id']
         return render(request, 'copo/import_ena_accession.html', {'profile_id': profile_id})
@@ -450,3 +445,11 @@ def import_ena_accession(request):
         for acc in accessions:
             output.append(eimp.do_import_ena_accession(acc))
         return HttpResponse(output)
+
+
+def view_groups(request):
+    #g = Group().create_group(description="test descrition")
+    profile_list = cursor_to_list(Profile().get_for_user())
+    group_list = cursor_to_list(Group().get_by_owner(request.user.id))
+    print(group_list)
+    return render(request, 'copo/copo_group.html', {'request': request, 'profile_list': profile_list, 'group_list': group_list})

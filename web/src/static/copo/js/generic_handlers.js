@@ -1566,6 +1566,7 @@ function do_context_help(data) {
     //set data
     var table = null;
 
+
     if ($.fn.dataTable.isDataTable('#' + tableID)) {
         //if table instance already exists, then do refresh
         table = $('#' + tableID).DataTable();
@@ -1652,6 +1653,7 @@ function do_context_help(data) {
         });
     }
 
+
     $('#' + tableID + '_wrapper')
         .find(".dataTables_filter")
         .find("input")
@@ -1674,6 +1676,7 @@ function do_global_help(component) {
             'component': component
         },
         success: function (data) {
+
             //set quick tour message and trigger display event
             try {
                 do_context_help(data.context_help);

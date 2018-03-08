@@ -15,6 +15,7 @@ DB_TEMPLATES = {
     'SUBMISSION': os.path.join(RESOLVER['isa_json_db_models'], 'copo_submission.json'),
     'ONTOLOGY_ANNOTATION': os.path.join(RESOLVER['isa_json_db_models'], 'ontology_annotation_schema.json'),
     'COMMENT': os.path.join(RESOLVER['isa_json_db_models'], 'comment_schema.json'),
+    'COPO_GROUP': os.path.join(RESOLVER['schemas_copo'], 'copo_group.json')
 }
 
 # SRA_SETTINGS PATHS
@@ -665,6 +666,7 @@ MESSAGES_LKUPS = {
     'HELP_MESSAGES': {
         'datafile': os.path.join(RESOLVER['lookup'], 'help_messages', 'datafile_help.json'),
         'sample': os.path.join(RESOLVER['lookup'], 'help_messages', 'sample_help.json'),
+        'group': os.path.join(RESOLVER['lookup'], 'help_messages', 'group_help.json'),
         'global': os.path.join(RESOLVER['lookup'], 'help_messages', 'global_help.json'),
         'context_help': os.path.join(RESOLVER['lookup'], 'help_messages', 'context_help.json'),
     },

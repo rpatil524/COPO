@@ -374,6 +374,7 @@ class BrokerVisuals:
         target_id = self.param_dict.get("target_id", str())
         da_object = DAComponent(target_id, self.component)
         print(target_id)
+
         print(self.component)
         self.context["component_info"] = "welcome to " + str(da_object.get_component_count())
 
