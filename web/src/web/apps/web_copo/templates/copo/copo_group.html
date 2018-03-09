@@ -33,10 +33,21 @@
             color: black;
         }
 
-        .autocomplete{
+        .autocomplete {
             margin-top: 40px;
             min-width: 200px;
         }
+
+        #users_table {
+            width: 300px;
+            margin-top: 40px;
+        }
+
+        .delete_cell{
+            text-align: center;
+            cursor: pointer;
+        }
+
 
     </style>
 {% endblock %}
@@ -104,11 +115,23 @@
 
         <div class="col-lg-6 col-md-6 col-sm-6">
             <p class="lead">Users in Group</p>
-            <label for="basic-url">Search for Users</label>
+            <label for="basic-url">Search for User <small>(Firstname, Lastname or Username)</small></label>
             <div class="input-group">
-                <span class="input-group-addon" id="basic-addon3">Firstname, Lastname or Username</span>
-                <input type="text" class="form-control user_search_field" id="basic-url" aria-describedby="basic-addon3">
+                <span class="input-group-addon" id="basic-addon3"><i class="fa fa-user"></i></span>
+                <input type="text" class="form-control user_search_field" id="basic-url"
+                       aria-describedby="basic-addon3">
             </div>
+
+            <table class="table" id="users_table">
+                <tbody class=".table-hover">
+                <tr>
+                    <td>Felix Shaw</td>
+                    <td class="delete_cell">
+                        <i data-toggle="modal" class="fa fa-minus-square delete-user-button minus-color"></i>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
 
     </div>

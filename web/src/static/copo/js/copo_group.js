@@ -2,14 +2,13 @@ $(document).ready(function () {
     user_lookup()
     $(document).on('click', ".dropdown-menu li a", function (e) {
         $(this).parents(".btn-group").find('.selection').text($(this).text() + ' ');
-        $('#selected_group').html($(this).text())
-        $('#selected_group').data('selected_group_id', $(this).data('group-id'))
-        $('#delete_group_button').css('visibility', 'visible')
+        $('#selected_group').html($(this).text());
+        $('#selected_group').data('selected_group_id', $(this).data('group-id'));
+        $('#delete_group_button').css('visibility', 'visible');
         $('.in,.open').removeClass('in open');
-        $('#tool_window').css('visibility', 'visible')
-        get_profiles_in_group_data(e)
+        $('#tool_window').css('visibility', 'visible');
+        get_profiles_in_group_data(e);
     })
-    //toggle_profile_in_group
     $(document).on('click', '#submit_group', validate_group_form)
     $(document).on('click', '#delete_group_button', show_delete_dialog)
     $('#profiles_in_group').multiSelect({
@@ -19,6 +18,8 @@ $(document).ready(function () {
         afterSelect: add_profile_in_group_handler,
         afterDeselect: remove_profile_in_group_handler
     })
+
+    $(document).on('click', '.delete_cell', delete_user_row)
 
     //******************************Event Handlers Block*************************//
     var component = "group";
@@ -108,9 +109,6 @@ $(document).ready(function () {
                 }
             });
         }
-
-        //table.rows().deselect(); //deselect all rows
-
     }
 
 
@@ -224,8 +222,8 @@ $(document).ready(function () {
         }).done(function (data) {
             $('#profiles_in_group option').remove()
             $(data.resp).each(function (idx, el) {
-                $('#profiles_in_group').multiSelect('addOption', { value: el._id.$oid, text: el.title});
-                if(el.selected){
+                $('#profiles_in_group').multiSelect('addOption', {value: el._id.$oid, text: el.title});
+                if (el.selected) {
                     $('#profiles_in_group').multiSelect('select', el._id.$oid);
                 }
             })
@@ -248,16 +246,16 @@ var user_lookup = function () {
     }, '.user_search_field')
 
     function do_user_select(item) {
-        if ($(document).data('annotator_type') == 'txt') {
-            $('#annotator-field-0').val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
-        } else if ($(document).data('annotator_type') == 'ss') {
-            // this function defined in copo_annotations.js
-            append_to_annotation_list(item)
-        } else {
-            $(this.Input).val($(item).data('annotation_value'));
-            $(this.Input).siblings("[id*='termSource']").val($(item).data('term_source'));
-            $(this.Input).siblings("[id*='termAccession']").val($(item).data('term_accession'));
-        }
+        tr = document.createElement("tr")
+        tr.innerHTML = "<td>" + $(item).data('first_name') + " " + $(item).data('last_name') + "</td><td class='delete_cell'>" +
+            "<i class='fa fa-minus-square delete-user-button minus-color'></i>" +
+            "</td>"
+        $(tr).data('first_name', $(item).data('first_name'))
+        $(tr).data('last_name', $(item).data('last_name'))
+        $(tr).data('username', $(item).data('username'))
+        $(tr).data('email', $(item).data('email'))
+        $(tr).data('id', $(item).data('id'))
+        $(tr).appendTo('#users_table tbody')
     }
 
     function do_user_position(a, b, c) {
@@ -266,7 +264,7 @@ var user_lookup = function () {
 
 
     function do_user_post(response) {
-        if(response == ""){
+        if (response == "") {
             response = '[]'
         }
         response = JSON.parse(response);
@@ -282,7 +280,12 @@ var user_lookup = function () {
 
             try {
 
-                li.innerHTML = '<div class="h5">' + response[item][1] + ' ' + response[item][2] + '</div><span class="h6">' + response[item][3] +'</span>';
+                li.innerHTML = '<div class="h5">' + response[item][1] + ' ' + response[item][2] + '</div><span class="h6">' + response[item][3] + '</span>';
+                $(li).data('id', response[item][0])
+                $(li).data('first_name', response[item][1])
+                $(li).data('last_name', response[item][2])
+                $(li).data('email', response[item][3])
+                $(li).data('username', response[item][4])
 
 
                 //$(li).attr('data-id', doc.id);
@@ -304,5 +307,24 @@ var user_lookup = function () {
         this.DOMResults.append(ul)
     }
 
+
 } //end of function
 
+function add_user_to_do_group() {
+}
+
+function delete_user_row(e) {
+    var row = $(e.currentTarget).parents('tr')
+    var user_details = new Object()
+    user_details.id = $(row).data('id')
+    user_details.first_name = $(row).data('first_name')
+    user_details.last_name = $(row).data('last_name')
+    user_details.username = $(row).data('username')
+    user_details.email = $(row).data('email')
+    row.remove()
+    remove_user_from_group(user_details)
+}
+
+function remove_user_from_group(user_details) {
+    console.log(user_details)
+}
