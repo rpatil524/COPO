@@ -1564,3 +1564,14 @@ div.shown span.side-help-trigger:before {
     }
 }
 
+
+/*semantic ui button styling override*/
+.ui.tiny.buttons .button,
+.ui.tiny.buttons .or,
+.ui.tiny.button {
+  font-size: 11px; !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 15px !important;
+}

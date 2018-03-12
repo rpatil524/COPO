@@ -56,7 +56,7 @@ $(document).ready(function () {
         $('#sample-display-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
             if ($(event.target).attr("href") == "#descriptionWizardComponent") {
                 if (!$.isEmptyObject(tabShownStore)) {
-                    if(tabShownStore.method == "do_post_stage_retrieval2") {
+                    if (tabShownStore.method == "do_post_stage_retrieval2") {
                         $("#description_panel").css("display", "block");
                         do_post_stage_retrieval2(tabShownStore.data);
 
@@ -1194,6 +1194,30 @@ $(document).ready(function () {
 
             generatedSamples = data.generated_samples.generated_samples;
             formEditableElements = data.generated_samples.form_elements;
+
+            //flag error if no samples were generated
+            if (generatedSamples.length < 1) {
+                BootstrapDialog.show({
+                    title: 'Sample Generation Error!',
+                    message: "Couldn't generate samples. Possible duplicates in provided names.",
+                    cssClass: 'copo-modal3',
+                    closable: false,
+                    animate: true,
+                    type: BootstrapDialog.TYPE_DANGER,
+                    buttons: [
+                        {
+                            label: '<i class="copo-components-icons fa fa-times"></i> OK',
+                            cssClass: 'tiny ui basic red button',
+                            action: function (dialogRef) {
+                                dialogRef.close();
+                                window.location.reload();
+                            }
+                        }
+                    ]
+                });
+
+                return false;
+            }
 
             //generate table columns
             var sampleTableColumns = generate_sample_table_columns(generatedSamples);

@@ -73,7 +73,7 @@ class WizardHelper:
 
         bulk = Sample().get_collection_handle().initialize_unordered_bulk_op()
 
-        # form record template, for first item in generated_sample
+        # form record template, using first item in generated_samples
         auto_fields = dict()
         auto_fields[Sample().get_qualified_field("name")] = generated_samples[0]
         auto_fields[Sample().get_qualified_field("sample_type")] = sample_type
@@ -83,7 +83,7 @@ class WizardHelper:
 
         kwargs = dict()
         kwargs["target_id"] = str()
-        kwargs["validate_only"] = True  # preventing save of record
+        kwargs["validate_only"] = True  # prevents saving of record
 
         record = Sample(profile_id=self.profile_id).save_record(auto_fields, **kwargs)
 
@@ -92,7 +92,7 @@ class WizardHelper:
             new_record = copy.deepcopy(record)
             new_record["name"] = name
 
-            # create a new sample if no existing sample with both the same name and profile_id
+            # create a new sample if none exists having same name and profile_id
             bulk.find({"name": new_record["name"], "profile_id": new_record["profile_id"]}).upsert().replace_one(
                 new_record)
 

@@ -125,7 +125,7 @@ function do_table_buttons_events() {
                 type: BootstrapDialog.TYPE_WARNING,
                 buttons: [{
                     label: 'OK',
-                    cssClass: ' ui basic orange button',
+                    cssClass: 'tiny ui basic orange button',
                     action: function (dialogRef) {
                         dialogRef.close();
                     }
@@ -336,7 +336,7 @@ function do_render_component_table(data, componentMeta) {
             .each(function (value) {
                 $(this)
                     .removeClass("btn btn-default")
-                    .addClass(' ui basic button');
+                    .addClass('tiny ui basic button');
             });
 
         place_task_buttons(componentMeta); //this will place custom buttons on the table for executing tasks on records

@@ -51,7 +51,7 @@ function setup_autocomplete() {
 
 function ontology_value_change() {
     //handles 'change of mind by user while entering value to clear associated fields'
-    $(document).on('keyup', '.ontology-field', function (e) {
+    $(document).on('keyup', '.ontology-field', function () {
         var elem = $(this);
         elem.siblings(".ontology-field-hidden").each(function () {
             $(this).val('');
@@ -215,7 +215,7 @@ function do_render_table(data) {
         var custDef;
         var v = [];
         for (var i = 0; i < data.table_data.columns.length - 1; ++i) {
-            v.push(i)
+            v.push(i);
         }
 
         //exception for datafile table, it treats the first column differently
