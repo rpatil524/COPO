@@ -92,7 +92,9 @@ class WizardHelper:
             new_record = copy.deepcopy(record)
             new_record["name"] = name
 
-            bulk.find({"name": new_record["name"]}).upsert().replace_one(new_record)
+            # create a new sample if no existing sample with both the same name and profile_id
+            bulk.find({"name": new_record["name"], "profile_id": new_record["profile_id"]}).upsert().replace_one(
+                new_record)
 
         feedback = bulk.execute()
 
