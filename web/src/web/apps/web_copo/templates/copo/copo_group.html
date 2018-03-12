@@ -43,11 +43,14 @@
             margin-top: 40px;
         }
 
-        .delete_cell{
+        .delete_cell {
             text-align: center;
             cursor: pointer;
         }
 
+        .saving_status {
+            margin-right: 25px
+        }
 
     </style>
 {% endblock %}
@@ -72,10 +75,13 @@
 
 {% block page_tile %}
     <div class="row">
-
-        <div class="page-title-custom" style="margin-left:10px;">Groups</div>
+        <div class="page-title-custom" style="margin-left:10px;">Groups
+            <span class="pull-right saving_status">
+                <span class="lead label label-default">Accessing</span>
+                <img height="20px" src="{% static "copo/img/ajax.gif" %}"/>
+            </span>
+        </div>
     </div>
-
 {% endblock page_tile %}
 
 
@@ -115,7 +121,9 @@
 
         <div class="col-lg-6 col-md-6 col-sm-6">
             <p class="lead">Users in Group</p>
-            <label for="basic-url">Search for User <small>(Firstname, Lastname or Username)</small></label>
+            <label for="basic-url">Search for User
+                <small>(Firstname, Lastname or Username)</small>
+            </label>
             <div class="input-group">
                 <span class="input-group-addon" id="basic-addon3"><i class="fa fa-user"></i></span>
                 <input type="text" class="form-control user_search_field" id="basic-url"
@@ -125,10 +133,7 @@
             <table class="table" id="users_table">
                 <tbody class=".table-hover">
                 <tr>
-                    <td>Felix Shaw</td>
-                    <td class="delete_cell">
-                        <i data-toggle="modal" class="fa fa-minus-square delete-user-button minus-color"></i>
-                    </td>
+
                 </tr>
                 </tbody>
             </table>
