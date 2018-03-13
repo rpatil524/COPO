@@ -1233,6 +1233,7 @@ function get_profile_components() {
             buttons: ["quick-tour-template", "new-component-template"],
             sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
             tableID: 'copo_profiles_table',
+            secondaryTableID:'copo_shared_profiles_table',
             visibleColumns: 3,
             recordActions: ["add_record_all", "edit_record_single"] //specifies action buttons for records manipulation
         },

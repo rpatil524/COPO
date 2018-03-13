@@ -538,7 +538,6 @@ class Profile(DAComponent):
     def get_for_user(self, user=None):
         if not user:
             user = data_utils.get_current_user().id
-
         docs = self.get_collection_handle().find({"user_id": user, "deleted": data_utils.get_not_deleted_flag()}).sort(
             [['_id', -1]])
 
@@ -546,6 +545,25 @@ class Profile(DAComponent):
             return docs
         else:
             return None
+
+    def get_shared_for_user(self, user=None):
+        # get profiles shared with user
+        if not user:
+            user = data_utils.get_current_user().id
+        groups = Group().Group.find({'member_ids': str(user)})
+
+        p_list = list()
+        for g in list(groups):
+            p_list.extend(g['shared_profile_ids'])
+        # remove duplicates
+        # p_list = list(set(p_list))
+        docs = self.get_collection_handle().find(
+            {
+                "_id": {"$in": p_list},
+                "deleted": data_utils.get_not_deleted_flag()
+            }
+        )
+        return docs
 
     def save_record(self, auto_fields=dict(), **kwargs):
         if not kwargs.get("target_id", str()):
