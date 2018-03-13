@@ -40,7 +40,10 @@ $(document).ready(function () {
     //******************************Functions Block******************************//
 
 
-    function do_render_profile_table(data, do_shared_profiles=False) {
+    function do_render_profile_table(data, do_shared_profiles) {
+
+        do_shared_profiles = do_shared_profiles || false
+
         var dtd = data.table_data.dataSet;
 
         set_empty_component_message(dtd); //display empty profile message for potential first time users
@@ -49,7 +52,7 @@ $(document).ready(function () {
             return false;
         }
 
-        if(do_shared_profiles==True) {
+        if(do_shared_profiles==true) {
             var tableID = componentMeta.secondaryTableID
         }
         else{

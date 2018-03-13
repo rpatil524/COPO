@@ -226,8 +226,8 @@ class BrokerVisuals:
             datafile=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             sample=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             submission=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
-            profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_for_user(), component=self.component)),
-            shared_profiles=(htags.generate_copo_shared_profiles_data, dict(shared_profiles=Profile().get_shared_for_user(), component="shared_profiles"))
+            profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_for_user())),
+            shared_profiles=(htags.generate_copo_shared_profiles_data, dict(shared_profiles=Profile().get_shared_for_user()))
         )
 
         # NB: in table_data_dict, use an empty dictionary as a parameter for listed functions that define zero arguments
