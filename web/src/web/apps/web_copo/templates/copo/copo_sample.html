@@ -20,6 +20,7 @@
     <div hidden id="hidden_attrs">
         <!-- hidden attributes  -->
         <input type="hidden" id="nav_component_name" value="sample"/>
+        <input type="hidden" id="profile_id" value="{{ profile_id }}"/>
         <input type="hidden" value="{% url 'copo:copo_submissions' profile_id=profile_id %}" name="submission_url"
                id="submission_url"/>
     </div>

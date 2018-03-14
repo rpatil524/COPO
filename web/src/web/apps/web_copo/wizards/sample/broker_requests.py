@@ -17,6 +17,7 @@ class BrokerRequests:
         self.sample_type = self.param_dict.get("sample_type", str())
         self.number_to_generate = self.param_dict.get("number_to_generate", str())
         self.target_id = self.param_dict.get("target_id", str())
+        self.profile_id = self.param_dict.get("profile_id", str())
 
         self.auto_fields = self.param_dict.get("auto_fields", dict())
 
@@ -61,11 +62,12 @@ class BrokerRequests:
     def do_save_generated_samples(self):
         self.context['generated_samples'] = self.wizard_helper.save_initial_samples(self.generated_samples,
                                                                                     self.sample_type,
-                                                                                    self.initial_sample_attributes)
+                                                                                    self.initial_sample_attributes,
+                                                                                    self.profile_id)
         return self.context
 
     def do_sample_name_schema(self):
-        self.context['sample_name_schema'] = self.wizard_helper.sample_name_schema()
+        self.context['sample_name_schema'] = self.wizard_helper.sample_name_schema(self.profile_id)
 
         return self.context
 

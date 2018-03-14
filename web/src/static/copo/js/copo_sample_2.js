@@ -19,7 +19,7 @@ $(document).ready(function () {
         //****************************** Event Handlers Block *************************//
 
         //page global variables
-        var csrftoken = $.cookie('csrftoken');
+        var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
         var component = "sample";
         var wizardURL = "/rest/sample_wiz/";
         var copoFormsURL = "/copo/copo_forms/";
@@ -705,7 +705,8 @@ $(document).ready(function () {
                         type: "POST",
                         headers: {'X-CSRFToken': csrftoken},
                         data: {
-                            'request_action': 'sample_name_schema'
+                            'request_action': 'sample_name_schema',
+                            'profile_id': $('#profile_id').val()
                         },
                         success: function (data) {
                             $("#wizard_form_" + currentIndx).html('');
@@ -1035,7 +1036,8 @@ $(document).ready(function () {
                 type: "POST",
                 headers: {'X-CSRFToken': csrftoken},
                 data: {
-                    'request_action': 'sample_wizard_components'
+                    'request_action': 'sample_wizard_components',
+                    'profile_id': $('#profile_id').val()
                 },
                 success: function (data) {
                     wizardStages = data.wizard_stages;
@@ -1356,7 +1358,8 @@ $(document).ready(function () {
                     'request_action': 'save_generated_samples',
                     'generated_samples': JSON.stringify(generatedSampleNames),
                     'sample_type': get_stage_inputs_by_ref("sample_type")["sample_type"],
-                    'initial_sample_attributes': JSON.stringify(initialSampleAttributes)
+                    'initial_sample_attributes': JSON.stringify(initialSampleAttributes),
+                    'profile_id': $('#profile_id').val()
                 },
                 success: function (data) {
                     do_generated_samples_display(data);
@@ -1753,7 +1756,8 @@ $(document).ready(function () {
                         'request_action': 'sample_cell_update',
                         'target_rows': JSON.stringify(targetRows),
                         'update_metadata': update_metadata,
-                        'auto_fields': JSON.stringify(form_values)
+                        'auto_fields': JSON.stringify(form_values),
+                        'profile_id': $('#profile_id').val()
                     },
                     success: function (data) {
                         if (data.updated_samples.status && data.updated_samples.status == "error") {

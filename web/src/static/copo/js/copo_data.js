@@ -41,7 +41,8 @@ $(document).ready(function () {
     }
 
 
-    var csrftoken = $.cookie('csrftoken');
+    var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
+
     var component = "datafile";
     var wizardURL = "/rest/data_wiz/";
     var copoFormsURL = "/copo/copo_forms/";
@@ -473,7 +474,6 @@ $(document).ready(function () {
             $('#sample_ena').attr('disabled', 'disabled')
             $('#sample_copo').removeAttr('disabled')
             // now get samples in study
-            var csrftoken = $.cookie('csrftoken');
             $.ajax(
                 {
                     headers: {'X-CSRFToken': csrftoken},

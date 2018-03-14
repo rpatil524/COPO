@@ -7,7 +7,6 @@ from bson import ObjectId
 from dal.copo_da import Sample
 from dal import cursor_to_list
 import web.apps.web_copo.lookup.lookup as lkup
-from web.apps.web_copo.schemas.utils import data_utils
 from converters.ena.copo_isa_ena import ISAHelpers
 import web.apps.web_copo.templatetags.html_tags as htags
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
@@ -16,7 +15,6 @@ from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 
 class WizardHelper:
     def __init__(self):
-        self.profile_id = data_utils.get_current_request().session['profile_id']
         self.schema = Sample().get_schema().get("schema_dict")
         self.sample_types = list()
 
@@ -69,7 +67,7 @@ class WizardHelper:
 
         return wizard_stages
 
-    def save_initial_samples(self, generated_samples, sample_type, initial_sample_attributes):
+    def save_initial_samples(self, generated_samples, sample_type, initial_sample_attributes, profile_id):
 
         bulk = Sample().get_collection_handle().initialize_unordered_bulk_op()
 
@@ -85,7 +83,7 @@ class WizardHelper:
         kwargs["target_id"] = str()
         kwargs["validate_only"] = True  # prevents saving of record
 
-        record = Sample(profile_id=self.profile_id).save_record(auto_fields, **kwargs)
+        record = Sample(profile_id=profile_id).save_record(auto_fields, **kwargs)
 
         # use template record to generate other records, modifying only the name attribute
         for name in generated_samples:
@@ -111,7 +109,7 @@ class WizardHelper:
 
         return self.resolve_samples_display(generated_sample_records, sample_type)
 
-    def sample_name_schema(self):
+    def sample_name_schema(self, profile_id):
         """
         function return sample name schema with unique items
         :return: name schema
@@ -131,7 +129,7 @@ class WizardHelper:
             sample_name_schema["batchuniquename"] = "assigned_sample"
 
             # get all sample names for unique test
-            unique_names = htags.generate_unique_items(component="sample", profile_id=self.profile_id, elem_id="name",
+            unique_names = htags.generate_unique_items(component="sample", profile_id=profile_id, elem_id="name",
                                                        record_id=str())
             sample_name_schema["unique_items"] = unique_names
 
