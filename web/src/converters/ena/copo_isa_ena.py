@@ -33,7 +33,9 @@ class Investigation:
                     try:
                         properties[k] = getattr(Investigation, "_" + k)(self, properties[k])
                     except:
+                        print("Error occurred " + k)
                         properties[k] = ISAHelpers().get_schema_key_type(properties.get(k, dict()))
+                print("finished " + k)
 
         return properties
 
