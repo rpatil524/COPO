@@ -33,9 +33,7 @@ class Investigation:
                     try:
                         properties[k] = getattr(Investigation, "_" + k)(self, properties[k])
                     except:
-                        print("Error occurred " + k)
                         properties[k] = ISAHelpers().get_schema_key_type(properties.get(k, dict()))
-                print("finished " + k)
 
         return properties
 
@@ -72,12 +70,28 @@ class Investigation:
         for record in records:
             target_record_list = ISAHelpers().get_object_instances(record, target_record_list, target_object_keys)
 
-        if target_record_list:
-            df = pd.DataFrame(target_record_list)
-            df = df[df.termSource != '']
-            df = pd.DataFrame({'onto': list(df.termSource.unique())})
+        termsources = [x["termSource"] for x in target_record_list if len(x["termSource"]) > 0]
+        termsources = list(set(termsources))
 
-            osr = list(df.onto.apply(ISAHelpers().refactor_ontology_source_references))
+        component = "ontology_source_reference"
+
+        # get ontology base uri
+        base_url = lookup.ONTOLOGY_LKUPS.get("ontology_file_uri", str())
+
+        for ts in termsources:
+            value_dict = dict(
+                name=ts,
+                file=base_url + ts
+            )
+
+            osr_schema = d_utils.get_db_json_schema(component)
+            for k in osr_schema:
+                if k == "@id":
+                    osr_schema[k] = ISAHelpers().get_id_field(component, dict(name=ts))
+                else:
+                    osr_schema[k] = value_dict.get(k, ISAHelpers().get_schema_key_type(osr_schema.get(k, dict())))
+
+            osr.append(osr_schema)
 
         return osr
 
