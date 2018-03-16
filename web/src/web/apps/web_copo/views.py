@@ -166,14 +166,6 @@ def copo_visualize(request):
 
     task = request.POST.get("task", str())
 
-    # import converters.ena.copo_isa_ena as cnv
-    # conv = cnv.Investigation(submission_token="5a27d59c3bd23600479ae611")
-    # meta = conv.get_schema()
-    # from submission import enaSubmission
-    # ena_status = "commenced"
-    # sub_id = "5a27d59c3bd23600479ae611"
-    # result = enaSubmission.EnaSubmit4Reads(submission_id=sub_id, status=ena_status).submit()
-
     profile_id = request.session.get("profile_id", str())
 
     context["quick_tour_flag"] = request.session.get("quick_tour_flag", True)
