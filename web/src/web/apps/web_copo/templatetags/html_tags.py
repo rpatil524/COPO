@@ -356,6 +356,12 @@ def generate_copo_profiles_data(profiles=list()):
             if f.get("show_in_table", True):
                 temp_set.append({"header": f.get("label", str()), "data": resolve_control_output(pr, f),
                                  "key": f["id"].split(".")[-1]})
+        # add whether this is a shared profile
+        shared = dict()
+        shared['header'] = None
+        shared['data'] = pr.get('shared', False)
+        shared['key'] = 'shared_profile'
+        temp_set.append(shared)
 
         data_set.append(temp_set)
 

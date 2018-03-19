@@ -535,6 +535,12 @@ class Profile(DAComponent):
     def __init__(self, profile=None):
         super(Profile, self).__init__(None, "profile")
 
+    def get_all_profiles(self, user=None):
+        mine = list(self.get_for_user(user))
+        shared = list(self.get_shared_for_user(user))
+        return shared + mine
+
+
     def get_for_user(self, user=None):
         if not user:
             user = data_utils.get_current_user().id
@@ -564,7 +570,11 @@ class Profile(DAComponent):
                 "deleted": data_utils.get_not_deleted_flag()
             }
         )
-        return docs
+        out = list(docs)
+        for d in out:
+            d['shared'] = True
+
+        return out
 
     def save_record(self, auto_fields=dict(), **kwargs):
         if not kwargs.get("target_id", str()):

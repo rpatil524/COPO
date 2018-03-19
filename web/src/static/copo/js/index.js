@@ -22,7 +22,6 @@ $(document).ready(function () {
     //trigger refresh of profiles list
     $('body').on('refreshtable', function (event) {
         do_render_profile_table(globalDataBuffer);
-        //do_render_profile_table(globalDataBuffer, true)
     });
 
     //handle task button event
@@ -41,32 +40,83 @@ $(document).ready(function () {
     //******************************Functions Block******************************//
 
 
-    function do_render_profile_table(data, do_shared_profiles) {
+    function do_render_profile_table(data) {
+        var dtd = data.table_data.dataSet;
 
-        do_shared_profiles = do_shared_profiles || false
+        set_empty_component_message(dtd); //display empty profile message for potential first time users
 
-        var tableID = undefined
-        var dtd = undefined
-        var secondary_tableID = undefined
-        var secondary_dtd = undefined
-
-        if(do_shared_profiles==true) {
-            secondary_tableID = componentMeta.secondaryTableID
-            secondary_dtd = data.secondary_table_data.dataSet;
-        }
-
-        tableID = componentMeta.tableID;
-        dtd = data.table_data.dataSet;
-
-
-        if (dtd.length == 0 || secondary_dtd == 0) {
+        if (dtd.length == 0) {
             return false;
         }
 
+        var tableID = componentMeta.tableID;
 
-        var dataSet = do_table_data(dtd)
+        var dataSet = [];
 
-        var secondary_dataSet = do_table_data(secondary_dtd)
+        for (var i = 0; i < dtd.length; ++i) {
+            var data = dtd[i];
+
+            //get profile id
+            var record_id = '';
+            var result = $.grep(data, function (e) {
+                return e.key == "_id";
+            });
+
+            if (result.length) {
+                record_id = result[0].data;
+            }
+
+            //get title
+            var title = '';
+            result = $.grep(data, function (e) {
+                return e.key == "title";
+            });
+
+            if (result.length) {
+                title = result[0].data;
+            }
+
+            //get shared
+            var shared = false
+            result = $.grep(data, function (e) {
+                return e.key == "shared_profile";
+            });
+            if (result.length) {
+                shared = result[0].data;
+            }
+
+
+            //get description
+            var description = '';
+            result = $.grep(data, function (e) {
+                return e.key == "description";
+            });
+
+            if (result.length) {
+                description = result[0].data;
+            }
+
+            //get date
+            var profile_date = '';
+            result = $.grep(data, function (e) {
+                return e.key == "date_created";
+            });
+
+            if (result.length) {
+                profile_date = result[0].data;
+            }
+
+            if (record_id) {
+                var option = {};
+                option["title"] = title;
+                option["description"] = description;
+                option["profile_date"] = profile_date;
+                option["record_id"] = record_id;
+                option["shared"] = shared
+                dataSet.push(option);
+            }
+        }
+
 
         //set data
         var table = null;
@@ -94,105 +144,7 @@ $(document).ready(function () {
                 .search('')
                 .draw();
         } else {
-
-            var table = do_table(dataSet, tableID)
-            var secondary_table = do_table(secondary_dataSet, secondary_tableID)
-
-            table
-                .buttons()
-                .nodes()
-                .each(function (value) {
-                    $(this)
-                        .removeClass("btn btn-default")
-                        .addClass('tiny ui basic button');
-                });
-
-            place_task_buttons(componentMeta); //this will place custom buttons on the table for executing tasks on records
-        }
-
-        $('#' + tableID + '_wrapper')
-            .find(".dataTables_filter")
-            .find("input")
-            .removeClass("input-sm")
-            .attr("placeholder", "Search Work Profiles")
-            .attr("size", 30);
-
-
-        if (table) {
-            table.on('select', function (e, dt, type, indexes) {
-                set_selected_rows(dt);
-            });
-
-            table.on('deselect', function (e, dt, type, indexes) {
-                set_selected_rows(dt);
-            });
-        }
-
-    } //end of func
-
-    function do_table_data(dtd){
-        set_empty_component_message(dtd); //display empty profile message for potential first time users
-
-
-        var dataSet = [];
-
-        for (var i = 0; i < dtd.length; ++i) {
-            var data = dtd[i];
-
-            //get profile id
-            var record_id = '';
-            var result = $.grep(data, function (e) {
-                return e.key == "_id";
-            });
-
-            if (result.length) {
-                record_id = result[0].data;
-            }
-
-            //get title
-            var title = '';
-            var result = $.grep(data, function (e) {
-                return e.key == "title";
-            });
-
-            if (result.length) {
-                title = result[0].data;
-            }
-
-            //get description
-            var description = '';
-            var result = $.grep(data, function (e) {
-                return e.key == "description";
-            });
-
-            if (result.length) {
-                description = result[0].data;
-            }
-
-            //get date
-            var profile_date = '';
-            var result = $.grep(data, function (e) {
-                return e.key == "date_created";
-            });
-
-            if (result.length) {
-                profile_date = result[0].data;
-            }
-
-            if (record_id) {
-                var option = {};
-                option["title"] = title;
-                option["description"] = description;
-                option["profile_date"] = profile_date;
-                option["record_id"] = record_id;
-                dataSet.push(option);
-            }
-        }
-        return dataSet
-    }
-
-    function do_table(dataSet, tableID){
-        table = $('#' + tableID).DataTable({
+            table = $('#' + tableID).DataTable({
                 data: dataSet,
                 searchHighlight: true,
                 ordering: true,
@@ -229,8 +181,13 @@ $(document).ready(function () {
                                 .addClass("copo-records-panel");
 
                             //set heading
-                            renderHTML.find(".panel-heading").find(".row-title").html('<span>' + data.title + '</span>');
-
+                            if (!data.shared) {
+                                renderHTML.find(".panel-heading").find(".row-title").html('<span style="font-weight: bolder">' + data.title + '</span>');
+                            }
+                            else{
+                                renderHTML.find(".panel-heading").find(".row-title").html('<span style="">' + data.title + '&nbsp<small>(Shared With Me)</small></span>');
+                                renderHTML.find(".panel-heading").css("background-color", "#007eff")
+                            }
                             //set body
                             var bodyRow = $('<div class="row"></div>');
 
@@ -265,6 +222,10 @@ $(document).ready(function () {
                     {
                         "data": "record_id",
                         "visible": false
+                    },
+                    {
+                        "data": "shared",
+                        "visible": false
                     }
                 ],
                 "columnDefs": [],
@@ -274,8 +235,38 @@ $(document).ready(function () {
                 },
                 dom: 'Bfr<"row"><"row info-rw" i>tlp',
             });
-        return table;
-    }
+
+            table
+                .buttons()
+                .nodes()
+                .each(function (value) {
+                    $(this)
+                        .removeClass("btn btn-default")
+                        .addClass('tiny ui basic button');
+                });
+
+            place_task_buttons(componentMeta); //this will place custom buttons on the table for executing tasks on records
+        }
+
+        $('#' + tableID + '_wrapper')
+            .find(".dataTables_filter")
+            .find("input")
+            .removeClass("input-sm")
+            .attr("placeholder", "Search Work Profiles")
+            .attr("size", 30);
+
+
+        if (table) {
+            table.on('select', function (e, dt, type, indexes) {
+                set_selected_rows(dt);
+            });
+
+            table.on('deselect', function (e, dt, type, indexes) {
+                set_selected_rows(dt);
+            });
+        }
+
+    } //end of func
 
     function set_selected_rows(dt) {
         var tableID = dt.table().node().id;
@@ -312,7 +303,6 @@ $(document).ready(function () {
             }
 
             var buttonHTML = $(".pcomponent-button").clone();
-            // check if array if so take first elemenet
             buttonHTML.attr("title", "Navigate to " + item.title);
             buttonHTML.attr("href", $("#" + item.component + "_url").val().replace("999", record_id));
             buttonHTML.find(".pcomponent-icon").addClass(item.iconClass);
@@ -376,8 +366,7 @@ $(document).ready(function () {
                 'component': component
             },
             success: function (data) {
-                do_render_profile_table(data, true);
-                //do_render_profile_table(data, true);
+                do_render_profile_table(data);
                 tableLoader.remove();
             },
             error: function () {
