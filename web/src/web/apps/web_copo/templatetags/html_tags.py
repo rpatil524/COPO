@@ -346,7 +346,7 @@ def get_record_data(record_object=dict(), component=str()):
 
 
 @register.filter("generate_copo_profiles_data")
-def generate_copo_profiles_data(profiles=list(), shared_profiles=list()):
+def generate_copo_profiles_data(profiles=list()):
     data_set = list()
 
     for pr in profiles:
@@ -360,16 +360,12 @@ def generate_copo_profiles_data(profiles=list(), shared_profiles=list()):
         data_set.append(temp_set)
 
     return_dict = dict(dataSet=data_set)
-
-    print(profiles)
-    for p in shared_profiles:
-        print(p)
 
     return return_dict
 
 
-@register.filter("generate_copo_profiles_data")
-def generate_copo_shared_profiles_data(profiles=list(), shared_profiles=list()):
+@register.filter("generate_copo_shared_profiles_data")
+def generate_copo_shared_profiles_data(profiles=list()):
     data_set = list()
 
     for pr in profiles:
@@ -383,10 +379,6 @@ def generate_copo_shared_profiles_data(profiles=list(), shared_profiles=list()):
         data_set.append(temp_set)
 
     return_dict = dict(dataSet=data_set)
-
-    print(profiles)
-    for p in shared_profiles:
-        print(p)
 
     return return_dict
 

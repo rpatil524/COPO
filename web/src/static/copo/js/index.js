@@ -22,6 +22,7 @@ $(document).ready(function () {
     //trigger refresh of profiles list
     $('body').on('refreshtable', function (event) {
         do_render_profile_table(globalDataBuffer);
+        //do_render_profile_table(globalDataBuffer, true)
     });
 
     //handle task button event
@@ -44,20 +45,94 @@ $(document).ready(function () {
 
         do_shared_profiles = do_shared_profiles || false
 
-        var dtd = data.table_data.dataSet;
+        var tableID = undefined
+        var dtd = undefined
+        var secondary_tableID = undefined
+        var secondary_dtd = undefined
 
-        set_empty_component_message(dtd); //display empty profile message for potential first time users
+        if(do_shared_profiles==true) {
+            secondary_tableID = componentMeta.secondaryTableID
+            secondary_dtd = data.secondary_table_data.dataSet;
+        }
 
-        if (dtd.length == 0) {
+        tableID = componentMeta.tableID;
+        dtd = data.table_data.dataSet;
+
+
+        if (dtd.length == 0 || secondary_dtd == 0) {
             return false;
         }
 
-        if(do_shared_profiles==true) {
-            var tableID = componentMeta.secondaryTableID
+
+        var dataSet = do_table_data(dtd)
+
+        var secondary_dataSet = do_table_data(secondary_dtd)
+
+        //set data
+        var table = null;
+
+        if ($.fn.dataTable.isDataTable('#' + tableID)) {
+            //if table instance already exists, then do refresh
+            table = $('#' + tableID).DataTable();
         }
-        else{
-            var tableID = componentMeta.tableID;
+
+        if (table) {
+            //clear old, set new data
+            table
+                .clear()
+                .draw();
+            table
+                .rows
+                .add(dataSet);
+            table
+                .columns
+                .adjust()
+                .draw();
+            table
+                .search('')
+                .columns()
+                .search('')
+                .draw();
+        } else {
+
+            var table = do_table(dataSet, tableID)
+            var secondary_table = do_table(secondary_dataSet, secondary_tableID)
+
+            table
+                .buttons()
+                .nodes()
+                .each(function (value) {
+                    $(this)
+                        .removeClass("btn btn-default")
+                        .addClass('tiny ui basic button');
+                });
+
+            place_task_buttons(componentMeta); //this will place custom buttons on the table for executing tasks on records
         }
+
+        $('#' + tableID + '_wrapper')
+            .find(".dataTables_filter")
+            .find("input")
+            .removeClass("input-sm")
+            .attr("placeholder", "Search Work Profiles")
+            .attr("size", 30);
+
+
+        if (table) {
+            table.on('select', function (e, dt, type, indexes) {
+                set_selected_rows(dt);
+            });
+
+            table.on('deselect', function (e, dt, type, indexes) {
+                set_selected_rows(dt);
+            });
+        }
+
+    } //end of func
+
+    function do_table_data(dtd){
+        set_empty_component_message(dtd); //display empty profile message for potential first time users
+
 
         var dataSet = [];
 
@@ -113,35 +188,11 @@ $(document).ready(function () {
                 dataSet.push(option);
             }
         }
+        return dataSet
+    }
 
-
-        //set data
-        var table = null;
-
-        if ($.fn.dataTable.isDataTable('#' + tableID)) {
-            //if table instance already exists, then do refresh
-            table = $('#' + tableID).DataTable();
-        }
-
-        if (table) {
-            //clear old, set new data
-            table
-                .clear()
-                .draw();
-            table
-                .rows
-                .add(dataSet);
-            table
-                .columns
-                .adjust()
-                .draw();
-            table
-                .search('')
-                .columns()
-                .search('')
-                .draw();
-        } else {
-            table = $('#' + tableID).DataTable({
+    function do_table(dataSet, tableID){
+        table = $('#' + tableID).DataTable({
                 data: dataSet,
                 searchHighlight: true,
                 ordering: true,
@@ -223,38 +274,8 @@ $(document).ready(function () {
                 },
                 dom: 'Bfr<"row"><"row info-rw" i>tlp',
             });
-
-            table
-                .buttons()
-                .nodes()
-                .each(function (value) {
-                    $(this)
-                        .removeClass("btn btn-default")
-                        .addClass('tiny ui basic button');
-                });
-
-            place_task_buttons(componentMeta); //this will place custom buttons on the table for executing tasks on records
-        }
-
-        $('#' + tableID + '_wrapper')
-            .find(".dataTables_filter")
-            .find("input")
-            .removeClass("input-sm")
-            .attr("placeholder", "Search Work Profiles")
-            .attr("size", 30);
-
-
-        if (table) {
-            table.on('select', function (e, dt, type, indexes) {
-                set_selected_rows(dt);
-            });
-
-            table.on('deselect', function (e, dt, type, indexes) {
-                set_selected_rows(dt);
-            });
-        }
-
-    } //end of func
+        return table;
+    }
 
     function set_selected_rows(dt) {
         var tableID = dt.table().node().id;
@@ -291,6 +312,7 @@ $(document).ready(function () {
             }
 
             var buttonHTML = $(".pcomponent-button").clone();
+            // check if array if so take first elemenet
             buttonHTML.attr("title", "Navigate to " + item.title);
             buttonHTML.attr("href", $("#" + item.component + "_url").val().replace("999", record_id));
             buttonHTML.find(".pcomponent-icon").addClass(item.iconClass);
@@ -354,7 +376,8 @@ $(document).ready(function () {
                 'component': component
             },
             success: function (data) {
-                do_render_profile_table(data);
+                do_render_profile_table(data, true);
+                //do_render_profile_table(data, true);
                 tableLoader.remove();
             },
             error: function () {

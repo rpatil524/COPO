@@ -553,8 +553,9 @@ class Profile(DAComponent):
         groups = Group().Group.find({'member_ids': str(user)})
 
         p_list = list()
-        for g in list(groups):
-            p_list.extend(g['shared_profile_ids'])
+        for g in groups:
+            gp = dict(g)
+            p_list.extend(gp['shared_profile_ids'])
         # remove duplicates
         # p_list = list(set(p_list))
         docs = self.get_collection_handle().find(
