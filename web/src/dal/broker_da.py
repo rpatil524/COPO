@@ -267,7 +267,7 @@ class BrokerVisuals:
         return self.context
 
     def do_profiles_counts(self):
-        self.context["profiles_counts"] = htags.generate_copo_profiles_counts(Profile().get_for_user())
+        self.context["profiles_counts"] = htags.generate_copo_profiles_counts(Profile().get_all_profiles())
         return self.context
 
     def get_profile_count(self):

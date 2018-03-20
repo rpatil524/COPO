@@ -47,7 +47,6 @@ class ProfileInfo:
         Sample and Submission objects in the given profile
         :return: Dictionary containing the data
         """
-
         num_dict = dict(num_pub="publication",
                         num_person="person",
                         num_data="datafile",

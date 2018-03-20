@@ -335,6 +335,7 @@ $(document).ready(function () {
     }
 
     function update_counts() {
+        console.log()
         $.ajax({
             url: copoVisualsURL,
             type: "POST",
