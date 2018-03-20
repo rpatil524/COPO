@@ -226,7 +226,7 @@ class BrokerVisuals:
             datafile=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             sample=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             submission=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
-            profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_for_user())),
+            profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_all_profiles())),
         )
 
         # NB: in table_data_dict, use an empty dictionary as a parameter for listed functions that define zero arguments
@@ -236,6 +236,7 @@ class BrokerVisuals:
             self.context["table_data"] = table_data_dict[self.component][0](**kwargs)
 
         self.context["component"] = self.component
+
         return self.context
 
     def do_row_data(self):
@@ -266,7 +267,7 @@ class BrokerVisuals:
         return self.context
 
     def do_profiles_counts(self):
-        self.context["profiles_counts"] = htags.generate_copo_profiles_counts(Profile().get_for_user())
+        self.context["profiles_counts"] = htags.generate_copo_profiles_counts(Profile().get_all_profiles())
         return self.context
 
     def get_profile_count(self):

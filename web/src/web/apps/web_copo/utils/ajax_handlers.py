@@ -273,9 +273,26 @@ def get_profiles_in_group(request):
     return HttpResponse(json_util.dumps({'resp': grp_info}))
 
 
+def get_users_in_group(request):
+    group_id = request.GET['group_id']
+    usr_info = Group().get_users_for_group_info(group_id=group_id)
+    return HttpResponse(json_util.dumps({'resp': usr_info}))
+
 def get_users(request):
     q = request.GET['q']
     x = list(User.objects.filter(Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).exclude(is_superuser=True).values_list('id', 'first_name', 'last_name', 'email', 'username'))
     if not x:
         return HttpResponse()
     return HttpResponse(json.dumps(x))
+
+def add_user_to_group(request):
+    group_id = request.GET['group_id']
+    user_id = request.GET['user_id']
+    grp_info = Group().add_user_to_group(group_id=group_id, user_id=user_id)
+    return HttpResponse(json_util.dumps({'resp': grp_info}))
+
+def remove_user_from_group(request):
+    group_id = request.GET['group_id']
+    user_id = request.GET['user_id']
+    grp_info = Group().remove_user_from_group(group_id=group_id, user_id=user_id)
+    return HttpResponse(json_util.dumps({'resp': grp_info}))
