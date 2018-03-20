@@ -51,6 +51,7 @@ def sample_wiz(request):
                                   generated_samples=generated_samples,
                                   target_rows=target_rows,
                                   target_id=request.POST.get("target_id", str()),
+                                  profile_id=request.POST.get("profile_id", str()),
                                   sample_type=request.POST.get("sample_type", str()),
                                   auto_fields=request.POST.get("auto_fields", dict()),
                                   initial_sample_attributes=request.POST.get("initial_sample_attributes", dict()),

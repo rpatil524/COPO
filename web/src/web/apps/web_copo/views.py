@@ -260,25 +260,6 @@ def copo_admin(request):
     context = dict()
     task = request.POST.get("task", str())
 
-    # broker_visuals = BrokerVisuals(context=context,
-    #                                component=request.POST.get("component", str()),
-    #                                target_id=request.POST.get("target_id", str()),
-    #                                datafile_ids=json.loads(request.POST.get("datafile_ids", "[]"))
-    #                                )
-    #
-    # task_dict = dict(table_data=broker_visuals.do_table_data,
-    #                  profiles_counts=broker_visuals.do_profiles_counts,
-    #                  wizard_messages=broker_visuals.do_wizard_messages,
-    #                  metadata_ratings=broker_visuals.do_metadata_ratings,
-    #                  description_summary=broker_visuals.do_description_summary,
-    #                  un_describe=broker_visuals.do_un_describe,
-    #                  attributes_display=broker_visuals.do_attributes_display,
-    #                  help_messages=broker_visuals.get_component_help_messages,
-    #                  )
-    #
-    # if task in task_dict:
-    #     context = task_dict[task]()
-
     out = jsonpickle.encode(context)
     return HttpResponse(out, content_type='application/json')
 
