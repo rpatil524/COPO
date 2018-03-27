@@ -270,6 +270,7 @@ function do_render_component_table(data, componentMeta) {
     } else {
         table = $('#' + tableID).DataTable({
             data: dataSet,
+            select: true,
             searchHighlight: true,
             ordering: true,
             lengthChange: true,
@@ -286,11 +287,8 @@ function do_render_component_table(data, componentMeta) {
                     }
                 },
                 'selectNone',
-                'copy', 'csv', 'excel'
+                'csv', 'excel'
             ],
-            select: {
-                style: 'multi',
-            },
             language: {
                 "info": "Showing _START_ to _END_ of _TOTAL_ records",
                 "search": " ",

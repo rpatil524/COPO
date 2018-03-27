@@ -1,6 +1,7 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 03/05/2016'
 
 import json
+import pandas as pd
 from bson import json_util
 import converters.ena.copo_isa_ena as cnv
 from bson import ObjectId
@@ -448,7 +449,6 @@ class EnaSubmit4Reads(object):
         :param status: the current status or stage the submission has reached
         """
         self._dir = os.path.join(os.path.dirname(__file__), "data")
-        self.d_files = []
         self.submission_id = submission_id
         self.transfer_token = str()
         self.context = dict()
@@ -523,11 +523,13 @@ class EnaSubmit4Reads(object):
         if not os.path.exists(os.path.join(conv_dir, 'json')):
             os.makedirs(os.path.join(conv_dir, 'json'))
         json_file_path = os.path.join(conv_dir, 'json', 'isa_json.json')
+        collated_file_path = os.path.join(conv_dir, 'json', 'collated.json')
         assay_file_path = os.path.join(conv_dir, 'json', 'assay.json')
         study_file_path = os.path.join(conv_dir, 'json', 'study.json')
 
         return dict(json_file_path=json_file_path,
                     assay_file_path=assay_file_path,
+                    collated_file_path=collated_file_path,
                     study_file_path=study_file_path,
                     xml_dir=conv_dir,
                     conv_dir=conv_dir,
@@ -543,12 +545,11 @@ class EnaSubmit4Reads(object):
         lg.log('Collating COPO records', level=Loglvl.INFO, type=Logtype.FILE)
 
         collated_records = cnv.ISAHelpers().broker_copo_records(submission_token=self.submission_id)
-        submission_record = Submission().get_record(self.submission_id)
-        transcript = submission_record["transcript"]
-        transcript["collated_records"] = json.dumps(collated_records, default=json_util.default)
 
-        kwargs = dict(target_id=self.submission_id, transcript=transcript)
-        Submission().save_record(dict(), **kwargs)
+        # dump generated json to output file
+        collated_file = open(self._get_output_paths()["collated_file_path"], '+w')
+        collated_file.write(json.dumps(collated_records, default=json_util.default))
+        collated_file.close()
 
         self.context["ena_status"] = "collated_records"
 
@@ -557,10 +558,9 @@ class EnaSubmit4Reads(object):
     def _get_assay_schema(self):
         lg.log('Composing Assay schema', level=Loglvl.INFO, type=Logtype.FILE)
 
-        submission_record = Submission().get_record(self.submission_id)
-
-        collated_records = submission_record["transcript"]["collated_records"]
-        collated_records = json.loads(collated_records, object_hook=json_util.object_hook)
+        # retrieve collated records and pass along
+        with open(self._get_output_paths()["collated_file_path"]) as json_file:
+            collated_records = json.load(json_file, object_hook=json_util.object_hook)
 
         assay_schema = cnv.Assay(copo_isa_records=collated_records).get_schema()
         assay_file = open(self._get_output_paths()["assay_file_path"], '+w')
@@ -576,10 +576,9 @@ class EnaSubmit4Reads(object):
     def _get_study_schema(self):
         lg.log('Composing Study schema', level=Loglvl.INFO, type=Logtype.FILE)
 
-        submission_record = Submission().get_record(self.submission_id)
-
-        collated_records = submission_record["transcript"]["collated_records"]
-        collated_records = json.loads(collated_records, object_hook=json_util.object_hook)
+        # retrieve collated records and pass along
+        with open(self._get_output_paths()["collated_file_path"]) as json_file:
+            collated_records = json.load(json_file, object_hook=json_util.object_hook)
 
         # retrieve stored assay schema and pass along
         assay_schema = d_utils.json_to_pytype(self._get_output_paths()["assay_file_path"])
@@ -601,10 +600,10 @@ class EnaSubmit4Reads(object):
         :return:
         """
         lg.log('Obtaining ISA-JSON', level=Loglvl.INFO, type=Logtype.FILE)
-        submission_record = Submission().get_record(self.submission_id)
 
-        collated_records = submission_record["transcript"]["collated_records"]
-        collated_records = json.loads(collated_records, object_hook=json_util.object_hook)
+        # retrieve collated records and pass along
+        with open(self._get_output_paths()["collated_file_path"]) as json_file:
+            collated_records = json.load(json_file, object_hook=json_util.object_hook)
 
         # retrieve stored study schema and pass along
         study_schema = d_utils.json_to_pytype(self._get_output_paths()["study_file_path"])
@@ -636,10 +635,11 @@ class EnaSubmit4Reads(object):
 
         lg.log('Converting to SRA', level=Loglvl.INFO, type=Logtype.FILE)
         sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
-        submission_record = Submission().get_record(self.submission_id)
 
-        collated_records = submission_record["transcript"]["collated_records"]
-        collated_records = json.loads(collated_records, object_hook=json_util.object_hook)
+        # retrieve collated records and pass along
+        with open(self._get_output_paths()["collated_file_path"]) as json_file:
+            collated_records = json.load(json_file, object_hook=json_util.object_hook)
+
         datafilehashes = collated_records["datafilehashes"]
 
         paths = self._get_output_paths()
@@ -923,31 +923,23 @@ class EnaSubmit4Reads(object):
     def _do_file_transfer(self):
         submission_record = Submission().get_record(self.submission_id)
 
-        # what datafiles need to be uploaded?
-        pending_files = list()
-        if "bundle_meta" in submission_record:
-            pending_files = [x["file_id"] for x in submission_record['bundle_meta'] if not x["upload_status"]]
+        # do we have files to be uploaded?
+        bundle_df = submission_record.get("bundle_meta", list())
+        pending_df = bundle_df[bundle_df['upload_status'] is False]
 
-        if pending_files:
-            # there are files to be transferred
+        if pending_df.shape[0] > 0:
             path2library = os.path.join(BASE_DIR, REPOSITORIES['ASPERA']['resource_path'])
 
             user_name = REPOSITORIES['ASPERA']['user_token']
             password = REPOSITORIES['ASPERA']['password']
 
+            # compose remote file directory
             remote_path = d_utils.get_ena_remote_path(self.submission_id)
-
-            # get each file in the bundle
-            file_path = []
-            for idx, f_id in enumerate(pending_files):
-                mongo_file = DataFile().get_record(f_id)
-                self.d_files.append(mongo_file)
-                file_path.append(mongo_file.get("file_location", str()))
 
             self._do_aspera_transfer(user_name=user_name,
                                      password=password,
                                      remote_path=remote_path,
-                                     file_path=file_path,
+                                     file_path=list(pending_df['file_path']),
                                      path2library=path2library)
         else:
             # no files to be uploaded
@@ -961,4 +953,5 @@ class EnaSubmit4Reads(object):
             RemoteDataFile().update_transfer(self.transfer_token, transfer_fields)
 
             self.context["ena_status"] = "files_transferred"
+
         return

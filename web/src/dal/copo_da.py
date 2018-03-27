@@ -182,6 +182,13 @@ class DAComponent:
 
         return cursor_to_list(self.get_collection_handle().find(doc).sort([[sort_by, sort_direction]]))
 
+    def get_all_records_columns(self, sort_by='_id', sort_direction=-1, projection=dict()):
+        doc = dict(deleted=data_utils.get_not_deleted_flag())
+        if self.profile_id:
+            doc["profile_id"] = self.profile_id
+
+        return cursor_to_list(self.get_collection_handle().find(doc, projection).sort([[sort_by, sort_direction]]))
+
     def execute_query(self, query_dict=dict()):
         if self.profile_id:
             query_dict["profile_id"] = self.profile_id
@@ -628,8 +635,6 @@ class Group(DAComponent):
             else:
                 p['selected'] = False
         return p_list
-
-
 
 
 class RemoteDataFile:

@@ -4064,4 +4064,38 @@ $(document).ready(function () {
         });
     }
 
+
+    function load_datafile_records(componentMeta) {
+    var csrftoken = $.cookie('csrftoken');
+
+    //loader
+    var tableLoader = null;
+    if ($("#component_table_loader").length) {
+        tableLoader = $('<div class="copo-i-loader"></div>');
+        $("#component_table_loader").append(tableLoader);
+    }
+
+    $.ajax({
+        url: copoVisualsURL,
+        type: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            'task': 'table_data',
+            'component': componentMeta.component
+        },
+        success: function (data) {
+            do_render_component_table(data, componentMeta);
+            //remove loader
+            if (tableLoader) {
+                tableLoader.remove();
+            }
+        },
+        error: function () {
+            alert("Couldn't retrieve " + componentMeta.component + " data!");
+        }
+    });
+}
+
 }) //end document ready

@@ -2,6 +2,7 @@ __author__ = 'tonietuk'
 
 import json
 import copy
+import pandas as pd
 from uuid import uuid4
 from django import template
 from django.urls import reverse
@@ -216,32 +217,30 @@ def generate_table_records(profile_id=str(), component=str()):
     # instantiate data access object
     da_object = DAComponent(profile_id, component)
 
-    # get records
-    records = da_object.get_all_records()
-
     # get schema
     schema = da_object.get_schema().get("schema_dict")
 
     data_set = list()
-    columns = list()
 
-    # get columns
-    for f in schema:
-        if f.get("show_in_table", True):
-            columns.append(dict(data=f["id"].split(".")[-1],
-                                title=f.get("label", str())))
+    # filter schema by columns to be displayed
+    schema = [x for x in schema if x.get("show_in_table", True)]
+
+    # build db column projection
+    projection = [(x["id"].split(".")[-1], 1) for x in schema]
+
+    # build UI table column
+    columns = [dict(data=x["id"].split(".")[-1], title=x.get("label", str())) for x in schema]
 
     # add record id column
     columns.append(dict(data="record_id"))
 
+    # retrieve records
+    records = da_object.get_all_records_columns(projection=dict(projection))
+
     # get records
     for pr in records:
-        option = dict()
-
-        for f in schema:
-            if f.get("show_in_table", True):
-                # add data
-                option[f["id"].split(".")[-1]] = resolve_control_output(pr, f)
+        option = [(x["id"].split(".")[-1], resolve_control_output(pr, x)) for x in schema]
+        option = dict(option)
 
         # add record id
         option["record_id"] = str(pr["_id"])
@@ -405,7 +404,8 @@ def generate_submission_accessions_data(submission_record):
                     for v in value:
                         if key == "sample":
                             try:
-                                data_set.append([v["sample_accession"], v["sample_alias"], v["biosample_accession"], key])
+                                data_set.append(
+                                    [v["sample_accession"], v["sample_alias"], v["biosample_accession"], key])
                             except:
                                 pass
                         else:
@@ -419,9 +419,7 @@ def generate_submission_accessions_data(submission_record):
             columns = [{"title": "Accession"}, {"title": "Alias"}, {"title": "Comment"}, {"title": "Type"}]
 
             for idx, value in enumerate(accessions):
-
                 data_set.append([value, "Figshare File: " + str(idx + 1), str(), str()])
-
 
     return_dict = dict(dataSet=data_set,
                        columns=columns,

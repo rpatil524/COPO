@@ -459,6 +459,7 @@ def get_ena_remote_path(submission_token):
     :return:
     """
     remote_path = os.path.join(submission_token, str(get_current_user()))
+
     return remote_path
 
 

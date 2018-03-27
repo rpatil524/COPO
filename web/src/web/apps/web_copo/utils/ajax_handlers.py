@@ -106,7 +106,7 @@ def get_upload_information(request):
                     current_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
                     fmt = "%d-%m-%Y %H:%M:%S"
                     tdelta = datetime.strptime(current_time, fmt) - datetime.strptime(rem['current_time'], fmt)
-                    time_threshold = 4  # acceptable threshold, after perceived inactivity,
+                    time_threshold = 15  # acceptable threshold, after perceived inactivity,
                     # for the submission to be classified as valid
                     if tdelta.seconds / 60 > time_threshold:  # i.e. elapsed time = 'time_threshold' minutes
                         sub_info_dict["active_submission"] = False
