@@ -675,17 +675,21 @@ var auto_complete = function () {
                 //console.log(response.highlighting[doc.id])
                 //console.log(doc)
                 var s;
-                s = response.highlighting[doc.id].label;
+                s = response.highlighting[doc.id].label_autosuggest[0];
                 if (s == undefined) {
                     s = response.highlighting[doc.id].synonym
                 }
                 var short_form;
+                var desc = doc.description
+                if (desc == undefined){
+                    desc = "Description Not Available"
+                }
                 if (doc.ontology_prefix == undefined) {
                     short_form = "Origin Unknown"
                 } else {
                     short_form = doc.ontology_prefix
                 }
-                li.innerHTML = '<span class="label label-info"><span title="' + short_form + '" style="color:white; padding-top:3px; padding-bottom:3px"><img style="height:15px; margin-right:10px" src="/static/copo/img/ontology.png"/>' + doc.ontology_prefix + ':' + doc.label + ' ' + '</span>' + ' - ' + '<span style="color:#fcff5e">' + doc.iri + '</span></span>';
+                li.innerHTML = '<span title="' + doc.iri + " - " + desc + '" class="ontology-label label label-info"><span class="ontology-label-text"><img src="/static/copo/img/ontology.png"/>' + doc.ontology_prefix + ' : ' + s + ' ' + '</span>' + ' - ' + '<span class="ontology-description">' + desc + '</span></span>';
 
 
                 $(li).attr('data-id', doc.id);

@@ -656,7 +656,7 @@ WIZARD_FILES = {
 ONTOLOGY_LKUPS = {
     'ontologies_to_search': 'go,co,po',
     'fields_to_search': 'label,description,short_form',
-    'ebi_ols_autocomplete': 'http://www.ebi.ac.uk/ols/api/select?q={term!s}&ontology={ontology_names!s}&rows=50&local=true&type=class&fieldList=iri,label,short_form,obo_id,ontology_name,ontology_prefix,description,type',
+    'ebi_ols_autocomplete': 'http://www.ebi.ac.uk/ols/api/select?q={term!s}&ontology={ontology_names!s}&rows=50&local=true&type=class&fieldList=iri,label,short_form,obo_id,ontology_name,ontology_prefix,description,type,id',
     'ontology_file_uri': 'http://data.bioontology.org/ontologies/'
 }
 
