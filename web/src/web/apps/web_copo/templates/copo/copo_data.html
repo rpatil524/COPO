@@ -39,8 +39,8 @@
         <input type="hidden" id="nav_component_name" value="datafile"/>
 
         <input type="hidden" id="figshare_check_creds_url" value="{% url 'rest:check_figshare_credentials' %}"/>
-        <input type="hidden" id="zipping_image" value="{% static 'copo/img/pacman.gif' %}"/>
-        <input type="hidden" id="hashing_image" value="{% static 'copo/img/pacman.gif' %}"/>
+        <input type="hidden" id="zipping_image" size="24px" value="{% static 'copo/img/ajax.gif' %}"/>
+        <input type="hidden" id="hashing_image" size="24px" value="{% static 'copo/img/ajax.gif' %}"/>
         <input type="hidden" value="{% url 'copo:copo_submissions' profile_id=profile_id %}" name="submission_url"
                id="submission_url"/>
         <input type="hidden" value="{{ cyverse_files }}" name="cyverse_file_data"
