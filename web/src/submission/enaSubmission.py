@@ -444,7 +444,7 @@ class EnaSubmit(object):
 class EnaSubmit4Reads(object):
     def __init__(self, submission_id=str(), status=str()):
         """
-        the submission module breaks tasks into smaller 'callable' chunks to deal with the gunicorn timeout issue
+        the submission module breaks tasks into smaller 'callable' chunks to deal with the timeout issue
         :param submission_id: the submission id
         :param status: the current status or stage the submission has reached
         """
@@ -489,13 +489,13 @@ class EnaSubmit4Reads(object):
             self.transfer_token = RemoteDataFile().create_transfer(self.submission_id)['_id']
 
         # get the next action in the sequence of submission tasks
-        next_stage_indx = 0
         try:
             next_stage_indx = self.submission_sequence.index(self.status)
         except:
             # no valid stage, flag error and terminate
             self.update_process_time()
             self.context["ena_status"] = "error"
+
             return self.context
 
         # check for completed stage
