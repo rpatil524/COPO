@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="adding accessions collation for dataverse">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
     </list>
@@ -164,8 +164,8 @@
       <file leaf-file-name="html_tags.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="172">
-              <caret line="450" column="38" lean-forward="true" selection-start-line="450" selection-start-column="38" selection-end-line="450" selection-end-column="38" />
+            <state relative-caret-position="247">
+              <caret line="455" column="18" lean-forward="false" selection-start-line="455" selection-start-column="18" selection-end-line="455" selection-end-column="18" />
               <folding />
             </state>
           </provider>
@@ -1685,7 +1685,14 @@
       <option name="project" value="LOCAL" />
       <updated>1524058264924</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="adding accessions collation for dataverse">
+      <created>1524066168240</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1524066168240</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1798,7 +1805,8 @@
     <MESSAGE value="adding loading spinner to ontology fields which shows when lookup to OLS is being performed." />
     <MESSAGE value="adding news item for PhenoHarmonIS" />
     <MESSAGE value="change to css of ontology field" />
-    <option name="LAST_COMMIT_MESSAGE" value="change to css of ontology field" />
+    <MESSAGE value="adding accessions collation for dataverse" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding accessions collation for dataverse" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2286,8 +2294,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="172">
-          <caret line="450" column="38" lean-forward="true" selection-start-line="450" selection-start-column="38" selection-end-line="450" selection-end-column="38" />
+        <state relative-caret-position="247">
+          <caret line="455" column="18" lean-forward="false" selection-start-line="455" selection-start-column="18" selection-end-line="455" selection-end-column="18" />
           <folding />
         </state>
       </provider>
