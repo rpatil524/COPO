@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" afterPath="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -113,6 +113,26 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="143">
+              <caret line="192" column="77" lean-forward="false" selection-start-line="192" selection-start-column="77" selection-end-line="192" selection-end-column="77" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="broker_da.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/dal/broker_da.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="203">
+              <caret line="265" column="73" lean-forward="false" selection-start-line="265" selection-start-column="73" selection-end-line="265" selection-end-column="73" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="generic_handlers.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js">
           <provider selected="true" editor-type-id="text-editor">
@@ -141,21 +161,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="copo_data.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_data.html">
+      <file leaf-file-name="html_tags.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="405">
-              <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ena_study.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/ena_study.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1425">
-              <caret line="95" column="32" lean-forward="false" selection-start-line="95" selection-start-column="32" selection-end-line="95" selection-end-column="32" />
+            <state relative-caret-position="172">
+              <caret line="450" column="38" lean-forward="true" selection-start-line="450" selection-start-column="38" selection-end-line="450" selection-end-column="38" />
               <folding />
             </state>
           </provider>
@@ -180,11 +190,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="style.css" pinned="false" current-in-tab="true">
+      <file leaf-file-name="style.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/css/copo/style.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="111">
-              <caret line="1254" column="17" lean-forward="false" selection-start-line="1254" selection-start-column="17" selection-end-line="1254" selection-end-column="17" />
+            <state relative-caret-position="216">
+              <caret line="1261" column="25" lean-forward="true" selection-start-line="1261" selection-start-column="25" selection-end-line="1261" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="base.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/web/settings/base.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="234">
+              <caret line="183" column="51" lean-forward="false" selection-start-line="183" selection-start-column="25" selection-end-line="183" selection-end-column="51" />
               <folding />
             </state>
           </provider>
@@ -210,30 +230,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="enaSubmission.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="9630">
-              <caret line="642" column="42" lean-forward="false" selection-start-line="642" selection-start-column="42" selection-end-line="642" selection-end-column="42" />
-              <folding>
-                <element signature="e#51#62#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="copo_base_da.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/dal/copo_base_da.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="39" lean-forward="false" selection-start-line="14" selection-start-column="39" selection-end-line="14" selection-end-column="39" />
-              <folding>
-                <element signature="e#28#53#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -248,10 +244,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>table</find>
-      <find>upload</find>
-      <find>select files</find>
-      <find>generatedSamples</find>
       <find>save_generated_samples</find>
       <find>val</find>
       <find>initial_sample_attributes</find>
@@ -276,8 +268,12 @@
       <find>autocomplete</find>
       <find>pacman</find>
       <find>auto</find>
-      <find>autpm</find>
       <find>style=&quot;text-decoration: underline; color:white !important; font-size: xx-large !important; font-weight: bolder !important&quot;</find>
+      <find>dataverse</find>
+      <find>autpm</find>
+      <find>Submission().</find>
+      <find>submission_control</find>
+      <find>get_submission_accessions</find>
     </findStrings>
     <replaceStrings>
       <replace>context-help-ctrl</replace>
@@ -308,7 +304,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/tests.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/docs_urls.py" />
         <option value="$PROJECT_DIR$/web/src/api/urls.py" />
         <option value="$PROJECT_DIR$/web/src/web/urls.py" />
@@ -359,6 +354,7 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/web/src/web/landing/index.html" />
         <option value="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
       </list>
     </option>
   </component>
@@ -1682,7 +1678,14 @@
       <option name="project" value="LOCAL" />
       <updated>1524052973448</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="change to css of ontology field">
+      <created>1524058264924</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1524058264924</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1794,7 +1797,8 @@
     <MESSAGE value="changes to ols display" />
     <MESSAGE value="adding loading spinner to ontology fields which shows when lookup to OLS is being performed." />
     <MESSAGE value="adding news item for PhenoHarmonIS" />
-    <option name="LAST_COMMIT_MESSAGE" value="adding news item for PhenoHarmonIS" />
+    <MESSAGE value="change to css of ontology field" />
+    <option name="LAST_COMMIT_MESSAGE" value="change to css of ontology field" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1815,7 +1819,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="594" />
+      <option name="time" value="596" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Python.DjangoServer">
@@ -1848,14 +1852,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_sample.js" />
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/semantic_ui/icon.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="404">
-          <caret line="3316" column="0" lean-forward="false" selection-start-line="3316" selection-start-column="0" selection-end-line="3316" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/semantic_ui/semantic.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="404">
@@ -1974,6 +1970,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1498">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#25#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1981,6 +1980,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1589">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -2006,6 +2006,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1740">
           <caret line="125" column="0" lean-forward="false" selection-start-line="125" selection-start-column="0" selection-end-line="125" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -2013,6 +2014,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
           <caret line="34" column="0" lean-forward="false" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -2027,6 +2029,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="525">
           <caret line="39" column="8" lean-forward="false" selection-start-line="39" selection-start-column="8" selection-end-line="39" selection-end-column="8" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -2034,6 +2037,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="6360">
           <caret line="437" column="0" lean-forward="false" selection-start-line="437" selection-start-column="0" selection-end-line="437" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -2045,21 +2049,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2820">
-          <caret line="199" column="41" lean-forward="false" selection-start-line="199" selection-start-column="41" selection-end-line="199" selection-end-column="41" />
-          <folding>
-            <marker date="1524058239125" expanded="true" signature="11968:13366" ph="..." />
-            <marker date="1524058239125" expanded="true" signature="12015:12397" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="8490">
           <caret line="566" column="45" lean-forward="false" selection-start-line="566" selection-start-column="33" selection-end-line="566" selection-end-column="45" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -2093,16 +2087,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="349">
-          <caret line="365" column="59" lean-forward="false" selection-start-line="365" selection-start-column="59" selection-end-line="365" selection-end-column="59" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers_ext2.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
@@ -2130,6 +2114,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="235">
           <caret line="658" column="221" lean-forward="false" selection-start-line="658" selection-start-column="221" selection-end-line="658" selection-end-column="221" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -2269,8 +2254,40 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/css/copo/style.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="111">
-          <caret line="1254" column="17" lean-forward="false" selection-start-line="1254" selection-start-column="17" selection-end-line="1254" selection-end-column="17" />
+        <state relative-caret-position="216">
+          <caret line="1261" column="25" lean-forward="true" selection-start-line="1261" selection-start-column="25" selection-end-line="1261" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/settings/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="183" column="51" lean-forward="false" selection-start-line="183" selection-start-column="25" selection-end-line="183" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="143">
+          <caret line="192" column="77" lean-forward="false" selection-start-line="192" selection-start-column="77" selection-end-line="192" selection-end-column="77" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/dal/broker_da.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="265" column="73" lean-forward="false" selection-start-line="265" selection-start-column="73" selection-end-line="265" selection-end-column="73" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="172">
+          <caret line="450" column="38" lean-forward="true" selection-start-line="450" selection-start-column="38" selection-end-line="450" selection-end-column="38" />
           <folding />
         </state>
       </provider>
