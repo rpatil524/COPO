@@ -440,7 +440,6 @@ div[class*=" col-"] {
     font-size: 13px;
 }
 
-
 /*modal4*/
 .copo-modal4 > .modal-dialog {
     width: 70%;
@@ -455,7 +454,6 @@ div[class*=" col-"] {
     line-height: 1.7;
     font-size: 13px;
 }
-
 
 .input-copo {
     height: 30px !important;
@@ -1253,6 +1251,8 @@ input.date-picker {
 
 .autocomplete {
     z-index: 10;
+    margin-left: -170px;
+    margin-top: 30px
 }
 
 input[data-autocomplete] {
@@ -1564,14 +1564,38 @@ div.shown span.side-help-trigger:before {
     }
 }
 
-
 /*semantic ui button styling override*/
 .ui.tiny.buttons .button,
 .ui.tiny.buttons .or,
 .ui.tiny.button {
-  font-size: 11px; !important;
+    font-size: 11px;
+!important;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button {
     padding: 15px !important;
+}
+
+.ontology-label {
+    font-weight: normal;
+    max-width: 400px
+}
+
+.ontology-label img {
+    height: 15px;
+    margin-right: 10px
+}
+
+.ontology-label-text {
+    color: white;
+    padding-top: 3px;
+    padding-bottom: 3px
+}
+
+.ontology-label-text b{
+    color: white;
+}
+
+.ontology-description {
+    color: #415156
 }

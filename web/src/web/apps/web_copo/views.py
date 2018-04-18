@@ -419,7 +419,7 @@ def import_ena_accession(request):
             output.append(eimp.do_import_ena_accession(acc))
         return HttpResponse(output)
 
-
+@login_required()
 def view_groups(request):
     #g = Group().create_group(description="test descrition")
     profile_list = cursor_to_list(Profile().get_for_user())

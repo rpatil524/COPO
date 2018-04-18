@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="" />
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/web/src/dal/broker_da.py" afterPath="$PROJECT_DIR$/web/src/dal/broker_da.py" />
+      <change beforePath="$PROJECT_DIR$/web/src/dal/copo_da.py" afterPath="$PROJECT_DIR$/web/src/dal/copo_da.py" />
+      <change beforePath="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" afterPath="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" />
+      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
+      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_group.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_group.js" />
+      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" />
+      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/index.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/index.js" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_data.html" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_data.html" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_group.html" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_group.html" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/ena_study.html" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/ena_study.html" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/index.html" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/index.html" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/landing/index.html" afterPath="$PROJECT_DIR$/web/src/web/landing/index.html" />
+    </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -67,7 +88,7 @@
       <file leaf-file-name="enaSubmission.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-928">
+            <state relative-caret-position="15">
               <caret line="492" column="27" lean-forward="false" selection-start-line="492" selection-start-column="12" selection-end-line="492" selection-end-column="27" />
               <folding>
                 <element signature="e#51#62#0" expanded="true" />
@@ -98,7 +119,7 @@
       <file leaf-file-name="generic_handlers_ext2.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers_ext2.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="252">
+            <state relative-caret-position="1905">
               <caret line="289" column="30" lean-forward="false" selection-start-line="289" selection-start-column="30" selection-end-line="289" selection-end-column="30" />
               <folding>
                 <marker date="1524054600708" expanded="true" signature="6314:6330" ph="..." />
@@ -111,7 +132,7 @@
       <file leaf-file-name="copo_isa_ena.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="19320">
+            <state relative-caret-position="2370">
               <caret line="1288" column="8" lean-forward="false" selection-start-line="1288" selection-start-column="8" selection-end-line="1288" selection-end-column="8" />
               <folding>
                 <element signature="e#22#31#0" expanded="true" />
@@ -343,11 +364,11 @@
   <component name="NodeModulesDirectoryManager">
     <handled-path value="$PROJECT_DIR$/web/src/static/copo/annotator-2.0.0-alpha.3/node_modules" />
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-1776" />
-    <option name="y" value="-81" />
-    <option name="width" value="1440" />
-    <option name="height" value="829" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-1900" />
+    <option name="y" value="-93" />
+    <option name="width" value="1853" />
+    <option name="height" value="1026" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -1525,22 +1546,22 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1920" y="-94" width="1920" height="1057" extended-state="6" />
+    <frame x="-1900" y="-93" width="1853" height="1026" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.42276424" sideWeight="0.2825465" order="9" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32885906" sideWeight="0.49767134" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32885906" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32885906" sideWeight="0.49767134" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32880434" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1656017" sideWeight="0.49182117" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1490889" sideWeight="0.49182117" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25181347" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="SciView" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3297568" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.13045794" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1939834" sideWeight="0.7174535" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12552084" sideWeight="0.50817883" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1939834" sideWeight="0.7174535" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -2006,7 +2027,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers_ext2.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
+        <state relative-caret-position="1905">
           <caret line="289" column="30" lean-forward="false" selection-start-line="289" selection-start-column="30" selection-end-line="289" selection-end-column="30" />
           <folding>
             <marker date="1524054600708" expanded="true" signature="6314:6330" ph="..." />
@@ -2017,7 +2038,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19320">
+        <state relative-caret-position="2370">
           <caret line="1288" column="8" lean-forward="false" selection-start-line="1288" selection-start-column="8" selection-end-line="1288" selection-end-column="8" />
           <folding>
             <element signature="e#22#31#0" expanded="true" />
@@ -2106,7 +2127,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-928">
+        <state relative-caret-position="15">
           <caret line="492" column="27" lean-forward="false" selection-start-line="492" selection-start-column="12" selection-end-line="492" selection-end-column="27" />
           <folding>
             <element signature="e#51#62#0" expanded="true" />

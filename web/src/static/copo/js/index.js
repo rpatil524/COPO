@@ -68,7 +68,7 @@ $(document).ready(function () {
 
             //get title
             var title = '';
-            var result = $.grep(data, function (e) {
+            result = $.grep(data, function (e) {
                 return e.key == "title";
             });
 
@@ -76,9 +76,19 @@ $(document).ready(function () {
                 title = result[0].data;
             }
 
+            //get shared
+            var shared = false
+            result = $.grep(data, function (e) {
+                return e.key == "shared_profile";
+            });
+            if (result.length) {
+                shared = result[0].data;
+            }
+
+
             //get description
             var description = '';
-            var result = $.grep(data, function (e) {
+            result = $.grep(data, function (e) {
                 return e.key == "description";
             });
 
@@ -88,7 +98,7 @@ $(document).ready(function () {
 
             //get date
             var profile_date = '';
-            var result = $.grep(data, function (e) {
+            result = $.grep(data, function (e) {
                 return e.key == "date_created";
             });
 
@@ -102,6 +112,7 @@ $(document).ready(function () {
                 option["description"] = description;
                 option["profile_date"] = profile_date;
                 option["record_id"] = record_id;
+                option["shared"] = shared
                 dataSet.push(option);
             }
         }
@@ -170,8 +181,13 @@ $(document).ready(function () {
                                 .addClass("copo-records-panel");
 
                             //set heading
-                            renderHTML.find(".panel-heading").find(".row-title").html('<span>' + data.title + '</span>');
-
+                            if (!data.shared) {
+                                renderHTML.find(".panel-heading").find(".row-title").html('<span style="font-weight: bolder">' + data.title + '</span>');
+                            }
+                            else{
+                                renderHTML.find(".panel-heading").find(".row-title").html('<span style="">' + data.title + '&nbsp<small>(Shared With Me)</small></span>');
+                                renderHTML.find(".panel-heading").css("background-color", "#007eff")
+                            }
                             //set body
                             var bodyRow = $('<div class="row"></div>');
 
@@ -205,6 +221,10 @@ $(document).ready(function () {
                     },
                     {
                         "data": "record_id",
+                        "visible": false
+                    },
+                    {
+                        "data": "shared",
                         "visible": false
                     }
                 ],
@@ -315,6 +335,7 @@ $(document).ready(function () {
     }
 
     function update_counts() {
+        console.log()
         $.ajax({
             url: copoVisualsURL,
             type: "POST",

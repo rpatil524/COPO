@@ -30,6 +30,12 @@ $(document).ready(function () {
     //add event for ontology field change
     ontology_value_change();
 
+
+    $(document).ajaxComplete(function () {
+        console.log("Triggered ajaxComplete handler.")
+    });
+
+
 });
 
 function setup_autocomplete() {
@@ -623,6 +629,7 @@ function refresh_multisearch() {
 
 
 var auto_complete = function () {
+
     // remove all previous autocomplete divs
     $('.autocomplete').remove()
     AutoComplete({
@@ -631,7 +638,15 @@ var auto_complete = function () {
         _Select: do_select,
         _Render: do_post,
         _Position: do_position,
+        _Pre: do_pre,
     }, '.ontology-field')
+
+    function do_pre(){
+        // make loading spinner visible before request to OLS
+        $(this.Input).siblings(".input-group-addon").css("visibility", "visible")
+        // we can also make changes to the value sent OLS here if needs be
+        return this.Input.value;
+    }
 
     function do_select(item) {
         if ($(document).data('annotator_type') == 'txt') {
@@ -675,17 +690,21 @@ var auto_complete = function () {
                 //console.log(response.highlighting[doc.id])
                 //console.log(doc)
                 var s;
-                s = response.highlighting[doc.id].label;
+                s = response.highlighting[doc.id].label_autosuggest[0];
                 if (s == undefined) {
                     s = response.highlighting[doc.id].synonym
                 }
                 var short_form;
+                var desc = doc.description
+                if (desc == undefined) {
+                    desc = "Description Not Available"
+                }
                 if (doc.ontology_prefix == undefined) {
                     short_form = "Origin Unknown"
                 } else {
                     short_form = doc.ontology_prefix
                 }
-                li.innerHTML = '<span class="label label-info"><span title="' + short_form + '" style="color:white; padding-top:3px; padding-bottom:3px"><img style="height:15px; margin-right:10px" src="/static/copo/img/ontology.png"/>' + doc.ontology_prefix + ':' + doc.label + ' ' + '</span>' + ' - ' + '<span style="color:#fcff5e">' + doc.iri + '</span></span>';
+                li.innerHTML = '<span title="' + doc.iri + " - " + desc + '" class="ontology-label label label-info"><span class="ontology-label-text"><img src="/static/copo/img/ontology.png"/>' + doc.ontology_prefix + ' : ' + s + ' ' + '</span>' + ' - ' + '<span class="ontology-description">' + desc + '</span></span>';
 
 
                 $(li).attr('data-id', doc.id);
@@ -714,6 +733,7 @@ var auto_complete = function () {
         }
         $(this.DOMResults).empty()
         this.DOMResults.append(ul)
+        $(this.Input).siblings(".input-group-addon").css("visibility", "hidden")
     }
 
 } //end of function
@@ -1233,6 +1253,7 @@ function get_profile_components() {
             buttons: ["quick-tour-template", "new-component-template"],
             sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
             tableID: 'copo_profiles_table',
+            secondaryTableID: 'copo_shared_profiles_table',
             visibleColumns: 3,
             recordActions: ["add_record_all", "edit_record_single"] //specifies action buttons for records manipulation
         },

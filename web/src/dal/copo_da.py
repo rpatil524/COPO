@@ -10,6 +10,7 @@ from dal.copo_base_da import DataSchemas
 from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
+from django.contrib.auth.models import User
 
 PubCollection = 'PublicationCollection'
 PersonCollection = 'PersonCollection'
@@ -46,7 +47,6 @@ class ProfileInfo:
         Sample and Submission objects in the given profile
         :return: Dictionary containing the data
         """
-
         num_dict = dict(num_pub="publication",
                         num_person="person",
                         num_data="datafile",
@@ -541,10 +541,15 @@ class Profile(DAComponent):
     def __init__(self, profile=None):
         super(Profile, self).__init__(None, "profile")
 
+    def get_all_profiles(self, user=None):
+        mine = list(self.get_for_user(user))
+        shared = list(self.get_shared_for_user(user))
+        return shared + mine
+
+
     def get_for_user(self, user=None):
         if not user:
             user = data_utils.get_current_user().id
-
         docs = self.get_collection_handle().find({"user_id": user, "deleted": data_utils.get_not_deleted_flag()}).sort(
             [['_id', -1]])
 
@@ -552,6 +557,30 @@ class Profile(DAComponent):
             return docs
         else:
             return None
+
+    def get_shared_for_user(self, user=None):
+        # get profiles shared with user
+        if not user:
+            user = data_utils.get_current_user().id
+        groups = Group().Group.find({'member_ids': str(user)})
+
+        p_list = list()
+        for g in groups:
+            gp = dict(g)
+            p_list.extend(gp['shared_profile_ids'])
+        # remove duplicates
+        # p_list = list(set(p_list))
+        docs = self.get_collection_handle().find(
+            {
+                "_id": {"$in": p_list},
+                "deleted": data_utils.get_not_deleted_flag()
+            }
+        )
+        out = list(docs)
+        for d in out:
+            d['shared'] = True
+
+        return out
 
     def save_record(self, auto_fields=dict(), **kwargs):
         if not kwargs.get("target_id", str()):
@@ -635,6 +664,28 @@ class Group(DAComponent):
             else:
                 p['selected'] = False
         return p_list
+
+    def get_users_for_group_info(self, group_id):
+        group = Group().get_record(ObjectId(group_id))
+        member_ids = group['member_ids']
+        user_list = list()
+        for u in member_ids:
+            usr = User.objects.get(pk=u)
+            x = {'id': usr.id, 'first_name': usr.first_name, 'last_name': usr.last_name, 'email': usr.email,
+                 'username': usr.username}
+            user_list.append(x)
+        return user_list
+
+    def add_user_to_group(self, group_id, user_id):
+        return self.Group.update(
+            {'_id': ObjectId(group_id)},
+            {'$push': {'member_ids': user_id}})
+
+    def remove_user_from_group(self, group_id, user_id):
+        return self.Group.update(
+            {'_id': ObjectId(group_id)},
+            {'$pull': {'member_ids': user_id}}
+        )
 
 
 class RemoteDataFile:

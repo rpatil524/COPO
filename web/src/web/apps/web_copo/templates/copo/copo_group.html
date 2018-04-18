@@ -33,9 +33,23 @@
             color: black;
         }
 
-        .autocomplete{
+        .autocomplete {
             margin-top: 40px;
             min-width: 200px;
+        }
+
+        #users_table {
+            width: 300px;
+            margin-top: 40px;
+        }
+
+        .delete_cell {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .saving_status {
+            margin-right: 25px
         }
 
     </style>
@@ -61,10 +75,13 @@
 
 {% block page_tile %}
     <div class="row">
-
-        <div class="page-title-custom" style="margin-left:10px;">Groups</div>
+        <div class="page-title-custom" style="margin-left:10px;">Groups
+            <span class="pull-right saving_status">
+                <span class="lead label label-default">Accessing</span>
+                <img height="20px" src="{% static "copo/img/ajax.gif" %}"/>
+            </span>
+        </div>
     </div>
-
 {% endblock page_tile %}
 
 
@@ -104,11 +121,22 @@
 
         <div class="col-lg-6 col-md-6 col-sm-6">
             <p class="lead">Users in Group</p>
-            <label for="basic-url">Search for Users</label>
+            <label for="basic-url">Search for User
+                <small>(Firstname, Lastname or Username)</small>
+            </label>
             <div class="input-group">
-                <span class="input-group-addon" id="basic-addon3">Firstname, Lastname or Username</span>
-                <input type="text" class="form-control user_search_field" id="basic-url" aria-describedby="basic-addon3">
+                <span class="input-group-addon" id="basic-addon3"><i class="fa fa-user"></i></span>
+                <input type="text" class="form-control user_search_field" id="basic-url"
+                       aria-describedby="basic-addon3">
             </div>
+
+            <table class="table" id="users_table">
+                <tbody class=".table-hover">
+                <tr>
+
+                </tr>
+                </tbody>
+            </table>
         </div>
 
     </div>
