@@ -924,10 +924,14 @@ class EnaSubmit4Reads(object):
         submission_record = Submission().get_record(self.submission_id)
 
         # do we have files to be uploaded?
-        bundle_df = submission_record.get("bundle_meta", list())
-        pending_df = bundle_df[bundle_df['upload_status'] is False]
+        bundle_df = pd.DataFrame(submission_record.get("bundle_meta", list()))
 
-        if pending_df.shape[0] > 0:
+        if len(bundle_df) == 0:  # insufficient information to proceed - no bundle meta
+            return
+
+        pending_df = bundle_df[bundle_df['upload_status'] == False]
+
+        if len(pending_df) > 0:
             path2library = os.path.join(BASE_DIR, REPOSITORIES['ASPERA']['resource_path'])
 
             user_name = REPOSITORIES['ASPERA']['user_token']
