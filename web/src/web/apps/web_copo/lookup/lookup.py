@@ -406,35 +406,28 @@ DROP_DOWNS = {
         },
         {
             'value': 'ena-asm',
-            'label': 'European Nucleotide Archive (Sequence Assemblies)'
+            'label': 'ENA - Assemblies',
+            'description': 'This repository option defines metadata for submission of <strong>sequence assemblies</strong> to the European Nucleotide Archive (Sequence Reads)'
         },
         {
             'value': 'ena-ant',
-            'label': 'European Nucleotide Archive (Sequence Annotations).'
+            'label': 'ENA - Annotations',
+            'description': 'This repository option defines metadata for submission of <strong>assembly annotations</strong> to the European Nucleotide Archive (Sequence Reads) and is currently <strong>NOT SUPPORTED</strong> though COPO.'
         },
-        # {
-        #     'value': 'ena-ant',
-        #     'label': 'ENA - Sequence Annotations',
-        #     'description': 'This repository option defines metadata for submission of <strong>sequence annotations</strong> to the European Nucleotide Archive (ENA).'
-        # },
-        # {
-        #     'value': 'ena-asm',
-        #     'label': 'ENA - Sequence Assemblies',
-        #     'description': 'This repository option defines metadata for submission of <strong>sequence assemblies</strong> to the European Nucleotide Archive (ENA).'
-        # },
         {
             'value': 'figshare',
             'label': 'Figshare',
-            'description': 'Figshare accepts many file formats, and can be used to submit file types including PDFs, image, audio, and video files.'
+            'description': 'Figshare accepts many file formats, and can be used to submit file types including <strong>PDFs, image, audio, and video files</stong>.'
         },
         {
             'value': 'miappe',
             'label': 'MIAPPE Compliant',
-            'description': 'MIAPPE is a Minimum Information (MI) standard for plant phenotyping. This repository option defines a list of attributes for describing a phenotyping experiment.'
+            'description': '<strong>MIAPPE</strong> is a Minimum Information (MI) standard for plant phenotyping. This repository option defines a list of attributes for describing a phenotyping experiment.'
         },
         {
             'value': 'dcterms',
-            'label': 'Dataverse'
+            'label': 'Dataverse',
+            'description': 'This option is for labelling data using the <strong>Dublin Core</strong> standard, compatible with Dataverse instances.'
         }
         # {
         #     'value': 'MetaboLights',
