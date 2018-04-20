@@ -8,7 +8,8 @@ import os
 import pexpect
 import datetime
 import uuid
-from pandas import read_excel, read_csv
+import pandas
+from pandas import read_excel, read_csv, to_datetime
 from numpy import NaN
 import json
 
@@ -72,10 +73,12 @@ def handle_upload(request):
         # load spreadsheet data and return to backend
         s = read_excel(f, skiprows=int(skip_rows))
         s = s.replace(NaN, "")
+        s.replace(pandas.Timestamp, datetime)
         raw = list()
         raw.append(s.columns.tolist())
         raw.extend(s.values.tolist())
-        raw = json.dumps(raw)
+        jraw = j.dumps(raw)
+        raw = jraw
 
     elif file_type == "PDF Document":
         save_name = os.path.join(settings.MEDIA_ROOT, str(uuid.uuid4()))
