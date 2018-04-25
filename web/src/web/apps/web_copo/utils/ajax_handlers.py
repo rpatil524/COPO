@@ -296,3 +296,8 @@ def remove_user_from_group(request):
     user_id = request.GET['user_id']
     grp_info = Group().remove_user_from_group(group_id=group_id, user_id=user_id)
     return HttpResponse(json_util.dumps({'resp': grp_info}))
+
+def get_ontologies(request):
+    resp = requests.get('http://www.ebi.ac.uk/ols/api/ontologies?size=5000&sort=ontologyId')
+    data = json_util.dumps(json_util.loads(resp.content.decode('utf-8'))['_embedded']['ontologies'])
+    return HttpResponse(data)

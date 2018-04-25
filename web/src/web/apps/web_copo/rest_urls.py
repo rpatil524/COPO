@@ -42,5 +42,6 @@ urlpatterns = [
     path('test_sword/', su.test_module, name='test_module'),
     path('call_get_dataset_details/', ajax.get_dataset_details, name='call_get_dataset_details'),
     path('samples_from_study/', ajax.get_samples_for_study, name='get_samples_for_study'),
-    path('get_users/', ajax.get_users, name='get_users')
+    path('get_users/', ajax.get_users, name='get_users'),
+    path('get_ontologies/', ajax.get_ontologies, name='get_ontologies')
 ]

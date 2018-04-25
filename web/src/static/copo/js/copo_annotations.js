@@ -133,6 +133,12 @@ $(document).ready(function () {
             }
         }
     }
+
+    $(document).on('click', '#export_ss_annotation', function(e){
+        $('#export_ss_annotation').html("Saved")
+        $('#export_ss_annotation').addClass("disabled")
+    })
+
 })// end document ready
 
 // global variable for selected cell
@@ -328,6 +334,8 @@ function append_to_annotation_list(item) {
         // add div to panel showing annotation
         line_data.id.$oid = d
         add_line_to_annotation_table(line_data)
+        $('#export_ss_annotation').html("Save")
+        $('#export_ss_annotation').removeClass("disabled")
     })
 }
 

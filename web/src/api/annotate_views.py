@@ -73,7 +73,13 @@ def handle_upload(request):
         # load spreadsheet data and return to backend
         s = read_excel(f, skiprows=int(skip_rows))
         s = s.replace(NaN, "")
-        s.replace(pandas.Timestamp, datetime)
+        for column in s.iteritems():
+            # check data type
+            dt = column[1].dtype
+            if str(dt).startswith('datetime'):
+                # we are dealing with date objects
+                s[column[0]] = s[column[0]].astype(str)
+
         raw = list()
         raw.append(s.columns.tolist())
         raw.extend(s.values.tolist())

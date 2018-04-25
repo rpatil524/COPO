@@ -14,7 +14,7 @@ decorator==4.1.2
 deepdiff==3.3.0
 defusedxml==0.4.1
 dict.sorted==1.0.0
-Django==2.0.2
+Django==2
 -e git://github.com/pennersr/django-allauth.git@14377cb7756f074a3b090c8fb534ae43acfe1a21#egg=django_allauth
 django-appconf==1.0.2
 django-chunked-upload==1.1.3

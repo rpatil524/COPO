@@ -8,19 +8,24 @@ $(document).ready(function () {
 
     $(document).on('click', '#ontology_dropdown_filter li', handle_ontology_filter_click)
 
+    $.ajaxStart(function(){
+        $('#annotation_loader').css('visibility', 'visible')
+    })
+    $.ajaxStop(function(){
+        $('#annotation_loader').css('visibility', 'hidden')
+    })
+
 })
 
 
 function get_ontologies_for_filter() {
     // this function will query OLS for a list of current ontologies to populate the dropdown control on a page needing filtering of ontologies
     $.ajax({
-
-        url: 'http://www.ebi.ac.uk/ols/api/ontologies?size=5000',
-        dataType: 'json',
-        method: 'GET'
-
+        url: '/rest/get_ontologies/',
+        method: 'GET',
+        dataType: 'json'
     }).done(function (d) {
-        $(d._embedded.ontologies).each(function (idx, data) {
+        $(d).each(function (idx, data) {
 
             var anchor = $('<a></a>')
             var list_item = $('<li/>',
@@ -45,6 +50,8 @@ function get_ontologies_for_filter() {
             $('#ontology_dropdown_filter').append(anchor)
 
         })
+    }).error(function(msg){
+        console.log("HERE WE GOO")
     })
 }
 
