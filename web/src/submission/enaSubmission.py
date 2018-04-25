@@ -19,7 +19,9 @@ import xml.etree.ElementTree as ET
 from isatools.convert import json2sra
 from isatools import isajson
 
-import subprocess, os, pexpect
+import subprocess
+import os
+import pexpect
 
 from datetime import datetime
 
@@ -283,8 +285,6 @@ class EnaSubmit(object):
         experiment_file = os.path.join(xml_dir, 'experiment_set.xml')
         run_file = os.path.join(xml_dir, 'run_set.xml')
 
-        # "https://www-test.ebi.ac.uk"
-        # "https://www.ebi.ac.uk"
         pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
         user_token = resolve_env.get_env('WEBIN_USER')
         ena_service = resolve_env.get_env('ENA_SERVICE')
@@ -448,9 +448,15 @@ class EnaSubmit4Reads(object):
         :param submission_id: the submission id
         :param status: the current status or stage the submission has reached
         """
-        self._dir = os.path.join(os.path.dirname(__file__), "data")
         self.submission_id = submission_id
+        self._dir = os.path.join(os.path.dirname(__file__), "data")
+        self.conv_dir = os.path.join(self._dir, self.submission_id)
+        self.json_path = os.path.join(self.conv_dir, 'json')  # holds conversion schemas
+        self.xml_path = os.path.join(self.conv_dir, 'xml')  # holds generated SRAs
         self.transfer_token = str()
+        self.collated_records = dict()  # holds information about relevant records to be converted
+        self.assay_schema = dict()  # resolved assay schema
+        self.study_schema = dict()  # resolved study schema
         self.context = dict()
         self.status = status  # status or the execution stage the submission has reached
         self.dispatcher = {
@@ -480,11 +486,17 @@ class EnaSubmit4Reads(object):
 
             return
 
+        # create conversion directories
+        if not os.path.exists(self.json_path):
+            os.makedirs(self.json_path)
+
+        if not os.path.exists(self.xml_path):
+            os.makedirs(self.xml_path)
+
         # if there is an existing transfer token, reuse it
-        rem = RemoteDataFile().get_by_sub_id(self.submission_id)
-        if rem:
-            self.transfer_token = str(rem["_id"])
-        else:
+        try:
+            self.transfer_token = str(RemoteDataFile().get_by_sub_id(self.submission_id)["_id"])
+        except:
             # create a transfer record
             self.transfer_token = RemoteDataFile().create_transfer(self.submission_id)['_id']
 
@@ -505,6 +517,7 @@ class EnaSubmit4Reads(object):
             self.dispatcher[self.submission_sequence[next_stage_indx]]()  # dispatch the next task
 
         self.update_process_time()
+
         return self.context
 
     def update_process_time(self):
@@ -517,79 +530,51 @@ class EnaSubmit4Reads(object):
             # save error to transfer record
             RemoteDataFile().update_transfer(self.transfer_token, transfer_fields)
 
-    def _get_output_paths(self):
-        # setup paths for conversion directories
-        conv_dir = os.path.join(self._dir, self.submission_id)
-        if not os.path.exists(os.path.join(conv_dir, 'json')):
-            os.makedirs(os.path.join(conv_dir, 'json'))
-        json_file_path = os.path.join(conv_dir, 'json', 'isa_json.json')
-        collated_file_path = os.path.join(conv_dir, 'json', 'collated.json')
-        assay_file_path = os.path.join(conv_dir, 'json', 'assay.json')
-        study_file_path = os.path.join(conv_dir, 'json', 'study.json')
-
-        return dict(json_file_path=json_file_path,
-                    assay_file_path=assay_file_path,
-                    collated_file_path=collated_file_path,
-                    study_file_path=study_file_path,
-                    xml_dir=conv_dir,
-                    conv_dir=conv_dir,
-                    remote_path=d_utils.get_ena_remote_path(self.submission_id)
-                    )
-
     def _do_collate_copo_records(self):
         """
-        collates relevant copo records to be used in deriving the submission components
+        collates relevant copo records to be used in deriving the submission schema
         :return:
         """
 
         lg.log('Collating COPO records', level=Loglvl.INFO, type=Logtype.FILE)
 
-        collated_records = cnv.ISAHelpers().broker_copo_records(submission_token=self.submission_id)
-
-        # dump generated json to output file
-        collated_file = open(self._get_output_paths()["collated_file_path"], '+w')
-        collated_file.write(json.dumps(collated_records, default=json_util.default))
-        collated_file.close()
-
+        self.collated_records = cnv.ISAHelpers().broker_copo_records(submission_token=self.submission_id)
         self.context["ena_status"] = "collated_records"
+
+        new_sequence = self.submission_sequence[self.submission_sequence.index(self.context["ena_status"]):]
+
+        for nseq in new_sequence:
+            self.dispatcher[nseq]()  # dispatch the next task
+            task_status = self.context["ena_status"]
+            self.update_process_time()
+
+            if task_status in ["completed", "error"]:
+                break
 
         return
 
     def _get_assay_schema(self):
+        """
+        compose the assay schema based on collated records
+        :return:
+        """
+
         lg.log('Composing Assay schema', level=Loglvl.INFO, type=Logtype.FILE)
 
-        # retrieve collated records and pass along
-        with open(self._get_output_paths()["collated_file_path"]) as json_file:
-            collated_records = json.load(json_file, object_hook=json_util.object_hook)
-
-        assay_schema = cnv.Assay(copo_isa_records=collated_records).get_schema()
-        assay_file = open(self._get_output_paths()["assay_file_path"], '+w')
-
-        # dump generated json to output file
-        assay_file.write(dumps(assay_schema))
-        assay_file.close()
-
+        self.assay_schema = cnv.Assay(copo_isa_records=self.collated_records).get_schema()
         self.context["ena_status"] = "generated_assay_schema"
 
         return
 
     def _get_study_schema(self):
+        """
+        compose study schema based on collated records and assay schema
+        :return:
+        """
         lg.log('Composing Study schema', level=Loglvl.INFO, type=Logtype.FILE)
 
-        # retrieve collated records and pass along
-        with open(self._get_output_paths()["collated_file_path"]) as json_file:
-            collated_records = json.load(json_file, object_hook=json_util.object_hook)
-
-        # retrieve stored assay schema and pass along
-        assay_schema = d_utils.json_to_pytype(self._get_output_paths()["assay_file_path"])
-
-        study_schema = cnv.Study(copo_isa_records=collated_records, assay_schema=assay_schema).get_schema()
-        study_file = open(self._get_output_paths()["study_file_path"], '+w')
-
-        # dump generated json to output file
-        study_file.write(dumps(study_schema))
-        study_file.close()
-
+        self.study_schema = cnv.Study(copo_isa_records=self.collated_records,
+                                      assay_schema=self.assay_schema).get_schema()
         self.context["ena_status"] = "generated_study_schema"
 
         return
@@ -601,21 +586,12 @@ class EnaSubmit4Reads(object):
         """
         lg.log('Obtaining ISA-JSON', level=Loglvl.INFO, type=Logtype.FILE)
 
-        # retrieve collated records and pass along
-        with open(self._get_output_paths()["collated_file_path"]) as json_file:
-            collated_records = json.load(json_file, object_hook=json_util.object_hook)
-
-        # retrieve stored study schema and pass along
-        study_schema = d_utils.json_to_pytype(self._get_output_paths()["study_file_path"])
-
-        copo_isa_object = cnv.Investigation(copo_isa_records=collated_records, study_schema=study_schema)
-        generated_json = copo_isa_object.get_schema()
-
-        json_file = open(self._get_output_paths()["json_file_path"], '+w')
+        output_schema = cnv.Investigation(copo_isa_records=self.collated_records,
+                                          study_schema=self.study_schema).get_schema()
 
         # dump generated json to output file
-        json_file.write(dumps(generated_json))
-        json_file.close()
+        with open(os.path.join(self.json_path, 'isa_json.json'), "w") as ff:
+            ff.write(json.dumps(output_schema))
 
         self.context["ena_status"] = "generated_isajson"
 
@@ -623,8 +599,8 @@ class EnaSubmit4Reads(object):
 
     def validate_isajson(self):
         lg.log('Validating ISA-JSON', level=Loglvl.INFO, type=Logtype.FILE)
-        paths = self._get_output_paths()
-        with open(paths["json_file_path"]) as json_file:
+
+        with open(os.path.join(self.json_path, 'isa_json.json')) as json_file:
             v = isajson.validate(json_file)
             lg.log(v, level=Loglvl.INFO, type=Logtype.FILE)
 
@@ -636,15 +612,10 @@ class EnaSubmit4Reads(object):
         lg.log('Converting to SRA', level=Loglvl.INFO, type=Logtype.FILE)
         sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
 
-        # retrieve collated records and pass along
-        with open(self._get_output_paths()["collated_file_path"]) as json_file:
-            collated_records = json.load(json_file, object_hook=json_util.object_hook)
+        datafilehashes = self.collated_records["datafilehashes"]
 
-        datafilehashes = collated_records["datafilehashes"]
-
-        paths = self._get_output_paths()
-
-        json2sra.convert(json_fp=open(paths["json_file_path"]), path=paths["conv_dir"], sra_settings=sra_settings,
+        json2sra.convert(json_fp=open(os.path.join(self.json_path, 'isa_json.json')), path=self.xml_path,
+                         sra_settings=sra_settings,
                          datafilehashes=datafilehashes, validate_first=False)
 
         self.context["ena_status"] = "converted_to_sra"
@@ -652,9 +623,8 @@ class EnaSubmit4Reads(object):
 
     def _submit_to_sra(self):
         lg.log('Submitting XMLS to ENA via CURL', level=Loglvl.INFO, type=Logtype.FILE)
-        paths = self._get_output_paths()
-        xml_dir = paths["xml_dir"]
-        remote_path = paths["xml_dir"]
+        xml_dir = self.xml_path
+        remote_path = self.xml_path
 
         submission_file = os.path.join(xml_dir, 'submission.xml')
         project_file = os.path.join(xml_dir, 'project_set.xml')

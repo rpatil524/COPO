@@ -30,12 +30,6 @@ $(document).ready(function () {
     //add event for ontology field change
     ontology_value_change();
 
-
-    $(document).ajaxComplete(function () {
-        console.log("Triggered ajaxComplete handler.")
-    });
-
-
 });
 
 function setup_autocomplete() {
@@ -59,7 +53,7 @@ function ontology_value_change() {
     //handles 'change of mind by user while entering value to clear associated fields'
     $(document).on('keyup', '.ontology-field', function () {
         var elem = $(this);
-        elem.siblings(".ontology-field-hidden").each(function () {
+        elem.closest(".ontology-parent").find(".ontology-field-hidden").each(function () {
             $(this).val('');
         });
     });
@@ -650,14 +644,14 @@ var auto_complete = function () {
 
     function do_select(item) {
         if ($(document).data('annotator_type') == 'txt') {
-            $('#annotator-field-0').val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'))
+            $('#annotator-field-0').val($(item).data('annotation_value') + ' :-: ' + $(item).data('term_accession'));
         } else if ($(document).data('annotator_type') == 'ss') {
             // this function defined in copo_annotations.js
             append_to_annotation_list(item)
         } else {
             $(this.Input).val($(item).data('annotation_value'));
-            $(this.Input).siblings("[id*='termSource']").val($(item).data('term_source'));
-            $(this.Input).siblings("[id*='termAccession']").val($(item).data('term_accession'));
+            $(this.Input).closest(".ontology-parent").find("[id*='termSource']").val($(item).data('term_source'));
+            $(this.Input).closest(".ontology-parent").find("[id*='termAccession']").val($(item).data('term_accession'));
         }
 
     }

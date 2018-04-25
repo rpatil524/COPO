@@ -1878,6 +1878,7 @@ function get_basic_label(sp, formElem) {
 
 function get_ontology_span(ontologySpan, formElem) {
     var ontologySchema = copoSchemas[formElem.control.toLowerCase()];
+    ontologySpan.addClass("ontology-parent"); //used for selecting siblings in auto-complete
 
     for (var i = 0; i < ontologySchema.length; ++i) {
         var fv = ontologySchema[i].id.split(".").slice(-1)[0];
