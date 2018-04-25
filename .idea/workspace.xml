@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/submission/enaSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/enaSubmission.py" afterDir="false" />
-    </list>
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="" />
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -74,8 +69,8 @@
           <file leaf-file-name="enaSubmission.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="210">
-                  <caret line="533" column="11" lean-forward="true" selection-start-line="533" selection-start-column="11" selection-end-line="533" selection-end-column="11" />
+                <state relative-caret-position="136">
+                  <caret line="614" column="25" selection-start-line="614" selection-start-column="25" selection-end-line="614" selection-end-column="25" />
                   <folding>
                     <element signature="e#51#62#0" expanded="true" />
                     <element signature="e#1010#1157#0" expanded="true" />
@@ -87,11 +82,11 @@
                     <element signature="e#21383#22784#0" expanded="true" />
                     <element signature="e#22816#24106#0" expanded="true" />
                     <element signature="e#24151#24496#0" expanded="true" />
+                    <element signature="e#25774#26393#0" expanded="true" />
                     <element signature="e#25555#26244#0" expanded="true" />
                     <element signature="e#26271#27157#0" expanded="true" />
                     <element signature="e#27750#28843#0" expanded="true" />
                     <element signature="e#29020#29305#0" expanded="true" />
-                    <element signature="e#29346#30118#0" expanded="true" />
                     <element signature="e#30158#32730#0" expanded="true" />
                     <element signature="e#32780#35921#0" expanded="true" />
                     <element signature="e#36079#43579#0" expanded="true" />
@@ -3004,8 +2999,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="533" column="11" lean-forward="true" selection-start-line="533" selection-start-column="11" selection-end-line="533" selection-end-column="11" />
+        <state relative-caret-position="136">
+          <caret line="614" column="25" selection-start-line="614" selection-start-column="25" selection-end-line="614" selection-end-column="25" />
           <folding>
             <element signature="e#51#62#0" expanded="true" />
             <element signature="e#1010#1157#0" expanded="true" />
@@ -3017,11 +3012,11 @@
             <element signature="e#21383#22784#0" expanded="true" />
             <element signature="e#22816#24106#0" expanded="true" />
             <element signature="e#24151#24496#0" expanded="true" />
+            <element signature="e#25774#26393#0" expanded="true" />
             <element signature="e#25555#26244#0" expanded="true" />
             <element signature="e#26271#27157#0" expanded="true" />
             <element signature="e#27750#28843#0" expanded="true" />
             <element signature="e#29020#29305#0" expanded="true" />
-            <element signature="e#29346#30118#0" expanded="true" />
             <element signature="e#30158#32730#0" expanded="true" />
             <element signature="e#32780#35921#0" expanded="true" />
             <element signature="e#36079#43579#0" expanded="true" />
