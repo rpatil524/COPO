@@ -135,6 +135,7 @@ $(document).ready(function () {
     }
 
     $(document).on('click', '#export_ss_annotation', function(e){
+        save_annotations()
         $('#export_ss_annotation').html("Saved")
         $('#export_ss_annotation').addClass("disabled")
     })
@@ -143,6 +144,18 @@ $(document).ready(function () {
 
 // global variable for selected cell
 cell;
+
+function save_annotations(){
+    var t = $('#annotations_table tbody tr')
+    $(t).each(function(idx, el){
+        tr_lst = $(el).find('td')
+        var col = $(tr_lst[0]).html()
+        var ant = $(tr_lst[1]).html()
+        var ont = $(tr_lst[2]).html()
+        var ref = $(tr_lst[3]).html()
+        console.log(col + " " + ant + " " + ont + " " + ref)
+    })
+}
 
 function show_skip_dropdown(e){
     if($('#file_type_dropdown_label').html() == 'Spreadsheet') {

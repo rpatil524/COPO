@@ -66,6 +66,8 @@ def handle_upload(request):
 
     # TODO - this should be changed to a uuid
 
+    # save file to media location
+
     file_name = os.path.splitext(f.name)[0]
     file_type = request.POST['file_type']
     skip_rows = request.POST['skip_rows']
