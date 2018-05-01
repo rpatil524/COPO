@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/web/src/api/annotate_views.py" afterPath="$PROJECT_DIR$/web/src/api/annotate_views.py" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_annotations.js" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_annotations.js" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -91,8 +89,8 @@
       <file leaf-file-name="annotate_views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/api/annotate_views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="94">
-              <caret line="68" column="33" lean-forward="false" selection-start-line="68" selection-start-column="33" selection-end-line="68" selection-end-column="33" />
+            <state relative-caret-position="34">
+              <caret line="64" column="29" lean-forward="true" selection-start-line="64" selection-start-column="29" selection-end-line="64" selection-end-column="29" />
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
               </folding>
@@ -252,7 +250,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="more_dataverse_features" />
+        <entry key="$PROJECT_DIR$" value="release_candidate_0.2" />
       </map>
     </option>
   </component>
@@ -1610,7 +1608,14 @@
       <option name="project" value="LOCAL" />
       <updated>1524672105509</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="adding some export functionality to generic annotations">
+      <created>1525176777846</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1525176777846</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1694,7 +1699,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add some annotate methods" />
     <MESSAGE value="change base page inheritence for annotator" />
     <MESSAGE value="bugfix - save annotations without otological reference when ref unavailable" />
     <MESSAGE value="finish migration of annotation code" />
@@ -1719,7 +1723,8 @@
     <MESSAGE value="adding accessions collation for dataverse" />
     <MESSAGE value="fixing bugs in spreadsheet loading and ontology field styles" />
     <MESSAGE value="robusting the loading on spreadsheets and adding ability to save/export annotations" />
-    <option name="LAST_COMMIT_MESSAGE" value="robusting the loading on spreadsheets and adding ability to save/export annotations" />
+    <MESSAGE value="adding some export functionality to generic annotations" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding some export functionality to generic annotations" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2167,8 +2172,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/api/annotate_views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="94">
-          <caret line="68" column="33" lean-forward="false" selection-start-line="68" selection-start-column="33" selection-end-line="68" selection-end-column="33" />
+        <state relative-caret-position="34">
+          <caret line="64" column="29" lean-forward="true" selection-start-line="64" selection-start-column="29" selection-end-line="64" selection-end-column="29" />
           <folding>
             <element signature="e#0#36#0" expanded="true" />
           </folding>
