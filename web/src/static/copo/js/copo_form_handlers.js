@@ -119,7 +119,7 @@ function initiate_annotation_call() {
             dataType: 'json'
         }).done(function (e) {
             // add mongo id to document data
-            $(document).data('mongo_id', e._id.$oid)
+            $(document).data('annotation_id', e._id.$oid)
             $('#annotation_table_wrapper').hide()
             $('#annotation_content').show()
 

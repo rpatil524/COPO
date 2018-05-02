@@ -3,7 +3,6 @@
  */
 $(document).ready(function () {
 
-
     //******************************Setup Annotator Specifics*************************//
     hide_controls()
     show_help()
@@ -134,34 +133,43 @@ $(document).ready(function () {
         }
     }
 
-    $(document).on('click', '#export_ss_annotation', function(e){
-        save_annotations()
-        $('#export_ss_annotation').html("Saved")
-        $('#export_ss_annotation').addClass("disabled")
+    $(document).on('click', '#export_ss_annotation', function (e) {
+        export_annotations()
+        //$('#export_ss_annotation').html("Saved")
+        //$('#export_ss_annotation').addClass("disabled")
     })
+
+    $('.copo-sidebar-tabs a[href="#copo-sidebar-help"]').tab('show');
 
 })// end document ready
 
 // global variable for selected cell
 cell;
 
-function save_annotations(){
-    var t = $('#annotations_table tbody tr')
-    $(t).each(function(idx, el){
-        tr_lst = $(el).find('td')
-        var col = $(tr_lst[0]).html()
-        var ant = $(tr_lst[1]).html()
-        var ont = $(tr_lst[2]).html()
-        var ref = $(tr_lst[3]).html()
-        console.log(col + " " + ant + " " + ont + " " + ref)
+function export_annotations() {
+    var ant_id = $(document).data("annotation_id")
+    $.ajax({
+        url: "/rest/export_generic_annotation/",
+        data: {"annotation_id": ant_id},
+        headers: {'X-CSRFToken': $.cookie('csrftoken')},
+        method: 'POST',
+        dataType: 'json'
+    }).done(function (e) {
+
+        var txt = JSON.stringify(e, null, 4)
+        $('#export_model_content').text(txt)
+        $('#export_modal').modal("show")
+
+    }).error(function(e){
+        console.error(e)
     })
 }
 
-function show_skip_dropdown(e){
-    if($('#file_type_dropdown_label').html() == 'Spreadsheet') {
+function show_skip_dropdown(e) {
+    if ($('#file_type_dropdown_label').html() == 'Spreadsheet') {
         $('#row_skip_div').css('visibility', 'visible')
     }
-    else{
+    else {
         $('#row_skip_div').css('visibility', 'hidden')
     }
 }
@@ -187,6 +195,7 @@ function hide_controls() {
     // $('#annotation_panel').hide()
     $('#help_tips').hide()
     $('#annotation_list').hide()
+    $('.copo-sidebar-annotate').removeClass("active")
 }
 
 function remove_ss_controls() {
@@ -232,6 +241,7 @@ function load_txt_data(e) {
 
 
 function load_ss_data(e) {
+    $('.copo-sidebar-tabs a[href="#copo-sidebar-annotate"]').tab('show');
     // load data from spreadsheet and initialise handsontable into global variable 'hot'
     var data = JSON.parse(e.raw)
     $('#annotation_content').empty()
@@ -257,6 +267,7 @@ function load_ss_data(e) {
     var doc_id = $(document).data('mongo_id')
     $.get('/api/search/', {'document_id': doc_id}, $.noop(), 'json')
         .done(function (d) {
+            $(document).data("annotation_id", d.annotation_id.$oid)
             $(d.rows).each(function (idx, element) {
                 add_line_to_annotation_table(element)
             })
@@ -448,6 +459,7 @@ function mouseenter_annotation(e) {
     }
     $(e.currentTarget).addClass('annotation_mouseover')
 }
+
 function mouseleave_annotation(e) {
     var cell = $(e.currentTarget).data('attached_cell')
     var col_idx = hot.getCoords(cell).col

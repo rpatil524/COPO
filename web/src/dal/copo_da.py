@@ -1,7 +1,7 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 
 from datetime import datetime
-from bson import ObjectId
+from bson import ObjectId, json_util
 from chunked_upload.models import ChunkedUpload
 from web.apps.web_copo.lookup.lookup import DB_TEMPLATES
 import web.apps.web_copo.utils.EnaUtils as u
@@ -206,10 +206,10 @@ class Annotation(DAComponent):
         super(Annotation, self).__init__(profile_id, "annotation")
 
     def get_annotations_for_page(self, document_id):
-        doc = self.get_collection_handle().find_one({
-            "_id": ObjectId(document_id)
-        })
-        return doc['annotation']
+        doc = self.get_collection_handle().find_one(
+            {"_id": ObjectId(document_id)},
+        )
+        return doc
 
     def update_annotation(self, document_id, annotation_id, fields, delete=False):
         # first remove element

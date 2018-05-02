@@ -114,6 +114,23 @@
       "deprecated": false,
       "default_value": "",
       "show_in_form": false,
+      "id": "copo.annotation.file_location",
+      "show_in_table": false,
+      "control": "text",
+      "versions": [
+        "deleted"
+      ],
+      "help_tip": "",
+      "label": "Delete"
+    },
+    {
+      "type": "string",
+      "required": "true",
+      "ref": "",
+      "hidden": "true",
+      "deprecated": false,
+      "default_value": "",
+      "show_in_form": false,
       "id": "copo.annotation.date_created",
       "show_in_table": true,
       "control": "datetime",
