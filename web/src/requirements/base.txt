@@ -37,7 +37,7 @@ html5lib==1.0.1
 hurry.filesize==0.9
 idna==2.6
 imagesize==0.7.1
-isatools==0.9.4
+-e git+https://github.com/ISA-tools/isa-api.git@develop#egg=isatools
 iso8601==0.1.12
 isodate==0.6.0
 isort==4.2.15

@@ -499,6 +499,7 @@ function load_records(componentMeta) {
         },
         success: function (data) {
             do_render_component_table(data, componentMeta);
+
             //remove loader
             if (tableLoader) {
                 tableLoader.remove();

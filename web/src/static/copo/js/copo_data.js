@@ -1596,7 +1596,6 @@ $(document).ready(function () {
         // altering items in the bundle. if silence = false, then all validation steps will be performed/enforced
         // before engaging the description bundle
 
-
         var candidates = [];
         batchTargets.forEach(function (item) { //candidates are items not already in the description bundle
             if (!isInList(item, descriptionBundle)) {

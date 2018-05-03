@@ -1260,7 +1260,7 @@ class WizardHelper:
             while len(new_sorted_list) >= 2:
                 suggested_pairings.append([new_sorted_list.pop(0), new_sorted_list.pop(0)])
 
-            pairing_dict["suggested_pairings"] = suggested_pairings
+        pairing_dict["suggested_pairings"] = suggested_pairings
 
         return pairing_dict
 

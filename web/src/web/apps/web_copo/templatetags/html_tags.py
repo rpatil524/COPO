@@ -212,7 +212,7 @@ def generate_unique_items(component=str(), profile_id=str(), elem_id=str(), reco
 
 @register.filter("generate_table_records")
 def generate_table_records(profile_id=str(), component=str()):
-    # generates component records for for building an UI table
+    # generates component records for building an UI table
 
     # instantiate data access object
     da_object = DAComponent(profile_id, component)
@@ -220,32 +220,34 @@ def generate_table_records(profile_id=str(), component=str()):
     # get schema
     schema = da_object.get_schema().get("schema_dict")
 
-    data_set = list()
-
-    # filter schema by columns to be displayed
+    # filter schema elements based on displayable columns
     schema = [x for x in schema if x.get("show_in_table", True)]
+
+    schema_dict = {x["id"].split(".")[-1]: x for x in schema}
 
     # build db column projection
     projection = [(x["id"].split(".")[-1], 1) for x in schema]
 
     # build UI table column
     columns = [dict(data=x["id"].split(".")[-1], title=x.get("label", str())) for x in schema]
-
-    # add record id column
     columns.append(dict(data="record_id"))
 
-    # retrieve records
+    # retrieve and process records
     records = da_object.get_all_records_columns(projection=dict(projection))
 
-    # get records
-    for pr in records:
-        option = [(x["id"].split(".")[-1], resolve_control_output(pr, x)) for x in schema]
-        option = dict(option)
+    data_set = list()
 
-        # add record id
-        option["record_id"] = str(pr["_id"])
+    if len(records):
+        df = pd.DataFrame(records)
 
-        data_set.append(option)
+        # convert record id from ObjectID to string
+        df['record_id'] = df['_id'].apply(lambda x: str(x))
+        df.drop('_id', axis='columns')
+
+        for x in schema_dict.keys():
+            df[x] = df[x].apply(resolve_control_output_apply, args=(schema_dict[x],))
+
+        data_set = df.to_dict('records')
 
     return_dict = dict(dataSet=data_set,
                        columns=columns,
@@ -388,7 +390,6 @@ def generate_copo_shared_profiles_data(profiles=list()):
     return return_dict
 
 
-
 @register.filter("generate_submission_accessions_data")
 def generate_submission_accessions_data(submission_record):
     """
@@ -517,6 +518,18 @@ def attribute_filter(filter_attributes):
             return False
 
     return clear_attribute
+
+
+def resolve_control_output_apply(x, args):
+    if args.get("type", str()) == "array":  # resolve array data types
+        resolved_value = list()
+        data = x
+        for d in data:
+            resolved_value.append(get_resolver(d, args))
+    else:  # non-array types
+        resolved_value = get_resolver(x, args)
+
+    return resolved_value
 
 
 def resolve_control_output(data_dict, elem):

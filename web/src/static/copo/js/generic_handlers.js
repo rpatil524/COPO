@@ -635,7 +635,7 @@ var auto_complete = function () {
         _Pre: do_pre,
     }, '.ontology-field')
 
-    function do_pre(){
+    function do_pre() {
         // make loading spinner visible before request to OLS
         $(this.Input).siblings(".input-group-addon").css("visibility", "visible")
         // we can also make changes to the value sent OLS here if needs be
@@ -1318,7 +1318,7 @@ function get_profile_components() {
             colorClass: "people_color",
             color: "red",
             tableID: 'person_table',
-            recordActions: ["add_record_all", "edit_record_single", "delete_record_multi"],
+            recordActions: ["add_record_all", "edit_record_single"],
             visibleColumns: 5
         },
         {
