@@ -287,7 +287,7 @@ then
       then restart PostgreSQL."
       echo -e "local\t\tcopo\t\tall\t\ttrust\n$(cat /usr/local/var/postgres/pg_hba.conf)" > /usr/local/var/postgres/pg_hba.conf
       $pac_man services restart postgresql
-
+      $pac_man install poppler
 
       printf "Attempting to add required users to PostgreSQL. If this fails, try adding a .pgpass file to your home directory
       which should contain a line like:
