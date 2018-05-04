@@ -69,7 +69,7 @@ def handle_upload(request):
     # TODO - this should be changed to a uuid
 
     # save file to media location
-    save_name = path.join(settings.MEDIA_ROOT, "generic_annotations", f._name + '--' + str(uuid.uuid1()))
+    save_name = path.join(settings.MEDIA_ROOT, "generic_annotations", f._name)
     # check if path exists
     if not path.exists(path.join(settings.MEDIA_ROOT, "generic_annotations")):
         os.makedirs(path.join(settings.MEDIA_ROOT, "generic_annotations"))
@@ -104,8 +104,8 @@ def handle_upload(request):
         cmd = 'pdftotext -htmlmeta ' + save_name
         resp = pexpect.run(cmd)
         # now open the resulting file, parse and send to frontend
-        # file_name = os.path.splitext(fname)[0]
-        html_name = save_name + '.html'
+        file_name = os.path.splitext(save_name)[0]
+        html_name = file_name + '.html'
         with open(html_name, "r", encoding='utf-8', errors='ignore') as p:
             raw = p.read()
     out = dict()
