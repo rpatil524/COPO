@@ -13,7 +13,7 @@ from dateutil import parser
 from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
 from django.conf import settings
-from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, Group
+from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, Group, Annotation
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
@@ -296,3 +296,14 @@ def remove_user_from_group(request):
     user_id = request.GET['user_id']
     grp_info = Group().remove_user_from_group(group_id=group_id, user_id=user_id)
     return HttpResponse(json_util.dumps({'resp': grp_info}))
+
+def get_ontologies(request):
+    resp = requests.get('http://www.ebi.ac.uk/ols/api/ontologies?size=5000&sort=ontologyId')
+    data = json_util.dumps(json_util.loads(resp.content.decode('utf-8'))['_embedded']['ontologies'])
+    return HttpResponse(data)
+
+def export_generic_annotation(request):
+    ant_id = request.POST["annotation_id"]
+    doc = Annotation().get_annotations_for_page(ant_id)
+    out = {"raw": json.loads(doc["raw"]), "annotations": doc["annotation"]}
+    return HttpResponse(json_util.dumps(out))

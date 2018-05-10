@@ -388,7 +388,6 @@ def generate_copo_shared_profiles_data(profiles=list()):
     return return_dict
 
 
-
 @register.filter("generate_submission_accessions_data")
 def generate_submission_accessions_data(submission_record):
     """
@@ -446,6 +445,16 @@ def generate_submission_accessions_data(submission_record):
 
             for idx, value in enumerate(accessions):
                 data_set.append([value, "Figshare File: " + str(idx + 1), str(), str()])
+
+        elif repository == "dcterms":
+            # -----------COLLATE ACCESSIONS FOR DATAVERSE REPO----------
+            columns = [{"title": "DOI"}, {"title": "Dataverse"}, {"title": "File"}, {"title": "Dataverse Title"}]
+
+            for idx, value in enumerate(accessions):
+                data_set.append(
+                    [value["dataset_doi"], value["dataverse_title"], value["filename"], value["dataverse_title"]]
+                )
+
 
     return_dict = dict(dataSet=data_set,
                        columns=columns,

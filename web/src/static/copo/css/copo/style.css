@@ -1249,10 +1249,8 @@ input.date-picker {
     margin-top: 15px;
 }
 
-.autocomplete {
-    z-index: 10;
-    margin-left: -170px;
-    margin-top: 0px
+.autocomplete{
+    overflow-y: scroll;
 }
 
 input[data-autocomplete] {
