@@ -1,5 +1,7 @@
 __author__ = 'tonietuk'
 
+
+import time
 import json
 import copy
 import pandas as pd
@@ -778,8 +780,13 @@ def resolve_copo_select_data(data, elem):
 
 def resolve_datetime_data(data, elem):
     resolved_value = str()
+
     if data:
-        resolved_value = data.strftime('%d %b, %Y, %H:%M')
+        if data.date:
+            try:
+                resolved_value = time.strftime('%a, %d %b %Y %H:%M', data.timetuple())
+            except ValueError:
+                pass
     return resolved_value
 
 

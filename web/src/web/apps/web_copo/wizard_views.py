@@ -23,18 +23,19 @@ def data_wiz(request):
     if description_bundle:
         request.session['description_bundle'] = description_bundle
 
-    context = datf.BrokerRequests(context=context,
-                                  description_targets=description_targets,
-                                  description_bundle=description_bundle,
-                                  description_token=request.POST.get("description_token", str()),
-                                  stage_id=request.POST.get("stage_id", str()),
-                                  stage_ref=request.POST.get("stage_ref", str()),
-                                  auto_fields=request.POST.get("auto_fields", dict()),
-                                  rendered_stages=rendered_stages,
-                                  default_stage_form=request.POST.get("default_stage_form", False),
-                                  target_id=request.POST.get("target_id", str())
-                                  ).post_context(request_action)
+    broker_request = datf.BrokerRequests(context=context,
+                                         description_targets=description_targets,
+                                         description_bundle=description_bundle,
+                                         description_token=request.POST.get("description_token", str()),
+                                         stage_id=request.POST.get("stage_id", str()),
+                                         stage_ref=request.POST.get("stage_ref", str()),
+                                         auto_fields=request.POST.get("auto_fields", dict()),
+                                         rendered_stages=rendered_stages,
+                                         default_stage_form=request.POST.get("default_stage_form", False),
+                                         target_id=request.POST.get("target_id", str())
+                                         )
 
+    context = broker_request.post_context(request_action)
     out = jsonpickle.encode(context)
 
     return HttpResponse(out, content_type='application/json')
@@ -83,8 +84,8 @@ def forward_to_figshare(request):
     files = request.session['description_bundle']
     file_ids = [x['recordID'] for x in files]
 
-    kwarg = dict(profile_id=request.session['profile_id'], datafile_ids=file_ids, redirect_url=redirect_url, complete='false', token_obtained='false')
+    kwarg = dict(profile_id=request.session['profile_id'], datafile_ids=file_ids, redirect_url=redirect_url,
+                 complete='false', token_obtained='false')
     Submission().save_record(dict(), **kwarg)
-
 
     return HttpResponseRedirect(redirect_url)

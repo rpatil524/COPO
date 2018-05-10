@@ -4,6 +4,7 @@ from bson import ObjectId
 from dal import cursor_to_list
 
 import difflib
+import pandas as pd
 from operator import itemgetter
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
@@ -22,8 +23,16 @@ class WizardHelper:
         self.description_token = description_token
         self.description_targets = description_targets
         self.targets_datafiles = self.set_targets_datafiles()
-        self.profile_id = data_utils.get_current_request().session['profile_id']
+        self.profile_id = self.get_profile_id()
         self.rendered_stages = list()
+
+    def get_profile_id(self):
+        try:
+            profile_id = DataFile().get_record(self.description_targets[0]["recordID"])['profile_id']
+        except:
+            profile_id = data_utils.get_current_request().session['profile_id']
+
+        return profile_id
 
     def set_rendered_stages(self, rendered_stages=list()):
         """
@@ -37,23 +46,28 @@ class WizardHelper:
         return self.rendered_stages
 
     def set_targets_datafiles(self):
-        targets_datafiles = dict()
+        df = dict()
 
-        object_list = list()
-        for target in self.description_targets:
-            object_list.append(ObjectId(target["recordID"]))
+        if self.description_targets:
+            df_targets = pd.DataFrame(self.description_targets)
+            object_list = list(df_targets['recordID'].apply(lambda x: ObjectId(x)))
 
-        datafiles = cursor_to_list(DataFile().get_collection_handle().find({"_id": {"$in": object_list}}))
+            datafiles = cursor_to_list(DataFile().get_collection_handle().find({"_id": {"$in": object_list}}))
 
-        for df in datafiles:
-            targets_datafiles[str(df["_id"])] = df
+            df = pd.DataFrame(datafiles)
+            df['_id'] = df['_id'].apply(lambda x: str(x))
+            df.index = list(df['_id'])
 
-        return targets_datafiles
+            df = df.loc[:, ['description']]
+
+        return df
 
     def update_targets_datafiles(self):
         bulk = DataFile().get_collection_handle().initialize_unordered_bulk_op()
-        for k, v in self.targets_datafiles.items():
-            bulk.find({'_id': ObjectId(k)}).update({'$set': {"description": v.get("description", dict())}})
+
+        for k in self.targets_datafiles.index:
+            bulk.find({'_id': ObjectId(k)}).update({'$set': {"description": self.targets_datafiles.loc[k].description}})
+
         bulk.execute()
 
     def set_datafile_id(self, datafile_id):
@@ -67,7 +81,10 @@ class WizardHelper:
         return self.description_token
 
     def get_datafile_description(self):
-        description = self.targets_datafiles.get(self.datafile_id, dict()).get("description", dict())
+        description = dict()
+
+        if self.datafile_id in self.targets_datafiles.index:
+            description = self.targets_datafiles.loc[self.datafile_id].description
 
         for k in [dict(key="stages", type=list()), dict(key="attributes", type=dict())]:
             if k["key"] not in description:
@@ -117,8 +134,8 @@ class WizardHelper:
         return stages[listed_stage[0]]
 
     def update_description(self, description):
-        if self.datafile_id in self.targets_datafiles:
-            self.targets_datafiles[self.datafile_id]["description"] = description
+        if self.datafile_id in self.targets_datafiles.index:
+            self.targets_datafiles.loc[self.datafile_id].description = description
 
         return
 
@@ -373,12 +390,35 @@ class WizardHelper:
         In initiating a description process, it may well be the case that the target items (to be described) already
         have metadata recorded (from a previous description session). Try bootstrapping the
         current description using available metadata. Specifically, the target (item in description bundle)
-        with the highest number of (recorded) stages takes precedence over others, and, thus is used for initiating
+        with the highest number of (recorded) stages takes precedence over others and, thus, is used for initiating
         the current description. Of course, there are obvious implications to this. For instance, do we assume
         other (potentially less described) items in the current bundle adopt the 'difference' in the metadata? Also,
-        we poll the attributes metadata from every target, the result of which might be used in making suggestions
-        for new items added to the bundle at a later stage in the current description pipeline.
+        we poll the attributes metadata from the most described target, the result of which can be used to suggest
+        metadata for new items added to the bundle at a later stage in the current description pipeline.
         """
+
+        # check metadata status of targets
+        if self.description_targets:
+            targets_with_description = self.targets_datafiles[self.targets_datafiles['description'] != dict()]
+
+            batch_stages = list()
+            batch_attributes = dict()
+
+            if len(targets_with_description) > 0:  # there are description targets with metadata
+                # get the most described datafile to use as benchmark
+                targets_stages = targets_with_description.description.apply(lambda x: x['stages'])
+                targets_stages = pd.DataFrame(targets_stages, index=targets_stages.index)
+                targets_stages['counts'] = targets_stages.description.apply(lambda x: len(x))
+
+                # get maximum number of stages
+                batch_stages = targets_stages[targets_stages.counts == targets_stages.counts.max()].iloc[0].description
+
+                targets_attributes = targets_with_description.description.apply(lambda x: x['attributes'])
+
+                targets_attributes_df = pd.DataFrame(list(targets_attributes), index=targets_attributes.index)
+                t = 1
+            else:
+                pass
 
         batch_stages = list()
         targets_attributes = list()
@@ -404,7 +444,7 @@ class WizardHelper:
                 batch_attributes[key].append(value)
 
         description_token = self.get_description_token()  # if there is a valid description token, use it -
-        # ...it might well be a call to re-invalidate displayed stages
+        # ...this might well be a call to re-validate displayed stages
 
         if description_token:
             Description().edit_description(self.description_token, dict(attributes=batch_attributes))
@@ -942,7 +982,8 @@ class WizardHelper:
                     # set 'focus' to target
                     self.set_datafile_id(target["recordID"])
 
-                    paired_file = self.get_datafile_attributes().get("datafiles_pairing", dict()).get("paired_file", str())
+                    paired_file = self.get_datafile_attributes().get("datafiles_pairing", dict()).get("paired_file",
+                                                                                                      str())
                     paired_files.append(paired_file)
 
                 if len(set(paired_files)) == 1 and list(set(paired_files))[0] == str():  # i.e., no previous pairing
@@ -1004,7 +1045,7 @@ class WizardHelper:
         result_dict = self.validate_prospective_targets()
 
         if description_bundle:
-            # validate targets against one another as well as existing items in the bundle
+            # validate targets against one another as well as existing items in the description bundle
             validation_code = result_dict["validation_code"]
             if validation_code in ["100", "101"]:
                 # targets are compatible with one another, also there may be some datafiles ahead
@@ -1100,6 +1141,17 @@ class WizardHelper:
         attributes_counts = list()
         benchmark_target = None
         benchmark_count = -1
+
+        # test
+
+        df = pd.DataFrame(self.description_targets)
+        df.index = list(df['recordID'])
+        df_attributes = pd.DataFrame(list(df.attributes))
+        df_attributes.index = list(df['recordID'])
+
+        perfect_attributes = df_attributes.dropna()
+        t = 1
+        # test ends
 
         for target in self.description_targets:
             # 'focus' on target
@@ -1250,8 +1302,10 @@ class WizardHelper:
                 # uneven number of files to be paired
                 # we might have to remove a file from the start or end of the list before suggesting pairing
                 # to do that, we compute how similar the top three files are and use that metric to decide
-                d01 = difflib.SequenceMatcher(None, new_sorted_list[0]["recordLabel"], new_sorted_list[1]["recordLabel"]).ratio()
-                d12 = difflib.SequenceMatcher(None, new_sorted_list[1]["recordLabel"], new_sorted_list[2]["recordLabel"]).ratio()
+                d01 = difflib.SequenceMatcher(None, new_sorted_list[0]["recordLabel"],
+                                              new_sorted_list[1]["recordLabel"]).ratio()
+                d12 = difflib.SequenceMatcher(None, new_sorted_list[1]["recordLabel"],
+                                              new_sorted_list[2]["recordLabel"]).ratio()
                 if d01 > d12:
                     new_sorted_list = new_sorted_list[:-1]
                 else:

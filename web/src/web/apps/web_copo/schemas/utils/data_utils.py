@@ -367,7 +367,7 @@ def get_datetime():
     provides a consistent way of storing fields of this type across modules
     :return:
     """
-    return datetime.now()
+    return datetime.utcnow()
 
 
 def get_not_deleted_flag():
