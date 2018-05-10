@@ -1253,6 +1253,10 @@ input.date-picker {
     overflow-y: scroll;
 }
 
+.autocomplete.open {
+  z-index: 2000;
+}
+
 input[data-autocomplete] {
     border: 1px solid #ccc !important;
 }

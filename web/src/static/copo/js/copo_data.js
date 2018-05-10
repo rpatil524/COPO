@@ -8,7 +8,7 @@ var silenceAlert = false; //use to temporary suppress stage alerts
 var descriptionWizSummary = {}; //wizard summary stage content
 var onGoingDescription = false; //informs wizard state refresh/exit
 var displayedMessages = {}; //holds stage messages already displayed
-var tabShownStore = Object();
+var tabShownStore = {};
 var setTargetStageRef = ''; //if loading batch stages, set current stage to 'setTargetStageRef'
 
 
@@ -128,13 +128,11 @@ $(document).ready(function () {
     //description tab loading event
     $('#copo-datafile-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
         if ($(event.target).attr("href") == "#descriptionWizardComponent") {
-            if (tabShownStore) {
-                if (tabShownStore.method == "do_post_stage_retrieval2") {
-                    $("#description_panel").css("display", "block");
-                    do_post_stage_retrieval2(tabShownStore.data);
-
-                    tabShownStore = null;
-                }
+            if (tabShownStore.hasOwnProperty("method") && tabShownStore.method == "do_post_stage_retrieval2" && tabShownStore.hasOwnProperty("automatic") && tabShownStore.hasOwnProperty("automatic")) {
+                $("#description_panel").css("display", "block");
+                var newData = tabShownStore.data
+                tabShownStore = {};
+                do_post_stage_retrieval2(newData);
             }
         }
     });
@@ -1105,13 +1103,16 @@ $(document).ready(function () {
             do_post_stage_retrieval2(data);
         } else {
             $('#copo-datafile-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show');
+            tabShownStore.automatic = true;
         }
 
         //hide wizard getting started
         $(".page-wizard-message").hide();
 
+
         tabShownStore.data = data;
         tabShownStore.method = "do_post_stage_retrieval2";
+
     }
 
 
@@ -4066,36 +4067,36 @@ $(document).ready(function () {
 
 
     function load_datafile_records(componentMeta) {
-    var csrftoken = $.cookie('csrftoken');
+        var csrftoken = $.cookie('csrftoken');
 
-    //loader
-    var tableLoader = null;
-    if ($("#component_table_loader").length) {
-        tableLoader = $('<div class="copo-i-loader"></div>');
-        $("#component_table_loader").append(tableLoader);
-    }
-
-    $.ajax({
-        url: copoVisualsURL,
-        type: "POST",
-        headers: {
-            'X-CSRFToken': csrftoken
-        },
-        data: {
-            'task': 'table_data',
-            'component': componentMeta.component
-        },
-        success: function (data) {
-            do_render_component_table(data, componentMeta);
-            //remove loader
-            if (tableLoader) {
-                tableLoader.remove();
-            }
-        },
-        error: function () {
-            alert("Couldn't retrieve " + componentMeta.component + " data!");
+        //loader
+        var tableLoader = null;
+        if ($("#component_table_loader").length) {
+            tableLoader = $('<div class="copo-i-loader"></div>');
+            $("#component_table_loader").append(tableLoader);
         }
-    });
-}
+
+        $.ajax({
+            url: copoVisualsURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'task': 'table_data',
+                'component': componentMeta.component
+            },
+            success: function (data) {
+                do_render_component_table(data, componentMeta);
+                //remove loader
+                if (tableLoader) {
+                    tableLoader.remove();
+                }
+            },
+            error: function () {
+                alert("Couldn't retrieve " + componentMeta.component + " data!");
+            }
+        });
+    }
 
 }) //end document ready

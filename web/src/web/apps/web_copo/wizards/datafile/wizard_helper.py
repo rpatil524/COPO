@@ -413,8 +413,6 @@ class WizardHelper:
             self.description_token = str(
                 Description(self.profile_id).create_description(batch_stages, batch_attributes)['_id'])
 
-        self.refresh_description_stages()  # refresh previously stored stages to pick up any schema changes
-
         current_stage = str()
 
         # load all previously activated stages to determine UI display 'take-off' point
@@ -497,43 +495,6 @@ class WizardHelper:
                     self.fire_on_create_triggers(elem)
 
         return stage_dict
-
-    def refresh_description_stages(self):
-        """
-        function refreshes description stages in order to pick up eventual schema updates
-        :return:
-        """
-
-        batch_stages = self.get_batch_stages()
-
-        if not batch_stages:
-            return
-
-        # update the start stages
-        new_stage_list = d_utils.json_to_pytype(lkup.WIZARD_FILES["start"])['properties']
-
-        for update_stage in new_stage_list:
-            listed_stage = [indx for indx, stage in enumerate(batch_stages) if stage['ref'] == update_stage['ref']]
-
-            if listed_stage:
-                temp_stage = update_stage
-                temp_stage["activated"] = batch_stages[listed_stage[0]].get("activated", False)
-                batch_stages[listed_stage[0]] = update_stage
-
-        # update other stages that may be resolved
-        for elem in list(batch_stages):
-            new_stage_list = self.resolve_stage_stub(elem)
-            for update_stage in new_stage_list:
-                listed_stage = [indx for indx, stage in enumerate(batch_stages) if stage['ref'] == update_stage['ref']]
-
-                if listed_stage:
-                    temp_stage = update_stage
-                    temp_stage["activated"] = batch_stages[listed_stage[0]].get("activated", False)
-                    batch_stages[listed_stage[0]] = update_stage
-
-        self.set_batch_stages(batch_stages)
-
-        return
 
     def revalidate_stage_display(self):
         """
@@ -942,7 +903,8 @@ class WizardHelper:
                     # set 'focus' to target
                     self.set_datafile_id(target["recordID"])
 
-                    paired_file = self.get_datafile_attributes().get("datafiles_pairing", dict()).get("paired_file", str())
+                    paired_file = self.get_datafile_attributes().get("datafiles_pairing", dict()).get("paired_file",
+                                                                                                      str())
                     paired_files.append(paired_file)
 
                 if len(set(paired_files)) == 1 and list(set(paired_files))[0] == str():  # i.e., no previous pairing
@@ -1250,8 +1212,10 @@ class WizardHelper:
                 # uneven number of files to be paired
                 # we might have to remove a file from the start or end of the list before suggesting pairing
                 # to do that, we compute how similar the top three files are and use that metric to decide
-                d01 = difflib.SequenceMatcher(None, new_sorted_list[0]["recordLabel"], new_sorted_list[1]["recordLabel"]).ratio()
-                d12 = difflib.SequenceMatcher(None, new_sorted_list[1]["recordLabel"], new_sorted_list[2]["recordLabel"]).ratio()
+                d01 = difflib.SequenceMatcher(None, new_sorted_list[0]["recordLabel"],
+                                              new_sorted_list[1]["recordLabel"]).ratio()
+                d12 = difflib.SequenceMatcher(None, new_sorted_list[1]["recordLabel"],
+                                              new_sorted_list[2]["recordLabel"]).ratio()
                 if d01 > d12:
                     new_sorted_list = new_sorted_list[:-1]
                 else:
