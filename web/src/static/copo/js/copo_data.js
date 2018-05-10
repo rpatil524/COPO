@@ -128,12 +128,12 @@ $(document).ready(function () {
     //description tab loading event
     $('#copo-datafile-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
         if ($(event.target).attr("href") == "#descriptionWizardComponent") {
-            if (!$.isEmptyObject(tabShownStore)) {
+            if (tabShownStore) {
                 if (tabShownStore.method == "do_post_stage_retrieval2") {
                     $("#description_panel").css("display", "block");
                     do_post_stage_retrieval2(tabShownStore.data);
 
-                    tabShownStore = Object();
+                    tabShownStore = null;
                 }
             }
         }
