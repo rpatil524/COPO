@@ -92,6 +92,7 @@ function initiate_form_call(component) {
         success: function (data) {
             json2HtmlForm(data);
             componentData = data;
+
         },
         error: function () {
             alert(errorMsg);
@@ -175,6 +176,12 @@ function json2HtmlForm(data) {
             //custom validators
             custom_validate(htmlForm.find("form"));
 
+            refresh_form_aux_controls();
+
+            var event = jQuery.Event("postformload"); //individual compnents can trap and handle this event as they so wish
+            $('body').trigger(event);
+
+
             //validate on submit event
             htmlForm.find("form").validator().on('submit', function (e) {
                 if (e.isDefaultPrevented()) {
@@ -188,7 +195,7 @@ function json2HtmlForm(data) {
                 }
             });
 
-            refresh_form_aux_controls();
+
         },
         buttons: [
             {

@@ -358,6 +358,20 @@ DROP_DOWNS = {
             'label': 'Other',
         }
     ],
+    "REPO_TYPE_OPTIONS": [
+        {
+            "value": "dataverse",
+            "label": "Dataverse"
+        },
+        {
+            "value": "dspace",
+            "label": "dSPACE"
+        },
+        {
+            "value": "ckan",
+            "label": "CKAN"
+        }
+    ],
     "LICENSE_TYPES": [
         {
             'value': 'Apache-2.0',

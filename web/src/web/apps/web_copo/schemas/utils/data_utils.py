@@ -117,6 +117,8 @@ def get_figshare_category_options():
 
     return output
 
+def get_repo_type_options():
+    return lookup.DROP_DOWNS['REPO_TYPE_OPTIONS']
 
 def get_dataverse_subject_dropdown():
     return lookup.DROP_DOWNS['DATAVERSE_SUBJECTS']

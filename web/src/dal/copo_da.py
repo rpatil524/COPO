@@ -24,6 +24,7 @@ DescriptionCollection = 'DescriptionCollection'
 ProfileCollection = 'Profiles'
 AnnotationReference = 'AnnotationCollection'
 GroupCollection = 'GroupCollection'
+RepositoryCollection = 'RepositoryCollection'
 
 handle_dict = dict(publication=get_collection_ref(PubCollection),
                    person=get_collection_ref(PersonCollection),
@@ -33,7 +34,8 @@ handle_dict = dict(publication=get_collection_ref(PubCollection),
                    submission=get_collection_ref(SubmissionCollection),
                    datafile=get_collection_ref(DataFileCollection),
                    annotation=get_collection_ref(AnnotationReference),
-                   group=get_collection_ref(GroupCollection)
+                   group=get_collection_ref(GroupCollection),
+                   repository=get_collection_ref(RepositoryCollection)
                    )
 
 
@@ -200,6 +202,10 @@ class Publication(DAComponent):
     def __init__(self, profile_id=None):
         super(Publication, self).__init__(profile_id, "publication")
 
+
+class Repository(DAComponent):
+    def __init__(self, profile_id=None):
+        super(Repository, self).__init__(profile_id, "repository")
 
 class Annotation(DAComponent):
     def __init__(self, profile_id=None):
@@ -686,6 +692,15 @@ class Group(DAComponent):
             {'_id': ObjectId(group_id)},
             {'$pull': {'member_ids': user_id}}
         )
+
+class Repository(DAComponent):
+    def __init__(self):
+        super(Repository, self).__init__(None, "repository")
+        self.Repository = get_collection_ref(RepositoryCollection)
+
+    def get_by_uid(self, uid):
+        doc = self.get_collection_handle().find({"uid": uid}, {"name": 1, "type": 1, "url": 1})
+        return doc
 
 
 class RemoteDataFile:

@@ -1334,6 +1334,20 @@ function get_profile_components() {
             tableID: 'annotation_table',
             recordActions: ["delete_record_multi"],
             visibleColumns: 10000
+        },
+        {
+            component: 'repository',
+            title: 'Repositories',
+            iconClass: "fa fa-pencil",
+            semanticIcon: "write",
+            countsKey: "num_annotation",
+            buttons: ["quick-tour-template", "new-component-template"],
+            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help", "copo-sidebar-annotate"],
+            colorClass: "annotations_color",
+            color: "violet",
+            tableID: 'repository_table',
+            recordActions: ["delete_record_multi"],
+            visibleColumns: 10000
         }
     ];
 

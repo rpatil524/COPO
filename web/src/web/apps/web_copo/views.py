@@ -25,6 +25,7 @@ from rauth import OAuth2Service
 from web.apps.web_copo.utils import EnaImports as eimp
 from submission.enaSubmission import EnaSubmit
 from web.apps.web_copo.schemas.utils import data_utils
+from web.apps.web_copo.decorators import user_is_superuser
 
 LOGGER = settings.LOGGER
 
@@ -153,6 +154,11 @@ def copo_data(request, profile_id, cyverse_file_data=None):
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
     return render(request, 'copo/copo_data.html', {'profile_id': profile_id, 'profile': profile})
+
+@login_required
+def copo_repository(request, profile_id):
+    profile = Profile().get_record(profile_id)
+    return render(request, 'copo/copo_repo.html', {'profile_id': profile_id, 'profile': profile})
 
 
 def copo_docs(request):
@@ -426,3 +432,8 @@ def view_groups(request):
     group_list = cursor_to_list(Group().get_by_owner(request.user.id))
     print(group_list)
     return render(request, 'copo/copo_group.html', {'request': request, 'profile_list': profile_list, 'group_list': group_list})
+
+@login_required()
+@user_is_superuser
+def administer_repos(request):
+    return render(request, 'copo/copo_repository.html', {'request': request})

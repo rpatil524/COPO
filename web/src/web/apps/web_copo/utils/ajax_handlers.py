@@ -13,7 +13,7 @@ from dateutil import parser
 from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
 from django.conf import settings
-from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, Group, Annotation
+from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, Group, Annotation, Repository
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
@@ -278,12 +278,16 @@ def get_users_in_group(request):
     usr_info = Group().get_users_for_group_info(group_id=group_id)
     return HttpResponse(json_util.dumps({'resp': usr_info}))
 
+
 def get_users(request):
     q = request.GET['q']
-    x = list(User.objects.filter(Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).exclude(is_superuser=True).values_list('id', 'first_name', 'last_name', 'email', 'username'))
+    x = list(User.objects.filter(
+        Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).exclude(
+        is_superuser=True).values_list('id', 'first_name', 'last_name', 'email', 'username'))
     if not x:
         return HttpResponse()
     return HttpResponse(json.dumps(x))
+
 
 def add_user_to_group(request):
     group_id = request.GET['group_id']
@@ -291,19 +295,44 @@ def add_user_to_group(request):
     grp_info = Group().add_user_to_group(group_id=group_id, user_id=user_id)
     return HttpResponse(json_util.dumps({'resp': grp_info}))
 
+
 def remove_user_from_group(request):
     group_id = request.GET['group_id']
     user_id = request.GET['user_id']
     grp_info = Group().remove_user_from_group(group_id=group_id, user_id=user_id)
     return HttpResponse(json_util.dumps({'resp': grp_info}))
 
+
 def get_ontologies(request):
     resp = requests.get('http://www.ebi.ac.uk/ols/api/ontologies?size=5000&sort=ontologyId')
     data = json_util.dumps(json_util.loads(resp.content.decode('utf-8'))['_embedded']['ontologies'])
     return HttpResponse(data)
+
 
 def export_generic_annotation(request):
     ant_id = request.POST["annotation_id"]
     doc = Annotation().get_annotations_for_page(ant_id)
     out = {"raw": json.loads(doc["raw"]), "annotations": doc["annotation"]}
     return HttpResponse(json_util.dumps(out))
+
+
+def create_new_repo(request):
+    name = request.POST['name']
+    type = request.POST['type']
+    url = request.POST['url']
+    apikey = request.POST['apikey']
+    username = request.POST['username']
+    password = request.POST['password']
+    uid = request.user.id
+    args = {'name': name, 'type': type, 'url': url, 'apikey': apikey, 'username': username, 'password': password, 'uid': uid}
+    Repository().save_record(dict(), **args)
+    out = {'name': name, 'type': type, 'url': url}
+    return HttpResponse(json_util.dumps(out))
+
+def get_repos_data(request):
+    uid = request.user.id
+    doc = Repository().get_by_uid(uid)
+    return HttpResponse(json_util.dumps(doc))
+
+
+def add_user_to_repo(request):

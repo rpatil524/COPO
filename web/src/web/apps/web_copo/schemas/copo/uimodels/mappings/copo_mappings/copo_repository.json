@@ -1,0 +1,161 @@
+{
+    "configuration": {
+        "type": "json",
+        "provider": "copo",
+        "ref": ""
+    },
+    "properties": [
+        {
+            "help_tip": "",
+            "required": "true",
+            "default_value": "",
+            "control_meta": {},
+            "versions": [
+                "type"
+            ],
+            "description": "Name of repository type",
+            "deprecated": false,
+            "hidden": "false",
+            "id": "copo.repository.type",
+            "label": "Repository Type",
+            "show_in_form": true,
+            "ref": "",
+            "type": "object",
+            "show_in_table": true,
+            "control": "select"
+        },
+        {
+            "help_tip": "",
+            "required": "true",
+            "default_value": "",
+            "control_meta": {},
+            "versions": [
+                "name"
+            ],
+            "description": "Description of Repository",
+            "deprecated": false,
+            "hidden": "false",
+            "id": "copo.repository.name",
+            "label": "Name",
+            "show_in_form": true,
+            "ref": "",
+            "type": "object",
+            "show_in_table": true,
+            "control": "text"
+        },
+        {
+            "help_tip": "",
+            "required": "true",
+            "default_value": "",
+            "control_meta": {},
+            "versions": [
+                "url"
+            ],
+            "description": "URL of repository",
+            "deprecated": false,
+            "hidden": "false",
+            "id": "copo.repository.url",
+            "label": "Repository URL",
+            "show_in_form": true,
+            "ref": "",
+            "type": "object",
+            "show_in_table": true,
+            "control": "text"
+        },
+        {
+            "help_tip": "",
+            "required": "false",
+            "default_value": "",
+            "control_meta": {},
+            "versions": [
+                "apikey"
+            ],
+            "description": "Repository API Key",
+            "deprecated": false,
+            "hidden": "false",
+            "id": "copo.repository.apikey",
+            "label": "API Key",
+            "show_in_form": true,
+            "ref": "",
+            "type": "object",
+            "show_in_table": true,
+            "control": "text"
+        },
+        {
+            "help_tip": "",
+            "required": "false",
+            "default_value": "",
+            "control_meta": {},
+            "versions": [
+                "username"
+            ],
+            "description": "Repository Username",
+            "deprecated": false,
+            "hidden": "false",
+            "id": "copo.repository.username",
+            "label": "Username",
+            "show_in_form": true,
+            "ref": "",
+            "type": "object",
+            "show_in_table": true,
+            "control": "text"
+        },
+        {
+            "help_tip": "",
+            "required": "false",
+            "default_value": "",
+            "control_meta": {},
+            "versions": [
+                "password"
+            ],
+            "description": "Repository Password",
+            "deprecated": false,
+            "hidden": "false",
+            "id": "copo.repository.password",
+            "label": "Password",
+            "show_in_form": true,
+            "ref": "",
+            "type": "object",
+            "show_in_table": true,
+            "control": "text"
+        },
+        {
+            "help_tip": "",
+            "required": "true",
+            "default_value": "",
+            "control_meta": {},
+            "versions": [
+                "deleted"
+            ],
+            "ref": "",
+            "deprecated": false,
+            "hidden": "true",
+            "label": "Delete",
+            "show_in_form": false,
+            "id": "copo.repository.deleted",
+            "type": "string",
+            "show_in_table": false,
+            "control": "text"
+        },
+        {
+            "help_tip": "",
+            "required": "true",
+            "default_value": "",
+            "control_meta": {},
+            "versions": [
+                "uid"
+            ],
+            "ref": "",
+            "deprecated": false,
+            "hidden": "true",
+            "label": "Delete",
+            "show_in_form": false,
+            "id": "copo.repository.uid",
+            "type": "string",
+            "show_in_table": false,
+            "control": "text"
+        }
+    ],
+    "description": "Attributes for COPO Repository Schema.",
+    "title": "Repository mappings"
+}

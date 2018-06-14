@@ -182,7 +182,7 @@ DATAVERSE = {
     "TEST_DATAVERSE_API_TOKEN": "06745d26-1684-489d-a87b-52df9ba05375",
     "HARVARD_TOKEN": "ea9a511b-d8ae-49ee-9614-9fe131dd8f5f",
     "HARVARD_TEST_API": "https://demo.dataverse.org/api/v1/",
-    "HARVARD_TEST_TOKEN": "227bc74d-088f-423f-8f49-d8503f62f7de"
+    "HARVARD_TEST_TOKEN": "fe6998df-c2a4-4103-9bf8-95200953fe0c"
 }
 
 UNIT_TESTING = False

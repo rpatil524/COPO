@@ -29,7 +29,6 @@
     <link rel="stylesheet" href="{% static 'copo/webui_popover/jquery.webui-popover.css' %}">
 
 
-
     <link rel="shortcut icon" href="{% static 'copo/img/COPO_icon.png' %}"/>
 
     <!-- Font Awesome -->
@@ -51,7 +50,6 @@
     <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/search_highlight/dataTables.searchHighlight.css' %}">
     <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.css' %}">
-
 
 
     <!-- Google Fonts -->
@@ -255,7 +253,7 @@
                     </div>
                 </form>
             </li>
-            <li class="dropdown" style="margin-left: 15px;" title="Documentation" >
+            <li class="dropdown" style="margin-left: 15px;" title="Documentation">
                 <a href="http://copo-project.readthedocs.io/en/latest/" target="_blank">
                     <span data-copo-tour-id="documentation_button"><i class="fa fa-book" aria-hidden="true"></i></span>
                 </a>
@@ -281,6 +279,16 @@
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                     {% if user.is_authenticated %}
 
+                        {% if request.user.is_superuser %}
+                            <li>
+                                <a href="{% url 'copo:administer_repos' %}" role="menuitem" tabindex="-1">
+                                    <div class="custom-nav-items">
+                                        <i class="fa fa-database" aria-hidden="true"></i>
+                                        <span class="icon_text">Administer Repositories</span>
+                                    </div>
+                                </a>
+                            </li>
+                        {% endif %}
                         <li>
                             <a href="{% url 'copo:groups' %}" role="menuitem" tabindex="-1">
                                 <div class="custom-nav-items">

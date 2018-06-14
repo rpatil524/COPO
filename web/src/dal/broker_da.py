@@ -226,6 +226,7 @@ class BrokerVisuals:
             datafile=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             sample=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             submission=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
+            repository=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_all_profiles())),
         )
 
@@ -248,6 +249,7 @@ class BrokerVisuals:
             sample=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_for_user())),
             datafile=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
+            repository=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
         )
 
         # NB: in table_data_dict, use an empty dictionary as a parameter to functions that define zero arguments
