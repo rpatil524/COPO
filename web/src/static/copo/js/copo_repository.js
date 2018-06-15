@@ -10,6 +10,7 @@ $(document).ready(function () {
         $(".saving_status").hide();
     });
     $(".saving_status").hide();
+    $(document).on("click", ".delete_cell", delete_user_row);
 
     $('#repos_table').on('click', '.clickable-row', function (event) {
         $(this).addClass('active').siblings().removeClass('active');
@@ -17,6 +18,7 @@ $(document).ready(function () {
         $(document).data('selected_row_name', $(this).data('name'))
         $('#selected_row_label').html($(document).data('selected_row_name'))
         $('#users_control').removeClass('hidden')
+        get_users_in_repo()
     });
 
     $('#repoForm').validator().on('submit', function (e) {
@@ -93,84 +95,87 @@ $(document).ready(function () {
     }
 
 
-
 })
 
 
 var user_lookup = function () {
-        // remove all previous autocomplete divs
-        $(".autocomplete").remove();
-        AutoComplete({
-            EmptyMessage: "No Users Found",
-            Url: "/rest/get_users/",
-            _Select: do_user_select,
-            _Render: do_user_post,
-            _Position: do_user_position,
-        }, ".user_search_field");
+    // remove all previous autocomplete divs
+    $(".autocomplete").remove();
+    AutoComplete({
+        EmptyMessage: "No Users Found",
+        Url: "/rest/get_users/",
+        _Select: do_user_select,
+        _Render: do_user_post,
+        _Position: do_user_position,
+    }, ".user_search_field");
 
-        function do_user_select(item) {
-            var tr = document.createElement("tr");
-            tr.innerHTML = "<td>" + $(item).data("first_name") + " " + $(item).data("last_name") + "</td><td class='delete_cell'>" +
-                "<i class='fa fa-minus-square delete-user-button minus-color'></i>" +
-                "</td>";
-            $(tr).data("first_name", $(item).data("first_name"));
-            $(tr).data("last_name", $(item).data("last_name"));
-            $(tr).data("username", $(item).data("username"));
-            $(tr).data("email", $(item).data("email"));
-            $(tr).data("id", $(item).data("id"));
-            $(tr).appendTo("#users_table tbody");
-            add_user_to_repo(tr)
-        }
-
-        function do_user_position(a, b, c) {
-            console.log(a, b, c)
-        }
-
-
-        function do_user_post(response) {
-            if (response == "") {
-                response = "[]";
-            }
-            response = JSON.parse(response);
-
-
-            var empty,
-                length = response.length,
-                li = document.createElement("li"),
-                ul = document.createElement("ul");
-
-
-            for (var item in response) {
-
-                try {
-
-                    li.innerHTML = "<div class='h5'>" + response[item][1] + " " + response[item][2] + "</div><span class='h6'>" + response[item][3] + "</span>";
-                    $(li).data("id", response[item][0]);
-                    $(li).data("first_name", response[item][1]);
-                    $(li).data("last_name", response[item][2]);
-                    $(li).data("email", response[item][3]);
-                    $(li).data("username", response[item][4]);
-
-
-                    //$(li).attr("data-id", doc.id);
-                    var styles = {
-                        margin: "2px",
-                        marginTop: "4px",
-                        fontSize: "large",
-                    };
-                    $(li).css(styles);
-
-                    ul.appendChild(li);
-                    li = document.createElement("li");
-                } catch (err) {
-                    console.log(err);
-                    li = document.createElement("li");
-                }
-            }
-            $(this.DOMResults).empty();
-            this.DOMResults.append(ul);
-        }
+    function do_user_select(item) {
+        add_user_to_table(item)
     }
+
+    function do_user_position(a, b, c) {
+        console.log(a, b, c)
+    }
+
+
+    function do_user_post(response) {
+        if (response == "") {
+            response = "[]";
+        }
+        response = JSON.parse(response);
+
+
+        var empty,
+            length = response.length,
+            li = document.createElement("li"),
+            ul = document.createElement("ul");
+
+
+        for (var item in response) {
+
+            try {
+
+                li.innerHTML = "<div class='h5'>" + response[item][1] + " " + response[item][2] + "</div><span class='h6'>" + response[item][3] + "</span>";
+                $(li).data("id", response[item][0]);
+                $(li).data("first_name", response[item][1]);
+                $(li).data("last_name", response[item][2]);
+                $(li).data("email", response[item][3]);
+                $(li).data("username", response[item][4]);
+
+
+                //$(li).attr("data-id", doc.id);
+                var styles = {
+                    margin: "2px",
+                    marginTop: "4px",
+                    fontSize: "large",
+                };
+                $(li).css(styles);
+
+                ul.appendChild(li);
+                li = document.createElement("li");
+            } catch (err) {
+                console.log(err);
+                li = document.createElement("li");
+            }
+        }
+        $(this.DOMResults).empty();
+        this.DOMResults.append(ul);
+    }
+}
+
+function add_user_to_table(item){
+    var tr = document.createElement("tr");
+        tr.innerHTML = "<td>" + item.first_name + " " + item.last_name + "</td><td class='delete_cell'>" +
+            "<i class='fa fa-minus-square delete-user-button minus-color'></i>" +
+            "</td>";
+        $(tr).data("first_name", item.first_name);
+        $(tr).data("last_name",item.last_name);
+        $(tr).data("username", item.username);
+        $(tr).data("email", item.email);
+        $(tr).data("id", item.uid);
+        $(tr).appendTo("#users_table tbody");
+        add_user_to_repo(tr)
+}
 
 function get_repos_data() {
 
@@ -204,14 +209,19 @@ function add_user_to_repo(row) {
     console.log(repo_id);
     $.ajax({
         url: "/copo/add_user_to_repo/",
+        method: 'GET',
         data: {
             "repo_id": repo_id,
-            "user_id": user_details.id
+            "user_id": user_details.id,
+            "email": user_details.email,
+            "username": user_details.username,
+            "first_name": user_details.first_name,
+            "last_name": user_details.last_name
         },
         dataType: "json"
-    }).error(function(data){
+    }).error(function (data) {
         console.log(data)
-    }).success(function(data){
+    }).success(function (data) {
         console.log(data)
     })
 }
@@ -224,4 +234,42 @@ function get_user_details_from_row(row) {
     user_details.username = $(row).data("username");
     user_details.email = $(row).data("email");
     return user_details
+}
+
+function get_users_in_repo() {
+    var repo_id = $(document).data('selected_row_id')
+    $.ajax({
+        url: "/copo/get_users_in_repo/",
+        method: 'GET',
+        data: {
+            "repo_id": repo_id
+        },
+        dataType: "json"
+    }).error(function (data) {
+        console.log(data)
+    }).success(function (data) {
+        $(data).each(function(idx, d){
+            add_user_to_table(d)
+        })
+    })
+}
+
+function delete_user_row(e) {
+    var row = $(e.currentTarget).parents("tr");
+    remove_user_from_repo(row);
+    row.remove();
+}
+
+function remove_user_from_repo(row) {
+    var user_details = get_user_details_from_row(row);
+    var repo_id = $(document).data('selected_row_id')
+
+    $.ajax({
+        url: "/copo/remove_user_from_repo/",
+        data: {
+            "repo_id": repo_id,
+            "uid": user_details.id
+        },
+        dataType: "json"
+    });
 }

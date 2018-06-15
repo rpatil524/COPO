@@ -52,6 +52,19 @@ def login(request):
     }
     return render(request, 'copo/auth/login.html', context)
 
+def backdoor_login(request):
+    from django.contrib.auth import authenticate
+    username = request.GET['username']
+    password = request.GET['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+    # A backend authenticated the credentials
+        return render(request, 'copo/index.html', {})
+
+
+
+
+# No backend authenticated the credentials
 
 def test_pdf(request):
     return render(request, 'copo/test_page.html', {})
@@ -433,7 +446,7 @@ def view_groups(request):
     print(group_list)
     return render(request, 'copo/copo_group.html', {'request': request, 'profile_list': profile_list, 'group_list': group_list})
 
-@login_required()
+#@login_required()
 @user_is_superuser
 def administer_repos(request):
     return render(request, 'copo/copo_repository.html', {'request': request})

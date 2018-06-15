@@ -336,3 +336,20 @@ def get_repos_data(request):
 
 
 def add_user_to_repo(request):
+    user_id = request.GET['user_id']
+    first_name = request.GET['first_name']
+    last_name = request.GET['last_name']
+    username = request.GET['username']
+    email = request.GET['email']
+    Repository().push_user(request.GET['repo_id'], user_id, first_name, last_name, username, email)
+    return HttpResponse(json_util.dumps({"out": "1"}))
+
+def remove_user_from_repo(request):
+    repo_id = request.GET['repo_id']
+    user_id = request.GET['uid']
+    Repository().pull_user(repo_id, user_id)
+    return HttpResponse(json_util.dumps({"out": "1"}))
+
+def get_users_in_repo(request):
+    doc = Repository().get_users(request.GET['repo_id'])
+    return HttpResponse(json_util.dumps(doc))

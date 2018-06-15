@@ -207,6 +207,7 @@ class Repository(DAComponent):
     def __init__(self, profile_id=None):
         super(Repository, self).__init__(profile_id, "repository")
 
+
 class Annotation(DAComponent):
     def __init__(self, profile_id=None):
         super(Annotation, self).__init__(profile_id, "annotation")
@@ -552,7 +553,6 @@ class Profile(DAComponent):
         shared = list(self.get_shared_for_user(user))
         return shared + mine
 
-
     def get_for_user(self, user=None):
         if not user:
             user = data_utils.get_current_user().id
@@ -693,6 +693,7 @@ class Group(DAComponent):
             {'$pull': {'member_ids': user_id}}
         )
 
+
 class Repository(DAComponent):
     def __init__(self):
         super(Repository, self).__init__(None, "repository")
@@ -700,6 +701,22 @@ class Repository(DAComponent):
 
     def get_by_uid(self, uid):
         doc = self.get_collection_handle().find({"uid": uid}, {"name": 1, "type": 1, "url": 1})
+        return doc
+
+    def get_users(self, repo_id):
+        doc = self.get_collection_handle().find_one({"_id": ObjectId(repo_id)})
+        return doc['users']
+
+    def push_user(self, repo_id, uid, first_name, last_name, username, email):
+        args = {'uid': uid, "first_name": first_name, "last_name": last_name, "username": username, "email": email}
+        return self.Repository.update(
+            {'_id': ObjectId(repo_id)},
+            {'$push': {'users': args}}
+        )
+
+    def pull_user(self, repo_id, user_id):
+        doc = self.Repository.update({'_id': ObjectId(repo_id)},
+                                     {'$pull': {'users.uid': {'$in': [user_id]}}})
         return doc
 
 

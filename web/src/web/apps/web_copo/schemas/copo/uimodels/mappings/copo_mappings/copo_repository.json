@@ -148,12 +148,29 @@
             "ref": "",
             "deprecated": false,
             "hidden": "true",
-            "label": "Delete",
+            "label": "UserId",
             "show_in_form": false,
             "id": "copo.repository.uid",
             "type": "string",
             "show_in_table": false,
             "control": "text"
+        },
+        {
+            "type": "array",
+            "required": "false",
+            "ref": "",
+            "hidden": "false",
+            "deprecated": false,
+            "default_value": "",
+            "show_in_form": true,
+            "id": "copo.repository.users",
+            "show_in_table": false,
+            "control": "",
+            "versions": [
+                "users"
+            ],
+            "help_tip": "",
+            "label": ""
         }
     ],
     "description": "Attributes for COPO Repository Schema.",

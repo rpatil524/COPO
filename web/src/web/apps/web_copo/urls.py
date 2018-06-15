@@ -62,4 +62,7 @@ urlpatterns = [path('', views.index, name='index'),
                path('create_new_repo/', ajax_handlers.create_new_repo, name="create_new_repo"),
                path('get_repos_data/', ajax_handlers.get_repos_data, name="get_repos_data"),
                path('add_user_to_repo/', ajax_handlers.add_user_to_repo, name="add_user_to_repo"),
+               path('remove_user_from_repo/', ajax_handlers.remove_user_from_repo, name="remove_user_from_repo"),
+               path('get_users_in_repo/', ajax_handlers.get_users_in_repo, name="get_users_in_repo"),
+               path('backdoor_login/', views.backdoor_login, name="backdoor_login")
                ]
