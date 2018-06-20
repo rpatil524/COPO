@@ -19,12 +19,20 @@ $(document).ready(function () {
         $("#tool_window").css("visibility", "visible");
         get_profiles_in_group_data(e);
         get_users_in_group_data(e);
+        get_repos_in_group_data()
     });
     $(document).on("click", "#submit_group", validate_group_form);
     $(document).on("click", "#delete_group_button", show_delete_dialog);
     $("#profiles_in_group").multiSelect({
         selectableHeader: "<div class='custom-header'>Your Profiles</div>",
         selectionHeader: "<div class='custom-header'>Added to Group</div>",
+        dblClick: true,
+        afterSelect: add_profile_in_group_handler,
+        afterDeselect: remove_profile_in_group_handler
+    });
+    $("#repos_in_group").multiSelect({
+        selectableHeader: "<div class='custom-header'>Addable Repositores</div>",
+        selectionHeader: "<div class='custom-header'>Added Repositories</div>",
         dblClick: true,
         afterSelect: add_profile_in_group_handler,
         afterDeselect: remove_profile_in_group_handler
@@ -131,6 +139,7 @@ $(document).ready(function () {
         if (e.isDefaultPrevented()) {
             console.log();
         } else {
+            e.preventDefault()
             // submit form to create new group
             var group_name = $("#groupName").val();
             var description = $("#groupDescription").val();
@@ -226,24 +235,6 @@ $(document).ready(function () {
         });
     }
 
-    function get_profiles_in_group_data() {
-        var group_id = $("#selected_group").data("selected_group_id");
-        $.ajax({
-            url: "/copo/get_profiles_in_group/",
-            method: "GET",
-            data: {"group_id": group_id},
-            dataType: "json"
-        }).done(function (data) {
-            $("#profiles_in_group option").remove();
-            $(data.resp).each(function (idx, el) {
-                $("#profiles_in_group").multiSelect("addOption", {value: el._id.$oid, text: el.title});
-                if (el.selected) {
-                    $("#profiles_in_group").multiSelect("select", el._id.$oid);
-                }
-            });
-            $("#profiles_in_group").multiSelect("refresh");
-        });
-    }
 
     function get_users_in_group_data() {
         var group_id = $("#selected_group").data("selected_group_id");
@@ -394,3 +385,42 @@ function remove_user_from_group(row) {
         dataType: "json"
     });
 }
+
+function get_repos_in_group_data() {
+    var group_id = $("#selected_group").data("selected_group_id");
+    $.ajax({
+        url: "/copo/get_repos_for_user/",
+        method: "GET",
+        data: {"group_id": group_id},
+        dataType: "json"
+    }).done(function (data) {
+        $("#repos_in_group option").remove();
+        $(data.resp).each(function (idx, el) {
+            console.log(el)
+            $("#repos_in_group").multiSelect("addOption", {value: el._id.$oid, text: el.name + ' - ' + el.url});
+            //if (el.selected) {
+            //    $("#profiles_in_group").multiSelect("select", el._id.$oid);
+            //}
+        });
+        $("#repos_in_group").multiSelect("refresh");
+    });
+}
+
+function get_profiles_in_group_data() {
+        var group_id = $("#selected_group").data("selected_group_id");
+        $.ajax({
+            url: "/copo/get_profiles_in_group/",
+            method: "GET",
+            data: {"group_id": group_id},
+            dataType: "json"
+        }).done(function (data) {
+            $("#profiles_in_group option").remove();
+            $(data.resp).each(function (idx, el) {
+                $("#profiles_in_group").multiSelect("addOption", {value: el._id.$oid, text: el.title});
+                if (el.selected) {
+                    $("#profiles_in_group").multiSelect("select", el._id.$oid);
+                }
+            });
+            $("#profiles_in_group").multiSelect("refresh");
+        });
+    }

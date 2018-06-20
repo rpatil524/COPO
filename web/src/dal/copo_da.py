@@ -203,10 +203,6 @@ class Publication(DAComponent):
         super(Publication, self).__init__(profile_id, "publication")
 
 
-class Repository(DAComponent):
-    def __init__(self, profile_id=None):
-        super(Repository, self).__init__(profile_id, "repository")
-
 
 class Annotation(DAComponent):
     def __init__(self, profile_id=None):
@@ -703,6 +699,10 @@ class Repository(DAComponent):
         doc = self.get_collection_handle().find({"uid": uid}, {"name": 1, "type": 1, "url": 1})
         return doc
 
+    def get_by_username(self, username):
+        doc = self.get_collection_handle().find({"username": username})
+        return doc
+
     def get_users(self, repo_id):
         doc = self.get_collection_handle().find_one({"_id": ObjectId(repo_id)})
         return doc['users']
@@ -716,8 +716,12 @@ class Repository(DAComponent):
 
     def pull_user(self, repo_id, user_id):
         doc = self.Repository.update({'_id': ObjectId(repo_id)},
-                                     {'$pull': {'users.uid': {'$in': [user_id]}}})
+                                     {'$pull': {'users': {'uid': user_id}}})
         return doc
+
+    def get_for_user(self, uid):
+        docs = self.Repository.find({'users.uid': uid})
+        return list(docs)
 
 
 class RemoteDataFile:

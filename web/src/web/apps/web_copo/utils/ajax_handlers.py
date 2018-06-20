@@ -324,10 +324,12 @@ def create_new_repo(request):
     username = request.POST['username']
     password = request.POST['password']
     uid = request.user.id
-    args = {'name': name, 'type': type, 'url': url, 'apikey': apikey, 'username': username, 'password': password, 'uid': uid}
+    args = {'name': name, 'type': type, 'url': url, 'apikey': apikey, 'username': username, 'password': password,
+            'uid': uid}
     Repository().save_record(dict(), **args)
     out = {'name': name, 'type': type, 'url': url}
     return HttpResponse(json_util.dumps(out))
+
 
 def get_repos_data(request):
     uid = request.user.id
@@ -341,8 +343,15 @@ def add_user_to_repo(request):
     last_name = request.GET['last_name']
     username = request.GET['username']
     email = request.GET['email']
-    Repository().push_user(request.GET['repo_id'], user_id, first_name, last_name, username, email)
-    return HttpResponse(json_util.dumps({"out": "1"}))
+    doc = Repository().get_by_username(username)
+    if True:
+        Repository().push_user(request.GET['repo_id'], user_id, first_name, last_name, username, email)
+        return HttpResponse(json_util.dumps({"out": "1"}))
+    else:
+        out = {"out": "0", "user_id": user_id, "first_name": first_name, "last_name": last_name, "username": username,
+               "email": email}
+        return HttpResponse(json_util.dumps(out))
+
 
 def remove_user_from_repo(request):
     repo_id = request.GET['repo_id']
@@ -350,6 +359,13 @@ def remove_user_from_repo(request):
     Repository().pull_user(repo_id, user_id)
     return HttpResponse(json_util.dumps({"out": "1"}))
 
+
 def get_users_in_repo(request):
     doc = Repository().get_users(request.GET['repo_id'])
     return HttpResponse(json_util.dumps(doc))
+
+
+def get_repos_for_user(request):
+    uid = str(request.user.id)
+    doc = Repository().get_for_user(uid)
+    return HttpResponse(json_util.dumps({'resp': doc}))

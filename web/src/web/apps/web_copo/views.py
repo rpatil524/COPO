@@ -91,6 +91,10 @@ def test_submission(request):
     delegate_submission(request)
     return render(request, 'copo/test_page.html', {})
 
+@login_required
+def copo_repository(request, profile_id):
+    profile = Profile().get_record(profile_id)
+    return render(request, 'copo/copo_repo.html', {'profile_id': profile_id, 'profile': profile})
 
 def forward_to_info(request):
     message = request.GET['message']
@@ -168,10 +172,6 @@ def copo_data(request, profile_id, cyverse_file_data=None):
     profile = Profile().get_record(profile_id)
     return render(request, 'copo/copo_data.html', {'profile_id': profile_id, 'profile': profile})
 
-@login_required
-def copo_repository(request, profile_id):
-    profile = Profile().get_record(profile_id)
-    return render(request, 'copo/copo_repo.html', {'profile_id': profile_id, 'profile': profile})
 
 
 def copo_docs(request):

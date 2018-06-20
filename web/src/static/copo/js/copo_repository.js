@@ -110,7 +110,7 @@ var user_lookup = function () {
     }, ".user_search_field");
 
     function do_user_select(item) {
-        add_user_to_table(item)
+        add_user_to_repo(item)
     }
 
     function do_user_position(a, b, c) {
@@ -163,18 +163,8 @@ var user_lookup = function () {
     }
 }
 
-function add_user_to_table(item){
-    var tr = document.createElement("tr");
-        tr.innerHTML = "<td>" + item.first_name + " " + item.last_name + "</td><td class='delete_cell'>" +
-            "<i class='fa fa-minus-square delete-user-button minus-color'></i>" +
-            "</td>";
-        $(tr).data("first_name", item.first_name);
-        $(tr).data("last_name",item.last_name);
-        $(tr).data("username", item.username);
-        $(tr).data("email", item.email);
-        $(tr).data("id", item.uid);
-        $(tr).appendTo("#users_table tbody");
-        add_user_to_repo(tr)
+function add_user_to_table(item) {
+
 }
 
 function get_repos_data() {
@@ -203,10 +193,9 @@ function get_repos_data() {
 
 
 function add_user_to_repo(row) {
+
     var user_details = get_user_details_from_row(row);
     var repo_id = $(document).data('selected_row_id')
-    console.log(user_details);
-    console.log(repo_id);
     $.ajax({
         url: "/copo/add_user_to_repo/",
         method: 'GET',
@@ -222,7 +211,18 @@ function add_user_to_repo(row) {
     }).error(function (data) {
         console.log(data)
     }).success(function (data) {
-        console.log(data)
+        if(data.out == '0') {
+            var tr = document.createElement("tr");
+            tr.innerHTML = "<td>" + data.first_name + " " + data.last_name + "</td><td class='delete_cell'>" +
+                "<i class='fa fa-minus-square delete-user-button minus-color'></i>" +
+                "</td>";
+            $(tr).data("first_name", data.first_name);
+            $(tr).data("last_name", data.last_name);
+            $(tr).data("username", data.username);
+            $(tr).data("email", data.email);
+            $(tr).data("id", data.id);
+            $(tr).appendTo("#users_table tbody");
+        }
     })
 }
 
@@ -248,8 +248,14 @@ function get_users_in_repo() {
     }).error(function (data) {
         console.log(data)
     }).success(function (data) {
-        $(data).each(function(idx, d){
-            add_user_to_table(d)
+        $(data).each(function (idx, d) {
+
+            var tr = document.createElement("tr");
+            $(tr).data("id", d.uid)
+            $(tr).data("first_name", d.first_name);
+            $(tr).data("last_name", d.last_name);
+            add_user_to_table(tr)
+
         })
     })
 }
