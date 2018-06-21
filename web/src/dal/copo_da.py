@@ -667,6 +667,16 @@ class Group(DAComponent):
                 p['selected'] = False
         return p_list
 
+    def get_repos_for_group_info(self, uid, group_id):
+        g = Group().get_record(ObjectId(group_id))
+        docs = cursor_to_list(Repository().Repository.find({'users.uid': uid}))
+        for d in docs:
+            if d['_id'] in g['repo_ids']:
+                d['selected'] = True
+            else:
+                d['selected'] = False
+        return list(docs)
+
     def get_users_for_group_info(self, group_id):
         group = Group().get_record(ObjectId(group_id))
         member_ids = group['member_ids']
@@ -689,6 +699,14 @@ class Group(DAComponent):
             {'$pull': {'member_ids': user_id}}
         )
 
+    def add_repo(self, group_id, repo_id):
+        return self.Group.update({'_id': ObjectId(group_id)}, {'$push': {'repo_ids': ObjectId(repo_id)}})
+
+    def remove_repo(self, group_id, repo_id):
+        return self.Group.update(
+            {'_id': ObjectId(group_id)},
+            {'$pull': {'repo_ids': ObjectId(repo_id)}}
+        )
 
 class Repository(DAComponent):
     def __init__(self):
@@ -719,9 +737,7 @@ class Repository(DAComponent):
                                      {'$pull': {'users': {'uid': user_id}}})
         return doc
 
-    def get_for_user(self, uid):
-        docs = self.Repository.find({'users.uid': uid})
-        return list(docs)
+
 
 
 class RemoteDataFile:

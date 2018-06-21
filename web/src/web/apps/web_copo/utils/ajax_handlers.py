@@ -367,5 +367,26 @@ def get_users_in_repo(request):
 
 def get_repos_for_user(request):
     uid = str(request.user.id)
-    doc = Repository().get_for_user(uid)
+    group_id = request.GET['group_id']
+    doc = Group().get_repos_for_group_info(uid, group_id)
     return HttpResponse(json_util.dumps({'resp': doc}))
+
+
+def add_repo_to_group(request):
+    group_id = request.GET['group_id']
+    repo_id = request.GET['repo_id']
+    resp = Group().add_repo(group_id=group_id, repo_id=repo_id)
+    if resp:
+        return HttpResponse(json.dumps({'resp': 'Added to Group'}))
+    else:
+        return HttpResponseBadRequest(json.dumps({'resp': 'Server Error - Try again'}))
+
+
+def remove_repo_from_group(request):
+    group_id = request.GET['group_id']
+    repo_id = request.GET['repo_id']
+    resp = Group().remove_repo(group_id=group_id, repo_id=repo_id)
+    if resp:
+        return HttpResponse(json.dumps({'resp': 'Removed from Group'}))
+    else:
+        return HttpResponseBadRequest(json.dumps({'resp': 'Server Error - Try again'}))
