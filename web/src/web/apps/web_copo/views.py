@@ -25,7 +25,7 @@ from rauth import OAuth2Service
 from web.apps.web_copo.utils import EnaImports as eimp
 from submission.enaSubmission import EnaSubmit
 from web.apps.web_copo.schemas.utils import data_utils
-from web.apps.web_copo.decorators import user_is_superuser
+from web.apps.web_copo.decorators import user_is_staff
 
 LOGGER = settings.LOGGER
 
@@ -447,6 +447,9 @@ def view_groups(request):
     return render(request, 'copo/copo_group.html', {'request': request, 'profile_list': profile_list, 'group_list': group_list})
 
 #@login_required()
-@user_is_superuser
+@user_is_staff
 def administer_repos(request):
     return render(request, 'copo/copo_repository.html', {'request': request})
+
+def manage_repos(request):
+    return render(request, 'copo/repo_management.html', {'request': request})

@@ -4,6 +4,7 @@
 {% load compress %}
 {% load staticfiles %}
 {% load html_tags %}
+{% load web_tags %}
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -279,12 +280,22 @@
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                     {% if user.is_authenticated %}
 
-                        {% if request.user.is_superuser %}
+                        {% if request.user.is_staff %}
                             <li>
                                 <a href="{% url 'copo:administer_repos' %}" role="menuitem" tabindex="-1">
                                     <div class="custom-nav-items">
                                         <i class="fa fa-database" aria-hidden="true"></i>
                                         <span class="icon_text">Administer Repositories</span>
+                                    </div>
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if request.user|has_group:"data_managers" %}
+                            <li>
+                                <a href="{% url 'copo:manage_repos' %}" role="menuitem" tabindex="-1">
+                                    <div class="custom-nav-items">
+                                        <i class="fa fa-database" aria-hidden="true"></i>
+                                        <span class="icon_text">Manage Repositories</span>
                                     </div>
                                 </a>
                             </li>

@@ -35,13 +35,12 @@ DJANGO_APPS = [
 
 # user-defined applications definition
 PROJECT_APPS = [
-    'web.apps.web_copo',
+    'web_copo',
     'web.apps.web_copo.rest',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.orcid',
-    # 'web.apps.web_copo',
     'rest_framework',
     'chunked_upload',
     'compressor',
@@ -189,3 +188,5 @@ UNIT_TESTING = False
 TEST_USER = None
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400
+
+# check if correct groups exist

@@ -20,7 +20,10 @@ from dal import mongo_util as util
 from pandas import read_excel
 from submission.dataverseSubmission import DataverseSubmit
 from django.contrib.auth.models import User
+from web_copo.models import UserDetails
 from django.db.models import Q
+from django.contrib.auth.models import Group
+from django.core import serializers
 
 
 def get_source_count(self):
@@ -338,31 +341,53 @@ def get_repos_data(request):
 
 
 def add_user_to_repo(request):
+    repo_id = request.GET['repo_id']
     user_id = request.GET['user_id']
     first_name = request.GET['first_name']
     last_name = request.GET['last_name']
     username = request.GET['username']
     email = request.GET['email']
-    doc = Repository().get_by_username(username)
-    if True:
-        Repository().push_user(request.GET['repo_id'], user_id, first_name, last_name, username, email)
-        return HttpResponse(json_util.dumps({"out": "1"}))
+    # doc = Repository().get_by_username(username)
+    dms = Group.objects.get(name='data_managers')
+    u = User.objects.get(pk=user_id)
+    dms.user_set.add(u)
+    # User.UserDetails is an extension to User via a one-to-one django field....look in models.py
+    repos = u.userdetails.repo_manager
+    if repos == None:
+        u.userdetails.repo_manager = [repo_id]
+        u.save()
     else:
-        out = {"out": "0", "user_id": user_id, "first_name": first_name, "last_name": last_name, "username": username,
-               "email": email}
-        return HttpResponse(json_util.dumps(out))
+        if repo_id not in repos:
+            u.userdetails.repo_manager.append(repo_id)
+            u.save()
+
+    out = {"out": "0", "user_id": user_id, "first_name": first_name, "last_name": last_name, "username": username,
+           "email": email}
+    return HttpResponse(json_util.dumps(out))
 
 
 def remove_user_from_repo(request):
     repo_id = request.GET['repo_id']
     user_id = request.GET['uid']
-    Repository().pull_user(repo_id, user_id)
+    u = User.objects.get(pk=user_id)
+    u.userdetails.repo_manager.remove(repo_id)
+    u.save()
+    if len(u.userdetails.repo_manager) == 0:
+        # remove from admins group
+        dms = Group.objects.get(name='data_managers')
+        dms.user_set.remove(u)
+
     return HttpResponse(json_util.dumps({"out": "1"}))
 
 
 def get_users_in_repo(request):
-    doc = Repository().get_users(request.GET['repo_id'])
-    return HttpResponse(json_util.dumps(doc))
+    repo_id = request.GET['repo_id']
+    data = UserDetails.objects.filter(repo_manager__contains=[repo_id])
+    u_list = list()
+    for d in data:
+        u_list.append({'uid': d.user.id, 'first_name': d.user.first_name, 'last_name': d.user.last_name})
+    #data = serializers.serialize('json', u_list)
+    return HttpResponse(json_util.dumps(u_list))
 
 
 def get_repos_for_user(request):

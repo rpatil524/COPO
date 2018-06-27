@@ -10,7 +10,7 @@ $(document).ready(function () {
         $(".saving_status").hide();
     });
     $(".saving_status").hide();
-    $(document).on("click", ".delete_cell", delete_user_row);
+    $(document).on("click", ".delete_cell_user", delete_user_row);
 
     $('#repos_table').on('click', '.clickable-row', function (event) {
         $(this).addClass('active').siblings().removeClass('active');
@@ -248,14 +248,17 @@ function get_users_in_repo() {
     }).error(function (data) {
         console.log(data)
     }).success(function (data) {
+        $('#users_table tbody').empty()
         $(data).each(function (idx, d) {
 
             var tr = document.createElement("tr");
             $(tr).data("id", d.uid)
             $(tr).data("first_name", d.first_name);
             $(tr).data("last_name", d.last_name);
-            add_user_to_table(tr)
-
+            $(tr).append("<td>" + d.first_name + "</td>");
+            $(tr).append("<td>" + d.last_name + "</td>")
+            $(tr).append("<td class='delete_cell_user text-center'><i class=\"fa fa-minus-square delete-user-button minus-color\"></i>")
+            $('#users_table tbody').append(tr)
         })
     })
 }

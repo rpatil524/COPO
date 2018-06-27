@@ -1,8 +1,10 @@
 __author__ = 'fshaw'
 from django import template
+from django.contrib.auth.models import Group
 
 register = template.Library()
 from dal.copo_da import DataFile
+
 
 @register.filter("mongo_id")
 def mongo_id(value):
@@ -19,6 +21,7 @@ def datafile_title(value):
     cu = DataFile().get_relational_record_for_id(d['file_id'])
     return cu.filename
 
+
 @register.filter("make_repo_name")
 def make_repo_name(value):
     str = ''
@@ -27,6 +30,7 @@ def make_repo_name(value):
     else:
         str += value.capitalize()
     return str + ' ' + 'Submission'
+
 
 @register.filter("make_file_count")
 def make_file_count(value):
@@ -45,3 +49,9 @@ def produce_submission_header(value):
     str += make_file_count(value)
 
     return str
+
+
+@register.filter("has_group")
+def check_group(user, group_name):
+    group = Group.objects.get(name=group_name)
+    return group in user.groups.all()
