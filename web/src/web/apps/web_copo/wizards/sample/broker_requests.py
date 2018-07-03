@@ -2,8 +2,6 @@ __author__ = 'etuka'
 __date__ = '21 Nov 2016'
 
 import json
-import web.apps.web_copo.lookup.lookup as lkup
-import web.apps.web_copo.schemas.utils.data_utils as d_utils
 import web.apps.web_copo.wizards.sample.wizard_helper as wizh
 
 
@@ -12,39 +10,33 @@ class BrokerRequests:
         self.param_dict = kwargs
 
         self.context = self.param_dict.get("context", dict())
-        self.generated_samples = self.param_dict.get("generated_samples", list())
-        self.target_rows = self.param_dict.get("target_rows", list())
         self.sample_type = self.param_dict.get("sample_type", str())
-        self.number_to_generate = self.param_dict.get("number_to_generate", str())
         self.target_id = self.param_dict.get("target_id", str())
         self.profile_id = self.param_dict.get("profile_id", str())
+        self.description_token = self.param_dict.get("description_token", str())
 
         self.auto_fields = self.param_dict.get("auto_fields", dict())
-
         if self.auto_fields and isinstance(self.auto_fields, str):
             self.auto_fields = json.loads(self.auto_fields)
 
-        self.update_metadata = self.param_dict.get("update_metadata", dict())
-
-        if self.update_metadata and isinstance(self.update_metadata, str):
-            self.update_metadata = json.loads(self.update_metadata)
-
-        self.initial_sample_attributes = self.param_dict.get("initial_sample_attributes", dict())
-
-        if self.initial_sample_attributes and isinstance(self.initial_sample_attributes, str):
-            self.initial_sample_attributes = json.loads(self.initial_sample_attributes)
-
         # instance of wizard helper for handling request actions
-        self.wizard_helper = wizh.WizardHelper()
+        self.wizard_helper = wizh.WizardHelper(description_token=self.description_token, profile_id=self.profile_id)
 
     def get_request_dict(self):
         # request-to-action mapping
-        request_dict = dict(sample_wizard_components=self.do_sample_wizard_components,
-                            save_generated_samples=self.do_save_generated_samples,
-                            sample_cell_update=self.do_sample_cell_update,
-                            sample_name_schema=self.do_sample_name_schema,
-                            resolved_object=self.do_resolved_object,
-                            )
+        request_dict = dict(
+            resolved_object=self.do_resolved_object,
+            next_stage=self.do_next_stage,
+            resolve_uri=self.do_resolve_uri,
+            validate_sample_names=self.do_validate_sample_names,
+            validate_bundle_name=self.do_validate_bundle_name,
+            get_discrete_attributes=self.do_get_discrete_attributes,
+            get_cell_control=self.do_get_cell_control,
+            save_cell_data=self.do_save_cell_data,
+            finalise_description=self.do_finalise_description,
+            discard_description=self.do_discard_description,
+            batch_update=self.do_batch_update
+        )
 
         return request_dict
 
@@ -59,18 +51,6 @@ class BrokerRequests:
 
         return self.context
 
-    def do_save_generated_samples(self):
-        self.context['generated_samples'] = self.wizard_helper.save_initial_samples(self.generated_samples,
-                                                                                    self.sample_type,
-                                                                                    self.initial_sample_attributes,
-                                                                                    self.profile_id)
-        return self.context
-
-    def do_sample_name_schema(self):
-        self.context['sample_name_schema'] = self.wizard_helper.sample_name_schema(self.profile_id)
-
-        return self.context
-
     def do_resolved_object(self):
         resolved_object = self.param_dict.get("resolved_object", dict())
 
@@ -81,14 +61,43 @@ class BrokerRequests:
 
         return self.context
 
-    def do_sample_cell_update(self):
-        self.context['updated_samples'] = self.wizard_helper.sample_cell_update(self.target_rows, self.auto_fields,
-                                                                                self.update_metadata)
-        return self.context
-
-    def do_sample_wizard_components(self):
-        self.context['wiz_message'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["sample_wizard_messages"])[
-            "properties"]
-        self.context['wizard_stages'] = self.wizard_helper.generate_stage_items()
+    def do_next_stage(self):
+        self.context['next_stage'] = self.wizard_helper.resolve_next_stage(self.auto_fields)
 
         return self.context
+
+    def do_resolve_uri(self):
+        self.context['resolved_output'] = self.wizard_helper.resolver_uri(self.param_dict.get("resolver_uri", str()))
+
+    def do_validate_sample_names(self):
+        self.context['validation_result'] = self.wizard_helper.validate_sample_names(
+            self.param_dict.get("sample_names", str()))
+
+    def do_validate_bundle_name(self):
+        self.context['validation_status'] = self.wizard_helper.validate_bundle_name(
+            self.param_dict.get("bundle_name", str()))["status"]
+
+    def do_get_discrete_attributes(self):
+        self.context['table_data'] = self.wizard_helper.generate_discrete_attributes()
+
+    def do_get_cell_control(self):
+        record_id = self.param_dict.get("record_id", str())
+        cell_reference = self.param_dict.get("cell_reference", str())
+        self.context['cell_control'] = self.wizard_helper.get_cell_control(cell_reference, record_id)
+
+    def do_save_cell_data(self):
+        record_id = self.param_dict.get("record_id", str())
+        cell_reference = self.param_dict.get("cell_reference", str())
+        self.context['cell_update'] = self.wizard_helper.save_cell_data(cell_reference, record_id, self.auto_fields)
+
+    def do_batch_update(self):
+        record_id = self.param_dict.get("record_id", str())
+        cell_reference = self.param_dict.get("cell_reference", str())
+        target_rows = self.param_dict.get("target_rows", list())
+        self.context['batch_update'] = self.wizard_helper.batch_update_cells(cell_reference, record_id, target_rows)
+
+    def do_finalise_description(self):
+        self.context['finalise_result'] = self.wizard_helper.finalise_description()
+
+    def do_discard_description(self):
+        self.context['discard_result'] = self.wizard_helper.discard_description()

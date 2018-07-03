@@ -11,6 +11,7 @@ from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 from django.contrib.auth.models import User
+import pandas as pd
 
 PubCollection = 'PublicationCollection'
 PersonCollection = 'PersonCollection'
@@ -158,7 +159,6 @@ class DAComponent:
         # if True, then the database action (to save/update) is never performed, but validated 'fields' are returned
         validate_only = kwargs.pop("validate_only", False)
 
-        # use the equality (==) test to save-guard against all sorts of value the 'validate_only' can assume
         if validate_only == True:
             return fields
         else:
@@ -546,7 +546,6 @@ class Profile(DAComponent):
         shared = list(self.get_shared_for_user(user))
         return shared + mine
 
-
     def get_for_user(self, user=None):
         if not user:
             user = data_utils.get_current_user().id
@@ -782,14 +781,17 @@ class Description:
             pass
         return doc
 
-    def create_description(self, stages=list(), attributes=dict()):
-        self.purge_descriptions()
+    def create_description(self, stages=list(), attributes=dict(), profile_id=str(), component=str(), meta=dict()):
+
+        self.purge_descriptions()  # remove obsolete descriptions
 
         fields = dict(
             stages=stages,
             attributes=attributes,
+            profile_id=profile_id,
+            component=component,
+            meta=meta,
             created_on=data_utils.get_datetime(),
-            user_id=data_utils.get_current_user().id
         )
         doc = self.DescriptionCollection.insert(fields)
 
@@ -801,6 +803,13 @@ class Description:
         self.DescriptionCollection.update(
             {"_id": ObjectId(description_id)},
             {'$set': fields})
+
+    def delete_description(self, description_ids=list()):
+        object_ids = []
+        for id in description_ids:
+            object_ids.append(ObjectId(id))
+
+        self.DescriptionCollection.remove({"_id": {"$in": object_ids}})
 
     def get_all_descriptions(self):
         return cursor_to_list(self.DescriptionCollection.find())
@@ -816,12 +825,27 @@ class Description:
 
     def purge_descriptions(self):
         """
-        purges the Description collection of all 'obsolete' tokens
+        remove 'obsolete' tokens - where date created is more than 'no_of_days' days
         :return:
         """
 
-        user_id = data_utils.get_current_user().id
+        no_of_days = 2  # no of days
 
-        bulk = self.DescriptionCollection.initialize_unordered_bulk_op()
-        bulk.find({'user_id': user_id}).remove()
-        bulk.execute()
+        pipeline = [{"$project": {"_id": 1, "diff_days": {
+            "$divide": [{"$subtract": [data_utils.get_datetime(), "$created_on"]}, 1000 * 60 * 60 * 24]}}}]
+
+        description_df = pd.DataFrame(cursor_to_list(self.DescriptionCollection.aggregate(pipeline)))
+
+        if len(description_df):
+            object_ids = description_df[description_df.diff_days > no_of_days]['_id'].tolist()
+
+            self.DescriptionCollection.remove({"_id": {"$in": object_ids}})
+
+            # now go through and remove any records associated with the description_tokens from the sample collection
+            SampleCollection = get_collection_ref('SampleCollection')
+
+            for id in object_ids:
+                SampleCollection.delete_many({"description_token": str(id), "deleted": data_utils.get_deleted_flag()})
+
+
+        return True

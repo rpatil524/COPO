@@ -12,9 +12,6 @@ $(document).ready(function () {
 
     setup_autocomplete()
 
-    //set up copo-multi-search component lookup
-    do_multi_search_lookup();
-
     //set up global navigation components
     do_page_controls(componentName);
 
@@ -29,6 +26,9 @@ $(document).ready(function () {
 
     //add event for ontology field change
     ontology_value_change();
+
+    //add selectize control event
+    set_selectize_select_event();
 
 });
 
@@ -50,12 +50,146 @@ function setup_autocomplete() {
 }
 
 function ontology_value_change() {
-    //handles 'change of mind by user while entering value to clear associated fields'
+    //handles 'change of mind by user while entering value', to clear associated fields
     $(document).on('keyup', '.ontology-field', function () {
         var elem = $(this);
         elem.closest(".ontology-parent").find(".ontology-field-hidden").each(function () {
             $(this).val('');
         });
+    });
+}
+
+function set_selectize_select_event() {
+    $(document).on("keyup keypress", function (event) {
+        var keyCode = event.keyCode || event.which;
+        if (keyCode === 38 || keyCode === 40) {
+            if ($(event.target).closest(".onto-select")) {
+                var item = $(event.target).closest(".onto-select");
+                var activeElem = item.find(".selectize-dropdown-content .active").find(".onto-label");
+
+                var desc = activeElem.attr("data-desc");
+                var prefix = activeElem.attr("data-prefix");
+                var label = activeElem.attr("data-label");
+                var accession = activeElem.attr("data-accession");
+
+                showontopop(item, label, prefix, desc, accession)
+
+            }
+
+            if ($(event.target).closest(".copo-multi-search")) {
+                var eventTarget = $(event.target).closest(".copo-multi-search");
+                item = eventTarget.find(".selectize-dropdown-content .active");
+                var recordId = item.attr("data-value");
+                var associatedComponent = item.find(".caption-component").attr("data-component");
+                var popTarget = item.closest(".copo-form-group");
+
+                if (associatedComponent) {
+                    resolve_element_view(recordId, associatedComponent, popTarget);
+                }
+            }
+        }
+    });
+
+
+    $(document).on("mouseenter", ".selectize-dropdown-content .active", function (event) {
+        if ($(this).closest(".selectize-control.onto-select").length) {
+            var item = $(this).closest(".selectize-control.onto-select");
+
+            var desc = $(this).find(".onto-label").attr("data-desc");
+            var prefix = $(this).find(".onto-label").attr("data-prefix");
+            var label = $(this).find(".onto-label").attr("data-label");
+            var accession = $(this).find(".onto-label").attr("data-accession");
+
+            showontopop(item, label, prefix, desc, accession);
+        }
+
+        if ($(this).closest(".selectize-control.copo-multi-search").length) {
+            var item = $(this).closest(".selectize-control.copo-multi-search");
+
+            var recordId = item.find(".selectize-dropdown-content .active").attr("data-value");
+            var associatedComponent = item.find(".caption-component").attr("data-component");
+            var popTarget = item.closest(".copo-form-group");
+
+            if (associatedComponent) {
+                resolve_element_view(recordId, associatedComponent, popTarget);
+            }
+        }
+
+    });
+}
+
+function showontopop(item, label, prefix, desc, accession) {
+    var result = '<div class="limit-text"><ul class="list-group list-group-flush"><li style="border: none;" class="list-group-item">Value: ' + label + '</li><li style="border: none;" class="list-group-item">Accession: ' + accession + '</li><li style="border: none;" class="list-group-item">Description: ' + desc + '</li></ul></div>';
+
+    item.webuiPopover('destroy');
+
+    item.webuiPopover({
+        title: 'Info',
+        content: '<div class="webpop-content-div">' + result + '</div>',
+        trigger: 'sticky',
+        width: 300,
+        arrow: true,
+        placement: 'right',
+        dismissible: true
+    });
+}
+
+
+function resolve_element_view(recordId, associatedComponent, eventTarget) {
+    //maps form element by id to component type e.g source, sample
+
+    if (associatedComponent == "") {
+        return false;
+    }
+
+    $.ajax({
+        url: copoVisualsURL,
+        type: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            'task': "attributes_display",
+            'component': associatedComponent,
+            'target_id': recordId
+        },
+        success: function (data) {
+            var gAttrib = {};
+            if (associatedComponent == "datafile") { //datafile component rendered differently
+                gAttrib = build_description_display(data);
+            } else {
+                gAttrib = build_attributes_display(data);
+            }
+
+            eventTarget.webuiPopover('destroy');
+
+            eventTarget.webuiPopover({
+                title: 'Info',
+                content: '<div class="webpop-content-div limit-text">' + $('<div/>').append(gAttrib).html() + '</div>',
+                trigger: 'sticky',
+                width: 300,
+                arrow: true,
+                placement: 'right',
+                dismissible: true
+            });
+
+
+        },
+        error: function () {
+            var message = "Couldn't retrieve attributes!";
+
+            eventTarget.webuiPopover('destroy');
+
+            eventTarget.webuiPopover({
+                title: 'Info',
+                content: '<div class="webpop-content-div">' + message + '</div>',
+                trigger: 'sticky',
+                width: 300,
+                arrow: true,
+                placement: 'right',
+                dismissible: true
+            });
+        }
     });
 }
 
@@ -438,6 +572,7 @@ function refresh_tool_tips() {
     refresh_selectbox();
     refresh_multiselectbox();
     refresh_multisearch();
+    refresh_ontology_select();
 
     refresh_range_slider();
     auto_complete();
@@ -555,6 +690,181 @@ function refresh_multiselectbox() {
     });
 }
 
+function refresh_ontology_select() {
+    $('.onto-select').each(function () {
+        var elem = $(this);
+        var url = elem.attr("data-url");
+        var options = [];
+        var defaultValue = {};
+
+        var parentID = elem.attr("data-element");
+
+        //set previous value
+        elem.closest(".ontology-parent").find(".ontology-field-hidden").each(function () {
+            defaultValue[$(this).attr("data-key")] = $(this).val();
+        });
+
+        if (defaultValue.hasOwnProperty('annotationValue') && defaultValue.annotationValue.trim() != '') {
+            var option = {};
+            option.labelblank = defaultValue.annotationValue
+            if (option.labelblank.length > 9) {
+                option.labelblank = option.labelblank.substr(0, 9) + "...";
+            }
+            option.label = defaultValue.annotationValue;
+            option.ontology_prefix = defaultValue.termSource;
+            option.iri = defaultValue.termAccession;
+            option.description = defaultValue.comments;
+            option.copo_values = JSON.stringify({
+                'termAccession': defaultValue.termAccession,
+                'termSource': defaultValue.termSource,
+                'annotationValue': defaultValue.annotationValue,
+                'comments': defaultValue.comments
+            });
+
+            options.push(option);
+        }
+
+        if (!(/selectize/i.test(elem.attr('class')))) { // if not already instantiated
+            var $funSelect = elem.selectize({
+                onChange: function (value) {
+                    if (value) {
+                        try {
+                            value = JSON.parse(value);
+                            //set value
+                            var setValue = '';
+
+                            if (typeof value === "object") {
+                                elem.closest(".ontology-parent").find(".ontology-field-hidden").each(function () {
+                                    var dataKey = $(this).attr("data-key");
+                                    $(this).val(value[dataKey]);
+                                });
+                                setValue = value.annotationValue;
+                            } else {
+                                // a string slipped through - apparently numbers are parsed to JSON
+                                elem.closest(".ontology-parent").find(".ontology-field-hidden").each(function () {
+                                    var dataKey = $(this).attr("data-key");
+
+                                    $(this).val('');
+
+                                    if (dataKey == 'annotationValue') {
+                                        $(this).val(value);
+                                        setValue = value;
+                                    }
+                                });
+                            }
+
+                            //set display
+                            elem.closest(".ontology-parent").find(".onto-label").find("span.onto-label-span").html(setValue);
+                        } catch (e) {
+
+                            //likely an unresolved or free-text entry - set only annotationValue, all others to empty
+                            elem.closest(".ontology-parent").find(".ontology-field-hidden").each(function () {
+                                var dataKey = $(this).attr("data-key");
+
+                                $(this).val('');
+
+                                if (dataKey == 'annotationValue') {
+                                    $(this).val(value);
+                                }
+
+                            });
+
+                            //set display
+                            elem.closest(".ontology-parent").find(".onto-label").find("span.onto-label-span").html(value);
+                        }
+
+                    } else {
+
+                        //unset values
+                        elem.closest(".ontology-parent").find(".ontology-field-hidden").each(function () {
+                            $(this).val('');
+                        });
+
+                        //set or, rather, unset display
+                        elem.closest(".ontology-parent").find(".onto-label").find("span.onto-label-span").html('');
+                    }
+
+                    $(".selectize-control.onto-select").webuiPopover('destroy');
+                },
+                onBlur: function () {
+                    $(".selectize-control.onto-select").webuiPopover('destroy');
+                },
+                maxItems: '1',
+                create: true,
+                plugins: ['remove_button'],
+                valueField: 'copo_values',
+                labelField: 'labelblank',
+                searchField: 'label',
+                options: options,
+                render: {
+                    option: function (item, escape) {
+                        var desc = escape(item.description) != "undefined" ? escape(item.description) : 'N/A';
+                        var prefix = escape(item.ontology_prefix) != "undefined" ? escape(item.ontology_prefix) : '?';
+                        var accession = escape(item.iri);
+                        var label = escape(item.label);
+
+                        return '<div>' +
+                            '<span data-accession="' + accession + '"  data-label="' + label + '"data-prefix="' + prefix + '" data-desc="' + desc + '" class="webpop-content-div ontology-label onto-label">' + prefix + ' : ' + escape(item.label) + '</span></div>';
+
+                    }
+                },
+                load: function (query, callback) {
+                    if (!query.length) return callback();
+                    this.clearOptions();        // clear the data
+                    this.renderCache = {};      // clear the html template cache
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {
+                            q: query
+                        },
+                        error: function () {
+                            callback();
+                        },
+                        success: function (data) {
+                            var ontologies = [];
+
+                            data.response.docs.forEach(function (item) {
+                                item.copo_values = JSON.stringify({
+                                    'termAccession': item.iri,
+                                    'termSource': item.ontology_prefix,
+                                    'annotationValue': item.label,
+                                    'comments': item.description
+                                });
+
+                                item.labelblank = item.label;
+
+                                if (item.labelblank.length > 9) {
+                                    item.labelblank = item.labelblank.substr(0, 9) + "...";
+                                }
+
+                                ontologies.push(item);
+                            });
+
+                            callback(ontologies);
+                        }
+                    });
+                }
+            });
+
+            //reference to selectize object
+            var control = $funSelect[0].selectize;
+
+            //set default values
+            if (options.length) {
+                for (var p in control.options) {
+                    control.setValue(p); //set default value
+                }
+            }
+
+            //retain reference to control for any future reference
+            selectizeObjects[parentID] = control;
+
+        }
+    });
+}
+
 
 function refresh_multisearch() {
     $('.copo-multi-search').each(function () {
@@ -564,6 +874,7 @@ function refresh_multisearch() {
             var valueElem = elem.closest('.copo-form-group').find('.copo-multi-values');
             var elemSpecs = JSON.parse(elem.closest('.copo-form-group').find('.elem-json').val());
             var maxTems = 'null'; //maximum selectable items
+            var component = elem.attr("data-component");
 
             if (valueElem.is("[data-maxItems]")) {
                 maxTems = valueElem.attr("data-maxItems");
@@ -577,6 +888,12 @@ function refresh_multisearch() {
                     } else {
                         valueElem.val("");
                     }
+
+                    $(".selectize-control.copo-multi-search").closest(".copo-form-group").webuiPopover('destroy');
+
+                },
+                onBlur: function () {
+                    $(".selectize-control.copo-multi-search").closest(".copo-form-group").webuiPopover('destroy');
                 },
                 // dropdownParent: 'body',
                 maxItems: maxTems,
@@ -598,12 +915,12 @@ function refresh_multisearch() {
                         var label = ''; // item[elemSpecs.label_field];
                         var caption = '<div>';
                         for (var i = 0; i < elemSpecs.secondary_label_field.length; ++i) {
-                            caption += '<div class="text-primary">' + item[elemSpecs.secondary_label_field[i]] + '</div>';
+                            caption += '<div>' + item[elemSpecs.secondary_label_field[i]] + '</div>';
                         }
                         caption += "</div>";
 
                         return '<div>' +
-                            '<span class="caption">' + escape(label) + '</span>' +
+                            '<span class="caption caption-component" data-component="' + component + '">' + escape(label) + '</span>' +
                             (caption ? '<div class="caption">' + caption + '</div>' : '') +
                             '</div>';
                     }
@@ -691,10 +1008,10 @@ var auto_complete = function () {
                 var short_form;
                 var desc = doc.description
                 if (desc == undefined) {
-                    desc = "Description Not Available"
+                    desc = "Description Not Available";
                 }
                 if (doc.ontology_prefix == undefined) {
-                    short_form = "Origin Unknown"
+                    short_form = "Origin Unknown";
                 } else {
                     short_form = doc.ontology_prefix
                 }
@@ -1362,6 +1679,18 @@ function do_page_controls(componentName) {
     var pageIcons = $(".copo-page-icons"); //profile component icons
     var sideBar = $(".copo-sidebar"); //sidebar panels
 
+    //add profile title
+    if ($("#profile_title").length) {
+        var profileTitle = $('<div/>', {
+            class: "page-title-custom",
+            style: "margin-right:10px;",
+            html:  "<span title='Profile title' style='color: #8c8c8c; font-size: 18px;'>Profile: "+$("#profile_title").val()+"</span>"
+        });
+
+        pageHeaders.append(profileTitle);
+    }
+
+    //add page title
     var PageTitle = $('<span/>', {
         class: "page-title-custom",
         style: "margin-right:10px;",
@@ -1393,10 +1722,12 @@ function do_page_controls(componentName) {
     }
 
     //create buttons
+    var buttonsSpan = $('<span/>', {style: "white-space:nowrap;"});
+    pageHeaders.append(buttonsSpan);
     component.buttons.forEach(function (item) {
         if (component.buttons) {
             component.buttons.forEach(function (item) {
-                pageHeaders.append($("." + item)).append("<span>&nbsp;</span>");
+                buttonsSpan.append($("." + item)).append("<span style='display: inline;'>&nbsp;</span>");
             });
         }
     });
@@ -1468,69 +1799,6 @@ function toggle_display_help_tips(state, parentElement) {
     } else {
         parentElement.find(".copo-form-group").attr("data-helptip", "yes");
     }
-}
-
-function do_multi_search_lookup() {
-    //handle hover info for copo-select control types
-
-    $(document).on("mouseenter", ".selectize-dropdown-content .active", function (event) {
-        if ($(this).closest(".copo-multi-search").length) {
-            var recordId = $(this).attr("data-value"); // the id of the hovered-on option
-            var associatedComponent = ""; //the form control with which the event is associated
-
-            //get the associated component
-            var clss = $($(event.target)).closest(".input-copo").attr("class").split(" ");
-            $.each(clss, function (key, val) {
-                var cssSplit = val.split("copo-component-control-");
-                if (cssSplit.length > 1) {
-                    associatedComponent = cssSplit.slice(-1)[0];
-
-                    resolve_element_view(recordId, associatedComponent, $($(event.target)).closest(".copo-form-group"));
-                    return false;
-                }
-            });
-
-        }
-    });
-}
-
-
-function resolve_element_view(recordId, associatedComponent, eventTarget) {
-    //maps form element by id to component type e.g source, sample
-
-    if (associatedComponent == "") {
-        return false;
-    }
-
-    $.ajax({
-        url: copoVisualsURL,
-        type: "POST",
-        headers: {
-            'X-CSRFToken': csrftoken
-        },
-        data: {
-            'task': "attributes_display",
-            'component': associatedComponent,
-            'target_id': recordId
-        },
-        success: function (data) {
-            var gAttrib = Object();
-            if (associatedComponent == "datafile") { //datafile component rendered differently
-                gAttrib = build_description_display(data);
-            } else {
-                gAttrib = build_attributes_display(data);
-            }
-            var attribDiv = $('<div/>', {
-                style: "max-height:300px; overflow-y: scroll;"
-            });
-            attribDiv.append(gAttrib);
-            WebuiPopovers.updateContent(eventTarget, '<div class="webpop-content-div">' + $('<div/>').append(attribDiv).html() + '</div>');
-        },
-        error: function () {
-            var message = "Couldn't retrieve attributes!";
-            WebuiPopovers.updateContent(eventTarget, '<div class="webpop-content-div">' + message + '</div>');
-        }
-    });
 }
 
 
@@ -1943,6 +2211,10 @@ function quick_tour_messages() {
             "documentation_button": {
                 "title": "Documentation",
                 "content": "Click here to access COPO's documentation."
+            },
+            "notifications_button": {
+                "title": "Notifications",
+                "content": "Click here to access notifications."
             },
             "global_notification_button": {
                 "title": "Notification Component",

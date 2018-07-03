@@ -261,7 +261,7 @@ def copo_submissions(request, profile_id):
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
 
-    return render(request, 'copo/copo_submission_2.html', {'profile_id': profile_id, 'profile': profile})
+    return render(request, 'copo/copo_submission.html', {'profile_id': profile_id, 'profile': profile})
 
 
 @login_required

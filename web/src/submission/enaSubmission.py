@@ -2,7 +2,6 @@ __author__ = 'felix.shaw@tgac.ac.uk - 03/05/2016'
 
 import json
 import pandas as pd
-from bson import json_util
 import converters.ena.copo_isa_ena as cnv
 from bson import ObjectId
 from bson.json_util import dumps

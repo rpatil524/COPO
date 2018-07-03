@@ -1,18 +1,19 @@
-{% extends 'copo/base_1col.html' %}
+{% extends 'copo/base_2col.html' %}
+
 
 {% load staticfiles %}
 {% load web_tags %}
 {% load html_tags %}
 
 {% block stylesheet_block %}
-    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
-    <link rel="stylesheet" href="{% static 'copo/css/copo/submission.css' %}" xmlns="http://www.w3.org/1999/html">
+
 {% endblock %}
 
 
-{% block title_block %} COPO Submission {% endblock %}
+{% block title_block %} COPO People {% endblock %}
 
 {% block tagline_block %}
+
 
 {% endblock %}
 
@@ -21,6 +22,7 @@
     {% csrf_token %}
     <div hidden id="hidden_attrs">
         <!-- hidden attributes  -->
+        <input type="hidden" id="profile_title" value="{{ profile.title }}"/>
         <input type="hidden" id="nav_component_name" value="submission"/>
     </div>
 {% endblock %}
@@ -29,73 +31,61 @@
     {% include "component_navbar.html" %}
 {% endblock page_tile %}
 
-
 {% block content %}
 
-    <input type="hidden" id="profile_id" value="{{ profile_id }}"/>
+    {#    test#}
 
-    <table id="submission_table">
-        <thead>
-        <tr>
-            <th>
-                Type
-            </th>
-            <th>
-                Files / Accessions
-            </th>
-            <th>
-                Created
-            </th>
-            <th>
-                Status
-            </th>
-            <th>
-                Uploaded Percentage
-            </th>
-            <th>
-                Upload Speed
-            </th>
-            <th>
-                Send
-            </th>
-        </tr>
-        </thead>
-        <tbody>
+    {#    test ends#}
 
-        </tbody>
-    </table>
-
-
-    <!-- files and accessions modal -->
-    <div class="modal fade" id="accessionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Files and Accessions in Submission</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div id="file_accession_panel" class="modal-body">
-
-
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Export</button>
+    <!-- getting started section -->
+    <div class="row">
+        <div class="col-sm-4 col-md-4 col-lg-4 col-xs-offset-0 page-welcome-message" style="display: none;">
+            <div class="copo-webui-popover">
+                <div class="webui-popover-inner">
+                    <h3 class="copo-webui-popover-title">Submissions - Getting started</h3>
+                    <div class="copo-webui-popover-content">
+                        <div class="webpop-content-div">
+                            The submission component of a profile displays submissions created (conclusive or pending)
+                            within a profile.<br/><br/>To create a submission entry, you have to first go through
+                            the process of datafile description (under the datafile component).
+                            A submission entry is created when the user completes the task of metadata attribution
+                            (within the description wizard), and selects to initiate submission of the
+                            described datafiles.
+                            <br/><br/>
+                            <div><strong>Quick Tour: </strong>To explore the various
+                                controls available on this page, click the
+                                <button class="circular mini ui icon orange button">
+                                    <i class="icon lightbulb"></i>
+                                </button>
+                                icon.
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- people table -->
+    <div id="component_table_loader" class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"
+         data-copo-tour-id="submission_table"></div> <!-- div used by the quick tour agent -->
+    <div class="table-parent-div">
+        <table id="submission_table" class="ui celled table copo-noselect-table copo-noborders-table"
+               cellspacing="0" width="100%">
+        </table>
+    </div>
 
 {% endblock %}
 
+{% block help_section %}
+
+
+{% endblock %}
+
+
 {% block js_block %}
     <script src="{% static 'copo/js/generic_handlers.js' %}"></script>
+    <script src="{% static 'copo/js/generic_handlers_ext2.js' %}"></script>
+    <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
     <script src="{% static 'copo/js/copo_submission_2.js' %}"></script>
-    <script src="{% static 'copo/chart_js/Chart.js' %}"></script>
-
 {% endblock %}

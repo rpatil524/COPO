@@ -287,7 +287,12 @@ function do_render_component_table(data, componentMeta) {
                     }
                 },
                 'selectNone',
-                'csv', 'excel'
+                'csv',
+                {
+                    extend: 'excel',
+                    text: 'Spreadsheet',
+                    title: null
+                }
             ],
             language: {
                 "info": "Showing _START_ to _END_ of _TOTAL_ records",

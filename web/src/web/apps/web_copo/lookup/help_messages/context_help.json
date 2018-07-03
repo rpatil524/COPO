@@ -82,7 +82,7 @@
     },
     {
       "title": "Describing samples",
-      "content": "To start descrbing your samples, click on the <button class='circular mini ui icon primary button'><i class='icon tags'></i></button>icon or, under the <strong><i class='fa fa-file'></i> Inspect </strong> tab, click the 'Describe' button. The view should change to the <strong><i class='fa fa-tags'></i> Describe </strong> tab, with the description wizard initialised. Follow the sequence of steps presented by the wizard to describe your samples.",
+      "content": "To start descrbing your samples, click on the <button class='circular mini ui icon primary button'><i class='icon add sign'></i></button> icon, and follow the steps presented by the wizard.",
       "context": [
         "sample",
         "describe"

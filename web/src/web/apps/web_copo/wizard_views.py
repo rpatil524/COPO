@@ -45,22 +45,19 @@ def sample_wiz(request):
     context = dict()
     request_action = request.POST.get("request_action", str())
 
-    generated_samples = json.loads(request.POST.get("generated_samples", "[]"))
-    target_rows = json.loads(request.POST.get("target_rows", "[]"))
-
     context = samp.BrokerRequests(context=context,
-                                  generated_samples=generated_samples,
-                                  target_rows=target_rows,
                                   target_id=request.POST.get("target_id", str()),
+                                  resolver_uri=request.POST.get("resolver_uri", str()),
+                                  description_token=request.POST.get("description_token", str()),
                                   profile_id=request.POST.get("profile_id", str()),
-                                  sample_type=request.POST.get("sample_type", str()),
                                   auto_fields=request.POST.get("auto_fields", dict()),
-                                  initial_sample_attributes=request.POST.get("initial_sample_attributes", dict()),
                                   update_metadata=request.POST.get("update_metadata", dict()),
-                                  number_to_generate=request.POST.get("number_to_generate", str()),
+                                  target_rows=json.loads(request.POST.get("target_rows", "[]")),
+                                  record_id=request.POST.get("record_id", str()),
+                                  cell_reference=request.POST.get("cell_reference", str()),
                                   column_reference=request.POST.get("column_reference", str()),
                                   bundle_name=request.POST.get("bundle_name", str()),
-                                  resolved_object=request.POST.get("resolved_object", dict()),
+                                  sample_names=request.POST.get("sample_names", str()),
                                   ).post_context(request_action)
 
     out = jsonpickle.encode(context)

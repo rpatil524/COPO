@@ -8,11 +8,11 @@
     },
     "confirm_initial_sample_generation": {
       "title": "Sample Generation",
-      "text": "The specified number of samples will now be generated using the sample attributes you've entered. <br/><br/>Click <strong>Continue</strong> if you are happy to go ahead and generate the samples. <br/>Note: In the next stage, you will be able to modify attribute values for individual samples. <br/>Click <strong>Review</strong> to modify the attributes entries you've so far made.",
+      "text": "The specified number of samples will now be generated using the sample attributes you've entered. <br/><br/>Click <strong>Continue</strong> if you are happy to go ahead and generate the samples. <br/>Note: In the next stage, you will be able to modify attribute values for individual samples or group of samples. <br/>Click <strong>Review</strong> to modify the attributes entries you've so far made.",
       "text_class": "text-default"
     },
     "review_message": {
-      "text": "In this stage, you will be able modify specific attribute values for your samples. To modify an attribute value, highlight the required cell and press the 'Enter' key. When done modifying the value in a cell, press the 'Enter' key again to save your changes. <br/><br/>Click <strong>Finish!</strong> when you are done with your changes to terminate the description session.",
+      "text": "Description metadata for your samples are presented below as discrete attribute values. You can modify specific attribute values for individual samples. Additionally, you can batch-update attribute values for groups of samples. <ul><li>To update attribute value for a single sample: <ol><li>Click to focus on a cell (note: this action is different from row selection)</li><li>Double-click or press 'Enter' on a focused cell to make it editable</li><li>Make your changes and double-click or press 'Enter' again to save your changes</li></ol><li>To batch-update corresponding attribute values for a group of samples:<ol><li>Click to focus on a target cell, the value of which will be used to update corresponding cells of selected records</li><li>Click the checkbox beside required rows; selected rows will form the update batch</li><li>Click the 'Update selected records' button</li></ol></li><li>Click <strong>Next</strong>, when done editing, to proceed to the final stage</li></ul>",
       "text_class": "text-default"
     },
     "confirm_initiate_submission": {
@@ -26,14 +26,6 @@
     "exit_wizard_message": {
       "title": "Discard Description",
       "text": "Are you sure you want to discard the current description?",
-      "text_class": "text-default"
-    },
-    "discard_description_message": {
-      "text": "You have selected to discard description. Please note that all description metadata associated with bundle items will be permanently removed from the system. <br/><br/>Are you sure you want to discard description?",
-      "text_class": "text-default"
-    },
-    "delete_description_message": {
-      "text": "Are you sure you want to go ahead and delete description metadata for the selected files? <br/><div style='color:red; margin-top:20px;'>Please note that files currently being described will not be affected by this action.</div>",
       "text_class": "text-default"
     },
     "dismiss_alert_message": {

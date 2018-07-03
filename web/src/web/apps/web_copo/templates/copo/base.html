@@ -29,7 +29,6 @@
     <link rel="stylesheet" href="{% static 'copo/webui_popover/jquery.webui-popover.css' %}">
 
 
-
     <link rel="shortcut icon" href="{% static 'copo/img/COPO_icon.png' %}"/>
 
     <!-- Font Awesome -->
@@ -51,7 +50,6 @@
     <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/search_highlight/dataTables.searchHighlight.css' %}">
     <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.css' %}">
-
 
 
     <!-- Google Fonts -->
@@ -144,6 +142,11 @@
             //end suspended toggle
 
 
+            $(document).on("click", "#trigger-notifications", function (event) {
+                $("#global-notifications").collapse("toggle");
+            });
+
+
         });
 
 
@@ -214,6 +217,29 @@
 
     </script>
 
+    <style type="text/css">
+        .selectize-control.onto-select::before {
+            -moz-transition: opacity 0.2s;
+            -webkit-transition: opacity 0.2s;
+            transition: opacity 0.2s;
+            content: ' ';
+            z-index: 2;
+            position: absolute;
+            display: block;
+            top: 12px;
+            right: 34px;
+            width: 16px;
+            height: 16px;
+            background: url({% static 'copo/img/ajax_loader1.gif' %});
+            background-size: 16px 16px;
+            opacity: 0;
+        }
+
+        .selectize-control.onto-select.loading::before {
+            opacity: 0.4;
+        }
+    </style>
+
 </head>
 
 
@@ -255,8 +281,17 @@
                     </div>
                 </form>
             </li>
-            <li class="dropdown" style="margin-left: 15px;" title="Documentation" >
-                <a href="http://copo-project.readthedocs.io/en/latest/" target="_blank">
+
+            <li class="dropdown" title="Notifications">
+                <a id="trigger-notifications" href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
+                   aria-expanded="false">
+                    <span data-copo-tour-id="notifications_button"><i class="fa fa-bell" aria-hidden="true"></i></span>
+                </a>
+            </li>
+
+
+            <li class="dropdown" style="margin-left: 15px;" title="Documentation">
+                <a id="copo-documentation" href="http://copo-project.readthedocs.io/en/latest/" target="_blank">
                     <span data-copo-tour-id="documentation_button"><i class="fa fa-book" aria-hidden="true"></i></span>
                 </a>
             </li>

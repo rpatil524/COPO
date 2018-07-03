@@ -102,6 +102,10 @@ div[class*=" col-"] {
     margin-top: 0px;
 }
 
+.notifications-body {
+    font-size: 18px;
+}
+
 .copo-header-icons {
     font-size: 22px !important;
 }
@@ -144,6 +148,13 @@ div[class*=" col-"] {
     font-weight: 300;
     font-size: 21px;
     line-height: 1.4;
+}
+
+.global-notifications-title {
+    font-weight: 500;
+    font-size: 21px;
+    line-height: 1.4;
+    padding-bottom: 20px;
 }
 
 .page-title-breadcrumb {
@@ -1208,7 +1219,9 @@ th {
 /*datatable focus*/
 
 table.dataTable td.focus {
-    outline: 4px solid rgba(179, 0, 0, 0.6) !important;
+    outline: 1px solid #ac1212;
+    outline-offset: -3px;
+    background-color: #f8e6e6 !important;
 }
 
 /*end datatable focus*/
@@ -1222,6 +1235,17 @@ table.dataTable td.focus {
 
 .selectize-dropdown {
     z-index: 9999 !important;
+}
+
+.selectize-dropdown .active {
+    background-color: #265a88 !important;
+    color: #fff !important;
+}
+
+.selectize-input {
+    display: table !important;
+    table-layout: fixed;
+    width: 100% !important;
 }
 
 /*end selectize overrrides*/
@@ -1576,6 +1600,11 @@ div.shown span.side-help-trigger:before {
     padding: 15px !important;
 }
 
+.ontol-span {
+    background: #eee;
+    color: #000;
+}
+
 .ontology-label {
     font-weight: normal;
     max-width: 400px
@@ -1583,7 +1612,7 @@ div.shown span.side-help-trigger:before {
 
 .ontology-label img {
     height: 15px;
-    margin-right: 10px
+    margin-right: 5px
 }
 
 .ontology-label-text {
@@ -1592,10 +1621,16 @@ div.shown span.side-help-trigger:before {
     padding-bottom: 3px
 }
 
-.ontology-label-text b{
+.ontology-label-text b {
     color: white;
 }
 
 .ontology-description {
     color: #415156
+}
+
+.limit-text {
+    width: 250px;
+    word-wrap: break-word;
+    max-height: 400px;
 }

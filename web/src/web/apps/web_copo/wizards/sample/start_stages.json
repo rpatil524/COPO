@@ -9,58 +9,27 @@
       "items": [
         {
           "id": "number_of_samples",
+          "type": "string",
           "help_tip": "Enter number of samples to be described",
-          "label": "Number of Samples",
+          "label": "How many samples do you want to describe?",
           "hidden": "false",
           "required": "true",
           "control": "copo-item-count",
           "min": 1,
-          "max": 1000
-        }
-      ]
-    },
-    {
-      "ref": "confirm_sample_clone",
-      "is_conditional_stage": true,
-      "callback": {
-        "function": "confirm_sample_clone",
-        "parameter": ""
-      },
-      "title": "Sample Clone",
-      "message": "Sample cloning is a way of bootstrapping sample description, and can help speed up the description process. If you choose to clone a sample, you will, at a later stage, be able to select an existing sample to clone. Alternatively, you can clone from a remote service by providing a sample accession.",
-      "items": [
-        {
-          "id": "confirm_sample_clone",
-          "help_tip": "Please specify if you want to clone a sample",
-          "label": "Do you want to clone a sample?",
-          "hidden": "false",
-          "required": "true",
-          "control": "copo-button-list",
-          "default_value": "no",
-          "option_values": [
-            {
-              "value": "yes",
-              "label": "Yes",
-              "description": "Select this option if you want to clone an existing sample. "
-            },
-            {
-              "value": "no",
-              "label": "No",
-              "description": "Select this option if you do not want to clone a sample."
-            }
-          ]
+          "max": 50000
         }
       ]
     },
     {
       "ref": "sample_type",
       "title": "Sample Type",
-      "message": "Please specify how you want to describe your samples. Sample Type provides suitable metadata specifications or configurations that form the basis of your description.",
+      "message": "Please specify the sample type. Sample type enables a specific template to be employed for describing the samples.",
       "items": [
         {
           "id": "sample_type",
+          "type": "string",
           "help_tip": "Select sample type",
-          "label": "Sample Type",
+          "label": "What sample type do you want to base this description?",
           "hidden": "false",
           "required": "true",
           "control": "copo-button-list",
@@ -76,18 +45,50 @@
     },
     {
       "ref": "sample_clone",
-      "is_conditional_stage": true,
-      "callback": {
-        "function": "display_sample_clone",
-        "parameter": "confirm_sample_clone"
-      },
-      "title": "Cloning Method",
-      "message": "You can either select an existing sample record from your work profile to clone, or enter a sample accession to be resolved from a remote service. ",
+      "title": "Sample Clone",
+      "callback": "sample_clone_options",
+      "message": "Sample cloning is a way of bootstrapping sample description, and can help speed up the description process. You can choose to clone an existing sample. Alternatively, you can clone from a remote service by providing a sample accession.",
+      "items": [
+        {
+          "id": "sample_clone",
+          "type": "string",
+          "help_tip": "Please specify if, and how, you want to clone a sample",
+          "label": "Do you want to clone a sample?",
+          "hidden": "false",
+          "required": "true",
+          "control": "copo-button-list",
+          "default_value": "no",
+          "option_values": [
+            {
+              "value": "clone_existing",
+              "label": "Yes - Clone a Profile sample",
+              "description": "Select this option if you want to clone an existing sample in your work profile. "
+            },
+            {
+              "value": "clone_biosample",
+              "label": "Yes - Clone a Biosample",
+              "description": "Select this option if you want to clone a sample from the Biosample repository."
+            },
+            {
+              "value": "no",
+              "label": "No",
+              "description": "Select this option if you do not want to clone a sample."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "clone_existing",
+      "title": "Clone Existing",
+      "message": "Select an existing sample to clone. Existing samples are limited to those already defined within the current profile.",
+      "callback": "display_sample_clone",
       "items": [
         {
           "id": "clone_existing",
           "type": "string",
           "help_tip": "Select an existing sample to clone",
+          "placeholder": "Select a sample to clone",
           "label": "Sample",
           "hidden": "false",
           "required": "false",
@@ -102,76 +103,51 @@
               "parameter": ""
             }
           }
-        },
-        {
-          "id": "clone_resolved",
-          "type": "string",
-          "help_tip": "Enter sample accession to resolve, then click the <strong>Resolve!</strong> button",
-          "label": "Accession",
-          "hidden": "false",
-          "required": "false",
-          "control": "copo-resolver",
-          "resolver_uri": "https://www.ebi.ac.uk/biosamples/api/samples/",
-          "resolver_component": "sample"
-        },
-        {
-          "id": "sample_clone_route",
-          "help_tip": "Please specify and commit to a sample cloning method",
-          "label": "Specify a cloning method",
-          "hidden": "false",
-          "required": "true",
-          "control": "copo-button-list",
-          "default_value": "clone_existing",
-          "option_values": [
-            {
-              "value": "clone_existing",
-              "label": "Existing Sample",
-              "description": "Select this option if you want to clone an existing sample in your work profile. You will be required to select a target sample from the list of available samples presented. <br/><span style='color:#a94442;'>Please note that this option is disabled when there are no samples in your profile.</span>"
-            },
-            {
-              "value": "clone_resolved",
-              "label": "Resolve Accession",
-              "description": "Select this option if you want to clone a sample from a remote service. You will be required to supply a valid and publicly available accession to be resolved. <br/><span style='color:#a94442;'>Please note that this process currently only supports resolving accessions to the BioSamples database.</span>"
-            }
-          ]
         }
       ]
     },
     {
-      "ref": "sample_name",
-      "title": "Proposed Sample Name",
-      "message": "If you have predefined sample names, you can copy and paste them as tab or comma delimited string values in the <strong>Predefined Names</strong> box. Alternatively, you can supply a ‘bundle name’, in the <strong>Bundle Name</strong> box, that will form the base part from which individual sample names may be derived. <br/>Please note that sample names, both generated and predefined, will be validated in the next stage for uniqueness.",
+      "ref": "clone_biosample",
+      "title": "Clone Biosample",
+      "message": "Enter a Biosample accession to resolve. A Biosample accession is of the form: 'SAMEA214394'",
+      "callback": "display_sample_clone",
       "items": [
         {
+          "id": "clone_resolved",
           "type": "string",
-          "required": "false",
+          "help_tip": "Enter sample accession to resolve, then click the <strong>Resolve!</strong> button",
+          "label": "Biosample Accession",
           "hidden": "false",
-          "deprecated": false,
-          "default_value": "",
-          "show_in_form": true,
-          "id": "provided_names",
-          "show_in_table": true,
-          "control": "textarea",
-          "help_tip": "Enter your predefined sample names as tab or comma delimited string values in the provided text box (e.g., SMPXY_1EU,SMPXY_2EU,SMPXY_3BF).",
-          "label": "Predefined Names"
+          "required": "false",
+          "control": "copo-resolver",
+          "resolver_uri": "https://www.ebi.ac.uk/biosamples/api/samples/",
+          "resolver_component": "biosample"
         },
         {
+          "id": "clone_resolved_hidden",
           "type": "string",
           "required": "false",
-          "hidden": "false",
+          "hidden": "true",
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "bundle_name",
-          "show_in_table": true,
+          "show_in_table": false,
           "control": "text",
-          "help_tip": "Enter a bundle name. Generated names from this entry will be of the form: SMPXY_1, SMPXY_2, etc., where the 'SMPXY' part of a generated name is the entry you provide here.",
-          "label": "Bundle Name"
-        },
+          "help_tip": "",
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "sample_naming_method",
+      "title": "Naming method",
+      "message": "You can name your samples by supplying predefined names (already captured elsewhere, e.g., spreadsheet). Another option is to let COPO generate sample names from a supplied 'bundle' name. ",
+      "items": [
         {
-          "id": "sample_name_route",
-          "help_tip": "Please specify and commit to a sample naming method",
-          "label": "Select a naming method",
+          "id": "sample_naming_method",
+          "type": "string",
+          "help_tip": "Specify how your sample names will be provided",
+          "label": "How do you want to name your samples?",
           "hidden": "false",
           "required": "true",
           "control": "copo-button-list",
@@ -180,41 +156,100 @@
             {
               "value": "provided_names",
               "label": "Predefined Names",
-              "description": "Select this option if you have predefined sample names elsewhere that you would like to use to label your samples. <br/>You will have to supply the sample names as tab or comma delimited string values."
+              "description": "I want to supply predefined sample names."
             },
             {
               "value": "bundle_name",
               "label": "Bundle Name",
-              "description": "Select this option if you want to supply a ‘bundle name’. <br/>A bundle name forms the base part from which individual sample names will be derived."
+              "description": "I want to supply a 'bundle name', from which individual sample names can be derived."
             }
           ]
         }
       ]
     },
     {
-      "ref": "assigned_sample_name",
-      "title": "Assigned Sample Name",
-      "message": "Do you want to modify the generated sample names to better reflect individual samples in your bundle?",
+      "ref": "provided_names",
+      "title": "Sample Name",
+      "message": "Enter your predefined sample names as tab or comma delimited values in the space provided. <br/>Please note that the supplied names will be validated against existing sample names for uniqueness.",
+      "callback": "display_sample_naming",
       "items": [
         {
+          "id": "provided_names",
           "type": "string",
-          "required": "true",
+          "help_tip": "Enter your predefined sample names as tab or comma delimited values (e.g., SMPXY_1EU, SMPXY_2EU, SMPXY_3BF). Note: you have to click the validate button for the proposed sample names to be validated and registered.",
+          "label": "Predefined Names",
           "hidden": "false",
+          "required": "true",
+          "control": "copo-input-group",
+          "button_label": "Validate!",
+          "igroup": "true"
+        },
+        {
+          "id": "provided_names_hidden",
+          "type": "string",
+          "required": "false",
+          "hidden": "true",
+          "deprecated": false,
           "default_value": "",
-          "id": "assigned_sample_name",
+          "show_in_form": true,
+          "show_in_table": false,
           "control": "text",
-          "help_tip": "Assigned sample names",
-          "label": "Sample names"
+          "help_tip": "",
+          "label": ""
         }
       ]
     },
     {
-      "ref": "description_stages",
-      "is_stage_stub": true,
-      "callback": {
-        "function": "get_sample_type_stages",
-        "parameter": "sample_type"
-      }
+      "ref": "bundle_name",
+      "title": "Sample Name",
+      "message": "Enter a ‘bundle name’ that will form the base part from which individual sample names can be derived. <br/>Please note that the generated names will be validated against existing sample names for uniqueness.",
+      "callback": "display_sample_naming",
+      "items": [
+        {
+          "id": "bundle_name",
+          "type": "string",
+          "required": "true",
+          "hidden": "false",
+          "deprecated": false,
+          "default_value": "",
+          "control": "copo-input-group",
+          "button_label": "Validate!",
+          "igroup": "true",
+          "help_tip": "Enter a bundle name and click 'Validate!'. Generated sample names will be of the form: SMPXY_1, SMPXY_2, etc., where the 'SMPXY' part of the generated names is the entry you provide here.",
+          "label": "Bundle Name"
+        },
+        {
+          "id": "bundle_name_hidden",
+          "type": "string",
+          "required": "false",
+          "hidden": "true",
+          "deprecated": false,
+          "default_value": "",
+          "show_in_form": true,
+          "show_in_table": false,
+          "control": "text",
+          "help_tip": "",
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "sample_attributes",
+      "title": "Sample Attributes",
+      "callback": "get_sample_attributes",
+      "message": "Enter the attributes that describe your sample(s). <br/><span style='font-weight:bold;'>Note: Cloned sample attributes may not entirely capture your intended metadata assignment. Please check carefully to ensure that you are happy with the resolved entries!</span>",
+      "items": [
+
+      ]
+    },
+    {
+      "ref": "samples_editing",
+      "title": "Edit Samples",
+      "callback": "perform_sample_generation",
+      "renderer": "perform_sample_generation",
+      "message": "Edit individual samples to complete the description.</span>",
+      "items": [
+      ]
     }
   ]
 }

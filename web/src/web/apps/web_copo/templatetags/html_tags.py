@@ -242,7 +242,7 @@ def generate_table_records(profile_id=str(), component=str()):
     if len(records):
         df = pd.DataFrame(records)
 
-        # convert record id from ObjectID to string
+        # convert record id column from ObjectId to string
         df['record_id'] = df['_id'].apply(lambda x: str(x))
         df.drop('_id', axis='columns')
 

@@ -39,6 +39,15 @@
 {% endblock browse_header_block %}
 
 {% block page_tile %}
+    <div id="global-notifications" class="row collapse">
+        <div class="col-sm-12 col-md-12 col-lg-12" style="margin-bottom:40px;">
+            <div class="global-notifications-title">Notifications</div>
+            <div class="notifications-body" style="border-bottom: 2px solid rgba(38, 38, 38, 0.4);">
+                No notifications
+            </div>
+        </div>
+    </div>
+
     <div class="row" style="margin-bottom:70px;">
         <div class="col-sm-5 col-md-5 col-lg-5 copo-page-headers"></div>
         <div class="col-sm-7 col-md-7 col-lg-7 copo-page-icons"></div>
@@ -99,7 +108,8 @@
     </div>
 
     <!-- profile table -->
-    <div id="component_table_loader" class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5" data-copo-tour-id="profile_table"></div>
+    <div id="component_table_loader" class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"
+         data-copo-tour-id="profile_table"></div>
     <!-- div used by the quick tour agent -->
     <div id="profile_table_div">
         <table id="copo_profiles_table" class="ui celled table copo-noselect-table copo-noborders-table"

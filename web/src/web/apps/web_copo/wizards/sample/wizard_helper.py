@@ -1,50 +1,286 @@
 __author__ = 'etuka'
 
 import re
-import copy
+import os
+import json
+import numpy as np
 import pandas as pd
 from bson import ObjectId
-from dal.copo_da import Sample
-from dal import cursor_to_list
+from django.conf import settings
+import urllib.request as urllib2
+from dal.mongo_util import get_collection_ref
+
+from dal.copo_da import Sample, Description
 import web.apps.web_copo.lookup.lookup as lkup
 from converters.ena.copo_isa_ena import ISAHelpers
 import web.apps.web_copo.templatetags.html_tags as htags
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
+from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
+
+lg = settings.LOGGER
 
 
 class WizardHelper:
-    def __init__(self):
+    def __init__(self, description_token, profile_id):
         self.schema = Sample().get_schema().get("schema_dict")
+        self.description_token = description_token
+        self.profile_id = self.set_profile_id(profile_id)
+        self.key_split = "___0___"
+        self.store_key = "_" + self.description_token
+        self.store_name = os.path.join(settings.OBJECT_STORE, "samples.h5")
         self.sample_types = list()
 
         for s_t in d_utils.get_sample_type_options():
             self.sample_types.append(s_t["value"])
 
+    def set_profile_id(self, profile_id):
+        """
+        function sets profile id either from passed value or from description metadata
+        :param profile_id:
+        :return:
+        """
+
+        if not self.description_token:
+            return profile_id
+
+        description = Description().GET(self.description_token)
+
+        if not description:
+            return profile_id
+
+        profile_id = description.get('profile_id', str())
+
+        return profile_id
+
     def generate_stage_items(self):
-        wizard_stages = dict()
+        """
+        function generates the stages of the wizard, it then returns the first stage in the sequence of stages
+        :return:
+        """
 
         # get start stages
-        start = d_utils.json_to_pytype(lkup.WIZARD_FILES["sample_start"])['properties']
-        wizard_stages['start'] = start
+        wizard_stages = d_utils.json_to_pytype(lkup.WIZARD_FILES["sample_start"])['properties']
 
         # if required, resolve data source for select-type controls,
         # i.e., if a callback is defined on the 'option_values' field
-        for stage in wizard_stages['start']:
+        for stage in wizard_stages:
             if "items" in stage:
                 for st in stage['items']:
                     if "option_values" in st:
                         st["option_values"] = htags.get_control_options(st)
 
-        # get sample types
-        for s_t in self.sample_types:
-            s_stages = d_utils.json_to_pytype(lkup.WIZARD_FILES["sample_attributes"])['properties']
+        # create a description record for storing temporary values as the user moves through the wizard
+        self.description_token = str(
+            Description().create_description(stages=wizard_stages, attributes=dict(), profile_id=self.profile_id,
+                                             component='sample', meta=dict())['_id'])
 
-            form_schema = list()
+        return True
+
+    def resolve_next_stage(self, auto_fields):
+        """
+        given data from a stage, function tries to resolve the next stage to be displayed to the user by the wizard
+        :param auto_fields:
+        :return:
+        """
+
+        next_stage_dict = dict(abort=False)
+        current_stage = auto_fields.get("current_stage", str())
+
+        if not current_stage and not self.description_token:  # likely the first (dynamic) stage to be requested
+            self.generate_stage_items()
+            next_stage_dict['wiz_token'] = self.description_token
+            next_stage_dict['wiz_message'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["sample_wizard_messages"])[
+                "properties"]
+
+        # start by getting the description record
+        description = Description().GET(self.description_token)
+
+        if not description:
+            # invalid description; send signal to abort the current description
+            next_stage_dict["abort"] = True
+            return next_stage_dict
+
+        stages = description["stages"]
+        attributes = description["attributes"]
+
+        # save in-coming stage data, check for changes, re-validate wizard, serve next stage
+        next_stage_index = [indx for indx, stage in enumerate(stages) if stage['ref'] == current_stage]
+        next_stage_index = next_stage_index[0] + 1 if len(next_stage_index) else 0
+
+        # save current stage data, but hold on to previous data for comparison purposes
+        previous_data = dict()
+        if current_stage:
+            previous_data = attributes.get(current_stage, dict())
+            current_data = DecoupleFormSubmission(auto_fields,
+                                                  d_utils.json_to_object(
+                                                      stages[next_stage_index - 1]).items).get_schema_fields_updated()
+            # save current stage data
+            attributes[current_stage] = current_data
+
+            # save attributes
+            Description().edit_description(self.description_token, dict(attributes=attributes))
+
+        # get next stage
+        next_stage_dict['stage'] = self.serve_stage(stages, next_stage_index)
+
+        if not next_stage_dict['stage']:
+            # no stage to retrieve, this should signal end
+            return next_stage_dict
+
+        if next_stage_index > 0:
+            if previous_data and not (previous_data == current_data):  # stage data has changed, refresh wizard
+                next_stage_dict['refresh_wizard'] = True
+
+                # store previous value, some processes might need it
+                # save current stage data
+                attributes[current_stage + "_old"] = previous_data
+
+                # save attributes
+                Description().edit_description(self.description_token, dict(attributes=attributes))
+
+            # build data dictionary for new stage
+            if next_stage_dict['stage']['ref'] in attributes and "data" not in next_stage_dict['stage']:
+                next_stage_dict['stage']['data'] = DecoupleFormSubmission(attributes[next_stage_dict['stage']['ref']],
+                                                                          d_utils.json_to_object(
+                                                                              next_stage_dict[
+                                                                                  'stage']).items).get_schema_fields_updated()
+        return next_stage_dict
+
+    def serve_stage(self, stages, next_stage_index):
+        """
+        function determines how a given stage should be served
+        :param stage:
+        :return:
+        """
+
+        stage = dict()
+
+        if next_stage_index < len(stages):
+            stage = stages[next_stage_index]
+
+        if "callback" in stage:
+            # execute callback to derive stage
+            try:
+                stage = getattr(WizardHelper, stage["callback"])(self, next_stage_index)
+            except:
+                pass
+
+        return stage
+
+    def display_sample_clone(self, next_stage_index):
+        """
+        stage callback function: determines if sample clone stage should be displayed
+        :param stage:
+        :return:
+        """
+
+        stage = dict()
+
+        description = Description().GET(self.description_token)
+        stages = description["stages"]
+        attributes = description["attributes"]
+
+        if next_stage_index < len(stages):
+            stage = stages[next_stage_index]
+
+        user_choice = attributes.get("sample_clone", dict()).get("sample_clone", str())
+
+        if not stage["ref"] == user_choice:
+            stage = self.serve_stage(stages, next_stage_index + 1)
+
+        return stage
+
+    def sample_clone_options(self, next_stage_index):
+        """
+        stage callback function: determines if local sample clone option should be displayed given presence of samples
+        :param next_stage_index:
+        :return:
+        """
+
+        description = Description().GET(self.description_token)
+        stages = description["stages"]
+
+        stage = dict()
+
+        if next_stage_index < len(stages):
+            stage = stages[next_stage_index]
+
+            if len(d_utils.get_samples_json()["options"]) == 0:
+                # remove option for local sample clone
+
+                for item in stage["items"]:
+                    if item["id"] == "sample_clone":
+                        indx = [indx for indx, x in enumerate(item["option_values"]) if x["value"] == "clone_existing"]
+                        if indx:
+                            del item["option_values"][indx[0]]
+
+        return stage
+
+    def display_sample_naming(self, next_stage_index):
+        """
+        stage callback function: determines sample naming method to display based on user choice
+        :param next_stage_index:
+        :return:
+        """
+
+        stage = dict()
+
+        description = Description().GET(self.description_token)
+        stages = description["stages"]
+        attributes = description["attributes"]
+
+        if next_stage_index < len(stages):
+            stage = stages[next_stage_index]
+
+        user_choice = attributes.get("sample_naming_method", dict()).get("sample_naming_method", str())
+
+        if not stage["ref"] == user_choice:
+            stage = self.serve_stage(stages, next_stage_index + 1)
+
+        # this stage is dependent on the number of samples; if this has changed, re-validate...
+
+        number_of_samples = attributes.get("number_of_samples", dict()).get("number_of_samples", 1)
+        number_of_samples_old = attributes.get("number_of_samples_old", dict()).get("number_of_samples", None)
+
+        if number_of_samples_old and not number_of_samples == number_of_samples_old:
+            # do we need to trigger re-validation?
+            if stage["ref"] in attributes:
+                data = attributes[stage["ref"]]
+
+                data[user_choice + "_hidden"] = str()
+                # if not self.revalidate_sample_name(user_choice) == "success":
+                #     data[user_choice + "_hidden"] = str()
+
+                stage["data"] = DecoupleFormSubmission(data,
+                                                       d_utils.json_to_object(stage).items).get_schema_fields_updated()
+
+        return stage
+
+    def get_sample_attributes(self, next_stage_index):
+        """
+        stage callback function: identifies sample attribute to present to user, mostly based on sample type choice
+        :param next_stage_index:
+        :return:
+        """
+        stage = dict()
+
+        description = Description().GET(self.description_token)
+        stages = description["stages"]
+        attributes = description["attributes"]
+
+        # get sample type - user choice
+        user_choice = attributes.get("sample_type", dict()).get("sample_type", str())
+
+        if next_stage_index < len(stages):
+            stage = stages[next_stage_index]
+
+            # compose stage items if first time here
+            stage_items = list()
 
             for f in self.schema:
                 # get relevant attributes based on sample type
-                if f.get("show_in_form", True) and s_t in f.get("specifications", self.sample_types):
+                if f.get("show_in_form", True) and user_choice in f.get("specifications", self.sample_types):
                     # if required, resolve data source for select-type controls,
                     # i.e., if a callback is defined on the 'option_values' field
                     if "option_values" in f:
@@ -53,87 +289,267 @@ class WizardHelper:
                     # get short-form id
                     f["id"] = f["id"].split(".")[-1]
 
-                    # might not need to include name
+                    # don't need to include sample name
                     if f["id"] == "name":
                         continue
 
-                    form_schema.append(f)
+                    stage_items.append(f)
 
-                for p in s_stages:
-                    if p["ref"] == "sample_attributes":
-                        p["items"] = form_schema
+            stage["items"] = stage_items
 
-            wizard_stages[s_t] = s_stages
+            # update description
+            stages[next_stage_index] = stage
 
-        return wizard_stages
+            Description().edit_description(self.description_token, dict(stages=stages))
 
-    def save_initial_samples(self, generated_samples, sample_type, initial_sample_attributes, profile_id):
+            # build data dictionary depending on clone option
+            clone_option = attributes.get("sample_clone", dict()).get("sample_clone", str())
 
-        bulk = Sample().get_collection_handle().initialize_unordered_bulk_op()
+            # this stage is dependent on sample clone; if this has changed, re-validate data...
+            clone_option_old = attributes.get("sample_clone_old", dict()).get("sample_clone", None)
 
-        # form record template, using first item in generated_samples
+            stage['data'] = attributes.get(stage["ref"], dict())
+
+            if not clone_option == "no":
+                if clone_option_old and not clone_option_old == clone_option:
+                    # clone option changed, re-validate attributes:
+                    clone_value = attributes.get(clone_option, dict())
+                    stage['data'] = self.resolve_clone_data(clone_value, clone_option)
+                else:
+                    # clone option not changed, but has value changed
+                    clone_value = attributes.get(clone_option, dict())
+                    clone_value_old = attributes.get(clone_option + "_old", None)
+                    if (clone_value_old and not clone_value_old == clone_value) or not attributes.get(stage["ref"],
+                                                                                                      dict()):
+                        # clone value changed or first time
+                        clone_value = attributes.get(clone_option, dict())
+                        stage['data'] = self.resolve_clone_data(clone_value, clone_option)
+        return stage
+
+    def perform_sample_generation(self, next_stage_index):
+        """
+        stage callback function: to initiate display of requested number of samples and attributes
+        :param next_stage_index:
+        :return:
+        """
+
+        stage = dict()
+
+        description = Description().GET(self.description_token)
+        stages = description["stages"]
+
+        if next_stage_index < len(stages):
+            stage = stages[next_stage_index]
+
+        return stage
+
+    def generate_discrete_attributes(self):
+        """
+        function generate discrete attributes for individual sample editing
+        :return:
+        """
+        # object type controls and their corresponding schemas
+        object_array_controls = ["copo-characteristics", "copo-comment"]
+        object_array_schemas = [d_utils.get_copo_schema("material_attribute_value"),
+                                d_utils.get_copo_schema("comment")]
+
+        # data and columns lists
+        dataSet = list()
+        data = list()
+
+        columns = [dict(title=' ', name='s_n', data="s_n", className='select-checkbox'),
+                   dict(title='Name', name='name', data="name")]
+
+        description = Description().GET(self.description_token)
+        attributes = description["attributes"]
+
+        # get stored sample attributes
+        sample_attributes = attributes.get("sample_attributes", dict())
+
+        # get sample schema
+        schema_df = pd.DataFrame(self.schema)
+        schema_df['id2'] = schema_df['id'].apply(lambda x: x.split(".")[-1])
+
+        schema_df = schema_df[schema_df['id2'].isin(list(sample_attributes.keys()))]
+
+        for index, row in schema_df.iterrows():
+            resolved_data = htags.resolve_control_output(sample_attributes, row)
+            label = row["label"]
+
+            if row['control'] in object_array_controls:
+                # get object-type-control schema
+                control_index = object_array_controls.index(row['control'])
+                control_df = pd.DataFrame(object_array_schemas[control_index])
+                control_df['id2'] = control_df['id'].apply(lambda x: x.split(".")[-1])
+
+                for indx_1, item in enumerate(resolved_data):
+                    # item must contain at least 2 elements; also, discount objects with no header
+                    # (e.g., category value for characteristics; name value for comments)
+                    if len(item) > 1 and list(item[0].values())[0].strip():
+
+                        # add primary header/value
+                        shown_keys = (row["id"].split(".")[-1], str(indx_1), list(item[1].keys())[0].strip())
+                        class_name = self.key_split.join(shown_keys)
+
+                        columns.append(
+                            dict(title=label + "[{0}]".format(list(item[0].values())[0].strip()), data=class_name))
+                        dataSet.append(list(item[1].values())[0].strip())
+                        data_attribute = dict()
+                        data_attribute[class_name] = dataSet[-1]
+                        data.append(data_attribute)
+
+                        # add other headers/values e.g., Unit
+                        for subitem in item[2:]:
+                            if list(subitem.values())[0].strip():
+                                # use object schema to resolve label
+                                shown_keys = (row["id"].split(".")[-1], str(indx_1), list(subitem.keys())[0].strip())
+                                class_name = self.key_split.join(shown_keys)
+                                columns.append(dict(
+                                    title=control_df[control_df.id2 == list(subitem.keys())[0].strip()].iloc[0].label,
+                                    data=class_name))
+                                dataSet.append(list(subitem.values())[0].strip())
+
+                                data_attribute = dict()
+                                data_attribute[class_name] = dataSet[-1]
+                                data.append(data_attribute)
+
+
+
+            else:
+                shown_keys = row["id"].split(".")[-1]
+                class_name = shown_keys
+                columns.append(dict(title=label, data=class_name))
+                val = resolved_data[0] if row['type'] == "array" else resolved_data
+                if isinstance(val, list):
+                    val = ', '.join(val)
+                dataSet.append(val)
+
+                data_attribute = dict()
+                data_attribute[class_name] = dataSet[-1]
+                data.append(data_attribute)
+
+        # generate sample names
+        user_choice = attributes.get("sample_naming_method", dict()).get("sample_naming_method", str())
+        sample_names = attributes.get(user_choice, dict()).get(user_choice + "_hidden", str())
+        sample_names = self.resolve_sample_names(user_choice, sample_names)
+
+        name_series = pd.Series(sample_names.split(",") if "," in sample_names else sample_names.split())
+        name_series = name_series[name_series.str.strip() != '']
+
+        number_of_samples = attributes.get("number_of_samples", dict()).get("number_of_samples", 1)
+        name_series = name_series.head(int(number_of_samples))
+
+        # save control information
         auto_fields = dict()
-        auto_fields[Sample().get_qualified_field("name")] = generated_samples[0]
-        auto_fields[Sample().get_qualified_field("sample_type")] = sample_type
-        for k, v in initial_sample_attributes.items():
-            if k:
-                auto_fields[Sample().get_qualified_field(k)] = v
+        auto_fields[Sample().get_qualified_field("name")] = str()
+        auto_fields[Sample().get_qualified_field("sample_type")] = attributes.get("sample_type", dict()).get(
+            "sample_type", str())
 
-        kwargs = dict()
-        kwargs["target_id"] = str()
-        kwargs["validate_only"] = True  # prevents saving of record
+        fields = DecoupleFormSubmission(auto_fields, Sample().get_schema().get("schema")).get_schema_fields_updated()
 
-        record = Sample(profile_id=profile_id).save_record(auto_fields, **kwargs)
+        for k, v in sample_attributes.items():
+            fields[k] = v
 
-        # use template record to generate other records, modifying only the name attribute
-        for name in generated_samples:
-            new_record = copy.deepcopy(record)
-            new_record["name"] = name
+        fields["target_id"] = str()
+        fields["validate_only"] = True  # prevents saving of record
 
-            # create a new sample if none exists having same name and profile_id
-            bulk.find({"name": new_record["name"], "profile_id": new_record["profile_id"]}).upsert().replace_one(
-                new_record)
+        record = Sample(profile_id=self.profile_id).save_record(dict(), **fields)
 
-        feedback = bulk.execute()
+        # save initial attributes to db
+        SampleCollection = get_collection_ref('SampleCollection')
 
-        # validate result and retrieve inserted samples
-        if 'upserted' in feedback:
-            feedback = feedback['upserted']
+        # remove previous entries associated with this token
+        SampleCollection.delete_many(
+            {"description_token": self.description_token, "deleted": d_utils.get_deleted_flag()})
 
-        generated_sample_records = list()
+        record['deleted'] = d_utils.get_deleted_flag()
+        record['description_token'] = self.description_token
 
-        if isinstance(feedback, list) and len(feedback) == len(generated_samples):
-            generated_samples_id = [p.get("_id") for p in feedback if "_id" in p]
-            generated_sample_records = cursor_to_list(
-                Sample().get_collection_handle().find({"_id": {"$in": generated_samples_id}}))
+        # build db dataset
+        samples_df = pd.DataFrame(name_series)
+        samples_df.columns = ['name']
 
-        return self.resolve_samples_display(generated_sample_records, sample_type)
+        new_samples_list = samples_df.to_dict('records')
+        result = SampleCollection.insert_many(new_samples_list)
+        object_ids = result.inserted_ids
+        record.pop('name', None)
 
-    def sample_name_schema(self, profile_id):
+        SampleCollection.update_many(
+            {"_id": {"$in": object_ids}},
+            {'$set': record})
+
+        # build display dataset
+        samples_df["DT_RowId"] = object_ids
+        samples_df.DT_RowId = 'row_' + samples_df.DT_RowId.astype(str)
+
+        data_record = dict(pair for d in data for pair in d.items())
+        for k, v in data_record.items():
+            samples_df[k] = v
+
+        samples_df.insert(loc=0, column='s_n', value=np.arange(1, int(number_of_samples) + 1))  # - for sorting
+
+        data_set = samples_df.to_dict('records')
+
+        # save generated data to drive update display
+        try:
+            with pd.HDFStore(self.store_name) as store:
+                store[self.store_key] = pd.DataFrame(data_set)
+        except Exception as e:
+            lg.log('HDF5 Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+
+        return dict(columns=columns, rows=data_set)
+
+    def resolve_sample_names(self, naming_method, proposed_name):
         """
-        function return sample name schema with unique items
-        :return: name schema
+        based on user choice (naming_method) sample names may have been supplied or left to be generated as bundle name
+        :param naming_method:
+        :param proposed_name:
+        :return:
+        """
+        samples_names = proposed_name
+
+        if naming_method == "bundle_name":
+            description = Description().GET(self.description_token)
+            samples_names = description["meta"].get("generated_names", str())
+
+        return samples_names
+
+    def revalidate_sample_name(self, naming_method):
+        """
+        function checks that supplied names are still valid - needed when a any stage change is encountered
+        :param naming_method:
+        :return:
         """
 
-        # get sample name element from the sample schema
-        name_schema_template_list = [x for x in self.schema if x["id"].split(".")[-1] == "name"]
+        description = Description().GET(self.description_token)
+        attributes = description["attributes"]
 
-        sample_name_schema = dict()
-        if name_schema_template_list:
-            sample_name_schema = name_schema_template_list[0]
-            sample_name_schema["help_tip"] = "Modify as required to reflect your specific sample name."
-            sample_name_schema["label"] = str()
-            sample_name_schema["control_meta"]["input_group_addon"] = "left"
-            sample_name_schema["batch"] = "true"  # allows unique test to extend to siblings
-            sample_name_schema["batchuniquename"] = "assigned_sample"
-            sample_name_schema["batchuniquename"] = "assigned_sample"
+        name_value = attributes.get(naming_method, dict()).get(naming_method, str())
 
-            # get all sample names for unique test
-            unique_names = htags.generate_unique_items(component="sample", profile_id=profile_id, elem_id="name",
-                                                       record_id=str())
-            sample_name_schema["unique_items"] = unique_names
+        if naming_method == "bundle_name":
+            return self.validate_bundle_name(name_value)
+        elif naming_method == "provided_names":
+            return self.validate_sample_names(name_value)["status"]
 
-        return sample_name_schema
+        return
+
+    def resolve_clone_data(self, clone_value, clone_option):
+        """
+        function resolves stage data based on clone option
+        :param clone_value:
+        :param clone_option:
+        :return:
+        """
+
+        data = dict()
+
+        if clone_option == "clone_existing":
+            data = Sample().get_record(clone_value["clone_existing"])
+            del data["_id"]
+        elif clone_option == "clone_biosample":
+            data = json.loads(clone_value["clone_resolved_hidden"])
+
+        return data
 
     def resolve_sample_object(self, resolved_object):
         """
@@ -162,6 +578,7 @@ class WizardHelper:
                             if isinstance(value['text'], str):
                                 material_value_dict = dict()
 
+                                # category
                                 category_dict = dict(annotationValue=key_refined)
 
                                 # purify category schema
@@ -172,11 +589,13 @@ class WizardHelper:
                                                                                       category_dict)
 
                                 material_value_dict['category'] = ontology_schema
+
+                                # value
                                 value_dict = dict(annotationValue=value['text'])
 
                                 ontology_term = value['ontologyTerms'][0]  # interested only in the first entry,
                                 # ...we do recognise that there might be more than one entries here,
-                                # but selecting one will suffice
+                                # but selecting one should suffice
 
                                 value_dict['termAccession'] = ontology_term
                                 term_source = ''
@@ -193,6 +612,18 @@ class WizardHelper:
                                                                                       value_dict)
 
                                 material_value_dict['value'] = ontology_schema
+
+                                # unit - not really expecting any values or not yet determined how to extract if any
+                                unit_dict = dict(annotationValue=str(), termAccession=str(), termSource=str())
+
+                                # purify unit schema
+                                ontology_schema = d_utils.get_db_json_schema("ontology_annotation")
+                                for onto in ontology_schema:
+                                    ontology_schema = ISAHelpers().resolve_schema_key(ontology_schema, onto,
+                                                                                      "ontology_annotation",
+                                                                                      unit_dict)
+
+                                material_value_dict['unit'] = ontology_schema
 
                                 material_attribute_schema = d_utils.get_db_json_schema("material_attribute_value")
                                 for onto in material_attribute_schema:
@@ -218,257 +649,435 @@ class WizardHelper:
 
         return sample_object
 
-    def resolve_object_arrays_column(self, columns):
+    def do_validation(self, validation_parameters):
         """
-        function deconstructs object type controls into discrete items for tabular rendering and editing
-        :param columns:
-        :return:
-        """
-        object_array_controls = ["copo-characteristics", "copo-comment"]
-
-        gap_elements = list()
-
-        for col in [cl for cl in columns if cl["control"] in object_array_controls]:
-            gap_dict = dict(parent_element=col, derived_elements=list())
-
-            derived_id_count = 0
-
-            for indx, cd in enumerate(col["data"]):
-                derived_id_count += 1
-                new_column = dict(
-                    actual_id=col["actual_id"],
-                    derived_id=col["actual_id"] + "_" + str(derived_id_count),
-                    control=col["control"],
-                    indx=indx,
-                    title=col["title"] + " [" + list(cd[0].values())[0] + "]",
-                    data=list(cd[1].values())[0],
-                    meta=list(cd[1].keys())[0]
-                )
-
-                gap_dict.get("derived_elements").append(new_column)
-
-                # get other elements
-                for cd_ext in list(cd[2:]):
-                    derived_id_count += 1
-                    cd_ext_val = list(cd_ext.values())[0]
-                    cd_ext_title = list(cd_ext.keys())[0]
-                    new_column = dict(
-                        actual_id=col["actual_id"],
-                        derived_id=col["actual_id"] + "_" + str(derived_id_count),
-                        control=col["control"],
-                        indx=indx,
-                        title=cd_ext_title,
-                        data=cd_ext_val,
-                        meta=cd_ext_title
-                    )
-
-                    gap_dict.get("derived_elements").append(new_column)
-
-            gap_elements.append(gap_dict)
-
-        for gp in gap_elements:
-            slot_indx = columns.index(gp["parent_element"])
-            columns[slot_indx:slot_indx + 1] = gp["derived_elements"][:]
-            # get all derived elements
-
-    def resolve_samples_display(self, generated_samples, sample_type):
-        # resolve display metadata for samples
-        combined_meta = list()
-        form_elements = dict()  # form element specifications
-        df = list()
-
-        if len(generated_samples) > 0:
-            rec = generated_samples[0]
-            # get columns, and corresponding data using the representative candidate record, rec
-            for f in self.schema:
-                if self.truth_test_1(f, sample_type):
-
-                    # get short-form id
-                    f["id"] = f["id"].split(".")[-1]
-
-                    col = dict(title=f["label"], actual_id=f["id"], derived_id=f["id"], control=f["control"])
-
-                    # resolve element control for form generation
-                    if "option_values" in f:
-                        f["option_values"] = htags.get_control_options(f)
-
-                    form_elements[f["id"]] = f
-
-                    col["data"] = htags.resolve_control_output(rec, f)
-
-                    combined_meta.append(col)
-
-            # resolve object arrays for display in separate columns: e.g. of these are characteristics, comments'
-            self.resolve_object_arrays_column(combined_meta)
-
-            # now apply metadata to all generated samples
-            df = pd.DataFrame(generated_samples)
-            df['_id'] = df['_id'].apply(self.stringify_it)
-            df['_recordMeta'] = df['name'].apply(self.record_meta, args=(combined_meta,))
-
-            df = df.to_dict('records')
-
-        return dict(generated_samples=df, form_elements=form_elements)
-
-    def stringify_it(self, x):
-        return str(x)
-
-    def record_meta(self, x, args):
-        combined_data = copy.deepcopy(args)
-
-        for col in combined_data:
-            if col["actual_id"] == "name":
-                col["data"] = x
-                break
-
-        return combined_data
-
-    def sample_cell_update(self, target_rows, auto_fields, update_metadata):
-        """
-        function saves an update made to a sample cell
-        :param target_rows:
-        :param auto_fields:
-        :param update_metadata:
-        :return:
-        """
-
-        column_reference = update_metadata.get("column_reference", str())  # element key; the update target
-        sample_type = update_metadata.get("sample_type", str())  # the sample type
-        update_element_indx = update_metadata.get("update_element_indx", str())  # if a list element type, the index
-        update_meta = update_metadata.get("update_meta", str())  # present if a composite element is being updated
-
-        # get schema spec for the target element
-        elem_spec = [f for f in self.schema if f["id"].split(".")[-1] == column_reference]
-
-        if elem_spec:
-            elem_spec = elem_spec[0]
-            elem_spec["id"] = column_reference
-
-            partial_schema = dict(fields=[elem_spec])
-
-            # resolve the new entry given  'partial_schema'
-            resolved_data = DecoupleFormSubmission(auto_fields, d_utils.json_to_object(
-                partial_schema).fields).get_schema_fields_updated()
-
-            # kick in some validation here before proceeding to save!
-            validate_status = self.do_validation(elem_spec, resolved_data, target_rows)
-
-            if validate_status.get("status") == "error":
-                return validate_status
-
-            # set bulk object
-            bulk = Sample().get_collection_handle().initialize_unordered_bulk_op()
-
-            if update_element_indx != "":
-                update_element_indx = int(update_element_indx)
-                # do positional element update
-                object_list = list()
-                for t_r in target_rows:
-                    object_list.append(ObjectId(t_r["recordID"]))
-
-                update_candidates = cursor_to_list(Sample().get_collection_handle().find({"_id": {"$in": object_list}}))
-                for u_c in update_candidates:  # set element based on index
-                    amendable_entity = u_c[column_reference]
-                    if isinstance(amendable_entity, list):
-                        update_element = amendable_entity[update_element_indx]
-                        if update_meta:
-                            # update only the specified sub-document
-                            update_element[update_meta] = resolved_data[column_reference][0][update_meta]
-                            amendable_entity[update_element_indx] = update_element
-                        else:
-                            amendable_entity[update_element_indx] = resolved_data[column_reference][0]
-                        bulk.find({'_id': u_c["_id"]}).update({'$set': {column_reference: amendable_entity}})
-            else:
-                for t_r in target_rows:
-                    bulk.find({'_id': ObjectId(t_r["recordID"])}).update(
-                        {'$set': {column_reference: resolved_data[column_reference]}})
-
-            # execute bulk object
-            bulk.execute()
-
-        # pass on one representative update sample record to be resolved for display
-        sample = Sample().get_record(target_rows[0]["recordID"])
-
-        return self.resolve_samples_display([sample], sample_type)
-
-    def truth_test_1(self, elem, sample_type):
-        """
-        test for truth of expression
-        :param elem: schema element
-        :param sample_type: the associated sample type
-        :return: boolean
-        """
-        claim_is = False
-
-        hidden = elem.get("hidden", "false")
-        if elem.get("show_in_form", True) and (hidden == "false" or hidden == False) and sample_type in elem.get(
-                "specifications", self.sample_types):
-            claim_is = True
-
-        return claim_is
-
-    def do_validation(self, elem_spec, resolved_data, target_rows):
-        """
-        validates data given element's specification or schema
-        :param elem_spec:
-        :param resolved_data:
-        :param target_rows:
+        validates supplied entry
+        :param validation_parameters: dict(schema=dict(), data=str())
         :return:
         """
         validation_result = dict(status="success", message="")
-        resolved_data = resolved_data[elem_spec["id"].split(".")[-1]]
+
+        schema = validation_parameters.get("schema", dict())
+        data = validation_parameters.get("data", str())
 
         # validate required attributes
-        if "required" in elem_spec and str(elem_spec["required"]).lower() == "true":
-            if isinstance(resolved_data, str) and resolved_data.strip() == str():
+        if "required" in schema and str(schema["required"]).lower() == "true":
+            if isinstance(data, str) and data.strip() == str():
                 validation_result["status"] = "error"
-                validation_result["message"] = "The " + elem_spec["label"] + " value is required!"
+                validation_result["message"] = "This is a required field!"
 
                 return validation_result
 
-                # should probably add validation for object types here, that might need some thinking though
+                # should probably add validation for object types here, that might need some thinking with nested dicts
 
         # validate unique attributes
-        if "unique" in elem_spec and str(elem_spec["unique"]).lower() == "true":
-            if isinstance(resolved_data, str) and Sample().get_collection_handle().find(
-                    {'name': {'$regex': "^" + resolved_data + "$", "$options": 'i'}}).count() >= 1:
+        if "unique" in schema and str(schema["unique"]).lower() == "true":
+            if isinstance(data, str) and Sample().get_collection_handle().find(
+                    {schema["id"].split(".")[-1]: {'$regex': "^" + data + "$",
+                                                   "$options": 'i'}}).count() >= 1:
                 validation_result["status"] = "error"
-                validation_result["message"] = "Nothing to update or the " + elem_spec[
-                    "label"] + " value already exists!"
+                validation_result["message"] = "Nothing to update or value already exists!"
 
                 return validation_result
 
                 # should probably add validation for object types here, that might need some thinking though
 
         # validate characteristics attributes
-        if "control" in elem_spec and elem_spec["control"] == "copo-characteristics":
-            objects_of_interest = dict(unit=str(), value=str())
+        if schema.get("control", str()) == "copo-characteristics":
+            if set(['value', 'unit']) < set(data.keys()):
+                value = data['value']['annotationValue'].strip()
+                unit = data['unit']['annotationValue'].strip()
 
-            if resolved_data:
-                extracted_objects = resolved_data[0]
-                for k, v in extracted_objects.items():
-                    if k in objects_of_interest:
-                        objects_of_interest[k] = v['annotationValue']
-
-            is_numeric = False
-            if objects_of_interest['value']:
+                is_numeric = False
                 try:
-                    objects_of_interest['value'] = float(objects_of_interest['value'])
+                    float(value)
                     is_numeric = True
                 except ValueError:
                     pass
 
-            if is_numeric and not objects_of_interest['unit']:
-                validation_result["status"] = "error"
-                validation_result["message"] = "Numeric value requires a unit! Set the unit value to continue."
+                if is_numeric and not unit:
+                    validation_result["status"] = "error"
+                    validation_result["message"] = "Numeric value requires a unit!"
 
-                return validation_result
-                # commenting out the 'elif' condition below prevents an update lock up;
-                # a case where you can't update the value because of the unit, and vice versa
-                # elif not is_numeric and objects_of_interest['unit']:
-                #     validation_result["status"] = "error"
-                #     validation_result["message"] = "Non-numeric value does not require a unit!"
-                #
-                #     return validation_result
+                    # commenting out the 'elif' condition below prevents an update lock up;
+                    # a case where you can't update the value because of the unit, and vice versa
+
+                    return validation_result
 
         return validation_result
+
+    def resolver_uri(self, uri):
+        """
+        function resolves given uri to some remote service to retrieve data
+        :param resolver_uri:
+        :return:
+        """
+        result = dict(status="error")
+
+        try:
+            response = urllib2.urlopen(uri).read()
+            my_json = response.decode('utf8').replace("\n", '')
+
+            result["status"] = "success"
+            result["value"] = self.resolve_sample_object(json.loads(my_json))
+        except:
+            pass
+
+        return result
+
+    def validate_sample_names(self, sample_names):
+        """
+        function validates sample names - sample names are expected as comma or tab separated string
+        :param sample_names:
+        :return:
+        """
+        result = dict(status="success")
+        errors = list()
+
+        name_series = pd.Series(sample_names.split(",") if "," in sample_names else sample_names.split())
+        name_series = name_series[name_series.str.strip() != '']
+
+        # check for uniqueness of supplied names with existing sample names
+        records_df = pd.DataFrame(
+            Sample(profile_id=self.profile_id).get_all_records_columns(projection={'name': 1, '_id': 0}))
+
+        if len(records_df):
+            existing_name = list(name_series[name_series.isin(records_df.name)].unique())
+
+            if len(existing_name):
+                errors.append(["Existing names", "Supplied name(s) already exist", ', '.join(existing_name)])
+
+        # check for duplicates in supplied names
+        repeated_names = name_series.value_counts()[name_series.value_counts() > 1]
+        if len(repeated_names):
+            errors.append([
+                "Repeating names",
+                "Supplied name(s) are repeated",
+                repeated_names.to_string().replace("\n", '<br/>')
+            ])
+
+        # do we have matching number of supplied names to number of samples to be described?
+        description = Description().GET(self.description_token)
+        number_of_samples = description["attributes"].get("number_of_samples", dict()).get("number_of_samples", 0)
+        if len(name_series) < int(number_of_samples):
+            errors.append([
+                "Insufficient names",
+                "Supplied names are less than the requested number of samples",
+                "Supplied names: {0}<br/>Requested number of samples: {1}".format(str(len(name_series)),
+                                                                                  number_of_samples)
+            ])
+
+        # set error status
+        if len(errors):
+            result['status'] = "error"
+            result['errors'] = errors
+            result["error_columns"] = [{"title": "Error code"}, {"title": "Error message"}, {"title": "Error details"}]
+
+        return result
+
+    def validate_bundle_name(self, bundle_name):
+        """
+        function validates the suitability of bundle_name for generating unique sample names
+        :param bundle_name:
+        :return:
+        """
+
+        # get number of samples to inform name generation
+        description = Description().GET(self.description_token)
+        number_of_samples = description["attributes"].get("number_of_samples", dict()).get("number_of_samples", 0)
+
+        # initial attempt at generating names
+        bn_df = pd.DataFrame(pd.Series([bundle_name] * int(number_of_samples)), columns=['bundle_name'])
+        bn_df['generated_name'] = bn_df.apply(lambda row: row['bundle_name'] + "_" + str(row.name + 1), axis=1)
+
+        generated_names = ','.join(list(bn_df['generated_name']))
+
+        validate = self.validate_sample_names(generated_names)
+
+        # get meta
+        meta = description.get("meta", dict())
+
+        meta["generated_names"] = str()
+
+        if validate["status"] == "success":
+            meta["generated_names"] = generated_names
+
+        # save meta
+        Description().edit_description(self.description_token, dict(meta=meta))
+
+        return dict(status=validate["status"])
+
+    def get_cell_control(self, cell_reference, record_id):
+        """
+        function builds control for a UI data cell
+        :param cell_reference:
+        :param row_data:
+        :return:
+        """
+
+        # object type controls and their corresponding schemas
+        object_array_controls = ["copo-characteristics", "copo-comment"]
+        object_array_schemas = [d_utils.get_copo_schema("material_attribute_value"),
+                                d_utils.get_copo_schema("comment")]
+
+        control_schema = dict()
+
+        key = cell_reference.split(self.key_split)
+
+        if len(key) > 1:  # object type key
+            parent_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
+            if parent_schema:
+                parent_schema = parent_schema[0]
+                if parent_schema['control'] in object_array_controls:
+                    control_index = object_array_controls.index(parent_schema['control'])
+                    control_schema = [f for f in object_array_schemas[control_index] if
+                                      f["id"].split(".")[-1] == key[2]]
+
+        else:  # string type
+            control_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
+
+        if control_schema:
+            control_schema = control_schema[0]
+
+        if "option_values" in control_schema:
+            control_schema["option_values"] = htags.get_control_options(control_schema)
+
+        # get target record
+        record = Sample().get_record(record_id)
+
+        if len(key) == 1:
+            schema_data = record[key[0]]
+        else:
+            schema_data = record[key[0]]
+            schema_data = schema_data[int(key[1])]
+            schema_data = schema_data[key[2]]
+
+        return dict(control_schema=control_schema, schema_data=schema_data)
+
+    def save_cell_data(self, cell_reference, record_id, auto_fields):
+        """
+        function save updated cell data; for the target_cell and target_rows
+        :param cell_reference:
+        :param auto_fields:
+        :param target_rows:
+        :return:
+        """
+        result = dict(status='success', value='')
+
+        # object type controls and their corresponding schemas
+        object_array_controls = ["copo-characteristics", "copo-comment"]
+        object_array_schemas = [d_utils.get_copo_schema("material_attribute_value"),
+                                d_utils.get_copo_schema("comment")]
+
+        # get cell schema
+        control_schema = dict()
+
+        key = cell_reference.split(self.key_split)
+
+        # gather parameters for validation
+        validation_parameters = dict(schema=dict(), data=str())
+
+        if len(key) > 1:  # object type key
+            parent_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
+            if parent_schema:
+                parent_schema = parent_schema[0]
+                validation_parameters["schema"] = parent_schema
+                if parent_schema['control'] in object_array_controls:
+                    control_index = object_array_controls.index(parent_schema['control'])
+                    control_schema = [f for f in object_array_schemas[control_index] if
+                                      f["id"].split(".")[-1] == key[2]]
+
+        else:
+            control_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
+            validation_parameters["schema"] = control_schema[0] if control_schema else {}
+
+        control_schema = control_schema[0] if control_schema else {}
+        partial_schema = dict(fields=[control_schema])
+
+        # resolve the new entry given partial_schema
+        resolved_data = DecoupleFormSubmission(auto_fields, d_utils.json_to_object(
+            partial_schema).fields).get_schema_fields_updated()
+
+        # get target record
+        record = Sample().get_record(record_id)
+
+        if len(key) == 1:
+            record[key[0]] = resolved_data[key[0]]
+            validation_parameters["data"] = record[key[0]]
+            result["value"] = htags.get_resolver(resolved_data[key[0]], control_schema)
+        else:
+            record[key[0]][int(key[1])][key[2]] = resolved_data[key[2]]
+            validation_parameters["data"] = record[key[0]][int(key[1])]
+            result["value"] = htags.get_resolver(resolved_data[key[2]], control_schema)
+
+        # kick in some validation here before proceeding to save!
+        validate_status = self.do_validation(validation_parameters)
+
+        result["status"] = validate_status["status"]
+        result["message"] = validate_status["message"]
+
+        # return if error
+        if result["status"] == "error":
+            return result
+
+        SampleCollection = get_collection_ref('SampleCollection')
+
+        _id = record.pop('_id', None)
+
+        if _id:
+            SampleCollection.update(
+                {"_id": ObjectId(_id)},
+                {'$set': record})
+
+        # refresh stored dataset with new display value
+        try:
+            with pd.HDFStore(self.store_name) as store:
+                gd_df = store[self.store_key]
+                gd_df.loc[gd_df.loc[gd_df['DT_RowId'].isin(["row_" + record_id])].index, cell_reference] = result[
+                    "value"]
+                store[self.store_key] = gd_df
+        except Exception as e:
+            lg.log('HDF5 Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+
+        return result
+
+    def batch_update_cells(self, cell_reference, record_id, target_rows):
+        """
+        function uses a reference cell to update a batch of records
+        :param cell_reference:
+        :param record_id:
+        :param target_rows:
+        :return:
+        """
+
+        # to improve performance UI-side, use the refresh_threshold to decide if to send back the entire dataset
+        refresh_threshold = 1000
+
+        result = dict(status='success', value='')
+
+        SampleCollection = get_collection_ref('SampleCollection')
+
+        # object type controls and their corresponding schemas
+        object_array_controls = ["copo-characteristics", "copo-comment"]
+        object_array_schemas = [d_utils.get_copo_schema("material_attribute_value"),
+                                d_utils.get_copo_schema("comment")]
+
+        # get cell schema
+        control_schema = dict()
+
+        key = cell_reference.split(self.key_split)
+
+        # gather parameters for validation
+        validation_parameters = dict(schema=dict(), data=str())
+
+        if len(key) > 1:  # object type key
+            parent_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
+            if parent_schema:
+                parent_schema = parent_schema[0]
+                validation_parameters["schema"] = parent_schema
+                if parent_schema['control'] in object_array_controls:
+                    control_index = object_array_controls.index(parent_schema['control'])
+                    control_schema = [f for f in object_array_schemas[control_index] if
+                                      f["id"].split(".")[-1] == key[2]]
+
+        else:
+            control_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
+            validation_parameters["schema"] = control_schema[0] if control_schema else {}
+
+        control_schema = control_schema[0] if control_schema else {}
+
+        # get target record
+        record = Sample().get_record(record_id)
+
+        if len(key) == 1:
+            resolved_data = record[key[0]]
+            validation_parameters["data"] = resolved_data
+            result["value"] = htags.get_resolver(resolved_data, control_schema)
+        else:
+            resolved_data = record[key[0]][int(key[1])][key[2]]
+            validation_parameters["data"] = record[key[0]][int(key[1])]
+            result["value"] = htags.get_resolver(resolved_data, control_schema)
+
+        if isinstance(result["value"], list):  # ...this to get lists to render properly
+            result["value"] = " ".join(result["value"])
+
+        # kick in some validation here before proceeding to save!
+        validate_status = self.do_validation(validation_parameters)
+
+        result["status"] = validate_status["status"]
+        result["message"] = validate_status["message"]
+
+        # terminate if error
+        if result["status"] == "error":
+            return result
+
+        # update db records
+        object_ids = [ObjectId(x.split("row_")[-1]) for x in target_rows]
+
+        if len(key) == 1:
+            SampleCollection.update_many(
+                {"_id": {"$in": object_ids}},
+                {'$set': {key[0]: resolved_data}})
+        else:
+            SampleCollection.update_many(
+                {"_id": {"$in": object_ids}},
+                {'$set': {key[0] + "." + key[1] + "." + key[2]: resolved_data}})
+
+        # refresh stored dataset with new display value
+        try:
+            with pd.HDFStore(self.store_name) as store:
+                gd_df = store[self.store_key]
+                gd_df.loc[gd_df.loc[gd_df['DT_RowId'].isin(target_rows)].index, cell_reference] = result["value"]
+                store[self.store_key] = gd_df
+
+                if len(target_rows) > refresh_threshold:
+                    result["data_set"] = gd_df.to_dict('records')
+        except Exception as e:
+            lg.log('HDF5 Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+
+        return result
+
+    def finalise_description(self):
+        """
+        function makes described sample accessible in the main stream of sample records
+        :return:
+        """
+        result = dict(status='success', value='')
+
+        SampleCollection = get_collection_ref('SampleCollection')
+        fields = dict()
+
+        fields['deleted'] = d_utils.get_not_deleted_flag()
+
+        SampleCollection.update_many(
+            {"description_token": self.description_token},
+            {'$set': fields})
+
+        Description().delete_description([self.description_token])
+
+        return result
+
+    def discard_description(self):
+        """
+        function discards the current description
+        :return:
+        """
+
+        result = dict(status='success')
+
+        SampleCollection = get_collection_ref('SampleCollection')
+
+        # delete description object
+        try:
+            with pd.HDFStore(self.store_name) as store:
+                del store[self.store_key]
+        except Exception as e:
+            lg.log('HDF5 Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+
+        # remove entries associated with this token
+        SampleCollection.delete_many(
+            {"description_token": self.description_token, "deleted": d_utils.get_deleted_flag()})
+
+        Description().delete_description([self.description_token])
+
+        return result

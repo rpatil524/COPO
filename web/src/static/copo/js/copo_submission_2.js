@@ -718,7 +718,12 @@ $(document).ready(function () {
                                             }
                                         ],
                                         buttons: [
-                                            'copy', 'csv', 'excel'
+                                            'copy', 'csv',
+                                            {
+                                                extend: 'excel',
+                                                text: 'Spreadsheet',
+                                                title: null
+                                            }
                                         ],
                                         dom: 'Bfr<"row"><"row info-rw" i>tlp',
                                     });

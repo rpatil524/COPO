@@ -451,7 +451,9 @@ class WizardHelper:
             Description().edit_description(self.description_token, dict(stages=batch_stages))
         else:
             self.description_token = str(
-                Description(self.profile_id).create_description(batch_stages, batch_attributes)['_id'])
+                Description(self.profile_id).create_description(stages=batch_stages, attributes=batch_attributes,
+                                                                profile_id=self.profile_id, component='datafile',
+                                                                meta=dict())['_id'])
 
         self.refresh_description_stages()  # refresh previously stored stages to pick up any schema changes
 
