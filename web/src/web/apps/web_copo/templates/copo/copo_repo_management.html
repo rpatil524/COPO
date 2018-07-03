@@ -68,15 +68,14 @@
     <div hidden id="hidden_attrs">
         <!-- hidden attributes  -->
         <input type="hidden" id="nav_component_name" value="group"/>
-        <input type="hidden" id="user_type" value="managers"/>
-
+        <input type="hidden" id="user_type" value="submitters"/>
     </div>
 {% endblock browse_header_block %}
 
 
 {% block page_tile %}
     <div class="row">
-        <div class="page-title-custom" style="margin-left:10px;">Create Repos and Data Managers
+        <div class="page-title-custom" style="margin-left:10px;">Repositories you are a Manager for
             <span class="pull-right saving_status">
                 <span class="lead label label-default">Accessing</span>
                 <img height="20px" src="{% static "copo/img/ajax.gif" %}"/>
@@ -112,7 +111,7 @@
             <hr>
             <div class="col-lg-6 col-md-6 col-sm-6">
                 <div id="users_control" class="visibility: hidden">
-                    <p class="lead">Repository Managers</p>
+                    <p class="lead">Submitters to this Repository</p>
                     <label for="basic-url">Search for User
                         <small>(Firstname, Lastname or Username)</small>
                     </label>

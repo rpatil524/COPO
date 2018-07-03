@@ -12,7 +12,7 @@ urlpatterns = [path('', views.index, name='index'),
                path('logout/', views.copo_logout, name='logout'),
                path('register/', views.copo_register, name='register'),
                path('profile/update_counts/', views.get_profile_counts, name='update_counts'),
-               path('view_orcid_profile/', views.view_orcid_profile, name='view_orcid_profile'),
+               path('view_user_info/', views.view_user_info, name='view_user_info'),
                path('error/', views.goto_error, name='error_page'),
                path('register_to_irods/', views.register_to_irods, name='register_to_irods'),
                re_path(r'^copo_profile/(?P<profile_id>[a-z0-9]+)/view', views.view_copo_profile,
@@ -70,5 +70,3 @@ urlpatterns = [path('', views.index, name='index'),
                path('add_repo_to_group/', ajax_handlers.add_repo_to_group, name="add_repo_to_group"),
                path('remove_repo_from_group/', ajax_handlers.remove_repo_from_group, name="remove_repo_from_group"),
                ]
-
-

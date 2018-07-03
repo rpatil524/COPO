@@ -8,7 +8,7 @@ from jsonpickle import encode
 from submission.submissionDelegator import delegate_submission
 from dal.orcid_da import Orcid
 from api.handlers.general import *
-from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, Group
+from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, CopoGroup, Repository
 from dal.OAuthTokens import OAuthToken
 from dal.broker_da import BrokerDA, BrokerVisuals
 from dal import cursor_to_list
@@ -17,6 +17,7 @@ from exceptions_and_logging.logger import Logtype, Loglvl
 from exceptions_and_logging.CopoRuntimeError import CopoRuntimeError
 from django.conf import settings
 from allauth.account.forms import LoginForm
+from allauth.socialaccount.models import SocialAccount
 from bson import json_util as j
 from web.apps.web_copo.lookup.lookup import REPO_NAME_LOOKUP
 import requests
@@ -52,7 +53,10 @@ def login(request):
     }
     return render(request, 'copo/auth/login.html', context)
 
+
 def backdoor_login(request):
+    pass
+    '''
     from django.contrib.auth import authenticate
     username = request.GET['username']
     password = request.GET['password']
@@ -60,11 +64,7 @@ def backdoor_login(request):
     if user is not None:
     # A backend authenticated the credentials
         return render(request, 'copo/index.html', {})
-
-
-
-
-# No backend authenticated the credentials
+    '''
 
 def test_pdf(request):
     return render(request, 'copo/test_page.html', {})
@@ -335,13 +335,18 @@ def copo_register(request):
 
 
 @login_required
-def view_orcid_profile(request):
+def view_user_info(request):
     user = data_utils.get_current_user()
-    op = Orcid().get_orcid_profile(user)
-    data_dict = {'op': op}
-    # data_dict = jsonpickle.encode(data_dict)
+    #op = Orcid().get_orcid_profile(user)
+    d = SocialAccount.objects.get(user_id=user.id)
+    op = json.loads(json.dumps(d.extra_data).replace("-", "_"))
 
-    return render(request, 'copo/orcid_profile.html', data_dict)
+    repo_ids = user.userdetails.repo_submitter
+    repos = Repository().get_by_ids(repo_ids)
+    # data_dict = jsonpickle.encode(data_dict)
+    data_dict = {'orcid': op, "repos": repos}
+
+    return render(request, 'copo/user_info.html', data_dict)
 
 
 def register_to_irods(request):
@@ -442,7 +447,7 @@ def import_ena_accession(request):
 def view_groups(request):
     #g = Group().create_group(description="test descrition")
     profile_list = cursor_to_list(Profile().get_for_user())
-    group_list = cursor_to_list(Group().get_by_owner(request.user.id))
+    group_list = cursor_to_list(CopoGroup().get_by_owner(request.user.id))
     print(group_list)
     return render(request, 'copo/copo_group.html', {'request': request, 'profile_list': profile_list, 'group_list': group_list})
 
@@ -452,4 +457,4 @@ def administer_repos(request):
     return render(request, 'copo/copo_repository.html', {'request': request})
 
 def manage_repos(request):
-    return render(request, 'copo/repo_management.html', {'request': request})
+    return render(request, 'copo/copo_repo_management.html', {'request': request})

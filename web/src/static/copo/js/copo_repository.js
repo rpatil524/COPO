@@ -168,19 +168,26 @@ function add_user_to_table(item) {
 }
 
 function get_repos_data() {
-
+    var u_type = $('#user_type').val()
     $.ajax({
         url: "/copo/get_repos_data/",
         method: "GET",
-        dataType: "json"
+        dataType: "json",
+        data: {"u_type": $('#user_type').val()}
     }).done(function (data) {
         $("#repos_table tbody").empty();
         $(data).each(function (idx, item) {
 
             var tr = document.createElement("tr");
-            tr.innerHTML = "<td>" + item.name + "</td><td>" + item.type + "</td><td>" + item.url + "</td><td class='delete_cell'>" +
-                "<i class='fa fa-minus-square delete-user-button minus-color'></i>" +
-                "</td>";
+            if (u_type == "managers") {
+                tr.innerHTML = "<td>" + item.name + "</td><td>" + item.type + "</td><td>" + item.url + "</td><td class='delete_cell'>" +
+                    "<i class='fa fa-minus-square delete-user-button minus-color'></i>" +
+                    "</td>";
+            }
+            else if (u_type == "submitters") {
+                tr.innerHTML = "<td>" + item.name + "</td><td>" + item.type + "</td><td>" + item.url + "</td>";
+            }
+
             $(tr).data("id", item._id.$oid)
             $(tr).data("repo_name", item.repo_name);
             $(tr).data("url", item.url);
@@ -205,13 +212,14 @@ function add_user_to_repo(row) {
             "email": user_details.email,
             "username": user_details.username,
             "first_name": user_details.first_name,
-            "last_name": user_details.last_name
+            "last_name": user_details.last_name,
+            "u_type": $('#user_type').val()
         },
         dataType: "json"
     }).error(function (data) {
         console.log(data)
     }).success(function (data) {
-        if(data.out == '0') {
+        if (data.out == '0') {
             var tr = document.createElement("tr");
             tr.innerHTML = "<td>" + data.first_name + " " + data.last_name + "</td><td class='delete_cell'>" +
                 "<i class='fa fa-minus-square delete-user-button minus-color'></i>" +
@@ -238,10 +246,12 @@ function get_user_details_from_row(row) {
 
 function get_users_in_repo() {
     var repo_id = $(document).data('selected_row_id')
+    var u_type = $('#user_type').val()
     $.ajax({
         url: "/copo/get_users_in_repo/",
         method: 'GET',
         data: {
+            "user_type": u_type,
             "repo_id": repo_id
         },
         dataType: "json"
@@ -263,6 +273,7 @@ function get_users_in_repo() {
     })
 }
 
+
 function delete_user_row(e) {
     var row = $(e.currentTarget).parents("tr");
     remove_user_from_repo(row);
@@ -270,6 +281,7 @@ function delete_user_row(e) {
 }
 
 function remove_user_from_repo(row) {
+    u_type = $('#user_type').val()
     var user_details = get_user_details_from_row(row);
     var repo_id = $(document).data('selected_row_id')
 

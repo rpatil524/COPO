@@ -13,7 +13,7 @@ from dateutil import parser
 from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
 from django.conf import settings
-from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, Group, Annotation, Repository
+from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, CopoGroup, Annotation, Repository
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
@@ -234,7 +234,8 @@ def get_continuation_studies():
 def create_group(request):
     name = request.GET['group_name']
     description = request.GET['description']
-    uid = Group().create_group(name=name, description=description)
+    uid = CopoGroup().create_shared_group(name=name, description=description)
+
     if uid:
         return HttpResponse(json.dumps({'id': str(uid), 'name': name}))
     else:
@@ -243,7 +244,7 @@ def create_group(request):
 
 def delete_group(request):
     id = request.GET['group_id']
-    deleted = Group().delete_group(group_id=id)
+    deleted = CopoGroup().delete_group(group_id=id)
     if deleted:
         return HttpResponse(json.dumps({'deleted': True}))
     else:
@@ -253,7 +254,7 @@ def delete_group(request):
 def add_profile_to_group(request):
     group_id = request.GET['group_id']
     profile_id = request.GET['profile_id']
-    resp = Group().add_profile(group_id=group_id, profile_id=profile_id)
+    resp = CopoGroup().add_profile(group_id=group_id, profile_id=profile_id)
     if resp:
         return HttpResponse(json.dumps({'resp': 'Added to Group'}))
     else:
@@ -263,7 +264,7 @@ def add_profile_to_group(request):
 def remove_profile_from_group(request):
     group_id = request.GET['group_id']
     profile_id = request.GET['profile_id']
-    resp = Group().remove_profile(group_id=group_id, profile_id=profile_id)
+    resp = CopoGroup().remove_profile(group_id=group_id, profile_id=profile_id)
     if resp:
         return HttpResponse(json.dumps({'resp': 'Removed from Group'}))
     else:
@@ -272,13 +273,13 @@ def remove_profile_from_group(request):
 
 def get_profiles_in_group(request):
     group_id = request.GET['group_id']
-    grp_info = Group().get_profiles_for_group_info(group_id=group_id)
+    grp_info = CopoGroup().get_profiles_for_group_info(group_id=group_id)
     return HttpResponse(json_util.dumps({'resp': grp_info}))
 
 
 def get_users_in_group(request):
     group_id = request.GET['group_id']
-    usr_info = Group().get_users_for_group_info(group_id=group_id)
+    usr_info = CopoGroup().get_users_for_group_info(group_id=group_id)
     return HttpResponse(json_util.dumps({'resp': usr_info}))
 
 
@@ -295,14 +296,14 @@ def get_users(request):
 def add_user_to_group(request):
     group_id = request.GET['group_id']
     user_id = request.GET['user_id']
-    grp_info = Group().add_user_to_group(group_id=group_id, user_id=user_id)
+    grp_info = CopoGroup().add_user_to_group(group_id=group_id, user_id=user_id)
     return HttpResponse(json_util.dumps({'resp': grp_info}))
 
 
 def remove_user_from_group(request):
     group_id = request.GET['group_id']
     user_id = request.GET['user_id']
-    grp_info = Group().remove_user_from_group(group_id=group_id, user_id=user_id)
+    grp_info = CopoGroup().remove_user_from_group(group_id=group_id, user_id=user_id)
     return HttpResponse(json_util.dumps({'resp': grp_info}))
 
 
@@ -336,7 +337,15 @@ def create_new_repo(request):
 
 def get_repos_data(request):
     uid = request.user.id
-    doc = Repository().get_by_uid(uid)
+    u_type = request.GET["u_type"]
+    if u_type == "managers":
+        doc = Repository().get_by_uid(uid)
+    elif u_type == "submitters":
+        u = User.objects.get(pk=uid)
+        repo_ids = u.userdetails.repo_manager
+        doc = list()
+        for r in repo_ids:
+            doc.append(Repository().get_record(ObjectId(r)))
     return HttpResponse(json_util.dumps(doc))
 
 
@@ -347,19 +356,29 @@ def add_user_to_repo(request):
     last_name = request.GET['last_name']
     username = request.GET['username']
     email = request.GET['email']
-    # doc = Repository().get_by_username(username)
-    dms = Group.objects.get(name='data_managers')
+    u_type = request.GET['u_type']
     u = User.objects.get(pk=user_id)
-    dms.user_set.add(u)
-    # User.UserDetails is an extension to User via a one-to-one django field....look in models.py
-    repos = u.userdetails.repo_manager
-    if repos == None:
-        u.userdetails.repo_manager = [repo_id]
-        u.save()
-    else:
-        if repo_id not in repos:
-            u.userdetails.repo_manager.append(repo_id)
+    if u_type == "managers":
+        dms = Group.objects.get(name='data_managers')
+        dms.user_set.add(u)
+        # User.UserDetails is an extension to User via a one-to-one django field....look in models.py
+        repos = u.userdetails.repo_manager
+        if repos == None:
+            u.userdetails.repo_manager = [repo_id]
             u.save()
+        else:
+            if repo_id not in repos:
+                u.userdetails.repo_manager.append(repo_id)
+                u.save()
+    elif u_type == "submitters":
+        repos = u.userdetails.repo_submitter
+        if repos == None:
+            u.userdetails.repo_submitter = [repo_id]
+            u.save()
+        else:
+            if repo_id not in repos:
+                u.userdetails.repo_submitter.append(repo_id)
+                u.save()
 
     out = {"out": "0", "user_id": user_id, "first_name": first_name, "last_name": last_name, "username": username,
            "email": email}
@@ -382,7 +401,11 @@ def remove_user_from_repo(request):
 
 def get_users_in_repo(request):
     repo_id = request.GET['repo_id']
-    data = UserDetails.objects.filter(repo_manager__contains=[repo_id])
+    u_type = request.GET['user_type']
+    if u_type == 'managers':
+        data = UserDetails.objects.filter(repo_manager__contains=[repo_id])
+    elif u_type == 'submitters':
+        data = UserDetails.objects.filter(repo_submitter__contains=[repo_id])
     u_list = list()
     for d in data:
         u_list.append({'uid': d.user.id, 'first_name': d.user.first_name, 'last_name': d.user.last_name})
@@ -391,16 +414,17 @@ def get_users_in_repo(request):
 
 
 def get_repos_for_user(request):
+    #u_type = request.GET['u_type']
     uid = str(request.user.id)
     group_id = request.GET['group_id']
-    doc = Group().get_repos_for_group_info(uid, group_id)
+    doc = CopoGroup().get_repos_for_group_info(uid, group_id)
     return HttpResponse(json_util.dumps({'resp': doc}))
 
 
 def add_repo_to_group(request):
     group_id = request.GET['group_id']
     repo_id = request.GET['repo_id']
-    resp = Group().add_repo(group_id=group_id, repo_id=repo_id)
+    resp = CopoGroup().add_repo(group_id=group_id, repo_id=repo_id)
     if resp:
         return HttpResponse(json.dumps({'resp': 'Added to Group'}))
     else:
@@ -410,8 +434,9 @@ def add_repo_to_group(request):
 def remove_repo_from_group(request):
     group_id = request.GET['group_id']
     repo_id = request.GET['repo_id']
-    resp = Group().remove_repo(group_id=group_id, repo_id=repo_id)
+    resp = CopoGroup().remove_repo(group_id=group_id, repo_id=repo_id)
     if resp:
         return HttpResponse(json.dumps({'resp': 'Removed from Group'}))
     else:
         return HttpResponseBadRequest(json.dumps({'resp': 'Server Error - Try again'}))
+

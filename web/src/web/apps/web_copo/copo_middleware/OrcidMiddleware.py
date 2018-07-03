@@ -22,9 +22,9 @@ class OrcidOAuth:
                         extra_data = sa.extra_data
                         Orcid().store_orcid_profile(extra_data, user)
                         request.session['orcid_details_stored'] = True
-                    except:
-                        pass
-
+                    except Exception as e:
+                        print(e)
+        return
 
         # response = self.get_response(request)
         #

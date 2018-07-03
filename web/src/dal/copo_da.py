@@ -203,7 +203,6 @@ class Publication(DAComponent):
         super(Publication, self).__init__(profile_id, "publication")
 
 
-
 class Annotation(DAComponent):
     def __init__(self, profile_id=None):
         super(Annotation, self).__init__(profile_id, "annotation")
@@ -564,7 +563,7 @@ class Profile(DAComponent):
         # get profiles shared with user
         if not user:
             user = data_utils.get_current_user().id
-        groups = Group().Group.find({'member_ids': str(user)})
+        groups = CopoGroup().Group.find({'member_ids': str(user)})
 
         p_list = list()
         for g in groups:
@@ -619,9 +618,9 @@ class Profile(DAComponent):
                 return p['dataverse']['datasets']
 
 
-class Group(DAComponent):
+class CopoGroup(DAComponent):
     def __init__(self):
-        super(Group, self).__init__(None, "group")
+        super(CopoGroup, self).__init__(None, "group")
         self.Group = get_collection_ref(GroupCollection)
 
     def get_by_owner(self, owner_id):
@@ -630,7 +629,7 @@ class Group(DAComponent):
             return list()
         return doc
 
-    def create_group(self, name, description, owner_id=None):
+    def create_shared_group(self, name, description, owner_id=None):
         group_fields = data_utils.json_to_pytype(DB_TEMPLATES['COPO_GROUP'])
         if not owner_id:
             owner_id = data_utils.get_user_id()
@@ -659,7 +658,7 @@ class Group(DAComponent):
 
     def get_profiles_for_group_info(self, group_id):
         p_list = cursor_to_list(Profile().get_for_user(data_utils.get_user_id()))
-        group = Group().get_record(ObjectId(group_id))
+        group = CopoGroup().get_record(ObjectId(group_id))
         for p in p_list:
             if p['_id'] in group['shared_profile_ids']:
                 p['selected'] = True
@@ -668,7 +667,7 @@ class Group(DAComponent):
         return p_list
 
     def get_repos_for_group_info(self, uid, group_id):
-        g = Group().get_record(ObjectId(group_id))
+        g = CopoGroup().get_record(ObjectId(group_id))
         docs = cursor_to_list(Repository().Repository.find({'users.uid': uid}))
         for d in docs:
             if d['_id'] in g['repo_ids']:
@@ -678,7 +677,7 @@ class Group(DAComponent):
         return list(docs)
 
     def get_users_for_group_info(self, group_id):
-        group = Group().get_record(ObjectId(group_id))
+        group = CopoGroup().get_record(ObjectId(group_id))
         member_ids = group['member_ids']
         user_list = list()
         for u in member_ids:
@@ -708,6 +707,7 @@ class Group(DAComponent):
             {'$pull': {'repo_ids': ObjectId(repo_id)}}
         )
 
+
 class Repository(DAComponent):
     def __init__(self):
         super(Repository, self).__init__(None, "repository")
@@ -716,6 +716,11 @@ class Repository(DAComponent):
     def get_by_uid(self, uid):
         doc = self.get_collection_handle().find({"uid": uid}, {"name": 1, "type": 1, "url": 1})
         return doc
+
+    def get_by_ids(self, uids):
+        oids = list(map(lambda x: ObjectId(x), uids))
+        doc = self.get_collection_handle().find({"_id": {"$in": oids}})
+        return cursor_to_list(doc)
 
     def get_by_username(self, username):
         doc = self.get_collection_handle().find({"username": username})
@@ -736,8 +741,6 @@ class Repository(DAComponent):
         doc = self.Repository.update({'_id': ObjectId(repo_id)},
                                      {'$pull': {'users': {'uid': user_id}}})
         return doc
-
-
 
 
 class RemoteDataFile:
