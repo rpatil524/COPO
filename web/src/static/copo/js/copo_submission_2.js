@@ -161,6 +161,8 @@ $(document).ready(function () {
                         "data": null,
                         "orderable": false,
                         "render": function (data) {
+
+                            // set hidden field for repo_type
                             var renderHTML = $(".datatables3-panel-template")
                                 .clone()
                                 .removeClass("datatables3-panel-template")
@@ -168,6 +170,8 @@ $(document).ready(function () {
 
                             //set heading
                             renderHTML.find(".panel-heading").find(".row-title").html('<span>' + data.repository + '</span>');
+
+
 
                             //set body
                             var bodyRow = $('<div class="row" style="margin-bottom: 10px;"></div>');
@@ -195,9 +199,8 @@ $(document).ready(function () {
                                     ul.append(li)
                                 }
                                 colsFirstHTML.append(ul)
-
-
                             }
+                            colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-target="#repo_modal" class="btn btn-default" type="button" id="view_repo_structure">Inspect Repository</button>')
 
 
                             // set submission status

@@ -69,4 +69,5 @@ urlpatterns = [path('', views.index, name='index'),
                path('get_repos_for_user/', ajax_handlers.get_repos_for_user, name="get_repos_for_user"),
                path('add_repo_to_group/', ajax_handlers.add_repo_to_group, name="add_repo_to_group"),
                path('remove_repo_from_group/', ajax_handlers.remove_repo_from_group, name="remove_repo_from_group"),
+               path('get_repo_info/', ajax_handlers.get_repo_info, name="get_repo_info")
                ]

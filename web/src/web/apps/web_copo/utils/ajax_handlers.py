@@ -440,3 +440,9 @@ def remove_repo_from_group(request):
     else:
         return HttpResponseBadRequest(json.dumps({'resp': 'Server Error - Try again'}))
 
+
+def get_repo_info(request):
+    repo_id = request.GET['repo_id']
+    repo = Repository().get_record(ObjectId(repo_id))
+    out = {'repo_type': repo['type'], 'repo_url': repo['url']}
+    return HttpResponse(json.dumps(out))
