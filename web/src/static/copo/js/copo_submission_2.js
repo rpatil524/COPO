@@ -26,11 +26,17 @@ $(document).ready(function () {
         do_record_task(event);
     });
 
+    $(document).on('click', '.target_repo_option', function (event) {
+        var e = event.currentTarget
+        $('#custom_repo_id').val($(e).data('repoId'))
+        $('#target_repo_label').html(e.innerHTML)
+    })
+
     refresh_tool_tips();
 
     //******************************Functions Block******************************//
-    function do_render_submission_table(data) {
-        var dtd = data.table_data.dataSet;
+    function do_render_submission_table(d) {
+        var dtd = d.table_data.dataSet;
 
         set_empty_component_message(dtd); //display empty submission message.
 
@@ -91,6 +97,9 @@ $(document).ready(function () {
                 option["bundle_meta"] = bundle_meta;
                 option["date_created"] = date_created;
                 option["record_id"] = record_id;
+                if (data.hasOwnProperty("repos")) {
+                    option["repos"] = data.repos
+                }
                 dataSet.push(option);
             }
         }
@@ -168,8 +177,28 @@ $(document).ready(function () {
                                 .append('<div style="margin-bottom: 10px;">' + data.date_created + '</div>')
                                 .append('<div class="firstcol-completed1" style="display: none;">Completed:</div>')
                                 .append('<div class="firstcol-completed2" style="margin-bottom: 10px; display: none;"></div>')
-                                .append('<div>Target Repository:</div>')
-                                .append('<div style="margin-bottom: 10px;">' + data.repository + '</div>');
+                                .append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label" style="margin-bottom: 10px;"></span></div>')
+
+                            if (data.hasOwnProperty("repos")) {
+                                /*if data has repos attached then this user has permission to submit to one or more
+                                institutional repos, so add them into a dropdown here*/
+
+                                colsFirstHTML.append('<div id="target_repo_dropdown" class="dropdown">')
+                                    .append('<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Choose Repository<span class="caret"></span></button>')
+
+                                var ul = $('<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">')
+                                var li_default = $('<li><a data-repo-id="default" class="target_repo_option" href="#">Default ' + data.repository + '</a></li>')
+                                ul.append(li_default)
+                                for (r in data.repos) {
+                                    row = data.repos[r]
+                                    var li = $('<li><a data-repo-id="' + row._id + '"class="target_repo_option" href="#">' + row.name + ' - ' + row.url + '</a></li>')
+                                    ul.append(li)
+                                }
+                                colsFirstHTML.append(ul)
+
+
+                            }
+
 
                             // set submission status
                             var colsSecondHTML = $('<div class="col-sm-4 col-md-4 col-lg-4" style="padding-right: 2px; margin-left: 50px;"></div>')

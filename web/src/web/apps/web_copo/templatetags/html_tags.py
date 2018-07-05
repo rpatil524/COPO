@@ -11,8 +11,9 @@ from web.apps.web_copo.lookup.lookup import HTML_TAGS
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from dal.copo_base_da import DataSchemas
-from dal.copo_da import ProfileInfo, Profile, DAComponent
+from dal.copo_da import ProfileInfo, Profile, DAComponent, Repository
 from allauth.socialaccount import providers
+from django_tools.middlewares import ThreadLocal
 
 register = template.Library()
 
@@ -245,6 +246,21 @@ def generate_table_records(profile_id=str(), component=str()):
         # add record id
         option["record_id"] = str(pr["_id"])
 
+        # do check for custom repos here
+        if component == "submission":
+            sub_type = pr['repository']
+            user = ThreadLocal.get_current_user()
+            repo_ids = user.userdetails.repo_submitter
+            all_repos = Repository().get_by_ids(repo_ids)
+            correct_repos = list()
+            for repo in all_repos:
+                if repo["type"] == sub_type:
+                    correct_repos.append(repo)
+            if len(correct_repos) > 0:
+
+                for repo in correct_repos:
+                    repo["_id"] = str(repo["_id"])
+                option["repos"] = correct_repos
         data_set.append(option)
 
     return_dict = dict(dataSet=data_set,
@@ -252,6 +268,9 @@ def generate_table_records(profile_id=str(), component=str()):
                        )
 
     return return_dict
+
+
+
 
 
 @register.filter("generate_copo_table_data")
@@ -446,7 +465,7 @@ def generate_submission_accessions_data(submission_record):
             for idx, value in enumerate(accessions):
                 data_set.append([value, "Figshare File: " + str(idx + 1), str(), str()])
 
-        elif repository == "dcterms":
+        elif repository == "dataverse":
             # -----------COLLATE ACCESSIONS FOR DATAVERSE REPO----------
             columns = [{"title": "DOI"}, {"title": "Dataverse"}, {"title": "File"}, {"title": "Dataverse Title"}]
 
@@ -454,7 +473,6 @@ def generate_submission_accessions_data(submission_record):
                 data_set.append(
                     [value["dataset_doi"], value["dataverse_title"], value["filename"], value["dataverse_title"]]
                 )
-
 
     return_dict = dict(dataSet=data_set,
                        columns=columns,

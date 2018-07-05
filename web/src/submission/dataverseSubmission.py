@@ -96,11 +96,11 @@ class DataverseSubmit(object):
                 if n_dict['typeName'] == 'title':
                     # export title
                     n_dict['value'] = df.get('description').get('attributes').get('title_author_contributor').get(
-                        'dcterms:title')
+                        'dataverse:title')
                 elif n_dict['typeName'] == 'author':
                     # get authors from mongo
                     authors = listize(
-                        df.get('description').get('attributes').get('title_author_contributor').get('dcterms:creator'))
+                        df.get('description').get('attributes').get('title_author_contributor').get('dataverse:creator'))
                     author_obj = n_dict['value']
                     authors_list = list()
                     for m in authors:
@@ -117,11 +117,11 @@ class DataverseSubmit(object):
                             if contact_key == 'datasetContactName':
                                 contacts[contact_key]['value'] = df.get('description').get('attributes').get(
                                     'title_author_contributor').get(
-                                    'dcterms:creator')
+                                    'dataverse:creator')
                             elif contact_key == 'datasetContactAffiliation':
                                 tmp_email = df.get('description').get('attributes').get(
                                     'title_author_contributor').get(
-                                    'dcterms:contributor')
+                                    'dataverse:contributor')
                                 affiliation = tmp_email.rsplit('@')[1]
                                 contacts[contact_key]['value'] = affiliation
                             elif contact_key == 'datasetContactEmail':
@@ -132,31 +132,31 @@ class DataverseSubmit(object):
                             if ds_key == 'dsDescriptionValue':
                                 descriptions[ds_key]['value'] = df.get('description').get('attributes').get(
                                     'subject_description').get(
-                                    'dcterms:description')
+                                    'dataverse:description')
                             elif ds_key == 'dsDescriptionDate':
-                                d = df.get('description').get('attributes').get('optional_fields').get('dcterms:date')
+                                d = df.get('description').get('attributes').get('optional_fields').get('dataverse:date')
                                 descriptions[ds_key]['value'] = datetime.datetime.strptime(d, '%d/%m/%Y').strftime(
                                     '%Y-%m-%d')
                 elif n_dict['typeName'] == 'subject':
                     n_dict['value'].append(
                         df.get('description').get('attributes').get('subject_description').get(
-                            'dcterms:subject')
+                            'dataverse:subject')
                     )
                 elif n_dict['typeName'] == 'dateOfDeposit':
                     d = df.get('description').get('attributes').get('optional_fields').get(
-                        'dcterms:date')
+                        'dataverse:date')
                     n_dict['value'] = datetime.datetime.strptime(d, '%d/%m/%Y').strftime('%Y-%m-%d')
                 elif n_dict['typeName'] == 'depositor':
                     n_dict['value'] = settings.COPO_URL
                 elif n_dict['typeName'] == 'dataSources':
                     n_dict['value'] = df.get('description').get('attributes').get('optional_fields').get(
-                        'dcterms:source')
+                        'dataverse:source')
                     n_dict['value'] = listize(n_dict['value'])
                     if not n_dict['value']:
                         n_dict['value'] = []
                 elif n_dict['typeName'] == 'relatedMaterial':
                     n_dict['value'] = df.get('description').get('attributes').get('optional_fields').get(
-                        'dcterms:relation')
+                        'dataverse:relation')
                     n_dict['value'] = listize(n_dict['value'])
                     if not n_dict['value']:
                         n_dict['value'] = []

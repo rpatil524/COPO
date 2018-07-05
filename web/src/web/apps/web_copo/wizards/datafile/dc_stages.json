@@ -15,11 +15,11 @@
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "dcterms:title",
+          "id": "dataverse:title",
           "show_in_table": true,
           "control": "text",
           "versions": [
-            "dcterms:title"
+            "dataverse:title"
           ],
           "help_tip": "Enter a name for this item.",
           "label": "Title *"
@@ -32,11 +32,11 @@
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "dcterms:creator",
+          "id": "dataverse:creator",
           "show_in_table": true,
           "control": "text",
           "versions": [
-            "dcterms:creator"
+            "dataverse:creator"
           ],
           "help_tip": "Enter an author for this item. (Lastname/Firstname)",
           "label": "Author (comma separated) *"
@@ -49,11 +49,11 @@
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "dcterms:contributor",
+          "id": "dataverse:contributor",
           "show_in_table": true,
           "control": "text",
           "versions": [
-            "dcterms:contributor"
+            "dataverse:contributor"
           ],
           "help_tip": "Enter a contact email address for this item.",
           "label": "Contributor Email *"
@@ -73,11 +73,11 @@
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "dcterms:description",
+          "id": "dataverse:description",
           "show_in_table": true,
           "control": "text",
           "versions": [
-            "dcterms:description"
+            "dataverse:description"
           ],
           "help_tip": "Describe the purpose, scope or nature of this item.",
           "label": "Description *"
@@ -90,7 +90,7 @@
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "dcterms:subject",
+          "id": "dataverse:subject",
           "show_in_table": true,
           "control": "select",
           "option_values": {
@@ -100,7 +100,7 @@
             }
           },
           "versions": [
-            "dcterms:subject"
+            "dataverse:subject"
           ],
           "help_tip": "Enter subject from dropdown.",
           "label": "Subject *"
@@ -120,7 +120,7 @@
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "dcterms:publisher",
+          "id": "dataverse:publisher",
           "show_in_table": true,
           "control": "text",
           "other_schemas":{
@@ -130,7 +130,7 @@
             }
           },
           "versions": [
-            "dcterms:publisher"
+            "dataverse:publisher"
           ],
           "help_tip": "Person or agency financially or administratively responsible for the Dataset.",
           "label": "Producer"
@@ -143,7 +143,7 @@
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "dcterms:date",
+          "id": "dataverse:date",
           "show_in_table": true,
           "control": "date-picker",
           "other_schemas": {
@@ -153,7 +153,7 @@
             }
           },
           "versions": [
-            "dcterms:date"
+            "dataverse:date"
           ],
           "help_tip": "Production date of Dataset.",
           "label": "Production Date"
@@ -166,7 +166,7 @@
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "dcterms:type",
+          "id": "dataverse:type",
           "show_in_table": true,
           "control": "text",
           "other_schemas": {
@@ -176,7 +176,7 @@
             }
           },
           "versions": [
-            "dcterms:type"
+            "dataverse:type"
           ],
           "help_tip": "Type of data included in the file: survey data, census/enumeration data, aggregate data, clinical.",
           "label": "Kind of Data"
@@ -189,7 +189,7 @@
           "deprecated": false,
           "default_value": [],
           "show_in_form": true,
-          "id": "dcterms:source",
+          "id": "dataverse:source",
           "show_in_table": true,
           "control": "text",
           "other_schemas": {
@@ -199,7 +199,7 @@
             }
           },
           "versions": [
-            "dcterms:source"
+            "dataverse:source"
           ],
           "help_tip": "List of books, articles, data files if any that served as the sources for the Dataset.",
           "label": "Data Sources (comma separated)"
@@ -212,7 +212,7 @@
           "deprecated": false,
           "default_value": [],
           "show_in_form": true,
-          "id": "dcterms:relation",
+          "id": "dataverse:relation",
           "show_in_table": true,
           "control": "text",
           "other_schemas": {
@@ -222,9 +222,9 @@
             }
           },
           "versions": [
-            "dcterms:relation"
+            "dataverse:relation"
           ],
-          "help_tip": "Any related material (journal article citation is not included here - see: dcterms:isReferencedBy below).",
+          "help_tip": "Any related material (journal article citation is not included here - see: dataverse:isReferencedBy below).",
           "label": "Related Material (comma separated)"
         },
 
@@ -236,11 +236,11 @@
           "deprecated": false,
           "default_value": "CC0",
           "show_in_form": true,
-          "id": "dcterms:license",
+          "id": "dataverse:license",
           "show_in_table": true,
           "control": "text",
           "versions": [
-            "dcterms:license"
+            "dataverse:license"
           ],
           "help_tip": "Set the license to CC0 (default in Dataverse for new Datasets), otherwise enter “NONE” and fill in the Terms of Use field.",
           "label": "License"
@@ -253,11 +253,11 @@
           "deprecated": false,
           "default_value": "",
           "show_in_form": true,
-          "id": "dcterms:termsofuse",
+          "id": "dataverse:termsofuse",
           "show_in_table": true,
           "control": "text",
           "versions": [
-            "dcterms:termsofuse"
+            "dataverse:termsofuse"
           ],
           "help_tip": "If not using CC0, enter any terms of use or restrictions for the Dataset.",
           "label": "Terms of Use"
@@ -270,7 +270,7 @@
           "deprecated": false,
           "default_value": [],
           "show_in_form": true,
-          "id": "dcterms:isReferencedBy",
+          "id": "dataverse:isReferencedBy",
           "show_in_table": true,
           "control": "text",
           "other_schemas": {
@@ -280,7 +280,7 @@
             }
           },
           "versions": [
-            "dcterms:isReferencedBy"
+            "dataverse:isReferencedBy"
           ],
           "help_tip": "The publication (journal article, book, other work) that uses this dataset (include citation, permanent identifier (DOI), and permanent URL).",
           "label": "Referenced by (comma separated)"

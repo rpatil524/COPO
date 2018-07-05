@@ -175,7 +175,7 @@ function handle_upload(e) {
     var submission_id = $(tr).data('submission_id')
 
     var message = $(document).data('message')
-    if ($(tr).find('.repo_cell').html() != 'dcterms') {
+    if ($(tr).find('.repo_cell').html() != 'dataverse') {
         message = 'Are you sure you want to upload this submission bundle.'
     }
 
