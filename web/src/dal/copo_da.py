@@ -11,6 +11,7 @@ from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 from django.contrib.auth.models import User
+from django.conf import settings
 import pandas as pd
 
 PubCollection = 'PublicationCollection'
@@ -774,6 +775,7 @@ class Description:
     def __init__(self, profile_id=None):
         self.DescriptionCollection = get_collection_ref(DescriptionCollection)
         self.profile_id = profile_id
+        self.component = str()
 
     def GET(self, id):
         doc = self.DescriptionCollection.find_one({"_id": ObjectId(id)})
@@ -782,6 +784,7 @@ class Description:
         return doc
 
     def create_description(self, stages=list(), attributes=dict(), profile_id=str(), component=str(), meta=dict()):
+        self.component = component
 
         self.purge_descriptions()  # remove obsolete descriptions
 
@@ -814,6 +817,9 @@ class Description:
     def get_all_descriptions(self):
         return cursor_to_list(self.DescriptionCollection.find())
 
+    def get_all_records_columns(self, sort_by='_id', sort_direction=1, projection=dict(), filter_by=dict()):
+        return cursor_to_list(self.DescriptionCollection.find(filter_by, projection).sort([[sort_by, sort_direction]]))
+
     def is_valid_token(self, description_token):
         is_valid = False
 
@@ -829,7 +835,7 @@ class Description:
         :return:
         """
 
-        no_of_days = 2  # no of days
+        no_of_days = 3
 
         pipeline = [{"$project": {"_id": 1, "diff_days": {
             "$divide": [{"$subtract": [data_utils.get_datetime(), "$created_on"]}, 1000 * 60 * 60 * 24]}}}]
@@ -841,11 +847,25 @@ class Description:
 
             self.DescriptionCollection.remove({"_id": {"$in": object_ids}})
 
-            # now go through and remove any records associated with the description_tokens from the sample collection
-            SampleCollection = get_collection_ref('SampleCollection')
+            # remove records associated with the description_tokens from the collection
+            if self.component == "sample":
+                SampleCollection = get_collection_ref('SampleCollection')
 
-            for id in object_ids:
-                SampleCollection.delete_many({"description_token": str(id), "deleted": data_utils.get_deleted_flag()})
+                store_name = settings.SAMPLE_OBJECT_STORE
 
+                for id in object_ids:
+                    SampleCollection.delete_many(
+                        {"description_token": str(id), "deleted": data_utils.get_deleted_flag()})
 
+                    # delete store object
+                    object_key = settings.SAMPLE_OBJECT_PREFIX + str(id)
+                    self.remove_store_object(store_name=store_name, object_key=object_key)
         return True
+
+    def remove_store_object(self, store_name, object_key):
+        try:
+            with pd.HDFStore(store_name) as store:
+                if object_key in store:
+                    del store[object_key]
+        except Exception as e:
+            print('HDF5 Access Error: ' + str(e))

@@ -22,6 +22,9 @@ $(document).ready(function () {
     //load records
     load_records(componentMeta);
 
+    //load pending description
+    pending_sample_description();
+
     //description table data
     var dtRows = [];
     var dtColumns = [];
@@ -70,6 +73,18 @@ $(document).ready(function () {
         }
     });
 
+    //delete an incomplete description
+    $(document).on("click", ".delete-description-i", function (event) {
+        event.preventDefault();
+        delete_incomplete_description($(this), $(this).attr("data-target"));
+    });
+
+    //reload an incomplete description
+    $(document).on("click", ".reload-description-i", function (event) {
+        event.preventDefault();
+        reload_incomplete_description($(this), $(this).attr("data-target"));
+    });
+
     //custom stage renderers
     var dispatchStageRenderer = {
         perform_sample_generation: function (stage) {
@@ -100,6 +115,11 @@ $(document).ready(function () {
 
 
     //******************************* wizard events *******************************//
+
+    //handle event for saving description for later...
+    $('#reload_act').on('click', function (event) {
+        window.location.reload();
+    });
 
     //handle event for discarding current description...
     $('#remove_act').on('click', function (event) {
@@ -496,7 +516,7 @@ $(document).ready(function () {
             // get form inputs
             var form_values = {};
 
-            if (Number(activeStageIndx) > 1) {//intro stage, nothing to (re)validate
+            if (Number(activeStageIndx) > 1) {
                 $('#wizard_form_' + activeStageIndx).find(":input").each(function () {
                     form_values[this.id] = $(this).val();
                 });
@@ -1337,6 +1357,113 @@ $(document).ready(function () {
         dialog.realize();
         dialog.setMessage($dialogContent);
         dialog.open();
+    }
+
+    function pending_sample_description() {
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'request_action': "pending_description",
+                'profile_id': $('#profile_id').val()
+            },
+            success: function (data) {
+                if (data.pending.length) {
+                    var infoPanelElement = trigger_global_notification();
+
+                    for (var i = 0; i < data.pending.length; ++i) {
+                        var rec = data.pending[i];
+                        var message = $('<div/>');
+                        message.append("<h4>Incomplete description</h4>");
+                        message.append("<span>Modified on: </span>");
+                        message.append(rec.created_on);
+                        message.append("<div></div>");
+                        message.append("<span>Number of samples: </span>");
+                        message.append(rec.number_of_samples);
+                        message.append("<div style='margin-top: 10px;'></div>");
+
+                        var dismissTour = '<a class="delete-description-i pull-right" href="#" role="button" ' +
+                            'style="text-decoration: none; color:  #c93c00;" data-target="' + rec._id + '" title="delete description" aria-haspopup="true" aria-expanded="false">' +
+                            '<i class="fa fa-times-circle" aria-hidden="true">' +
+                            '</i>&nbsp; Delete</a>';
+
+                        var takeTour = '<a class="reload-description-i" href="#" role="button" ' +
+                            'style="text-decoration: none; color: #35637e;" data-target="' + rec._id + '" title="reload description" aria-haspopup="true" aria-expanded="false">' +
+                            '<i class="fa fa-refresh" aria-hidden="true">' +
+                            '</i>&nbsp; Reload</a>';
+
+                        message.append("<hr/>");
+                        message.append(dismissTour);
+                        message.append(takeTour);
+
+                        var alertElement = $(".alert-templates").find(".alert-info").clone();
+                        alertElement.addClass("inc-desc-badge");
+                        alertElement.find(".alert-message").append(message);
+                        infoPanelElement.prepend(alertElement);
+                    }
+                }
+            },
+            error: function () {
+                console.log("Couldn't complete request for pending description");
+            }
+        });
+    }
+
+    function delete_incomplete_description(elem, description_token) {
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'request_action': "delete_pending_description",
+                'description_token': description_token
+            },
+            success: function (data) {
+                elem.closest(".inc-desc-badge").remove();
+            },
+            error: function () {
+                console.log("Couldn't complete request for deleting description");
+            }
+        });
+    }
+
+
+    function reload_incomplete_description(elem, description_token) {
+        if ($("#wizard_toggle").is(":visible")) {
+            BootstrapDialog.show({
+                title: 'Description reload warning',
+                message: "<div class='webpop-content-div'>There's a running description session. Discard the current description session before attempting a reload.</div>",
+                cssClass: 'copo-modal3',
+                closable: false,
+                animate: true,
+                type: BootstrapDialog.TYPE_WARNING,
+                buttons: [
+                    {
+                        label: 'OK',
+                        cssClass: 'tiny ui basic orange button',
+                        action: function (dialogRef) {
+                            dialogRef.close();
+                        }
+                    }
+                ]
+            });
+
+            return false;
+        } else {
+            $("#wizard_toggle").collapse("toggle");
+
+            //hide the review stage -- to be redisplayed when all the dynamic stages are displayed
+            $('#sampleWizard').find('.steps li:last-child').hide();
+
+            elem.closest(".inc-desc-badge").remove();
+
+            sampleDescriptionToken = description_token;
+        }
     }
 
 }); //end document ready

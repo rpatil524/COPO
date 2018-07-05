@@ -37,7 +37,7 @@
     <!--test ends -->
 
 
-{#    <div id="example"></div>#}
+    <div id="example"></div>
 
     <!--test ends -->
 
@@ -54,6 +54,14 @@
                              title="Discard description"
                              tabindex="0">
                             <span style="padding-left: 3px;">Discard Description</span>
+                        </div>
+
+                        <!-- save for later description button -->
+                        <div id="reload_act" class=" tiny ui basic secondary button"
+                             data-toggle="tooltip"
+                             title="Save description for later"
+                             tabindex="0">
+                            <span style="padding-left: 3px;">Save for later</span>
                         </div>
 
                         <!-- Help tip -->
@@ -91,29 +99,32 @@
                         <div class="step-content"
                              style="margin-bottom: 45px; border: 0.1em solid rgba(229, 239, 255, 1.0); border-radius: 4px;">
                             <div class="step-pane active sample-pane" data-step="1">
-                                <h4>Getting started...</h4>
-                                <p>
-                                    <!-- description wizard getting started section -->
+
+                                <!-- description wizard getting started section -->
                                 <div class="webpop-content-div">
+                                    <h4>Getting started...</h4>
                                     The following tips are provided to help you navigate the wizard:
                                     <br/><br/>
                                     <ol>
                                         <li>
                                             Use the <strong><a class="wiz-showme" data-target="wiz_next_btn"
                                                                data-label="Next stage" href="#"
-                                                               title="show me">Next</a></strong> button to proceed to
+                                                               title="show me">Next</a></strong> button to proceed
+                                            to
                                             the next
                                             stage of the wizard,
                                             and the <strong><a class="wiz-showme" data-target="wiz_prev_btn"
                                                                data-label="Previous stage" href="#"
-                                                               title="show me">Prev</a></strong> button to return to a
+                                                               title="show me">Prev</a></strong> button to return to
+                                            a
                                             previous
                                             stage
                                         </li>
                                         <li>
                                             Use the <a class="wiz-showme" data-target="wizard-help-checkbox"
                                                        data-label="Help tips" href="#"
-                                                       title="show me"><strong>help tips</strong></a> button to toggle
+                                                       title="show me"><strong>help tips</strong></a> button to
+                                            toggle
                                             display of help
                                             tips
                                         </li>
@@ -127,7 +138,8 @@
                                         <li>
                                             The <a class="wiz-showme" data-target="copo-documentation"
                                                    data-label="Documentation" href="#"
-                                                   title="show me"><strong>documentation</strong></a> page offers a more
+                                                   title="show me"><strong>documentation</strong></a> page offers a
+                                            more
                                             detailed guide
                                             to sample description
                                         </li>
@@ -140,9 +152,7 @@
 
                                         </li>
                                     </ol>
-
                                 </div>
-                                </p>
                             </div>
                             <div class="step-pane" data-step="2">
                                 <h4>Wrap up!</h4>

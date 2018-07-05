@@ -166,7 +166,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # MEDIA_ROOT = STATIC_ROOT
 
 MEDIA_ROOT = os.path.join(BASE_DIR, resolve_env.get_env('MEDIA_PATH'))
-OBJECT_STORE = os.path.join(MEDIA_ROOT, 'object_store')
 
 ELASTIC_SEARCH_URL = 'http://localhost:9200/ontologies/plant_ontology/_search'
 

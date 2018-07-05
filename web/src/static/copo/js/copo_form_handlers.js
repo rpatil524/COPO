@@ -1558,6 +1558,9 @@ var dispatchFormControl = {
             min = formElem.min
         }
 
+        if(! elemValue) {
+            elemValue = min;
+        }
 
         var counter_ctrl = $('<input/>',
             {
@@ -1566,7 +1569,7 @@ var dispatchFormControl = {
                 class: "input-copo form-control",
                 id: formElem.id,
                 name: formElem.id,
-                value: 1,
+                value: elemValue,
             });
 
         var minmax = "Min: " + min;

@@ -35,7 +35,9 @@ class BrokerRequests:
             save_cell_data=self.do_save_cell_data,
             finalise_description=self.do_finalise_description,
             discard_description=self.do_discard_description,
-            batch_update=self.do_batch_update
+            batch_update=self.do_batch_update,
+            pending_description=self.do_pending_description,
+            delete_pending_description=self.do_delete_pending_description
         )
 
         return request_dict
@@ -101,3 +103,9 @@ class BrokerRequests:
 
     def do_discard_description(self):
         self.context['discard_result'] = self.wizard_helper.discard_description()
+
+    def do_pending_description(self):
+        self.context['pending'] = self.wizard_helper.get_pending_description()
+
+    def do_delete_pending_description(self):
+        self.context['status'] = self.wizard_helper.discard_description()

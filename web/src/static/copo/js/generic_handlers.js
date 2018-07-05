@@ -134,7 +134,6 @@ function showontopop(item, label, prefix, desc, accession) {
     });
 }
 
-
 function resolve_element_view(recordId, associatedComponent, eventTarget) {
     //maps form element by id to component type e.g source, sample
 

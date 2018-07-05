@@ -1,7 +1,5 @@
 __author__ = 'etuka'
-
 import re
-import os
 import json
 import numpy as np
 import pandas as pd
@@ -27,12 +25,8 @@ class WizardHelper:
         self.description_token = description_token
         self.profile_id = self.set_profile_id(profile_id)
         self.key_split = "___0___"
-        self.store_key = "_" + self.description_token
-        self.store_name = os.path.join(settings.OBJECT_STORE, "samples.h5")
-        self.sample_types = list()
-
-        for s_t in d_utils.get_sample_type_options():
-            self.sample_types.append(s_t["value"])
+        self.object_key = settings.SAMPLE_OBJECT_PREFIX + self.description_token
+        self.store_name = settings.SAMPLE_OBJECT_STORE
 
     def set_profile_id(self, profile_id):
         """
@@ -87,17 +81,22 @@ class WizardHelper:
         next_stage_dict = dict(abort=False)
         current_stage = auto_fields.get("current_stage", str())
 
-        if not current_stage and not self.description_token:  # likely the first (dynamic) stage to be requested
-            self.generate_stage_items()
-            next_stage_dict['wiz_token'] = self.description_token
+        if not current_stage:
             next_stage_dict['wiz_message'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["sample_wizard_messages"])[
                 "properties"]
+
+            if not self.description_token:  # likely the first (dynamic) stage to be requested
+                self.generate_stage_items()
+                next_stage_dict['wiz_token'] = self.description_token
+            else:  # likely a call to reload an incomplete description
+                # update timestamp
+                Description().edit_description(self.description_token, dict(created_on=d_utils.get_datetime()))
 
         # start by getting the description record
         description = Description().GET(self.description_token)
 
         if not description:
-            # invalid description; send signal to abort the current description
+            # invalid description; send signal to abort the wizard
             next_stage_dict["abort"] = True
             return next_stage_dict
 
@@ -132,6 +131,14 @@ class WizardHelper:
             if previous_data and not (previous_data == current_data):  # stage data has changed, refresh wizard
                 next_stage_dict['refresh_wizard'] = True
 
+                # remove store object, if any, associated with this description
+                Description().remove_store_object(store_name=self.store_name, object_key=self.object_key)
+
+                # update meta
+                meta = description.get("meta", dict())
+                meta["generated_columns"] = list()
+                Description().edit_description(self.description_token, dict(meta=meta))
+
                 # store previous value, some processes might need it
                 # save current stage data
                 attributes[current_stage + "_old"] = previous_data
@@ -139,12 +146,12 @@ class WizardHelper:
                 # save attributes
                 Description().edit_description(self.description_token, dict(attributes=attributes))
 
-            # build data dictionary for new stage
-            if next_stage_dict['stage']['ref'] in attributes and "data" not in next_stage_dict['stage']:
-                next_stage_dict['stage']['data'] = DecoupleFormSubmission(attributes[next_stage_dict['stage']['ref']],
-                                                                          d_utils.json_to_object(
-                                                                              next_stage_dict[
-                                                                                  'stage']).items).get_schema_fields_updated()
+        # build data dictionary for stage
+        if next_stage_dict['stage']['ref'] in attributes and "data" not in next_stage_dict['stage']:
+            next_stage_dict['stage']['data'] = DecoupleFormSubmission(attributes[next_stage_dict['stage']['ref']],
+                                                                      d_utils.json_to_object(
+                                                                          next_stage_dict[
+                                                                              'stage']).items).get_schema_fields_updated()
         return next_stage_dict
 
     def serve_stage(self, stages, next_stage_index):
@@ -265,6 +272,11 @@ class WizardHelper:
         """
         stage = dict()
 
+        sample_types = list()
+
+        for s_t in d_utils.get_sample_type_options():
+            sample_types.append(s_t["value"])
+
         description = Description().GET(self.description_token)
         stages = description["stages"]
         attributes = description["attributes"]
@@ -280,7 +292,7 @@ class WizardHelper:
 
             for f in self.schema:
                 # get relevant attributes based on sample type
-                if f.get("show_in_form", True) and user_choice in f.get("specifications", self.sample_types):
+                if f.get("show_in_form", True) and user_choice in f.get("specifications", sample_types):
                     # if required, resolve data source for select-type controls,
                     # i.e., if a callback is defined on the 'option_values' field
                     if "option_values" in f:
@@ -348,6 +360,22 @@ class WizardHelper:
         function generate discrete attributes for individual sample editing
         :return:
         """
+
+        # if there's stored object, use that rather than generating dataset from scratch
+        stored_data_set = list()
+        try:
+            with pd.HDFStore(self.store_name) as store:
+                if self.object_key in store:
+                    stored_data_set = store[self.object_key].to_dict('records')
+        except Exception as e:
+            print('HDF5 Access Error: ' + str(e))
+
+        description = Description().GET(self.description_token)
+        stored_columns = description["meta"].get("generated_columns", list())
+
+        if stored_columns and stored_data_set:
+            return dict(columns=stored_columns, rows=stored_data_set)
+
         # object type controls and their corresponding schemas
         object_array_controls = ["copo-characteristics", "copo-comment"]
         object_array_schemas = [d_utils.get_copo_schema("material_attribute_value"),
@@ -360,7 +388,6 @@ class WizardHelper:
         columns = [dict(title=' ', name='s_n', data="s_n", className='select-checkbox'),
                    dict(title='Name', name='name', data="name")]
 
-        description = Description().GET(self.description_token)
         attributes = description["attributes"]
 
         # get stored sample attributes
@@ -490,12 +517,19 @@ class WizardHelper:
 
         data_set = samples_df.to_dict('records')
 
-        # save generated data to drive update display
+        # save generated dataset
         try:
             with pd.HDFStore(self.store_name) as store:
-                store[self.store_key] = pd.DataFrame(data_set)
+                store[self.object_key] = pd.DataFrame(data_set)
         except Exception as e:
             lg.log('HDF5 Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+
+        # save generated columns
+        meta = description.get("meta", dict())
+        meta["generated_columns"] = columns
+
+        # save meta
+        Description().edit_description(self.description_token, dict(meta=meta))
 
         return dict(columns=columns, rows=data_set)
 
@@ -932,10 +966,10 @@ class WizardHelper:
         # refresh stored dataset with new display value
         try:
             with pd.HDFStore(self.store_name) as store:
-                gd_df = store[self.store_key]
+                gd_df = store[self.object_key]
                 gd_df.loc[gd_df.loc[gd_df['DT_RowId'].isin(["row_" + record_id])].index, cell_reference] = result[
                     "value"]
-                store[self.store_key] = gd_df
+                store[self.object_key] = gd_df
         except Exception as e:
             lg.log('HDF5 Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
 
@@ -1026,9 +1060,9 @@ class WizardHelper:
         # refresh stored dataset with new display value
         try:
             with pd.HDFStore(self.store_name) as store:
-                gd_df = store[self.store_key]
+                gd_df = store[self.object_key]
                 gd_df.loc[gd_df.loc[gd_df['DT_RowId'].isin(target_rows)].index, cell_reference] = result["value"]
-                store[self.store_key] = gd_df
+                store[self.object_key] = gd_df
 
                 if len(target_rows) > refresh_threshold:
                     result["data_set"] = gd_df.to_dict('records')
@@ -1067,12 +1101,8 @@ class WizardHelper:
 
         SampleCollection = get_collection_ref('SampleCollection')
 
-        # delete description object
-        try:
-            with pd.HDFStore(self.store_name) as store:
-                del store[self.store_key]
-        except Exception as e:
-            lg.log('HDF5 Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+        # delete store object
+        Description().remove_store_object(store_name=self.store_name, object_key=self.object_key)
 
         # remove entries associated with this token
         SampleCollection.delete_many(
@@ -1081,3 +1111,28 @@ class WizardHelper:
         Description().delete_description([self.description_token])
 
         return result
+
+    def get_pending_description(self):
+        """
+        function returns any pending description record
+        :param profile_id:
+        :return:
+        """
+
+        projection = dict(created_on=1, attributes=1)
+        filter_by = dict(profile_id=self.profile_id)
+        records = Description().get_all_records_columns(sort_by='created_on', projection=projection,
+                                                        filter_by=filter_by)
+
+        refined_records = list()
+
+        for r in records:
+            val = dict(
+                created_on=htags.resolve_datetime_data(r['created_on'], dict()),
+                _id=str(r['_id']),
+                number_of_samples=r['attributes'].get("number_of_samples", dict()).get("number_of_samples", 'N/A')
+            )
+
+            refined_records.append(val)
+
+        return refined_records

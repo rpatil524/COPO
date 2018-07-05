@@ -143,11 +143,22 @@
 
 
             $(document).on("click", "#trigger-notifications", function (event) {
-                $("#global-notifications").collapse("toggle");
+                trigger_global_notification();
             });
 
 
         });
+
+        function trigger_global_notification() {
+            var infoPanelElement = $("#page_alert_panel");
+
+            if (infoPanelElement.length) {
+                //reveal tab if not already shown
+                $('.copo-sidebar-tabs a[href="#copo-sidebar-info"]').tab('show');
+
+                return infoPanelElement
+            }
+        }
 
 
         function do_email_form() {
@@ -283,7 +294,8 @@
             </li>
 
             <li class="dropdown" title="Notifications">
-                <a id="trigger-notifications" href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
+                <a id="trigger-notifications" href="#" class="dropdown-toggle " data-toggle="dropdown" role="button"
+                   aria-haspopup="true"
                    aria-expanded="false">
                     <span data-copo-tour-id="notifications_button"><i class="fa fa-bell" aria-hidden="true"></i></span>
                 </a>
