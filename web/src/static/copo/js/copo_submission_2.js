@@ -162,7 +162,7 @@ $(document).ready(function () {
                         "orderable": false,
                         "render": function (data) {
 
-                            // set hidden field for repo_type
+
                             var renderHTML = $(".datatables3-panel-template")
                                 .clone()
                                 .removeClass("datatables3-panel-template")

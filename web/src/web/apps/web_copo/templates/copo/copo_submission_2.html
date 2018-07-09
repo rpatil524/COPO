@@ -84,7 +84,27 @@
                     <h4 class="modal-title" id="myModalLabel">Modal title</h4>
                 </div>
                 <div class="modal-body">
-                    ...
+                    <!-- RADIO BUTTON TO CHOOSE BETWEEN EXISTING AND NEW REPO -->
+                    <div class="create_add_dataverse">
+                        <label><input type="radio" name="create_dataverse_radio" value="new">&nbsp Create New Dataverse</label>
+                    </div>
+                    <div class="create_add_dataverse">
+                        <label><input type="radio" name="create_dataverse_radio" value="existing">&nbsp Add to Existing</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="create_new_dataverse">Dataverse Name</label>
+                        <input type="text" class="form-control" id="create_new_dataverse">
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <label for="search_dataverse">Search by Term</label>
+                            <input type="text" class="form-control" id="search_dataverse">
+                        </div>
+                        <div class="form-group">
+                            <label for="search_dataverse">Search by Dataverse ID</label>
+                            <input type="text" class="form-control" id="search_dataverse_id">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

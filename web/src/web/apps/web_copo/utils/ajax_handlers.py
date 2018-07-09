@@ -446,3 +446,15 @@ def get_repo_info(request):
     repo = Repository().get_record(ObjectId(repo_id))
     out = {'repo_type': repo['type'], 'repo_url': repo['url']}
     return HttpResponse(json.dumps(out))
+
+
+def search_dataverse(request):
+    box = request.GET['box']
+    q = request.GET['q']
+    url = request.GET['url']
+    if url == 'default':
+        url = settings.DATAVERSE['HARVARD_TEST_API']
+    url = url + '/api/search'
+    payload = {'q': q}
+    resp = requests.get(url=url, params=payload)
+    return HttpResponse(json.dumps(resp.content.decode('utf-8')))

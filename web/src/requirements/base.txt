@@ -9,7 +9,7 @@ certifi==2017.11.5
 chardet==3.0.4
 colorama==0.3.7
 configparser==3.5.0
--e git+https://github.com/IQSS/dataverse-client-python.git@c1965c37855ade468a6fcd90ff26138269b260da#egg=dataverse
+-e git+https://github.com/IQSS/dataverse-client-python.git#egg=dataverse
 decorator==4.1.2
 deepdiff==3.3.0
 defusedxml==0.4.1
@@ -82,7 +82,7 @@ rauth==0.7.3
 rcssmin==1.0.6
 rdflib==4.2.1
 redis==2.10.6
-requests==2.18.4
+requests
 requests-oauthlib==0.7.0
 rjsmin==1.0.12
 rsa==3.4.2
