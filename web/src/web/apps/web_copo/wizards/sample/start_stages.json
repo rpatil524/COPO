@@ -23,7 +23,7 @@
     {
       "ref": "sample_type",
       "title": "Sample Type",
-      "message": "Please specify the sample type. Sample type enables a specific template to be employed for describing the samples.",
+      "message": "Please specify the sample type. This will enable the wizard to select an appropriate metadata template for your sample description.",
       "items": [
         {
           "id": "sample_type",
@@ -237,7 +237,7 @@
       "ref": "sample_attributes",
       "title": "Sample Attributes",
       "callback": "get_sample_attributes",
-      "message": "Enter the attributes that describe your sample(s). <br/><span style='font-weight:bold;'>Note: Cloned sample attributes may not entirely capture your intended metadata assignment. Please check carefully to ensure that you are happy with the resolved entries!</span>",
+      "message": "Enter the attributes that describe your sample(s). Attributes entered in this stage will be used to generate individual samples. If attributes are from a cloned sample, please check to ensure that they are well aligned with your metadata needs.",
       "items": [
 
       ]

@@ -786,8 +786,6 @@ class Description:
     def create_description(self, stages=list(), attributes=dict(), profile_id=str(), component=str(), meta=dict()):
         self.component = component
 
-        self.purge_descriptions()  # remove obsolete descriptions
-
         fields = dict(
             stages=stages,
             attributes=attributes,
@@ -817,7 +815,7 @@ class Description:
     def get_all_descriptions(self):
         return cursor_to_list(self.DescriptionCollection.find())
 
-    def get_all_records_columns(self, sort_by='_id', sort_direction=1, projection=dict(), filter_by=dict()):
+    def get_all_records_columns(self, sort_by='_id', sort_direction=-1, projection=dict(), filter_by=dict()):
         return cursor_to_list(self.DescriptionCollection.find(filter_by, projection).sort([[sort_by, sort_direction]]))
 
     def is_valid_token(self, description_token):
@@ -835,12 +833,9 @@ class Description:
         :return:
         """
 
-        no_of_days = 3
+        no_of_days = settings.DESCRIPTION_GRACE_PERIOD
 
-        pipeline = [{"$project": {"_id": 1, "diff_days": {
-            "$divide": [{"$subtract": [data_utils.get_datetime(), "$created_on"]}, 1000 * 60 * 60 * 24]}}}]
-
-        description_df = pd.DataFrame(cursor_to_list(self.DescriptionCollection.aggregate(pipeline)))
+        description_df = self.get_elapsed_time_dataframe()
 
         if len(description_df):
             object_ids = description_df[description_df.diff_days > no_of_days]['_id'].tolist()
@@ -861,6 +856,14 @@ class Description:
                     object_key = settings.SAMPLE_OBJECT_PREFIX + str(id)
                     self.remove_store_object(store_name=store_name, object_key=object_key)
         return True
+
+    def get_elapsed_time_dataframe(self):
+        pipeline = [{"$project": {"_id": 1, "diff_days": {
+            "$divide": [{"$subtract": [data_utils.get_datetime(), "$created_on"]}, 1000 * 60 * 60 * 24]}}}]
+
+        description_df = pd.DataFrame(cursor_to_list(self.DescriptionCollection.aggregate(pipeline)))
+
+        return description_df
 
     def remove_store_object(self, store_name, object_key):
         try:

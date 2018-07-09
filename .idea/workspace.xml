@@ -4,15 +4,9 @@
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/dal/copo_da.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/dal/copo_da.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/component_navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/component_navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_sample.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_sample.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/broker_requests.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/broker_requests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/settings/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/settings/base.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/web/settings/data.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/settings/data.py" afterDir="false" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
@@ -80,8 +74,8 @@
       <file leaf-file-name="start_stages.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-891">
-              <caret line="170" column="30" selection-start-line="170" selection-start-column="30" selection-end-line="170" selection-end-column="30" />
+            <state relative-caret-position="-288">
+              <caret line="195" column="28" selection-start-line="195" selection-start-column="28" selection-end-line="195" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -89,8 +83,8 @@
       <file leaf-file-name="broker_requests.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/broker_requests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="354">
-              <caret line="110" column="71" selection-start-line="110" selection-start-column="71" selection-end-line="110" selection-end-column="71" />
+            <state relative-caret-position="153">
+              <caret line="78" column="70" selection-start-line="78" selection-start-column="70" selection-end-line="78" selection-end-column="70" />
               <folding>
                 <element signature="e#47#58#0" expanded="true" />
                 <element signature="e#187#937#0" expanded="true" />
@@ -100,7 +94,6 @@
                 <element signature="e#2371#2484#0" expanded="true" />
                 <element signature="e#2524#2633#0" expanded="true" />
                 <element signature="e#2683#2816#0" expanded="true" />
-                <element signature="e#2865#3006#0" expanded="true" />
                 <element signature="e#3058#3136#0" expanded="true" />
                 <element signature="e#3181#3404#0" expanded="true" />
                 <element signature="e#3447#3685#0" expanded="true" />
@@ -108,16 +101,17 @@
                 <element signature="e#4078#4153#0" expanded="true" />
                 <element signature="e#4201#4274#0" expanded="true" />
                 <element signature="e#4444#4481#0" expanded="true" />
+                <element signature="e#4583#4669#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="copo_sample_2.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="copo_sample_2.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="242">
-              <caret line="1116" column="28" selection-start-line="1116" selection-start-column="28" selection-end-line="1116" selection-end-column="28" />
+            <state relative-caret-position="5170">
+              <caret line="1441" column="141" selection-start-line="1441" selection-start-column="141" selection-end-line="1441" selection-end-column="141" />
               <folding>
                 <element signature="e#1002#1070#0" expanded="true" />
                 <element signature="e#1173#1211#0" expanded="true" />
@@ -175,8 +169,11 @@
                 <element signature="e#30815#32246#0" expanded="true" />
                 <element signature="e#32283#32450#0" expanded="true" />
                 <element signature="e#32519#32990#0" expanded="true" />
+                <element signature="e#33039#40075#0" expanded="true" />
+                <element signature="e#34714#39945#0" expanded="true" />
                 <element signature="e#35484#35827#0" expanded="true" />
                 <element signature="e#37730#37908#0" expanded="true" />
+                <element signature="e#38585#38721#0" expanded="true" />
                 <element signature="e#38983#39117#0" expanded="true" />
                 <element signature="e#39224#39408#0" expanded="true" />
                 <element signature="e#39559#39810#0" expanded="true" />
@@ -196,6 +193,8 @@
                 <element signature="e#47452#47539#0" expanded="true" />
                 <element signature="e#47891#47907#0" expanded="true" />
                 <element signature="e#48446#50569#0" expanded="true" />
+                <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#a#0;n#!!top" expanded="true" />
                 <element signature="e#207#213#0" expanded="true" />
@@ -206,7 +205,6 @@
                 <element signature="e#50759#50775#0" expanded="true" />
                 <element signature="e#51221#53342#0" expanded="true" />
                 <element signature="e#53375#53479#0" expanded="true" />
-                <element signature="e#51625#52182#0" expanded="true" />
                 <element signature="e#52401#52553#0" expanded="true" />
               </folding>
             </state>
@@ -216,8 +214,8 @@
       <file leaf-file-name="copo_da.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
-              <caret line="796" column="48" selection-start-line="796" selection-start-column="48" selection-end-line="796" selection-end-column="48" />
+            <state relative-caret-position="153">
+              <caret line="817" column="69" selection-start-line="817" selection-start-column="69" selection-end-line="817" selection-end-column="69" />
               <folding>
                 <element signature="e#49#78#0" expanded="true" />
                 <element signature="e#1774#1802#0" expanded="true" />
@@ -297,144 +295,15 @@
                 <element signature="e#27006#27010#0" expanded="true" />
                 <element signature="e#27081#27219#0" expanded="true" />
                 <element signature="e#27252#27372#0" expanded="true" />
+                <element signature="e#27498#27968#0" expanded="true" />
                 <element signature="e#28034#28145#0" expanded="true" />
                 <element signature="e#28213#28380#0" expanded="true" />
                 <element signature="e#28426#28482#0" expanded="true" />
                 <element signature="e#28601#28712#0" expanded="true" />
                 <element signature="e#28771#28965#0" expanded="true" />
                 <element signature="e#29009#30305#0" expanded="true" />
+                <element signature="e#30128#30428#0" expanded="true" />
                 <element signature="e#30374#30592#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="copo_form_handlers.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="1561" column="27" selection-start-line="1561" selection-start-column="27" selection-end-line="1561" selection-end-column="27" />
-              <folding>
-                <element signature="e#380#1371#0" expanded="true" />
-                <element signature="e#725#781#0" expanded="true" />
-                <element signature="e#810#877#0" expanded="true" />
-                <element signature="e#980#1365#0" expanded="true" />
-                <element signature="n#!!block;n#initiate_form_call#0" expanded="true" />
-                <element signature="e#2837#2915#0" expanded="true" />
-                <element signature="e#2944#2984#0" expanded="true" />
-                <element signature="n#!!block;n#initiate_annotation_call#0" expanded="true" />
-                <element signature="e#3158#4345#0" expanded="true" />
-                <element signature="e#3752#4337#0" expanded="true" />
-                <element signature="n#!!block;n#json2HtmlForm#0" expanded="true" />
-                <element signature="e#4483#4602#0" expanded="true" />
-                <element signature="e#4764#4842#0" expanded="true" />
-                <element signature="e#4954#4998#0" expanded="true" />
-                <element signature="e#5038#5844#0" expanded="true" />
-                <element signature="e#5157#5289#0" expanded="true" />
-                <element signature="e#5489#5790#0" expanded="true" />
-                <element signature="e#6007#6081#0" expanded="true" />
-                <element signature="e#6308#6386#0" expanded="true" />
-                <element signature="n#!!block;n#build_form_body#0" expanded="true" />
-                <element signature="n#!!block;n#generate_form_controls#0" expanded="true" />
-                <element signature="n#!!block;n#get_form_message#0" expanded="true" />
-                <element signature="e#66#73#1" expanded="true" />
-                <element signature="n#style#0;n#i#0;n#!!top" expanded="true" />
-                <element signature="n#!!block;n#get_form_title#0" expanded="true" />
-                <element signature="n#!!block;n#get_help_ctrl#0" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
-                <element signature="n#!!block;n#set_up_help_ctrl#0" expanded="true" />
-                <element signature="e#11241#11444#0" expanded="true" />
-                <element signature="n#!!block;n#set_up_form_help_div#0" expanded="true" />
-                <element signature="n#!!block;n#set_up_form_body_div#0" expanded="true" />
-                <element signature="n#!!block;n#build_clone_control#0" expanded="true" />
-                <element signature="n#!!block;n#refresh_form_aux_controls#0" expanded="true" />
-                <element signature="n#!!block;n#set_validation_markers#0" expanded="true" />
-                <element signature="e#16693#17282#0" expanded="true" />
-                <element signature="e#17340#17900#0" expanded="true" />
-                <element signature="e#17951#19848#0" expanded="true" />
-                <element signature="e#19905#20463#0" expanded="true" />
-                <element signature="e#20518#21102#0" expanded="true" />
-                <element signature="e#21155#22411#0" expanded="true" />
-                <element signature="e#22469#22950#0" expanded="true" />
-                <element signature="e#23010#24365#0" expanded="true" />
-                <element signature="e#23745#24227#0" expanded="true" />
-                <element signature="e#24432#27604#0" expanded="true" />
-                <element signature="e#25748#26672#0" expanded="true" />
-                <element signature="e#27673#30316#0" expanded="true" />
-                <element signature="e#28406#28680#0" expanded="true" />
-                <element signature="e#30375#32281#0" expanded="true" />
-                <element signature="e#32341#33077#0" expanded="true" />
-                <element signature="e#32608#32808#0" expanded="true" />
-                <element signature="e#33141#34719#0" expanded="true" />
-                <element signature="e#34783#36430#0" expanded="true" />
-                <element signature="e#35892#36026#0" expanded="true" />
-                <element signature="e#36488#37112#0" expanded="true" />
-                <element signature="e#37165#37404#0" expanded="true" />
-                <element signature="e#37441#37598#0" expanded="true" />
-                <element signature="e#37661#40849#0" expanded="true" />
-                <element signature="e#39078#39366#0" expanded="true" />
-                <element signature="e#40909#42928#0" expanded="true" />
-                <element signature="e#41627#41776#0" expanded="true" />
-                <element signature="e#42991#44796#0" expanded="true" />
-                <element signature="e#44863#47457#0" expanded="true" />
-                <element signature="n#style#0;n#p#0;n#!!top" expanded="true" />
-                <element signature="e#46429#46884#0" expanded="true" />
-                <element signature="e#47525#49343#0" expanded="true" />
-                <element signature="e#50689#50717#0" expanded="true" />
-                <element signature="n#!!block;n#create_attachable_component#0" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
-                <element signature="e#51888#51976#0" expanded="true" />
-                <element signature="e#52089#52133#0" expanded="true" />
-                <element signature="e#52173#55064#0" expanded="true" />
-                <element signature="e#52290#52422#0" expanded="true" />
-                <element signature="e#52596#54826#0" expanded="true" />
-                <element signature="e#52907#52992#0" expanded="true" />
-                <element signature="e#53577#54625#0" expanded="true" />
-                <element signature="e#54670#54770#0" expanded="true" />
-                <element signature="e#55227#55326#0" expanded="true" />
-                <element signature="e#55553#55618#0" expanded="true" />
-                <element signature="e#56225#58055#0" expanded="true" />
-                <element signature="e#56742#57994#0" expanded="true" />
-                <element signature="e#57415#57810#0" expanded="true" />
-                <element signature="e#57855#57952#0" expanded="true" />
-                <element signature="e#58084#58148#0" expanded="true" />
-                <element signature="n#!!block;n#form_help_ctrl#0" expanded="true" />
-                <element signature="n#!!block;n#form_div_ctrl#0" expanded="true" />
-                <element signature="n#!!block;n#form_label_ctrl#0" expanded="true" />
-                <element signature="n#!!block;n#do_array_ctrls#0" expanded="true" />
-                <element signature="e#59342#59636#0" expanded="true" />
-                <element signature="n#!!block;n#get_element_clone#0" expanded="true" />
-                <element signature="e#59839#60027#0" expanded="true" />
-                <element signature="e#60468#60558#0" expanded="true" />
-                <element signature="n#!!block;n#resolve_ctrl_values#0" expanded="true" />
-                <element signature="e#61246#61774#0" expanded="true" />
-                <element signature="e#62296#62752#0" expanded="true" />
-                <element signature="e#63001#63949#0" expanded="true" />
-                <element signature="n#!!block;n#resolve_ctrl_values_aux_1#0" expanded="true" />
-                <element signature="n#!!block;n#get_basic_input#0" expanded="true" />
-                <element signature="n#!!block;n#get_basic_label#0" expanded="true" />
-                <element signature="n#!!block;n#get_ontology_span#0" expanded="true" />
-                <element signature="n#style#0;n#input#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#!!block;n#get_ontology_span_2#0" expanded="true" />
-                <element signature="n#!!block;n#get_multi_search_span#0" expanded="true" />
-                <element signature="n#!!block;n#get_form_ctrl#0" expanded="true" />
-                <element signature="n#!!block;n#validate_forms#0" expanded="true" />
-                <element signature="n#!!block;n#custom_validate#0" expanded="true" />
-                <element signature="e#70741#71561#0" expanded="true" />
-                <element signature="e#71146#71454#0" expanded="true" />
-                <element signature="e#71597#72866#0" expanded="true" />
-                <element signature="e#72049#72221#0" expanded="true" />
-                <element signature="e#72426#72741#0" expanded="true" />
-                <element signature="e#72903#73328#0" expanded="true" />
-                <element signature="e#73364#73642#0" expanded="true" />
-                <element signature="e#73678#74089#0" expanded="true" />
-                <element signature="e#74135#76721#0" expanded="true" />
-                <element signature="e#74608#74829#0" expanded="true" />
-                <element signature="n#!!block;n#save_form#0" expanded="true" />
-                <element signature="e#77113#77166#0" expanded="true" />
-                <element signature="e#77819#78173#0" expanded="true" />
-                <element signature="e#78202#78243#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -449,54 +318,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="generic_handlers_ext2.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers_ext2.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="143">
-              <caret line="197" column="22" selection-start-line="197" selection-start-column="22" selection-end-line="197" selection-end-column="22" />
-              <folding>
-                <element signature="e#171#298#0" expanded="true" />
-                <element signature="e#253#293#0" expanded="true" />
-                <element signature="n#!!block;n#set_empty_component_message#0" expanded="true" />
-                <element signature="n#!!block;n#place_task_buttons#0" expanded="true" />
-                <element signature="e#1354#1580#0" expanded="true" />
-                <element signature="n#!!block;n#do_crud_action_feedback#0" expanded="true" />
-                <element signature="n#!!block;n#do_table_buttons_events#0" expanded="true" />
-                <element signature="e#1950#4027#0" expanded="true" />
-                <element signature="e#3907#3973#0" expanded="true" />
-                <element signature="n#!!block;n#display_copo_alert#0" expanded="true" />
-                <element signature="n#!!block;n#deselect_records#0" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
-                <element signature="e#7108#7291#0" expanded="true" />
-                <element signature="e#8304#8599#0" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#span#0;n#!!top" expanded="true" />
-                <element signature="n#!!block;n#refresh_sub_table#0" expanded="true" />
-                <element signature="n#!!block;n#do_component_attributes#0" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#!!block;n#load_records#0" expanded="true" />
-                <element signature="e#16258#16441#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="wizard_helper.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="wizard_helper.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="283">
-              <caret line="375" selection-start-line="375" selection-end-line="375" />
+            <state relative-caret-position="177">
+              <caret line="51" column="115" selection-start-line="51" selection-start-column="115" selection-end-line="51" selection-end-column="115" />
               <folding>
                 <element signature="e#22#31#0" expanded="true" />
                 <element signature="e#730#1064#0" expanded="true" />
                 <element signature="e#1241#1667#0" expanded="true" />
-                <element signature="e#1713#2717#0" expanded="true" />
-                <element signature="e#2774#6165#0" expanded="true" />
+                <element signature="e#2649#6608#0" expanded="true" />
                 <element signature="e#6228#6707#0" expanded="true" />
                 <element signature="e#6771#7398#0" expanded="true" />
                 <element signature="e#7462#8319#0" expanded="true" />
-                <element signature="e#8384#9963#0" expanded="true" />
+                <element signature="e#8827#10290#0" expanded="true" />
                 <element signature="e#10028#13139#0" expanded="true" />
                 <element signature="e#13208#13611#0" expanded="true" />
+                <element signature="e#13665#20648#0" expanded="true" />
                 <element signature="e#20724#21194#0" expanded="true" />
                 <element signature="e#21257#21858#0" expanded="true" />
                 <element signature="e#21929#22381#0" expanded="true" />
@@ -510,7 +348,7 @@
                 <element signature="e#40275#44149#0" expanded="true" />
                 <element signature="e#44195#44735#0" expanded="true" />
                 <element signature="e#44780#45519#0" expanded="true" />
-                <element signature="e#46048#46209#0" expanded="true" />
+                <element signature="e#47142#48273#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -530,15 +368,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>discrete</find>
-      <find>get_discrete_attributes</find>
-      <find>object_key</find>
-      <find>del</find>
-      <find>trigger-notifications</find>
-      <find>ajax</find>
-      <find>sample_types</find>
-      <find>htags</find>
-      <find>global-notifications</find>
       <find>info</find>
       <find>dismiss tour</find>
       <find>prof</find>
@@ -560,6 +389,15 @@
       <find>pad-it</find>
       <find>disca</find>
       <find>discre</find>
+      <find>display_sample_naming</find>
+      <find>validate_sa</find>
+      <find>validate_bundle_name</find>
+      <find>number_of_samples</find>
+      <find>sample_nam</find>
+      <find>provided_names</find>
+      <find>_old</find>
+      <find>modified</find>
+      <find>there</find>
     </findStrings>
     <replaceStrings>
       <replace>context-help-ctrl</replace>
@@ -618,7 +456,6 @@
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_publications.html" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_people.html" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_annotations.html" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/index.html" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" />
@@ -631,17 +468,18 @@
         <option value="$PROJECT_DIR$/web/src/web/settings/serv.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
         <option value="$PROJECT_DIR$/web/src/web/settings/base.py" />
-        <option value="$PROJECT_DIR$/web/src/web/settings/data.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/component_navbar.html" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base.html" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/broker_requests.py" />
-        <option value="$PROJECT_DIR$/web/src/dal/copo_da.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_sample.html" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json" />
+        <option value="$PROJECT_DIR$/web/src/web/settings/data.py" />
+        <option value="$PROJECT_DIR$/web/src/dal/copo_da.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py" />
       </list>
     </option>
   </component>
@@ -667,10 +505,10 @@
     </packageJsonPaths>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-5" />
-    <option name="y" value="23" />
-    <option name="width" value="1487" />
-    <option name="height" value="829" />
+    <option name="x" value="-1690" />
+    <option name="y" value="-26" />
+    <option name="width" value="1445" />
+    <option name="height" value="832" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -706,17 +544,6 @@
             <path>
               <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="media" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="media" type="462c0819:PsiDirectoryNode" />
-              <item name="object_store" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
@@ -1908,7 +1735,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="829" extended-state="6" />
+    <frame x="-1920" y="-94" width="1920" height="1057" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3292683" />
@@ -1919,14 +1746,14 @@
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32833788" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49767134" weight="0.32885906" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32880434" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49182117" visible="true" weight="0.14592275" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49182117" visible="true" weight="0.1086262" />
       <window_info anchor="bottom" id="Docker" order="8" weight="0.25181347" />
       <window_info anchor="right" id="Database" order="4" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49767134" weight="0.27546778" />
       <window_info anchor="right" id="SciView" order="5" weight="0.6044349" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.13045794" />
       <window_info id="Favorites" order="2" sideWeight="0.50817883" side_tool="true" weight="0.12552084" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.7174535" visible="true" weight="0.3065395" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.7174535" visible="true" weight="0.23388773" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -2033,7 +1860,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="929" />
+      <option name="time" value="941" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
@@ -2094,14 +1921,14 @@
             <element signature="e#22#31#0" expanded="true" />
             <element signature="e#730#1064#0" expanded="true" />
             <element signature="e#1241#1667#0" expanded="true" />
-            <element signature="e#1713#2717#0" expanded="true" />
-            <element signature="e#2774#6165#0" expanded="true" />
+            <element signature="e#2649#6608#0" expanded="true" />
             <element signature="e#6228#6707#0" expanded="true" />
             <element signature="e#6771#7398#0" expanded="true" />
             <element signature="e#7462#8319#0" expanded="true" />
-            <element signature="e#8384#9963#0" expanded="true" />
+            <element signature="e#8827#10290#0" expanded="true" />
             <element signature="e#10028#13139#0" expanded="true" />
             <element signature="e#13208#13611#0" expanded="true" />
+            <element signature="e#13665#20648#0" expanded="true" />
             <element signature="e#20724#21194#0" expanded="true" />
             <element signature="e#21257#21858#0" expanded="true" />
             <element signature="e#21929#22381#0" expanded="true" />
@@ -2115,7 +1942,7 @@
             <element signature="e#40275#44149#0" expanded="true" />
             <element signature="e#44195#44735#0" expanded="true" />
             <element signature="e#44780#45519#0" expanded="true" />
-            <element signature="e#46048#46209#0" expanded="true" />
+            <element signature="e#47142#48273#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2358,13 +2185,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/messages/wizard_messages.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="142">
-          <caret line="14" column="799" selection-start-line="14" selection-start-column="799" selection-end-line="14" selection-end-column="799" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="142">
@@ -2526,23 +2346,6 @@
           <folding>
             <element signature="e#672#965#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/settings/data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="64" selection-start-line="64" selection-end-line="64" />
-          <folding>
-            <element signature="e#63#95#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-891">
-          <caret line="170" column="30" selection-start-line="170" selection-start-column="30" selection-end-line="170" selection-end-column="30" />
         </state>
       </provider>
     </entry>
@@ -2856,31 +2659,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/broker_requests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="354">
-          <caret line="110" column="71" selection-start-line="110" selection-start-column="71" selection-end-line="110" selection-end-column="71" />
-          <folding>
-            <element signature="e#47#58#0" expanded="true" />
-            <element signature="e#187#937#0" expanded="true" />
-            <element signature="e#979#1688#0" expanded="true" />
-            <element signature="e#1742#1969#0" expanded="true" />
-            <element signature="e#2013#2332#0" expanded="true" />
-            <element signature="e#2371#2484#0" expanded="true" />
-            <element signature="e#2524#2633#0" expanded="true" />
-            <element signature="e#2683#2816#0" expanded="true" />
-            <element signature="e#2865#3006#0" expanded="true" />
-            <element signature="e#3058#3136#0" expanded="true" />
-            <element signature="e#3181#3404#0" expanded="true" />
-            <element signature="e#3447#3685#0" expanded="true" />
-            <element signature="e#3726#4029#0" expanded="true" />
-            <element signature="e#4078#4153#0" expanded="true" />
-            <element signature="e#4201#4274#0" expanded="true" />
-            <element signature="e#4444#4481#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="217">
@@ -3188,10 +2966,70 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_sample.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="233">
+          <caret line="56" column="30" selection-start-line="56" selection-start-column="30" selection-end-line="56" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers_ext2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="143">
+          <caret line="197" column="22" selection-start-line="197" selection-start-column="22" selection-end-line="197" selection-end-column="22" />
+          <folding>
+            <element signature="e#171#298#0" expanded="true" />
+            <element signature="e#253#293#0" expanded="true" />
+            <element signature="n#!!block;n#set_empty_component_message#0" expanded="true" />
+            <element signature="n#!!block;n#place_task_buttons#0" expanded="true" />
+            <element signature="e#1354#1580#0" expanded="true" />
+            <element signature="n#!!block;n#do_crud_action_feedback#0" expanded="true" />
+            <element signature="n#!!block;n#do_table_buttons_events#0" expanded="true" />
+            <element signature="e#1950#4027#0" expanded="true" />
+            <element signature="e#3907#3973#0" expanded="true" />
+            <element signature="n#!!block;n#display_copo_alert#0" expanded="true" />
+            <element signature="n#!!block;n#deselect_records#0" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+            <element signature="e#7108#7291#0" expanded="true" />
+            <element signature="e#8304#8599#0" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#span#0;n#!!top" expanded="true" />
+            <element signature="n#!!block;n#refresh_sub_table#0" expanded="true" />
+            <element signature="n#!!block;n#do_component_attributes#0" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#!!block;n#load_records#0" expanded="true" />
+            <element signature="e#16258#16441#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/css/copo/style.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="173">
+          <caret line="866" column="1" selection-start-line="866" selection-start-column="1" selection-end-line="866" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/messages/wizard_messages.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="123">
+          <caret line="14" column="799" selection-start-line="14" selection-start-column="799" selection-end-line="14" selection-end-column="799" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/settings/data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="67" column="29" selection-start-line="67" selection-start-column="29" selection-end-line="67" selection-end-column="29" />
+          <folding>
+            <element signature="e#63#95#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="796" column="48" selection-start-line="796" selection-start-column="48" selection-end-line="796" selection-end-column="48" />
+        <state relative-caret-position="153">
+          <caret line="817" column="69" selection-start-line="817" selection-start-column="69" selection-end-line="817" selection-end-column="69" />
           <folding>
             <element signature="e#49#78#0" expanded="true" />
             <element signature="e#1774#1802#0" expanded="true" />
@@ -3271,98 +3109,55 @@
             <element signature="e#27006#27010#0" expanded="true" />
             <element signature="e#27081#27219#0" expanded="true" />
             <element signature="e#27252#27372#0" expanded="true" />
+            <element signature="e#27498#27968#0" expanded="true" />
             <element signature="e#28034#28145#0" expanded="true" />
             <element signature="e#28213#28380#0" expanded="true" />
             <element signature="e#28426#28482#0" expanded="true" />
             <element signature="e#28601#28712#0" expanded="true" />
             <element signature="e#28771#28965#0" expanded="true" />
             <element signature="e#29009#30305#0" expanded="true" />
+            <element signature="e#30128#30428#0" expanded="true" />
             <element signature="e#30374#30592#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_sample.html">
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/broker_requests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="233">
-          <caret line="56" column="30" selection-start-line="56" selection-start-column="30" selection-end-line="56" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers_ext2.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="143">
-          <caret line="197" column="22" selection-start-line="197" selection-start-column="22" selection-end-line="197" selection-end-column="22" />
+        <state relative-caret-position="153">
+          <caret line="78" column="70" selection-start-line="78" selection-start-column="70" selection-end-line="78" selection-end-column="70" />
           <folding>
-            <element signature="e#171#298#0" expanded="true" />
-            <element signature="e#253#293#0" expanded="true" />
-            <element signature="n#!!block;n#set_empty_component_message#0" expanded="true" />
-            <element signature="n#!!block;n#place_task_buttons#0" expanded="true" />
-            <element signature="e#1354#1580#0" expanded="true" />
-            <element signature="n#!!block;n#do_crud_action_feedback#0" expanded="true" />
-            <element signature="n#!!block;n#do_table_buttons_events#0" expanded="true" />
-            <element signature="e#1950#4027#0" expanded="true" />
-            <element signature="e#3907#3973#0" expanded="true" />
-            <element signature="n#!!block;n#display_copo_alert#0" expanded="true" />
-            <element signature="n#!!block;n#deselect_records#0" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
-            <element signature="e#7108#7291#0" expanded="true" />
-            <element signature="e#8304#8599#0" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#span#0;n#!!top" expanded="true" />
-            <element signature="n#!!block;n#refresh_sub_table#0" expanded="true" />
-            <element signature="n#!!block;n#do_component_attributes#0" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#!!block;n#load_records#0" expanded="true" />
-            <element signature="e#16258#16441#0" expanded="true" />
+            <element signature="e#47#58#0" expanded="true" />
+            <element signature="e#187#937#0" expanded="true" />
+            <element signature="e#979#1688#0" expanded="true" />
+            <element signature="e#1742#1969#0" expanded="true" />
+            <element signature="e#2013#2332#0" expanded="true" />
+            <element signature="e#2371#2484#0" expanded="true" />
+            <element signature="e#2524#2633#0" expanded="true" />
+            <element signature="e#2683#2816#0" expanded="true" />
+            <element signature="e#3058#3136#0" expanded="true" />
+            <element signature="e#3181#3404#0" expanded="true" />
+            <element signature="e#3447#3685#0" expanded="true" />
+            <element signature="e#3726#4029#0" expanded="true" />
+            <element signature="e#4078#4153#0" expanded="true" />
+            <element signature="e#4201#4274#0" expanded="true" />
+            <element signature="e#4444#4481#0" expanded="true" />
+            <element signature="e#4583#4669#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/css/copo/style.css">
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/start_stages.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="866" column="1" selection-start-line="866" selection-start-column="1" selection-end-line="866" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="283">
-          <caret line="375" selection-start-line="375" selection-end-line="375" />
-          <folding>
-            <element signature="e#22#31#0" expanded="true" />
-            <element signature="e#730#1064#0" expanded="true" />
-            <element signature="e#1241#1667#0" expanded="true" />
-            <element signature="e#1713#2717#0" expanded="true" />
-            <element signature="e#2774#6165#0" expanded="true" />
-            <element signature="e#6228#6707#0" expanded="true" />
-            <element signature="e#6771#7398#0" expanded="true" />
-            <element signature="e#7462#8319#0" expanded="true" />
-            <element signature="e#8384#9963#0" expanded="true" />
-            <element signature="e#10028#13139#0" expanded="true" />
-            <element signature="e#13208#13611#0" expanded="true" />
-            <element signature="e#20724#21194#0" expanded="true" />
-            <element signature="e#21257#21858#0" expanded="true" />
-            <element signature="e#21929#22381#0" expanded="true" />
-            <element signature="e#22445#28348#0" expanded="true" />
-            <element signature="e#28410#30801#0" expanded="true" />
-            <element signature="e#30844#31324#0" expanded="true" />
-            <element signature="e#31385#33591#0" expanded="true" />
-            <element signature="e#33650#34792#0" expanded="true" />
-            <element signature="e#34861#36612#0" expanded="true" />
-            <element signature="e#36692#40191#0" expanded="true" />
-            <element signature="e#40275#44149#0" expanded="true" />
-            <element signature="e#44195#44735#0" expanded="true" />
-            <element signature="e#44780#45519#0" expanded="true" />
-            <element signature="e#46048#46209#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-288">
+          <caret line="195" column="28" selection-start-line="195" selection-start-column="28" selection-end-line="195" selection-end-column="28" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_sample_2.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="1116" column="28" selection-start-line="1116" selection-start-column="28" selection-end-line="1116" selection-end-column="28" />
+        <state relative-caret-position="5170">
+          <caret line="1441" column="141" selection-start-line="1441" selection-start-column="141" selection-end-line="1441" selection-end-column="141" />
           <folding>
             <element signature="e#1002#1070#0" expanded="true" />
             <element signature="e#1173#1211#0" expanded="true" />
@@ -3420,8 +3215,11 @@
             <element signature="e#30815#32246#0" expanded="true" />
             <element signature="e#32283#32450#0" expanded="true" />
             <element signature="e#32519#32990#0" expanded="true" />
+            <element signature="e#33039#40075#0" expanded="true" />
+            <element signature="e#34714#39945#0" expanded="true" />
             <element signature="e#35484#35827#0" expanded="true" />
             <element signature="e#37730#37908#0" expanded="true" />
+            <element signature="e#38585#38721#0" expanded="true" />
             <element signature="e#38983#39117#0" expanded="true" />
             <element signature="e#39224#39408#0" expanded="true" />
             <element signature="e#39559#39810#0" expanded="true" />
@@ -3441,6 +3239,8 @@
             <element signature="e#47452#47539#0" expanded="true" />
             <element signature="e#47891#47907#0" expanded="true" />
             <element signature="e#48446#50569#0" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#a#0;n#!!top" expanded="true" />
             <element signature="e#207#213#0" expanded="true" />
@@ -3451,8 +3251,41 @@
             <element signature="e#50759#50775#0" expanded="true" />
             <element signature="e#51221#53342#0" expanded="true" />
             <element signature="e#53375#53479#0" expanded="true" />
-            <element signature="e#51625#52182#0" expanded="true" />
             <element signature="e#52401#52553#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="177">
+          <caret line="51" column="115" selection-start-line="51" selection-start-column="115" selection-end-line="51" selection-end-column="115" />
+          <folding>
+            <element signature="e#22#31#0" expanded="true" />
+            <element signature="e#730#1064#0" expanded="true" />
+            <element signature="e#1241#1667#0" expanded="true" />
+            <element signature="e#2649#6608#0" expanded="true" />
+            <element signature="e#6228#6707#0" expanded="true" />
+            <element signature="e#6771#7398#0" expanded="true" />
+            <element signature="e#7462#8319#0" expanded="true" />
+            <element signature="e#8827#10290#0" expanded="true" />
+            <element signature="e#10028#13139#0" expanded="true" />
+            <element signature="e#13208#13611#0" expanded="true" />
+            <element signature="e#13665#20648#0" expanded="true" />
+            <element signature="e#20724#21194#0" expanded="true" />
+            <element signature="e#21257#21858#0" expanded="true" />
+            <element signature="e#21929#22381#0" expanded="true" />
+            <element signature="e#22445#28348#0" expanded="true" />
+            <element signature="e#28410#30801#0" expanded="true" />
+            <element signature="e#30844#31324#0" expanded="true" />
+            <element signature="e#31385#33591#0" expanded="true" />
+            <element signature="e#33650#34792#0" expanded="true" />
+            <element signature="e#34861#36612#0" expanded="true" />
+            <element signature="e#36692#40191#0" expanded="true" />
+            <element signature="e#40275#44149#0" expanded="true" />
+            <element signature="e#44195#44735#0" expanded="true" />
+            <element signature="e#44780#45519#0" expanded="true" />
+            <element signature="e#47142#48273#0" expanded="true" />
           </folding>
         </state>
       </provider>

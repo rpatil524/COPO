@@ -49,7 +49,7 @@ class WizardHelper:
 
     def generate_stage_items(self):
         """
-        function generates the stages of the wizard, it then returns the first stage in the sequence of stages
+        function generates the stages of the wizard and creates a description token that will guide the description
         :return:
         """
 
@@ -102,6 +102,7 @@ class WizardHelper:
 
         stages = description["stages"]
         attributes = description["attributes"]
+        meta = description.get("meta", dict())
 
         # save in-coming stage data, check for changes, re-validate wizard, serve next stage
         next_stage_index = [indx for indx, stage in enumerate(stages) if stage['ref'] == current_stage]
@@ -135,16 +136,7 @@ class WizardHelper:
                 Description().remove_store_object(store_name=self.store_name, object_key=self.object_key)
 
                 # update meta
-                meta = description.get("meta", dict())
                 meta["generated_columns"] = list()
-                Description().edit_description(self.description_token, dict(meta=meta))
-
-                # store previous value, some processes might need it
-                # save current stage data
-                attributes[current_stage + "_old"] = previous_data
-
-                # save attributes
-                Description().edit_description(self.description_token, dict(attributes=attributes))
 
         # build data dictionary for stage
         if next_stage_dict['stage']['ref'] in attributes and "data" not in next_stage_dict['stage']:
@@ -152,6 +144,13 @@ class WizardHelper:
                                                                       d_utils.json_to_object(
                                                                           next_stage_dict[
                                                                               'stage']).items).get_schema_fields_updated()
+
+        # save last rendered stage
+        if next_stage_dict['stage']['ref']:
+            meta["last_rendered_stage"] = next_stage_dict['stage']['ref']
+
+        Description().edit_description(self.description_token, dict(meta=meta))
+
         return next_stage_dict
 
     def serve_stage(self, stages, next_stage_index):
@@ -245,20 +244,19 @@ class WizardHelper:
         if not stage["ref"] == user_choice:
             stage = self.serve_stage(stages, next_stage_index + 1)
 
-        # this stage is dependent on the number of samples; if this has changed, re-validate...
+        # check for number of samples dependency, re-validate if necessary
 
         number_of_samples = attributes.get("number_of_samples", dict()).get("number_of_samples", 1)
-        number_of_samples_old = attributes.get("number_of_samples_old", dict()).get("number_of_samples", None)
+
+        meta = description.get("meta", dict())
+        number_of_samples_old = meta.get(stage["ref"] + "_number_of_samples", None)
 
         if number_of_samples_old and not number_of_samples == number_of_samples_old:
-            # do we need to trigger re-validation?
-            if stage["ref"] in attributes:
+            status = self.revalidate_sample_name(user_choice)  # revalidate
+            if stage["ref"] in attributes and status == 'error':
                 data = attributes[stage["ref"]]
 
                 data[user_choice + "_hidden"] = str()
-                # if not self.revalidate_sample_name(user_choice) == "success":
-                #     data[user_choice + "_hidden"] = str()
-
                 stage["data"] = DecoupleFormSubmission(data,
                                                        d_utils.json_to_object(stage).items).get_schema_fields_updated()
 
@@ -280,6 +278,7 @@ class WizardHelper:
         description = Description().GET(self.description_token)
         stages = description["stages"]
         attributes = description["attributes"]
+        meta = description["meta"]
 
         # get sample type - user choice
         user_choice = attributes.get("sample_type", dict()).get("sample_type", str())
@@ -318,7 +317,7 @@ class WizardHelper:
             clone_option = attributes.get("sample_clone", dict()).get("sample_clone", str())
 
             # this stage is dependent on sample clone; if this has changed, re-validate data...
-            clone_option_old = attributes.get("sample_clone_old", dict()).get("sample_clone", None)
+            clone_option_old = meta.get(stage["ref"] + "_sample_clone", None)
 
             stage['data'] = attributes.get(stage["ref"], dict())
 
@@ -336,6 +335,11 @@ class WizardHelper:
                         # clone value changed or first time
                         clone_value = attributes.get(clone_option, dict())
                         stage['data'] = self.resolve_clone_data(clone_value, clone_option)
+
+        # store dependency
+        meta[stage["ref"] + "_sample_clone"] = clone_option
+        Description().edit_description(self.description_token, dict(meta=meta))
+
         return stage
 
     def perform_sample_generation(self, next_stage_index):
@@ -768,6 +772,8 @@ class WizardHelper:
         result = dict(status="success")
         errors = list()
 
+        description = Description().GET(self.description_token)
+
         name_series = pd.Series(sample_names.split(",") if "," in sample_names else sample_names.split())
         name_series = name_series[name_series.str.strip() != '']
 
@@ -791,7 +797,7 @@ class WizardHelper:
             ])
 
         # do we have matching number of supplied names to number of samples to be described?
-        description = Description().GET(self.description_token)
+
         number_of_samples = description["attributes"].get("number_of_samples", dict()).get("number_of_samples", 0)
         if len(name_series) < int(number_of_samples):
             errors.append([
@@ -806,6 +812,13 @@ class WizardHelper:
             result['status'] = "error"
             result['errors'] = errors
             result["error_columns"] = [{"title": "Error code"}, {"title": "Error message"}, {"title": "Error details"}]
+
+        else:
+            # store dependency
+            meta = description.get("meta", dict())
+            meta["provided_names_number_of_samples"] = number_of_samples
+            # save meta
+            Description().edit_description(self.description_token, dict(meta=meta))
 
         return result
 
@@ -835,6 +848,9 @@ class WizardHelper:
 
         if validate["status"] == "success":
             meta["generated_names"] = generated_names
+
+            # store dependency
+            meta["bundle_name_number_of_samples"] = number_of_samples
 
         # save meta
         Description().edit_description(self.description_token, dict(meta=meta))
@@ -1119,18 +1135,27 @@ class WizardHelper:
         :return:
         """
 
+        # first, remove obsolete description records
+        Description().purge_descriptions()
+
         projection = dict(created_on=1, attributes=1)
         filter_by = dict(profile_id=self.profile_id)
         records = Description().get_all_records_columns(sort_by='created_on', projection=projection,
                                                         filter_by=filter_by)
 
+        # step toward computing grace period before automatic removal of description
+        description_df = Description().get_elapsed_time_dataframe()
+        no_of_days = settings.DESCRIPTION_GRACE_PERIOD
+
         refined_records = list()
 
         for r in records:
+            ll = description_df[description_df._id == r['_id']]
             val = dict(
                 created_on=htags.resolve_datetime_data(r['created_on'], dict()),
                 _id=str(r['_id']),
-                number_of_samples=r['attributes'].get("number_of_samples", dict()).get("number_of_samples", 'N/A')
+                number_of_samples=r['attributes'].get("number_of_samples", dict()).get("number_of_samples", 'N/A'),
+                grace_period=str(int(float(no_of_days) - float(ll.diff_days))) + ' days'
             )
 
             refined_records.append(val)

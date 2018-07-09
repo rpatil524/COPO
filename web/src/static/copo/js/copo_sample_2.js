@@ -1383,6 +1383,8 @@ $(document).ready(function () {
                         message.append("<div></div>");
                         message.append("<span>Number of samples: </span>");
                         message.append(rec.number_of_samples);
+                        message.append("<div></div>");
+                        message.append("<span style='color: #c93c00'>" + rec.grace_period + " before automatic deletion</span>");
                         message.append("<div style='margin-top: 10px;'></div>");
 
                         var dismissTour = '<a class="delete-description-i pull-right" href="#" role="button" ' +
@@ -1437,7 +1439,7 @@ $(document).ready(function () {
         if ($("#wizard_toggle").is(":visible")) {
             BootstrapDialog.show({
                 title: 'Description reload warning',
-                message: "<div class='webpop-content-div'>There's a running description session. Discard the current description session before attempting a reload.</div>",
+                message: "<div class='webpop-content-div'>There's a running description session. Terminate the current session before attempting a reload.</div>",
                 cssClass: 'copo-modal3',
                 closable: false,
                 animate: true,

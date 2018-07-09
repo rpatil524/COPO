@@ -65,3 +65,4 @@ SAMPLE_OBJECT_STORE = os.path.join(settings.MEDIA_ROOT, 'object_store', 'samples
 DATAFILE_OBJECT_STORE = os.path.join(settings.MEDIA_ROOT, 'object_store', 'datafiles.h5')
 SAMPLE_OBJECT_PREFIX = "samples_"
 DATAFILE_OBJECT_PREFIX = "datafiles_"
+DESCRIPTION_GRACE_PERIOD = 10  # no of days after which pending descriptions are deleted
