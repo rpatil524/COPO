@@ -55,7 +55,7 @@
              data-toggle="tooltip"
              data-container="body"
              data-action="describe"
-             data-error-message="Please select one or more records to describe"
+             data-error-message="Please select one or more datafiles to describe"
              data-btntype="multi"
              title="Describe datafiles"
              tabindex="0">
@@ -67,7 +67,7 @@
              data-toggle="tooltip"
              data-container="body"
              data-action="discard"
-             data-error-message="Please select one or more datafiles to discard metadata"
+             data-error-message="Please select target datafiles to discard metadata"
              data-btntype="multi"
              title="Discard description metadata"
              tabindex="0">
@@ -79,7 +79,7 @@
              data-toggle="tooltip"
              data-container="body"
              data-action="edit"
-             data-error-message="Please select a single record to edit"
+             data-error-message="Please select a record to edit"
              data-btntype="single"
              title="Edit record"
              tabindex="0">
@@ -170,12 +170,14 @@
     </button>
 
     <!-- New component button template -->
-    <button data-toggle="tooltip" title="Add new record" class="big circular ui icon primary button new-component-template">
+    <button data-toggle="tooltip" title="Add new record"
+            class="big circular ui icon primary button new-component-template">
         <i class="icon add sign"></i>
     </button>
 
     <!-- describe sample button template -->
-    <button data-toggle="tooltip" title="Describe samples" class="big circular ui icon primary button new-samples-template">
+    <button data-toggle="tooltip" title="Describe samples"
+            class="big circular ui icon primary button new-samples-template">
         <i class="icon plus sign"></i>
     </button>
 
@@ -218,8 +220,11 @@
         <ul class="nav nav-tabs copo-sidebar-tabs">
             <li class=" copo-sidebar-info"><a data-toggle="tab" href="#copo-sidebar-info"
                                               data-copo-tour-id="page_alert_panel">Info</a></li>
+            <li class=" copo-sidebar-upload"><a data-toggle="tab" href="#copo-sidebar-upload"
+                                                data-copo-tour-id="copo_data_upload_tab">Upload</a></li>
             <li class="active copo-sidebar-help"><a data-toggle="tab" href="#copo-sidebar-help"
-                                                    data-copo-tour-id="page_context_help_panel" id="copo-context-help">Help</a></li>
+                                                    data-copo-tour-id="page_context_help_panel" id="copo-context-help">Help</a>
+            </li>
             <li class="copo-sidebar-annotate"><a data-toggle="tab" href="#copo-sidebar-annotate"
                                                  data-copo-tour-id="copo_annotation_panel">Annotate</a></li>
         </ul>
@@ -230,6 +235,43 @@
                     <div class="col-sm-12 col-md-12 col-lg-12">
                         <div class="panel panel-dtables">
                             <div class="panel-body collapse in" id="page_alert_panel"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="copo-sidebar-upload" class="tab-pane fade copo-sidebar-upload">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="panel panel-dtables">
+                            <div class="panel-body collapse in" id="copo_data_upload_tab">
+                                <div style="display: inline-block; text-indent: 0.5em; margin-top: 15px;">
+                                    <form enctype="multipart/form-data" id="upload_0" method="POST"
+                                          action="/rest/receive_data_file_chunked/"
+                                          style="margin-right:40px">
+                                        {% csrf_token %}
+                                        <span data-copo-tour-id="copo_data_upload_file_button" id="upload_files_button"
+                                              class="tiny ui basic teal button fileinput-button"
+                                              style="background-image: none; border-color:transparent;">
+                                                <span>Select files...</span>
+                                                <input type="file" name="file"
+                                                       onchange="get_chunk_size(event)" multiple/>
+                                                <input type="hidden" name="upload_id" value=""/>
+                                                <input type="hidden" name="panel_ordering"
+                                                       value="0"/>
+                                                <input type="hidden" name="exp_id" value=""/>
+                                        </span>
+                                    </form>
+                                    <div class="CyVerse Files"><br/><br/>
+                                        <a id="cyverse_files_link" href="{% url 'copo:agave_oauth' %}">Click to View
+                                            Files in CyVerse</a>
+                                        <!--<a target="_blank" href="https://agave.iplantc.org/oauth2/authorize?response_type=code&client_id=KOm9gFBPVwq6sfCMgumZRJG5j8wa&redirect_uri=http://127.0.0.1:8000/copo/agave_oauth" class="get_files">Click to View Files in CyVerse</a>-->
+                                    </div>
+
+                                    <div id="file_tree" style="visibility:hidden"></div>
+
+                                    <div class="file_status_label" style="margin-top: 8px;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

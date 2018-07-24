@@ -127,17 +127,17 @@ function initiate_annotation_call() {
 
             if (e.type == 'PDF Document') {
                 $(document).data('annotator_type', 'txt')
-                load_txt_data(e)
+                load_txt_data(e);
             }
             else if (e.type == 'Spreadsheet') {
                 $(document).data('annotator_type', 'ss')
-                load_ss_data(e)
+                load_ss_data(e);
             }
 
             setup_annotator()
-            $('#file_picker_modal').modal('hide')
+            $('#file_picker_modal').modal('hide');
         });
-    })
+    });
 }
 
 function json2HtmlForm(data) {
@@ -794,7 +794,6 @@ var dispatchFormControl = {
                     style: "display: inline-block; " + mg
                 });
 
-            //get ontology ctrl
             var durationCtrlObject = get_basic_input(sp, durationSchema[i]);
 
 
@@ -817,82 +816,6 @@ var dispatchFormControl = {
             });
 
             ctrlsDiv.append(durationCtrlObject);
-        }
-
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-    },
-    do_copo_characteristics_ctrl: function (formElem, elemValue) {
-        var workingSchema = copoSchemas[formElem.control.toLowerCase()];
-
-        var ctrlsDiv = $('<div/>',
-            {
-                class: "ctrlDIV form-inline row"
-            });
-
-        for (var i = 0; i < workingSchema.length; ++i) {
-            var fv = formElem.id + "." + workingSchema[i].id.split(".").slice(-1)[0];
-
-            if (workingSchema[i].hidden == "false") {
-
-                var sp = $('<div/>',
-                    {
-                        class: "form-group col-sm-4 col-md-4 col-lg-4"
-                    });
-
-                if (formElem.hasOwnProperty("_displayOnlyThis") && (workingSchema[i].id.split(".").slice(-1)[0] != formElem["_displayOnlyThis"])) {
-                    //note: _displayOnlyThis is a mechanism for hiding some parts of a composite
-                    //control that would have ordinarily been displayed on the UI. Its use does not in any way
-                    // replace, or serve the purpose of, the html 'hidden' property defined on 'formElem'
-
-                    sp.attr({
-                        style: "display: none; "
-                    });
-                }
-
-                //get ontology ctrl
-                var ontologyCtrlObject = get_ontology_span(sp, workingSchema[i]);
-
-                ontologyCtrlObject.find(":input").each(function () {
-                    if (this.id) {
-                        this.id = fv + "." + this.id;
-                        this.name = this.id;
-                    }
-
-                    //set placeholder text
-                    if ($(this).hasClass("ontology-field")) {
-                        $(this).attr("placeholder", workingSchema[i].label);
-
-                        //gather validation information
-                        if (workingSchema[i].hasOwnProperty("validation_target") && (workingSchema[i].validation_target.toString() == "true")) {
-                            $(this).addClass("copo-validation-target");
-                        }
-
-                        if (workingSchema[i].hasOwnProperty("validation_source") && (workingSchema[i].validation_source.toString() == "true")) {
-                            $(this).addClass("copo-validation-source");
-                        }
-                    }
-                });
-
-                ctrlsDiv.append(ontologyCtrlObject);
-
-                //set validation markers for various special cases
-                if (ontologyCtrlObject.find(".copo-validation-source").length) {
-                    var validationObject = ontologyCtrlObject.find(".copo-validation-source").first();
-
-                    var formElemAdHoc = Object(); //ad-hoc form element
-                    formElemAdHoc["characteristics"] = "true";
-                    var vM = set_validation_markers(formElemAdHoc, validationObject);
-                    ontologyCtrlObject.append(vM.errorHelpDiv);
-                }
-
-            } else {
-                ctrlsDiv.append($('<input/>',
-                    {
-                        type: "hidden",
-                        id: fv,
-                        name: fv
-                    }));
-            }
         }
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
@@ -1045,12 +968,19 @@ var dispatchFormControl = {
             });
 
         //build hidden fields to hold selected options, and supply control data
+
+        var data_maxItems = 'null';
+        if (formElem.data_maxItems) {
+            data_maxItems = formElem.data_maxItems;
+        }
+
         var hiddenValuesCtrl = $('<input/>',
             {
                 type: "hidden",
                 id: formElem.id,
                 name: formElem.id,
-                class: "copo-multi-values"
+                class: "copo-multi-values",
+                "data-maxItems": data_maxItems, //sets the maximum selectable elements, default is 'null'
             });
 
         //build select
@@ -1088,7 +1018,7 @@ var dispatchFormControl = {
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
     do_copo_multi_search_ctrl: function (formElem, elemValue) {
-        formElem["type"] = "string"; //this for the purposes of the UI should be assigned a string temporarily, since multi_search takes care of the multiple values
+        formElem["type"] = "string"; //this, for the purposes of the UI, should be assigned a string temporarily, since multi_search takes care of the multiple values
 
         var ctrlsDiv = $('<div/>',
             {
@@ -1558,7 +1488,7 @@ var dispatchFormControl = {
             min = formElem.min
         }
 
-        if(! elemValue) {
+        if (!elemValue) {
             elemValue = min;
         }
 
@@ -2060,35 +1990,6 @@ function get_basic_label(sp, formElem) {
     return label
 }
 
-function get_ontology_span(ontologySpan, formElem) {
-    var ontologySchema = copoSchemas[formElem.control.toLowerCase()];
-    ontologySpan.addClass("ontology-parent"); //used for selecting siblings in auto-complete
-
-    for (var i = 0; i < ontologySchema.length; ++i) {
-        var fv = ontologySchema[i].id.split(".").slice(-1)[0];
-        if (ontologySchema[i].hidden == "false") {
-            //set restricted ontologies
-            var localolsURL = olsURL;
-            if (formElem.ontology_names && formElem.ontology_names.length) {
-                localolsURL = olsURL.replace("999", formElem.ontology_names.join(","));
-            }
-            ontologySpan.append('<div class="input-group"><input style="min-width: 100%;" autocomplete="off" data-autocomplete="' + localolsURL + '" class="input-copo form-control ontology-field" type="text" id="' + fv + '" name="' + fv + '" /><span style="background-color: white; border: none; visibility: hidden" class="input-group-addon"><img height="16px" src="/static/copo/img/ajax.gif" /></span></div>');
-
-        } else {
-            ontologySpan.append($('<input/>',
-                {
-                    type: "hidden",
-                    class: "ontology-field-hidden",
-                    id: fv,
-                    name: fv
-                }));
-        }
-    }
-
-
-    return ontologySpan;
-}
-
 function get_ontology_span_2(ontologySpan, formElem) {
     var ontologySchema = copoSchemas[formElem.control.toLowerCase()];
     ontologySpan.addClass("ontology-parent"); //used for selecting siblings in auto-complete
@@ -2126,10 +2027,10 @@ function get_ontology_span_2(ontologySpan, formElem) {
 
     var label = $('<div/>',
         {
-            style: "margin-top:5px;  padding:3px; background-image:none; border-color:transparent;",
+            style: "margin-top:5px;  padding:3px; background-image:none; border-color:transparent; word-wrap: break-word;",
             class: "onto-label ontol-span webpop-content-div alert alert-default",
-            title: "ontology field",
-            html: '<span class="ontology-label"><img src="/static/copo/img/ontology2.png"></span><span class="onto-label-span"></span>'
+            title: "Ontology field",
+            html: '<span class="ontology-label"><i class="fa fa-align-justify free-text" style="padding-right: 5px; display: none;"></i><img class="non-free-text" src="/static/copo/img/ontology2.png" style="cursor:pointer;"></span><span class="onto-label-span"></span><span class="onto-label-more collapse"></span>'
         });
 
     ontologySpan.append(label);

@@ -30,6 +30,8 @@ $(document).ready(function () {
     //add selectize control event
     set_selectize_select_event();
 
+    ontology_link_event();
+
 });
 
 function setup_autocomplete() {
@@ -59,6 +61,12 @@ function ontology_value_change() {
     });
 }
 
+function ontology_link_event() {
+    $(document).on('click', '.non-free-text', function () {
+        $(this).closest(".onto-label").find(".onto-label-more").toggle();
+    });
+}
+
 function set_selectize_select_event() {
     $(document).on("keyup keypress", function (event) {
         var keyCode = event.keyCode || event.which;
@@ -72,7 +80,7 @@ function set_selectize_select_event() {
                 var label = activeElem.attr("data-label");
                 var accession = activeElem.attr("data-accession");
 
-                showontopop(item, label, prefix, desc, accession)
+                showontopop(item, label, prefix, desc, accession);
 
             }
 
@@ -119,19 +127,65 @@ function set_selectize_select_event() {
 }
 
 function showontopop(item, label, prefix, desc, accession) {
-    var result = '<div class="limit-text"><ul class="list-group list-group-flush"><li style="border: none;" class="list-group-item">Value: ' + label + '</li><li style="border: none;" class="list-group-item">Accession: ' + accession + '</li><li style="border: none;" class="list-group-item">Description: ' + desc + '</li></ul></div>';
+    var result = $('<div/>',
+        {
+            class: "limit-text"
+        });
+
+    // var result = '<div class="limit-text"><ul class="list-group list-group-flush"><li style="border: none;" class="list-group-item">Value: ' + label + '</li><li style="border: none;" class="list-group-item">Accession: ' + accession + '</li><li style="border: none;" class="list-group-item">Description: ' + desc + '</li></ul></div>';
 
     item.webuiPopover('destroy');
 
-    item.webuiPopover({
-        title: 'Info',
-        content: '<div class="webpop-content-div">' + result + '</div>',
-        trigger: 'sticky',
-        width: 300,
-        arrow: true,
-        placement: 'right',
-        dismissible: true
-    });
+    if (String(accession) != 'undefined' && String(label) != 'undefined') {
+
+        //ontology source
+        var ontologySource = $('<div/>',
+            {
+                html: "This is a free-text value"
+            });
+
+        if (prefix != '') {
+            ontologySource.html("Ontology source: " + prefix);
+        }
+
+        result.append(ontologySource);
+
+        //ontology accession
+        var ontologyAccession = $('<div/>');
+
+        if (accession != '') {
+            ontologyAccession.css('margin-top', '5px')
+            $('<span>', {
+                class: "ontology-accession-link",
+                html: "<span style='text-decoration-line: underline; color:#2759a5'>" + accession + "</span>"
+            }).appendTo(ontologyAccession);
+        }
+
+        result.append(ontologyAccession);
+
+
+        //ontology description
+        var ontologyDescription = $('<div/>');
+
+        if (desc != '') {
+            ontologyDescription.css('margin-top', '5px');
+            ontologyDescription.html(desc);
+
+        }
+
+        result.append(ontologyDescription);
+
+        item.webuiPopover({
+            title: label,
+            content: '<div class="webpop-content-div">' + $('<div/>').append(result).html() + '</div>',
+            trigger: 'sticky',
+            width: 300,
+            arrow: true,
+            placement: 'right',
+            dismissible: true
+        });
+    }
+
 }
 
 function resolve_element_view(recordId, associatedComponent, eventTarget) {
@@ -163,7 +217,7 @@ function resolve_element_view(recordId, associatedComponent, eventTarget) {
             eventTarget.webuiPopover('destroy');
 
             eventTarget.webuiPopover({
-                title: 'Info',
+                title: 'Attributes',
                 content: '<div class="webpop-content-div limit-text">' + $('<div/>').append(gAttrib).html() + '</div>',
                 trigger: 'sticky',
                 width: 300,
@@ -583,7 +637,7 @@ function refresh_tool_tips() {
 function setup_datepicker() {
     $('.date-picker').datepicker({
         format: "dd/mm/yyyy"
-    })
+    });
 }
 
 function refresh_validator(formObject) {
@@ -739,7 +793,7 @@ function refresh_ontology_select() {
                                 });
                                 setValue = value.annotationValue;
                             } else {
-                                // a string slipped through - apparently numbers are parsed to JSON
+                                // a string slipped through - apparently numbers can be parsed to JSON
                                 elem.closest(".ontology-parent").find(".ontology-field-hidden").each(function () {
                                     var dataKey = $(this).attr("data-key");
 
@@ -779,11 +833,12 @@ function refresh_ontology_select() {
                             $(this).val('');
                         });
 
-                        //set or, rather, unset display
+                        //unset display
                         elem.closest(".ontology-parent").find(".onto-label").find("span.onto-label-span").html('');
                     }
 
                     $(".selectize-control.onto-select").webuiPopover('destroy');
+                    set_ontology_icon(elem, $funSelect[0].selectize.getValue());
                 },
                 onBlur: function () {
                     $(".selectize-control.onto-select").webuiPopover('destroy');
@@ -797,13 +852,13 @@ function refresh_ontology_select() {
                 options: options,
                 render: {
                     option: function (item, escape) {
-                        var desc = escape(item.description) != "undefined" ? escape(item.description) : 'N/A';
-                        var prefix = escape(item.ontology_prefix) != "undefined" ? escape(item.ontology_prefix) : '?';
+                        var desc = escape(item.description) != "undefined" ? escape(item.description) : ' ';
+                        var prefix = escape(item.ontology_prefix) != "undefined" ? escape(item.ontology_prefix) : '';
                         var accession = escape(item.iri);
                         var label = escape(item.label);
 
                         return '<div>' +
-                            '<span data-accession="' + accession + '"  data-label="' + label + '"data-prefix="' + prefix + '" data-desc="' + desc + '" class="webpop-content-div ontology-label onto-label">' + prefix + ' : ' + escape(item.label) + '</span></div>';
+                            '<span data-accession="' + accession + '"  data-label="' + label + '"data-prefix="' + prefix + '" data-desc="' + desc + '" class="webpop-content-div ontology-label onto-label">' + prefix + (prefix ? ': ' : "") + escape(item.label) + '</span></div>';
 
                     }
                 },
@@ -857,11 +912,45 @@ function refresh_ontology_select() {
                 }
             }
 
+            set_ontology_icon(elem, control.getValue());
+
             //retain reference to control for any future reference
             selectizeObjects[parentID] = control;
 
         }
     });
+}
+
+
+function set_ontology_icon(elem, onto_object) {
+    //function sets an appropriate icon depending on ontology or free-text value state
+    var freeText = 'Value not set or free-text value not resolved to an ontology';
+
+    try {
+        onto_object = JSON.parse(onto_object);
+
+
+
+        if (typeof onto_object === "object" && onto_object.termAccession != "") {
+            elem.closest(".ontology-parent").find(".onto-label").find(".free-text").hide();
+            elem.closest(".ontology-parent").find(".onto-label").find(".non-free-text").show();
+            elem.closest(".ontology-parent").find(".onto-label").prop('title', 'Ontology field - click for info');
+            elem.closest(".ontology-parent").find(".onto-label").find(".onto-label-more").html("").append("<div></div>");
+
+            elem.closest(".ontology-parent").find(".onto-label").find(".onto-label-more").append('<div style="margin-top: 5px;">Ontology source: ' + onto_object.termSource + '</div> ');
+            elem.closest(".ontology-parent").find(".onto-label").find(".onto-label-more").append('<a href="' + onto_object.termAccession + '" target="_blank">' + onto_object.termAccession + '</a> ');
+
+
+        } else {
+            elem.closest(".ontology-parent").find(".onto-label").find(".free-text").show();
+            elem.closest(".ontology-parent").find(".onto-label").find(".non-free-text").hide();
+            elem.closest(".ontology-parent").find(".onto-label").prop('title', freeText);
+        }
+    } catch (e) {
+        elem.closest(".ontology-parent").find(".onto-label").find(".free-text").show();
+        elem.closest(".ontology-parent").find(".onto-label").find(".non-free-text").hide();
+        elem.closest(".ontology-parent").find(".onto-label").prop('title', freeText);
+    }
 }
 
 
@@ -1537,6 +1626,13 @@ function get_panel(panelType) {
 
     panel.append(panelBody);
 
+    var panelFooter = $('<div/>', {
+        class: "panel-footer",
+        style: "background-color: #fff;"
+    });
+
+    panel.append(panelFooter);
+
     return $('<div/>').append(panel).clone();
 }
 
@@ -1590,7 +1686,7 @@ function get_profile_components() {
             colorClass: "data_color",
             color: "black",
             buttons: ["quick-tour-template"],
-            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
+            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help", "copo-sidebar-upload"],
             tableID: 'datafile_table',
             recordActions: ["describe_record_multi", "undescribe_record_multi"],
             visibleColumns: 3
@@ -1683,7 +1779,7 @@ function do_page_controls(componentName) {
         var profileTitle = $('<div/>', {
             class: "page-title-custom",
             style: "margin-right:10px;",
-            html:  "<span title='Profile title' style='color: #8c8c8c; font-size: 18px;'>Profile: "+$("#profile_title").val()+"</span>"
+            html: "<span title='Profile title' style='color: #8c8c8c; font-size: 18px;'>Profile: " + $("#profile_title").val() + "</span>"
         });
 
         pageHeaders.append(profileTitle);
@@ -1941,7 +2037,7 @@ function do_context_help(data) {
         .find("input")
         .removeClass("input-sm")
         .attr("placeholder", "Search Help")
-        .attr("size", 30);
+        // .attr("size", 30);
 }
 
 function do_global_help(component) {

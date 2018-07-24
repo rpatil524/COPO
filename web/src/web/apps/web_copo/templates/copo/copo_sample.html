@@ -36,9 +36,6 @@
 
     <!--test ends -->
 
-
-    <div id="example"></div>
-
     <!--test ends -->
 
     <!-- sample wizard section -->
@@ -53,7 +50,7 @@
                              data-toggle="tooltip"
                              title="Discard description"
                              tabindex="0">
-                            <span style="padding-left: 3px;">Discard Description</span>
+                            <span style="padding-left: 3px;">Discard description</span>
                         </div>
 
                         <!-- save for later description button -->
@@ -99,12 +96,17 @@
                         <div class="step-content"
                              style="margin-bottom: 45px; border: 0.1em solid rgba(229, 239, 255, 1.0); border-radius: 4px;">
                             <div class="step-pane active sample-pane" data-step="1">
+                                <form id="wizard_form_1" class="wizard-dynamic-form">
+                                    <input id="current_stage"
+                                           name="current_stage"
+                                           value="intro" type="hidden">
+                                </form>
 
                                 <!-- description wizard getting started section -->
                                 <div class="webpop-content-div">
                                     <h4>Getting started...</h4>
                                     The following tips are provided to help you navigate the wizard:
-                                    <br/><br/>
+                                    <div style="margin-top: 10px;"></div>
                                     <ol>
                                         <li>
                                             Use the <strong><a class="wiz-showme" data-target="wiz_next_btn"
@@ -127,13 +129,6 @@
                                             toggle
                                             display of help
                                             tips
-                                        </li>
-                                        <li>
-                                            Use the <a class="wiz-showme" data-target="copo-context-help"
-                                                       data-label="Help pane" href="#"
-                                                       title="show me"><strong>Help</strong></a> side pane to access
-                                            more information
-                                            on describing samples
                                         </li>
                                         <li>
                                             The <a class="wiz-showme" data-target="copo-documentation"

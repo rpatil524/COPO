@@ -148,7 +148,7 @@ def copo_samples(request, profile_id):
 
 
 @login_required
-def copo_data(request, profile_id, cyverse_file_data=None):
+def copo_data(request, profile_id):
     request.session['datafile_url'] = request.path
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
@@ -419,10 +419,12 @@ def import_ena_accession(request):
             output.append(eimp.do_import_ena_accession(acc))
         return HttpResponse(output)
 
+
 @login_required()
 def view_groups(request):
-    #g = Group().create_group(description="test descrition")
+    # g = Group().create_group(description="test descrition")
     profile_list = cursor_to_list(Profile().get_for_user())
     group_list = cursor_to_list(Group().get_by_owner(request.user.id))
     print(group_list)
-    return render(request, 'copo/copo_group.html', {'request': request, 'profile_list': profile_list, 'group_list': group_list})
+    return render(request, 'copo/copo_group.html',
+                  {'request': request, 'profile_list': profile_list, 'group_list': group_list})

@@ -1634,3 +1634,7 @@ div.shown span.side-help-trigger:before {
     word-wrap: break-word;
     max-height: 400px;
 }
+
+.locked-column {
+    background-color: #c9dce5;
+}

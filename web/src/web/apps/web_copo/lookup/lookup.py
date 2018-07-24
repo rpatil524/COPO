@@ -402,39 +402,32 @@ DROP_DOWNS = {
         {
             'value': 'ena',
             'label': 'ENA - Sequence Reads',
-            'description': 'This repository option defines metadata for submission of <strong>raw sequence reads</strong> to the European Nucleotide Archive (Sequence Reads)'
+            'description': 'This repository option defines metadata for submission of <strong>raw sequence reads</strong> to the European Nucleotide Archive (ENA)'
         },
         {
             'value': 'ena-asm',
-            'label': 'European Nucleotide Archive (Sequence Assemblies)'
+            'label': 'ENA - Sequence Assemblies',
+            'description': 'This repository option defines metadata for submission of <strong>sequence assemblies</strong> to the European Nucleotide Archive (ENA)'
         },
         {
             'value': 'ena-ant',
-            'label': 'European Nucleotide Archive (Sequence Annotations).'
+            'label': 'ENA - Sequence Annotations',
+            'description': 'This repository option defines metadata for submission of <strong>sequence annotations</strong> to the European Nucleotide Archive (ENA)'
         },
-        # {
-        #     'value': 'ena-ant',
-        #     'label': 'ENA - Sequence Annotations',
-        #     'description': 'This repository option defines metadata for submission of <strong>sequence annotations</strong> to the European Nucleotide Archive (ENA).'
-        # },
-        # {
-        #     'value': 'ena-asm',
-        #     'label': 'ENA - Sequence Assemblies',
-        #     'description': 'This repository option defines metadata for submission of <strong>sequence assemblies</strong> to the European Nucleotide Archive (ENA).'
-        # },
         {
             'value': 'figshare',
             'label': 'Figshare',
-            'description': 'Figshare accepts many file formats, and can be used to submit file types including PDFs, image, audio, and video files.'
+            'description': 'Figshare accepts many file formats, and can be used to submit file types including PDFs, image, audio, and video files'
         },
         {
             'value': 'miappe',
             'label': 'MIAPPE Compliant',
-            'description': 'MIAPPE is a Minimum Information (MI) standard for plant phenotyping. This repository option defines a list of attributes for describing a phenotyping experiment.'
+            'description': 'MIAPPE is a Minimum Information (MI) standard for plant phenotyping. This repository option defines a list of attributes for describing a phenotyping experiment'
         },
         {
             'value': 'dcterms',
-            'label': 'Dataverse'
+            'label': 'Dataverse',
+            'description': 'A Dataverse is an open source data management repository for a community or an institution. It allows data to be federated with a growing list of Dataverse repositories worldwide for increased discoverability'
         }
         # {
         #     'value': 'MetaboLights',

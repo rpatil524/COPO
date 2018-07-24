@@ -17,21 +17,12 @@ def data_wiz(request):
     request_action = request.POST.get("request_action", str())
 
     description_targets = json.loads(request.POST.get("description_targets", "[]"))
-    description_bundle = json.loads(request.POST.get("description_bundle", "[]"))
-    rendered_stages = json.loads(request.POST.get("rendered_stages", "[]"))
-
-    if description_bundle:
-        request.session['description_bundle'] = description_bundle
 
     broker_request = datf.BrokerRequests(context=context,
                                          description_targets=description_targets,
-                                         description_bundle=description_bundle,
                                          description_token=request.POST.get("description_token", str()),
-                                         stage_id=request.POST.get("stage_id", str()),
-                                         stage_ref=request.POST.get("stage_ref", str()),
+                                         profile_id=request.POST.get("profile_id", str()),
                                          auto_fields=request.POST.get("auto_fields", dict()),
-                                         rendered_stages=rendered_stages,
-                                         default_stage_form=request.POST.get("default_stage_form", False),
                                          target_id=request.POST.get("target_id", str())
                                          )
 

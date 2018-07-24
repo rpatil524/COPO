@@ -243,8 +243,10 @@ def generate_table_records(profile_id=str(), component=str()):
         df = pd.DataFrame(records)
 
         # convert record id column from ObjectId to string
-        df['record_id'] = df['_id'].apply(lambda x: str(x))
-        df.drop('_id', axis='columns')
+        df['record_id'] = df._id.astype(str)
+        df["DT_RowId"] = df.record_id
+        df.DT_RowId = 'row_' + df.DT_RowId
+        df = df.drop('_id', axis='columns')
 
         for x in schema_dict.keys():
             df[x] = df[x].apply(resolve_control_output_apply, args=(schema_dict[x],))
@@ -656,7 +658,7 @@ def resolve_environmental_characteristics_data(data, elem):
                 a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
                 resolved_data.append(a)
 
-    return str(resolved_data)  # turn this casting off after merge
+    return resolved_data  # turn this casting off after merge
 
 
 def resolve_phenotypic_characteristics_data(data, elem):
@@ -671,7 +673,7 @@ def resolve_phenotypic_characteristics_data(data, elem):
                 a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
                 resolved_data.append(a)
 
-    return str(resolved_data)  # turn this casting off after merge
+    return resolved_data  # turn this casting off after merge
 
 
 def resolve_copo_comment_data(data, elem):

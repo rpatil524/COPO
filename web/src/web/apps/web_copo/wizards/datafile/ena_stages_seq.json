@@ -1,34 +1,27 @@
 {
   "title": "ENA Datafile Description",
-  "description": "Definitions for elements that appear in different stages of a wizard targeted at submissions to the ENA (European Nucleotide Archive) repository. 'ref', id of stage; 'title',  header used for the stage; 'content', the function to call to generate stage html; items, actual form elements on the page; 'is_stage_stub', if the stage entry is a complete stage or a bootstrap; 'is_conditional_stage', displays a stage based on some condition being satisfied; 'is_singular_stage', if all items must have same value for this stage; 'is_clonable' if present will most likely be set to false, indicating that metadata for the stage shouldn't be cloned",
+  "description": "Definitions for elements that appear in different stages of a wizard targeted at submissions to the ENA (European Nucleotide Archive) repository. 'ref', id of stage; 'title',  header used for the stage; items, actual form elements on the page; 'apply_to_all', if all items must have same value for this stage;",
   "properties": [
     {
       "ref": "study_type",
       "title": "Study Type",
-      "is_singular_stage": true,
+      "apply_to_all": true,
       "message": "Select the study type under which the datafiles were created. The study type presents a controlled vocabulary for expressing the overall purpose of the study.",
       "items": [
         {
           "id": "study_type",
-          "help_tip": "Select Study Type from the drop-down list",
+          "help_tip": "Select Study Type from the list",
           "label": "Study Type",
           "hidden": "false",
           "required": "true",
           "type": "string",
-          "control": "select",
+          "control": "copo-multi-select",
+          "data_maxItems": 1,
           "default_value": "",
           "option_values": {
             "callback": {
               "function": "get_study_type_options",
               "parameter": ""
-            }
-          },
-          "trigger": {
-            "type": "change",
-            "message": "Changing the study type will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
-            "callback": {
-              "function": "study_type_change",
-              "parameter": "item_id,old_value,new_value"
             }
           }
         }
@@ -61,42 +54,7 @@
     },
     {
       "ref": "protocol_refs",
-      "is_stage_stub": true,
-      "callback": {
-        "function": "get_dynamic_elements_ena",
-        "parameter": "stub_ref"
-      }
-    },
-    {
-      "ref": "datafiles_pairing",
-      "title": "Datafiles Pairing",
-      "message": "In this stage, you will be able to pair up datafiles in the description bundle for which the library layout has been set to 'PAIRED'.",
-      "is_conditional_stage": true,
-      "is_clonable": false,
-      "callback": {
-        "function": "confirm_pairing",
-        "parameter": ""
-      },
-      "items": [
-        {
-          "id": "paired_file",
-          "type": "string",
-          "help_tip": "Select a datafile to pair",
-          "label": "Paired Datafile",
-          "hidden": "false",
-          "required": "true",
-          "control": "copo-multi-search",
-          "option_component": "datafile",
-          "data_maxItems": 1,
-          "default_value": "",
-          "option_values": {
-            "callback": {
-              "function": "get_datafiles_json",
-              "parameter": ""
-            }
-          }
-        }
-      ]
+      "callback": "get_ena_sequence_stages"
     }
   ]
 }

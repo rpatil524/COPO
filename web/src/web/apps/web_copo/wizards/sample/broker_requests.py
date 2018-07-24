@@ -10,7 +10,6 @@ class BrokerRequests:
         self.param_dict = kwargs
 
         self.context = self.param_dict.get("context", dict())
-        self.sample_type = self.param_dict.get("sample_type", str())
         self.target_id = self.param_dict.get("target_id", str())
         self.profile_id = self.param_dict.get("profile_id", str())
         self.description_token = self.param_dict.get("description_token", str())
@@ -25,6 +24,7 @@ class BrokerRequests:
     def get_request_dict(self):
         # request-to-action mapping
         request_dict = dict(
+            initiate_description=self.do_initiate_description,
             resolved_object=self.do_resolved_object,
             next_stage=self.do_next_stage,
             resolve_uri=self.do_resolve_uri,
@@ -50,6 +50,11 @@ class BrokerRequests:
         for rqa in request_action:
             if rqa in request_dict:
                 request_dict[rqa]()
+
+        return self.context
+
+    def do_initiate_description(self):
+        self.context['result'] = self.wizard_helper.initiate_description()
 
         return self.context
 

@@ -6,70 +6,89 @@ import pandas as pd
 from bson import ObjectId
 from django.conf import settings
 import urllib.request as urllib2
-from dal.mongo_util import get_collection_ref
 
 from dal.copo_da import Sample, Description
 import web.apps.web_copo.lookup.lookup as lkup
 from converters.ena.copo_isa_ena import ISAHelpers
 import web.apps.web_copo.templatetags.html_tags as htags
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
-from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
+from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 
 lg = settings.LOGGER
 
 
 class WizardHelper:
     def __init__(self, description_token, profile_id):
-        self.schema = Sample().get_schema().get("schema_dict")
         self.description_token = description_token
         self.profile_id = self.set_profile_id(profile_id)
+        self.schema = Sample().get_schema().get("schema_dict")
         self.key_split = "___0___"
         self.object_key = settings.SAMPLE_OBJECT_PREFIX + self.description_token
         self.store_name = settings.SAMPLE_OBJECT_STORE
 
+    def initiate_description(self):
+        """
+        function initates a new description or reinstantiates an existing description
+        :return:
+        """
+
+        initiate_result = dict(status="success", message="")
+        initiate_result['wiz_message'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["sample_wizard_messages"])[
+            "properties"]
+
+        if self.description_token:  # this is a call to reload an existing description; validate token
+
+            # start by getting the description record
+            description = Description().GET(self.description_token)
+
+            if not description:
+                # description record doesn't exist; flag error
+                initiate_result['status'] = "error"
+                initiate_result[
+                    'message'] = "Couldn't reload description. " \
+                                 "The description may have expired, or the associated token is invalid."
+                del initiate_result['wiz_message']
+            else:
+                # reset timestamp, which will also reset the 'grace period' for the description
+                Description().edit_description(self.description_token, dict(created_on=d_utils.get_datetime()))
+                initiate_result['description_token'] = self.description_token
+
+        else:  # this is a call to instantiate a new description; create description record and issue token
+            # get start stages
+            wizard_stages = d_utils.json_to_pytype(lkup.WIZARD_FILES["sample_start"])['properties']
+            self.resolve_select_data(wizard_stages)
+
+            # create description record
+            description_token = str(
+                Description().create_description(stages=wizard_stages, attributes=dict(), profile_id=self.profile_id,
+                                                 component='sample', meta=dict())['_id'])
+
+            initiate_result['description_token'] = description_token
+
+        return initiate_result
+
+    def resolve_select_data(self, stages):
+        """
+        function resolves data source for select-type controls
+        :param stages:
+        :return:
+        """
+
+        for stage in stages:
+            for st in stage.get("items", list()):
+                if "option_values" in st:
+                    st["option_values"] = htags.get_control_options(st)
+
+        return
+
     def set_profile_id(self, profile_id):
-        """
-        function sets profile id either from passed value or from description metadata
-        :param profile_id:
-        :return:
-        """
+        p_id = profile_id
+        if not p_id and self.description_token:
+            description = Description().GET(self.description_token)
+            p_id = description.get("profile_id", str())
 
-        if not self.description_token:
-            return profile_id
-
-        description = Description().GET(self.description_token)
-
-        if not description:
-            return profile_id
-
-        profile_id = description.get('profile_id', str())
-
-        return profile_id
-
-    def generate_stage_items(self):
-        """
-        function generates the stages of the wizard and creates a description token that will guide the description
-        :return:
-        """
-
-        # get start stages
-        wizard_stages = d_utils.json_to_pytype(lkup.WIZARD_FILES["sample_start"])['properties']
-
-        # if required, resolve data source for select-type controls,
-        # i.e., if a callback is defined on the 'option_values' field
-        for stage in wizard_stages:
-            if "items" in stage:
-                for st in stage['items']:
-                    if "option_values" in st:
-                        st["option_values"] = htags.get_control_options(st)
-
-        # create a description record for storing temporary values as the user moves through the wizard
-        self.description_token = str(
-            Description().create_description(stages=wizard_stages, attributes=dict(), profile_id=self.profile_id,
-                                             component='sample', meta=dict())['_id'])
-
-        return True
+        return p_id
 
     def resolve_next_stage(self, auto_fields):
         """
@@ -82,17 +101,11 @@ class WizardHelper:
         current_stage = auto_fields.get("current_stage", str())
 
         if not current_stage:
-            next_stage_dict['wiz_message'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["sample_wizard_messages"])[
-                "properties"]
+            # there's no way of telling what next stage is requested; send signal to abort the wizard
+            next_stage_dict["abort"] = True
+            return next_stage_dict
 
-            if not self.description_token:  # likely the first (dynamic) stage to be requested
-                self.generate_stage_items()
-                next_stage_dict['wiz_token'] = self.description_token
-            else:  # likely a call to reload an incomplete description
-                # update timestamp
-                Description().edit_description(self.description_token, dict(created_on=d_utils.get_datetime()))
-
-        # start by getting the description record
+        # get the description record
         description = Description().GET(self.description_token)
 
         if not description:
@@ -102,15 +115,20 @@ class WizardHelper:
 
         stages = description["stages"]
         attributes = description["attributes"]
-        meta = description.get("meta", dict())
 
-        # save in-coming stage data, check for changes, re-validate wizard, serve next stage
+        # resolve next stage
         next_stage_index = [indx for indx, stage in enumerate(stages) if stage['ref'] == current_stage]
+
+        if not next_stage_index and not current_stage == 'intro':  # invalid current stage; send abort signal
+            next_stage_dict["abort"] = True
+            return next_stage_dict
+
         next_stage_index = next_stage_index[0] + 1 if len(next_stage_index) else 0
 
-        # save current stage data, but hold on to previous data for comparison purposes
+        # save in-coming stage data, check for changes, re-validate wizard, serve next stage
+
         previous_data = dict()
-        if current_stage:
+        if next_stage_index > 0:  # we don't have to save 'intro' stage attributes;
             previous_data = attributes.get(current_stage, dict())
             current_data = DecoupleFormSubmission(auto_fields,
                                                   d_utils.json_to_object(
@@ -122,29 +140,30 @@ class WizardHelper:
             Description().edit_description(self.description_token, dict(attributes=attributes))
 
         # get next stage
-        next_stage_dict['stage'] = self.serve_stage(stages, next_stage_index)
+        next_stage_dict['stage'] = self.serve_stage(next_stage_index)
+
+        # refresh values from db after serve stage as this has the potential of modifying things
+        description = Description().GET(self.description_token)
+        attributes = description["attributes"]
+        meta = description.get("meta", dict())
 
         if not next_stage_dict['stage']:
             # no stage to retrieve, this should signal end
             return next_stage_dict
 
-        if next_stage_index > 0:
-            if previous_data and not (previous_data == current_data):  # stage data has changed, refresh wizard
-                next_stage_dict['refresh_wizard'] = True
+        if next_stage_index > 0 and previous_data and not (previous_data == current_data):
+            # stage data has changed, refresh wizard
+            next_stage_dict['refresh_wizard'] = True
 
-                # remove store object, if any, associated with this description
-                Description().remove_store_object(store_name=self.store_name, object_key=self.object_key)
+            # remove store object, if any, associated with this description
+            Description().remove_store_object(store_name=self.store_name, object_key=self.object_key)
 
-                # update meta
-                meta["generated_columns"] = list()
+            # update meta
+            meta["generated_columns"] = list()
 
         # build data dictionary for stage
         if next_stage_dict['stage']['ref'] in attributes and "data" not in next_stage_dict['stage']:
-            next_stage_dict['stage']['data'] = DecoupleFormSubmission(attributes[next_stage_dict['stage']['ref']],
-                                                                      d_utils.json_to_object(
-                                                                          next_stage_dict[
-                                                                              'stage']).items).get_schema_fields_updated()
-
+            next_stage_dict['stage']['data'] = attributes[next_stage_dict['stage']['ref']]
         # save last rendered stage
         if next_stage_dict['stage']['ref']:
             meta["last_rendered_stage"] = next_stage_dict['stage']['ref']
@@ -153,24 +172,48 @@ class WizardHelper:
 
         return next_stage_dict
 
-    def serve_stage(self, stages, next_stage_index):
+    def serve_stage(self, next_stage_index):
         """
         function determines how a given stage should be served
         :param stage:
         :return:
         """
 
+        # start by getting the description record
+        description = Description().GET(self.description_token)
+        stages = description["stages"]
+
         stage = dict()
 
         if next_stage_index < len(stages):
             stage = stages[next_stage_index]
 
-        if "callback" in stage:
-            # execute callback to derive stage
-            try:
-                stage = getattr(WizardHelper, stage["callback"])(self, next_stage_index)
-            except:
-                pass
+        while True:
+            if "callback" in stage:
+                # resolve stage from callback function
+                try:
+                    stage = getattr(WizardHelper, stage["callback"])(self, next_stage_index)
+                except:
+                    stage = dict()
+
+            # we expect a stage that cannot be directly rendered to return a False, thus prompting
+            # progression to the next
+            # stage in the sequence of stages (see below). Such non-renderable stages
+            # may just be processes or stubs meant for resolving other dynamically culled stages
+            if isinstance(stage, dict):
+                break
+
+            # refresh stages and index of the next stage - why do this? callbacks can potentially modify things
+            description = Description().GET(self.description_token)
+            stages = description["stages"]
+
+            next_stage_index = next_stage_index + 1  # progress to next index in this very quest for a valid next stage
+
+            if next_stage_index < len(stages):
+                stage = stages[next_stage_index]
+            else:
+                stage = dict()
+                break
 
         return stage
 
@@ -193,7 +236,7 @@ class WizardHelper:
         user_choice = attributes.get("sample_clone", dict()).get("sample_clone", str())
 
         if not stage["ref"] == user_choice:
-            stage = self.serve_stage(stages, next_stage_index + 1)
+            return False
 
         return stage
 
@@ -242,7 +285,7 @@ class WizardHelper:
         user_choice = attributes.get("sample_naming_method", dict()).get("sample_naming_method", str())
 
         if not stage["ref"] == user_choice:
-            stage = self.serve_stage(stages, next_stage_index + 1)
+            return False
 
         # check for number of samples dependency, re-validate if necessary
 
@@ -386,22 +429,22 @@ class WizardHelper:
                                 d_utils.get_copo_schema("comment")]
 
         # data and columns lists
-        dataSet = list()
         data = list()
 
         columns = [dict(title=' ', name='s_n', data="s_n", className='select-checkbox'),
                    dict(title='Name', name='name', data="name")]
 
         attributes = description["attributes"]
+        meta = description["meta"]
 
         # get stored sample attributes
         sample_attributes = attributes.get("sample_attributes", dict())
 
-        # get sample schema
-        schema_df = pd.DataFrame(self.schema)
-        schema_df['id2'] = schema_df['id'].apply(lambda x: x.split(".")[-1])
+        # get stage items list and remove hidden fields
+        items = [x["items"] for x in description["stages"] if x["ref"] == "sample_attributes"]
+        items = [x for x in items[0] if str(x.get("hidden", False)).lower() == "false"]
 
-        schema_df = schema_df[schema_df['id2'].isin(list(sample_attributes.keys()))]
+        schema_df = pd.DataFrame(items)
 
         for index, row in schema_df.iterrows():
             resolved_data = htags.resolve_control_output(sample_attributes, row)
@@ -409,66 +452,50 @@ class WizardHelper:
 
             if row['control'] in object_array_controls:
                 # get object-type-control schema
+                # get the key field and value field
+
                 control_index = object_array_controls.index(row['control'])
                 control_df = pd.DataFrame(object_array_schemas[control_index])
                 control_df['id2'] = control_df['id'].apply(lambda x: x.split(".")[-1])
 
-                for indx_1, item in enumerate(resolved_data):
-                    # item must contain at least 2 elements; also, discount objects with no header
-                    # (e.g., category value for characteristics; name value for comments)
-                    if len(item) > 1 and list(item[0].values())[0].strip():
+                if resolved_data:
+                    object_array_keys = [list(x.keys())[0] for x in resolved_data[0]]
+                    object_array_df = pd.DataFrame([dict(pair for d in k for pair in d.items()) for k in resolved_data])
 
-                        # add primary header/value
-                        shown_keys = (row["id"].split(".")[-1], str(indx_1), list(item[1].keys())[0].strip())
-                        class_name = self.key_split.join(shown_keys)
+                    for o_indx, o_row in object_array_df.iterrows():
+                        # add primary header/value - first element in object_array_keys taken as header, second value
+                        # e.g., category, value in material_attribute_value schema
+                        # a separate block will be needed for object type control that do not conform to this display
 
-                        columns.append(
-                            dict(title=label + "[{0}]".format(list(item[0].values())[0].strip()), data=class_name))
-                        dataSet.append(list(item[1].values())[0].strip())
-                        data_attribute = dict()
-                        data_attribute[class_name] = dataSet[-1]
-                        data.append(data_attribute)
+                        row_id_split = row["id"].split(".")[-1]
+                        class_name = self.key_split.join((row_id_split, str(o_indx), object_array_keys[1]))
+                        columns.append(dict(title=label + "[{0}]".format(o_row[object_array_keys[0]]), data=class_name))
+                        data.append({class_name: o_row[object_array_keys[1]]})
 
-                        # add other headers/values e.g., Unit
-                        for subitem in item[2:]:
-                            if list(subitem.values())[0].strip():
-                                # use object schema to resolve label
-                                shown_keys = (row["id"].split(".")[-1], str(indx_1), list(subitem.keys())[0].strip())
-                                class_name = self.key_split.join(shown_keys)
-                                columns.append(dict(
-                                    title=control_df[control_df.id2 == list(subitem.keys())[0].strip()].iloc[0].label,
-                                    data=class_name))
-                                dataSet.append(list(subitem.values())[0].strip())
-
-                                data_attribute = dict()
-                                data_attribute[class_name] = dataSet[-1]
-                                data.append(data_attribute)
-
-
-
+                        # add other headers/values e.g., unit in material_attribute_value schema
+                        for subitem in object_array_keys[2:]:
+                            class_name = self.key_split.join((row_id_split, str(o_indx), subitem))
+                            columns.append(dict(
+                                title=control_df[control_df.id2.str.lower() == subitem].iloc[0].label, data=class_name))
+                            data.append({class_name: o_row[subitem]})
             else:
                 shown_keys = row["id"].split(".")[-1]
                 class_name = shown_keys
                 columns.append(dict(title=label, data=class_name))
                 val = resolved_data[0] if row['type'] == "array" else resolved_data
+
                 if isinstance(val, list):
                     val = ', '.join(val)
-                dataSet.append(val)
 
                 data_attribute = dict()
-                data_attribute[class_name] = dataSet[-1]
+                data_attribute[class_name] = val
                 data.append(data_attribute)
 
         # generate sample names
-        user_choice = attributes.get("sample_naming_method", dict()).get("sample_naming_method", str())
-        sample_names = attributes.get(user_choice, dict()).get(user_choice + "_hidden", str())
-        sample_names = self.resolve_sample_names(user_choice, sample_names)
-
-        name_series = pd.Series(sample_names.split(",") if "," in sample_names else sample_names.split())
-        name_series = name_series[name_series.str.strip() != '']
+        sample_names = meta["generated_names"]
+        name_series = pd.Series(sample_names.split(","))
 
         number_of_samples = attributes.get("number_of_samples", dict()).get("number_of_samples", 1)
-        name_series = name_series.head(int(number_of_samples))
 
         # save control information
         auto_fields = dict()
@@ -487,10 +514,9 @@ class WizardHelper:
         record = Sample(profile_id=self.profile_id).save_record(dict(), **fields)
 
         # save initial attributes to db
-        SampleCollection = get_collection_ref('SampleCollection')
 
         # remove previous entries associated with this token
-        SampleCollection.delete_many(
+        Sample().get_collection_handle().delete_many(
             {"description_token": self.description_token, "deleted": d_utils.get_deleted_flag()})
 
         record['deleted'] = d_utils.get_deleted_flag()
@@ -501,11 +527,11 @@ class WizardHelper:
         samples_df.columns = ['name']
 
         new_samples_list = samples_df.to_dict('records')
-        result = SampleCollection.insert_many(new_samples_list)
+        result = Sample().get_collection_handle().insert_many(new_samples_list)
         object_ids = result.inserted_ids
         record.pop('name', None)
 
-        SampleCollection.update_many(
+        Sample().get_collection_handle().update_many(
             {"_id": {"$in": object_ids}},
             {'$set': record})
 
@@ -536,21 +562,6 @@ class WizardHelper:
         Description().edit_description(self.description_token, dict(meta=meta))
 
         return dict(columns=columns, rows=data_set)
-
-    def resolve_sample_names(self, naming_method, proposed_name):
-        """
-        based on user choice (naming_method) sample names may have been supplied or left to be generated as bundle name
-        :param naming_method:
-        :param proposed_name:
-        :return:
-        """
-        samples_names = proposed_name
-
-        if naming_method == "bundle_name":
-            description = Description().GET(self.description_token)
-            samples_names = description["meta"].get("generated_names", str())
-
-        return samples_names
 
     def revalidate_sample_name(self, naming_method):
         """
@@ -702,7 +713,7 @@ class WizardHelper:
         if "required" in schema and str(schema["required"]).lower() == "true":
             if isinstance(data, str) and data.strip() == str():
                 validation_result["status"] = "error"
-                validation_result["message"] = "This is a required field!"
+                validation_result["message"] = "This is a required attribute!"
 
                 return validation_result
 
@@ -714,7 +725,7 @@ class WizardHelper:
                     {schema["id"].split(".")[-1]: {'$regex': "^" + data + "$",
                                                    "$options": 'i'}}).count() >= 1:
                 validation_result["status"] = "error"
-                validation_result["message"] = "Nothing to update or value already exists!"
+                validation_result["message"] = "This is a unique attribute!"
 
                 return validation_result
 
@@ -773,6 +784,8 @@ class WizardHelper:
         errors = list()
 
         description = Description().GET(self.description_token)
+        attributes = description.get("attributes", dict())
+        meta = description.get("meta", dict())
 
         name_series = pd.Series(sample_names.split(",") if "," in sample_names else sample_names.split())
         name_series = name_series[name_series.str.strip() != '']
@@ -796,9 +809,10 @@ class WizardHelper:
                 repeated_names.to_string().replace("\n", '<br/>')
             ])
 
-        # do we have matching number of supplied names to number of samples to be described?
+        # do we have matching number of supplied names to proposed number of samples?
 
-        number_of_samples = description["attributes"].get("number_of_samples", dict()).get("number_of_samples", 0)
+        number_of_samples = attributes.get("number_of_samples", dict()).get("number_of_samples", 0)
+
         if len(name_series) < int(number_of_samples):
             errors.append([
                 "Insufficient names",
@@ -815,8 +829,10 @@ class WizardHelper:
 
         else:
             # store dependency
-            meta = description.get("meta", dict())
-            meta["provided_names_number_of_samples"] = number_of_samples
+            name_series = name_series.head(int(number_of_samples))
+            meta["generated_names"] = ','.join(list(name_series))
+            user_choice = attributes.get("sample_naming_method", dict()).get("sample_naming_method", str())
+            meta[user_choice + "_number_of_samples"] = number_of_samples
             # save meta
             Description().edit_description(self.description_token, dict(meta=meta))
 
@@ -833,27 +849,12 @@ class WizardHelper:
         description = Description().GET(self.description_token)
         number_of_samples = description["attributes"].get("number_of_samples", dict()).get("number_of_samples", 0)
 
-        # initial attempt at generating names
+        # generate and validate names from bundle stub
         bn_df = pd.DataFrame(pd.Series([bundle_name] * int(number_of_samples)), columns=['bundle_name'])
-        bn_df['generated_name'] = bn_df.apply(lambda row: row['bundle_name'] + "_" + str(row.name + 1), axis=1)
+        bn_df.insert(loc=0, column='s_n', value=np.arange(1, int(number_of_samples) + 1))
+        bn_df['new_name'] = bn_df['bundle_name'].map(str) + '_' + bn_df['s_n'].map(str)
 
-        generated_names = ','.join(list(bn_df['generated_name']))
-
-        validate = self.validate_sample_names(generated_names)
-
-        # get meta
-        meta = description.get("meta", dict())
-
-        meta["generated_names"] = str()
-
-        if validate["status"] == "success":
-            meta["generated_names"] = generated_names
-
-            # store dependency
-            meta["bundle_name_number_of_samples"] = number_of_samples
-
-        # save meta
-        Description().edit_description(self.description_token, dict(meta=meta))
+        validate = self.validate_sample_names(','.join(list(bn_df.new_name)))
 
         return dict(status=validate["status"])
 
@@ -970,12 +971,10 @@ class WizardHelper:
         if result["status"] == "error":
             return result
 
-        SampleCollection = get_collection_ref('SampleCollection')
-
         _id = record.pop('_id', None)
 
         if _id:
-            SampleCollection.update(
+            Sample().get_collection_handle().update(
                 {"_id": ObjectId(_id)},
                 {'$set': record})
 
@@ -1000,12 +999,10 @@ class WizardHelper:
         :return:
         """
 
-        # to improve performance UI-side, use the refresh_threshold to decide if to send back the entire dataset
+        # to enhance performance UI-side, use the refresh_threshold to decide if to send back the entire dataset
         refresh_threshold = 1000
 
         result = dict(status='success', value='')
-
-        SampleCollection = get_collection_ref('SampleCollection')
 
         # object type controls and their corresponding schemas
         object_array_controls = ["copo-characteristics", "copo-comment"]
@@ -1065,11 +1062,11 @@ class WizardHelper:
         object_ids = [ObjectId(x.split("row_")[-1]) for x in target_rows]
 
         if len(key) == 1:
-            SampleCollection.update_many(
+            Sample().get_collection_handle().update_many(
                 {"_id": {"$in": object_ids}},
                 {'$set': {key[0]: resolved_data}})
         else:
-            SampleCollection.update_many(
+            Sample().get_collection_handle().update_many(
                 {"_id": {"$in": object_ids}},
                 {'$set': {key[0] + "." + key[1] + "." + key[2]: resolved_data}})
 
@@ -1094,12 +1091,10 @@ class WizardHelper:
         """
         result = dict(status='success', value='')
 
-        SampleCollection = get_collection_ref('SampleCollection')
         fields = dict()
-
         fields['deleted'] = d_utils.get_not_deleted_flag()
 
-        SampleCollection.update_many(
+        Sample().get_collection_handle().update_many(
             {"description_token": self.description_token},
             {'$set': fields})
 
@@ -1115,13 +1110,11 @@ class WizardHelper:
 
         result = dict(status='success')
 
-        SampleCollection = get_collection_ref('SampleCollection')
-
         # delete store object
         Description().remove_store_object(store_name=self.store_name, object_key=self.object_key)
 
         # remove entries associated with this token
-        SampleCollection.delete_many(
+        Sample().get_collection_handle().delete_many(
             {"description_token": self.description_token, "deleted": d_utils.get_deleted_flag()})
 
         Description().delete_description([self.description_token])
@@ -1138,8 +1131,8 @@ class WizardHelper:
         # first, remove obsolete description records
         Description().purge_descriptions()
 
-        projection = dict(created_on=1, attributes=1)
-        filter_by = dict(profile_id=self.profile_id)
+        projection = dict(created_on=1, attributes=1, meta=1, stages=1)
+        filter_by = dict(profile_id=self.profile_id, component='sample')
         records = Description().get_all_records_columns(sort_by='created_on', projection=projection,
                                                         filter_by=filter_by)
 
@@ -1151,11 +1144,16 @@ class WizardHelper:
 
         for r in records:
             ll = description_df[description_df._id == r['_id']]
+            last_rendered_stage = r['meta'].get('last_rendered_stage', str())
+            stages = r['stages']
+            lrs = [x['title'] for x in stages if x['ref'] == last_rendered_stage]
+            lrs = lrs[0] if lrs else 'N/A'
             val = dict(
                 created_on=htags.resolve_datetime_data(r['created_on'], dict()),
                 _id=str(r['_id']),
                 number_of_samples=r['attributes'].get("number_of_samples", dict()).get("number_of_samples", 'N/A'),
-                grace_period=str(int(float(no_of_days) - float(ll.diff_days))) + ' days'
+                grace_period=str(int(float(no_of_days) - float(ll.diff_days))) + ' days',
+                last_rendered_stage=lrs
             )
 
             refined_records.append(val)
