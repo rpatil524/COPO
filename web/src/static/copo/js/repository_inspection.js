@@ -18,13 +18,14 @@ $(document).ready(function () {
     $(document).on('click', '#view_repo_structure', check_repo_id)
     $(document).on('click', '.create_add_dataverse', handle_radio)
     $(document).on('click', '.panel-heading', build_dataverse_header_click)
-    $(document).on('click', '.dataset-checkbox', select_dataverse)
+    $(document).on('click', '.dataset-checkbox', select_dataset)
 
 
     $('#create_new_dataverse').attr('disabled', 'disabled')
     $('#search_dataverse').attr('disabled', 'disabled')
     $('#search_dataverse_id').attr('disabled', 'disabled')
 
+    // delayed keyup function to delay searching for n miliseconds before firing search off to dataverse
     $('#search_dataverse, #search_dataverse_id').delayKeyup(function (e) {
         var typed = e.val()
         var box;
@@ -46,7 +47,7 @@ $(document).ready(function () {
     }, 1000)
 })
 
-
+// function to get url for selected repo
 function check_repo_id(e) {
     // check for repo_id
     var repo_id = $('#custom_repo_id').val()
@@ -60,7 +61,7 @@ function check_repo_id(e) {
     })
 }
 
-
+// enable / disable inputs depending on which radio has been selected
 function handle_radio() {
     var checked = $('input[name=create_dataverse_radio]:checked').val();
     if (checked == 'new') {
@@ -75,13 +76,12 @@ function handle_radio() {
     }
 }
 
-
+// build table showing either dataverses or datasets based on returns from search
 function build_dataverse_modal(resp) {
+
     $('#ajax-loading-div').fadeOut()
     var t = $('#dataverse-table-template').clone()
     $(t).attr('id', 'dataverse-table')
-
-    // here we can build dataset table
     var checked = $('input[name=dataverse-radio]:checked').val();
     if (checked == 'dataverse') {
         $(resp.data.items).each(function (idx, el) {
@@ -130,11 +130,15 @@ function build_dataverse_modal(resp) {
 
 }
 
+/*
 function build_dataverse_header_click(e) {
     var doid = $(e.currentTarget).data('doid')
 }
+*/
 
-function select_dataverse(e) {
+
+// when a dataset checkbox is clicked store dataset details and update label info
+function select_dataset(e) {
 
     var row = $(e.currentTarget).closest('tr')
     var dataset_id = $(row).data('id')
@@ -148,11 +152,11 @@ function select_dataverse(e) {
 
 }
 
+
+// when dataverse is expanded, fire off request to dataverse to get information on datasets contained within
 function expand_table(event) {
     event.preventDefault();
-
     var table = $('#dataverse-table').DataTable()
-
     var tr = $(this).closest('tr');
     var type = $(tr).data('type')
     var entity_id = $(tr).data('entity_id')
