@@ -13,7 +13,8 @@ from dateutil import parser
 from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
 from django.conf import settings
-from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, CopoGroup, Annotation, Repository
+from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, CopoGroup, Annotation, \
+    Repository
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
@@ -409,12 +410,12 @@ def get_users_in_repo(request):
     u_list = list()
     for d in data:
         u_list.append({'uid': d.user.id, 'first_name': d.user.first_name, 'last_name': d.user.last_name})
-    #data = serializers.serialize('json', u_list)
+    # data = serializers.serialize('json', u_list)
     return HttpResponse(json_util.dumps(u_list))
 
 
 def get_repos_for_user(request):
-    #u_type = request.GET['u_type']
+    # u_type = request.GET['u_type']
     uid = str(request.user.id)
     group_id = request.GET['group_id']
     doc = CopoGroup().get_repos_for_group_info(uid, group_id)
@@ -453,8 +454,43 @@ def search_dataverse(request):
     q = request.GET['q']
     url = request.GET['url']
     if url == 'default':
-        url = settings.DATAVERSE['HARVARD_TEST_API']
+        url = settings.DATAVERSE['HARVARD_LIVE_API']
     url = url + '/api/search'
-    payload = {'q': q}
-    resp = requests.get(url=url, params=payload)
-    return HttpResponse(json.dumps(resp.content.decode('utf-8')))
+    payload = {'q': q, 'per_page': 10, 'show_entity_ids': True, 'type': box}
+    resp = requests.get(url=url, params=payload).content.decode('utf-8')
+    print(resp)
+    return HttpResponse(resp)
+
+
+def get_dataverse_content(request):
+    id = request.GET['id']
+    url = request.GET['url']
+    if url == 'default':
+        url = settings.DATAVERSE['HARVARD_LIVE_API']
+        key = settings.DATAVERSE['HARVARD_LIVE_TOKEN']
+    dv_url = url + '/api/dataverses/' + id + '/contents'
+
+    resp = requests.get(dv_url).content.decode('utf-8')
+    ids = json.loads(resp)
+    dvs = list()
+    for ds_id in ids['data']:
+        ds_url = url + '/api/datasets/' + str(ds_id['id'])
+        resp = requests.get(url=ds_url)
+        fields = dict()
+        fields['id'] = ds_id['id']
+        fields['persistentUrl'] = ds_id['persistentUrl']
+        for f in json.loads(resp.content.decode('utf-8'))['data']['latestVersion']['metadataBlocks']['citation']['fields']:
+            if f['typeName'] == 'title':
+                fields['title'] = f['value']
+            elif f['typeName'] == 'author':
+                fields['author'] = f['value']
+            elif f['typeName'] == 'dsDescription':
+                fields['dsDescription'] = f['value']
+            elif f['typeName'] == 'subject':
+                fields['subject'] = f['value']
+            elif f['typeName'] == 'depositor':
+                fields['depositor'] = f['value']
+            elif f['typeName'] == 'dateOfDeposit':
+                fields['dateOfDeposit'] = f['value']
+        dvs.append(fields)
+    return HttpResponse(json.dumps(dvs))

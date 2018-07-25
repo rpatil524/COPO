@@ -177,7 +177,9 @@ COPO_URL = 'copo-project.org'
 
 DATAVERSE = {
     "HARVARD_TEST_API": "https://demo.dataverse.org",
-    "HARVARD_TEST_TOKEN": "fe6998df-c2a4-4103-9bf8-95200953fe0c"
+    "HARVARD_TEST_TOKEN": "fe6998df-c2a4-4103-9bf8-95200953fe0c",
+    "HARVARD_LIVE_API": "https://dataverse.harvard.edu",
+    "HARVARD_LIVE_TOKEN": "10731a84-b3d3-457e-999d-21f48fe8d812"
 }
 
 UNIT_TESTING = False

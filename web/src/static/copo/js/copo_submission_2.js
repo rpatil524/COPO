@@ -202,6 +202,8 @@ $(document).ready(function () {
                             }
                             colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-target="#repo_modal" class="btn btn-default" type="button" id="view_repo_structure">Inspect Repository</button>')
 
+                            colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge"></span></div>')
+
 
                             // set submission status
                             var colsSecondHTML = $('<div class="col-sm-4 col-md-4 col-lg-4" style="padding-right: 2px; margin-left: 50px;"></div>')
