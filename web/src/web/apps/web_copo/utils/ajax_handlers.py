@@ -14,7 +14,7 @@ from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
 from django.conf import settings
 from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, CopoGroup, Annotation, \
-    Repository
+    Repository, Person
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
@@ -25,6 +25,7 @@ from web_copo.models import UserDetails
 from django.db.models import Q
 from django.contrib.auth.models import Group
 from django.core import serializers
+from dal.orcid_da import Orcid
 
 
 def get_source_count(self):
@@ -494,3 +495,20 @@ def get_dataverse_content(request):
                 fields['dateOfDeposit'] = f['value']
         dvs.append(fields)
     return HttpResponse(json.dumps(dvs))
+
+
+def get_info_for_new_dataverse(request):
+    out = dict()
+    p_id = request.session['profile_id']
+    profile = Profile().get_record(p_id)
+    out['dvTitle'] = profile['title']
+    out['dvAlias'] = str(profile['title']).lower()
+    person_list = list(Person(p_id).get_people_for_profile())
+    out['dvPerson'] = person_list
+    orcid = Orcid().get_orcid_profile(request.user)
+    affiliation = orcid['op']['activities_summary']['employments']['employment_summary'][0]['organization']['name']
+    out['dsAffiliation'] = affiliation
+    out['dsTitle'] = 'GET NAME FROM FILE'
+    out['dsDescriptionValue'] = profile['description']
+    out['subject'] = 'GET FROM FILE METADATA'
+    return HttpResponse(json_util.dumps(out))

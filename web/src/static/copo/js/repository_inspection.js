@@ -17,13 +17,11 @@ $(document).ready(function () {
     $(document).data('url', 'default')
     $(document).on('click', '#view_repo_structure', check_repo_id)
     $(document).on('click', '.create_add_dataverse', handle_radio)
-    $(document).on('click', '.panel-heading', build_dataverse_header_click)
     $(document).on('click', '.dataset-checkbox', select_dataset)
 
+    do_new_dataverse_fields()
 
-    $('#create_new_dataverse').attr('disabled', 'disabled')
-    $('#search_dataverse').attr('disabled', 'disabled')
-    $('#search_dataverse_id').attr('disabled', 'disabled')
+
 
     // delayed keyup function to delay searching for n miliseconds before firing search off to dataverse
     $('#search_dataverse, #search_dataverse_id').delayKeyup(function (e) {
@@ -65,14 +63,12 @@ function check_repo_id(e) {
 function handle_radio() {
     var checked = $('input[name=create_dataverse_radio]:checked').val();
     if (checked == 'new') {
-        $('#create_new_dataverse').removeAttr('disabled')
-        $('#search_dataverse').attr('disabled', 'disabled')
-        $('#search_dataverse_id').attr('disabled', 'disabled')
+        $('.new-controls').show()
+        $('.existing-controls').hide()
     }
     else {
-        $('#search_dataverse').removeAttr('disabled')
-        $('#search_dataverse_id').removeAttr('disabled')
-        $('#create_new_dataverse').attr('disabled', 'disabled')
+        $('.new-controls').hide()
+        $('.existing-controls').show()
     }
 }
 
@@ -155,6 +151,7 @@ function select_dataset(e) {
 
 // when dataverse is expanded, fire off request to dataverse to get information on datasets contained within
 function expand_table(event) {
+
     event.preventDefault();
     var table = $('#dataverse-table').DataTable()
     var tr = $(this).closest('tr');
@@ -267,4 +264,10 @@ function expand_table(event) {
 
 
     }
+}
+
+function do_new_dataverse_fields(){
+    $.getJSON("/copo/get_info_for_new_dataverse/", function(data){
+        console.log(data)
+    })
 }
