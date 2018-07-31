@@ -445,8 +445,11 @@ def remove_repo_from_group(request):
 
 def get_repo_info(request):
     repo_id = request.GET['repo_id']
-    repo = Repository().get_record(ObjectId(repo_id))
-    out = {'repo_type': repo['type'], 'repo_url': repo['url']}
+    try:
+        repo = Repository().get_record(ObjectId(repo_id))
+        out = {'repo_type': repo['type'], 'repo_url': repo['url']}
+    except:
+        out = {}
     return HttpResponse(json.dumps(out))
 
 
@@ -457,7 +460,7 @@ def search_dataverse(request):
     if url == 'default':
         url = settings.DATAVERSE['HARVARD_LIVE_API']
     url = url + '/api/search'
-    payload = {'q': q, 'per_page': 10, 'show_entity_ids': True, 'type': box}
+    payload = {'q': q, 'per_page': 100, 'show_entity_ids': True, 'type': box}
     resp = requests.get(url=url, params=payload).content.decode('utf-8')
     print(resp)
     return HttpResponse(resp)
@@ -501,14 +504,25 @@ def get_info_for_new_dataverse(request):
     out = dict()
     p_id = request.session['profile_id']
     profile = Profile().get_record(p_id)
-    out['dvTitle'] = profile['title']
+
     out['dvAlias'] = str(profile['title']).lower()
     person_list = list(Person(p_id).get_people_for_profile())
     out['dvPerson'] = person_list
     orcid = Orcid().get_orcid_profile(request.user)
-    affiliation = orcid['op']['activities_summary']['employments']['employment_summary'][0]['organization']['name']
+    try:
+        affiliation = orcid.get('op', {}).get('activities_summary', {}).get('employments', {})\
+            .get('employment_summary', {})[0].get('organization', "").get('name', "")
+    except IndexError:
+        affiliation = ""
     out['dsAffiliation'] = affiliation
-    out['dsTitle'] = 'GET NAME FROM FILE'
-    out['dsDescriptionValue'] = profile['description']
-    out['subject'] = 'GET FROM FILE METADATA'
+    df = list(DataFile().get_for_profile(p_id))
+    file = df[0]
+
+    out['dvName'] = profile.get('title', "")
+    out['dsTitle'] = file.get('description', {}).get('attributes', {})\
+        .get('title_author_contributor', {}).get('dcterms:title', "")
+    out['dsDescriptionValue'] = file.get('description', {}).get('attributes', {})\
+        .get('subject_description', {}).get('dcterms:description', "")
+    out['dsSubject'] = file.get('description', {}).get('attributes', {})\
+        .get('subject_description', {}).get('dcterms:subject', "")
     return HttpResponse(json_util.dumps(out))

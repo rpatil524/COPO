@@ -24,17 +24,11 @@ $(document).ready(function () {
 
 
     // delayed keyup function to delay searching for n miliseconds before firing search off to dataverse
-    $('#search_dataverse, #search_dataverse_id').delayKeyup(function (e) {
+    $('#search_dataverse').delayKeyup(function (e) {
         var typed = e.val()
+        var search_type = e.attr('id')
         var box;
-        if (e.attr('id') == "search_dataverse_id") {
-            $('#search_dataverse').val("")
-            box = 'id'
-        }
-        else if (e.attr('id') == "search_dataverse") {
-            $('#search_dataverse_id').val("")
-            box = 'term'
-        }
+
         $('#ajax-loading-div').fadeIn()
         var box = $('input[name="dataverse-radio"]:checked').val()
         $.getJSON("/copo/get_dataverse/", {
@@ -43,7 +37,12 @@ $(document).ready(function () {
             'url': $(document).data('url')
         }, build_dataverse_modal)
     }, 1000)
+
+
+
 })
+
+
 
 // function to get url for selected repo
 function check_repo_id(e) {
@@ -269,5 +268,17 @@ function expand_table(event) {
 function do_new_dataverse_fields(){
     $.getJSON("/copo/get_info_for_new_dataverse/", function(data){
         console.log(data)
+        $('#dvName').val(data.dvName)
+        $('#dvAlias').val(data.dvAlias)
+        $('#dvContactFirstname').val(data.dvPerson[0].firstName)
+        $('#dvContactLastname').val(data.dvPerson[0].lastName)
+        $('#dsTitle').val(data.dsTitle)
+        $('#dsDescription').val(data.dsDescriptionValue)
+        $('#dsAuthorFirstname').val(data.dvPerson[0].firstName)
+        $('#dsAuthorLastname').val(data.dvPerson[0].lastName)
+        $('#dsAffiliation').val(data.dsAffiliation)
+        $('#dsContactFirstname').val(data.dvPerson[0].firstName)
+        $('#dsContactLastname').val(data.dvPerson[0].lastName)
+        $('#dsContactEmail').val(data.dvPerson[0].email)
     })
 }

@@ -98,19 +98,29 @@
                         <!-- new dataverse controls -->
                         <div class="col-sm-6 col-md-6 col-lg-6">
                             <h5>Dataverse Details</h5>
-                            <div class="form-group width300px">
-                                <label for="dvName">Dataverse Name</label>
+                            <div class="form-group">
+                                <label for="dvName">Name</label>
                                 <input type="text" class="form-control" id="dvName">
                             </div>
-                            <div class="form-group width300px">
-                                <label for="dvAlias">Dataverse Alias</label>
+                            <div class="form-group">
+                                <label for="dvAlias">Alias</label>
                                 <input type="text" class="form-control" id="dvAlias">
                             </div>
-                            <div class="form-group width300px">
-                                <label for="dvContact">Dataverse Contact</label>
-                                <input type="text" class="form-control" id="dvContact">
+                            <div class="form-row">
+
+                                <div class="form-group col-md-6" style="padding-left:0">
+                                    <label for="dvContactFirstname">Primary Contact Firstname</label>
+                                    <input type="text" class="form-control" id="dvContactFirstname">
+                                </div>
+
+
+                                <div class="form-group col-md-6" style="padding-left:0">
+                                    <label for="dvContactLastname">Primary Contact Lastname</label>
+                                    <input type="text" class="form-control" id="dvContactLastname">
+                                </div>
+
                             </div>
-                            <div class="form-group width300px">
+                            <div class="form-group">
                                 <label for="dvType">Dataverse Type</label>
                                 <select class="form-control" id="dvType">
                                     <option value="UNCATEGORIZED">Uncategorized</option>
@@ -129,7 +139,7 @@
                         <!-- new dataset controls -->
                         <div class="col-sm-6 col-md-6 col-lg-6">
                             <h5>Dataset Details</h5>
-                            <div class="form-group width300px">
+                            <div class="form-group">
                                 <label for="dsTitle">Dataset Title</label>
                                 <input type="text" class="form-control" id="dsTitle">
                             </div>
@@ -137,19 +147,31 @@
                                 <label for="dsDescription">Dataset Descripion</label>
                                 <textarea class="form-control" rows="5" id="dsDescription"></textarea>
                             </div>
-                            <div class="form-group width300px">
-                                <label for="dsAuthor">Author Name</label>
-                                <input type="text" class="form-control" id="dsAuthor">
+                            <div class="form-row">
+                                <div class="form-group col-md-6" style="padding-left:0">
+                                    <label for="dsAuthorFirstname">Author Firstname</label>
+                                    <input type="text" class="form-control" id="dsAuthorFirstname">
+                                </div>
+                                <div class="form-group col-md-6" style="padding-left:0">
+                                    <label for="dsAuthorLastname">Author Lastname</label>
+                                    <input type="text" class="form-control" id="dsAuthorLastname">
+                                </div>
                             </div>
-                            <div class="form-group width300px">
+                            <div class="form-group">
                                 <label for="dsAffiliation">Author Affiliation</label>
                                 <input type="text" class="form-control" id="dsAffiliation">
                             </div>
-                            <div class="form-group width300px">
-                                <label for="dsContactName">Contact Name</label>
-                                <input type="text" class="form-control" id="dsContactName">
+                            <div class="form-row">
+                                <div class="form-group col-md-6" style="padding-left:0">
+                                    <label for="dsContactFirstname">Contact Firstname</label>
+                                    <input type="text" class="form-control" id="dsContactFirstname">
+                                </div>
+                                <div class="form-group col-md-6" style="padding-left:0">
+                                    <label for="dsContactLastname">Contact Lastname</label>
+                                    <input type="text" class="form-control" id="dsContactLastname">
+                                </div>
                             </div>
-                            <div class="form-group width300px">
+                            <div class="form-group">
                                 <label for="dsContactEmail">Contact Email</label>
                                 <input type="text" class="form-control" id="dsContactEmail">
                             </div>
@@ -157,7 +179,7 @@
                         </div>
                     </div>
                     <div class="existing-controls" style="display: none">
-                        <h5>Search by keyword</h5>
+                        <h5>Search</h5>
                         <div class="radio-inline">
                             <label><input type="radio" value="dataverse" checked="true"
                                           name="dataverse-radio">Dataverse</label>
@@ -166,7 +188,7 @@
                             <label><input type="radio" value="dataset" name="dataverse-radio">Dataset</label>
                         </div>
                         <div class="form-inline">
-                            <div class="input-group width300px  marginBottom10px">
+                            <div class="input-group  marginBottom10px width300px">
                                 <span class="input-group-addon" id="search_dv_addon">Search</span>
                                 <input type="text" class="form-control" placeholder="Author, Keyword etc."
                                        id="search_dataverse" aria-describedby="search_dv_addon">
@@ -178,14 +200,7 @@
 
 
                         </div>
-                        <h5>Or Search by ID</h5>
-                        <div class="input-group width300px">
-                            <!--<label for="search_dataverse">Search by Dataverse ID</label>-->
-                            <span class="input-group-addon" id="search_dv_id_addon">Dataverse ID</span>
-                            <input type="text" class="form-control" id="search_dataverse_id"
-                                   aria-describedby="search_dv_id_addon">
 
-                        </div>
 
 
                         <!--<div style="margin-top:30px" class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
