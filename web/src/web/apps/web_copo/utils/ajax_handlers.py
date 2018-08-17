@@ -27,6 +27,7 @@ from django.contrib.auth.models import Group
 from django.core import serializers
 from dal.orcid_da import Orcid
 
+DV_STRING = 'HARVARD_TEST_API'
 
 def get_source_count(self):
     profile_id = data_utils.get_current_request().session['profile_id']
@@ -456,33 +457,28 @@ def get_repo_info(request):
 def search_dataverse(request):
     box = request.GET['box']
     q = request.GET['q']
-    url = request.GET['url']
-    if url == 'default':
-        url = settings.DATAVERSE['HARVARD_LIVE_API']
-    url = url + '/api/search'
+    url = Submission().get_dataverse_details(request.GET['submission_id'])
+    dv_url = url['url'] + '/api/search'
     payload = {'q': q, 'per_page': 100, 'show_entity_ids': True, 'type': box}
-    resp = requests.get(url=url, params=payload).content.decode('utf-8')
+    resp = requests.get(url=dv_url, params=payload).content.decode('utf-8')
     print(resp)
     return HttpResponse(resp)
 
 
 def get_dataverse_content(request):
     id = request.GET['id']
-    url = request.GET['url']
-    if url == 'default':
-        url = settings.DATAVERSE['HARVARD_LIVE_API']
-        key = settings.DATAVERSE['HARVARD_LIVE_TOKEN']
-    dv_url = url + '/api/dataverses/' + id + '/contents'
-
+    url = Submission().get_dataverse_details(request.GET['submission_id'])
+    dv_url = url['url'] + '/api/dataverses/' + id + '/contents'
     resp = requests.get(dv_url).content.decode('utf-8')
     ids = json.loads(resp)
     dvs = list()
     for ds_id in ids['data']:
-        ds_url = url + '/api/datasets/' + str(ds_id['id'])
+        ds_url = url['url'] + '/api/datasets/' + str(ds_id['id'])
         resp = requests.get(url=ds_url)
         fields = dict()
         fields['id'] = ds_id['id']
-        fields['persistentUrl'] = ds_id['persistentUrl']
+        if "persistentUrl" in ds_id:
+            fields['persistentUrl'] = ds_id['persistentUrl']
         for f in json.loads(resp.content.decode('utf-8'))['data']['latestVersion']['metadataBlocks']['citation']['fields']:
             if f['typeName'] == 'title':
                 fields['title'] = f['value']
@@ -526,3 +522,18 @@ def get_info_for_new_dataverse(request):
     out['dsSubject'] = file.get('description', {}).get('attributes', {})\
         .get('subject_description', {}).get('dcterms:subject', "")
     return HttpResponse(json_util.dumps(out))
+
+def update_submission_repo_data(request):
+
+    task = request.POST['task']
+
+    if task == 'change_destination':
+        custom_repo_id = request.POST['custom_repo_id']
+        submission_id = request.POST['submission_id']
+        s = Submission().update_destination_repo(repo_id=custom_repo_id, submission_id=submission_id)
+        return HttpResponse(s)
+    elif task == 'change_meta':
+        meta = request.POST['meta']
+        submission_id = request.POST['submission_id']
+        s = Submission().update_meta(submission_id=submission_id, meta=meta)
+        return HttpResponse(s)

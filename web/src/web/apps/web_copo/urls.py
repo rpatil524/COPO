@@ -72,5 +72,8 @@ urlpatterns = [path('', views.index, name='index'),
                path('get_repo_info/', ajax_handlers.get_repo_info, name="get_repo_info"),
                path('get_dataverse/', ajax_handlers.search_dataverse, name="get_dataverse"),
                path('get_dataverse_content/', ajax_handlers.get_dataverse_content, name="get_dataverse_content"),
-               path('get_info_for_new_dataverse/', ajax_handlers.get_info_for_new_dataverse, name="get_info_for_new_dataverse")
+               path('get_info_for_new_dataverse/', ajax_handlers.get_info_for_new_dataverse,
+                    name="get_info_for_new_dataverse"),
+               path('update_submission_repo_data/', ajax_handlers.update_submission_repo_data,
+                    name="update_submission_repo_data")
                ]

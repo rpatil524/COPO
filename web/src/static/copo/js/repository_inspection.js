@@ -16,11 +16,12 @@ $(document).ready(function () {
 
     $(document).data('url', 'default')
     $(document).on('click', '#view_repo_structure', check_repo_id)
+    $(document).on('click', '#view_repo_structure', mark_as_active_panel)
     $(document).on('click', '.create_add_dataverse', handle_radio)
     $(document).on('click', '.dataset-checkbox', select_dataset)
+    $(document).on('click', '#save_inspection_button', save_inspection_info)
 
     do_new_dataverse_fields()
-
 
 
     // delayed keyup function to delay searching for n miliseconds before firing search off to dataverse
@@ -34,14 +35,12 @@ $(document).ready(function () {
         $.getJSON("/copo/get_dataverse/", {
             'q': typed,
             'box': box,
-            'url': $(document).data('url')
+            'submission_id': $(document).data('submission_id')
         }, build_dataverse_modal)
     }, 1000)
 
 
-
 })
-
 
 
 // function to get url for selected repo
@@ -56,6 +55,12 @@ function check_repo_id(e) {
             $(document).data('url', url)
         }
     })
+}
+
+function mark_as_active_panel(e) {
+    var submission_id = $(e.currentTarget).data('submission_id')
+    $(document).data('submission_id', submission_id)
+    console.log("Active Sub" + " " + submission_id)
 }
 
 // enable / disable inputs depending on which radio has been selected
@@ -80,7 +85,7 @@ function build_dataverse_modal(resp) {
     var checked = $('input[name=dataverse-radio]:checked').val();
     if (checked == 'dataverse') {
         $(resp.data.items).each(function (idx, el) {
-            var trow = "<tr data-type='" + el.type + "' data-entity_id='" + el.entity_id + "'>" +
+            var trow = "<tr data-alias='" + el.identifier + "' data-type='" + el.type + "' data-entity_id='" + el.entity_id + "'>" +
                 "<td class='summary-details-control' style='min-width: 50px; text-align:center'></td>" +
                 "<td>" + el.name + "</td>" +
                 "<td>" + el.description + "</td>" +
@@ -132,26 +137,12 @@ function build_dataverse_header_click(e) {
 */
 
 
-// when a dataset checkbox is clicked store dataset details and update label info
-function select_dataset(e) {
-
-    var row = $(e.currentTarget).closest('tr')
-    var dataset_id = $(row).data('id')
-    var persistent = $(row).data('persistent')
-    var identifier = $(row).data('identifier')
-    var entity_id = $(row).data('id')
-    $('#dataset_id').val(dataset_id)
-    var label = $(document).data('current-label')
-    $(label).html(identifier + " - " + persistent)
-    $('#repo_modal').modal('hide')
-
-}
-
-
 // when dataverse is expanded, fire off request to dataverse to get information on datasets contained within
 function expand_table(event) {
 
     event.preventDefault();
+    var dv_alias = $(event.currentTarget).closest('tr').data('alias')
+    $(document).data('dv_alias', dv_alias)
     var table = $('#dataverse-table').DataTable()
     var tr = $(this).closest('tr');
     var type = $(tr).data('type')
@@ -184,7 +175,7 @@ function expand_table(event) {
         if (type == 'dataverse') {
             $.get("/copo/get_dataverse_content/", {
                 'id': entity_id,
-                'url': $(document).data('url')
+                'submission_id': $(document).data('submission_id')
             }, function (data) {
 
                 try {
@@ -230,7 +221,7 @@ function expand_table(event) {
                 })
 
                 var thead = document.createElement("thead")
-                $(thead).append($(tr_header).append(title).append(doi).append(description).append(publication_date).append(czech))
+                $(thead).append($(tr_header).append("<td/>").append(title).append(doi).append(description).append(publication_date).append(czech))
                 $(contentHtml).append(thead)
 
                 $(data).each(function (idx, el) {
@@ -239,6 +230,7 @@ function expand_table(event) {
                     $(colTR).attr('data-identifier', el.title)
                     $(colTR).attr('data-persistent', el.persistentUrl)
                     var col1 = $('<td/>').append(el.title);
+                    var col11 = $('<td/>').append(el.persistentUrl);
                     var col2 = $('<td/>').append(el.dsDescription[0].dsDescriptionValue.value);
                     var col3 = $('<td/>').append(el.dateOfDeposit)
                     var col4 = $('<td/>').append('dataset')
@@ -249,7 +241,7 @@ function expand_table(event) {
                         "<label></label>" +
                         "</div>" +
                         "</div>")
-                    colTR.append(colCheck).append(col1).append(col2).append(col3).append(col4);
+                    colTR.append(colCheck).append(col1).append(col11).append(col2).append(col3).append(col4);
                     contentHtml.append(colTR);
                 })
 
@@ -265,9 +257,9 @@ function expand_table(event) {
     }
 }
 
-function do_new_dataverse_fields(){
-    $.getJSON("/copo/get_info_for_new_dataverse/", function(data){
-        console.log(data)
+function do_new_dataverse_fields() {
+    $.getJSON("/copo/get_info_for_new_dataverse/", function (data) {
+
         $('#dvName').val(data.dvName)
         $('#dvAlias').val(data.dvAlias)
         $('#dvContactFirstname').val(data.dvPerson[0].firstName)
@@ -281,4 +273,65 @@ function do_new_dataverse_fields(){
         $('#dsContactLastname').val(data.dvPerson[0].lastName)
         $('#dsContactEmail').val(data.dvPerson[0].email)
     })
+}
+
+function save_inspection_info(e) {
+    //e.preventDefault()
+    var sub_id = $(document).data('submission_id')
+    var jsondata = JSON.stringify($('#repo_metadata_form').serializeFormJSON())
+    $.ajax({
+        url: "/copo/update_submission_repo_data/",
+        type: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            'submission_id': sub_id,
+            'task': 'change_meta',
+            'meta': jsondata,
+        },
+        success: function (data) {
+            $('#repo_modal').modal('toggle')
+        },
+        error: function () {
+        }
+    });
+}
+
+// when a dataset checkbox is clicked store dataset details and update label info
+function select_dataset(e) {
+    var sub_id = $(document).data('submission_id')
+    var row = $(e.currentTarget).closest('tr')
+    var dataset_id = $(row).data('id')
+    var persistent = $(row).data('persistent')
+    var identifier = $(row).data('identifier')
+    var entity_id = $(row).data('id')
+    $('#dataset_id').val(dataset_id)
+    var label = $(document).data('current-label')
+    $(label).html(identifier + " - " + persistent)
+    $.ajax({
+        url: "/copo/update_submission_repo_data/",
+        type: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            'submission_id': sub_id,
+            'task': 'change_meta',
+            'meta': JSON.stringify({
+                'doi': persistent,
+                'dataset_id': dataset_id,
+                'identifier': identifier,
+                'dataverse_alias': $(document).data('dv_alias'),
+                'dataverse_id': $(document).data('entity_id')
+            })
+        },
+        success: function (data) {
+            $('#repo_modal').modal('hide')
+        },
+        error: function () {
+        }
+    });
+
+
 }

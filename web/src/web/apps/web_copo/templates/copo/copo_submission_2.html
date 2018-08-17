@@ -82,143 +82,19 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                    <h4 class="modal-title" id="myModalLabel">Submission Details</h4>
                 </div>
                 <div class="modal-body">
                     <!-- RADIO BUTTON TO CHOOSE BETWEEN EXISTING AND NEW REPO -->
-                    <div class="create_add_dataverse">
-                        <label><input type="radio" checked="true" name="create_dataverse_radio" value="new">&nbsp Create
-                            New Dataverse</label>
-                    </div>
-                    <div class="create_add_dataverse">
-                        <label><input type="radio" name="create_dataverse_radio" value="existing">&nbsp Add to Existing</label>
-                    </div>
-                    <hr/>
-                    <div class="row new-controls">
-                        <!-- new dataverse controls -->
-                        <div class="col-sm-6 col-md-6 col-lg-6">
-                            <h5>Dataverse Details</h5>
-                            <div class="form-group">
-                                <label for="dvName">Name</label>
-                                <input type="text" class="form-control" id="dvName">
-                            </div>
-                            <div class="form-group">
-                                <label for="dvAlias">Alias</label>
-                                <input type="text" class="form-control" id="dvAlias">
-                            </div>
-                            <div class="form-row">
+                    {% include "copo/repo_submission_forms/dataverse_controls_for_submission_modal.html" %}
 
-                                <div class="form-group col-md-6" style="padding-left:0">
-                                    <label for="dvContactFirstname">Primary Contact Firstname</label>
-                                    <input type="text" class="form-control" id="dvContactFirstname">
-                                </div>
-
-
-                                <div class="form-group col-md-6" style="padding-left:0">
-                                    <label for="dvContactLastname">Primary Contact Lastname</label>
-                                    <input type="text" class="form-control" id="dvContactLastname">
-                                </div>
-
-                            </div>
-                            <div class="form-group">
-                                <label for="dvType">Dataverse Type</label>
-                                <select class="form-control" id="dvType">
-                                    <option value="UNCATEGORIZED">Uncategorized</option>
-                                    <option value="DEPARTMENT">Department</option>
-                                    <option value="JOURNALS">Journals</option>
-                                    <option value="LABORATORY">Laboratory</option>
-                                    <option value="ORGANIZATIONS_INSTITUTIONS">Organizations / Institutions</option>
-                                    <option value="RESEARCHERS">Researchers</option>
-                                    <option value="RESEARCH_GROUP">Research Group</option>
-                                    <option value="RESEARCH_PROJECTS">Research Project</option>
-                                    <option value="TEACHING_COURSES">Teaching Course</option>
-
-                                </select>
-                            </div>
-                        </div>
-                        <!-- new dataset controls -->
-                        <div class="col-sm-6 col-md-6 col-lg-6">
-                            <h5>Dataset Details</h5>
-                            <div class="form-group">
-                                <label for="dsTitle">Dataset Title</label>
-                                <input type="text" class="form-control" id="dsTitle">
-                            </div>
-                            <div class="form-group">
-                                <label for="dsDescription">Dataset Descripion</label>
-                                <textarea class="form-control" rows="5" id="dsDescription"></textarea>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-6" style="padding-left:0">
-                                    <label for="dsAuthorFirstname">Author Firstname</label>
-                                    <input type="text" class="form-control" id="dsAuthorFirstname">
-                                </div>
-                                <div class="form-group col-md-6" style="padding-left:0">
-                                    <label for="dsAuthorLastname">Author Lastname</label>
-                                    <input type="text" class="form-control" id="dsAuthorLastname">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="dsAffiliation">Author Affiliation</label>
-                                <input type="text" class="form-control" id="dsAffiliation">
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-6" style="padding-left:0">
-                                    <label for="dsContactFirstname">Contact Firstname</label>
-                                    <input type="text" class="form-control" id="dsContactFirstname">
-                                </div>
-                                <div class="form-group col-md-6" style="padding-left:0">
-                                    <label for="dsContactLastname">Contact Lastname</label>
-                                    <input type="text" class="form-control" id="dsContactLastname">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="dsContactEmail">Contact Email</label>
-                                <input type="text" class="form-control" id="dsContactEmail">
-                            </div>
-
-                        </div>
-                    </div>
-                    <div class="existing-controls" style="display: none">
-                        <h5>Search</h5>
-                        <div class="radio-inline">
-                            <label><input type="radio" value="dataverse" checked="true"
-                                          name="dataverse-radio">Dataverse</label>
-                        </div>
-                        <div class="radio-inline">
-                            <label><input type="radio" value="dataset" name="dataverse-radio">Dataset</label>
-                        </div>
-                        <div class="form-inline">
-                            <div class="input-group  marginBottom10px width300px">
-                                <span class="input-group-addon" id="search_dv_addon">Search</span>
-                                <input type="text" class="form-control" placeholder="Author, Keyword etc."
-                                       id="search_dataverse" aria-describedby="search_dv_addon">
-                            </div>
-
-                            <span class="input-group" style="display: none" id="ajax-loading-div"><img
-                                    style="height: 24px; margin-left:5px;"
-                                    src="{% static 'copo/img/loading.gif' %}"></span>
-
-
-                        </div>
-
-
-
-                        <!--<div style="margin-top:30px" class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-
-                        </div>-->
-
-                        <div id="table-div-dataverse" class="table table-striped table-bordered"
-                             style="padding: 10px;width:100%">
-
-                        </div>
-                    </div>
 
                 </div>
 
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" id="save_inspection_button" class="btn btn-primary">Save</button>
                 </div>
             </div>
         </div>

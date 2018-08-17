@@ -25,7 +25,23 @@ class DataverseSubmit(object):
 
     def submit(self, sub_id, dataFile_ids):
 
+
         profile_id = data_utils.get_current_request().session.get('profile_id')
+
+        s = Submission().get_record(ObjectId(sub_id))
+
+        # get url for dataverse
+        url = Submission().get_dataverse_details(sub_id)
+
+        # if dataset id in submission meta, we are adding to existing dataset, otherwise
+        # we are creating a new dataset
+        if 'dataverse_alias' in s['meta'] and 'doi' in s['meta']:
+            # submit to existing
+            self._add_to_dataverse(url, s)
+        else:
+            # create new
+            pass
+
         dataverse = self._get_dataverse(profile_id=profile_id)
         dataset = self._get_dataset(profile_id=profile_id, dataFile_ids=dataFile_ids, dataverse=dataverse)
 
@@ -35,6 +51,13 @@ class DataverseSubmit(object):
         if not file:
             return 'File already present'
         return True
+
+    def _add_to_dataverse(self, url, sub):
+        c = Connection(url['url'], url['token'])
+        dv = c.get_dataverse(sub['meta']['dataverse_alias'])
+        ds = dv.get_dataset_by_doi(sub['meta']['doi'])
+        print(ds)
+
 
     def _get_dataverse(self, profile_id):
 
