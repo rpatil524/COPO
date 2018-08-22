@@ -108,6 +108,22 @@ $(document).ready(function () {
                 bundle = data.bundle;
             }
 
+            // get repo info
+            var meta = undefined
+            if (data.hasOwnProperty('meta')) {
+                meta = data['meta']
+            }
+
+            var destination_repo = undefined
+            if(data.hasOwnProperty('destination_repo')){
+                destination_repo = data.destination_repo
+            }
+
+            var accessions = undefined
+            if(data.hasOwnProperty('accessions')){
+                accessions = data.accessions
+            }
+
             //get bundle_meta
             var bundle_meta = [];
             if (data.hasOwnProperty("bundle_meta")) {
@@ -128,6 +144,9 @@ $(document).ready(function () {
 
             if (record_id) {
                 var option = {};
+                option["accessions"] = accessions;
+                option["meta"] = meta;
+                option["destination_repo"] = destination_repo
                 option["repository"] = repository;
                 option["status"] = status;
                 option["bundle"] = bundle;
@@ -238,8 +257,15 @@ $(document).ready(function () {
                             }
                             colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default" type="button" id="view_repo_structure">Inspect Repository</button>')
 
-                            colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge"></span></div>')
+                            if (data.accessions == undefined){
 
+
+                            } else if (data.meta != "") {
+                                colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' - ' + data.meta.doi + '</span></div>')
+                            }
+                            else {
+                                colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge"></span></div>')
+                            }
 
                             // set submission status
                             var colsSecondHTML = $('<div class="col-sm-4 col-md-4 col-lg-4" style="padding-right: 2px; margin-left: 50px;"></div>')

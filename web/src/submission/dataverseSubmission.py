@@ -11,33 +11,33 @@ from dal.copo_da import Submission, DataFile
 from web.apps.web_copo.schemas.utils import data_utils
 from dal.copo_da import Profile
 import datetime
-from bson import ObjectId
+from bson import ObjectId, json_util
 from pprint import pprint
 import copy
 
 
+
 class DataverseSubmit(object):
+    host = None
+    headers = None
+
     def __init__(self):
-        self.host = settings.DATAVERSE["HARVARD_TEST_API"]
-        self.token = settings.DATAVERSE["HARVARD_TEST_TOKEN"]
-        # self.API_URL = settings.TEST_DATAVERSE_API_URL
-        self.headers = {'X-Dataverse-key': self.token}
+        pass
 
     def submit(self, sub_id, dataFile_ids):
 
-
         profile_id = data_utils.get_current_request().session.get('profile_id')
-
         s = Submission().get_record(ObjectId(sub_id))
 
         # get url for dataverse
-        url = Submission().get_dataverse_details(sub_id)
+        self.host = Submission().get_dataverse_details(sub_id)
+        self.headers = {'X-Dataverse-key': self.host['apikey']}
 
         # if dataset id in submission meta, we are adding to existing dataset, otherwise
-        # we are creating a new dataset
+        #  we are creating a new dataset
         if 'dataverse_alias' in s['meta'] and 'doi' in s['meta']:
             # submit to existing
-            self._add_to_dataverse(url, s)
+            self._add_to_dataverse(s)
         else:
             # create new
             pass
@@ -46,18 +46,43 @@ class DataverseSubmit(object):
         dataset = self._get_dataset(profile_id=profile_id, dataFile_ids=dataFile_ids, dataverse=dataverse)
 
         #  get details of files
-
         file = self._upload_files(dataverse, dataset, dataFile_ids, sub_id)
         if not file:
             return 'File already present'
         return True
 
-    def _add_to_dataverse(self, url, sub):
-        c = Connection(url['url'], url['token'])
-        dv = c.get_dataverse(sub['meta']['dataverse_alias'])
-        ds = dv.get_dataset_by_doi(sub['meta']['doi'])
-        print(ds)
+    def truncate_url(self, url):
+        if url.startswith('https://'):
+            url = url[8:]
+        elif url.startswith('http://'):
+            url = url[7:]
+        return url
 
+    def _add_to_dataverse(self, sub):
+        c = self._get_connection()
+        dv = c.get_dataverse(sub['meta']['dataverse_alias'])
+        doi = self.truncate_url(sub['meta']['doi'])
+        ds = dv.get_dataset_by_doi(doi)
+        if ds == None:
+            ds = dv.get_dataset_by_title(sub['meta']['identifier'])
+            if ds == None:
+                ds = dv.get_dataset_by_string_in_entry(str(sub['meta']['doi']).encode())
+
+        for id in sub['bundle']:
+            file = DataFile().get_record(ObjectId(id))
+            file_location = file['file_location']
+            file_name = file['name']
+            ds.upload_file(file_location, file_name)
+        meta = ds._metadata
+        dv_storageIdentifier = meta['latest']['storageIdentifier']
+        return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
+
+    def _get_connection(self):
+        dvurl = self.host['url']
+        apikey = self.host['apikey']
+        dvurl = self.truncate_url(dvurl)
+        c = Connection(dvurl, apikey)
+        return c
 
     def _get_dataverse(self, profile_id):
 
@@ -123,7 +148,8 @@ class DataverseSubmit(object):
                 elif n_dict['typeName'] == 'author':
                     # get authors from mongo
                     authors = listize(
-                        df.get('description').get('attributes').get('title_author_contributor').get('dataverse:creator'))
+                        df.get('description').get('attributes').get('title_author_contributor').get(
+                            'dataverse:creator'))
                     author_obj = n_dict['value']
                     authors_list = list()
                     for m in authors:
@@ -174,13 +200,13 @@ class DataverseSubmit(object):
                 elif n_dict['typeName'] == 'dataSources':
                     n_dict['value'] = df.get('description').get('attributes').get('optional_fields').get(
                         'dataverse:source')
-                    n_dict['value'] = listize(n_dict['value'])
+                    n_dict['value'] = self._listize(n_dict['value'])
                     if not n_dict['value']:
                         n_dict['value'] = []
                 elif n_dict['typeName'] == 'relatedMaterial':
                     n_dict['value'] = df.get('description').get('attributes').get('optional_fields').get(
                         'dataverse:relation')
-                    n_dict['value'] = listize(n_dict['value'])
+                    n_dict['value'] = self._listize(n_dict['value'])
                     if not n_dict['value']:
                         n_dict['value'] = []
                         # TODO - if other fields are required, add them into the dataset_scaffold template, and extract them from the datafile object
@@ -202,17 +228,13 @@ class DataverseSubmit(object):
 
         return out
 
-    def _upload_files(self, dataverse, dataset, dataFile_ids, sub_id):
+    def _upload_files(self, dataverse, dataset, sub):
 
-        # TODO - get first dataset in dataverse...this should change in a future release
-        if isinstance(dataset, list):
-            dataset = dataset[0]
-
-        url_dataset_id = '{0}datasets/:persistentId/add?persistentId={1}&key={2}'.format(self.host,
-                                                                                         dataset['doi'],
-                                                                                         self.token)
+        url_dataset_id = '{0}/api/datasets/:persistentId/add?persistentId={1}&key={2}'.format(self.host['url'],
+                                                                                         dataset.doi,
+                                                                                         self.host['apikey'])
         accessions = list()
-        for id in dataFile_ids:
+        for id in sub['bundle']:
             file = DataFile().get_record(ObjectId(id))
             file_location = file['file_location']
 
@@ -224,8 +246,9 @@ class DataverseSubmit(object):
             files = {'file': (name, file_content)}
 
             payload = dict()
-            params = dict(description='Blue skies!',
-                          categories=['Lily', 'Rosemary', 'Jack of Hearts'])
+            params = dict()
+            #params = dict(description='Blue skies!',
+            #              categories=['Lily', 'Rosemary', 'Jack of Hearts'])
             params_as_json_string = json.dumps(params)
             payload = dict(jsonData=params_as_json_string)
             r = requests.post(url_dataset_id, data=payload, files=files)
@@ -243,18 +266,37 @@ class DataverseSubmit(object):
             accessions.append(acc)
 
         # save accessions to mongo profile record
-        s = Submission().get_record(sub_id)
+        s = Submission().get_record(sub['_id'])
         s['accessions'] = accessions
         s['complete'] = True
         s['target_id'] = str(s.pop('_id'))
         Submission().save_record(dict(), **s)
-        Submission().mark_submission_complete(sub_id)
+        Submission().mark_submission_complete(sub['_id'])
         return True
 
+    def _update_submission_record(self, sub, dataset, dataverse, dv_storageIdentifier=None):
+        # add mongo_file id
+        acc = dict()
+        acc['storageIdentifier'] = dv_storageIdentifier
+        acc['mongo_file_id'] = dataset.id
+        acc['dataset_doi'] = dataset.doi
+        acc['dataset_edit_media_uri'] = dataset.edit_media_uri
+        acc['dataset_edit_uri'] = dataset.edit_uri
+        acc['dataset_is_deleted'] = dataset.is_deleted
+        acc['dataset_title'] = dataset.title
+        acc['dataverse_title'] = dataset.dataverse.title
+        acc['dataverse_alias'] = dataset.dataverse.alias
+        # save accessions to mongo profile record
+        sub['accessions'] = acc
+        sub['complete'] = True
+        sub['target_id'] = str(sub.pop('_id'))
+        Submission().save_record(dict(), **sub)
+        Submission().mark_submission_complete(sub['target_id'])
+        return True
 
-def listize(list):
-    # split list by comma
-    if list == '':
-        return None
-    else:
-        return list.split(',')
+    def _listize(list):
+        # split list by comma
+        if list == '':
+            return None
+        else:
+            return list.split(',')

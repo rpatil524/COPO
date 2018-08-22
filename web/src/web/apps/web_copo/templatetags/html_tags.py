@@ -467,12 +467,12 @@ def generate_submission_accessions_data(submission_record):
 
         elif repository == "dataverse":
             # -----------COLLATE ACCESSIONS FOR DATAVERSE REPO----------
-            columns = [{"title": "DOI"}, {"title": "Dataverse"}, {"title": "File"}, {"title": "Dataverse Title"}]
+            columns = [{"title": "DOI"}, {"title": "Dataverse"}, {"title": "Dataverse Alias"}, {"title": "Dataverse Title"}]
 
-            for idx, value in enumerate(accessions):
-                data_set.append(
-                    [value["dataset_doi"], value["dataverse_title"], value["filename"], value["dataverse_title"]]
-                )
+
+            data_set.append(
+                [accessions["dataset_doi"], accessions["dataset_title"], accessions["dataverse_alias"], accessions["dataverse_title"]]
+            )
 
     return_dict = dict(dataSet=data_set,
                        columns=columns,
