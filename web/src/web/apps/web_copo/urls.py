@@ -2,6 +2,7 @@ from django.urls import path, re_path
 from . import views
 from web.apps.web_copo.utils import ajax_handlers
 
+
 app_name = 'web_copo'
 urlpatterns = [path('', views.index, name='index'),
                path('dataverse_submit/', views.test_dataverse_submit, name='test_dataverse_submit'),
@@ -75,5 +76,7 @@ urlpatterns = [path('', views.index, name='index'),
                path('get_info_for_new_dataverse/', ajax_handlers.get_info_for_new_dataverse,
                     name="get_info_for_new_dataverse"),
                path('update_submission_repo_data/', ajax_handlers.update_submission_repo_data,
-                    name="update_submission_repo_data")
+                    name="update_submission_repo_data"),
+               path('dataverse_publish/', ajax_handlers.publish_dataverse,
+                    name="publish_dataverse")
                ]

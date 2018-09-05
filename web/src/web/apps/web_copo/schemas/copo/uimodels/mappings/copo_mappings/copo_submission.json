@@ -347,6 +347,24 @@
             "type": "string",
             "show_in_table": true,
             "control": "text"
+        },
+        {
+            "help_tip": "",
+            "required": "false",
+            "default_value": "false",
+            "control_meta": {},
+            "versions": [
+                "published"
+            ],
+            "ref": "",
+            "deprecated": false,
+            "hidden": "true",
+            "label": "published",
+            "show_in_form": false,
+            "id": "copo.submission.published",
+            "type": "string",
+            "show_in_table": true,
+            "control": "text"
         }
     ],
     "description": "Attributes for COPO Submission schema.",

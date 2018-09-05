@@ -291,6 +291,8 @@ function save_inspection_info(e) {
             'meta': jsondata,
         },
         success: function (data) {
+            var label = $(document).data('current-label')
+            $(label).html("New Dataverse: " + $('#dvName').val())
             $('#repo_modal').modal('toggle')
         },
         error: function () {

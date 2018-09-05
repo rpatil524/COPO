@@ -26,6 +26,7 @@ from django.db.models import Q
 from django.contrib.auth.models import Group
 from django.core import serializers
 from dal.orcid_da import Orcid
+from submission.dataverseSubmission import DataverseSubmit as ds
 
 DV_STRING = 'HARVARD_TEST_API'
 
@@ -537,3 +538,7 @@ def update_submission_repo_data(request):
         submission_id = request.POST['submission_id']
         s = Submission().update_meta(submission_id=submission_id, meta=meta)
         return HttpResponse(s)
+
+def publish_dataverse(request):
+    resp = ds().publish_dataverse(request.POST['sub_id'])
+    return HttpResponse(resp)

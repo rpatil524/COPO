@@ -240,6 +240,7 @@ def generate_table_records(profile_id=str(), component=str()):
 
     # get records
     for pr in records:
+
         option = [(x["id"].split(".")[-1], resolve_control_output(pr, x)) for x in schema]
         option = dict(option)
 
@@ -268,9 +269,6 @@ def generate_table_records(profile_id=str(), component=str()):
                        )
 
     return return_dict
-
-
-
 
 
 @register.filter("generate_copo_table_data")
@@ -467,11 +465,12 @@ def generate_submission_accessions_data(submission_record):
 
         elif repository == "dataverse":
             # -----------COLLATE ACCESSIONS FOR DATAVERSE REPO----------
-            columns = [{"title": "DOI"}, {"title": "Dataverse"}, {"title": "Dataverse Alias"}, {"title": "Dataverse Title"}]
-
+            columns = [{"title": "DOI"}, {"title": "Dataverse"}, {"title": "Dataverse Alias"},
+                       {"title": "Dataset Title"}]
 
             data_set.append(
-                [accessions["dataset_doi"], accessions["dataset_title"], accessions["dataverse_alias"], accessions["dataverse_title"]]
+                [accessions["dataset_doi"], accessions["dataverse_title"], accessions["dataverse_alias"],
+                 accessions["dataset_title"]]
             )
 
     return_dict = dict(dataSet=data_set,

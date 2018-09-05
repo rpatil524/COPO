@@ -482,7 +482,8 @@ class Submission(DAComponent):
         doc = self.get_collection_handle().find_one(
             {'_id': ObjectId(submission_id)}, {'destination_repo': 1}
         )
-        default_dataverse = {'url': settings.DATAVERSE["HARVARD_TEST_API"], 'apikey': settings.DATAVERSE["HARVARD_TEST_TOKEN"]}
+        default_dataverse = {'url': settings.DATAVERSE["HARVARD_TEST_API"],
+                             'apikey': settings.DATAVERSE["HARVARD_TEST_TOKEN"]}
         if 'destination_repo' in doc:
             if doc['destination_repo'] == 'default':
                 return default_dataverse
@@ -490,6 +491,11 @@ class Submission(DAComponent):
                 return doc['destination_repo']
         else:
             return default_dataverse
+
+    def mark_as_published(self, submission_id):
+        return self.get_collection_handle().update(
+            {'_id': ObjectId(submission_id)}, {'$set': {'published': True}}
+        )
 
 
 class DataFile(DAComponent):
