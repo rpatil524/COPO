@@ -290,8 +290,7 @@ def get_users_in_group(request):
 def get_users(request):
     q = request.GET['q']
     x = list(User.objects.filter(
-        Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).exclude(
-        is_superuser=True).values_list('id', 'first_name', 'last_name', 'email', 'username'))
+        Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).values_list('id', 'first_name', 'last_name', 'email', 'username'))
     if not x:
         return HttpResponse()
     return HttpResponse(json.dumps(x))
@@ -331,8 +330,15 @@ def create_new_repo(request):
     apikey = request.POST['apikey']
     username = request.POST['username']
     password = request.POST['password']
+    isCG = request.POST['isCG']
     uid = request.user.id
-    args = {'name': name, 'type': type, 'url': url, 'apikey': apikey, 'username': username, 'password': password,
+
+    if isCG == 'true':
+        isCG = True
+    else:
+        isCG = False
+
+    args = {'isCG':isCG, 'name': name, 'type': type, 'url': url, 'apikey': apikey, 'username': username, 'password': password,
             'uid': uid}
     Repository().save_record(dict(), **args)
     out = {'name': name, 'type': type, 'url': url}
@@ -532,12 +538,13 @@ def update_submission_repo_data(request):
         custom_repo_id = request.POST['custom_repo_id']
         submission_id = request.POST['submission_id']
         s = Submission().update_destination_repo(repo_id=custom_repo_id, submission_id=submission_id)
-        return HttpResponse(s)
+        s['record_id'] = str(submission_id)
+        return HttpResponse(json_util.dumps(s))
     elif task == 'change_meta':
         meta = request.POST['meta']
         submission_id = request.POST['submission_id']
         s = Submission().update_meta(submission_id=submission_id, meta=meta)
-        return HttpResponse(s)
+        return HttpResponse(json.dumps(s))
 
 def publish_dataverse(request):
     resp = ds().publish_dataverse(request.POST['sub_id'])

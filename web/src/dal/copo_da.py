@@ -468,10 +468,11 @@ class Submission(DAComponent):
                 {'_id': ObjectId(submission_id)}, {'$set': {'destination_repo': 'default'}}
             )
         r = Repository().get_record(ObjectId(repo_id))
-        dest = {"url": r['url'], 'apikey': r['apikey']}
-        return self.get_collection_handle().update(
+        dest = {"url": r['url'], 'apikey': r['apikey'], "isCG": r['isCG'], "name":r['name'], "type": r['type'], "username": r['username'], "password": r['password']}
+        self.get_collection_handle().update(
             {'_id': ObjectId(submission_id)}, {'$set': {'destination_repo': dest}}
         )
+        return r
 
     def update_meta(self, submission_id, meta):
         return self.get_collection_handle().update(

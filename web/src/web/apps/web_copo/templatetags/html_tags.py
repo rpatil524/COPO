@@ -255,7 +255,11 @@ def generate_table_records(profile_id=str(), component=str()):
             all_repos = Repository().get_by_ids(repo_ids)
             correct_repos = list()
             for repo in all_repos:
-                if repo["type"] == sub_type:
+                if sub_type == 'dataverse':
+                    if repo['type'] == 'dataverse' or repo['type'] == 'dspace' or repo['type'] == 'ckan':
+                        # TODO - this needs sorting properly
+                        correct_repos.append(repo)
+                elif repo["type"] == sub_type:
                     correct_repos.append(repo)
             if len(correct_repos) > 0:
 

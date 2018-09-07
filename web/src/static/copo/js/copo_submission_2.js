@@ -26,7 +26,7 @@ $(document).ready(function () {
         do_record_task(event);
     });
 
-    $(document).on('click', '#publish_dataset', function(event){
+    $(document).on('click', '#publish_dataset', function (event) {
         e = $(event.currentTarget)
         sub_id = $(e).data('submission_id')
         $.ajax({
@@ -72,6 +72,7 @@ $(document).ready(function () {
         $.ajax({
             url: "/copo/update_submission_repo_data/",
             type: "POST",
+            dataType: "json",
             headers: {
                 'X-CSRFToken': csrftoken
             },
@@ -81,7 +82,8 @@ $(document).ready(function () {
                 'submission_id': submission_id,
             },
             success: function (data) {
-                console.log(data)
+                $('#view_repo_structure_' + data.record_id).removeClass('disabled').addClass('enabled')
+                $('#submission_control_' + data.record_id).children('.disabled').removeClass('disabled').addClass('enabled')
             },
             error: function () {
             }
@@ -148,7 +150,13 @@ $(document).ready(function () {
 
             var destination_repo = undefined
             if (data.hasOwnProperty('destination_repo')) {
-                destination_repo = data.destination_repo
+                if (data.destination_repo) {
+                    if (typeof(data.destination_repo == 'object')) {
+                        if (Object.keys(data.destination_repo).length > 0) {
+                            destination_repo = data.destination_repo
+                        }
+                    }
+                }
             }
 
             var accessions = undefined
@@ -271,6 +279,11 @@ $(document).ready(function () {
                                 .append('<div class="firstcol-completed1" style="display: none;">Completed:</div>')
                                 .append('<div class="firstcol-completed2" style="margin-bottom: 10px; display: none;"></div>')
 
+                            var repo_selected = false
+                            if (data.destination_repo != undefined) {
+                                repo_selected = true
+                            }
+
                             if (data.complete == 'true') {
                                 // add publish button to table if complete
                                 colsFirstHTML.append('<button style="margin-left: 5px"  data-submission_id="' + data.record_id + '" class="btn btn-default" type="button" id="publish_dataset">Publish</button>')
@@ -300,11 +313,15 @@ $(document).ready(function () {
                                     }
                                     colsFirstHTML.append(ul)
                                 }
-                                colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default" type="button" id="view_repo_structure">Inspect Repository</button>')
 
+                                if (repo_selected == true) {
+                                    colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
+                                }
+                                else {
+                                    colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default disabled" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
+
+                                }
                                 if (data.accessions == undefined) {
-
-
                                 } else if (!jQuery.isEmptyObject(data.meta) && $(data.meta)[0].hasOwnProperty('identifier')) {
                                     colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' - ' + data.meta.doi + '</span></div>')
                                 }
@@ -316,9 +333,12 @@ $(document).ready(function () {
                             var colsSecondHTML = $('<div class="col-sm-4 col-md-4 col-lg-4" style="padding-right: 2px; margin-left: 50px;"></div>')
                                 .append($(".submission-progess-wrapper").clone().attr("id", "submission_progress_" + data.record_id));
 
-                            var colsThirdHTML = $('<div class="col-sm-2 col-md-2 col-lg-2" style="padding-left: 2px; margin-left: -50px;"></div>')
-                                .append('<div class="pull-right" id="submission_control_' + data.record_id + '"></div>');
 
+                            var colsThirdHTML = $('<div class="col-sm-2 col-md-2 col-lg-2" style="padding-left: 2px; margin-left: -50px;"></div>')
+                                .append('<div data-repo-selected="' + repo_selected + '" class="pull-right" id="submission_control_' + data.record_id + '"></div>');
+
+
+                            $(colsThirdHTML).attr('data-repo-selected', repo_selected)
 
                             bodyRow.append(colsFirstHTML);
                             bodyRow.append(colsSecondHTML);
@@ -610,7 +630,7 @@ $(document).ready(function () {
                         progressObject
                             .html('')
                             .append('<div><span class=" submission-info-label">Pending submission. Please click \'Submit\' to begin.</span></div>');
-                        actionButton = get_submit_action(submissionRecord.submission_id, "submit");
+                        actionButton = get_submit_action(submissionRecord.submission_id, $("#submission_control_" + submissionRecord.submission_id), "submit");
                     }
 
 
@@ -739,9 +759,13 @@ $(document).ready(function () {
         });
     }
 
-    function get_submit_action(submission_id, typeMessage) {
+    function get_submit_action(submission_id, element, typeMessage) {
         var buttonLabel = 'Submit';
-        var buttonClass = "tiny ui basic primary button";
+        var is_enabled = 'disabled'
+        if ($(element).data('repo-selected')) {
+            is_enabled = 'enabled'
+        }
+        var buttonClass = "tiny ui basic primary button " + is_enabled;
         if (typeMessage == 'retry') {
             buttonLabel = 'Retry';
             buttonClass = "tiny ui basic red button";
@@ -807,7 +831,7 @@ $(document).ready(function () {
                 }
             })
             .append('<i class="copo-components-icons fa fa-cloud-upload"></i>')
-            .append('<span style="padding-left: 3px;">' + buttonLabel + '</span>');
+            .append('<span style="padding-left: 3px;" >' + buttonLabel + '</span>');
 
         return actionButton
     }

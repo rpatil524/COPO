@@ -171,6 +171,24 @@
             ],
             "help_tip": "",
             "label": ""
+        },
+        {
+            "help_tip": "",
+            "required": "true",
+            "default_value": false,
+            "control_meta": {},
+            "versions": [
+                "isCG"
+            ],
+            "ref": "",
+            "deprecated": false,
+            "hidden": "true",
+            "label": "UserId",
+            "show_in_form": false,
+            "id": "copo.repository.isCG",
+            "type": "string",
+            "show_in_table": false,
+            "control": "text"
         }
     ],
     "description": "Attributes for COPO Repository Schema.",
