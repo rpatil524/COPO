@@ -468,7 +468,7 @@ class Submission(DAComponent):
                 {'_id': ObjectId(submission_id)}, {'$set': {'destination_repo': 'default'}}
             )
         r = Repository().get_record(ObjectId(repo_id))
-        dest = {"url": r['url'], 'apikey': r['apikey'], "isCG": r['isCG'], "name":r['name'], "type": r['type'], "username": r['username'], "password": r['password']}
+        dest = {"url": r['url'], 'apikey': r['apikey'], "isCG": r['isCG'], "repo_id": repo_id, "name":r['name'], "type": r['type'], "username": r['username'], "password": r['password']}
         self.get_collection_handle().update(
             {'_id': ObjectId(submission_id)}, {'$set': {'destination_repo': dest}}
         )

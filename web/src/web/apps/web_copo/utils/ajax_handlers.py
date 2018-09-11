@@ -30,6 +30,7 @@ from submission.dataverseSubmission import DataverseSubmit as ds
 
 DV_STRING = 'HARVARD_TEST_API'
 
+
 def get_source_count(self):
     profile_id = data_utils.get_current_request().session['profile_id']
     num_sources = ProfileInfo(profile_id).source_count()
@@ -290,7 +291,11 @@ def get_users_in_group(request):
 def get_users(request):
     q = request.GET['q']
     x = list(User.objects.filter(
-        Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).values_list('id', 'first_name', 'last_name', 'email', 'username'))
+        Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).values_list('id',
+                                                                                                             'first_name',
+                                                                                                             'last_name',
+                                                                                                             'email',
+                                                                                                             'username'))
     if not x:
         return HttpResponse()
     return HttpResponse(json.dumps(x))
@@ -338,7 +343,8 @@ def create_new_repo(request):
     else:
         isCG = False
 
-    args = {'isCG':isCG, 'name': name, 'type': type, 'url': url, 'apikey': apikey, 'username': username, 'password': password,
+    args = {'isCG': isCG, 'name': name, 'type': type, 'url': url, 'apikey': apikey, 'username': username,
+            'password': password,
             'uid': uid}
     Repository().save_record(dict(), **args)
     out = {'name': name, 'type': type, 'url': url}
@@ -452,9 +458,11 @@ def remove_repo_from_group(request):
 
 
 def get_repo_info(request):
-    repo_id = request.GET['repo_id']
+    sub_id = request.GET['sub_id']
+    s = Submission().get_record(ObjectId(sub_id))
+
     try:
-        repo = Repository().get_record(ObjectId(repo_id))
+        repo = s['destination_repo']
         out = {'repo_type': repo['type'], 'repo_url': repo['url']}
     except:
         out = {}
@@ -467,8 +475,11 @@ def search_dataverse(request):
     url = Submission().get_dataverse_details(request.GET['submission_id'])
     dv_url = url['url'] + '/api/search'
     payload = {'q': q, 'per_page': 100, 'show_entity_ids': True, 'type': box}
-    resp = requests.get(url=dv_url, params=payload).content.decode('utf-8')
-    print(resp)
+    resp = requests.get(url=dv_url, params=payload)
+    if not resp.status_code == '200' or not resp.status_code == '201':
+        return HttpResponse(None)
+    resp = resp.content.decode('utf-8')
+
     return HttpResponse(resp)
 
 
@@ -486,7 +497,8 @@ def get_dataverse_content(request):
         fields['id'] = ds_id['id']
         if "persistentUrl" in ds_id:
             fields['persistentUrl'] = ds_id['persistentUrl']
-        for f in json.loads(resp.content.decode('utf-8'))['data']['latestVersion']['metadataBlocks']['citation']['fields']:
+        for f in json.loads(resp.content.decode('utf-8'))['data']['latestVersion']['metadataBlocks']['citation'][
+            'fields']:
             if f['typeName'] == 'title':
                 fields['title'] = f['value']
             elif f['typeName'] == 'author':
@@ -513,7 +525,7 @@ def get_info_for_new_dataverse(request):
     out['dvPerson'] = person_list
     orcid = Orcid().get_orcid_profile(request.user)
     try:
-        affiliation = orcid.get('op', {}).get('activities_summary', {}).get('employments', {})\
+        affiliation = orcid.get('op', {}).get('activities_summary', {}).get('employments', {}) \
             .get('employment_summary', {})[0].get('organization', "").get('name', "")
     except IndexError:
         affiliation = ""
@@ -522,16 +534,16 @@ def get_info_for_new_dataverse(request):
     file = df[0]
 
     out['dvName'] = profile.get('title', "")
-    out['dsTitle'] = file.get('description', {}).get('attributes', {})\
+    out['dsTitle'] = file.get('description', {}).get('attributes', {}) \
         .get('title_author_contributor', {}).get('dcterms:title', "")
-    out['dsDescriptionValue'] = file.get('description', {}).get('attributes', {})\
+    out['dsDescriptionValue'] = file.get('description', {}).get('attributes', {}) \
         .get('subject_description', {}).get('dcterms:description', "")
-    out['dsSubject'] = file.get('description', {}).get('attributes', {})\
+    out['dsSubject'] = file.get('description', {}).get('attributes', {}) \
         .get('subject_description', {}).get('dcterms:subject', "")
     return HttpResponse(json_util.dumps(out))
 
-def update_submission_repo_data(request):
 
+def update_submission_repo_data(request):
     task = request.POST['task']
 
     if task == 'change_destination':
@@ -545,6 +557,7 @@ def update_submission_repo_data(request):
         submission_id = request.POST['submission_id']
         s = Submission().update_meta(submission_id=submission_id, meta=meta)
         return HttpResponse(json.dumps(s))
+
 
 def publish_dataverse(request):
     resp = ds().publish_dataverse(request.POST['sub_id'])

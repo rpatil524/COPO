@@ -13,46 +13,77 @@ $.fn.delayKeyup = function (callback, ms) {
 };
 
 $(document).ready(function () {
-
+    $('.ajax-loading-div').hide()
     $(document).data('url', 'default')
-    $(document).on('click', '#view_repo_structure', check_repo_id)
-    $(document).on('click', '#view_repo_structure', mark_as_active_panel)
+    $(document).on('click', '[id^=view_repo_structure]', check_repo_id)
+    $(document).on('click', '[id^=view_repo_structure]', mark_as_active_panel)
     $(document).on('click', '.create_add_dataverse', handle_radio)
     $(document).on('click', '.dataset-checkbox', select_dataset)
     $(document).on('click', '#save_inspection_button', save_inspection_info)
 
+    //check_repo_id()
     do_new_dataverse_fields()
+    // here we should call funcs for filling out other repo details
 
-
-    // delayed keyup function to delay searching for n miliseconds before firing search off to dataverse
-    $('#search_dataverse').delayKeyup(function (e) {
-        var typed = e.val()
-        var search_type = e.attr('id')
-        var box;
-
-        $('#ajax-loading-div').fadeIn()
-        var box = $('input[name="dataverse-radio"]:checked').val()
-        $.getJSON("/copo/get_dataverse/", {
-            'q': typed,
-            'box': box,
-            'submission_id': $(document).data('submission_id')
-        }, build_dataverse_modal)
-    }, 1000)
+    $(document).on("shown.bs.modal", '#repo_modal', function (e) {
+        console.log(e.currentTarget)
+        add_delay_keyup(e.currentTarget)
+    })
 
 
 })
 
 
+// delayed keyup function to delay searching for n miliseconds before firing search off to dataverse
+function add_delay_keyup(modal) {
+
+    $(modal).find('#search_dataverse, #search_dspace').delayKeyup(function (e) {
+        $(document).data('open_modal', modal)
+        var typed = e.val()
+        var search_type = e.attr('id')
+        var box = "";
+
+        $('.ajax-loading-div').fadeIn()
+        var box = $('input[name="dataverse-radio"]:checked').val()
+        $.ajax({
+            url: "/copo/get_dataverse/",
+            data: {
+                'q': typed,
+                'box': box,
+                'submission_id': $(document).data('submission_id')
+            }
+        }).done(build_dataverse_modal)
+            .error(function () {
+
+                trow = "Error Retieving Data. Are you connected to a network?"
+                $(modal).find('.modal-body').append(trow)
+            })
+    }, 1000)
+
+}
+
 // function to get url for selected repo
 function check_repo_id(e) {
     // check for repo_id
-    var repo_id = $('#custom_repo_id').val()
+    var sub_id = $(e.currentTarget).data('submission_id')
     // get repo info
     $(document).data('current-label', $(e.currentTarget).siblings('.dataset-label').find('.badge'))
-    $.getJSON("/copo/get_repo_info/", {'repo_id': repo_id}, function (data) {
+    $.getJSON("/copo/get_repo_info/", {'sub_id': sub_id}, function (data) {
         if (data.repo_type == 'dataverse') {
-            var url = data.repo_url
-            $(document).data('url', url)
+            // load dataverse repo html into modal
+            $('#repo_modal-body').html()
+            var form_html = $('#template_repo_metadata_form').clone()
+            $(form_html).attr('id', 'repo_metadata_form')
+            $('#repo_modal-body').html(form_html)
+            add_delay_keyup('#search_dataverse')
+        }
+        else if (data.repo_type == 'dspace') {
+            // load dspace repo html into modal
+            $('#repo_modal-body').html()
+            var form_html = $('#template_dspace_form').find('form').clone()
+            $(form_html).attr('id', 'dspace_form')
+            $('#repo_modal-body').html(form_html)
+            add_delay_keyup('#search_dspace')
         }
     })
 }
@@ -64,8 +95,9 @@ function mark_as_active_panel(e) {
 }
 
 // enable / disable inputs depending on which radio has been selected
-function handle_radio() {
-    var checked = $('input[name=create_dataverse_radio]:checked').val();
+function handle_radio(el) {
+    var checked = $(el.currentTarget).find('input[name=create_repo_radio]:checked').val();
+    console.log(checked)
     if (checked == 'new') {
         $('.new-controls').show()
         $('.existing-controls').hide()
@@ -78,22 +110,35 @@ function handle_radio() {
 
 // build table showing either dataverses or datasets based on returns from search
 function build_dataverse_modal(resp) {
+    var modal = $(document).data('open_modal')
+    if (resp == "None") {
+        trow = "Repo returned an error. Please try again."
+        $(modal).find('.modal-body').append(trow)
+        return false
+    }
 
-    $('#ajax-loading-div').fadeOut()
-    var t = $('#dataverse-table-template').clone()
+
+    $('.ajax-loading-div').fadeOut()
+    var t = $('#dataverse-table-template').find('table').clone()
     $(t).attr('id', 'dataverse-table')
     var checked = $('input[name=dataverse-radio]:checked').val();
+    var trow
     if (checked == 'dataverse') {
-        $(resp.data.items).each(function (idx, el) {
-            var trow = "<tr data-alias='" + el.identifier + "' data-type='" + el.type + "' data-entity_id='" + el.entity_id + "'>" +
-                "<td class='summary-details-control' style='min-width: 50px; text-align:center'></td>" +
-                "<td>" + el.name + "</td>" +
-                "<td>" + el.description + "</td>" +
-                "<td>" + el.published_at + "</td>" +
-                "<td>" + el.type + "</td>"
-            "</tr>"
-            t.find('tbody').append(trow)
-        })
+        if (resp.data.items.length > 0) {
+            $(resp.data.items).each(function (idx, el) {
+                trow = "<tr data-alias='" + el.identifier + "' data-type='" + el.type + "' data-entity_id='" + el.entity_id + "'>" +
+                    "<td class='summary-details-control' style='min-width: 50px; text-align:center'></td>" +
+                    "<td>" + el.name + "</td>" +
+                    "<td>" + el.description + "</td>" +
+                    "<td>" + el.published_at + "</td>" +
+                    "<td>" + el.type + "</td>"
+                "</tr>"
+            })
+        }
+        else {
+            trow = "<tr><td colspan='5'>No Data to Show</td></tr>"
+        }
+        $(t).find('tbody').append(trow)
     }
     else if (checked == 'dataset') {
         var trow
@@ -112,15 +157,13 @@ function build_dataverse_modal(resp) {
                 "<td>" + el.description + "</td>" +
                 "<td>" + el.published_at + "</td>" +
                 "<td>" + el.type + "</td></tr>"
-            t.find('tbody').append(colCheck).append(trow)
-
-
+            $(t).find('tbody').append(colCheck).append(trow)
         })
-
     }
 
-    $('#table-div-dataverse').empty()
-    $('#table-div-dataverse').append(t)
+    var dt = $(modal).find('#table-div-dataverse')
+    $(dt).empty().append(t)
+
     ///$('#dataverse-table .summary-details-control').on('click', expand_table)
     $('#dataverse-table').DataTable();
 

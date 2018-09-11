@@ -52,22 +52,6 @@ $(document).ready(function () {
         $('#custom_repo_id').val($(e).data('repoId'))
         $('#target_repo_label').html(e.innerHTML)
         var submission_id = $(e).data('submission_id')
-        /*
-        var data = {
-            'task': 'change_destination',
-            'repo_id': $(e).data('repoId'),
-            'submission_id': submission_id
-        }*/
-        // $.get(
-        //     '/copo/copo_visualize', {
-        //         'task': 'change_destination',
-        //         'repo_id': $(e).data('repoId'),
-        //         'submission_id': submission_id
-        //     }, function (data) {
-        //         alert(data)
-        //
-        //
-        //     })
 
         $.ajax({
             url: "/copo/update_submission_repo_data/",
