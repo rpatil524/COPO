@@ -68,6 +68,7 @@ $(document).ready(function () {
             success: function (data) {
                 $('#view_repo_structure_' + data.record_id).removeClass('disabled').addClass('enabled')
                 $('#submission_control_' + data.record_id).children('.disabled').removeClass('disabled').addClass('enabled')
+                $('#submission_firstcol_' + submission_id).find('.badge').html('')
             },
             error: function () {
             }

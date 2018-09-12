@@ -39,28 +39,41 @@ function add_delay_keyup(modal) {
 
     $(modal).find('#search_dataverse, #search_dspace').delayKeyup(function (e) {
         $(document).data('open_modal', modal)
-        var typed = e.val()
+        var q = e.val()
         var search_type = e.attr('id')
         var box = "";
-
+        var repo_type = $('#repo_modal-body').data('repo')
         $('.ajax-loading-div').fadeIn()
-        var box = $('input[name="dataverse-radio"]:checked').val()
-        $.ajax({
-            url: "/copo/get_dataverse/",
-            data: {
-                'q': typed,
-                'box': box,
-                'submission_id': $(document).data('submission_id')
-            }
-        }).done(build_dataverse_modal)
-            .error(function () {
 
-                trow = "Error Retieving Data. Are you connected to a network?"
-                $(modal).find('.modal-body').append(trow)
-            })
+        var url
+        var handler
+        if(repo_type == "dataverse") {
+            url = "/copo/get_dataverse/"
+            handler = build_dataverse_modal
+        }
+        else if(repo_type == "dspace"){
+            url = "/copo/get_dspace/"
+            handler = build_dspace_modal
+        }
+        $.ajax({
+        url: url,
+        data: {
+            'q': q,
+            'box': $('input[name="dataverse-radio"]:checked').val(),
+            'submission_id': $(document).data('submission_id')
+        },
+        dataType: 'json'
+    }).done(handler)
+        .error(function () {
+
+            trow = "Error Retieving Data. Are you connected to a network?"
+            $(modal).find('.modal-body').append(trow)
+        })
+
     }, 1000)
 
 }
+
 
 // function to get url for selected repo
 function check_repo_id(e) {
@@ -75,6 +88,7 @@ function check_repo_id(e) {
             var form_html = $('#template_repo_metadata_form').clone()
             $(form_html).attr('id', 'repo_metadata_form')
             $('#repo_modal-body').html(form_html)
+            $('#repo_modal-body').data('repo', data.repo_type)
             add_delay_keyup('#search_dataverse')
         }
         else if (data.repo_type == 'dspace') {
@@ -83,6 +97,7 @@ function check_repo_id(e) {
             var form_html = $('#template_dspace_form').find('form').clone()
             $(form_html).attr('id', 'dspace_form')
             $('#repo_modal-body').html(form_html)
+            $('#repo_modal-body').data('repo', data.repo_type)
             add_delay_keyup('#search_dspace')
         }
     })
@@ -110,6 +125,10 @@ function handle_radio(el) {
 
 // build table showing either dataverses or datasets based on returns from search
 function build_dataverse_modal(resp) {
+
+    $('.ajax-loading-div').fadeOut()
+
+
     var modal = $(document).data('open_modal')
     if (resp == "None") {
         trow = "Repo returned an error. Please try again."
@@ -117,8 +136,6 @@ function build_dataverse_modal(resp) {
         return false
     }
 
-
-    $('.ajax-loading-div').fadeOut()
     var t = $('#dataverse-table-template').find('table').clone()
     $(t).attr('id', 'dataverse-table')
     var checked = $('input[name=dataverse-radio]:checked').val();
@@ -126,9 +143,11 @@ function build_dataverse_modal(resp) {
     if (checked == 'dataverse') {
         if (resp.data.items.length > 0) {
             $(resp.data.items).each(function (idx, el) {
+                console.log(el)
                 trow = "<tr data-alias='" + el.identifier + "' data-type='" + el.type + "' data-entity_id='" + el.entity_id + "'>" +
                     "<td class='summary-details-control' style='min-width: 50px; text-align:center'></td>" +
                     "<td>" + el.name + "</td>" +
+                    "<td>" + el.identifier + "</td>" +
                     "<td>" + el.description + "</td>" +
                     "<td>" + el.published_at + "</td>" +
                     "<td>" + el.type + "</td>"
@@ -173,6 +192,11 @@ function build_dataverse_modal(resp) {
 
 }
 
+
+function build_dspace_modal(resp){
+    alert(resp)
+}
+
 /*
 function build_dataverse_header_click(e) {
     var doid = $(e.currentTarget).data('doid')
@@ -189,24 +213,9 @@ function expand_table(event) {
     var table = $('#dataverse-table').DataTable()
     var tr = $(this).closest('tr');
     var type = $(tr).data('type')
-    var entity_id = $(tr).data('entity_id')
+    var entity_id = $(tr).data('alias')
     var row = table.row(tr);
     row.deselect(); // remove selection on row
-
-    //close other rows
-    // $('#' + tableID + ' tbody').find('tr').each(function () {
-    //
-    //     var row_all = table.row($(this));
-    //
-    //     if (row_all.child.isShown()) {
-    //         // This row is already open - close it
-    //         if (row_all.data().record_id != row.data().record_id) {
-    //             row_all.child('');
-    //             row_all.child.hide();
-    //             $(this).removeClass('shown');
-    //         }
-    //     }
-    // });
 
     if (row.child.isShown()) {
         // This row is already open - close it
@@ -232,6 +241,10 @@ function expand_table(event) {
                     row.child($('<div></div>').append("<h5>" + data.message + "</h5>")).show();
                     return
                 }
+                if (data.hasOwnProperty("no_datasets")) {
+                    row.child($('<div></div>').append("<h5>" + data.no_datasets + "</h5>")).show();
+                    return
+                }
                 if (data.length == 0) {
                     row.child($('<div></div>').append("<h5>No Datasets to Show</h5>")).show();
                     return
@@ -247,10 +260,10 @@ function expand_table(event) {
                 var tr_header = $("<tr/>")
 
                 var title = $("<th/>", {
-                    html: "Title"
+                    html: "Identifier"
                 })
                 var doi = $("<th/>", {
-                    html: "DOI"
+                    html: "Publisher"
                 })
 
                 var description = $("<th/>", {
@@ -264,18 +277,18 @@ function expand_table(event) {
                 })
 
                 var thead = document.createElement("thead")
-                $(thead).append($(tr_header).append("<td/>").append(title).append(doi).append(description).append(publication_date).append(czech))
+                $(thead).append($(tr_header).append("<td/>").append(title).append(publication_date).append(czech))
                 $(contentHtml).append(thead)
 
                 $(data).each(function (idx, el) {
                     var colTR = $('<tr/>')
                     $(colTR).attr('data-id', el.id)
-                    $(colTR).attr('data-identifier', el.title)
+                    $(colTR).attr('data-identifier', el.identifier)
                     $(colTR).attr('data-persistent', el.persistentUrl)
-                    var col1 = $('<td/>').append(el.title);
-                    var col11 = $('<td/>').append(el.persistentUrl);
-                    var col2 = $('<td/>').append(el.dsDescription[0].dsDescriptionValue.value);
-                    var col3 = $('<td/>').append(el.dateOfDeposit)
+                    var col1 = $('<td/>').append(el.identifier);
+                    var col11 = $('<td/>').append(el.publisher);
+                    //var col2 = $('<td/>').append(el.dsDescription[0].dsDescriptionValue.value);
+                    var col3 = $('<td/>').append(el.publicationDate)
                     var col4 = $('<td/>').append('dataset')
 
                     var colCheck = $('<td>/').append("<div class='pretty p-default' style='font-size: 26px'>" +
@@ -284,7 +297,7 @@ function expand_table(event) {
                         "<label></label>" +
                         "</div>" +
                         "</div>")
-                    colTR.append(colCheck).append(col1).append(col11).append(col2).append(col3).append(col4);
+                    colTR.append(colCheck).append(col1).append(col11).append(col3).append(col4);
                     contentHtml.append(colTR);
                 })
 

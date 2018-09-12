@@ -5,17 +5,12 @@ from dataverse import Connection, Dataverse, Dataset, DataverseFile
 from dataverse.exceptions import ConnectionError
 import uuid
 import requests
-from requests.compat import urlencode, urljoin
-import json
 from dal.copo_da import Submission, DataFile
 from web.apps.web_copo.schemas.utils import data_utils
 from dal.copo_da import Profile
 import datetime
 from bson import ObjectId, json_util
-from pprint import pprint
-import copy
 import xml.etree.ElementTree as et
-import urllib.parse as up
 from dataverse.exceptions import OperationFailedError
 
 
@@ -23,8 +18,10 @@ class DataverseSubmit(object):
     host = None
     headers = None
 
-    def __init__(self):
-        pass
+    def __init__(self, sub_id=None):
+        if sub_id:
+            self.host = Submission().get_dataverse_details(sub_id)
+            self.headers = {'X-Dataverse-key': self.host['apikey']}
 
     def submit(self, sub_id, dataFile_ids):
 
@@ -43,15 +40,6 @@ class DataverseSubmit(object):
         else:
             # create new
             self._create_and_add_to_dataverse(s)
-
-
-        #dataverse = self._get_dataverse(profile_id=profile_id)
-        #dataset = self._get_dataset(profile_id=profile_id, dataFile_ids=dataFile_ids, dataverse=dataverse)
-
-        #  get details of files
-        #file = self._upload_files(dataverse, dataset, dataFile_ids, sub_id)
-        #if not file:
-        #    return 'File already present'
         return True
 
     def truncate_url(self, url):
@@ -60,6 +48,10 @@ class DataverseSubmit(object):
         elif url.startswith('http://'):
             url = url[7:]
         return url
+
+
+    def clear_submission_metadata(self, sub_id):
+        Submission().clear_submission_metadata(sub_id)
 
     def _add_to_dataverse(self, sub):
         c = self._get_connection()
@@ -99,7 +91,6 @@ class DataverseSubmit(object):
         dv_storageIdentifier = meta['latest']['storageIdentifier']
         return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
 
-
     def _get_connection(self):
         dvurl = self.host['url']
         apikey = self.host['apikey']
@@ -108,13 +99,10 @@ class DataverseSubmit(object):
         return c
 
     def _get_dataverse(self, profile_id):
-
         # create new dataverse if none already exists
-
         u = data_utils.get_current_user()
         # create new dataverse if none exists already
         dv_details = Profile().check_for_dataverse_details(profile_id)
-
         if not dv_details:
             # dataverse = connection.create_dataverse(dv_alias, '{0} {1}'.format(u.first_name, u.last_name), u.email)
             dv_details = self._create_dataverse(profile_id)
@@ -210,17 +198,17 @@ class DataverseSubmit(object):
         dsId = submission['accessions']['dataset_id']
         conn = self._get_connection()
         dv = conn.get_dataverse(dvAlias)
-        #ds = dv.get_dataset_by_doi(dsDoi)
+        # ds = dv.get_dataset_by_doi(dsDoi)
         if not dv.is_published:
             dv.publish()
-        #POST http://$SERVER/api/datasets/$id/actions/:publish?type=$type&key=$apiKey
+        # POST http://$SERVER/api/datasets/$id/actions/:publish?type=$type&key=$apiKey
         url = submission['destination_repo']['url']
         url = url + '/api/datasets/' + str(dsId) + '/actions/:publish?type=major'
         print(url)
         resp = requests.post(
             url,
             data={'type': 'major', 'key': self.host['apikey']},
-            headers = self.headers
+            headers=self.headers
         )
         if resp.status_code != 200 or resp.status_code != 201:
             raise OperationFailedError('The Dataset could not be published. ' + resp.content)
@@ -228,5 +216,3 @@ class DataverseSubmit(object):
         doc = Submission().mark_as_published(sub_id)
 
         return doc
-
-

@@ -473,10 +473,10 @@ def search_dataverse(request):
     box = request.GET['box']
     q = request.GET['q']
     url = Submission().get_dataverse_details(request.GET['submission_id'])
-    dv_url = url['url'] + '/api/search'
+    dv_url = url['url'] + '/api/v1/search'
     payload = {'q': q, 'per_page': 100, 'show_entity_ids': True, 'type': box}
     resp = requests.get(url=dv_url, params=payload)
-    if not resp.status_code == '200' or not resp.status_code == '201':
+    if not resp.status_code == 200:
         return HttpResponse(None)
     resp = resp.content.decode('utf-8')
 
@@ -486,33 +486,12 @@ def search_dataverse(request):
 def get_dataverse_content(request):
     id = request.GET['id']
     url = Submission().get_dataverse_details(request.GET['submission_id'])
-    dv_url = url['url'] + '/api/dataverses/' + id + '/contents'
-    resp = requests.get(dv_url).content.decode('utf-8')
-    ids = json.loads(resp)
-    dvs = list()
-    for ds_id in ids['data']:
-        ds_url = url['url'] + '/api/datasets/' + str(ds_id['id'])
-        resp = requests.get(url=ds_url)
-        fields = dict()
-        fields['id'] = ds_id['id']
-        if "persistentUrl" in ds_id:
-            fields['persistentUrl'] = ds_id['persistentUrl']
-        for f in json.loads(resp.content.decode('utf-8'))['data']['latestVersion']['metadataBlocks']['citation'][
-            'fields']:
-            if f['typeName'] == 'title':
-                fields['title'] = f['value']
-            elif f['typeName'] == 'author':
-                fields['author'] = f['value']
-            elif f['typeName'] == 'dsDescription':
-                fields['dsDescription'] = f['value']
-            elif f['typeName'] == 'subject':
-                fields['subject'] = f['value']
-            elif f['typeName'] == 'depositor':
-                fields['depositor'] = f['value']
-            elif f['typeName'] == 'dateOfDeposit':
-                fields['dateOfDeposit'] = f['value']
-        dvs.append(fields)
-    return HttpResponse(json.dumps(dvs))
+    dv_url = url['url'] + '/api/v1/dataverses/' + id + '/contents'
+    resp_dv = requests.get(dv_url).content.decode('utf-8')
+    ids = json.loads(resp_dv)
+    if not ids['data']:
+        return HttpResponse(json.dumps({"no_datasets": "No datasets found in this dataverse."}))
+    return HttpResponse(json.dumps(ids['data']))
 
 
 def get_info_for_new_dataverse(request):
@@ -551,6 +530,7 @@ def update_submission_repo_data(request):
         submission_id = request.POST['submission_id']
         s = Submission().update_destination_repo(repo_id=custom_repo_id, submission_id=submission_id)
         s['record_id'] = str(submission_id)
+        clear_submission_metadata(request)
         return HttpResponse(json_util.dumps(s))
     elif task == 'change_meta':
         meta = request.POST['meta']
@@ -559,6 +539,14 @@ def update_submission_repo_data(request):
         return HttpResponse(json.dumps(s))
 
 
+def clear_submission_metadata(request):
+    Submission().clear_submission_metadata(request.POST['submission_id'])
+
+
 def publish_dataverse(request):
     resp = ds().publish_dataverse(request.POST['sub_id'])
     return HttpResponse(resp)
+
+
+def search_dspace(request):
+    return HttpResponse(json.dumps({'abc': 'ABD'}))
