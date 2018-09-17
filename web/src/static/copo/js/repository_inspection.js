@@ -47,28 +47,25 @@ function add_delay_keyup(modal) {
 
         var url
         var handler
-        if(repo_type == "dataverse") {
+        if (repo_type == "dataverse") {
             url = "/copo/get_dataverse/"
             handler = build_dataverse_modal
         }
-        else if(repo_type == "dspace"){
-            url = "/copo/get_dspace/"
-            handler = build_dspace_modal
-        }
-        $.ajax({
-        url: url,
-        data: {
-            'q': q,
-            'box': $('input[name="dataverse-radio"]:checked').val(),
-            'submission_id': $(document).data('submission_id')
-        },
-        dataType: 'json'
-    }).done(handler)
-        .error(function () {
 
-            trow = "Error Retieving Data. Are you connected to a network?"
-            $(modal).find('.modal-body').append(trow)
-        })
+        $.ajax({
+            url: url,
+            data: {
+                'q': q,
+                'box': $('input[name="dataverse-radio"]:checked').val(),
+                'submission_id': $(document).data('submission_id')
+            },
+            dataType: 'json'
+        }).done(handler)
+            .error(function () {
+
+                trow = "Error Retieving Data. Are you connected to a network?"
+                $(modal).find('.modal-body').append(trow)
+            })
 
     }, 1000)
 
@@ -93,12 +90,14 @@ function check_repo_id(e) {
         }
         else if (data.repo_type == 'dspace') {
             // load dspace repo html into modal
+            $('.ajax-loading-div').show()
             $('#repo_modal-body').html()
             var form_html = $('#template_dspace_form').find('form').clone()
             $(form_html).attr('id', 'dspace_form')
             $('#repo_modal-body').html(form_html)
             $('#repo_modal-body').data('repo', data.repo_type)
-            add_delay_keyup('#search_dspace')
+            $.getJSON("/copo/get_dspace_communities/", {'submission_id': sub_id}).done(build_dspace_modal
+            )
         }
     })
 }
@@ -193,8 +192,31 @@ function build_dataverse_modal(resp) {
 }
 
 
-function build_dspace_modal(resp){
-    alert(resp)
+function build_dspace_modal(data) {
+    var dt = $('#repo_modal').find('#table-div-dataverse')
+    if (data.hasOwnProperty('error')) {
+        $(dt).empty().append(data.error)
+        return false
+    }
+
+    var t = $('#dspace-table-template').find('table').clone()
+    $(t).attr('id', 'dspace-table')
+
+    $(data).each(function (idx, el) {
+        trow = "<tr  data-dspace_type='" + el.type + "' data-type='dspace' data-alias='" + el.id + "'>" +
+            "<td class='summary-details-control' style='min-width: 50px; text-align:center'></td>" +
+            "<td>" + el.name + "</td>" +
+            "<td>" + el.handle + "</td>" +
+            "<td>" + el.type + "</td></tr>"
+        $(t).find('tbody').append(trow)
+    })
+    var dt = $('.modal').find('#table-div-dataverse')
+    $(dt).empty().append(t)
+    $('#dspace-table').DataTable()
+    $('.ajax-loading-div').fadeOut()
+    $('#dspace-table tbody')
+        .off('click', 'td.summary-details-control')
+        .on('click', 'td.summary-details-control', expand_table);
 }
 
 /*
@@ -206,11 +228,17 @@ function build_dataverse_header_click(e) {
 
 // when dataverse is expanded, fire off request to dataverse to get information on datasets contained within
 function expand_table(event) {
-
+    console.log("expand table " + event)
     event.preventDefault();
     var dv_alias = $(event.currentTarget).closest('tr').data('alias')
     $(document).data('dv_alias', dv_alias)
-    var table = $('#dataverse-table').DataTable()
+    var table
+    if ($('#dataverse-table').length) {
+        table = $('#dataverse-table').DataTable()
+    }
+    if ($('#dspace-table').length) {
+        table = $('#dspace-table').DataTable()
+    }
     var tr = $(this).closest('tr');
     var type = $(tr).data('type')
     var entity_id = $(tr).data('alias')
@@ -224,6 +252,107 @@ function expand_table(event) {
         tr.removeClass('shown');
     } else {
         // expand row
+        if (type == 'dspace') {
+            // get dspace type i.e. collection or item
+            var dspace_type = $(tr).data('dspace_type')
+            if (dspace_type == 'community') {
+                $.get("/copo/get_collection/", {
+                    'collection_id': entity_id,
+                    'submission_id': $(document).data('submission_id')
+                }, function (data) {
+                    try {
+                        var data = JSON.parse(data)
+                    }
+                    catch (e) {
+                        row.child($('<div></div>').append("<h5>JSON ERROR</h5>")).show();
+                        return
+                    }
+                    if (data.status == "ERROR") {
+                        row.child($('<div></div>').append("<h5>" + data.message + "</h5>")).show();
+                        return
+                    }
+                    if (data.hasOwnProperty("no_datasets")) {
+                        row.child($('<div></div>').append("<h5>" + data.no_datasets + "</h5>")).show();
+                        tr.addClass('shown');
+                        return
+                    }
+                    if (data.hasOwnProperty('error')) {
+                        row.child($('<div></div>').append("<h5>" + data.error + "</h5>")).show();
+                        tr.addClass('shown');
+                        return
+                    }
+                    if (data.length == 0) {
+                        row.child($('<div></div>').append("<h5>No Datasets to Show</h5>")).show();
+                        return
+                    }
+                    var headerHtml = $("<h5>Collections in Community</h5>")
+                    var contentHtml = ($('<table/>', {
+                        // cellpadding: "5",
+                        cellspacing: "0",
+                        border: "0",
+                        // style: "padding-left:50px;"
+                    }))
+                    var tr_header = $("<tr/>", {
+                        "data-id": data.id
+                    })
+
+                    var name = $("<th/>", {
+                        html: "Name"
+                    })
+
+                    var handle = $("<th/>", {
+                        html: "Handle"
+                    })
+
+                    var type = $("<th/>", {
+                        html: "Type"
+                    })
+
+                    var thead = document.createElement("thead")
+                    $(thead).append($(tr_header).append("<td/>").append(name).append(handle).append(type))
+                    $(contentHtml).append(thead)
+
+                    $(data).each(function (idx, el) {
+                        var colTR = $('<tr/>', {
+                            "data-alias": el.id,
+                            "data-type": 'dspace',
+                            "data-dspace_type": el.type,
+                            style: "width:100%"
+                        })
+                        $(colTR).attr('data-id', el.id)
+
+                        var col1 = $('<td/>').append(el.name);
+                        var col11 = $('<td/>').append(el.handle);
+                        var col111 = $('<td>').append(el.type)
+
+                        var plus = "<td class='summary-details-control' style='min-width: 50px; vertical-align: top; text-align:center'></td>"
+                        colTR.append(plus).append(col1).append(col11).append(col11).append(col111)
+                        contentHtml.append(colTR);
+
+                    })
+
+
+                    contentHtml.find("tbody > tr").css("background-color", "rgba(229, 239, 255, 0.3)");
+
+                    row.child($('<div></div>').append(headerHtml).append(contentHtml).html()).show();
+                    tr.addClass('shown');
+
+                    $('#dspace-table tbody')
+                        .off('click', 'td.summary-details-control')
+                        .on('click', 'td.summary-details-control', expand_table);
+                })
+            }
+            else if (dspace_type == "collection") {
+                var x = 1
+                $.get("/copo/get_dspace_items/", {
+                        'collection_id': entity_id,
+                        'submission_id': $(document).data('submission_id')
+                    }, function (data) {
+                        console.log(data)
+                    }
+                )
+            }
+        }
         if (type == 'dataverse') {
             $.get("/copo/get_dataverse_content/", {
                 'id': entity_id,
@@ -259,10 +388,10 @@ function expand_table(event) {
                 }))
                 var tr_header = $("<tr/>")
 
-                var title = $("<th/>", {
+                var identifier = $("<th/>", {
                     html: "Identifier"
                 })
-                var doi = $("<th/>", {
+                var publisher = $("<th/>", {
                     html: "Publisher"
                 })
 
@@ -275,9 +404,12 @@ function expand_table(event) {
                 var czech = $("<th/>", {
                     html: "Select"
                 })
+                var type = $("<th/>", {
+                    html: "Type"
+                })
 
                 var thead = document.createElement("thead")
-                $(thead).append($(tr_header).append("<td/>").append(title).append(publication_date).append(czech))
+                $(thead).append($(tr_header).append("<th/>").append(identifier).append(publisher).append(publication_date).append(type))
                 $(contentHtml).append(thead)
 
                 $(data).each(function (idx, el) {

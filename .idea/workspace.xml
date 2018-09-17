@@ -7,22 +7,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/dal/copo_da.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/dal/copo_da.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" afterDir="false" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
+    <ignored path="$PROJECT_DIR$/.idea/httpRequests/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/COPO$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1536933885867" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -92,11 +94,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ajax_handlers.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ajax_handlers.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="461">
-              <caret line="551" column="51" selection-start-line="551" selection-start-column="51" selection-end-line="551" selection-end-column="51" />
+            <state relative-caret-position="476">
+              <caret line="565" column="14" lean-forward="true" selection-start-line="565" selection-start-column="14" selection-end-line="565" selection-end-column="14" />
               <folding>
                 <element signature="e#137#148#0" expanded="true" />
               </folding>
@@ -125,16 +127,39 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="repository_inspection.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="repository_inspection.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="55" column="40" selection-start-line="55" selection-start-column="40" selection-end-line="55" selection-end-column="40" />
+            <state relative-caret-position="220">
+              <caret line="345" column="22" selection-start-line="345" selection-start-column="22" selection-end-line="345" selection-end-column="22" />
               <folding>
                 <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#td#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="rest-api.http" pinned="false" current-in-tab="false">
+        <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/rest-api.http">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="15">
+              <caret line="1" column="30" selection-start-line="1" selection-start-column="30" selection-end-line="1" selection-end-column="30" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="scratch.py" pinned="false" current-in-tab="false">
+        <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="165">
+              <caret line="11" column="16" lean-forward="true" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -143,8 +168,8 @@
       <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="296">
-              <caret line="72" column="44" selection-start-line="72" selection-start-column="44" selection-end-line="72" selection-end-column="44" />
+            <state relative-caret-position="299">
+              <caret line="73" column="47" selection-start-line="73" selection-start-column="47" selection-end-line="73" selection-end-column="47" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -155,12 +180,14 @@
       <file leaf-file-name="components_template.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="324" column="30" selection-start-line="324" selection-start-column="30" selection-end-line="324" selection-end-column="30" />
+            <state relative-caret-position="265">
+              <caret line="335" column="7" selection-start-line="335" selection-start-column="7" selection-end-line="335" selection-end-column="7" />
               <folding>
                 <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#2;n#form#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#3;n#form#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#img#0;n#span#0;n#div#3;n#form#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#1;n#div#3;n#form#0;n#div#0;n#!!top" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -169,8 +196,8 @@
       <file leaf-file-name="dataverseSubmission.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="52" column="8" lean-forward="true" selection-start-line="52" selection-start-column="8" selection-end-line="52" selection-end-column="33" />
+            <state relative-caret-position="184">
+              <caret line="17" column="4" lean-forward="true" selection-start-line="17" selection-start-column="4" selection-end-line="23" selection-end-column="67" />
               <folding>
                 <element signature="e#50#59#0" expanded="true" />
               </folding>
@@ -178,49 +205,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="connection.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/src/dataverse/dataverse/connection.py">
+      <file leaf-file-name="dspaceSubmission.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="99" column="8" selection-start-line="99" selection-start-column="8" selection-end-line="99" selection-end-column="8" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="copo_submission_2.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_submission_2.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="111">
-              <caret line="78" column="42" selection-start-line="78" selection-start-column="32" selection-end-line="78" selection-end-column="42" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="copo_submission_2.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="465">
-              <caret line="70" column="20" selection-start-line="70" selection-start-column="20" selection-end-line="70" selection-end-column="20" />
+            <state relative-caret-position="386">
+              <caret line="41" column="30" lean-forward="true" selection-start-line="41" selection-start-column="30" selection-end-line="41" selection-end-column="30" />
               <folding>
-                <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <marker date="1536764210950" expanded="true" signature="8312:8332" ph="..." />
-                <marker date="1536764210950" expanded="true" signature="8609:8629" ph="..." />
-                <marker date="1536764210950" expanded="true" signature="8746:8760" ph="..." />
-                <marker date="1536764210950" expanded="true" signature="8862:8897" ph="..." />
-                <marker date="1536764210950" expanded="true" signature="9993:10035" ph="..." />
-                <marker date="1536764210950" expanded="true" signature="10067:10087" ph="..." />
-                <marker date="1536764210950" expanded="true" signature="11847:11863" ph="..." />
-                <marker date="1536764210950" expanded="true" signature="13430:13468" ph="..." />
-                <marker date="1536764210950" expanded="true" signature="13714:13752" ph="..." />
-                <marker date="1536764210950" expanded="true" signature="21104:21135" ph="..." />
-                <marker date="1536764210950" expanded="true" signature="26550:26565" ph="..." />
-                <marker date="1536764210950" expanded="true" signature="34671:34689" ph="..." />
-                <marker date="1536764210950" expanded="true" signature="39257:39275" ph="..." />
+                <element signature="e#33#69#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -232,20 +223,14 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="CSS File" />
-        <option value="Python Script" />
         <option value="JavaScript File" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>class=&quot;pretty</find>
-      <find>&lt;input type=&quot;checkbox&quot; /&gt;</find>
-      <find>submit_group</find>
-      <find>check</find>
-      <find>submit</find>
-      <find>treat</find>
       <find>submission_control</find>
       <find>buttonLabel</find>
       <find>BLA</find>
@@ -264,12 +249,18 @@
       <find>dataverse-table</find>
       <find>sub_id</find>
       <find>dataverse-table-template</find>
-      <find>table-tem</find>
       <find>/api/</find>
       <find>target_repo_option</find>
       <find>change_destination</find>
       <find>update_submission_repo_data</find>
       <find>check_repo_id</find>
+      <find>ds</find>
+      <find>table-tem</find>
+      <find>table-div-dataverse</find>
+      <find>summary_details</find>
+      <find>summary-details-control</find>
+      <find>accor</find>
+      <find>colle</find>
     </findStrings>
     <replaceStrings>
       <replace>context-help-ctrl</replace>
@@ -299,13 +290,11 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/.gitignore" root0="SKIP_INSPECTION" />
+    <setting file="dummy://restClient/response53.html" root0="SKIP_INSPECTION" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/index.html" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_repo.html" />
-        <option value="$PROJECT_DIR$/web/src/dal/broker_da.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_repo.js" />
@@ -347,13 +336,16 @@
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/repo_submission_forms/dataverse_controls_for_submission_modal.html" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/repo_submission_forms/dspace_controls_for_submission_modal.html" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_submission_2.html" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" />
         <option value="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/dal/copo_da.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/rest-api.http" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
+        <option value="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" />
+        <option value="$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" />
       </list>
     </option>
   </component>
@@ -378,7 +370,7 @@
       <path value="$PROJECT_DIR$/web/src/static/copo/lou-multi-select-e052211/package.json" />
     </packageJsonPaths>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="23" />
     <option name="width" value="1920" />
     <option name="height" value="983" />
@@ -412,217 +404,12 @@
           <expand>
             <path>
               <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
+              <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
             </path>
             <path>
               <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="requirements" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="static" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="static" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="static" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-              <item name="js" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="submission" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="management" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="schemas" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="schemas" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="schemas" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-              <item name="dbmodels" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="schemas" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-              <item name="uimodels" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="schemas" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-              <item name="uimodels" type="462c0819:PsiDirectoryNode" />
-              <item name="mappings" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="schemas" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-              <item name="uimodels" type="462c0819:PsiDirectoryNode" />
-              <item name="mappings" type="462c0819:PsiDirectoryNode" />
-              <item name="copo_mappings" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="schemas" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-              <item name="uimodels" type="462c0819:PsiDirectoryNode" />
-              <item name="mappings" type="462c0819:PsiDirectoryNode" />
-              <item name="dublincore_mappings" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-              <item name="repo_submission_forms" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="settings" type="462c0819:PsiDirectoryNode" />
+              <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
+              <item name="Scratches" type="d62648e6:ScratchProjectViewPane$MyRootNode" />
             </path>
           </expand>
           <select />
@@ -633,9 +420,10 @@
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
-    <property name="SearchEverywhereHistoryKey" value="urls&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/urls.py&#10;sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission_2.html&#10;ajax&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;component_&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/components_template.html&#10;views&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/views.py&#10;submission&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission_2.html&#10;copo_repo&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_repository.js&#10;sample.js&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/sample.json&#10;copo_pro&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_profile.json&#10;dc&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json&#10;exceptions&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/exceptions_and_logging&#10;dataset&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/environments/copo_python3.5_django2/src/dataverse/dataverse/dataset.py&#10;rls&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/urls.py&#10;copo_&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_submission_2.js&#10;dataset_sc&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/blanks/dataset_scaffold.json&#10;copo_s&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission_2.html&#10;submission.json&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_submission.json&#10;copo_sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission_2.html&#10;submit&#9;null&#9;null&#10;settings&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/settings&#10;copo&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_submission_2.js&#10;submi&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/submissionDelegator.py&#10;orcid_da&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/dal/orcid_da.py&#10;base&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/base.html&#10;copo_data&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_data.js&#10;copo_da&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/dal/copo_da.py&#10;orcid&#9;null&#9;null&#10;context&#9;null&#9;null&#10;base.html&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/base.html&#10;group&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_group.html&#10;mana&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/manage.py&#10;template&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templatetags&#10;rest&#9;null&#9;null&#10;copo_group&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_group.js&#10;login&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/auth/login.html&#10;copo_gro&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_group.js&#10;style&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/css/copo/style.css&#10;copo_re&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_repo.js&#10;looku&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/lookup/lookup.py&#10;dataverse&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/dataverseSubmission.py&#10;lookup&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/lookup/lookup.py&#10;lookups&#9;null&#9;null&#10;gene&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/generic_handlers.js&#10;gener&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/generic_handlers_ext2.js&#10;htmlta&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templatetags/html_tags.py&#10;copo_publi&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_publications.html&#10;copo_sample&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_sample.html&#10;htmltag&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templatetags/html_tags.py&#10;datautil&#9;null&#9;null&#10;copo_anno&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_annotations.html" />
+    <property name="SearchEverywhereHistoryKey" value="submission&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/dataverseSubmission.py&#10;url&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/urls.py&#10;urls&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/urls.py&#10;sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission_2.html&#10;ajax&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;component_&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/components_template.html&#10;views&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/views.py&#10;copo_repo&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_repository.js&#10;sample.js&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/sample.json&#10;copo_pro&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_profile.json&#10;dc&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json&#10;exceptions&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/exceptions_and_logging&#10;dataset&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/environments/copo_python3.5_django2/src/dataverse/dataverse/dataset.py&#10;rls&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/urls.py&#10;copo_&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_submission_2.js&#10;dataset_sc&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/blanks/dataset_scaffold.json&#10;copo_s&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission_2.html&#10;submission.json&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_submission.json&#10;copo_sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_submission_2.html&#10;submit&#9;null&#9;null&#10;settings&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/settings&#10;copo&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_submission_2.js&#10;submi&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/submissionDelegator.py&#10;orcid_da&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/dal/orcid_da.py&#10;base&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/base.html&#10;copo_data&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_data.js&#10;copo_da&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/dal/copo_da.py&#10;orcid&#9;null&#9;null&#10;context&#9;null&#9;null&#10;base.html&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/base.html&#10;group&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_group.html&#10;mana&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/manage.py&#10;template&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templatetags&#10;rest&#9;null&#9;null&#10;copo_group&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_group.js&#10;login&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/auth/login.html&#10;copo_gro&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_group.js&#10;style&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/css/copo/style.css&#10;copo_re&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_repo.js&#10;looku&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/lookup/lookup.py&#10;dataverse&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/dataverseSubmission.py&#10;lookup&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/lookup/lookup.py&#10;lookups&#9;null&#9;null&#10;gene&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/generic_handlers.js&#10;gener&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/generic_handlers_ext2.js&#10;htmlta&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templatetags/html_tags.py&#10;copo_publi&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_publications.html&#10;copo_sample&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/copo_sample.html&#10;htmltag&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templatetags/html_tags.py&#10;datautil&#9;null&#9;null" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="add_unversioned_files" value="$PROJECT_DIR$/web/src/exceptions_and_logging/logs/2018-03-07.log&#10;true&#10;/Users/etuka/Dropbox/Dev/COPO/web/src/exceptions_and_logging/logs/2017-03-29.log&#10;/Users/etuka/Dropbox/Dev/COPO/web/src/submission/data/5a27d59c3bd23600479ae611/json/isa_json.json&#10;/Users/etuka/Dropbox/Dev/COPO/web/src/exceptions_and_logging/logs/2018-03-01.log&#10;/Users/etuka/Dropbox/Dev/COPO/web/src/submission/data/5a27d59c3bd23600479ae611/run_set.xml" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
     <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
     <property name="js.eslint.eslintPackage" value="" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -665,6 +453,825 @@
   <component name="RestClientSettings">
     <option name="REQUEST_HISTORY">
       <list>
+        <RestClientRequest>
+          <option name="httpMethod" value="GET" />
+          <option name="urlBase" value="https://cgspace.cgiar.org/rest/communities" />
+          <option name="urlPath" value="" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="Content-Type" />
+                <option name="value" value="multipart/form-data; boundary=WebAppBoundary" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="isFileUpload" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="httpMethod" value="GET" />
+          <option name="urlBase" value="https://cgspace.cgiar.org/rest/items" />
+          <option name="urlPath" value="" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="Content-Type" />
+                <option name="value" value="multipart/form-data; boundary=WebAppBoundary" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="isFileUpload" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://cgspace.cgiar.org/rest/items" />
+          <option name="urlPath" value="" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="Content-Type" />
+                <option name="value" value="multipart/form-data; boundary=WebAppBoundary" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="isFileUpload" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="http://cgspace.cgiar.org/rest/items" />
+          <option name="urlPath" value="" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="Content-Type" />
+                <option name="value" value="multipart/form-data; boundary=WebAppBoundary" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="isFileUpload" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://demo.dspace.org/rest/collections/find-collection" />
+          <option name="urlPath" value="" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.name" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://demo.dspace.org/rest/collections/find-collection" />
+          <option name="urlPath" value="" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="name" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://demo.dspace.org/rest/collections/find-collection" />
+          <option name="urlPath" value="" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://demo.dspace.org/rest/collection/find-collection" />
+          <option name="urlPath" value="" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://demo.dspace.org/rest/items/find-by-metadata-field" />
+          <option name="urlPath" value="" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="cgspace.cgiar.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="8C15BCFCF73A3111160A3721CAC0E914" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://demo.dspace.org" />
+          <option name="urlPath" value="/rest/items/find-by-metadata-field" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="cgspace.cgiar.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="8C15BCFCF73A3111160A3721CAC0E914" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://cgspace.cgiar.org" />
+          <option name="urlPath" value="/rest/items/find-by-metadata-field" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="cgspace.cgiar.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="8C15BCFCF73A3111160A3721CAC0E914" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://cgspace.cgiar.org" />
+          <option name="urlPath" value="rest/items/find-by-metadata-field" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="cgspace.cgiar.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="8C15BCFCF73A3111160A3721CAC0E914" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://cgspace.cgiar.org" />
+          <option name="urlPath" value="/items/find-by-metadata-field" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="cgspace.cgiar.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="8C15BCFCF73A3111160A3721CAC0E914" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://cgspace.cgiar.org" />
+          <option name="urlPath" value="items/find-by-metadata-field" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://cgspace.cgiar.org" />
+          <option name="urlPath" value="items/find-by-metadata-field" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="GET" />
+          <option name="urlBase" value="https://cgspace.cgiar.org" />
+          <option name="urlPath" value="/rest/communities/find-by-metadata-field" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://cgspace.cgiar.org" />
+          <option name="urlPath" value="/rest/communities/find-by-metadata-field" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://cgspace.cgiar.org" />
+          <option name="urlPath" value="/rest/collections/find-by-metadata-field" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://cgspace.cgiar.org" />
+          <option name="urlPath" value="/rest/items/find-by-metadata-field" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="Africa" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://cgspace.cgiar.org" />
+          <option name="urlPath" value="/rest/items/find-by-metadata-field" />
+          <option name="parameters">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="key" />
+                <option name="value" value="dc.title" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="value" />
+                <option name="value" value="test" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="https://cgspace.cgiar.org" />
+          <option name="urlPath" value="/rest/collections" />
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="GET" />
+          <option name="urlBase" value="https://cgspace.cgiar.org" />
+          <option name="urlPath" value="/rest/collections" />
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="demo.dataverse.org" />
+                <option name="name" value="JSESSIONID" />
+                <option name="path" value="/" />
+                <option name="value" value="3bdad72836f30634bf1db4848106" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="GET" />
+          <option name="urlBase" value="https://demo.dataverse.org" />
+          <option name="urlPath" value="/rest/collections" />
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="biscuits">
+            <list>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="ASPSESSIONIDQQDSRAQA" />
+                <option name="path" value="/" />
+                <option name="value" value="NBOGJDKAKGPHBJKBAGMEOGOH" />
+              </Biscuit>
+              <Biscuit>
+                <option name="date" value="-1" />
+                <option name="domain" value="intranet.nbi.ac.uk" />
+                <option name="name" value="username" />
+                <option name="path" value="/" />
+                <option name="value" value="fshaw" />
+              </Biscuit>
+            </list>
+          </option>
+          <option name="httpMethod" value="GET" />
+          <option name="urlBase" value="https://demo.dataverse.org" />
+          <option name="urlPath" value="rest/collections" />
+          <option name="parametersEnabled" value="true" />
+          <option name="textToSend" value="" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
         <RestClientRequest>
           <option name="biscuits">
             <list>
@@ -1300,7 +1907,26 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Django server.copo-dev">
+  <component name="RunManager" selected="Python.scratch">
+    <configuration name="scratch" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="COPO" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$APPLICATION_CONFIG_DIR$/scratches/scratch.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
     <configuration default="true" type="Python.DjangoServer" factoryName="Django server">
       <module name="COPO" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -1463,7 +2089,13 @@
     <list>
       <item itemvalue="Django server.setup_groups" />
       <item itemvalue="Django server.copo-dev" />
+      <item itemvalue="Python.scratch" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.scratch" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="StructureViewFactory">
     <option name="ACTIVE_ACTIONS" value=",HIDE_INHERITED,SHOW_FIELDS" />
@@ -1478,13 +2110,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1480591260906</updated>
-    </task>
-    <task id="LOCAL-00002" summary="add some annotate methods">
-      <created>1480594622899</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1480594622899</updated>
     </task>
     <task id="LOCAL-00003" summary="change base page inheritence for annotator">
       <created>1480601697540</created>
@@ -1822,7 +2447,14 @@
       <option name="project" value="LOCAL" />
       <updated>1536681988502</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="bug fixes to dataverse/dspace search functioinality">
+      <created>1536768694149</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1536768694149</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1841,9 +2473,10 @@
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3292683" />
       <window_info anchor="bottom" id="Event Log" order="9" show_stripe_button="false" sideWeight="0.2825465" side_tool="true" weight="0.42276424" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
+      <window_info anchor="bottom" id="REST Client" order="13" sideWeight="0.49499285" weight="0.4391892" />
       <window_info anchor="bottom" id="Version Control" order="12" weight="0.3276644" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.3243243" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49767134" weight="0.3277592" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49767134" weight="0.3272727" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32545045" />
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7793345" visible="true" weight="0.2257721" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" weight="0.25181347" />
@@ -1859,7 +2492,6 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" id="JSON Viewer" order="5" />
       <window_info anchor="right" id="Mongo Explorer" order="3" />
-      <window_info anchor="bottom" id="REST Client" order="13" sideWeight="0.49499285" weight="0.44004524" />
       <window_info anchor="bottom" id="Messages" order="7" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -1907,7 +2539,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="adding loading spinner to ontology fields which shows when lookup to OLS is being performed." />
     <MESSAGE value="adding news item for PhenoHarmonIS" />
     <MESSAGE value="change to css of ontology field" />
     <MESSAGE value="adding accessions collation for dataverse" />
@@ -1932,7 +2563,8 @@
     <MESSAGE value="submission to existing custom dataverses and display of accessions working" />
     <MESSAGE value="more changes to submission ui" />
     <MESSAGE value="bugs with multiple modals fixed" />
-    <option name="LAST_COMMIT_MESSAGE" value="bugs with multiple modals fixed" />
+    <MESSAGE value="bug fixes to dataverse/dspace search functioinality" />
+    <option name="LAST_COMMIT_MESSAGE" value="bug fixes to dataverse/dspace search functioinality" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1958,11 +2590,21 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="1006" />
+      <option name="time" value="1017" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
+      <expression>
+        <expression-string>{&quot;error&quot;: self.not_found}</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>json.dumps(resp)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>ids['data']</expression-string>
         <language-id>Python</language-id>
@@ -1998,16 +2640,6 @@
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
-      <expression>
-        <expression-string>c.get_dataverse(12725)</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>c.get_dataverse('china-archive')</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
@@ -2033,27 +2665,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/web/src/dal/orcid_da.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="27" column="8" selection-start-line="27" selection-start-column="8" selection-end-line="27" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/site-packages/django/template/base.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="158">
-          <caret line="474" selection-start-line="474" selection-end-line="474" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/site-packages/django/utils/log.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="143" selection-start-line="143" selection-end-line="143" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/logging/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="205">
@@ -2335,49 +2946,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="324" column="30" selection-start-line="324" selection-start-column="30" selection-end-line="324" selection-end-column="30" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#2;n#form#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#3;n#form#0;n#div#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/site-packages/django/core/handlers/exception.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
           <caret line="34" selection-start-line="34" selection-end-line="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/site-packages/django/core/handlers/base.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="344">
-          <caret line="125" selection-start-line="125" selection-end-line="125" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="52" column="8" lean-forward="true" selection-start-line="52" selection-start-column="8" selection-end-line="52" selection-end-column="33" />
-          <folding>
-            <element signature="e#50#59#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="386" selection-start-line="386" selection-end-line="386" />
-          <folding>
-            <element signature="e#49#78#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2409,35 +2981,105 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="17" column="4" lean-forward="true" selection-start-line="17" selection-start-column="4" selection-end-line="23" selection-end-column="67" />
+          <folding>
+            <element signature="e#50#59#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/rest-api.http">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="30" selection-start-line="1" selection-start-column="30" selection-end-line="1" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="16" lean-forward="true" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="265">
+          <caret line="335" column="7" selection-start-line="335" selection-start-column="7" selection-end-line="335" selection-end-column="7" />
+          <folding>
+            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#2;n#form#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#3;n#form#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#img#0;n#span#0;n#div#3;n#form#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#1;n#div#3;n#form#0;n#div#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="188">
+          <caret line="386" selection-start-line="386" selection-end-line="386" />
+          <folding>
+            <element signature="e#49#78#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/site-packages/django/core/handlers/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="344">
+          <caret line="125" selection-start-line="125" selection-end-line="125" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="296">
-          <caret line="72" column="44" selection-start-line="72" selection-start-column="44" selection-end-line="72" selection-end-column="44" />
+        <state relative-caret-position="299">
+          <caret line="73" column="47" selection-start-line="73" selection-start-column="47" selection-end-line="73" selection-end-column="47" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js">
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="55" column="40" selection-start-line="55" selection-start-column="40" selection-end-line="55" selection-end-column="40" />
+        <state relative-caret-position="476">
+          <caret line="565" column="14" lean-forward="true" selection-start-line="565" selection-start-column="14" selection-end-line="565" selection-end-column="14" />
           <folding>
-            <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#td#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="e#137#148#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
+    <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="461">
-          <caret line="551" column="51" selection-start-line="551" selection-start-column="51" selection-end-line="551" selection-end-column="51" />
+        <state relative-caret-position="386">
+          <caret line="41" column="30" lean-forward="true" selection-start-line="41" selection-start-column="30" selection-end-line="41" selection-end-column="30" />
           <folding>
-            <element signature="e#137#148#0" expanded="true" />
+            <element signature="e#33#69#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="345" column="22" selection-start-line="345" selection-start-column="22" selection-end-line="345" selection-end-column="22" />
+          <folding>
+            <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#td#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -22,15 +22,11 @@
             <div class="existing-controls" style="display: block">
                 <!-- existing dspace controls -->
                 <div class="form-inline">
-                    <div class="input-group  marginBottom10px width300px">
-                        <span class="input-group-addon" id="search_ds_addon">Search</span>
-                        <input type="text" class="form-control" placeholder="Author, Keyword etc."
-                               id="search_dspace" aria-describedby="search_ds_addon">
-                    </div>
-                    <span class="input-group ajax-loading-div"><img
-                            style="height: 24px; margin-left:5px;"
-                            src="{% static 'copo/img/loading.gif' %}"></span>
+
+
                 </div>
+                <span class="input-group ajax-loading-div">
+                    <img style="height: 24px; margin-left:5px;" src="{% static 'copo/img/loading.gif' %}"></span>
                 <div id="table-div-dataverse" class="table table-striped table-bordered"
                      style="padding: 10px;width:100%">
 
@@ -325,6 +321,21 @@
                 <th>Identifier</th>
                 <th>Description</th>
                 <th>Published</th>
+                <th>Type</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="dspace-table-template">
+        <table class="table table-striped table-bordered" style="width:100%">
+            <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Handle</th>
                 <th>Type</th>
 
             </tr>

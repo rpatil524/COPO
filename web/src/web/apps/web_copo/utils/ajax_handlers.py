@@ -27,6 +27,7 @@ from django.contrib.auth.models import Group
 from django.core import serializers
 from dal.orcid_da import Orcid
 from submission.dataverseSubmission import DataverseSubmit as ds
+from submission.dspaceSubmission import DspaceSubmit as dspace
 
 DV_STRING = 'HARVARD_TEST_API'
 
@@ -548,5 +549,19 @@ def publish_dataverse(request):
     return HttpResponse(resp)
 
 
-def search_dspace(request):
-    return HttpResponse(json.dumps({'abc': 'ABD'}))
+def get_dspace_communities(request):
+    sub_id = request.GET['submission_id']
+    resp = dspace(sub_id).get_dspace_communites()
+    return HttpResponse(resp)
+
+def get_dspace_collection(request):
+    sub_id = request.GET['submission_id']
+    collection_id = request.GET['collection_id']
+    resp = dspace(sub_id).get_dspace_collection(collection_id)
+    return HttpResponse(resp)
+
+def get_dspace_items(request):
+    sub_id = request.GET['submission_id']
+    collection_id = request.GET['collection_id']
+    resp = dspace(sub_id).get_dspace_items(collection_id)
+    return HttpResponse(resp)
