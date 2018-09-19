@@ -1,6 +1,7 @@
 //**some re-usable functions across different modules
 var copoFormsURL = "/copo/copo_forms/";
 var copoVisualsURL = "/copo/copo_visualize/";
+var server_side_select = {}; //holds selected ids for table data - needed in server-side processing
 
 $(document).ready(function () {
 
@@ -14,7 +15,7 @@ $(document).ready(function () {
 function set_empty_component_message(dataRows) {
     //decides, based on presence of record, to display table or getting started info
 
-    if (dataRows.length == 0) {
+    if (dataRows == 0) {
         if ($(".table-parent-div").length) {
             $(".table-parent-div").hide();
         }
@@ -86,7 +87,7 @@ function do_table_buttons_events() {
         var message = elem.attr("data-error-message");
 
         if (!message) {
-            message = "No records selected for " + title + " action"
+            message = "No records selected for " + title + " action";
         }
 
         //validate event before passing to handler
@@ -104,7 +105,6 @@ function do_table_buttons_events() {
             } else if (selectedRows > 1 && btntype == "single") { //sort out 'single record buttons'
                 triggerEvent = false;
             }
-
         }
 
         if (triggerEvent) { //trigger button event, else deal with error
@@ -115,26 +115,78 @@ function do_table_buttons_events() {
             $('body').trigger(event);
         } else {
             //alert user
-
-            BootstrapDialog.show({
-                title: "Record action",
-                message: message,
-                cssClass: 'copo-modal3',
-                closable: false,
-                animate: true,
-                type: BootstrapDialog.TYPE_WARNING,
-                buttons: [{
-                    label: 'OK',
-                    cssClass: 'tiny ui basic orange button',
-                    action: function (dialogRef) {
-                        dialogRef.close();
-                    }
-                }]
-            });
-
-
+            button_event_alert(message);
         }
 
+    });
+}
+
+
+function do_table_buttons_events_server_side(component) {
+    //attaches events to table buttons - server-side processing version to function with similar name
+
+    $(document)
+        .off("click", ".copo-dt")
+        .on("click", ".copo-dt", function (event) {
+            event.preventDefault();
+
+            $('.copo-dt').webuiPopover('destroy');
+
+
+            var elem = $(this);
+            var task = elem.attr('data-action').toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
+            var tableID = elem.attr('data-table'); //get target table
+            var btntype = elem.attr('data-btntype'); //type of button: single, multi, all
+            var title = elem.find(".action-label").html();
+            var message = elem.attr("data-error-message");
+
+            if (!message) {
+                message = "No records selected for " + title + " action";
+            }
+
+            //validate event before passing to handler
+            var selectedRows = server_side_select[component].length;
+
+            var triggerEvent = true;
+
+            //do button type validation based on the number of records selected
+            if (btntype == "single" || btntype == "multi") {
+                if (selectedRows == 0) {
+                    triggerEvent = false;
+                } else if (selectedRows > 1 && btntype == "single") { //sort out 'single record buttons'
+                    triggerEvent = false;
+                }
+            }
+
+            if (triggerEvent) { //trigger button event, else deal with error
+                var event = jQuery.Event("addbuttonevents");
+                event.tableID = tableID;
+                event.task = task;
+                event.title = title;
+                $('body').trigger(event);
+            } else {
+                //alert user
+                button_event_alert(message);
+            }
+
+        });
+}
+
+function button_event_alert(message) {
+    BootstrapDialog.show({
+        title: "Record action",
+        message: message,
+        cssClass: 'copo-modal3',
+        closable: false,
+        animate: true,
+        type: BootstrapDialog.TYPE_WARNING,
+        buttons: [{
+            label: 'OK',
+            cssClass: 'tiny ui basic orange button',
+            action: function (dialogRef) {
+                dialogRef.close();
+            }
+        }]
     });
 }
 
@@ -169,76 +221,272 @@ function deselect_records(tableID) {
     table.rows().deselect();
 }
 
+function do_render_server_side_table(componentMeta) {
+    var tableID = componentMeta.tableID;
+    var component = componentMeta.component;
+    server_side_select[component] = [];
+
+    var table = $('#' + tableID).DataTable({
+        "paging": true,
+        "processing": true,
+        "serverSide": true,
+        "searchDelay": 850,
+        "columns": componentMeta.table_columns,
+        ajax: {
+            url: copoVisualsURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'task': 'server_side_table_data',
+                'component': component
+            },
+            dataFilter: function (data) {
+                var json = jQuery.parseJSON(data);
+                json.recordsTotal = json.records_total;
+                json.recordsFiltered = json.records_filtered;
+                json.data = json.data_set;
+
+                return JSON.stringify(json); // return JSON string
+            }
+        },
+        "rowCallback": function (row, data) {
+            if ($.inArray(data.DT_RowId, server_side_select[component]) !== -1) {
+                $(row).addClass('selected');
+            }
+        },
+        fnDrawCallback: function () {
+            refresh_tool_tips();
+            var event = jQuery.Event("posttablerefresh"); //individual compnents can trap and handle this event as they so wish
+            $('body').trigger(event);
+
+            if (server_side_select[component].length > 0) {
+                var message = server_side_select[component].length + " records selected";
+                if (server_side_select[component].length == 1) {
+                    message = server_side_select[component].length + " record selected";
+                }
+                $('#' + tableID + '_info').append("<span class='select-item select-item-1'>" + message + "</span>");
+            }
+        },
+        buttons: [
+            {
+                text: 'Select visible records',
+                action: function (e, dt, node, config) {
+                    //remove custom select info
+                    $('#' + tableID + '_info').find(".select-item-1").remove();
+
+                    dt.rows().select();
+                    var selectedRows = table.rows('.selected').ids().toArray();
+
+                    for (var i = 0; i < selectedRows.length; ++i) {
+                        var index = $.inArray(selectedRows[i], server_side_select[component]);
+
+                        if (index === -1) {
+                            server_side_select[component].push(selectedRows[i]);
+                        }
+                    }
+
+                    $('#' + tableID + '_info')
+                        .find(".select-row-message")
+                        .html(server_side_select[component].length + " records selected");
+                }
+            },
+            {
+                text: 'Clear selection',
+                action: function (e, dt, node, config) {
+                    dt.rows().deselect();
+                    server_side_select[component] = [];
+                    $('#' + tableID + '_info').find(".select-item-1").remove();
+                }
+            }
+        ],
+        language: {
+            select: {
+                rows: {
+                    _: "<span class='select-row-message'>%d records selected</span>",
+                    0: "",
+                    1: "%d record selected"
+                }
+            },
+            "processing": "<div class='copo-i-loader'></div>"
+        },
+        dom: 'Bfr<"row"><"row info-rw" i>tlp'
+    });
+
+    table
+        .buttons()
+        .nodes()
+        .each(function (value) {
+            $(this)
+                .removeClass("btn btn-default")
+                .addClass('tiny ui basic button');
+        });
+
+    place_task_buttons(componentMeta); //this will place custom buttons on the table for executing tasks on records
+    do_table_buttons_events_server_side(component);
+
+    table.on('click', 'tr >td', function () {
+        var classList = ["describe-status", "summary-details-control", "detail-hover-message"]; //don't select on these
+        var foundClass = false;
+
+        var tdList = this.className.split(" ");
+
+        for (var i = 0; i < tdList.length; ++i) {
+            if($.inArray(tdList[i], classList) > -1) {
+                foundClass = true;
+                break;
+            }
+        }
+
+        if (foundClass) {
+            return false;
+        }
+
+        var elem = $(this).closest("tr");
+
+        var id = elem.attr("id");
+        var index = $.inArray(id, server_side_select[component]);
+
+        if (index === -1) {
+            server_side_select[component].push(id);
+        } else {
+            server_side_select[component].splice(index, 1);
+        }
+
+        elem.toggleClass('selected');
+
+        //selected message
+        $('#' + tableID + '_info').find(".select-item-1").remove();
+        var message = ''
+
+        if ($('#' + tableID + '_info').find(".select-row-message").length) {
+            if (server_side_select[component].length > 0) {
+                message = server_side_select[component].length + " records selected";
+                if (server_side_select[component].length == 1) {
+                    message = server_side_select[component].length + " record selected";
+                }
+
+                $('#' + tableID + '_info')
+                    .find(".select-row-message")
+                    .html(message);
+            } else {
+                $('#' + tableID + '_info')
+                    .find(".select-row-message")
+                    .html("");
+            }
+        } else {
+            if (server_side_select[component].length > 0) {
+                message = server_side_select[component].length + " records selected";
+                if (server_side_select[component].length == 1) {
+                    message = server_side_select[component].length + " record selected";
+                }
+                $('#' + tableID + '_info').append("<span class='select-item select-item-1'>" + message + "</span>");
+            }
+
+        }
+
+    });
+
+    $('#' + tableID + '_wrapper')
+        .find(".dataTables_filter")
+        .find("input")
+        .removeClass("input-sm")
+        .attr("placeholder", "Search " + componentMeta.title)
+        .attr("size", 30);
+
+    //handle event for table details
+    $('#' + tableID + ' tbody')
+        .off('click', 'td.summary-details-control')
+        .on('click', 'td.summary-details-control', function (event) {
+            event.preventDefault();
+
+            var event = jQuery.Event("posttablerefresh"); //individual compnents can trap and handle this event as they so wish
+            $('body').trigger(event);
+
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+            tr.addClass('showing');
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child('');
+                row.child.hide();
+                tr.removeClass('showing');
+                tr.removeClass('shown');
+            } else {
+                $.ajax({
+                    url: copoVisualsURL,
+                    type: "POST",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    data: {
+                        'task': "attributes_display",
+                        'component': componentMeta.component,
+                        'target_id': row.data().record_id
+                    },
+                    success: function (data) {
+                        if (data.component_attributes.columns) {
+                            // expand row
+
+                            var contentHtml = $('<table/>', {
+                                // cellpadding: "5",
+                                cellspacing: "0",
+                                border: "0",
+                                // style: "padding-left:50px;"
+                            });
+
+                            for (var i = 0; i < data.component_attributes.columns.length; ++i) {
+                                var colVal = data.component_attributes.columns[i];
+
+                                var colTR = $('<tr/>');
+                                contentHtml.append(colTR);
+
+                                colTR
+                                    .append($('<td/>').append(colVal.title))
+                                    .append($('<td/>').append(data.component_attributes.data_set[colVal.data]));
+
+                            }
+
+                            row.child($('<div></div>').append(contentHtml).html()).show();
+                            tr.removeClass('showing');
+                            tr.addClass('shown');
+                        }
+                    },
+                    error: function () {
+                        alert("Couldn't retrieve " + component + " attributes!");
+                        return '';
+                    }
+                });
+            }
+        });
+
+    $('#' + tableID + ' tbody')
+        .off('click', 'td.describe-status')
+        .on('click', 'td.describe-status', function (event) {
+            event.preventDefault();
+
+            var tr = $(this).closest('tr');
+
+            var event = jQuery.Event("showrecordbundleinfo"); //individual compnents can trap and handle this event as they so wish
+            event.rowId = tr.attr("id");
+            event.tableID = tableID;
+            $('body').trigger(event);
+        });
+
+} //end of func
+
+
 function do_render_component_table(data, componentMeta) {
     var tableID = componentMeta.tableID;
     var dataSet = data.table_data.dataSet;
     var cols = data.table_data.columns;
-    var visibleColumns = 10000; //a very high number of columns to display as upper limit
 
-    if (componentMeta.visibleColumns) {
-        visibleColumns = componentMeta.visibleColumns;
-    }
-
-    set_empty_component_message(dataSet); //display empty component message for potential first time users
+    set_empty_component_message(dataSet.length); //display empty component message for potential first time users
 
     if (dataSet.length == 0) {
         return false;
-    }
-
-    // treat columns
-    var columns = [{
-        "className": 'summary-details-control detail-hover-message',
-        "orderable": false,
-        "data": null,
-        "title": "Details",
-        "defaultContent": ''
-    }];
-
-    var columnDefs = [{
-        "width": "5%",
-        "targets": 0
-    }]
-
-    //add extra column, if datafile component, for displaying metadata rating
-    if (componentMeta.component == "datafile") {
-
-        columns.push({
-            "orderable": false,
-            "data": null,
-            "className": "describe-status",
-            "title": "",
-            "defaultContent": '<span style="cursor: pointer;" class="metadata-rating uncertain"><i class="fa fa-square" aria-hidden="true"></i></span>'
-        });
-
-        columnDefs.push({
-            "width": "1%",
-            "targets": 1
-        });
-    }
-
-    var sortIndex = 1; //column by which records may be sorted
-
-    for (var i = 0; i < cols.length; ++i) {
-        var col = cols[i];
-        col["visible"] = false;
-
-        // use date_modified as sort column
-        if (col.data == "date_modified") {
-            sortIndex = i + 1;
-        }
-
-        //only display the specified number of columns and the 'date_modifed' column, all others go in a sub-table
-
-        if ((i < visibleColumns) || col.data == "date_modified") {
-            col["visible"] = true;
-            col["render"] = function (data, type, row, meta) {
-                var collapseLink = row.record_id + "_" + meta.col;
-
-                return $('<div></div>').append(deconvulate_column_data(data, collapseLink)).html();
-            }
-        }
-
-        columns.push(col);
     }
 
     //set data
@@ -274,6 +522,7 @@ function do_render_component_table(data, componentMeta) {
             searchHighlight: true,
             ordering: true,
             lengthChange: true,
+            scrollX: true,
             buttons: [
                 'selectAll',
                 {
@@ -287,10 +536,9 @@ function do_render_component_table(data, componentMeta) {
                     }
                 },
                 'selectNone',
-                'csv',
                 {
                     extend: 'excel',
-                    text: 'Spreadsheet',
+                    text: 'Export',
                     title: null
                 }
             ],
@@ -301,23 +549,19 @@ function do_render_component_table(data, componentMeta) {
                 select: {
                     rows: {
                         _: "%d records selected",
-                        0: "<span class='extra-table-info'>Click <span class='fa-stack' style='color:green; font-size:10px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> beside a record to view details</span>",
+                        0: "<span class='extra-table-info'>Click <span class='fa-stack' style='color:green; font-size:10px;'><i class='fa fa-circle fa-stack-2x'></i><i class='fa fa-plus fa-stack-1x fa-inverse'></i></span> beside a record to view extra details</span>",
                         1: "%d record selected"
                     }
                 },
                 buttons: {
                     selectAll: "Select all",
-                    selectNone: "Select none",
+                    selectNone: "Clear selection"
                 }
             },
-            order: [
-                [sortIndex, "desc"]
-            ],
-            columns: columns,
-            columnDefs: columnDefs,
+            order: [[1, 'asc']],
+            columns: cols,
             fnDrawCallback: function () {
                 refresh_tool_tips();
-                refresh_sub_table(componentMeta, columns);
                 var event = jQuery.Event("posttablerefresh"); //individual compnents can trap and handle this event as they so wish
                 $('body').trigger(event);
             },
@@ -325,13 +569,13 @@ function do_render_component_table(data, componentMeta) {
                 //add class to row for ease of selection later
                 var recordId = index;
                 try {
-                    recordId = data.record_id
+                    recordId = data.record_id;
                 } catch (err) {
                 }
 
                 $(row).addClass(tableID + recordId);
             },
-            dom: 'Bfr<"row"><"row info-rw" i>tlp',
+            dom: 'Bfr<"row"><"row info-rw" i>tlp'
         });
 
         table
@@ -353,14 +597,7 @@ function do_render_component_table(data, componentMeta) {
         .attr("placeholder", "Search " + componentMeta.title)
         .attr("size", 30);
 
-
-} //end of func
-
-
-function refresh_sub_table(componentMeta, columns) {
-    var tableID = componentMeta.tableID;
-    var table = $('#' + tableID).DataTable();
-    // handle opening and closing summary details
+    //handle event for table details
     $('#' + tableID + ' tbody')
         .off('click', 'td.summary-details-control')
         .on('click', 'td.summary-details-control', function (event) {
@@ -371,115 +608,64 @@ function refresh_sub_table(componentMeta, columns) {
 
             var tr = $(this).closest('tr');
             var row = table.row(tr);
-            row.deselect(); // remove selection on row
-
-            //close other rows
-            // $('#' + tableID + ' tbody').find('tr').each(function () {
-            //
-            //     var row_all = table.row($(this));
-            //
-            //     if (row_all.child.isShown()) {
-            //         // This row is already open - close it
-            //         if (row_all.data().record_id != row.data().record_id) {
-            //             row_all.child('');
-            //             row_all.child.hide();
-            //             $(this).removeClass('shown');
-            //         }
-            //     }
-            // });
+            tr.addClass('showing');
 
             if (row.child.isShown()) {
                 // This row is already open - close it
                 row.child('');
                 row.child.hide();
+                tr.removeClass('showing');
                 tr.removeClass('shown');
             } else {
-                // expand row
+                $.ajax({
+                    url: copoVisualsURL,
+                    type: "POST",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    data: {
+                        'task': "attributes_display",
+                        'component': componentMeta.component,
+                        'target_id': row.data().record_id
+                    },
+                    success: function (data) {
+                        if (data.component_attributes.columns) {
+                            // expand row
 
-                var contentHtml = $('<table/>', {
-                    // cellpadding: "5",
-                    cellspacing: "0",
-                    border: "0",
-                    // style: "padding-left:50px;"
-                });
+                            var contentHtml = $('<table/>', {
+                                // cellpadding: "5",
+                                cellspacing: "0",
+                                border: "0",
+                                // style: "padding-left:50px;"
+                            });
 
+                            for (var i = 0; i < data.component_attributes.columns.length; ++i) {
+                                var colVal = data.component_attributes.columns[i];
 
-                columns.forEach(function (col, idx) {
-                    if (col.visible || col.data == 'record_id' || col.data == null) { //skip already shown columns
-                        return false;
+                                var colTR = $('<tr/>');
+                                contentHtml.append(colTR);
+
+                                colTR
+                                    .append($('<td/>').append(colVal.title))
+                                    .append($('<td/>').append(data.component_attributes.data_set[colVal.data]));
+
+                            }
+
+                            row.child($('<div></div>').append(contentHtml).html()).show();
+                            tr.removeClass('showing');
+                            tr.addClass('shown');
+                        }
+                    },
+                    error: function () {
+                        alert("Couldn't retrieve " + component + " attributes!");
+                        return '';
                     }
-
-                    var colTR = $('<tr/>')
-                    var colTitle = $('<td/>').append(col.title);
-                    var colData = $('<td/>').append(deconvulate_column_data(row.data()[col.data], row.data().record_id + "_" + idx));
-                    colTR
-                        .append(colTitle)
-                        .append(colData);
-                    contentHtml.append(colTR);
                 });
-
-                //these components require look-up for extra attributes before display
-                if (componentMeta.component == "sample" || componentMeta.component == "datafile") {
-                    do_component_attributes(componentMeta.component, row.data().record_id, contentHtml, tr, row);
-                } else {
-                    contentHtml.find("tbody > tr").css("background-color", "rgba(229, 239, 255, 0.3)");
-                    row.child($('<div></div>').append(contentHtml).html()).show();
-                    tr.addClass('shown');
-                }
             }
         });
-}
 
-function do_component_attributes(component, targetID, contentHtml, tr, row) {
-    var loaderHTML = "<div style='text-align: center'><i class='fa fa-spinner fa-pulse fa-2x'></i></div>";
 
-    var colTR = $('<tr/>')
-    var colLoader = $('<td/>').attr('colspan', 2);
-    colLoader.append(loaderHTML);
-    colTR.append(colLoader)
-    contentHtml.append(colTR);
-
-    var task = "attributes_display"; //sample and datafile are resolved differently, call relavant task
-    if (component == "datafile") {
-        task = "description_summary";
-    }
-
-    $.ajax({
-        url: copoVisualsURL,
-        type: "POST",
-        headers: {
-            'X-CSRFToken': csrftoken
-        },
-        data: {
-            'task': task,
-            'component': component,
-            'target_id': targetID
-        },
-        success: function (data) {
-            var table = Object();
-            if (component == "datafile") {
-                table = build_description_display(data);
-            } else {
-                table = build_attributes_display(data);
-            }
-
-            table.find("tbody > tr").each(function (indx, dtr) {
-                contentHtml.append(dtr);
-            });
-
-            colTR.remove();
-
-            contentHtml.find("tbody > tr").css("background-color", "rgba(229, 239, 255, 0.3)");
-
-            row.child($('<div></div>').append(contentHtml).html()).show();
-            tr.addClass('shown');
-        },
-        error: function () {
-            alert("Couldn't retrieve " + component + " attributes!");
-            return '';
-        }
-    });
-}
+} //end of func
 
 
 function load_records(componentMeta) {

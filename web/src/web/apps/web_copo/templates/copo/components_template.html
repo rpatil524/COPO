@@ -51,6 +51,20 @@
             <span class="action-label" style="padding-left: 3px;">Describe</span>
         </div>
 
+        <a class="description_bundle_button tiny ui labeled button" tabindex="0">
+            <div class="tiny ui primary button bundle-name" title="Reload bundle" style="background-color: #2b3d59 !important;">
+                <i class="tags icon"></i>
+                <span></span>
+            </div>
+            <div class="tiny ui basic left pointing label bundle-count" title="View bundle datafiles">
+                <span></span>
+            </div>
+            <div class="tiny ui basic left pointing label bundle-cut" title="Remove bundle">
+                <span><i class="fa fa-cut"></i></span>
+            </div>
+        </a>
+
+
         <div class="describe_record_multi tiny ui basic dtables-dbuttons  blue button copo-dt"
              data-toggle="tooltip"
              data-container="body"
@@ -73,6 +87,18 @@
              tabindex="0">
             <i class=" fa fa-times"></i>
             <span class="action-label" style="padding-left: 3px;">Discard Metadata</span>
+        </div>
+
+        <div class="unbundle_record_multi tiny ui basic dtables-dbuttons red button copo-dt"
+             data-toggle="tooltip"
+             data-container="body"
+             data-action="unbundle"
+             data-error-message="Please select target datafiles to [un]bundle"
+             data-btntype="multi"
+             title="[Un]bundle datafiles"
+             tabindex="0">
+            <i class=" fa fa-tags"></i>
+            <span class="action-label" style="padding-left: 3px;">[Un]bundle</span>
         </div>
 
         <div class="edit_record_single tiny ui basic dtables-dbuttons  green button copo-dt"
@@ -163,13 +189,13 @@
         </div>
     </div>
 
-    <!-- Quick tour button template -->
+    <!-- quick tour button template -->
     <button data-toggle="tooltip" title="Quick tour"
             class="big circular ui icon orange button takeatour quick-tour-template">
         <i class="icon lightbulb"></i>
     </button>
 
-    <!-- New component button template -->
+    <!-- new component button template -->
     <button data-toggle="tooltip" title="Add new record"
             class="big circular ui icon primary button new-component-template">
         <i class="icon add sign"></i>
@@ -180,7 +206,6 @@
             class="big circular ui icon primary button new-samples-template">
         <i class="icon plus sign"></i>
     </button>
-
 
     <!-- record tasks button -->
     <button data-toggle="tooltip" title="Record tasks" class="big circular ui icon button record-tasks-template">

@@ -88,20 +88,17 @@ class BrokerRequests:
         self.context['table_data'] = self.wizard_helper.generate_discrete_attributes()
 
     def do_get_cell_control(self):
-        record_id = self.param_dict.get("record_id", str())
         cell_reference = self.param_dict.get("cell_reference", str())
-        self.context['cell_control'] = self.wizard_helper.get_cell_control(cell_reference, record_id)
+        self.context['cell_control'] = self.wizard_helper.get_cell_control(cell_reference, self.target_id)
 
     def do_save_cell_data(self):
-        record_id = self.param_dict.get("record_id", str())
         cell_reference = self.param_dict.get("cell_reference", str())
-        self.context['cell_update'] = self.wizard_helper.save_cell_data(cell_reference, record_id, self.auto_fields)
+        self.context['cell_update'] = self.wizard_helper.save_cell_data(cell_reference, self.target_id, self.auto_fields)
 
     def do_batch_update(self):
-        record_id = self.param_dict.get("record_id", str())
         cell_reference = self.param_dict.get("cell_reference", str())
         target_rows = self.param_dict.get("target_rows", list())
-        self.context['batch_update'] = self.wizard_helper.batch_update_cells(cell_reference, record_id, target_rows)
+        self.context['batch_update'] = self.wizard_helper.batch_update_cells(cell_reference, self.target_id, target_rows)
 
     def do_finalise_description(self):
         self.context['finalise_result'] = self.wizard_helper.finalise_description()

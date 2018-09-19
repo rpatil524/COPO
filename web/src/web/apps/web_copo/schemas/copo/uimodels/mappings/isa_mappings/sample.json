@@ -6,7 +6,7 @@
   },
   "properties": [
     {
-      "help_tip": "A Sample represents major outputs resulting from a protocol application other than the special case outputs of Extract or a Labeled Extract.",
+      "help_tip": "A sample represents major outputs resulting from a protocol application other than the special case outputs of Extract or a Labeled Extract.",
       "unique": true,
       "default_value": "",
       "control_meta": {},

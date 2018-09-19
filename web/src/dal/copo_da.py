@@ -183,12 +183,34 @@ class DAComponent:
 
         return cursor_to_list(self.get_collection_handle().find(doc).sort([[sort_by, sort_direction]]))
 
-    def get_all_records_columns(self, sort_by='_id', sort_direction=-1, projection=dict()):
-        doc = dict(deleted=data_utils.get_not_deleted_flag())
+    def get_all_records_columns(self, sort_by='_id', sort_direction=-1, projection=dict(), filter_by=dict()):
+        filter_by["deleted"] = data_utils.get_not_deleted_flag()
         if self.profile_id:
-            doc["profile_id"] = self.profile_id
+            filter_by["profile_id"] = self.profile_id
 
-        return cursor_to_list(self.get_collection_handle().find(doc, projection).sort([[sort_by, sort_direction]]))
+        return cursor_to_list(
+            self.get_collection_handle().find(filter_by, projection).sort([[sort_by, sort_direction]]))
+
+    def get_all_records_columns_server(self, sort_by='_id', sort_direction=-1, projection=dict(), filter_by=dict(),
+                                       search_term=str(),
+                                       limit=0, skip=0):
+
+        filter_by["deleted"] = data_utils.get_not_deleted_flag()
+
+        # 'name' seems to be the only reasonable field to restrict searching; others fields are resolved
+        filter_by["name"] = {'$regex': search_term, "$options": 'i'}
+
+        if self.profile_id:
+            filter_by["profile_id"] = self.profile_id
+
+        if skip > 0:
+            records = self.get_collection_handle().find(filter_by, projection).sort([[sort_by, sort_direction]]).skip(
+                skip).limit(limit)
+        else:
+            records = self.get_collection_handle().find(filter_by, projection).sort([[sort_by, sort_direction]]).limit(
+                limit)
+
+        return cursor_to_list(records)
 
     def execute_query(self, query_dict=dict()):
         if self.profile_id:
@@ -783,7 +805,8 @@ class Description:
             pass
         return doc
 
-    def create_description(self, stages=list(), attributes=dict(), profile_id=str(), component=str(), meta=dict()):
+    def create_description(self, stages=list(), attributes=dict(), profile_id=str(), component=str(), meta=dict(),
+                           name=str()):
         self.component = component
 
         fields = dict(
@@ -792,8 +815,10 @@ class Description:
             profile_id=profile_id,
             component=component,
             meta=meta,
+            name=name,
             created_on=data_utils.get_datetime(),
         )
+
         doc = self.DescriptionCollection.insert(fields)
 
         # return inserted record
@@ -827,11 +852,14 @@ class Description:
 
         return is_valid
 
-    def purge_descriptions(self):
+    def purge_descriptions(self, component=str()):
         """
         remove 'obsolete' tokens - where date created is more than 'no_of_days' days
         :return:
         """
+
+        if not component == "sample":  # samples gets purge, but not other components e.g., datafiles
+            return True
 
         no_of_days = settings.DESCRIPTION_GRACE_PERIOD
 
@@ -843,18 +871,18 @@ class Description:
             self.DescriptionCollection.remove({"_id": {"$in": object_ids}})
 
             # remove records associated with the description_tokens from the collection
-            if self.component == "sample":
-                SampleCollection = get_collection_ref('SampleCollection')
+            SampleCollection = get_collection_ref('SampleCollection')
 
-                store_name = settings.SAMPLE_OBJECT_STORE
+            store_name = settings.SAMPLE_OBJECT_STORE
 
-                for id in object_ids:
-                    SampleCollection.delete_many(
-                        {"description_token": str(id), "deleted": data_utils.get_deleted_flag()})
+            for id in object_ids:
+                SampleCollection.delete_many(
+                    {"description_token": str(id), "deleted": data_utils.get_deleted_flag()})
 
-                    # delete store object
-                    object_key = settings.SAMPLE_OBJECT_PREFIX + str(id)
-                    self.remove_store_object(store_name=store_name, object_key=object_key)
+                # delete store object
+                object_key = settings.SAMPLE_OBJECT_PREFIX + str(id)
+                self.remove_store_object(store_name=store_name, object_key=object_key)
+
         return True
 
     def get_elapsed_time_dataframe(self):

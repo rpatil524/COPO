@@ -428,6 +428,11 @@ DROP_DOWNS = {
             'value': 'dcterms',
             'label': 'Dataverse',
             'description': 'A Dataverse is an open source data management repository for a community or an institution. It allows data to be federated with a growing list of Dataverse repositories worldwide for increased discoverability'
+        },
+        {
+            'value': 'cg_core',
+            'label': 'CG Core',
+            'description': 'CG compliant data object description template - this is a placeholder text'
         }
         # {
         #     'value': 'MetaboLights',
@@ -479,7 +484,7 @@ DROP_DOWNS = {
         },
         {
             "label": "Open_Top_Chamber",
-            "value": "open top chamber, OTC"
+            "value": "open top chamber"
         },
         {
             "value": "experimental_garden",
@@ -639,6 +644,7 @@ WIZARD_FILES = {
     'sample_start': os.path.join(RESOLVER['wizards_sample'], 'start_stages.json'),
     'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json'),
     'dcterms': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
+    'cg_core': os.path.join(RESOLVER['wizards_datafile'], 'cg_core_stages.json')
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
@@ -663,8 +669,7 @@ MESSAGES_LKUPS = {
         'global': os.path.join(RESOLVER['lookup'], 'help_messages', 'global_help.json'),
         'context_help': os.path.join(RESOLVER['lookup'], 'help_messages', 'context_help.json'),
     },
-    'datafile_wizard': os.path.join(RESOLVER['wizards_datafile'], 'messages', 'wizard_messages.json'),
-    'sample_wizard_messages': os.path.join(RESOLVER['wizards_sample'], 'messages', 'wizard_messages.json'),
+    'wizards_messages': os.path.join(RESOLVER['wizards_messages'], 'wizard_messages.json'),
     'lookup_messages': os.path.join(RESOLVER['lookup'], 'messages.json'),
     'message_templates': os.path.join(RESOLVER['lookup'], 'message_templates.json'),
     'exception_messages': os.path.join(RESOLVER['copo_exceptions'], 'messages.json')

@@ -43,6 +43,7 @@
         <input type="hidden" id="hashing_image" size="24px" value="{% static 'copo/img/ajax.gif' %}"/>
         <input type="hidden" id="profile_id" value="{{ profile_id }}"/>
         <input type="hidden" id="profile_title" value="{{ profile.title }}"/>
+        <input type="hidden" id="table_columns" value="{{ table_columns }}"/>
         <input type="hidden" value="{% url 'copo:copo_submissions' profile_id=profile_id %}" name="submission_url"
                id="submission_url"/>
         <input type="hidden" value="{{ cyverse_files }}" name="cyverse_file_data"
@@ -60,24 +61,18 @@
 
     <!--test ends -->
 
+    <table id="example" class="ui celled table hover copo-noborders-table" style="width:100%"></table>
+
     <!--test ends -->
 
 
     <!-- datafile wizard section -->
     <div id="wizard_toggle" class="collapse" style="margin-bottom: 20px;">
         <div class="panel panel-primary">
-            <div class="panel-heading">Datafile Description</div>
+            <div class="panel-heading">Datafile Description <span id="datafile_description_panel_title"></span></div>
             <div class="panel-body">
                 <div class="fuelux" style="margin-bottom: 5px;">
                     <div class="row action-rw">
-                        <!-- Discard description button -->
-                        <div id="remove_act" class=" tiny ui basic red button"
-                             data-toggle="tooltip"
-                             title="Discard description"
-                             tabindex="0">
-                            <span style="padding-left: 3px;">Discard description</span>
-                        </div>
-
                         <!-- save for later description button -->
                         <div id="reload_act" class=" tiny ui basic secondary button"
                              data-toggle="tooltip"
@@ -92,6 +87,14 @@
                              title="View description bundle"
                              tabindex="0">
                             <span style="padding-left: 3px;">View bundle</span>
+                        </div>
+
+                        <!-- add to bundle button -->
+                        <div id="bundle_add_act" class=" tiny ui basic teal button"
+                             data-toggle="tooltip"
+                             title="Add datafiles to bundle"
+                             tabindex="0">
+                            <span style="padding-left: 3px;">Add to bundle</span>
                         </div>
 
                         <!-- Help tip -->
@@ -115,16 +118,12 @@
                             </ul>
                         </div>
                         <div class="actions">
-                            <button id="wiz_prev_btn" type="button" class="tiny ui left labeled icon button btn-prev">
-                                <i class="left arrow icon"></i>
-                                Prev
-                            </button>
-                            <button id="wiz_next_btn" type="button"
-                                    class="tiny ui primary right labeled icon button btn-next"
-                                    data-last="Finish!">
-                                <i class="right arrow icon"></i>
-                                Next
-                            </button>
+                            <div class="large ui buttons">
+                                <button id="wiz_prev_btn" class="ui button btn-prev">Prev</button>
+                                <div class="or"></div>
+                                <button id="wiz_next_btn" class="ui primary button btn-next" data-last="Finish!">Next
+                                </button>
+                            </div>
                         </div>
                         <div class="step-content"
                              style="margin-bottom: 45px; border: 0.1em solid rgba(229, 239, 255, 1.0); border-radius: 4px;">
@@ -201,6 +200,16 @@
         </div>
     </div>
 
+    <!-- description bundle section -->
+    <div class="desc-bundle-display-div" style="display: none;">
+        <hr/>
+        <div style="font-size: 18px; margin-bottom: 15px;">Description bundles
+            <i style="font-size: 15px; padding-left: 3px; cursor: pointer;" class="fa fa-info-circle description-bundle-explained"></i>
+        </div>
+        <div class="desc-bundle-display-div-2"></div>
+        <hr/>
+        <div style="margin-bottom: 15px;">&nbsp;</div>
+    </div>
 
     <!-- datafile table section -->
     <div style="margin-top: 15px;">
@@ -233,8 +242,10 @@
                                     </li>
                                     <li>
                                         <div><strong>View: </strong>
-                                            Information about uploaded files is displayed in a tabular format, with
-                                            different functions (e.g., <i>describe</i>), to facilitate manipulation of
+                                            Information about uploaded files is displayed in a tabular format,
+                                            with
+                                            different functions (e.g., <i>describe</i>), to facilitate
+                                            manipulation of
                                             uploaded datafiles.
                                         </div>
                                     </li>
@@ -265,15 +276,18 @@
                 </div>
             </div>
         </div>
-
-        <!-- datafile table -->
-        <div id="component_table_loader" class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"
-             data-copo-tour-id="datafile_table"></div> <!-- div used by the quick tour agent -->
-        <table id="datafile_table"
-               class="ui celled table hover copo-noborders-table"
-               cellspacing="0" width="100%">
-        </table>
     </div>
+
+    <!-- datafile table -->
+    <div id="component_table_loader" class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"
+         data-copo-tour-id="datafile_table"></div> <!-- div used by the quick tour agent -->
+    <table id="datafile_table"
+           class="ui celled table hover copo-noborders-table"
+           cellspacing="0" width="100%">
+    </table>
+    <br/><br/>
+
+
 {% endblock %}
 
 {% block help_section %}

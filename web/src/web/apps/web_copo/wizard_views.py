@@ -23,7 +23,8 @@ def data_wiz(request):
                                          description_token=request.POST.get("description_token", str()),
                                          profile_id=request.POST.get("profile_id", str()),
                                          auto_fields=request.POST.get("auto_fields", dict()),
-                                         target_id=request.POST.get("target_id", str())
+                                         target_id=request.POST.get("target_id", str()),
+                                         cell_reference=request.POST.get("cell_reference", str()),
                                          )
 
     context = broker_request.post_context(request_action)
@@ -44,7 +45,6 @@ def sample_wiz(request):
                                   auto_fields=request.POST.get("auto_fields", dict()),
                                   update_metadata=request.POST.get("update_metadata", dict()),
                                   target_rows=json.loads(request.POST.get("target_rows", "[]")),
-                                  record_id=request.POST.get("record_id", str()),
                                   cell_reference=request.POST.get("cell_reference", str()),
                                   column_reference=request.POST.get("column_reference", str()),
                                   bundle_name=request.POST.get("bundle_name", str()),

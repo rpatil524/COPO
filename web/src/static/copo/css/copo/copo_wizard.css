@@ -210,6 +210,10 @@ ol {
     color: rgba(0, 204, 0, 0.6);
 }
 
+.in-desc {
+    color: rgba(22, 120, 194, 0.3);
+}
+
 .uncertain, .uncertain:hover {
     color: rgba(239, 239, 239, 0.9);
 }

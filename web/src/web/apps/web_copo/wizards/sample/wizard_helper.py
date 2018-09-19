@@ -23,6 +23,8 @@ class WizardHelper:
         self.description_token = description_token
         self.profile_id = self.set_profile_id(profile_id)
         self.schema = Sample().get_schema().get("schema_dict")
+        self.wiz_message = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["wizards_messages"])["properties"]
+
         self.key_split = "___0___"
         self.object_key = settings.SAMPLE_OBJECT_PREFIX + self.description_token
         self.store_name = settings.SAMPLE_OBJECT_STORE
@@ -34,8 +36,7 @@ class WizardHelper:
         """
 
         initiate_result = dict(status="success", message="")
-        initiate_result['wiz_message'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["sample_wizard_messages"])[
-            "properties"]
+        initiate_result['wiz_message'] = self.wiz_message
 
         if self.description_token:  # this is a call to reload an existing description; validate token
 
@@ -45,9 +46,7 @@ class WizardHelper:
             if not description:
                 # description record doesn't exist; flag error
                 initiate_result['status'] = "error"
-                initiate_result[
-                    'message'] = "Couldn't reload description. " \
-                                 "The description may have expired, or the associated token is invalid."
+                initiate_result['message'] = self.wiz_message["invalid_token_message"]
                 del initiate_result['wiz_message']
             else:
                 # reset timestamp, which will also reset the 'grace period' for the description
@@ -424,9 +423,7 @@ class WizardHelper:
             return dict(columns=stored_columns, rows=stored_data_set)
 
         # object type controls and their corresponding schemas
-        object_array_controls = ["copo-characteristics", "copo-comment"]
-        object_array_schemas = [d_utils.get_copo_schema("material_attribute_value"),
-                                d_utils.get_copo_schema("comment")]
+        object_controls = d_utils.get_object_array_schema()
 
         # data and columns lists
         data = list()
@@ -450,12 +447,10 @@ class WizardHelper:
             resolved_data = htags.resolve_control_output(sample_attributes, row)
             label = row["label"]
 
-            if row['control'] in object_array_controls:
+            if row['control'] in object_controls.keys():
                 # get object-type-control schema
                 # get the key field and value field
-
-                control_index = object_array_controls.index(row['control'])
-                control_df = pd.DataFrame(object_array_schemas[control_index])
+                control_df = pd.DataFrame(object_controls[row['control']])
                 control_df['id2'] = control_df['id'].apply(lambda x: x.split(".")[-1])
 
                 if resolved_data:
@@ -476,20 +471,30 @@ class WizardHelper:
                         for subitem in object_array_keys[2:]:
                             class_name = self.key_split.join((row_id_split, str(o_indx), subitem))
                             columns.append(dict(
-                                title=control_df[control_df.id2.str.lower() == subitem].iloc[0].label, data=class_name))
+                                title=control_df[control_df.id2.str.lower() == subitem.lower()].iloc[0].label,
+                                data=class_name))
                             data.append({class_name: o_row[subitem]})
+            elif row["type"] == "array":
+                for tt_indx, tt_val in enumerate(resolved_data):
+                    shown_keys = (row["id"].split(".")[-1], str(tt_indx))
+                    class_name = self.key_split.join(shown_keys)
+                    columns.append(
+                        dict(title=label + "[{0}]".format(str(tt_indx + 1)), data=class_name))
+
+                    if isinstance(tt_val, list):
+                        tt_val = ', '.join(tt_val)
+
+                    data.append({class_name: tt_val})
             else:
                 shown_keys = row["id"].split(".")[-1]
                 class_name = shown_keys
                 columns.append(dict(title=label, data=class_name))
-                val = resolved_data[0] if row['type'] == "array" else resolved_data
+                val = resolved_data
 
                 if isinstance(val, list):
                     val = ', '.join(val)
 
-                data_attribute = dict()
-                data_attribute[class_name] = val
-                data.append(data_attribute)
+                data.append({class_name: val})
 
         # generate sample names
         sample_names = meta["generated_names"]
@@ -867,28 +872,18 @@ class WizardHelper:
         """
 
         # object type controls and their corresponding schemas
-        object_array_controls = ["copo-characteristics", "copo-comment"]
-        object_array_schemas = [d_utils.get_copo_schema("material_attribute_value"),
-                                d_utils.get_copo_schema("comment")]
-
-        control_schema = dict()
+        object_controls = d_utils.get_object_array_schema()
 
         key = cell_reference.split(self.key_split)
 
-        if len(key) > 1:  # object type key
-            parent_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
-            if parent_schema:
-                parent_schema = parent_schema[0]
-                if parent_schema['control'] in object_array_controls:
-                    control_index = object_array_controls.index(parent_schema['control'])
-                    control_schema = [f for f in object_array_schemas[control_index] if
-                                      f["id"].split(".")[-1] == key[2]]
+        parent_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
+        parent_schema = parent_schema[0] if parent_schema else {}
+        control_schema = parent_schema
 
-        else:  # string type
-            control_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
-
-        if control_schema:
-            control_schema = control_schema[0]
+        if parent_schema.get("control", str()) in object_controls.keys():
+            control_schema = [f for f in object_controls[parent_schema['control']] if
+                              f["id"].split(".")[-1] == key[2]]
+            control_schema = control_schema[0] if control_schema else {}
 
         if "option_values" in control_schema:
             control_schema["option_values"] = htags.get_control_options(control_schema)
@@ -896,70 +891,70 @@ class WizardHelper:
         # get target record
         record = Sample().get_record(record_id)
 
-        if len(key) == 1:
-            schema_data = record[key[0]]
-        else:
-            schema_data = record[key[0]]
-            schema_data = schema_data[int(key[1])]
-            schema_data = schema_data[key[2]]
+        # compose return object
+        result_dict = dict()
+        result_dict["control_schema"] = control_schema
 
-        return dict(control_schema=control_schema, schema_data=schema_data)
+        result_dict["schema_data"] = record[key[0]]
+        if parent_schema.get("control", str()) in object_controls.keys():
+            result_dict["schema_data"] = record[key[0]][int(key[1])][key[2]]
+        elif parent_schema["type"] == "array":
+            result_dict["control_schema"]["type"] = "string"  # constraints control to be rendered as an non-array
+            result_dict["schema_data"] = record[key[0]][int(key[1])]
+
+        return result_dict
 
     def save_cell_data(self, cell_reference, record_id, auto_fields):
         """
-        function save updated cell data; for the target_cell and target_rows
+        function save updated cell data; for the target record_id
         :param cell_reference:
+        :param record_id:
         :param auto_fields:
-        :param target_rows:
         :return:
         """
         result = dict(status='success', value='')
 
         # object type controls and their corresponding schemas
-        object_array_controls = ["copo-characteristics", "copo-comment"]
-        object_array_schemas = [d_utils.get_copo_schema("material_attribute_value"),
-                                d_utils.get_copo_schema("comment")]
-
-        # get cell schema
-        control_schema = dict()
+        object_controls = d_utils.get_object_array_schema()
 
         key = cell_reference.split(self.key_split)
 
         # gather parameters for validation
         validation_parameters = dict(schema=dict(), data=str())
 
-        if len(key) > 1:  # object type key
-            parent_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
-            if parent_schema:
-                parent_schema = parent_schema[0]
-                validation_parameters["schema"] = parent_schema
-                if parent_schema['control'] in object_array_controls:
-                    control_index = object_array_controls.index(parent_schema['control'])
-                    control_schema = [f for f in object_array_schemas[control_index] if
-                                      f["id"].split(".")[-1] == key[2]]
+        parent_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
+        parent_schema = parent_schema[0] if parent_schema else {}
+        control_schema = parent_schema
+        validation_parameters["schema"] = control_schema
 
-        else:
-            control_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
-            validation_parameters["schema"] = control_schema[0] if control_schema else {}
+        if parent_schema.get("control", str()) in object_controls.keys():
+            control_schema = [f for f in object_controls[parent_schema['control']] if
+                              f["id"].split(".")[-1] == key[2]]
+            control_schema = control_schema[0] if control_schema else {}
 
-        control_schema = control_schema[0] if control_schema else {}
-        partial_schema = dict(fields=[control_schema])
-
-        # resolve the new entry given partial_schema
+        # resolve the new entry using the control schema
         resolved_data = DecoupleFormSubmission(auto_fields, d_utils.json_to_object(
-            partial_schema).fields).get_schema_fields_updated()
+            dict(fields=[control_schema])).fields).get_schema_fields_updated()
 
         # get target record
         record = Sample().get_record(record_id)
 
-        if len(key) == 1:
-            record[key[0]] = resolved_data[key[0]]
-            validation_parameters["data"] = record[key[0]]
-            result["value"] = htags.get_resolver(resolved_data[key[0]], control_schema)
-        else:
+        if parent_schema.get("control", str()) in object_controls.keys():
             record[key[0]][int(key[1])][key[2]] = resolved_data[key[2]]
             validation_parameters["data"] = record[key[0]][int(key[1])]
             result["value"] = htags.get_resolver(resolved_data[key[2]], control_schema)
+        elif parent_schema["type"] == "array":
+            record[key[0]][int(key[1])] = resolved_data[key[0]][0]
+            validation_parameters["data"] = resolved_data[key[0]][0]
+            result["value"] = htags.get_resolver(resolved_data[key[0]][0], control_schema)
+        else:
+            record[key[0]] = resolved_data[key[0]]
+            validation_parameters["data"] = resolved_data[key[0]]
+            result["value"] = htags.get_resolver(resolved_data[key[0]], control_schema)
+
+        # ...this to get lists to render properly
+        if isinstance(result["value"], list):
+            result["value"] = " ".join(result["value"])
 
         # kick in some validation here before proceeding to save!
         validate_status = self.do_validation(validation_parameters)
@@ -975,7 +970,7 @@ class WizardHelper:
 
         if _id:
             Sample().get_collection_handle().update(
-                {"_id": ObjectId(_id)},
+                {"_id": _id},
                 {'$set': record})
 
         # refresh stored dataset with new display value
@@ -1005,47 +1000,41 @@ class WizardHelper:
         result = dict(status='success', value='')
 
         # object type controls and their corresponding schemas
-        object_array_controls = ["copo-characteristics", "copo-comment"]
-        object_array_schemas = [d_utils.get_copo_schema("material_attribute_value"),
-                                d_utils.get_copo_schema("comment")]
-
-        # get cell schema
-        control_schema = dict()
+        object_controls = d_utils.get_object_array_schema()
 
         key = cell_reference.split(self.key_split)
 
         # gather parameters for validation
         validation_parameters = dict(schema=dict(), data=str())
 
-        if len(key) > 1:  # object type key
-            parent_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
-            if parent_schema:
-                parent_schema = parent_schema[0]
-                validation_parameters["schema"] = parent_schema
-                if parent_schema['control'] in object_array_controls:
-                    control_index = object_array_controls.index(parent_schema['control'])
-                    control_schema = [f for f in object_array_schemas[control_index] if
-                                      f["id"].split(".")[-1] == key[2]]
+        parent_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
+        parent_schema = parent_schema[0] if parent_schema else {}
+        control_schema = parent_schema
+        validation_parameters["schema"] = control_schema
 
-        else:
-            control_schema = [f for f in self.schema if f["id"].split(".")[-1] == key[0]]
-            validation_parameters["schema"] = control_schema[0] if control_schema else {}
-
-        control_schema = control_schema[0] if control_schema else {}
+        if parent_schema.get("control", str()) in object_controls.keys():
+            control_schema = [f for f in object_controls[parent_schema['control']] if
+                              f["id"].split(".")[-1] == key[2]]
+            control_schema = control_schema[0] if control_schema else {}
 
         # get target record
         record = Sample().get_record(record_id)
 
-        if len(key) == 1:
-            resolved_data = record[key[0]]
-            validation_parameters["data"] = resolved_data
-            result["value"] = htags.get_resolver(resolved_data, control_schema)
-        else:
+        if parent_schema.get("control", str()) in object_controls.keys():
             resolved_data = record[key[0]][int(key[1])][key[2]]
             validation_parameters["data"] = record[key[0]][int(key[1])]
             result["value"] = htags.get_resolver(resolved_data, control_schema)
+        elif parent_schema["type"] == "array":
+            resolved_data = record[key[0]][int(key[1])]
+            validation_parameters["data"] = resolved_data
+            result["value"] = htags.get_resolver(resolved_data, control_schema)
+        else:
+            resolved_data = record[key[0]]
+            validation_parameters["data"] = resolved_data
+            result["value"] = htags.get_resolver(resolved_data, control_schema)
 
-        if isinstance(result["value"], list):  # ...this to get lists to render properly
+        # ...this to get lists to render properly
+        if isinstance(result["value"], list):
             result["value"] = " ".join(result["value"])
 
         # kick in some validation here before proceeding to save!
@@ -1061,14 +1050,18 @@ class WizardHelper:
         # update db records
         object_ids = [ObjectId(x.split("row_")[-1]) for x in target_rows]
 
-        if len(key) == 1:
-            Sample().get_collection_handle().update_many(
-                {"_id": {"$in": object_ids}},
-                {'$set': {key[0]: resolved_data}})
-        else:
+        if parent_schema.get("control", str()) in object_controls.keys():
             Sample().get_collection_handle().update_many(
                 {"_id": {"$in": object_ids}},
                 {'$set': {key[0] + "." + key[1] + "." + key[2]: resolved_data}})
+        elif parent_schema["type"] == "array":
+            Sample().get_collection_handle().update_many(
+                {"_id": {"$in": object_ids}},
+                {'$set': {key[0] + "." + key[1]: resolved_data}})
+        else:
+            Sample().get_collection_handle().update_many(
+                {"_id": {"$in": object_ids}},
+                {'$set': {key[0]: resolved_data}})
 
         # refresh stored dataset with new display value
         try:
@@ -1123,13 +1116,12 @@ class WizardHelper:
 
     def get_pending_description(self):
         """
-        function returns any pending description record
-        :param profile_id:
+        function returns any pending description records
         :return:
         """
 
         # first, remove obsolete description records
-        Description().purge_descriptions()
+        Description().purge_descriptions(component="sample")
 
         projection = dict(created_on=1, attributes=1, meta=1, stages=1)
         filter_by = dict(profile_id=self.profile_id, component='sample')

@@ -677,9 +677,16 @@ $(document).ready(function () {
         });
 
         var right = $('<div/>', {
-            class: "col-sm-4",
-            html: ' <div class="webpop-content-div alert alert-default" style="background-color:#eee;">' + stage_message + '</div>'
+            class: "col-sm-4"
         });
+
+        var message = $('<div/>', {class: "webpop-content-div"});
+        message.append(stage_message);
+
+        var panel = get_panel('info');
+        panel.find('.panel-body').append(message);
+        panel.find(".panel-footer").remove();
+        right.append(panel);
 
         row
             .append(left)
@@ -974,7 +981,7 @@ $(document).ready(function () {
                 data: {
                     'request_action': "save_cell_data",
                     'cell_reference': dtColumns[cell.index().column].data,
-                    'record_id': recordID,
+                    'target_id': recordID,
                     'auto_fields': JSON.stringify(form_values),
                     'description_token': sampleDescriptionToken
 
@@ -1027,7 +1034,7 @@ $(document).ready(function () {
                 data: {
                     'request_action': "get_cell_control",
                     'cell_reference': dtColumns[cell.index().column].data,
-                    'record_id': recordID,
+                    'target_id': recordID,
                     'description_token': sampleDescriptionToken
 
                 },
@@ -1291,6 +1298,17 @@ $(document).ready(function () {
                     .on('key-blur', function (e, datatable, cell) {
                         //;
                     });
+
+                //add event for column highlighting and tooltip
+                $('#' + tableID + ' tbody')
+                    .on('mouseenter', 'td', function () {
+                        var colIdx = table.cell(this).index().column;
+
+                        $(this).prop("title", "[" + dtRows[table.cell(this).index().row].name + ", " + dtColumns[colIdx].title + "" + "]");
+
+                        $(table.cells().nodes()).removeClass('copo-higlighted-column');
+                        $(table.column(colIdx).nodes()).addClass('copo-higlighted-column');
+                    });
             },
             error: function () {
                 alert("Couldn't generate samples!");
@@ -1349,7 +1367,7 @@ $(document).ready(function () {
             BootstrapDialog.show({
                 title: "Confirm batch update",
                 message: "Corresponding cells in column <span style='color: #ff0000;'>" + dtColumns[cell.index().column].title + "</span> for the selected records will be assigned the value: <span style='color: #ff0000;'>" + dtRows[cell.index().row][dtColumns[cell.index().column].data] + "</span>.<div style='margin-top: 10px;'>Do you want to continue?</div>",
-                cssClass: 'copo-modal3',
+                // cssClass: 'copo-modal3',
                 closable: false,
                 animate: true,
                 type: BootstrapDialog.TYPE_WARNING,
@@ -1392,7 +1410,7 @@ $(document).ready(function () {
                                 data: {
                                     'request_action': "batch_update",
                                     'cell_reference': dtColumns[cell.index().column].data,
-                                    'record_id': recordID,
+                                    'target_id': recordID,
                                     'target_rows': JSON.stringify(target_rows),
                                     'description_token': sampleDescriptionToken
 

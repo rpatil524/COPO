@@ -32,7 +32,7 @@ $(document).ready(function () {
     function do_render_submission_table(data) {
         var dtd = data.table_data.dataSet;
 
-        set_empty_component_message(dtd); //display empty submission message.
+        set_empty_component_message(dtd.length); //display empty submission message.
 
         if (dtd.length == 0) {
             return false;

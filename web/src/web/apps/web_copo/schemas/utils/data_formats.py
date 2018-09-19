@@ -5,6 +5,7 @@ import re
 import json
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
+from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 
 
 class DataFormats:
@@ -27,7 +28,7 @@ class DataFormats:
         configuration elsewhere.
 
         Also, order matters! That is, the order of items in the properties list is preserved when those items are
-        rendered on the UI.
+        rendered in the UI.
         '''
 
         self.dispatch = {
@@ -38,6 +39,9 @@ class DataFormats:
 
     # generates template for UI rendering
     def generate_ui_template(self):
+        # update cg core
+        CgCoreSchemas().process_schema()
+
         new_list = []
         json_files_handle = self.get_mapping_files()
         for file_name in json_files_handle:

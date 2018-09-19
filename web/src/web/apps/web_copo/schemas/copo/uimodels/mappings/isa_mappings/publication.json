@@ -21,6 +21,7 @@
       "id": "copo.publication.title",
       "type": "string",
       "show_in_table": true,
+      "show_as_attribute": true,
       "control": "textarea"
     },
     {
@@ -111,7 +112,8 @@
       "show_in_form": true,
       "id": "copo.publication.comments",
       "type": "array",
-      "show_in_table": true,
+      "show_in_table": false,
+      "show_as_attribute": true,
       "control": "copo-comment"
     },
     {

@@ -1,4 +1,3 @@
-import json
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
@@ -25,6 +24,7 @@ from rauth import OAuth2Service
 from web.apps.web_copo.utils import EnaImports as eimp
 from submission.enaSubmission import EnaSubmit
 from web.apps.web_copo.schemas.utils import data_utils
+import web.apps.web_copo.templatetags.html_tags as htags
 
 LOGGER = settings.LOGGER
 
@@ -152,7 +152,9 @@ def copo_data(request, profile_id):
     request.session['datafile_url'] = request.path
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
-    return render(request, 'copo/copo_data.html', {'profile_id': profile_id, 'profile': profile})
+    table_columns = htags.generate_table_columns("datafile")
+    return render(request, 'copo/copo_data.html',
+                  {'profile_id': profile_id, 'profile': profile, 'table_columns': jsonpickle.encode(table_columns)})
 
 
 def copo_docs(request):
@@ -164,6 +166,11 @@ def copo_docs(request):
 def copo_visualize(request):
     context = dict()
 
+    # test
+    # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+    # CgCoreSchemas().extract_dublin_core("5b45cf4ed127fd90cc60e4a4")
+    # test ends
+
     task = request.POST.get("task", str())
 
     profile_id = request.session.get("profile_id", str())
@@ -173,6 +180,7 @@ def copo_visualize(request):
 
     broker_visuals = BrokerVisuals(context=context,
                                    profile_id=profile_id,
+                                   request=request,
                                    component=request.POST.get("component", str()),
                                    target_id=request.POST.get("target_id", str()),
                                    quick_tour_flag=request.POST.get("quick_tour_flag", False),
@@ -180,6 +188,7 @@ def copo_visualize(request):
                                    )
 
     task_dict = dict(table_data=broker_visuals.do_table_data,
+                     server_side_table_data=broker_visuals.do_server_side_table_data,
                      profiles_counts=broker_visuals.do_profiles_counts,
                      wizard_messages=broker_visuals.do_wizard_messages,
                      metadata_ratings=broker_visuals.do_metadata_ratings,

@@ -1,7 +1,26 @@
 {
   "title": "General Datafile Description - stages defined here apply to all description instances",
-  "description": "Definitions for elements that appear in different stages of a wizard for submission to different repositories. 'ref', id of stage; 'title', header used for the stage; 'content', the function to call to generate stage html; items, actual form elements on the page; 'apply_to_all', if all items must have same value for this stage",
+  "description": "Definitions for elements that appear in different stages of a wizard for submission to different repositories. 'ref', id of stage; 'title', header used for the stage; 'content', the function to call to generate stage html; items, actual form elements on the page; 'apply_to_all', if all items must have same value for this stage; 'is_metadata' if this stage should be considered as datafile metadata",
   "properties": [
+    {
+      "ref": "description_bundle_name",
+      "title": "Bundle Name",
+      "message": "Please assign a label to your description. Assigning a label to a description makes for easy referencing in the future.",
+      "is_metadata": false,
+      "callback": "get_unique_bundle_names",
+      "items": [
+        {
+          "id": "description_bundle_name",
+          "help_tip": "Supply a name for your description bundle",
+          "label": "Bundle name",
+          "hidden": "false",
+          "required": "true",
+          "control": "text",
+          "unique": true,
+          "unique_items": []
+        }
+      ]
+    },
     {
       "ref": "target_repository",
       "title": "Repository",
@@ -31,10 +50,10 @@
     },
     {
       "ref": "datafiles_editing",
-      "title": "Edit Datafiles",
+      "title": "Datafile Attributes",
       "callback": "perform_datafile_generation",
       "renderer": "perform_datafile_generation",
-      "message": "The Edit Datafiles stage presents datafile metadata as discrete attribute values, i.e., each attribute value captured in a column. You can modify specific attribute values for individual datafiles. Additionally, you can batch-update attribute values for groups of datafiles. <ul><li>To update attribute value for a single datafile: <ol><li>Click to focus on a cell (note: this action is different from row selection)</li><li>Double-click or press 'Enter' on a focused cell to make it editable</li><li>Make your changes and double-click or press 'Enter' again to save your changes</li></ol><li>To batch-update corresponding attribute values for a group of datafiles:<ol><li>Click to focus on a target cell, the value of which will be used to update corresponding cells of selected records</li><li>Select one or more rows that will form the update batch</li><li>Click the 'Update selected records' button</li></ol></li><li>Click <strong>Next</strong>, when done editing, to proceed to the final stage</li></ul>",
+      "message": "In this stage each attribute value that describes a datafile is represented in a column, allowing specific attribute values for individual datafiles to be easily accessed and modified. You can also batch-update attribute values for groups of datafiles. <ul><li>To update attribute value for a single datafile: <ol><li>Click to focus on a cell (note: this action is different from row selection)</li><li>Double-click or press 'Enter' on a focused cell to make it editable</li><li>Make your changes and double-click or press 'Enter' again to save your changes</li></ol><li>To batch-update corresponding attribute values for a group of datafiles:<ol><li>Click to focus on a target cell, the value of which will be used to update corresponding cells of selected records</li><li>Select one or more rows that will form the update batch</li><li>Click the 'Update selected records' button</li></ol></li><li>Click <strong>Next</strong>, when done editing, to proceed to the final stage</li></ul>",
       "items": [
       ]
     },

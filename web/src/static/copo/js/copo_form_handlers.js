@@ -3,18 +3,21 @@
  */
 
 var olsURL = ""; // url of ols lookup for ontology fields
+var lookupsURL = ""; //lookup url for agrovoc labels
 var copoSchemas = {};
 var copoFormsURL = "/copo/copo_forms/";
 var globalDataBuffer = {};
 var htmlForm = $('<div/>'); //global form div
 var formMode = "add";
 var componentData = null;
+var global_key_split = "___0___";
 
 $(document).ready(function () {
     var csrftoken = $.cookie('csrftoken');
 
     //get urls
     olsURL = $("#elastic_search_ajax").val();
+    lookupsURL = $("#ajax_search_copo_local").val();
 
     //retrieve and set form resources
     $.ajax({
@@ -62,6 +65,7 @@ var controlsMapping = {
     "hidden": "do_hidden_ctrl",
     "copo-select": "do_copo_select_ctrl",
     "ontology term": "do_ontology_term_ctrl",
+    "copo-lookup": "do_copo_lookup_ctrl",
     "select": "do_select_ctrl",
     "copo-onto-select": "do_onto_select_ctrl",
     "copo-multi-search": "do_copo_multi_search_ctrl",
@@ -447,7 +451,7 @@ function build_clone_control(component_records, component_label) {
     var selectCtrl = $('<select/>',
         {
             class: "input-copo copo-multi-select",
-            placeholder: "Clone a " + component_label + " record...",
+            placeholder: "Clone a " + component_label + " record..."
         });
 
     $('<option value=""></option>').appendTo(selectCtrl);
@@ -459,7 +463,7 @@ function build_clone_control(component_records, component_label) {
 
     ctrlsDiv.append(selectCtrl).append(hiddenValuesCtrl);
 
-    return form_div_ctrl().append(ctrlsDiv)
+    return form_div_ctrl().append(ctrlsDiv);
 }
 
 
@@ -961,6 +965,18 @@ var dispatchFormControl = {
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
+    do_copo_lookup_ctrl: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        ctrlsDiv = get_lookup_span(ctrlsDiv, formElem);
+
+        var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+
+        return returnDiv;
+    },
     do_copo_multi_select_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -989,6 +1005,7 @@ var dispatchFormControl = {
                 class: "input-copo copo-multi-select",
                 placeholder: "Select " + formElem.label + "...",
                 multiple: "multiple",
+                "data-element": formElem.id,
                 "data-validate": true,
             });
 
@@ -1193,7 +1210,7 @@ var dispatchFormControl = {
             radioGroup.append(radioCtrlDiv);
         }
 
-        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append(radioGroup).append(hiddenCtrl).append(hiddenCtrlPreviousValue);
+        ctrlsDiv.append(form_label_ctrl(formElem)).append(radioGroup).append(hiddenCtrl).append(hiddenCtrlPreviousValue);
 
         return form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
@@ -1264,7 +1281,7 @@ var dispatchFormControl = {
         ctrlsDiv.append(feedBackElem);
 
         return form_div_ctrl()
-            .append(form_label_ctrl(formElem.label, formElem.id))
+            .append(form_label_ctrl(formElem))
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
 
@@ -1332,7 +1349,7 @@ var dispatchFormControl = {
         ctrlsDiv.append(vM.errorHelpDiv);
 
         return form_div_ctrl()
-            .append(form_label_ctrl(formElem.label, formElem.id))
+            .append(form_label_ctrl(formElem))
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
 
@@ -1355,7 +1372,7 @@ var dispatchFormControl = {
                 class: "list-group"
             });
 
-        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append(listGroup);
+        ctrlsDiv.append(form_label_ctrl(formElem)).append(listGroup);
 
         for (var i = 0; i < formElem.option_values.length; ++i) {
             var option = formElem.option_values[i];
@@ -1469,7 +1486,7 @@ var dispatchFormControl = {
         countCtrlBtn.append(countCtrlOutput);
 
 
-        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append(countCtrlDiv);
+        ctrlsDiv.append(form_label_ctrl(formElem)).append(countCtrlDiv);
         ctrlsDiv.append(countCtrlOutputDiv);
         ctrlsDiv.append(hiddenCtrl);
 
@@ -1516,7 +1533,7 @@ var dispatchFormControl = {
             message_span.html(minmax + "; Max: " + formElem.max);
         }
 
-        ctrlsDiv.append(form_label_ctrl(formElem.label, formElem.id)).append(counter_ctrl).append(message_span);
+        ctrlsDiv.append(form_label_ctrl(formElem)).append(counter_ctrl).append(message_span);
 
         //set validation markers
         var vM = set_validation_markers(formElem, counter_ctrl);
@@ -1775,13 +1792,23 @@ function form_div_ctrl() {
         });
 }
 
-function form_label_ctrl(lbl, target) {
+function form_label_ctrl(formElem) {
+    var lbl = formElem.label;
+    var target = formElem.id;
     var lblCtrl = '';
+
+    if (formElem.hasOwnProperty("required") && (formElem.required.toString().toLowerCase() == "true")) {
+        lbl = lbl + "<span class='constraint-label required-label'> required</span>";
+    } else if (formElem.hasOwnProperty("field_constraint") && (formElem.field_constraint.trim().toLowerCase() != "")) {
+        var dclass = "constraint-label " + formElem.field_constraint.trim().toLowerCase() + "-label";
+        var dval = formElem.field_constraint.trim().toLowerCase();
+        lbl = lbl + "<span class='" + dclass + "'>" + dval + "</span>";
+    }
 
     if (lbl) {
         lblCtrl = $('<label/>',
             {
-                text: lbl,
+                html: lbl,
                 for: target,
                 class: "control-label"
             });
@@ -1825,8 +1852,8 @@ function get_element_clone(ctrlsDiv, counter) {
     ctrlClone.find(':input').each(function () {
         if (this.id) {
             var elemID = this.id;
-            $(this).attr("id", elemID + "_" + counter);
-            $(this).attr("name", elemID + "_" + counter);
+            $(this).attr("id", elemID + global_key_split + counter);
+            $(this).attr("name", elemID + global_key_split + counter);
         }
     });
 
@@ -1898,7 +1925,8 @@ function resolve_ctrl_values(ctrlsDiv, counter, formElem, elemValue) {
                         var ctrlsWithValuesDivSiblings = get_element_clone(ctrlsDiv.clone(), counter);
                         ctrlsWithValuesDivSiblings.find(":input").each(function () {
                             if (this.id) {
-                                var tId = this.id.substring(0, this.id.lastIndexOf("_")); //strip off subscript
+
+                                var tId = this.id.substring(0, this.id.lastIndexOf(global_key_split)); //strip off subscript
 
                                 var resolvedValue = resolve_ctrl_values_aux_1(tId, formElem, elemValue[i]);
                                 $(this).val(resolvedValue);
@@ -2038,6 +2066,58 @@ function get_ontology_span_2(ontologySpan, formElem) {
     return ontologySpan;
 }
 
+function get_lookup_span(ctrlsDiv, formElem) {
+    var localolsURL = lookupsURL;
+
+    //specify target component
+    if (formElem.hasOwnProperty('component_name')) {
+        localolsURL = lookupsURL.replace("999", formElem.component_name);
+    }
+
+    var hiddenValuesCtrl = $('<input/>',
+        {
+            type: "hidden",
+            id: formElem.id,
+            name: formElem.id,
+            class: "copo-multi-values",
+            "data-maxItems": 1, //to accommodate multiple values, set type in schema to 'array'
+        });
+
+    var elemJson = [];
+    if (formElem.hasOwnProperty("option_values")) {
+        elemJson = formElem.option_values;
+    }
+
+    var hiddenJsonCtrl = $('<input/>',
+        {
+            type: "hidden",
+            class: "elem-json",
+            value: JSON.stringify(elemJson)
+        });
+
+    var placeholder = "Lookup " + formElem.label + "...";
+    if (formElem.hasOwnProperty("placeholder")) {
+        placeholder = formElem.placeholder;
+    }
+
+    var selectCtrl = $('<select/>',
+        {
+            class: "input-copo copo-lookup ",
+            "data-url": localolsURL,
+            placeholder: placeholder,
+            multiple: "multiple",
+            "data-validate": true
+        });
+
+    ctrlsDiv.append(selectCtrl).append(hiddenValuesCtrl).append(hiddenJsonCtrl);
+
+    //set validation markers
+    var vM = set_validation_markers(formElem, selectCtrl);
+    ctrlsDiv.append(vM.errorHelpDiv);
+
+    return ctrlsDiv;
+}
+
 function get_multi_search_span(formElem, ctrlsDiv) {
     //build hidden fields to hold selected options and supply control data respectively
 
@@ -2105,7 +2185,7 @@ function get_form_ctrl(ctrlsDiv, formElem, elemValue) {
     }
 
     return form_div_ctrl()
-        .append(form_label_ctrl(formElem.label, formElem.id))
+        .append(form_label_ctrl(formElem))
         .append(ctrlObjects.ctrlsWithValuesDiv)
         .append(ctrlObjects.ctrlsWithValuesDivArray)
         .append(addbtnDiv)

@@ -46,7 +46,7 @@
         },
         {
           "id": "categories",
-          "help_tip": "Select a relevant category.",
+          "help_tip": "Select relevant categories",
           "label": "Categories",
           "hidden": "false",
           "control": "copo-multi-select",

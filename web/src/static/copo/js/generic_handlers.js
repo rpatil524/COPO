@@ -1,6 +1,6 @@
 //**some re-usable functions across different modules
 var AnnotationEventAdded = false;
-var selectizeObjects = Object(); //stores reference to selectize objects initialised on the page
+var selectizeObjects = {}; //stores reference to selectize objects initialised on the page
 var copoVisualsURL = "/copo/copo_visualize/";
 var csrftoken = $.cookie('csrftoken');
 var quickTourMessages = quick_tour_messages(); //holds quick tour messages
@@ -71,7 +71,7 @@ function set_selectize_select_event() {
     $(document).on("keyup keypress", function (event) {
         var keyCode = event.keyCode || event.which;
         if (keyCode === 38 || keyCode === 40) {
-            if ($(event.target).closest(".onto-select")) {
+            if ($(event.target).closest(".onto-select").length) {
                 var item = $(event.target).closest(".onto-select");
                 var activeElem = item.find(".selectize-dropdown-content .active").find(".onto-label");
 
@@ -82,9 +82,7 @@ function set_selectize_select_event() {
 
                 showontopop(item, label, prefix, desc, accession);
 
-            }
-
-            if ($(event.target).closest(".copo-multi-search")) {
+            } else if ($(event.target).closest(".copo-multi-search").length) {
                 var eventTarget = $(event.target).closest(".copo-multi-search");
                 item = eventTarget.find(".selectize-dropdown-content .active");
                 var recordId = item.attr("data-value");
@@ -94,6 +92,16 @@ function set_selectize_select_event() {
                 if (associatedComponent) {
                     resolve_element_view(recordId, associatedComponent, popTarget);
                 }
+            } else if ($(event.target).closest(".copo-lookup").length) {
+                var item = $(event.target).closest(".copo-lookup");
+                var activeElem = item.find(".selectize-dropdown-content .active").find(".lookup-label");
+
+                var desc = activeElem.attr("data-desc");
+                var label = activeElem.attr("data-label");
+                var accession = activeElem.attr("data-accession");
+
+                showlkup(item, label, desc, accession);
+
             }
         }
     });
@@ -109,9 +117,7 @@ function set_selectize_select_event() {
             var accession = $(this).find(".onto-label").attr("data-accession");
 
             showontopop(item, label, prefix, desc, accession);
-        }
-
-        if ($(this).closest(".selectize-control.copo-multi-search").length) {
+        } else if ($(this).closest(".selectize-control.copo-multi-search").length) {
             var item = $(this).closest(".selectize-control.copo-multi-search");
 
             var recordId = item.find(".selectize-dropdown-content .active").attr("data-value");
@@ -121,9 +127,65 @@ function set_selectize_select_event() {
             if (associatedComponent) {
                 resolve_element_view(recordId, associatedComponent, popTarget);
             }
+        } else if ($(this).closest(".selectize-control.copo-lookup").length) {
+            var item = $(this).closest(".selectize-control.copo-lookup");
+
+            var desc = $(this).find(".lookup-label").attr("data-desc");
+            var label = $(this).find(".lookup-label").attr("data-label");
+            var accession = $(this).find(".lookup-label").attr("data-accession");
+
+            showlkup(item, label, desc, accession);
         }
 
     });
+}
+
+function showlkup(item, label, desc, accession) {
+    var result = $('<div/>',
+        {
+            class: "limit-text"
+        });
+
+    item.webuiPopover('destroy');
+
+    if (String(accession) != 'undefined' && String(label) != 'undefined') {
+
+        //ontology accession
+        var lookupAccession = $('<div/>');
+
+        if (accession != '') {
+            lookupAccession.css('margin-top', '5px')
+            $('<span>', {
+                class: "ontology-accession-link",
+                html: "<span style='text-decoration-line: underline; color:#2759a5'>" + accession + "</span>"
+            }).appendTo(lookupAccession);
+        }
+
+        result.append(lookupAccession);
+
+
+        //ontology description
+        var lookupDescription = $('<div/>');
+
+        if (desc != '') {
+            lookupDescription.css('margin-top', '5px');
+            lookupDescription.html(desc);
+
+        }
+
+        result.append(lookupDescription);
+
+        item.webuiPopover({
+            title: label,
+            content: '<div class="webpop-content-div">' + $('<div/>').append(result).html() + '</div>',
+            trigger: 'sticky',
+            width: 300,
+            arrow: true,
+            placement: 'right',
+            dismissible: true
+        });
+    }
+
 }
 
 function showontopop(item, label, prefix, desc, accession) {
@@ -207,17 +269,17 @@ function resolve_element_view(recordId, associatedComponent, eventTarget) {
             'target_id': recordId
         },
         success: function (data) {
-            var gAttrib = {};
-            if (associatedComponent == "datafile") { //datafile component rendered differently
-                gAttrib = build_description_display(data);
-            } else {
-                gAttrib = build_attributes_display(data);
+            var title = 'Attributes';
+            gAttrib = build_attributes_display(data);
+
+            if (data.component_label) {
+                title = data.component_label;
             }
 
             eventTarget.webuiPopover('destroy');
 
             eventTarget.webuiPopover({
-                title: 'Attributes',
+                title: title,
                 content: '<div class="webpop-content-div limit-text">' + $('<div/>').append(gAttrib).html() + '</div>',
                 trigger: 'sticky',
                 width: 300,
@@ -225,7 +287,6 @@ function resolve_element_view(recordId, associatedComponent, eventTarget) {
                 placement: 'right',
                 dismissible: true
             });
-
 
         },
         error: function () {
@@ -626,6 +687,7 @@ function refresh_tool_tips() {
     refresh_multiselectbox();
     refresh_multisearch();
     refresh_ontology_select();
+    refresh_copo_lookup();
 
     refresh_range_slider();
     auto_complete();
@@ -702,7 +764,7 @@ function refresh_selectbox() {
                     return {
                         value: input,
                         text: input
-                    }
+                    };
                 }
             });
         }
@@ -716,6 +778,7 @@ function refresh_multiselectbox() {
         var valueElem = elem.closest('.copo-form-group').find('.copo-multi-values');
         var maxTems = 'null'; //maximum selectable items
 
+        var parentID = elem.attr("data-element");
 
         if (valueElem.is("[data-maxItems]")) {
             maxTems = valueElem.attr("data-maxItems");
@@ -739,6 +802,106 @@ function refresh_multiselectbox() {
             //set default values
             var control = $funSelect[0].selectize;
             control.setValue(valueElem.val().split(",")); //set default value
+
+            //retain reference to control for any future reference
+            selectizeObjects[parentID] = control;
+        }
+    });
+}
+
+function refresh_copo_lookup() {
+    $('.copo-lookup').each(function () {
+        var elem = $(this);
+        var url = elem.attr("data-url");
+        var valueElem = elem.closest('.ctrlDIV').find('.copo-multi-values');
+        var elemSpecs = JSON.parse(elem.closest('.ctrlDIV').find('.elem-json').val());
+
+        var maxTems = 'null'; //maximum selectable items
+        if (valueElem.is("[data-maxItems]")) {
+            maxTems = valueElem.attr("data-maxItems");
+        }
+
+        var options = [];
+
+        if (elemSpecs.length > 0) {
+            elemSpecs.forEach(function (item) {
+                if(item.accession == valueElem.val())
+                options.push(item);
+            });
+        }
+
+        if (!(/selectize/i.test(elem.attr('class')))) { // if not already instantiated
+            var $funSelect = elem.selectize({
+                onChange: function (value) {
+                    if (value) {
+                        valueElem.val(value)
+                            .trigger('change');
+                    } else {
+                        valueElem.val("");
+                    }
+
+                    WebuiPopovers.hideAll();
+                },
+                onBlur: function () {
+                    WebuiPopovers.hideAll();
+                },
+                maxItems: maxTems,
+                create: false,
+                plugins: ['remove_button'],
+                valueField: 'accession',
+                labelField: 'label',
+                searchField: 'label',
+                options: options,
+                render: {
+                    option: function (item, escape) {
+                        var desc = escape(item.description);
+                        var accession = escape(item.accession);
+                        var label = escape(item.label);
+
+                        return '<div>' +
+                            '<span data-accession="' + accession + '"  data-label="' + label + '" data-desc="' + desc + '" class="webpop-content-div ontology-label lookup-label">' + escape(item.label) + '</span></div>';
+
+                    }
+                },
+                load: function (query, callback) {
+                    if (!query.length) return callback();
+                    this.clearOptions();        // clear the data
+                    this.renderCache = {};      // clear the html template cache
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
+                        data: {q: query},
+                        success: function (data) {
+                            var ontologies = [];
+
+                            if (data.hasOwnProperty('result') && data.result.length > 0) {
+                                ontologies = data.result;
+                            }
+
+                            callback(ontologies);
+                        },
+                        error: function () {
+                            callback();
+                        }
+                    });
+                }
+            });
+
+            //reference to selectize object
+            var control = $funSelect[0].selectize;
+
+            //set default values
+            if (options.length) {
+                for (var p in control.options) {
+                    control.setValue(p); //set default value
+                }
+            }
+
+            //retain reference to control for any future reference
+            selectizeObjects[valueElem.attr("id")] = control;
         }
     });
 }
@@ -837,11 +1000,11 @@ function refresh_ontology_select() {
                         elem.closest(".ontology-parent").find(".onto-label").find("span.onto-label-span").html('');
                     }
 
-                    $(".selectize-control.onto-select").webuiPopover('destroy');
+                    WebuiPopovers.hideAll();
                     set_ontology_icon(elem, $funSelect[0].selectize.getValue());
                 },
                 onBlur: function () {
-                    $(".selectize-control.onto-select").webuiPopover('destroy');
+                    WebuiPopovers.hideAll();
                 },
                 maxItems: '1',
                 create: true,
@@ -928,7 +1091,6 @@ function set_ontology_icon(elem, onto_object) {
 
     try {
         onto_object = JSON.parse(onto_object);
-
 
 
         if (typeof onto_object === "object" && onto_object.termAccession != "") {
@@ -1142,38 +1304,6 @@ function isInArray(value, array) {
     return array.indexOf(value) > -1;
 }
 
-function get_attributes_outer_div() {
-    //used in rendering table information
-
-    var ctrlsDiv = $('<div/>', {
-        class: "copo-component-attributes-outer"
-    });
-
-    return ctrlsDiv.clone();
-}
-
-
-function get_attributes_inner_div() {
-    //used in rendering table information
-
-    var ctrlSpan = $('<span/>', {
-        class: "copo-component-attributes-inner"
-    });
-
-    return ctrlSpan.clone();
-}
-
-function get_attributes_inner_div_1() {
-    //used in rendering table information
-
-    var ctrlSpan = $('<span/>', {
-        class: "copo-component-attributes-inner-0"
-    });
-
-    return ctrlSpan.clone();
-}
-
-
 function get_data_list_panel(itemData, link) {
     if (!itemData) {
         return "";
@@ -1306,78 +1436,6 @@ function get_data_list_panel(itemData, link) {
     return $('<div/>').append(containerFuild).html();
 }
 
-
-function deconvulate_column_data(itemData, link) {
-    if (!itemData) {
-        return "";
-    }
-
-    if (Object.prototype.toString.call(itemData) === '[object String]') {
-        return itemData;
-    }
-
-    var resolvedDiv = $('<table/>');
-
-    var itemData = [itemData];
-
-    itemData.forEach(function (entry) {
-        var iRow = $('<tr/>').css("background-color", "transparent");
-
-        resolvedDiv.append(iRow);
-
-        var labelCol = $('<td/>');
-
-        var valueCol = $('<td/>');
-
-        iRow.append('');
-        iRow.append(valueCol);
-
-        // labelCol.append(entry.title);
-
-        var valueNode = [];
-        if (Object.prototype.toString.call(entry) === '[object String]') {
-            valueNode.push(entry);
-        } else if (Object.prototype.toString.call(entry) === '[object Array]') {
-            entry.forEach(function (item) {
-                if (Object.prototype.toString.call(item) === '[object String]') {
-                    valueNode.push(item);
-                } else {
-                    var valueNode_sub = [];
-                    item.forEach(function (item_sub) {
-                        if (Object.prototype.toString.call(item_sub) === '[object String]') {
-                            valueNode.push(item_sub);
-                        } else if (Object.prototype.toString.call(item_sub) === '[object Object]') {
-                            $.each(item_sub, function (key, val) {
-                                valueNode_sub.push(format_camel_case(key) + ":  " + val);
-                            });
-                        }
-                    });
-
-                    if (valueNode_sub.length > 0) {
-                        valueNode.push(valueNode_sub.join("<br/>"));
-                    }
-                }
-
-            });
-        }
-
-        var breakr = $('<div/>', {
-            style: "border-top: 1px solid rgba(34, 36, 38, 0.1);"
-        });
-
-        if (valueNode.length > 1) {
-            valueCol.append(valueNode[0]);
-            for (var i = 1; i < valueNode.length; ++i) {
-                valueCol.append(breakr.clone().append(valueNode[i]));
-            }
-        } else {
-            valueCol.append(valueNode.join("<br/>"));
-        }
-    });
-
-    return resolvedDiv;
-}
-
 function get_data_item_collapse(link, itemData, itemCount) {
     // create badge
     var badgeSpan = $('<span/>', {
@@ -1444,51 +1502,16 @@ function build_description_display(data) {
 
     var resolvedTable = $('<table/>');
 
-    for (var j = 0; j < data.description.length; ++j) {
-        var Ddata = data.description[j];
-
-        var i = 0; //need to change this to reflect stage index...actually suppressing that on purpose for now
+    for (var j = 0; j < data.description.columns.length; ++j) {
+        var Ddata = data.description.columns[j];
 
         var iRow = $('<tr/>');
 
         var labelCol = $('<td/>').attr('colspan', 2).append(Ddata.title);
         iRow.append(labelCol);
 
-        var valueCol = $('<div/>');
-        labelCol.append(valueCol);
-
-        for (var k = 0; k < Ddata.data.length; ++k) {
-            var Mdata = Ddata.data[k];
-
-            var mDataDiv = $('<tr/>', {
-                //class: "row"
-            });
-
-            var mDataDivLabel = $('<td/>', {
-                //class: "col-sm-5 col-md-5 col-lg-5",
-                html: Mdata.label
-            });
-
-            var mDataDivData = $('<td/>', {
-                //class: "col-sm-7 col-md-7 col-lg-7",
-            });
-
-            mDataDiv.append(mDataDivLabel).append(mDataDivData);
-
-            var displayedValue = "";
-
-            if (Object.prototype.toString.call(Mdata.data) === '[object Array]') {
-                Mdata.data.forEach(function (vv) {
-                    displayedValue += "<div>" + vv + "</div>";
-                });
-            } else if (Object.prototype.toString.call(Mdata.data) === '[object String]') {
-                displayedValue = String(Mdata.data);
-            }
-
-            mDataDivData.append(displayedValue);
-
-            valueCol.append(mDataDiv);
-        }
+        var dataCol = $('<td/>').attr('colspan', 2).append(data.description.data_set[Ddata.data]);
+        iRow.append(dataCol);
 
         resolvedTable.append(iRow);
     }
@@ -1497,60 +1520,30 @@ function build_description_display(data) {
 }
 
 function build_attributes_display(data) {
-    var resolvedTable = $('<table/>');
-
-    data.component_attributes.forEach(function (entry) {
-        var iRow = $('<tr/>');
-
-        resolvedTable.append(iRow);
-
-        var labelCol = $('<td/>');
-
-        var valueCol = $('<td/>');
-
-        iRow.append(labelCol);
-        iRow.append(valueCol);
-
-        labelCol.append(entry.title);
-
-        var valueNode = [];
-        if (Object.prototype.toString.call(entry.data) === '[object String]') {
-            valueNode.push(entry.data);
-        } else if (Object.prototype.toString.call(entry.data) === '[object Array]') {
-            entry.data.forEach(function (item) {
-                var valueNode_sub = [];
-                item.forEach(function (item_sub) {
-                    if (Object.prototype.toString.call(item_sub) === '[object String]') {
-                        valueNode.push(item_sub);
-                    } else if (Object.prototype.toString.call(item_sub) === '[object Object]') {
-                        $.each(item_sub, function (key, val) {
-                            valueNode_sub.push(format_camel_case(key) + ":  " + val);
-                        });
-                    }
-                });
-
-                if (valueNode_sub.length > 0) {
-                    valueNode.push(valueNode_sub.join("<br/>"));
-                }
-            });
-        }
-
-
-        var breakr = $('<div/>', {
-            style: "border-top: 1px solid rgba(34, 36, 38, 0.1);"
-        });
-
-        if (valueNode.length > 1) {
-            valueCol.append(valueNode[0]);
-            for (var i = 1; i < valueNode.length; ++i) {
-                valueCol.append(breakr.clone().append(valueNode[i]));
-            }
-        } else {
-            valueCol.append(valueNode.join("<br/>"));
-        }
+    var contentHtml = $('<table/>', {
+        // cellpadding: "5",
+        cellspacing: "0",
+        border: "0",
+        // style: "padding-left:50px;"
     });
 
-    return resolvedTable;
+    if (data.component_attributes.columns) {
+        // expand row
+
+        for (var i = 0; i < data.component_attributes.columns.length; ++i) {
+            var colVal = data.component_attributes.columns[i];
+
+            var colTR = $('<tr/>');
+            contentHtml.append(colTR);
+
+            colTR
+                .append($('<td/>').append(colVal.title))
+                .append($('<td/>').append(data.component_attributes.data_set[colVal.data]));
+
+        }
+    }
+
+    return contentHtml;
 }
 
 function get_collapsible_panel(panelType) {
@@ -1688,7 +1681,7 @@ function get_profile_components() {
             buttons: ["quick-tour-template"],
             sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help", "copo-sidebar-upload"],
             tableID: 'datafile_table',
-            recordActions: ["describe_record_multi", "undescribe_record_multi"],
+            recordActions: ["describe_record_multi", "unbundle_record_multi", "undescribe_record_multi"],
             visibleColumns: 3
         },
         {
@@ -2037,7 +2030,7 @@ function do_context_help(data) {
         .find("input")
         .removeClass("input-sm")
         .attr("placeholder", "Search Help")
-        // .attr("size", 30);
+    // .attr("size", 30);
 }
 
 function do_global_help(component) {
@@ -2102,6 +2095,11 @@ function set_inputs_help() {
         }
 
         var title = elem.find("label").html();
+        if (elem.find("label").find(".constraint-label").length) {
+            title = elem.find("label").clone();
+            title.find(".constraint-label").remove();
+            title = title.html();
+        }
         var content = elem.find(".form-input-help").html();
 
         elem.webuiPopover('destroy');
@@ -2324,7 +2322,7 @@ function quick_tour_messages() {
                 "content": "Shortcut buttons for accessing profile components."
             },
             "copo_data_upload_tab": {
-                "title": "File Upload Tab",
+                "title": "File Upload",
                 "content": "Select this tab to access the file upload view. <br/>For more information about this control, including a demonstration of its usage, please use the help component."
             },
             "copo_data_inspect_tab": {

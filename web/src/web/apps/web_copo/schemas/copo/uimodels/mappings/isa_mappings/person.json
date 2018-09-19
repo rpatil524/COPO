@@ -94,7 +94,8 @@
       "show_in_form": true,
       "ref": "Investigation Person Roles",
       "type": "array",
-      "show_in_table": true,
+      "show_in_table": false,
+      "show_as_attribute": true,
       "ontology_names": []
     },
     {
@@ -185,7 +186,8 @@
       "show_in_form": true,
       "id": "copo.person.comments",
       "type": "array",
-      "show_in_table": true,
+      "show_in_table": false,
+      "show_as_attribute": true,
       "control": "copo-comment"
     },
     {

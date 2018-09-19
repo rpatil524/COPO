@@ -120,6 +120,16 @@ div[class*=" col-"] {
     padding-bottom: 15px !important;
 }
 
+/*server-side processing styling for datatables*/
+div.dataTables_wrapper div.dataTables_processing {
+    background: transparent !important;
+}
+
+div.dataTables_processing.ui.segment {
+    box-shadow: none !important;
+    border: none !important;
+}
+
 .description-bundle-table .dataTables_info .select-item {
     font-weight: 600;
 }
@@ -1420,6 +1430,20 @@ tr.shown td.summary-details-control:before {
     font-size: 14px;
 }
 
+tr.showing td.summary-details-control {
+    position: relative;
+}
+
+tr.showing td.summary-details-control:before {
+    position: absolute;
+    font-family: 'FontAwesome';
+    content: "\f110";
+    color: forestgreen;
+    /*top: 30%;*/
+    left: 50%;
+    font-size: 14px;
+}
+
 span.summary-details-control {
     position: relative;
     cursor: pointer;
@@ -1637,4 +1661,37 @@ div.shown span.side-help-trigger:before {
 
 .locked-column {
     background-color: #c9dce5;
+}
+
+.webui-popover-title {
+    word-wrap: break-word !important;
+}
+
+/*colors*/
+.red {
+    color: #ff0000;
+}
+
+.describe-status {
+    cursor: pointer;
+}
+
+/*cosntraint-label*/
+
+.required-label {
+    font-size: 11px;
+    color: red;
+    margin-left: 5px;
+}
+
+.recommended-label {
+    font-size: 11px;
+    color: green;
+    margin-left: 5px;
+}
+
+.optional-label {
+    font-size: 11px;
+    color: grey;
+    margin-left: 5px;
 }

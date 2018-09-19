@@ -12,6 +12,7 @@ from jsonpickle import encode
 from dateutil import parser
 from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
+from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from django.conf import settings
 from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, Group
 from submission.figshareSubmission import FigshareSubmit
@@ -49,6 +50,22 @@ def search_ontology_ebi(request, ontology_names):
     data = requests.get(query, timeout=2).text
     # TODO - add return here for when OLS is down
     return HttpResponse(data)
+
+
+def search_copo_components(request, component_name):
+    """
+    function does local lookup of items given component_name
+    :param request:
+    :param component_name:
+    :return:
+    """
+    term = request.POST.get("q", str())
+
+    if component_name == "999":
+        component_name = str()
+
+    data = COPOLookup(search_term=term, component=component_name).broker_component_search()
+    return HttpResponse(jsonpickle.encode(data), content_type='application/json')
 
 
 def test_ontology(request):
@@ -278,18 +295,23 @@ def get_users_in_group(request):
     usr_info = Group().get_users_for_group_info(group_id=group_id)
     return HttpResponse(json_util.dumps({'resp': usr_info}))
 
+
 def get_users(request):
     q = request.GET['q']
-    x = list(User.objects.filter(Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).exclude(is_superuser=True).values_list('id', 'first_name', 'last_name', 'email', 'username'))
+    x = list(User.objects.filter(
+        Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).exclude(
+        is_superuser=True).values_list('id', 'first_name', 'last_name', 'email', 'username'))
     if not x:
         return HttpResponse()
     return HttpResponse(json.dumps(x))
+
 
 def add_user_to_group(request):
     group_id = request.GET['group_id']
     user_id = request.GET['user_id']
     grp_info = Group().add_user_to_group(group_id=group_id, user_id=user_id)
     return HttpResponse(json_util.dumps({'resp': grp_info}))
+
 
 def remove_user_from_group(request):
     group_id = request.GET['group_id']
