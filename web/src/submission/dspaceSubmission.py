@@ -19,7 +19,7 @@ class DspaceSubmit(object):
 
     def get_dspace_communites(self):
         url = self.host['url']
-        url = url + '/rest/communities?limit=2'
+        url = url + '/rest/communities?limit=5'
         resp = requests.get(url)
 
         if resp.status_code == 200:

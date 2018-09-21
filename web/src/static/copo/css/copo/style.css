@@ -1628,3 +1628,7 @@ div.shown span.side-help-trigger:before {
 .marginBottom10px {
     margin-bottom: 10px;
 }
+
+.no-15-left-margin{
+    margin-left: 0 !important
+}
