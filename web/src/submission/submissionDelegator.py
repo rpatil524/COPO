@@ -3,7 +3,7 @@ __author__ = 'felix.shaw@tgac.ac.uk - 27/05/2016'
 from django.http import HttpResponse
 from dal.copo_da import Submission
 import dal.figshare_da as fda
-from . import enaSubmission, figshareSubmission, dataverseSubmission
+from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission
 from django.urls import reverse
 import jsonpickle
 
@@ -60,6 +60,17 @@ def delegate_submission(request):
     ## Submit to Dataverse
     elif repo == 'dataverse':
         result = dataverseSubmission.DataverseSubmit().submit(
+            sub_id=sub_id,
+            dataFile_ids=sub['bundle']
+        )
+        if result == True:
+            return HttpResponse(jsonpickle.dumps({'status': 1}))
+        else:
+            return HttpResponse(jsonpickle.dumps({'status': result}))
+
+    ## Submit to Dataverse
+    elif repo == 'dspace':
+        result = dspaceSubmission.DspaceSubmit().submit(
             sub_id=sub_id,
             dataFile_ids=sub['bundle']
         )

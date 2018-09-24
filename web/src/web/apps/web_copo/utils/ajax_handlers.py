@@ -499,7 +499,6 @@ def get_info_for_new_dataverse(request):
     out = dict()
     p_id = request.session['profile_id']
     profile = Profile().get_record(p_id)
-
     out['dvAlias'] = str(profile['title']).lower()
     person_list = list(Person(p_id).get_people_for_profile())
     out['dvPerson'] = person_list
@@ -512,7 +511,6 @@ def get_info_for_new_dataverse(request):
     out['dsAffiliation'] = affiliation
     df = list(DataFile().get_for_profile(p_id))
     file = df[0]
-
     out['dvName'] = profile.get('title', "")
     out['dsTitle'] = file.get('description', {}).get('attributes', {}) \
         .get('title_author_contributor', {}).get('dcterms:title', "")
@@ -525,7 +523,6 @@ def get_info_for_new_dataverse(request):
 
 def update_submission_repo_data(request):
     task = request.POST['task']
-
     if task == 'change_destination':
         custom_repo_id = request.POST['custom_repo_id']
         submission_id = request.POST['submission_id']

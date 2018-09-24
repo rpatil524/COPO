@@ -308,7 +308,11 @@ $(document).ready(function () {
                                 }
                                 if (data.accessions == undefined) {
                                 } else if (!jQuery.isEmptyObject(data.meta) && $(data.meta)[0].hasOwnProperty('identifier')) {
-                                    colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' - ' + data.meta.doi + '</span></div>')
+                                    if (data.destination_repo['type'] == 'dspace') {
+                                        colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' - ' + data.meta.dspace_item_name + '</span></div>')
+                                    } else if (data.destination_repo['type'] == 'dataverse') {
+                                        colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' - ' + data.meta.doi + '</span></div>')
+                                    }
                                 }
                                 else {
                                     colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">New Dataverse: ' + data.meta.dvName + '</span></div>')

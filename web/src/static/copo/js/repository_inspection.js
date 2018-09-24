@@ -452,8 +452,8 @@ function expand_dspace_table(event) {
                         //$(td).append(tdata)
                         td_temp.append(tdata)
                         var tr_temp = $("<tr/>").append(td_temp)
-                        $(tr).parent().append(tr_temp).show();
-                        tr.addClass('shown');
+                        $(tr_temp).insertAfter(tr)
+                        $(tr).addClass('shown');
                     }
                 )
             }
@@ -644,7 +644,7 @@ function select_dataset(e) {
             'task': 'change_meta',
             'meta': JSON.stringify({
                 'identifier': identifier,
-                'name': name
+                'dspace_item_name': name
             })
         }
     }
