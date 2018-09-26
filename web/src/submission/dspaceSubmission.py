@@ -39,22 +39,32 @@ class DspaceSubmit(object):
 
     def _add_to_dspace(self, sub):
 
+        # get data required and perform login
         dspace_url = sub['destination_repo']['url']
         email = sub['destination_repo']['username']
         password = sub['destination_repo']['password']
         login_url = dspace_url + "/rest/login"
         resp = requests.post(login_url, {"email": email, "password": password})
+
+        #store session identifier for future requests
         login_details = resp.cookies["JSESSIONID"]
+
+        # get item identifier, this is where we will deposit bitstream
         item_id = sub['meta']['identifier']
 
         for s in sub['bundle']:
+            # for each file in submission bundle
             f = DataFile().get_record(ObjectId(s))
+            # name is name without path
             name = f['name']
+            # location is path/filename
             location = f['file_location']
+            # get description from dc metadata
             description = f['description']['attributes']['subject_description']['description']
-            # files = {name: open(location, 'rb')}
 
+            # make bitstream first, n.b. that name and description need to be added as url params, not json data
             bitstream_url = dspace_url + "/rest/items/" + item_id + "/bitstreams?name=" + name + "&description=" + description
+            # make sure json is set here or dspace will return XML response
             headers = {"Content-Type": "application/json", "accept": "application/json"}
             policy = [{"action": "DEFAULT_*", "epersonId": -1, "groupId": 0, "resourceId": 47166,
                        "resourceType": "bitstream", "rpDescription": None, "rpName": None, "rpType": "TYPE_INHERITED",
@@ -65,8 +75,10 @@ class DspaceSubmit(object):
                          "policies": policy,
                          }
 
+            # request new bitstream
             resp = requests.post(bitstream_url, data=bitstream, headers=headers, cookies={"JSESSIONID": login_details})
             if resp.status_code == 200:
+                # get bitstream id and open file to be uploaded
                 c = resp.content.decode('utf-8')
                 data = json.loads(c)
                 fi = open(location, 'rb')
@@ -74,6 +86,8 @@ class DspaceSubmit(object):
                     data_url = dspace_url + "/rest/bitstreams/" + data["uuid"] + "/data"
                 else:
                     data_url = dspace_url + "/rest/bitstreams/" + data["id"] + "/data"
+
+                # upload file
                 data_resp = requests.put(data_url, data=fi, headers=headers, cookies={"JSESSIONID": login_details})
                 if data_resp.status_code == 200:
                     self._update_submission(sub, data_resp)
