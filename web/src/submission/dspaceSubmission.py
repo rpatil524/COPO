@@ -81,14 +81,15 @@ class DspaceSubmit(object):
                 # get bitstream id and open file to be uploaded
                 c = resp.content.decode('utf-8')
                 data = json.loads(c)
-                fi = open(location, 'rb')
+
                 if "uuid" in data:
                     data_url = dspace_url + "/rest/bitstreams/" + data["uuid"] + "/data"
                 else:
                     data_url = dspace_url + "/rest/bitstreams/" + data["id"] + "/data"
 
                 # upload file
-                data_resp = requests.put(data_url, data=fi, headers=headers, cookies={"JSESSIONID": login_details})
+                with open(location, 'rb') as file_stream:
+                    data_resp = requests.put(data_url, data=file_stream, headers=headers, cookies={"JSESSIONID": login_details})
                 if data_resp.status_code == 200:
                     self._update_submission(sub, data_resp)
             else:

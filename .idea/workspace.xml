@@ -157,8 +157,8 @@
       <file leaf-file-name="dspaceSubmission.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="219">
-              <caret line="87" column="18" lean-forward="true" selection-start-line="87" selection-start-column="18" selection-end-line="87" selection-end-column="18" />
+            <state relative-caret-position="132">
+              <caret line="91" column="71" selection-start-line="91" selection-start-column="71" selection-end-line="91" selection-end-column="71" />
               <folding>
                 <element signature="e#33#69#0" expanded="true" />
               </folding>
@@ -2174,20 +2174,6 @@
       <option name="presentableId" value="Default" />
       <updated>1480591260906</updated>
     </task>
-    <task id="LOCAL-00005" summary="finish migration of annotation code">
-      <created>1480606910221</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1480606910221</updated>
-    </task>
-    <task id="LOCAL-00006" summary="finish annotations of pdf documents">
-      <created>1481129407722</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1481129407722</updated>
-    </task>
     <task id="LOCAL-00007" summary="update requirements">
       <created>1481301653334</created>
       <option name="number" value="00007" />
@@ -2517,7 +2503,21 @@
       <option name="project" value="LOCAL" />
       <updated>1537805689072</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <task id="LOCAL-00054" summary="submission of single items to dspace working!!!">
+      <created>1537978486694</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1537978486695</updated>
+    </task>
+    <task id="LOCAL-00055" summary="adding some comments">
+      <created>1537978884992</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1537978884992</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="TodoView">
@@ -2602,8 +2602,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="adding accessions collation for dataverse" />
-    <MESSAGE value="fixing bugs in spreadsheet loading and ontology field styles" />
     <MESSAGE value="robusting the loading on spreadsheets and adding ability to save/export annotations" />
     <MESSAGE value="adding some export functionality to generic annotations" />
     <MESSAGE value="new branch" />
@@ -2627,7 +2625,9 @@
     <MESSAGE value="bug fixes to dataverse/dspace search functioinality" />
     <MESSAGE value="can select existing community / collection / item for file, now need to upload to existing" />
     <MESSAGE value="bug fixes for adding to space item and logic for directing to dspace submission pathway" />
-    <option name="LAST_COMMIT_MESSAGE" value="bug fixes for adding to space item and logic for directing to dspace submission pathway" />
+    <MESSAGE value="submission of single items to dspace working!!!" />
+    <MESSAGE value="adding some comments" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding some comments" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -3119,8 +3119,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="219">
-          <caret line="87" column="18" lean-forward="true" selection-start-line="87" selection-start-column="18" selection-end-line="87" selection-end-column="18" />
+        <state relative-caret-position="132">
+          <caret line="91" column="71" selection-start-line="91" selection-start-column="71" selection-end-line="91" selection-end-column="71" />
           <folding>
             <element signature="e#33#69#0" expanded="true" />
           </folding>
