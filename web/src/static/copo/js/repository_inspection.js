@@ -20,7 +20,7 @@ $(document).ready(function () {
     $(document).on('click', '.create_add_dataverse', handle_radio)
     $(document).on('click', '.dataset-checkbox', select_dataset)
     $(document).on('click', '#save_inspection_button', save_inspection_info)
-
+    $(document).on('click', '.create_add_community', get_existing_communites)
     //check_repo_id()
     do_new_dataverse_fields()
     // here we should call funcs for filling out other repo details
@@ -32,6 +32,26 @@ $(document).ready(function () {
 
 
 })
+
+function get_existing_communites(e){
+    var t_selected = $('input[name="create_community_radio"]:checked').val()
+    console.log(t_selected)
+    if (t_selected == "new"){
+        // retrieve community details for community
+    }
+    else if(t_selected == "existing"){
+        // search existing communities
+        $.ajax({
+            url:'copo/get_dspace_communities',
+            dataType: 'json',
+            data:{
+                'submission_id': $(document).data('submission_id')
+            }
+        }).done(function(data){
+            console.log(data)
+        })
+    }
+}
 
 
 // delayed keyup function to delay searching for n miliseconds before firing search off to dataverse
@@ -114,6 +134,7 @@ function handle_radio(el) {
     console.log(checked)
     if (checked == 'new') {
         $('.new-controls').show()
+        $('#dspace_wizard').wizard()
         $('.existing-controls').hide()
     }
     else {

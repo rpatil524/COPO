@@ -42,6 +42,7 @@ class DspaceSubmit(object):
         # get data required and perform login
         dspace_url = sub['destination_repo']['url']
         email = sub['destination_repo']['username']
+        print(email)
         password = sub['destination_repo']['password']
         login_url = dspace_url + "/rest/login"
         resp = requests.post(login_url, {"email": email, "password": password})
@@ -93,7 +94,8 @@ class DspaceSubmit(object):
                 if data_resp.status_code == 200:
                     self._update_submission(sub, data_resp)
             else:
-                return (str(resp.status_code) + " ," + resp.reason + " ," + resp.content)
+                print(str(resp.status_code) + " ," + resp.reason)
+                return (str(resp.status_code) + " ," + resp.reason + " ," + resp.content.decode('utf-8'))
         logout_url = dspace_url + '/rest/logout'
         requests.post(logout_url, cookies={"JSESSIONID": login_details})
 

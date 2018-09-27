@@ -17,7 +17,93 @@
             <hr/>
             <div class="row new-controls" style="display:none">
                 <!-- new dspace controls -->
-                NEW
+                <div class="fuelux">
+                    <div class="wizard" data-initialize="wizard" id="dspace_wizard">
+                        <div class="steps-container">
+                            <ul class="steps">
+                                <li data-step="1" data-name="community" class="active">
+                                    <span class="badge">1</span>Community
+                                    <span class="chevron"></span>
+                                </li>
+                                <li data-step="2" data-name="collection">
+                                    <span class="badge">2</span>Collection
+                                    <span class="chevron"></span>
+                                </li>
+                                <li data-step="3" data-name="template">
+                                    <span class="badge">3</span>Item
+                                    <span class="chevron"></span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="actions">
+                            <button type="button" class="btn btn-default btn-prev">
+                                <span class="glyphicon glyphicon-arrow-left"></span>Prev
+                            </button>
+                            <button type="button" class="btn btn-primary btn-next" data-last="Complete">Next
+                                <span class="glyphicon glyphicon-arrow-right"></span>
+                            </button>
+                        </div>
+                        <div class="step-content">
+                            <div class="step-pane active sample-pane alert" data-step="1">
+                                <h4>Choose Community</h4>
+                                <p>
+                                <div class="create_add_community">
+                                    <label><input type="radio" checked="true" name="create_community_radio" value="new">&nbsp
+                                        Create New Community</label>
+                                </div>
+                                <div class="create_add_community">
+                                    <label><input type="radio" name="create_community_radio"
+                                                  value="existing">&nbsp
+                                        Add To Existing Community</label>
+                                </div>
+                                </p>
+
+                                <hr/>
+                                <div class="new_community_controls">
+
+                                    <!-- new Community controls -->
+                                    <div class="form-group">
+                                        <label for="dspName">Name</label>
+                                        <input type="text" class="form-control" name="dspName" id="dspName">
+                                        <label for="dspDescription">Description</label>
+                                        <input type="text" class="form-control" name="dspDescription"
+                                               id="dspDescription">
+                                        <label for="dspIntroductoryText">Introductory Text</label>
+                                        <input type="text" class="form-control" name="dspIntroductoryText"
+                                               id="dspIntroductoryText">
+                                    </div>
+                                    <!-- Existing Community table -->
+
+                                </div>
+                                <div class="existing_community_table" style="display: none">
+                                    <table>
+                                        <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Name</th>
+                                            <th>Handle</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="step-pane sample-pane alert" data-step="2">
+                                <h4>Choose Collection</h4>
+                                <p></p>
+                            </div>
+                            <div class="step-pane sample-pane alert" data-step="3">
+                                <h4>Choose Item</h4>
+                                <p></p>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
             </div>
             <div class="existing-controls" style="display: block">
                 <!-- existing dspace controls -->
