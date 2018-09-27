@@ -39,16 +39,10 @@
           "label": "Sample",
           "hidden": "false",
           "required": "true",
-          "control": "copo-multi-search",
-          "option_component": "sample",
+          "control": "copo-lookup",
           "data_maxItems": 1,
-          "default_value": "",
-          "option_values": {
-            "callback": {
-              "function": "get_isasamples_json",
-              "parameter": ""
-            }
-          }
+          "data_source": "isa_samples_lookup",
+          "option_values": []
         }
       ]
     },

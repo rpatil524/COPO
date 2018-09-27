@@ -128,7 +128,8 @@ class DAComponent:
 
         # set auto fields
         if auto_fields:
-            fields = DecoupleFormSubmission(auto_fields, self.get_schema().get("schema")).get_schema_fields_updated()
+            fields = DecoupleFormSubmission(auto_fields,
+                                            self.get_schema().get("schema_dict")).get_schema_fields_updated_dict()
 
         # should have target_id for updates and return empty string for inserts
         target_id = kwargs.pop("target_id", str())

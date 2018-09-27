@@ -76,10 +76,29 @@ class WizardHelper:
 
         for stage in stages:
             for st in stage.get("items", list()):
-                if "option_values" in st:
-                    st["option_values"] = htags.get_control_options(st)
+                if st["control"] == "copo-lookup":
+                    continue
+                if st.get("option_values", False) == False:
+                    st.pop('option_values', None)
+                    continue
 
-        return
+                st["option_values"] = htags.get_control_options(st)
+
+        return True
+
+    def verify_lookup_items(self, stage):
+        """
+        function verifies if stage items have lookups to be resolved
+        :param stage:
+        :return:
+        """
+
+        for item in stage.get("items", list()):
+            if item.get("control", str()) == "copo-lookup":
+                item['data'] = stage['data'].get(item["id"].split(".")[-1], str())
+                item["option_values"] = htags.get_control_options(item)
+
+        return True
 
     def set_profile_id(self, profile_id):
         p_id = profile_id
@@ -168,6 +187,10 @@ class WizardHelper:
             meta["last_rendered_stage"] = next_stage_dict['stage']['ref']
 
         Description().edit_description(self.description_token, dict(meta=meta))
+
+        # check and resolve value for lookup fields
+        if "data" in next_stage_dict['stage']:
+            self.verify_lookup_items(next_stage_dict['stage'])
 
         return next_stage_dict
 
@@ -548,7 +571,7 @@ class WizardHelper:
         for k, v in data_record.items():
             samples_df[k] = v
 
-        samples_df.insert(loc=0, column='s_n', value=np.arange(1, int(number_of_samples) + 1))  # - for sorting
+        samples_df.insert(loc=0, column='s_n', value=[''] * int(number_of_samples))  # - for sorting
 
         data_set = samples_df.to_dict('records')
 

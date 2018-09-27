@@ -64,6 +64,7 @@ class DataFormats:
             self.set_form_display()
             self.set_table_display()
             self.set_ontologies()
+            self.set_option_values()
 
             # self.update_original_resource()
             self.refactor_deprecated_controls()
@@ -222,9 +223,14 @@ class DataFormats:
 
     def set_ontologies(self):
         for elem_dict in self.generated_controls:
-            if elem_dict.get("control", str()).lower() == "ontology term":
-                if not elem_dict.get("ontology_names"):
-                    elem_dict["ontology_names"] = list()
+            if elem_dict.get("control", str()).lower() == "ontology term" and "ontology_names" not in elem_dict:
+                elem_dict["ontology_names"] = list()
+
+    def set_option_values(self):
+        for elem_dict in self.generated_controls:
+            if elem_dict.get("control", str()).lower() in ['copo-lookup', 'copo-multi-select',
+                                                           'copo-button-list'] and "option_values" not in elem_dict:
+                elem_dict["option_values"] = list()
 
     def update_original_resource(self):
         """

@@ -1695,3 +1695,13 @@ div.shown span.side-help-trigger:before {
     color: grey;
     margin-left: 5px;
 }
+
+.required-if-applicable-label {
+    font-size: 11px;
+    color: rgb(242, 113, 28);
+    margin-left: 5px;
+}
+
+.copo-webui-tabular:hover {
+    background: #eee;
+}

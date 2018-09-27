@@ -167,8 +167,9 @@ def copo_visualize(request):
     context = dict()
 
     # test
+    # request.session.get("profile_id", str())
     # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
-    # CgCoreSchemas().extract_dublin_core("5b45cf4ed127fd90cc60e4a4")
+    # vext = CgCoreSchemas().extract_dublin_core("5ba0b949d127fd313b62677c")
     # test ends
 
     task = request.POST.get("task", str())

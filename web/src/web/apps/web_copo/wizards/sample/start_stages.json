@@ -87,22 +87,14 @@
         {
           "id": "clone_existing",
           "type": "string",
-          "help_tip": "Select an existing sample to clone",
-          "placeholder": "Select a sample to clone",
+          "help_tip": "Lookup a sample to clone",
           "label": "Sample",
           "hidden": "false",
           "required": "true",
-          "control": "copo-multi-search",
-          "show_create_button": false,
-          "option_component": "sample",
+          "control": "copo-lookup",
           "data_maxItems": 1,
-          "default_value": "",
-          "option_values": {
-            "callback": {
-              "function": "get_samples_json",
-              "parameter": ""
-            }
-          }
+          "data_source": "isa_samples_lookup",
+          "option_values": []
         }
       ]
     },

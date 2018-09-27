@@ -85,18 +85,26 @@ def get_control_options(f):
 
     if f.get("control", str()) == "copo-lookup":
         return COPOLookup(accession=f.get('data', str()),
-                          component=f.get('component_name', str())).broker_component_search()['result']
+                          data_source=f.get('data_source', str())).broker_component_search()['result']
 
-    if "option_values" not in f:
+    if "option_values" not in f:  # you shouldn't be here
         return option_values
 
-    if isinstance(f["option_values"], list):
+    # return existing option values
+    if isinstance(f["option_values"], list) and f["option_values"]:
         return f["option_values"]
 
-    if isinstance(f["option_values"], dict) and f.get("option_values", dict()).get("callback", dict()).get("function",
-                                                                                                           str()):
-        call_back_function = f.get("option_values", dict()).get("callback", dict()).get("function", str())
-        option_values = getattr(d_utils, call_back_function)()
+    # resolve option values from a data source
+    if f.get("data_source", str()):
+        return COPOLookup(data_source=f.get('data_source', str())).broker_data_source()
+
+    if isinstance(f["option_values"], dict):
+        if f.get("option_values", dict()).get("callback", dict()).get("function", str()):
+            call_back_function = f.get("option_values", dict()).get("callback", dict()).get("function", str())
+            option_values = getattr(d_utils, call_back_function)()
+        else:
+            # e.g., multi-search has this format
+            option_values = f["option_values"]
 
         return option_values
 
@@ -612,9 +620,6 @@ def generate_attributes(component, target_id):
         for x in schema:
             x['id'] = x["id"].split(".")[-1]
 
-            if "option_values" in x:
-                x["option_values"] = get_control_options(x)
-
         if component == "datafile":
             key_split = "___0___"
             attributes = record.get("description", dict()).get("attributes", dict())
@@ -745,7 +750,7 @@ def resolve_display_data(datafile_items, datafile_attributes):
                     # that require a different display structure
 
                     class_name = key_split.join((row.id, str(o_indx), object_array_keys[1]))
-                    columns.append(dict(title=label + "[{0}]".format(o_row[object_array_keys[0]]), data=class_name))
+                    columns.append(dict(title=label + " [{0}]".format(o_row[object_array_keys[0]]), data=class_name))
                     data.append({class_name: o_row[object_array_keys[1]]})
 
                     # add other headers/values e.g., unit in material_attribute_value schema
@@ -762,7 +767,7 @@ def resolve_display_data(datafile_items, datafile_attributes):
                     shown_keys = (row["id"], str(tt_indx))
                     class_name = key_split.join(shown_keys)
                     columns.append(
-                        dict(title=label + "[{0}]".format(str(tt_indx + 1)), data=class_name))
+                        dict(title=label + " [{0}]".format(str(tt_indx + 1)), data=class_name))
 
                     if isinstance(tt_val, list):
                         tt_val = ', '.join(tt_val)

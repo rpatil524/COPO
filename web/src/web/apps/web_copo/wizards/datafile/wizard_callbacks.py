@@ -160,6 +160,9 @@ class WizardCallbacks:
                 # no resolved stages; signal abort
                 return dict()
 
+            # resolve type and data source for generated stages
+            self.__wzh.sanitise_stages(new_stages)
+
             # register dependency
             self.__wzh.set_stage_dependency(new_stages)
 
@@ -226,6 +229,7 @@ class WizardCallbacks:
                 title = "Stage - " + s_id
 
                 ref = "cg_stage_" + s_id
+                # todo: get message for stage, and an appropriate title
                 message = "Dynamically generated stage - still needs appropriate message!"
 
                 stage_dict = dict(title=title,

@@ -2,6 +2,7 @@ __author__ = 'etuka'
 
 import os
 import json
+import numpy as np
 import pandas as pd
 from web.apps.web_copo.lookup.resolver import RESOLVER
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
@@ -14,7 +15,7 @@ class CgCoreSchemas:
         self.path_to_json = os.path.join(self.resource_path, 'cg_core.json')
         self.type_field_status_path = os.path.join(self.schemas_utils_paths, 'type_field_STATUS.csv')
         self.map_type_subtype_path = os.path.join(self.schemas_utils_paths, 'mapTypeSubtype.csv')
-        self.copo_schema_spec_path = os.path.join(self.schemas_utils_paths, 'copo_schema_spec.csv')
+        self.copo_schema_spec_path = os.path.join(self.schemas_utils_paths, 'copo_schema.csv')
 
     def retrieve_schema_specs(self, path_to_spec):
         """
@@ -46,11 +47,12 @@ class CgCoreSchemas:
         df['match_type_subtype_x'] = df['in cgc2 typelist'].astype(str) + df['in cgc2 subtypelist'].astype(str)
         df = df[(df['match_type_subtype_x'] == '01') | (df['match_type_subtype_x'] == '10')]
 
-        # substitute value todo: no need for this... keep as is or optional user will decide
-        df = df.replace('required if applicable', 'required')
+        # # substitute value todo: might have to revisit this - for now user gets to decide
+        # df = df.replace('required if applicable', 'required')
+        df = df.replace('required if applicable', 'required-if-applicable')
 
         # drop noisy columns - that do not define any constraint
-        constraints = ['required', 'recommended', 'optional', 'not applicable']
+        constraints = ['required', 'recommended', 'optional', 'not applicable', 'required-if-applicable']
 
         # filter out noisy columns
         df = df.T
@@ -88,17 +90,20 @@ class CgCoreSchemas:
         schemas_df.loc[schemas_df.index, 'field_constraint'] = df_type_series
 
         schemas_df["required"] = schemas_df["required"].replace(
-            {'required': True, 'recommended': False, 'optional': False})
+            {'required': True, 'recommended': False, 'optional': False, 'required-if-applicable': False})
 
         # rank fields by constraints
         constraint_to_rank = {
             'required': 1,
-            'recommended': 2,
-            'optional': 3
+            'required-if-applicable': 2,
+            'recommended': 3,
+            'optional': 4
         }
 
         lowercased = schemas_df['field_constraint'].str.lower()
         schemas_df['field_constraint_rank'] = lowercased.map(constraint_to_rank)
+
+        schemas_df['option_values'] = schemas_df['option_values'].fillna(False)
 
         return schemas_df
 
@@ -231,7 +236,7 @@ class CgCoreSchemas:
 
         items_df = items_df[['ref', 'id', 'vals']]
 
-        items_df.rename(index=str, columns={"ref": "dc", "id": "copo_id"},  inplace=True)
+        items_df.rename(index=str, columns={"ref": "dc", "id": "copo_id"}, inplace=True)
 
         dc_list = items_df.to_dict('records')
 
@@ -255,6 +260,16 @@ class CgCoreSchemas:
 
         return self.get_required_subtype('multiple item types', type_name)
 
+    def controls_mapping(self):
+        """
+        function maps to COPO controls
+        :return:
+        """
+
+        control = 'text'
+
+        return control
+
     def get_schema_spec(self):
         """
         function returns cg core field specifications e.g., field id, field type, field label
@@ -270,14 +285,16 @@ class CgCoreSchemas:
 
         df = df[spec_qualified_cols]
 
-        # filter out columns with no copo id set
+        # filter out columns with no copo id
         cid_series = df.loc['COPO_ID']
         df = df[cid_series[~cid_series.isna()].index]
 
-        df.loc['LABEL'] = df.loc['LABEL'].fillna('Label')
-        df.loc['HELP_TIP'] = df.loc['HELP_TIP'].fillna('Help tip')
-        df.loc['CONTROL'] = df.loc['CONTROL'].fillna('text')
+        # substitute for NANs
+        df.loc['LABEL'] = df.loc['LABEL'].fillna('**No label**')
+        df.loc['HELP_TIP'] = df.loc['HELP_TIP'].fillna('n/a')
+        df.loc['COPO_CONTROL'] = df.loc['COPO_CONTROL'].fillna('text')
         df.loc['TYPE'] = df.loc['TYPE'].fillna('string')
+        df.loc['COPO_DATA_SOURCE'] = df.loc['COPO_DATA_SOURCE'].fillna('')
         df.loc['Wizard_Stage_ID'] = df.loc['Wizard_Stage_ID'].fillna('-1')
 
         return df
@@ -288,29 +305,33 @@ class CgCoreSchemas:
         :return:
         """
 
-        # schema_fields_df = self.get_type_field_matrix()
-
         specs_df = self.get_schema_spec()
 
         # compose copo schema fragment from cg-core spec
+        df = specs_df.T.copy()
+        df["ref"] = list(df.index)
 
-        new_copo_id_df = specs_df.T.copy()
-        new_copo_id_df["ref"] = list(new_copo_id_df.index)
-        new_copo_id_df["id"] = new_copo_id_df['COPO_ID']
-        new_copo_id_df["label"] = new_copo_id_df['LABEL']
-        new_copo_id_df["help_tip"] = new_copo_id_df['HELP_TIP']
-        new_copo_id_df["control"] = "text"  # new_copo_id_df['CONTROL'] todo:  uncomment this after test
-        new_copo_id_df["type"] = new_copo_id_df['TYPE']
-        new_copo_id_df["type"] = new_copo_id_df["type"].replace({'1': 'string', 'm': 'array'})
-        new_copo_id_df["stage_id"] = new_copo_id_df['Wizard_Stage_ID']
+        df["id"] = df['COPO_ID'].apply(lambda x: ".".join(("copo", "cgCore", x)))
+        df["label"] = df['LABEL']
+        df["help_tip"] = df['HELP_TIP']
+        df["control"] = df['COPO_CONTROL']
+        df["stage_id"] = df['Wizard_Stage_ID']
 
-        new_copo_id_df = new_copo_id_df.loc[:, ["ref", "id", "label", "help_tip", "control", "type", "stage_id"]]
+        # set cardinality
+        df["type"] = df['TYPE'].replace({'1': 'string', 'm': 'array'})
 
-        new_copo_id_df["id"] = new_copo_id_df["id"].apply(lambda x: ".".join(("copo", "cgCore", x)))
-        new_copo_id_df["required"] = False
-        new_copo_id_df["field_constraint"] = "optional"
+        # set data source for relevant controls
+        df['data_source'] = np.where(df['control'].isin(['copo-lookup', 'copo-multi-select', 'copo-button-list']), df['COPO_DATA_SOURCE'],
+                                     '')
+        df['data_maxItems'] = np.where(df['control'] == 'copo-multi-select', 1, '')
 
-        schema_list = new_copo_id_df.to_dict('records')
+        df = df.loc[:,
+             ["ref", "id", "label", "help_tip", "control", "type", "stage_id", "data_source", "data_maxItems"]]
+
+        df["required"] = False
+        df["field_constraint"] = "optional"
+
+        schema_list = df.to_dict('records')
 
         # update schema in file
         cg_schema = d_utils.json_to_pytype(self.path_to_json)

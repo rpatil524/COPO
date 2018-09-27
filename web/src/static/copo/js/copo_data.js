@@ -78,11 +78,25 @@ $(document).ready(function () {
         show_record_bundle_info(event);
     });
 
-    //reload description
+    //reload description 1
     $(document).on("click", ".reload-description-i", function (event) {
         event.preventDefault();
         WebuiPopovers.hideAll();
         initiate_datafile_description({'description_token': $(this).attr("data-record")});
+    });
+
+    //reload description 2
+    $(document).on("click", ".bundle-name-i", function (event) {
+        event.preventDefault();
+        WebuiPopovers.hideAll();
+        initiate_datafile_description({'description_token': $(this).closest(".bundle-action-btn").attr("data-record")});
+    });
+
+    //show bundle details
+    $(document).on("click", ".bundle-more-info", function (event) {
+        event.preventDefault();
+        WebuiPopovers.hideAll();
+        show_bundle_details($(this), $(this).closest(".bundle-action-btn").attr("data-record"));
     });
 
     //description bundle view
@@ -1504,6 +1518,9 @@ $(document).ready(function () {
 
         } else { // call to edit
             //disable table navigation keys
+            $(node)
+                .html('')
+                .append(cell_loader_icon());
             table.keys.disable();
 
             $.ajax({
@@ -1523,7 +1540,7 @@ $(document).ready(function () {
                     var formElem = data.cell_control.control_schema;
                     var elemValue = data.cell_control.schema_data;
                     var htmlCtrl = dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue);
-                    htmlCtrl.find("label").remove();
+                    // htmlCtrl.find("label").remove();
 
                     var cellEditPanel = get_cell_edit_panel();
                     cellEditPanel.find("#cell-loader").hide();
@@ -1750,19 +1767,23 @@ $(document).ready(function () {
         }
     }
 
-    function get_cell_edit_panel() {
-        var attributesPanel = $('<div/>', {
-            class: "cell-edit-panel",
-            style: "min-width:450px; border:none; margin-bottom:0px; padding:5px;"
-        });
-
+    function cell_loader_icon() {
         var loaderObject = $('<div>', {
             style: 'text-align: center; margin-top: 3px;',
             id: "cell-loader",
             html: "<span class='fa fa-spinner fa-pulse fa-2x'></span>"
         });
 
-        return $('<div>').append(attributesPanel).append(loaderObject);
+        return loaderObject;
+    }
+
+    function get_cell_edit_panel() {
+        var attributesPanel = $('<div/>', {
+            class: "cell-edit-panel",
+            style: "min-width:450px; border:none; margin-bottom:0px; padding:5px;"
+        });
+
+        return $('<div>').append(attributesPanel).append(cell_loader_icon());
     }
 
     function show_locked_cell_message(cell) {
@@ -1809,6 +1830,21 @@ $(document).ready(function () {
         });
     } //end of function
 
+    function show_bundle_details(item, target_id) {
+        item.webuiPopover('destroy');
+
+        item.webuiPopover({
+            title: "Details",
+            content: '<div class="webpop-content-div limit-text">A description bundle is a collection of datafiles with similar attributes, which can potentially be described as a single unit.</div>',
+            trigger: 'sticky',
+            width: 300,
+            arrow: true,
+            placement: 'right',
+            dismissible: true,
+            closeable: true
+        });
+    }
+
     function load_description_bundles() {
         WebuiPopovers.hideAll();
 
@@ -1838,26 +1874,26 @@ $(document).ready(function () {
                             var actionBTN = $(".record-action-templates").find(".description_bundle_button").clone();
                             actionBTN.removeClass("description_bundle_button");
                             actionBTN.addClass("bundle-action-btn");
-                            actionBTN.find(".bundle-name").find("span").html(Ddata.name);
-                            actionBTN.find(".bundle-count").find("span").html(Ddata.number_of_datafiles);
+                            actionBTN.find(".bundle-name-i").find("span").html(Ddata.name);
+                            // actionBTN.find(".bundle-count").find("span").html(Ddata.number_of_datafiles);
                             actionBTN.attr("data-record", Ddata.id);
                             $(".desc-bundle-display-div").find(".desc-bundle-display-div-2").append(actionBTN);
-
-                            actionBTN.on("click", ".bundle-name", function (event) {
-                                var bundleID = $(this).closest(".bundle-action-btn").attr("data-record");
-                                initiate_datafile_description({'description_token': bundleID});
-                            });
-
-                            actionBTN.on("click", ".bundle-count", function (event) {
-                                var bundleID = $(this).closest(".bundle-action-btn").attr("data-record");
-                                do_view_description(bundleID);
-                            });
-
-                            actionBTN.on("click", ".bundle-cut", function (event) {
-                                var bundleID = $(this).closest(".bundle-action-btn").attr("data-record");
-                                $(this).find("i").addClass("fa-spin red");
-                                delete_description_record(bundleID, $(this));
-                            });
+                            //
+                            // actionBTN.on("click", ".bundle-name", function (event) {
+                            //     var bundleID = $(this).closest(".bundle-action-btn").attr("data-record");
+                            //     initiate_datafile_description({'description_token': bundleID});
+                            // });
+                            //
+                            // actionBTN.on("click", ".bundle-count", function (event) {
+                            //     var bundleID = $(this).closest(".bundle-action-btn").attr("data-record");
+                            //     do_view_description(bundleID);
+                            // });
+                            //
+                            // actionBTN.on("click", ".bundle-cut", function (event) {
+                            //     var bundleID = $(this).closest(".bundle-action-btn").attr("data-record");
+                            //     $(this).find("i").addClass("fa-spin red");
+                            //     delete_description_record(bundleID, $(this));
+                            // });
 
                         }
                     } else {
@@ -2027,9 +2063,11 @@ $(document).ready(function () {
 
         var recordID = eventTarget.rowId.split("row_")[1];
 
-        var item = $("#" + eventTarget.rowId).find("td.describe-status");
+        var item = $('#' + eventTarget.tableID).find($("#" + eventTarget.rowId)).find("td.describe-status");
         item.find(".fa").addClass("fa-spin");
         item.webuiPopover('destroy');
+
+        console.log(item.html())
 
         $.ajax({
             url: copoVisualsURL,
@@ -2194,7 +2232,7 @@ $(document).ready(function () {
         //shouldn't be able to delete current description
         if (bundle_id == datafileDescriptionToken) {
             BootstrapDialog.show({
-                title: "Remove bundle",
+                title: "[Un]bundle",
                 message: "Can't [Un]bundle a current description!",
                 cssClass: 'copo-modal3',
                 closable: false,

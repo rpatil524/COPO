@@ -60,6 +60,7 @@ $(document).ready(function () {
 //map controls to rendering functions
 var controlsMapping = {
     "text": "do_text_ctrl",
+    "email": "do_text_ctrl",
     "text_small": "do_small_text_ctrl",
     "textarea": "do_textarea_ctrl",
     "hidden": "do_hidden_ctrl",
@@ -617,6 +618,10 @@ var dispatchFormControl = {
             readonly = formElem.readonly;
         }
 
+        if (formElem.control == 'email') {
+            formElem.email = true;
+        }
+
         var txt = $('<input/>',
             {
                 type: "text",
@@ -1005,7 +1010,6 @@ var dispatchFormControl = {
                 class: "input-copo copo-multi-select",
                 placeholder: "Select " + formElem.label + "...",
                 multiple: "multiple",
-                "data-element": formElem.id,
                 "data-validate": true,
             });
 
@@ -1127,8 +1131,6 @@ var dispatchFormControl = {
                 class: "ctrlDIV"
             });
 
-        // var radioGroup = $('<div/>');
-
         var radioGroup = $('<div/>',
             {
                 class: "ui grid",
@@ -1157,6 +1159,18 @@ var dispatchFormControl = {
 
         for (var i = 0; i < formElem.option_values.length; ++i) {
             var option = formElem.option_values[i];
+            var description = '';
+            var descriptionDiv = '';
+            if (option.hasOwnProperty('description')) {
+                description = option.description;
+
+                descriptionDiv = $('<div/>',
+                    {
+                        style: "padding: 5px; border-left: 6px solid #D4E4ED; color:#4d4d4d; margin-bottom:4px; line-height:1.7;",
+                        class: "copo-radio-description",
+                        html: description
+                    });
+            }
 
             var radioCtrl = $('<input/>',
                 {
@@ -1165,7 +1179,7 @@ var dispatchFormControl = {
                     name: formElem.id + "_input",
                     value: option.value,
                     "data-lbl": option.label,
-                    "data-desc": option.description,
+                    "data-desc": description,
                     "data-value": option.value,
                     change: function (evt) {
                         if ($(this).is(':checked')) {
@@ -1191,12 +1205,6 @@ var dispatchFormControl = {
                 style: "font-weight: normal; cursor:pointer;",
             }).append(radioCtrl).append(radioCtrlTxt);
 
-            var descriptionDiv = $('<div/>',
-                {
-                    style: "padding: 5px; border-left: 6px solid #D4E4ED; color:#4d4d4d; margin-bottom:4px; line-height:1.7;",
-                    class: "copo-radio-description",
-                    html: option.description
-                });
 
             var radioCtrlDiv = $('<div/>',
                 {
@@ -1578,7 +1586,7 @@ function create_attachable_component(formElem) {
 
     var cloneCol = $('<div/>',
         {
-            class: "col-sm-7 col-md-7 col-lg-7"
+            class: "col-sm-7 col-md-7 col-lg-7 ctrlDIV"
         });
 
     var helpCtrlCol = $('<div/>',
@@ -1857,6 +1865,14 @@ function get_element_clone(ctrlsDiv, counter) {
         }
     });
 
+    // ctrlClone.find(':input').each(function () {
+    //     if (this.id) {
+    //         var elemID = this.id;
+    //         $(this).attr("id", elemID + global_key_split + counter);
+    //         $(this).attr("name", elemID + global_key_split + counter);
+    //     }
+    // });
+
     var cloneDiv = $('<div/>',
         {
             style: 'margin-top:20px;'
@@ -2070,8 +2086,8 @@ function get_lookup_span(ctrlsDiv, formElem) {
     var localolsURL = lookupsURL;
 
     //specify target component
-    if (formElem.hasOwnProperty('component_name')) {
-        localolsURL = lookupsURL.replace("999", formElem.component_name);
+    if (formElem.hasOwnProperty('data_source')) {
+        localolsURL = lookupsURL.replace("999", formElem.data_source);
     }
 
     var hiddenValuesCtrl = $('<input/>',

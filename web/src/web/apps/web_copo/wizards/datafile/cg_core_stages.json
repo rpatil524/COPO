@@ -20,26 +20,6 @@
           "data_maxItems": 1,
           "default_value": "",
           "option_values": []
-        },
-        {
-          "id": "tadtast",
-          "type": "array",
-          "help_tip": "Select a type for your information product",
-          "label": "Agrovoc",
-          "hidden": "false",
-          "required": "true",
-          "control": "copo-lookup",
-          "component_name": "agrovoclabels"
-        },
-        {
-          "id": "mamand",
-          "type": "array",
-          "help_tip": "Select a type for your information product",
-          "label": "Country",
-          "hidden": "false",
-          "required": "true",
-          "control": "copo-lookup",
-          "component_name": "countrieslist"
         }
       ]
     },

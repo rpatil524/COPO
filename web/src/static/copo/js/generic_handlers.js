@@ -84,7 +84,7 @@ function set_selectize_select_event() {
 
             } else if ($(event.target).closest(".copo-multi-search").length) {
                 var eventTarget = $(event.target).closest(".copo-multi-search");
-                item = eventTarget.find(".selectize-dropdown-content .active");
+                var item = eventTarget.find(".selectize-dropdown-content .active");
                 var recordId = item.attr("data-value");
                 var associatedComponent = item.find(".caption-component").attr("data-component");
                 var popTarget = item.closest(".copo-form-group");
@@ -95,12 +95,12 @@ function set_selectize_select_event() {
             } else if ($(event.target).closest(".copo-lookup").length) {
                 var item = $(event.target).closest(".copo-lookup");
                 var activeElem = item.find(".selectize-dropdown-content .active").find(".lookup-label");
-
                 var desc = activeElem.attr("data-desc");
                 var label = activeElem.attr("data-label");
                 var accession = activeElem.attr("data-accession");
+                var url = activeElem.attr("data-url");
 
-                showlkup(item, label, desc, accession);
+                showlkup(item, label, desc, accession, url);
 
             }
         }
@@ -134,58 +134,80 @@ function set_selectize_select_event() {
             var label = $(this).find(".lookup-label").attr("data-label");
             var accession = $(this).find(".lookup-label").attr("data-accession");
 
-            showlkup(item, label, desc, accession);
+            var url = $(this).find(".lookup-label").attr("data-url");
+
+            showlkup(item, label, desc, accession, url);
         }
 
     });
 }
 
-function showlkup(item, label, desc, accession) {
-    var result = $('<div/>',
-        {
-            class: "limit-text"
-        });
+function showlkup(item, label, desc, accession, url) {
+    $.ajax({
+        url: url,
+        type: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            "accession": accession
+        },
+        success: function (data) {
 
-    item.webuiPopover('destroy');
+            if (data.hasOwnProperty('result') && data.result.length > 0) {
+                desc = data.result[0].description;
+            }
 
-    if (String(accession) != 'undefined' && String(label) != 'undefined') {
+            var result = $('<div/>',
+                {
+                    class: "limit-text"
+                });
 
-        //ontology accession
-        var lookupAccession = $('<div/>');
+            item.webuiPopover('destroy');
 
-        if (accession != '') {
-            lookupAccession.css('margin-top', '5px')
-            $('<span>', {
-                class: "ontology-accession-link",
-                html: "<span style='text-decoration-line: underline; color:#2759a5'>" + accession + "</span>"
-            }).appendTo(lookupAccession);
+            if (String(accession) != 'undefined' && String(label) != 'undefined') {
+
+                //ontology accession
+                var lookupAccession = $('<div/>');
+
+                if (accession != '') {
+                    lookupAccession.css('margin-top', '5px')
+                    $('<span>', {
+                        class: "ontology-accession-link",
+                        html: "<span style='text-decoration-line: underline; color:#2759a5'>" + accession + "</span>"
+                    }).appendTo(lookupAccession);
+                }
+
+                result.append(lookupAccession);
+
+
+                //ontology description
+                var lookupDescription = $('<div/>');
+
+                if (desc != '') {
+                    lookupDescription.css('margin-top', '5px');
+                    lookupDescription.html(desc);
+
+                }
+
+                result.append(lookupDescription);
+
+                item.webuiPopover({
+                    title: label,
+                    content: '<div class="webpop-content-div">' + $('<div/>').append(result).html() + '</div>',
+                    trigger: 'sticky',
+                    width: 300,
+                    arrow: true,
+                    placement: 'right',
+                    dismissible: true
+                });
+            }
+
+        },
+        error: function () {
+            alert("Couldn't retrieve item's details!");
         }
-
-        result.append(lookupAccession);
-
-
-        //ontology description
-        var lookupDescription = $('<div/>');
-
-        if (desc != '') {
-            lookupDescription.css('margin-top', '5px');
-            lookupDescription.html(desc);
-
-        }
-
-        result.append(lookupDescription);
-
-        item.webuiPopover({
-            title: label,
-            content: '<div class="webpop-content-div">' + $('<div/>').append(result).html() + '</div>',
-            trigger: 'sticky',
-            width: 300,
-            arrow: true,
-            placement: 'right',
-            dismissible: true
-        });
-    }
-
+    });
 }
 
 function showontopop(item, label, prefix, desc, accession) {
@@ -775,10 +797,10 @@ function refresh_selectbox() {
 function refresh_multiselectbox() {
     $('.copo-multi-select').each(function () {
         var elem = $(this);
-        var valueElem = elem.closest('.copo-form-group').find('.copo-multi-values');
+        var valueElem = elem.closest('.ctrlDIV').find('.copo-multi-values');
         var maxTems = 'null'; //maximum selectable items
 
-        var parentID = elem.attr("data-element");
+        var parentID = valueElem.attr("id");
 
         if (valueElem.is("[data-maxItems]")) {
             maxTems = valueElem.attr("data-maxItems");
@@ -823,10 +845,15 @@ function refresh_copo_lookup() {
 
         var options = [];
 
+        var profile_id = '';
+        if ($('#profile_id').length) {
+            profile_id = $('#profile_id').val();
+        }
+
         if (elemSpecs.length > 0) {
             elemSpecs.forEach(function (item) {
-                if(item.accession == valueElem.val())
-                options.push(item);
+                if (item.accession == valueElem.val())
+                    options.push(item);
             });
         }
 
@@ -859,7 +886,7 @@ function refresh_copo_lookup() {
                         var label = escape(item.label);
 
                         return '<div>' +
-                            '<span data-accession="' + accession + '"  data-label="' + label + '" data-desc="' + desc + '" class="webpop-content-div ontology-label lookup-label">' + escape(item.label) + '</span></div>';
+                            '<span data-url="' + url + '" data-accession="' + accession + '"  data-label="' + label + '" data-desc="' + desc + '" class="webpop-content-div ontology-label lookup-label">' + escape(item.label) + '</span></div>';
 
                     }
                 },
@@ -873,7 +900,10 @@ function refresh_copo_lookup() {
                         headers: {
                             'X-CSRFToken': csrftoken
                         },
-                        data: {q: query},
+                        data: {
+                            q: query,
+                            'profile_id': profile_id
+                        },
                         success: function (data) {
                             var ontologies = [];
 
@@ -913,7 +943,7 @@ function refresh_ontology_select() {
         var options = [];
         var defaultValue = {};
 
-        var parentID = elem.attr("data-element");
+        var parentID = elem.closest(".ontology-parent").find(".ontology-field-hidden").attr("id");
 
         //set previous value
         elem.closest(".ontology-parent").find(".ontology-field-hidden").each(function () {
@@ -1505,7 +1535,9 @@ function build_description_display(data) {
     for (var j = 0; j < data.description.columns.length; ++j) {
         var Ddata = data.description.columns[j];
 
-        var iRow = $('<tr/>');
+        var iRow = $('<tr/>', {
+            "class": "copo-webui-tabular"
+        });
 
         var labelCol = $('<td/>').attr('colspan', 2).append(Ddata.title);
         iRow.append(labelCol);
@@ -1667,7 +1699,7 @@ function get_profile_components() {
             colorClass: "samples_color",
             color: "olive",
             tableID: 'sample_table',
-            recordActions: ["describe_record_all", "edit_record_single"],
+            recordActions: ["show_sample_source", "describe_record_all", "edit_record_single"],
             visibleColumns: 3 //no of columns to be displayed, if tabular data is required. remaining columns will be displayed in a sub-table
         },
         {

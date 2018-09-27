@@ -681,10 +681,10 @@ class DecoupleFormSubmission:
 
                                     key_split = (key.split(f.id + ".")[-1]).split(".")
                                     if len(key_split) == 1:
-                                        primary_data[(key_split[0]).rsplit("_", 1)[0]] = self.auto_fields[key]
+                                        primary_data[(key_split[0]).rsplit(self.global_key_split, 1)[0]] = self.auto_fields[key]
                                     else:
                                         key_list.append(key_split[:-1])
-                                        key_split[-1] = key_split[-1].rsplit("_", 1)[0]
+                                        key_split[-1] = key_split[-1].rsplit(self.global_key_split, 1)[0]
                                         key_value_list.append(dict(keys=key_split, value=self.auto_fields[key]))
 
                             if key_list:
@@ -832,7 +832,7 @@ class DecoupleFormSubmission:
                     for o_f in object_fields:
                         comp_key = f_id + "." + o_f['id'].split(".")[-1]
 
-                        # and even the field may, also, very well be of type object, decouple further...
+                        # and even the field may very well be of type object, decouple further...
                         decoupled_list = self.decouple_object_dict(comp_key, list(), o_f)
 
                         # match decoupled elements
@@ -902,10 +902,10 @@ class DecoupleFormSubmission:
 
                                     key_split = (key.split(f_id + ".")[-1]).split(".")
                                     if len(key_split) == 1:
-                                        primary_data[(key_split[0]).rsplit("_", 1)[0]] = self.auto_fields[key]
+                                        primary_data[(key_split[0]).rsplit(self.global_key_split, 1)[0]] = self.auto_fields[key]
                                     else:
                                         key_list.append(key_split[:-1])
-                                        key_split[-1] = key_split[-1].rsplit("_", 1)[0]
+                                        key_split[-1] = key_split[-1].rsplit(self.global_key_split, 1)[0]
                                         key_value_list.append(dict(keys=key_split, value=self.auto_fields[key]))
 
                             if key_list:

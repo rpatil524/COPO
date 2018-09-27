@@ -15,6 +15,7 @@ $(document).ready(function () {
     var component = "sample";
     var wizardURL = "/rest/sample_wiz/";
     var copoFormsURL = "/copo/copo_forms/";
+    var copoVisualsURL = "/copo/copo_visualize/";
 
     var wizardElement = $('#sampleWizard');
 
@@ -685,6 +686,9 @@ $(document).ready(function () {
 
         var panel = get_panel('info');
         panel.find('.panel-body').append(message);
+        panel.find('.panel-heading')
+            .append('<i style="font-size: 20px;" class="fa fa-info-circle text-info"></i>')
+            .css({"padding-top": "5px", "padding-bottom": "5px"});
         panel.find(".panel-footer").remove();
         right.append(panel);
 
@@ -843,6 +847,174 @@ $(document).ready(function () {
     }
 
 
+    function show_sample_source() {
+        //show description bundle
+
+        var tableID = 'sample_source_view_tbl';
+        var tbl = $('<table/>',
+            {
+                id: tableID,
+                "class": "ui celled table hover copo-noborders-table",
+                cellspacing: "0",
+                width: "100%"
+            });
+
+        var $dialogContent = $('<div/>');
+        var table_div = $('<div/>').append(tbl);
+        var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader"></div>'));
+
+        var dialog = new BootstrapDialog({
+            type: BootstrapDialog.TYPE_PRIMARY,
+            size: BootstrapDialog.SIZE_NORMAL,
+            title: function () {
+                return $('<span>Sample source</span>');
+            },
+            closable: false,
+            animate: true,
+            draggable: false,
+            onhide: function (dialogRef) {
+                //nothing to do for now
+            },
+            onshown: function (dialogRef) {
+                $.ajax({
+                    url: copoVisualsURL,
+                    type: "POST",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    data: {
+                        'task': "table_data",
+                        'component': "source"
+                    },
+                    success: function (data) {
+                        var dataSet = data.table_data.dataSet;
+                        var cols = data.table_data.columns;
+                        spinner_div.remove();
+
+                        var dtd = dataSet;
+                        var cols = cols;
+
+                        var table = null;
+
+                        table = $('#' + tableID).DataTable({
+                            data: dtd,
+                            searchHighlight: true,
+                            "lengthChange": false,
+                            order: [
+                                [1, "asc"]
+                            ],
+                            scrollY: "300px",
+                            scrollX: true,
+                            scrollCollapse: true,
+                            paging: false,
+                            language: {
+                                "info": " _START_ to _END_ of _TOTAL_ sources",
+                                "search": " "
+                            },
+                            select: {
+                                style: 'multi',
+                                selector: 'td:first-child'
+                            },
+                            columns: cols,
+                            dom: 'lfit<"row">rp'
+                        });
+
+                        $('#' + tableID + '_wrapper')
+                            .find(".dataTables_filter")
+                            .find("input")
+                            .removeClass("input-sm")
+                            .attr("placeholder", "Search sample source");
+
+                        //handle event for table details
+    $('#' + tableID + ' tbody')
+        .off('click', 'td.summary-details-control')
+        .on('click', 'td.summary-details-control', function (event) {
+            event.preventDefault();
+
+            var event = jQuery.Event("posttablerefresh"); //individual compnents can trap and handle this event as they so wish
+            $('body').trigger(event);
+
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+            tr.addClass('showing');
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child('');
+                row.child.hide();
+                tr.removeClass('showing');
+                tr.removeClass('shown');
+            } else {
+                $.ajax({
+                    url: copoVisualsURL,
+                    type: "POST",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    data: {
+                        'task': "attributes_display",
+                        'component': "source",
+                        'target_id': row.data().record_id
+                    },
+                    success: function (data) {
+                        if (data.component_attributes.columns) {
+                            // expand row
+
+                            var contentHtml = $('<table/>', {
+                                // cellpadding: "5",
+                                cellspacing: "0",
+                                border: "0",
+                                // style: "padding-left:50px;"
+                            });
+
+                            for (var i = 0; i < data.component_attributes.columns.length; ++i) {
+                                var colVal = data.component_attributes.columns[i];
+
+                                var colTR = $('<tr/>');
+                                contentHtml.append(colTR);
+
+                                colTR
+                                    .append($('<td/>').append(colVal.title))
+                                    .append($('<td/>').append(data.component_attributes.data_set[colVal.data]));
+
+                            }
+
+                            row.child($('<div></div>').append(contentHtml).html()).show();
+                            tr.removeClass('showing');
+                            tr.addClass('shown');
+                        }
+                    },
+                    error: function () {
+                        alert("Couldn't retrieve " + component + " attributes!");
+                        return '';
+                    }
+                });
+            }
+        });
+
+                    },
+                    error: function () {
+                        alert("Couldn't sample source!");
+                        dialogRef.close();
+                    }
+                });
+            },
+            buttons: [{
+                label: 'OK',
+                cssClass: 'tiny ui basic primary button',
+                action: function (dialogRef) {
+                    dialogRef.close();
+                }
+            }]
+        });
+
+
+        $dialogContent.append(table_div).append(spinner_div);
+        dialog.realize();
+        dialog.setMessage($dialogContent);
+        dialog.open();
+    } // end of function
+
     //handles button events on a record or group of records
     function do_record_task(event) {
         var task = event.task.toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
@@ -851,6 +1023,13 @@ $(document).ready(function () {
         //describe task
         if (task == "describe") {
             initiate_description({});
+            return false;
+        }
+
+        //show sample source table
+        //sample-source
+        if (task == "sample-source") {
+            show_sample_source();
             return false;
         }
 
@@ -1042,7 +1221,7 @@ $(document).ready(function () {
                     var formElem = data.cell_control.control_schema;
                     var elemValue = data.cell_control.schema_data;
                     var htmlCtrl = dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue);
-                    htmlCtrl.find("label").remove();
+                    // htmlCtrl.find("label").remove();
 
                     var cellEditPanel = get_cell_edit_panel();
                     cellEditPanel.find("#cell-loader").hide();
@@ -1183,7 +1362,7 @@ $(document).ready(function () {
                     searchHighlight: true,
                     lengthChange: true,
                     select: {
-                        style: 'os',
+                        style: 'multi',
                         selector: 'td:first-child'
                     },
                     order: [[0, 'asc']],

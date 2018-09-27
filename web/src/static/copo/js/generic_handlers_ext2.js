@@ -664,7 +664,6 @@ function do_render_component_table(data, componentMeta) {
             }
         });
 
-
 } //end of func
 
 

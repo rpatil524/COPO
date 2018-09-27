@@ -1,7 +1,10 @@
 __author__ = 'etuka'
 
 import os
+import glob
+import json
 import pandas as pd
+from dal.copo_da import Sample
 from web.apps.web_copo.lookup.resolver import RESOLVER
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 
@@ -14,37 +17,62 @@ Each resolver should provide a mechanism for:
 
 
 class COPOLookup:
-    def __init__(self, search_term=str(), component=str(), accession=str()):
-        self.search_term = search_term.lower()
-        self.accession = accession
-        self.component = component
-
+    def __init__(self, **kwargs):
+        self.param_dict = kwargs
+        self.search_term = self.param_dict.get("search_term", str()).lower()
+        self.accession = self.param_dict.get("accession", dict())
+        self.data_source = self.param_dict.get("data_source", str())
+        self.profile_id = self.param_dict.get("profile_id", str())
         self.drop_downs_pth = RESOLVER['copo_drop_downs']
 
     def broker_component_search(self):
         dispatcher = {
             'agrovoclabels': self.get_agrovoclabels,
-            'countrieslist': self.get_countrieslist
+            'countrieslist': self.get_countrieslist,
+            'mediatypelabels': self.get_mediatypelabels,
+            'isa_samples_lookup': self.get_isasamples
         }
 
         result = []
         message = 'error'
 
-        if self.component in dispatcher:
+        if self.data_source in dispatcher:
             try:
-                result = dispatcher[self.component]()
+                result = dispatcher[self.data_source]()
                 message = 'success'
             except Exception as e:
                 message = 'error'
 
         return dict(result=result, message=message)
 
+    def broker_data_source(self):
+        """
+        function resolves dropdown list given a data source handle
+        :return:
+        """
+
+        pths_map = dict(
+            select_yes_no=os.path.join(self.drop_downs_pth, 'select_yes_no.json'),
+            select_start_end=os.path.join(self.drop_downs_pth, 'select_start_end.json'),
+            cgiar_centres=os.path.join(self.drop_downs_pth, 'cgiar_centres.json'),
+            languagelist=os.path.join(self.drop_downs_pth, 'language_list.json')
+        )
+
+        data = list()
+
+        try:
+            data = d_utils.json_to_pytype(pths_map.get(self.data_source, str()))
+        except:
+            pass
+
+        return data
+
     def get_agrovoclabels(self):
         data = d_utils.json_to_pytype(os.path.join(self.drop_downs_pth, 'agrovocLabels.json'))["bindings"]
         data_df = pd.DataFrame(data)
 
-        data_df['accession'] = data_df['uri'].apply(lambda x: x['value'])
-        data_df['label'] = data_df['label'].apply(lambda x: x['value'])
+        data_df['accession'] = data_df['uri'].apply(lambda x: x.get('value', str()))
+        data_df['label'] = data_df['label'].apply(lambda x: x.get('value', str()))
         data_df['description'] = ' '
 
         if self.accession:
@@ -63,9 +91,54 @@ class COPOLookup:
         data = d_utils.json_to_pytype(os.path.join(self.drop_downs_pth, 'countries.json'))["bindings"]
         data_df = pd.DataFrame(data)
 
+        if self.accession:
+            bn = list()
+            bn.append(self.accession) if isinstance(self.accession, str) else bn.extend(self.accession)
+            data_df = data_df[data_df['iso_3166-2'].isin(bn)]
+        elif self.search_term:
+            data_df = data_df[data_df['name'].str.lower().str.contains(self.search_term, regex=False)]
+
         data_df['accession'] = data_df['iso_3166-2']
         data_df['label'] = data_df['name']
-        data_df['description'] = '<table style="width:100%"><tr><td>Code</td><td>'+data_df['country-code']+'</td></tr><tr><td>Region</td><td>'+data_df['region']+'</td></tr><tr><td>Sub-region</td><td>'+data_df['sub-region']+'</td></tr></table>'
+        data_df['description'] = '<table style="width:100%"><tr><td>Code</td><td>' + data_df[
+            'country-code'] + '</td></tr><tr><td>Region</td><td>' + data_df[
+                                     'region'] + '</td></tr><tr><td>Sub-region</td><td>' + data_df[
+                                     'sub-region'] + '</td></tr></table>'
+
+        data_df = data_df[['accession', 'label', 'description']]
+        result = data_df.to_dict('records')
+
+        return result
+
+    def get_mediatypelabels(self):
+        """
+        function generates and performs lookup of media types - to regenerate, delete 'all_list.json'
+        see: https://www.iana.org/assignments/media-types/media-types.xml
+        :return:
+        """
+        if not os.path.exists(os.path.join(self.drop_downs_pth, 'media_types', 'all_list.json')):
+            pth = os.path.join(self.drop_downs_pth, 'media_types')
+            all_files = glob.glob(os.path.join(pth, "*.csv"))
+
+            all_list = list()
+            for f in all_files:
+                df = pd.read_csv(f)
+                df['type'] = df['Template'].str.split("/").str.get(0)
+                stem_part = set(df['type'][~df['type'].isna()]).pop()
+                df['type'] = stem_part
+                vv = df['Template'][df['Template'].isna()].index
+                tt = df['Name'][vv]
+                df.loc[list(vv), 'Template'] = stem_part + '/' + tt
+                df = df[['Name', 'Template', 'type']]
+                all_list = all_list + df.to_dict('records')
+
+                with open(os.path.join(self.drop_downs_pth, 'media_types', 'all_list.json'), 'w') as fout:
+                    json.dump(all_list, fout)
+
+        data_df = pd.read_json(os.path.join(self.drop_downs_pth, 'media_types', 'all_list.json'))
+
+        data_df['accession'] = data_df['Template']
+        data_df['label'] = data_df['Template']
 
         if self.accession:
             bn = list()
@@ -74,7 +147,68 @@ class COPOLookup:
         elif self.search_term:
             data_df = data_df[data_df['label'].str.lower().str.contains(self.search_term, regex=False)]
 
+        data_df['description'] = '<table style="width:100%"><tr><td>Category</td><td>' + data_df[
+            'type'] + '</td></tr></table>'
+
         data_df = data_df[['accession', 'label', 'description']]
         result = data_df.to_dict('records')
+
+        return result
+
+    def get_samples(self):
+        """
+        lookup of sample
+        :return:
+        """
+
+        return None
+
+    def get_isasamples(self):
+        """
+        lookup for ISA-based (COPO standard) samples
+        :return:
+        """
+
+        import web.apps.web_copo.templatetags.html_tags as htags
+
+        df = pd.DataFrame()
+
+        if self.accession:
+            record = Sample().get_record(self.accession)
+            if record:
+                df = pd.DataFrame([record])
+                df['accession'] = df._id.astype(str)
+                df['label'] = df['name']
+                desc = df['accession'].apply(lambda x: htags.generate_attributes("sample", x))
+                desc = list(desc)[0]
+                html = """<table style="width:100%">"""
+                for col in desc['columns']:
+                    html += "<tr><td>{}</td>".format(col['title'])
+                    html += "<td>{}</td>".format(desc['data_set'][col['data']])
+                    html += "</tr>"
+                html += "</table>"
+                df['description'] = html
+
+        elif self.search_term:
+            projection = dict(name=1)
+            filter_by = dict(sample_type="isasample")
+            filter_by["name"] = {'$regex': self.search_term, "$options": 'i'}
+
+            sort_by = 'name'
+            sort_direction = -1
+
+            records = Sample(profile_id=self.profile_id).get_all_records_columns(filter_by=filter_by,
+                                                                                 projection=projection,
+                                                                                 sort_by=sort_by,
+                                                                                 sort_direction=sort_direction)
+
+            df = pd.DataFrame(records)
+            df['accession'] = df._id.astype(str)
+            df['label'] = df['name']
+            df['description'] = '<table style="width:100%"><tr><td>Name</td><td>' + df[
+                'name'] + '</td></tr></table>'
+
+        df = df[['accession', 'label', 'description']]
+        result = df.to_dict('records')
 
         return result

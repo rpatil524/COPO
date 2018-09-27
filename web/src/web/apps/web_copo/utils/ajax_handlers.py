@@ -52,19 +52,21 @@ def search_ontology_ebi(request, ontology_names):
     return HttpResponse(data)
 
 
-def search_copo_components(request, component_name):
+def search_copo_components(request, data_source):
     """
-    function does local lookup of items given component_name
+    function does local lookup of items given data_source
     :param request:
-    :param component_name:
+    :param data_source:
     :return:
     """
-    term = request.POST.get("q", str())
 
-    if component_name == "999":
-        component_name = str()
+    data = COPOLookup(
+        search_term=request.POST.get("q", str()),
+        accession=request.POST.get("accession", str()),
+        data_source=data_source,
+        profile_id=request.POST.get("profile_id", str())
+    ).broker_component_search()
 
-    data = COPOLookup(search_term=term, component=component_name).broker_component_search()
     return HttpResponse(jsonpickle.encode(data), content_type='application/json')
 
 

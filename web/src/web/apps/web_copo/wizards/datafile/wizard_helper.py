@@ -245,8 +245,13 @@ class WizardHelper:
 
         for stage in stages:
             for st in stage.get("items", list()):
-                if "option_values" in st:
-                    st["option_values"] = htags.get_control_options(st)
+                if st["control"] == "copo-lookup":
+                    continue
+                if st.get("option_values", False) == False:
+                    st.pop('option_values', None)
+                    continue
+
+                st["option_values"] = htags.get_control_options(st)
 
         return True
 
@@ -593,7 +598,7 @@ class WizardHelper:
                         # that require a different display structure
 
                         class_name = self.key_split.join((row.id, str(o_indx), object_array_keys[1]))
-                        columns.append(dict(title=label + "[{0}]".format(o_row[object_array_keys[0]]), data=class_name,
+                        columns.append(dict(title=label + " [{0}]".format(o_row[object_array_keys[0]]), data=class_name,
                                             className=column_class))
                         data.append({class_name: o_row[object_array_keys[1]]})
 
@@ -609,7 +614,7 @@ class WizardHelper:
                     shown_keys = (row["id"], str(tt_indx))
                     class_name = self.key_split.join(shown_keys)
                     columns.append(
-                        dict(title=label + "[{0}]".format(str(tt_indx + 1)), data=class_name,
+                        dict(title=label + " [{0}]".format(str(tt_indx + 1)), data=class_name,
                              className=column_class))
 
                     if isinstance(tt_val, list):
@@ -879,7 +884,7 @@ class WizardHelper:
                         # that require a different display structure
 
                         class_name = self.key_split.join((row.id, str(o_indx), object_array_keys[1]))
-                        columns.append(dict(title=label + "[{0}]".format(o_row[object_array_keys[0]]), data=class_name,
+                        columns.append(dict(title=label + " [{0}]".format(o_row[object_array_keys[0]]), data=class_name,
                                             className=column_class))
                         data.append({class_name: o_row[object_array_keys[1]]})
 
@@ -895,7 +900,7 @@ class WizardHelper:
                     shown_keys = (row["id"], str(tt_indx))
                     class_name = self.key_split.join(shown_keys)
                     columns.append(
-                        dict(title=label + "[{0}]".format(str(tt_indx + 1)), data=class_name,
+                        dict(title=label + " [{0}]".format(str(tt_indx + 1)), data=class_name,
                              className=column_class))
 
                     if isinstance(tt_val, list):
@@ -1140,17 +1145,19 @@ class WizardHelper:
                               f["id"].split(".")[-1] == key[3]]
             control_schema = control_schema[0] if control_schema else {}
 
-        if "option_values" in control_schema:
-            control_schema["option_values"] = htags.get_control_options(control_schema)
+        # compose return object
+        result_dict = dict()
 
         # get target record
         record_attributes = DataFile().get_record(record_id)['description']['attributes']
+        result_dict["schema_data"] = record_attributes[key[0]][key[1]]
 
-        # compose return object
-        result_dict = dict()
+        if "option_values" in control_schema:
+            control_schema["data"] = result_dict["schema_data"]
+            control_schema["option_values"] = htags.get_control_options(control_schema)
+
         result_dict["control_schema"] = control_schema
 
-        result_dict["schema_data"] = record_attributes[key[0]][key[1]]
         if parent_schema.get("control", str()) in object_controls.keys():
             result_dict["schema_data"] = record_attributes[key[0]][key[1]][int(key[2])][key[3]]
         elif parent_schema["type"] == "array":
