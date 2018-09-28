@@ -1433,17 +1433,9 @@ class WizardHelper:
         :return:
         """
 
-        columns = [
-            dict(data="name", title="Name"),
-            dict(data="target_repository", title="Target repository"),
-            dict(data="number_of_datafiles", title="Size"),
-            dict(data="last_rendered_stage", title="Last rendered stage"),
-            dict(data="created_on", title="Modified")
-        ]
-
         data_set = list()
 
-        projection = dict(created_on=1, attributes=1, meta=1, stages=1, name=1)
+        projection = dict(name=1)
         filter_by = dict(profile_id=self.profile_id, component=self.component)
 
         if self.description_token:
@@ -1452,36 +1444,59 @@ class WizardHelper:
         records = Description().get_all_records_columns(sort_by='created_on', sort_direction=1, projection=projection,
                                                         filter_by=filter_by)
 
-        for r in records:
-            stages = r['stages']
-            last_rendered_stage = r['meta'].get('last_rendered_stage', str())
-            number_of_datafiles = DataFile().get_collection_handle().count(
-                {'description_token': str(r['_id']), 'deleted': d_utils.get_not_deleted_flag()})
-            target_repository = r['attributes'].get("target_repository", dict()).get("target_repository", str())
+        if records:
+            df = pd.DataFrame(records)
+            df['id'] = df._id.astype(str)
+            df['name'] = df['name'].replace('', 'N/A')
 
-            if target_repository:
-                label = [z["label"] for x in stages if x['ref'] == "target_repository" for y in x["items"] if
-                         y["id"] == "target_repository" for z in y["option_values"] if z["value"] == target_repository]
-                target_repository = label[0] if label else 'N/A'
-            else:
-                target_repository = 'N/A'
+            data_set = df.to_dict('records')
 
-            lrs = [x['title'] for x in stages if x['ref'] == last_rendered_stage]
-            lrs = lrs[0] if lrs else 'N/A'
+        return data_set
 
-            val = dict(
-                name=r['name'],
-                created_on=htags.resolve_datetime_data(r['created_on'], dict()),
-                DT_RowId="row_" + str(r['_id']),
-                id=str(r['_id']),
-                number_of_datafiles=number_of_datafiles,
-                target_repository=target_repository,
-                last_rendered_stage=lrs
-            )
+    def get_description_record_details(self):
+        """
+        function returns description detail
+        :return:
+        """
 
-            data_set.append(val)
+        description = Description().GET(self.description_token)
 
-        return dict(dataSet=data_set, columns=columns)
+        number_of_datafiles = DataFile().get_collection_handle().count(
+            {'description_token': str(description['_id']), 'deleted': d_utils.get_not_deleted_flag()})
+
+        name = description['name']
+        created_on = htags.resolve_datetime_data(description['created_on'], dict())
+
+        attributes = description['attributes']
+        meta = description["meta"]
+
+        # get rendered stages
+        rendered_stages_ref = meta["rendered_stages"]
+        rendered_stages = [x for x in description["stages"] if
+                           x['ref'] in rendered_stages_ref and x.get("is_metadata", True)]
+
+        datafile_attributes = dict()
+        datafile_items = list()
+
+        for st in rendered_stages:
+            attributes[st["ref"]] = attributes.get(st["ref"], dict())
+            for item in st.get("items", list()):
+                if str(item.get("hidden", False)).lower() == "false":
+                    atrib_val = attributes.get(st["ref"], dict()).get(item["id"], str())
+                    item["id"] = st["ref"] + self.key_split + item["id"]
+                    datafile_attributes[item["id"]] = atrib_val
+                    datafile_items.append(item)
+
+        resolved_element = htags.resolve_display_data(datafile_items, datafile_attributes)
+        target_repository = resolved_element['data_set']['target_repository___0___target_repository']
+
+        data_set = list()
+
+        for indx, col in enumerate(resolved_element['columns']):
+            data_set.append([indx, col['title'], resolved_element['data_set'][col['data']]])
+
+        return dict(data_set=data_set, name=name, number_of_datafiles=number_of_datafiles, created_on=created_on,
+                    target_repository=target_repository)
 
     def match_to_description(self, target_rows):
         """

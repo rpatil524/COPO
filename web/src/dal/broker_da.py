@@ -325,6 +325,8 @@ class BrokerVisuals:
         if description_token:
             description_record = Description().GET(description_token)
             if description_record:
+                if not description_record["name"]:
+                    description_record["name"] = "N/A"
                 self.context['description']['description_record'] = dict(name=description_record["name"],
                                                                      id=str(description_record["_id"]))
 

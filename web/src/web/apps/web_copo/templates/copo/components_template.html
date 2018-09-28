@@ -63,15 +63,21 @@
             <span class="action-label" style="margin-left: -5px;">Source list</span>
         </div>
 
-        <a class="description_bundle_button tiny ui labeled button" tabindex="0">
-            <div class="tiny ui secondary button bundle-name-i" title="Reload bundle">
-                <i class="tags icon"></i>
-                <span></span>
-            </div>
-            <div class="tiny ui basic left pointing label bundle-more-info" title="More info">
-                <span><i class="caret square down"></i></span>
-            </div>
-        </a>
+        <div class="btn-group description_bundle_button" style="margin-left: 10px; margin-bottom: 10px;">
+            <a style="background-image: none;" class="btn btn-sm btn-default bundle-name-i" href="#"><i style="padding-right: 10px;" class="fa fa-tags fa-fw"></i></a>
+            <a style="background-image: none;" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"
+               href="#">
+                <span class="fa fa-caret-down" title="Show bundle tasks"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="reload-bundle" href="#"><i style="padding-right: 5px;" class="redo alternate brown icon"></i> Reload</a></li>
+                <li><a class="metadata-bundle" href="#"><i style="padding-right: 5px;" class="tags blue icon"></i> Metadata</a></li>
+                <li><a class="files-in-bundle" href="#"><i style="padding-right: 5px;" class="database icon"></i>Bundle items</a></li>
+                <li><a class="submit-in-bundle" href="#"><i style="padding-right: 5px;" class="mail green outline icon"></i> Submit</a></li>
+                <li class="divider"></li>
+                <li><a class="delete-bundle" style="color:#DB2828;" href="#"><i style="padding-right: 5px;" class="trash alternate outline icon"></i> Delete</a></li>
+            </ul>
+        </div>
 
         <div class="describe_record_multi tiny ui basic dtables-dbuttons  blue button copo-dt"
              data-toggle="tooltip"

@@ -334,7 +334,7 @@ def generate_server_side_table_records(profile_id=str(), component=str(), reques
 
 @register.filter("generate_table_records")
 def generate_table_records(profile_id=str(), component=str()):
-    # function generates component records for building an UI table - please note that for effective data display,
+    # function generates component records for building an UI table - please note that for effective tabular display,
     # all array and object-type fields (e.g., characteristics) are deferred to sub-table display.
     # please define such in the schema as "show_in_table": false and "show_as_attribute": true
 
@@ -379,7 +379,7 @@ def generate_table_records(profile_id=str(), component=str()):
         for x in schema:
             x["id"] = x["id"].split(".")[-1]
             columns.append(dict(data=x["id"], title=x["label"]))
-            df[x["id"]] = df[x["id"]].apply(resolve_control_output_apply, args=(x,)).astype(str)
+            df[x["id"]] = df[x["id"]].apply(resolve_control_output_apply, args=(x,))
 
         data_set = df.to_dict('records')
 

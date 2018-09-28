@@ -275,15 +275,18 @@ $(document).ready(function () {
     }
 
     function get_submission_bundle_table(submissionRecord) {
+        var bundle = submissionRecord["bundle"];
         //set up data source
         var dtd = [];
-        submissionRecord.bundle.forEach(function (item) {
+        for (var i = 0; i < bundle.length; ++i) {
+            var item = bundle[i];
+
             var option = {};
-            option["target_label"] = item.recordLabel;
-            option["target_id"] = item.recordID;
-            option["target_status"] = '';
+            option.target_label = item.recordLabel;
+            option.target_id = item.recordID;
+            option.target_status = '';
             dtd.push(option);
-        });
+        }
 
         var tableID = 'submission_bundle_table_' + submissionRecord.record_id;
 
