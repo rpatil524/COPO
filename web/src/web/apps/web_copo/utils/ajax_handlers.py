@@ -13,7 +13,8 @@ from dateutil import parser
 from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
 from django.conf import settings
-from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, CopoGroup, Annotation, Repository
+from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, CopoGroup, Annotation, \
+    Repository, Person
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
 from dal import mongo_util as util
@@ -24,6 +25,11 @@ from web_copo.models import UserDetails
 from django.db.models import Q
 from django.contrib.auth.models import Group
 from django.core import serializers
+from dal.orcid_da import Orcid
+from submission.dataverseSubmission import DataverseSubmit as ds
+from submission.dspaceSubmission import DspaceSubmit as dspace
+
+DV_STRING = 'HARVARD_TEST_API'
 
 
 def get_source_count(self):
@@ -286,8 +292,11 @@ def get_users_in_group(request):
 def get_users(request):
     q = request.GET['q']
     x = list(User.objects.filter(
-        Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).exclude(
-        is_superuser=True).values_list('id', 'first_name', 'last_name', 'email', 'username'))
+        Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).values_list('id',
+                                                                                                             'first_name',
+                                                                                                             'last_name',
+                                                                                                             'email',
+                                                                                                             'username'))
     if not x:
         return HttpResponse()
     return HttpResponse(json.dumps(x))
@@ -327,8 +336,16 @@ def create_new_repo(request):
     apikey = request.POST['apikey']
     username = request.POST['username']
     password = request.POST['password']
+    isCG = request.POST['isCG']
     uid = request.user.id
-    args = {'name': name, 'type': type, 'url': url, 'apikey': apikey, 'username': username, 'password': password,
+
+    if isCG == 'true':
+        isCG = True
+    else:
+        isCG = False
+
+    args = {'isCG': isCG, 'name': name, 'type': type, 'url': url, 'apikey': apikey, 'username': username,
+            'password': password,
             'uid': uid}
     Repository().save_record(dict(), **args)
     out = {'name': name, 'type': type, 'url': url}
@@ -409,12 +426,12 @@ def get_users_in_repo(request):
     u_list = list()
     for d in data:
         u_list.append({'uid': d.user.id, 'first_name': d.user.first_name, 'last_name': d.user.last_name})
-    #data = serializers.serialize('json', u_list)
+    # data = serializers.serialize('json', u_list)
     return HttpResponse(json_util.dumps(u_list))
 
 
 def get_repos_for_user(request):
-    #u_type = request.GET['u_type']
+    # u_type = request.GET['u_type']
     uid = str(request.user.id)
     group_id = request.GET['group_id']
     doc = CopoGroup().get_repos_for_group_info(uid, group_id)
@@ -440,3 +457,108 @@ def remove_repo_from_group(request):
     else:
         return HttpResponseBadRequest(json.dumps({'resp': 'Server Error - Try again'}))
 
+
+def get_repo_info(request):
+    sub_id = request.GET['sub_id']
+    s = Submission().get_record(ObjectId(sub_id))
+
+    try:
+        repo = s['destination_repo']
+        out = {'repo_type': repo['type'], 'repo_url': repo['url']}
+    except:
+        out = {}
+    return HttpResponse(json.dumps(out))
+
+
+def search_dataverse(request):
+    box = request.GET['box']
+    q = request.GET['q']
+    url = Submission().get_dataverse_details(request.GET['submission_id'])
+    dv_url = url['url'] + '/api/v1/search'
+    payload = {'q': q, 'per_page': 100, 'show_entity_ids': True, 'type': box}
+    resp = requests.get(url=dv_url, params=payload)
+    if not resp.status_code == 200:
+        return HttpResponse(None)
+    resp = resp.content.decode('utf-8')
+
+    return HttpResponse(resp)
+
+
+def get_dataverse_content(request):
+    id = request.GET['id']
+    url = Submission().get_dataverse_details(request.GET['submission_id'])
+    dv_url = url['url'] + '/api/v1/dataverses/' + id + '/contents'
+    resp_dv = requests.get(dv_url).content.decode('utf-8')
+    ids = json.loads(resp_dv)
+    if not ids['data']:
+        return HttpResponse(json.dumps({"no_datasets": "No datasets found in this dataverse."}))
+    return HttpResponse(json.dumps(ids['data']))
+
+
+def get_info_for_new_dataverse(request):
+    out = dict()
+    p_id = request.session['profile_id']
+    profile = Profile().get_record(p_id)
+    out['dvAlias'] = str(profile['title']).lower()
+    person_list = list(Person(p_id).get_people_for_profile())
+    out['dvPerson'] = person_list
+    orcid = Orcid().get_orcid_profile(request.user)
+    try:
+        affiliation = orcid.get('op', {}).get('activities_summary', {}).get('employments', {}) \
+            .get('employment_summary', {})[0].get('organization', "").get('name', "")
+    except IndexError:
+        affiliation = ""
+    out['dsAffiliation'] = affiliation
+    df = list(DataFile().get_for_profile(p_id))
+    file = df[0]
+    out['dvName'] = profile.get('title', "")
+    out['dsTitle'] = file.get('description', {}).get('attributes', {}) \
+        .get('title_author_contributor', {}).get('dcterms:title', "")
+    out['dsDescriptionValue'] = file.get('description', {}).get('attributes', {}) \
+        .get('subject_description', {}).get('dcterms:description', "")
+    out['dsSubject'] = file.get('description', {}).get('attributes', {}) \
+        .get('subject_description', {}).get('dcterms:subject', "")
+    return HttpResponse(json_util.dumps(out))
+
+
+def update_submission_repo_data(request):
+    task = request.POST['task']
+    if task == 'change_destination':
+        custom_repo_id = request.POST['custom_repo_id']
+        submission_id = request.POST['submission_id']
+        s = Submission().update_destination_repo(repo_id=custom_repo_id, submission_id=submission_id)
+        s['record_id'] = str(submission_id)
+        clear_submission_metadata(request)
+        return HttpResponse(json_util.dumps(s))
+    elif task == 'change_meta':
+        meta = request.POST['meta']
+        submission_id = request.POST['submission_id']
+        s = Submission().update_meta(submission_id=submission_id, meta=meta)
+        return HttpResponse(json.dumps(s))
+
+
+def clear_submission_metadata(request):
+    Submission().clear_submission_metadata(request.POST['submission_id'])
+
+
+def publish_dataverse(request):
+    resp = ds().publish_dataverse(request.POST['sub_id'])
+    return HttpResponse(resp)
+
+
+def get_dspace_communities(request):
+    sub_id = request.GET['submission_id']
+    resp = dspace(sub_id).get_dspace_communites()
+    return HttpResponse(resp)
+
+def get_dspace_collection(request):
+    sub_id = request.GET['submission_id']
+    collection_id = request.GET['collection_id']
+    resp = dspace(sub_id).get_dspace_collection(collection_id)
+    return HttpResponse(resp)
+
+def get_dspace_items(request):
+    sub_id = request.GET['submission_id']
+    collection_id = request.GET['collection_id']
+    resp = dspace(sub_id).get_dspace_items(collection_id)
+    return HttpResponse(resp)

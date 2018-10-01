@@ -33,6 +33,7 @@ $(document).ready(function () {
             var apikey = $('#apikey').val()
             var username = $('#username').val()
             var password = $('#password').val()
+            var isCG = $('input[name=isCG]:checked').val();
             $.ajax({
                 url: "/copo/create_new_repo/",
                 data: {
@@ -41,7 +42,8 @@ $(document).ready(function () {
                     'url': url,
                     'apikey': apikey,
                     'username': username,
-                    'password': password
+                    'password': password,
+                    'isCG': isCG
                 },
                 headers: {'X-CSRFToken': $.cookie('csrftoken')},
                 method: 'POST',

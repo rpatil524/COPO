@@ -11,6 +11,7 @@ from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 from django.contrib.auth.models import User
+from django.conf import settings
 
 PubCollection = 'PublicationCollection'
 PersonCollection = 'PersonCollection'
@@ -382,6 +383,9 @@ class Submission(DAComponent):
             }
         )
 
+    def clear_submission_metadata(self, sub_id):
+        return self.get_collection_handle().update({"_id": ObjectId(sub_id)}, {"$set": {"meta": {}}})
+
     def isComplete(self, sub_id):
         doc = self.get_collection_handle().find_one({"_id": ObjectId(sub_id)})
 
@@ -460,6 +464,44 @@ class Submission(DAComponent):
     def get_ena_type(self):
         subs = self.get_collection_handle().find({'repository': {'$in': ['ena-ant', 'ena', 'ena-asm']}})
         return subs
+
+    def update_destination_repo(self, submission_id, repo_id):
+        if repo_id == 'default':
+            return self.get_collection_handle().update(
+                {'_id': ObjectId(submission_id)}, {'$set': {'destination_repo': 'default'}}
+            )
+        r = Repository().get_record(ObjectId(repo_id))
+        dest = {"url": r['url'], 'apikey': r['apikey'], "isCG": r['isCG'], "repo_id": repo_id, "name": r['name'],
+                "type": r['type'], "username": r['username'], "password": r['password']}
+        self.get_collection_handle().update(
+            {'_id': ObjectId(submission_id)}, {'$set': {'destination_repo': dest, 'repository': r['type']}}
+        )
+
+        return r
+
+    def update_meta(self, submission_id, meta):
+        return self.get_collection_handle().update(
+            {'_id': ObjectId(submission_id)}, {'$set': {'meta': json_util.loads(meta)}}
+        )
+
+    def get_dataverse_details(self, submission_id):
+        doc = self.get_collection_handle().find_one(
+            {'_id': ObjectId(submission_id)}, {'destination_repo': 1}
+        )
+        default_dataverse = {'url': settings.DATAVERSE["HARVARD_TEST_API"],
+                             'apikey': settings.DATAVERSE["HARVARD_TEST_TOKEN"]}
+        if 'destination_repo' in doc:
+            if doc['destination_repo'] == 'default':
+                return default_dataverse
+            else:
+                return doc['destination_repo']
+        else:
+            return default_dataverse
+
+    def mark_as_published(self, submission_id):
+        return self.get_collection_handle().update(
+            {'_id': ObjectId(submission_id)}, {'$set': {'published': True}}
+        )
 
 
 class DataFile(DAComponent):

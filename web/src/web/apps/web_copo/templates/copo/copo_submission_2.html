@@ -7,6 +7,16 @@
 
 {% block stylesheet_block %}
 
+    <style>
+        .row {
+            margin-left: 0 !important
+        }
+
+        .steps li span {
+            margin-left: 10px !important;
+        }
+    </style>
+
 {% endblock %}
 
 
@@ -23,6 +33,8 @@
     <div hidden id="hidden_attrs">
         <!-- hidden attributes  -->
         <input type="hidden" id="nav_component_name" value="submission"/>
+        <input type="hidden" id="custom_repo_id" value=""/>
+        <input type="hidden" id="dataset_id"/>
     </div>
 {% endblock %}
 
@@ -74,6 +86,29 @@
         </table>
     </div>
 
+    <div class="modal fade" id="repo_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Submission Details</h4>
+                </div>
+                <div class="modal-body" id="repo_modal-body">
+                    <!-- RADIO BUTTON TO CHOOSE BETWEEN EXISTING AND NEW REPO -->
+
+
+                </div>
+
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="save_inspection_button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 
 {% block help_section %}
@@ -87,4 +122,5 @@
     <script src="{% static 'copo/js/generic_handlers_ext2.js' %}"></script>
     <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
     <script src="{% static 'copo/js/copo_submission_2.js' %}"></script>
+    <script src="{% static 'copo/js/repository_inspection.js' %}"></script>
 {% endblock %}

@@ -176,12 +176,10 @@ SITE_ID = 1
 COPO_URL = 'copo-project.org'
 
 DATAVERSE = {
-    "TEST_DATAVERSE_API_URL": "https://apitest.dataverse.org//api/v1",
-    "TEST_DATAVERSE_SERVICE": "/dvn/api/data-deposit/v1.1/swordv2/",
-    "TEST_DATAVERSE_API_TOKEN": "06745d26-1684-489d-a87b-52df9ba05375",
-    "HARVARD_TOKEN": "ea9a511b-d8ae-49ee-9614-9fe131dd8f5f",
-    "HARVARD_TEST_API": "https://demo.dataverse.org/api/v1/",
-    "HARVARD_TEST_TOKEN": "fe6998df-c2a4-4103-9bf8-95200953fe0c"
+    "HARVARD_TEST_API": "https://demo.dataverse.org",
+    "HARVARD_TEST_TOKEN": "fe6998df-c2a4-4103-9bf8-95200953fe0c",
+    "HARVARD_LIVE_API": "https://dataverse.harvard.edu",
+    "HARVARD_LIVE_TOKEN": "10731a84-b3d3-457e-999d-21f48fe8d812"
 }
 
 UNIT_TESTING = False

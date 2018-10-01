@@ -5,45 +5,104 @@ from dataverse import Connection, Dataverse, Dataset, DataverseFile
 from dataverse.exceptions import ConnectionError
 import uuid
 import requests
-from requests.compat import urlencode, urljoin
-import json
 from dal.copo_da import Submission, DataFile
 from web.apps.web_copo.schemas.utils import data_utils
 from dal.copo_da import Profile
 import datetime
-from bson import ObjectId
-from pprint import pprint
-import copy
+from bson import ObjectId, json_util
+import xml.etree.ElementTree as et
+from dataverse.exceptions import OperationFailedError
 
 
 class DataverseSubmit(object):
-    def __init__(self):
-        self.host = settings.DATAVERSE["HARVARD_TEST_API"]
-        self.token = settings.DATAVERSE["HARVARD_TEST_TOKEN"]
-        # self.API_URL = settings.TEST_DATAVERSE_API_URL
-        self.headers = {'X-Dataverse-key': self.token}
+    host = None
+    headers = None
+
+    def __init__(self, sub_id=None):
+        if sub_id:
+            self.host = Submission().get_dataverse_details(sub_id)
+            self.headers = {'X-Dataverse-key': self.host['apikey']}
 
     def submit(self, sub_id, dataFile_ids):
 
         profile_id = data_utils.get_current_request().session.get('profile_id')
-        dataverse = self._get_dataverse(profile_id=profile_id)
-        dataset = self._get_dataset(profile_id=profile_id, dataFile_ids=dataFile_ids, dataverse=dataverse)
+        s = Submission().get_record(ObjectId(sub_id))
 
-        #  get details of files
+        # get url for dataverse
+        self.host = Submission().get_dataverse_details(sub_id)
+        self.headers = {'X-Dataverse-key': self.host['apikey']}
 
-        file = self._upload_files(dataverse, dataset, dataFile_ids, sub_id)
-        if not file:
-            return 'File already present'
+        # if dataset id in submission meta, we are adding to existing dataset, otherwise
+        #  we are creating a new dataset
+        if 'dataverse_alias' in s['meta'] and 'doi' in s['meta']:
+            # submit to existing
+            self._add_to_dataverse(s)
+        else:
+            # create new
+            self._create_and_add_to_dataverse(s)
         return True
 
+    def truncate_url(self, url):
+        if url.startswith('https://'):
+            url = url[8:]
+        elif url.startswith('http://'):
+            url = url[7:]
+        return url
+
+
+    def clear_submission_metadata(self, sub_id):
+        Submission().clear_submission_metadata(sub_id)
+
+    def _add_to_dataverse(self, sub):
+        c = self._get_connection()
+        dv = c.get_dataverse(sub['meta']['dataverse_alias'])
+        doi = self.truncate_url(sub['meta']['doi'])
+        ds = dv.get_dataset_by_doi(doi)
+        if ds == None:
+            ds = dv.get_dataset_by_title(sub['meta']['identifier'])
+            if ds == None:
+                ds = dv.get_dataset_by_string_in_entry(str(sub['meta']['doi']).encode())
+
+        for id in sub['bundle']:
+            file = DataFile().get_record(ObjectId(id))
+            file_location = file['file_location']
+            file_name = file['name']
+            with open(file_location, 'rb') as f:
+                contents = f.read()
+                ds.upload_file(file_name, contents, zip_files=False)
+        meta = ds._metadata
+        dv_storageIdentifier = meta['latest']['storageIdentifier']
+        return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
+
+    def _create_and_add_to_dataverse(self, sub):
+        connection = self._get_connection()
+        dv = self._create_dataverse(sub['meta'], connection)
+        xml_path = self._make_dataset_xml(sub)
+        ds = Dataset.from_xml_file(xml_path)
+        dv._add_dataset(ds)
+        for id in sub['bundle']:
+            file = DataFile().get_record(ObjectId(id))
+            file_location = file['file_location']
+            file_name = file['name']
+            with open(file_location, 'rb') as f:
+                contents = f.read()
+                ds.upload_file(file_name, contents, zip_files=False)
+        meta = ds._metadata
+        dv_storageIdentifier = meta['latest']['storageIdentifier']
+        return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
+
+    def _get_connection(self):
+        dvurl = self.host['url']
+        apikey = self.host['apikey']
+        dvurl = self.truncate_url(dvurl)
+        c = Connection(dvurl, apikey)
+        return c
+
     def _get_dataverse(self, profile_id):
-
         # create new dataverse if none already exists
-
         u = data_utils.get_current_user()
         # create new dataverse if none exists already
         dv_details = Profile().check_for_dataverse_details(profile_id)
-
         if not dv_details:
             # dataverse = connection.create_dataverse(dv_alias, '{0} {1}'.format(u.first_name, u.last_name), u.email)
             dv_details = self._create_dataverse(profile_id)
@@ -51,23 +110,15 @@ class DataverseSubmit(object):
 
         return dv_details
 
-    def _create_dataverse(self, profile_id):
-        profile = Profile().get_record(profile_id)
-        dv_alias = str(uuid.uuid1())
-        dv_scaf = dict()
-        # load dataverse scaffold
-        pth = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'blanks', 'dataverse_scaffold.json')
-        with open(pth, 'r') as f:
-            user = data_utils.get_current_user()
-            email = user.email
-            dv_scaf = json.loads(f.read())
-            dv_scaf['name'] = profile['title']
-            dv_scaf['description'] = profile['description']
-            dv_scaf['dataverseContacts'][0]['contactEmail'] = email
-            dv_scaf['alias'] = dv_alias
-        make_dataverse_url = self.host + '{0}/{1}/?key={2}'.format('dataverses', ':root', self.token)
-        resp = requests.post(make_dataverse_url, data=json.dumps(dv_scaf))
-        return json.loads(resp.content.decode('utf-8'))
+    def _create_dataverse(self, meta, conn):
+        alias = str(uuid.uuid4())
+        dv = conn.create_dataverse(alias, meta['dvName'], meta['dsContactEmail'])
+        return dv
+
+    def _create_dataset(self, meta, dv, conn):
+        dv.create_dataset()
+        x = self._make_dataset_xml(meta)
+        Dataset.from_xml_file()
 
     def _get_dataset(self, profile_id, dataFile_ids, dataverse):
         # create new dataset if none exists already
@@ -77,161 +128,91 @@ class DataverseSubmit(object):
             Profile().add_dataverse_dataset_details(profile_id, ds_details)
         return ds_details
 
-    def _create_dataset(self, dataFile_ids, dataverse):
-        # get datafile mongo object to extract dataset metadata
-        # all files submitted in this call will have the same dataverse dc:metadata
-        id = dataFile_ids[0]
-        df = DataFile().get_record(ObjectId(id))
+    def _make_dataset_xml(self, sub):
+        meta = sub['meta']
+        # get datafile for some dataverse specific metadata
+        datafile = DataFile().get_record(ObjectId(sub['bundle'][0]))
+        df = datafile['description']['attributes']
+        pth = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'blanks', 'dataset_xml.xml')
+        tree = et.parse(pth)
+        root = tree.getroot()
+        xmlns = "http://www.w3.org/2005/Atom"
+        dcns = "http://purl.org/dc/terms/"
+        x = "<?xml version='1.0'?>"
+        x = x + '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/">'
+        x = x + '<title>' + meta['dsTitle'] + '</title>'
+        x = x + '<id>' + str(uuid.uuid4()) + '</id>'
+        x = x + '<updated>' + datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') + '</updated>'
+        x = x + '<author><name>' + meta['dsAuthorLastname'] + ', ' + meta['dsAuthorFirstname'] + '</name></author>'
+        x = x + '<summary type="text"></summary>'
+        x = x + '<dcterms:title>' + meta['dsTitle'] + '</dcterms:title>'
+        x = x + '<dcterms:creator>' + meta['dsAuthorLastname'] + ', ' + meta['dsAuthorFirstname'] + '</dcterms:creator>'
+        x = x + '<dcterms:date>' + sub['date_modified'].strftime('%Y-%m-%d') + '</dcterms:date>'
+        x = x + '<dcterms:rights>' + df['optional_fields']['license'] + '</dcterms:rights>'
+        # this should be an array
+        x = x + '<dcterms:bibliographicCitation>' + df['optional_fields']['source'] + '</dcterms:bibliographicCitation>'
+        x = x + '<dcterms:description>' + df['subject_description']['description'] + '</dcterms:description>'
+        x = x + '<dcterms:identifier>' + '' + '</dcterms:identifier>'
+        x = x + '<dcterms:subject>' + df['subject_description']['subject'] + '</dcterms:subject>'
+        x = x + '</entry>'
+        path = os.path.dirname(datafile['file_location'])
+        xml_path = os.path.join(path, 'xml.xml')
+        with open(xml_path, 'w+') as f:
+            f.write(x)
+        return xml_path
 
-        # load metadata skeleton
-        ds_scaf = dict()
-        pth = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'blanks', 'dataset_scaffold.json')
-        with open(pth, 'r') as f:
-            ds_scaf = json.loads(f.read())
-            user = data_utils.get_current_user()
-            email = user.email
-
-            for n_dict in ds_scaf["datasetVersion"]["metadataBlocks"]["citation"]["fields"]:
-                # parse skeleton dictionary checking for tag names, and inserting metadata where relevant
-                if n_dict['typeName'] == 'title':
-                    # export title
-                    n_dict['value'] = df.get('description').get('attributes').get('title_author_contributor').get(
-                        'dcterms:title')
-                elif n_dict['typeName'] == 'author':
-                    # get authors from mongo
-                    authors = listize(
-                        df.get('description').get('attributes').get('title_author_contributor').get('dcterms:creator'))
-                    author_obj = n_dict['value']
-                    authors_list = list()
-                    for m in authors:
-                        temp = copy.deepcopy(author_obj[0])
-                        # reverse names
-                        names = m.strip().split(' ')
-                        temp['authorName']['value'] = names[1] + ' ' + names[0]
-                        temp['authorAffiliation']['value'] = email.rsplit('@')[1]
-                        authors_list.append(temp)
-                    n_dict['value'] = authors_list
-                elif n_dict['typeName'] == 'datasetContact':
-                    for contacts in n_dict['value']:
-                        for contact_key in contacts.keys():
-                            if contact_key == 'datasetContactName':
-                                contacts[contact_key]['value'] = df.get('description').get('attributes').get(
-                                    'title_author_contributor').get(
-                                    'dcterms:creator')
-                            elif contact_key == 'datasetContactAffiliation':
-                                tmp_email = df.get('description').get('attributes').get(
-                                    'title_author_contributor').get(
-                                    'dcterms:contributor')
-                                affiliation = tmp_email.rsplit('@')[1]
-                                contacts[contact_key]['value'] = affiliation
-                            elif contact_key == 'datasetContactEmail':
-                                contacts[contact_key]['value'] = email
-                elif n_dict['typeName'] == 'dsDescription':
-                    for descriptions in n_dict['value']:
-                        for ds_key in descriptions.keys():
-                            if ds_key == 'dsDescriptionValue':
-                                descriptions[ds_key]['value'] = df.get('description').get('attributes').get(
-                                    'subject_description').get(
-                                    'dcterms:description')
-                            elif ds_key == 'dsDescriptionDate':
-                                d = df.get('description').get('attributes').get('optional_fields').get('dcterms:date')
-                                descriptions[ds_key]['value'] = datetime.datetime.strptime(d, '%d/%m/%Y').strftime(
-                                    '%Y-%m-%d')
-                elif n_dict['typeName'] == 'subject':
-                    n_dict['value'].append(
-                        df.get('description').get('attributes').get('subject_description').get(
-                            'dcterms:subject')
-                    )
-                elif n_dict['typeName'] == 'dateOfDeposit':
-                    d = df.get('description').get('attributes').get('optional_fields').get(
-                        'dcterms:date')
-                    n_dict['value'] = datetime.datetime.strptime(d, '%d/%m/%Y').strftime('%Y-%m-%d')
-                elif n_dict['typeName'] == 'depositor':
-                    n_dict['value'] = settings.COPO_URL
-                elif n_dict['typeName'] == 'dataSources':
-                    n_dict['value'] = df.get('description').get('attributes').get('optional_fields').get(
-                        'dcterms:source')
-                    n_dict['value'] = listize(n_dict['value'])
-                    if not n_dict['value']:
-                        n_dict['value'] = []
-                elif n_dict['typeName'] == 'relatedMaterial':
-                    n_dict['value'] = df.get('description').get('attributes').get('optional_fields').get(
-                        'dcterms:relation')
-                    n_dict['value'] = listize(n_dict['value'])
-                    if not n_dict['value']:
-                        n_dict['value'] = []
-                        # TODO - if other fields are required, add them into the dataset_scaffold template, and extract them from the datafile object
-            new_dataset_url = self.host + '{0}/{1}/{2}/?key={3}'.format('dataverses', dataverse['data']['alias'],
-                                                                        'datasets',
-                                                                        self.token)
-            resp = requests.post(new_dataset_url,
-                                 data=json.dumps(ds_scaf)
-                                 )
-
-            out = json.loads(resp.content.decode('utf-8'))
-            if out['status'] == "OK":
-                # now we get dataset details
-                dataset_id = out["data"]["id"]
-                url = urljoin(self.host, 'datasets/' + str(dataset_id) + '/?key=' + self.token)
-                d = requests.get(url)
-                out = json.loads(d.content.decode('utf-8'))
-                out['doi'] = out['data']['protocol'] + ':' + out['data']['authority'] + '/' + out['data']['identifier']
-
-        return out
-
-    def _upload_files(self, dataverse, dataset, dataFile_ids, sub_id):
-
-        # TODO - get first dataset in dataverse...this should change in a future release
-        if isinstance(dataset, list):
-            dataset = dataset[0]
-
-        url_dataset_id = '{0}datasets/:persistentId/add?persistentId={1}&key={2}'.format(self.host,
-                                                                                         dataset['doi'],
-                                                                                         self.token)
-        accessions = list()
-        for id in dataFile_ids:
-            file = DataFile().get_record(ObjectId(id))
-            file_location = file['file_location']
-
-            with open(file_location, "rb") as f:
-                file_content = f.read()
-                # file_content = file_content + str(uuid.uuid1()).encode('utf-8')
-
-            name = file['name']
-            files = {'file': (name, file_content)}
-
-            payload = dict()
-            params = dict(description='Blue skies!',
-                          categories=['Lily', 'Rosemary', 'Jack of Hearts'])
-            params_as_json_string = json.dumps(params)
-            payload = dict(jsonData=params_as_json_string)
-            r = requests.post(url_dataset_id, data=payload, files=files)
-            if r.status_code == 400:
-                resp = json.loads(r.content.decode('utf-8'))
-                if resp['status'] == 'ERROR':
-                    return False
-
-            # add mongo_file id
-            acc = json.loads(r.content.decode('utf-8'))['data']['files'][0]['dataFile']
-            acc['mongo_file_id'] = id
-            acc['dataset_doi'] = dataset['doi']
-            acc['dataverse_title'] = dataverse['data']['name']
-            acc['dataverse_alias'] = dataverse['data']['alias']
-            accessions.append(acc)
-
+    def _update_submission_record(self, sub, dataset, dataverse, dv_storageIdentifier=None):
+        # add mongo_file id
+        acc = dict()
+        acc['storageIdentifier'] = dv_storageIdentifier
+        acc['mongo_file_id'] = dataset.id
+        acc['dataset_doi'] = dataset.doi
+        acc['dataset_edit_media_uri'] = dataset.edit_media_uri
+        acc['dataset_edit_uri'] = dataset.edit_uri
+        acc['dataset_is_deleted'] = dataset.is_deleted
+        acc['dataset_title'] = dataset.title
+        acc['dataverse_title'] = dataset.dataverse.title
+        acc['dataverse_alias'] = dataset.dataverse.alias
+        acc['dataset_id'] = dataset._id
         # save accessions to mongo profile record
-        s = Submission().get_record(sub_id)
-        s['accessions'] = accessions
-        s['complete'] = True
-        s['target_id'] = str(s.pop('_id'))
-        Submission().save_record(dict(), **s)
-        Submission().mark_submission_complete(sub_id)
+        sub['accessions'] = acc
+        sub['complete'] = True
+        sub['target_id'] = str(sub.pop('_id'))
+        Submission().save_record(dict(), **sub)
+        Submission().mark_submission_complete(sub['target_id'])
         return True
 
+    def _listize(list):
+        # split list by comma
+        if list == '':
+            return None
+        else:
+            return list.split(',')
 
-def listize(list):
-    # split list by comma
-    if list == '':
-        return None
-    else:
-        return list.split(',')
+    def publish_dataverse(self, sub_id):
+        # get url for dataverse
+        self.host = Submission().get_dataverse_details(sub_id)
+        self.headers = {'X-Dataverse-key': self.host['apikey']}
+        submission = Submission().get_record(sub_id)
+        dvAlias = submission['accessions']['dataverse_alias']
+        dsId = submission['accessions']['dataset_id']
+        conn = self._get_connection()
+        dv = conn.get_dataverse(dvAlias)
+        # ds = dv.get_dataset_by_doi(dsDoi)
+        if not dv.is_published:
+            dv.publish()
+        # POST http://$SERVER/api/datasets/$id/actions/:publish?type=$type&key=$apiKey
+        url = submission['destination_repo']['url']
+        url = url + '/api/datasets/' + str(dsId) + '/actions/:publish?type=major'
+        print(url)
+        resp = requests.post(
+            url,
+            data={'type': 'major', 'key': self.host['apikey']},
+            headers=self.headers
+        )
+        if resp.status_code != 200 or resp.status_code != 201:
+            raise OperationFailedError('The Dataset could not be published. ' + resp.content)
+
+        doc = Submission().mark_as_published(sub_id)
+
+        return doc

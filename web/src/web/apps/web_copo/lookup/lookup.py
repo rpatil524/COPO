@@ -439,7 +439,7 @@ DROP_DOWNS = {
             'description': '<strong>MIAPPE</strong> is a Minimum Information (MI) standard for plant phenotyping. This repository option defines a list of attributes for describing a phenotyping experiment.'
         },
         {
-            'value': 'dcterms',
+            'value': 'dataverse',
             'label': 'Dataverse',
             'description': 'This option is for labelling data using the <strong>Dublin Core</strong> standard, compatible with Dataverse instances.'
         }
@@ -652,7 +652,7 @@ WIZARD_FILES = {
     'miappe': os.path.join(RESOLVER['wizards_datafile'], 'miappe_stages.json'),
     'sample_start': os.path.join(RESOLVER['wizards_sample'], 'start_stages.json'),
     'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json'),
-    'dcterms': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
+    'dataverse': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
@@ -820,5 +820,5 @@ REPO_NAME_LOOKUP = {
     'ena-asm': 'Sequence Assembly',
     'ena': 'Sequence Reads',
     'figshare': 'Figshare',
-    'dcterms': 'Dataverse'
+    'dataverse': 'Dataverse'
 }

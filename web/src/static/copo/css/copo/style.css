@@ -1251,12 +1251,12 @@ input.date-picker {
     margin-top: 15px;
 }
 
-.autocomplete{
+.autocomplete {
     overflow-y: scroll;
 }
 
 .autocomplete.open {
-  z-index: 2000;
+    z-index: 2000;
 }
 
 input[data-autocomplete] {
@@ -1596,10 +1596,39 @@ div.shown span.side-help-trigger:before {
     padding-bottom: 3px
 }
 
-.ontology-label-text b{
+.ontology-label-text b {
     color: white;
 }
 
 .ontology-description {
     color: #415156
+}
+
+.accordion-table td {
+    padding: 5px
+}
+
+.accordion-table .accordion_label {
+    font-weight: bold
+}
+
+.template-section {
+    margin-bottom: 5px
+}
+
+#table-div-dataverse {
+    border: none;
+    margin-top: 20px
+}
+
+.width300px {
+    width: 300px;
+}
+
+.marginBottom10px {
+    margin-bottom: 10px;
+}
+
+.no-15-left-margin{
+    margin-left: 0 !important
 }
