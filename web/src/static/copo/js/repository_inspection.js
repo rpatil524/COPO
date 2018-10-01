@@ -20,7 +20,7 @@ $(document).ready(function () {
     $(document).on('click', '.create_add_dataverse', handle_radio)
     $(document).on('click', '.dataset-checkbox', select_dataset)
     $(document).on('click', '#save_inspection_button', save_inspection_info)
-    $(document).on('click', '.create_add_community', get_existing_communites)
+    $(document).on('change', '.create_add_community_radio_div', get_existing_communites)
     //check_repo_id()
     do_new_dataverse_fields()
     // here we should call funcs for filling out other repo details
@@ -34,8 +34,10 @@ $(document).ready(function () {
 })
 
 function get_existing_communites(e){
-    var t_selected = $('input[name="create_community_radio"]:checked').val()
+
+    var t_selected = $(e.currentTarget).find($("input[name=create_community_radio]:checked")).val()
     console.log(t_selected)
+
     if (t_selected == "new"){
         // retrieve community details for community
     }
@@ -49,6 +51,11 @@ function get_existing_communites(e){
             }
         }).done(function(data){
             console.log(data)
+            var table_data
+            $(data).each(function(idx, el) {
+                $(table_data).append($('<tr>', {"data-identifier": data.id}).append($("<td>", {text: ""}), $("<td>", {text: el.name}), $("<td>", {text: el.handle})))
+            })
+            $("#existing_community_table").find("tbody").append(table_data)
         })
     }
 }
