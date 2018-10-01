@@ -147,8 +147,6 @@ function handle_radio(el) {
 function build_dataverse_modal(resp) {
 
     $('.ajax-loading-div').fadeOut()
-
-
     var modal = $(document).data('open_modal')
     if (resp == "None") {
         trow = "Repo returned an error. Please try again."
