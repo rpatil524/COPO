@@ -40,7 +40,8 @@ class BrokerRequests:
                             unbundle_datafiles=self.do_unbundle_datafiles,
                             delete_description_record=self.do_delete_description_record,
                             get_unbundled_datafiles=self.do_get_unbundled_datafiles,
-                            get_description_bundle_details=self.do_get_description_bundle_details
+                            get_description_bundle_details=self.do_get_description_bundle_details,
+                            initiate_submission=self.do_initiate_submission
                             )
 
         return request_dict
@@ -111,3 +112,5 @@ class BrokerRequests:
     def do_get_description_bundle_details(self):
         self.context['result'] = self.wizard_helper.get_description_record_details()
 
+    def do_initiate_submission(self):
+        self.context['result'] = self.wizard_helper.initiate_submission()

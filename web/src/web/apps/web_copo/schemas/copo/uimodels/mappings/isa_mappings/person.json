@@ -6,7 +6,7 @@
   },
   "properties": [
     {
-      "help_tip": "",
+      "help_tip": "Enter person first name",
       "required": "true",
       "default_value": "",
       "control_meta": {},
