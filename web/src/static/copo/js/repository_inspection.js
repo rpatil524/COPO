@@ -31,34 +31,48 @@ $(document).ready(function () {
     })
 
 
-})
+    function get_existing_communites(e) {
 
-function get_existing_communites(e){
+        var t_selected = $(e.currentTarget).find($("input[name=create_community_radio]:checked")).val()
+        console.log(t_selected)
 
-    var t_selected = $(e.currentTarget).find($("input[name=create_community_radio]:checked")).val()
-    console.log(t_selected)
+        if (t_selected == "new") {
+            // retrieve community details for community
+            $('.new_community_controls').show()
+            $('.existing_community_table').hide()
+        }
+        else if (t_selected == "existing") {
+            $('.new_community_controls').hide()
+            // search existing communities
+            $.ajax({
+                url: '/copo/get_dspace_communities/',
+                dataType: 'json',
+                data: {
+                    'submission_id': $(document).data('submission_id')
+                }
+            }).done(function (data) {
+                console.log(data)
+                //var tab = '<table id="existing_community_table"><thead><tr><th></th><th>Name</th><th>Handle</th></tr></thead></table>'
+                var table_data = $("<tbody/>")
+                $(data).each(function (idx, el) {
+                    $(table_data).append($('<tr/>', {"data-identifier": el.id}).append($("<td/>", {text: ""}), $("<td/>", {text: el.name}), $("<td/>", {text: el.handle})))
+                })
+                console.log($(table_data))
+                //$(tab).append(table_data)
+                //$('.existing_community_table_div').append(tab)
+                console.log($("#existing_community_table_div"))
 
-    if (t_selected == "new"){
-        // retrieve community details for community
-    }
-    else if(t_selected == "existing"){
-        // search existing communities
-        $.ajax({
-            url:'copo/get_dspace_communities',
-            dataType: 'json',
-            data:{
-                'submission_id': $(document).data('submission_id')
-            }
-        }).done(function(data){
-            console.log(data)
-            var table_data
-            $(data).each(function(idx, el) {
-                $(table_data).append($('<tr>', {"data-identifier": data.id}).append($("<td>", {text: ""}), $("<td>", {text: el.name}), $("<td>", {text: el.handle})))
+                $('#repo_modal').find('#existing_community_table_div').append(table_data)
+                $('.existing_community_table_div').show()
+                $('#dspace_wizard').wizard()
+                //$("#existing_community_table_div").find("table").html(table_data)
+
             })
-            $("#existing_community_table").find("tbody").append(table_data)
-        })
+        }
     }
-}
+
+
+})
 
 
 // delayed keyup function to delay searching for n miliseconds before firing search off to dataverse
