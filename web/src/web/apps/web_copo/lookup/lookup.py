@@ -414,6 +414,11 @@ DROP_DOWNS = {
     ],
     "REPOSITORIES": [
         {
+            'value': 'cg_core',
+            'label': 'CG Core',
+            'description': 'CG compliant data object description template - this is a placeholder text'
+        },
+        {
             'value': 'ena',
             'label': 'ENA - Sequence Reads',
             'description': 'This repository option defines metadata for submission of <strong>raw sequence reads</strong> to the European Nucleotide Archive (ENA)'
@@ -443,11 +448,7 @@ DROP_DOWNS = {
             'label': 'Dataverse',
             'description': 'A Dataverse is an open source data management repository for a community or an institution. It allows data to be federated with a growing list of Dataverse repositories worldwide for increased discoverability'
         },
-        {
-            'value': 'cg_core',
-            'label': 'CG Core',
-            'description': 'CG compliant data object description template - this is a placeholder text'
-        }
+
         # {
         #     'value': 'MetaboLights',
         #     'label': 'MetaboLights'

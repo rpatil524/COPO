@@ -1757,7 +1757,7 @@ function get_profile_components() {
             tableID: 'person_table',
             recordActions: ["add_record_all", "edit_record_single"],
             visibleColumns: 5
-        },
+        },/* TODO - these need to be reactivated in the future sometime
         {
             component: 'annotation',
             title: 'Generic Annotations',
@@ -1785,7 +1785,7 @@ function get_profile_components() {
             tableID: 'repository_table',
             recordActions: ["delete_record_multi"],
             visibleColumns: 10000
-        }
+        }*/
     ];
 
     return componentProperties

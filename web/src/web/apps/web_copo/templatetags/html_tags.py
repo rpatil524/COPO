@@ -386,6 +386,7 @@ def generate_table_records(profile_id=str(), component=str()):
 
         data_set = df.to_dict('records')
 
+    correct_repos = list()
     # do check for custom repos here
     if component == "submission":
 
@@ -393,7 +394,7 @@ def generate_table_records(profile_id=str(), component=str()):
         user = ThreadLocal.get_current_user()
         repo_ids = user.userdetails.repo_submitter
         all_repos = Repository().get_by_ids(repo_ids)
-        correct_repos = list()
+
         for repo in all_repos:
             for r_id in repo_ids:
                     if r_id == str(repo["_id"]):
