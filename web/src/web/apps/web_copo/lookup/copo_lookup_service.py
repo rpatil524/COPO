@@ -176,8 +176,9 @@ class COPOLookup:
             for acc in bn:
                 resp = requests.get(acc)
                 json_body = resp.json()
-                label = json_body.get("prefLabel", dict()).get("Label", dict()).get("literalForm", dict()).get("content",
-                                                                                                               "n/a")
+                label = json_body.get("prefLabel", dict()).get("Label", dict()).get("literalForm", dict()).get(
+                    "content",
+                    "n/a")
                 all_list.append(dict(accession=acc, label=label, description=''))
         elif self.search_term:
             resp = requests.get(REQUEST_BASE_URL, params={'query': str(self.search_term)}, headers=BASE_HEADERS)

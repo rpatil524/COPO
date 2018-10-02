@@ -647,7 +647,7 @@ function do_new_dataverse_fields() {
 function save_inspection_info(e) {
     //e.preventDefault()
     var sub_id = $(document).data('submission_id')
-    var jsondata = JSON.stringify($('#repo_metadata_form').serializeFormJSON())
+    var jsondata = JSON.stringify($('#repo_modal').find('#repo_metadata_form form').serializeFormJSON())
     $.ajax({
         url: "/copo/update_submission_repo_data/",
         type: "POST",

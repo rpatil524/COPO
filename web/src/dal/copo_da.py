@@ -353,7 +353,7 @@ class Submission(DAComponent):
 
     def save_record(self, auto_fields=dict(), **kwargs):
         if kwargs.get("bundle", list()):
-            repo = kwargs.pop("repo")
+            repo = kwargs.pop("repository")
             for k, v in dict(
                     repository=repo,
                     status=False,

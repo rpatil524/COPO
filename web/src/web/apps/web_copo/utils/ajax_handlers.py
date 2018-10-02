@@ -525,7 +525,7 @@ def get_info_for_new_dataverse(request):
     try:
         affiliation = orcid.get('op', {}).get('activities_summary', {}).get('employments', {}) \
             .get('employment_summary', {})[0].get('organization', "").get('name', "")
-    except IndexError:
+    except:
         affiliation = ""
     out['dsAffiliation'] = affiliation
     df = list(DataFile().get_for_profile(p_id))
