@@ -354,6 +354,8 @@ def generate_table_records(profile_id=str(), component=str()):
     # retrieve and process records
     records = da_object.get_all_records_columns(projection=dict(projection))
 
+
+
     if len(records):
 
         df = pd.DataFrame(records)
@@ -363,26 +365,6 @@ def generate_table_records(profile_id=str(), component=str()):
         df.DT_RowId = 'row_' + df.DT_RowId
         df = df.drop('_id', axis='columns')
 
-        # do check for custom repos here
-        if component == "submission":
-            sub_type = pr['repository']
-            user = ThreadLocal.get_current_user()
-            repo_ids = user.userdetails.repo_submitter
-            all_repos = Repository().get_by_ids(repo_ids)
-            correct_repos = list()
-            for repo in all_repos:
-                if sub_type == "dataverse" or sub_type == "dspace" or sub_type == "ckan":
-                    if repo['type'] == 'dataverse' or repo['type'] == 'dspace' or repo['type'] == 'ckan':
-                        # TODO - this needs sorting properly
-                        correct_repos.append(repo)
-                elif repo["type"] == sub_type:
-                    correct_repos.append(repo)
-            if len(correct_repos) > 0:
-
-                for repo in correct_repos:
-                    repo["_id"] = str(repo["_id"])
-                option["repos"] = correct_repos
-        data_set.append(option)
         columns.append(dict(data="record_id", visible=False))
         detail_dict = dict(className='summary-details-control detail-hover-message', orderable=False, data=None,
                            title='', defaultContent='', width="5%")
@@ -404,8 +386,26 @@ def generate_table_records(profile_id=str(), component=str()):
 
         data_set = df.to_dict('records')
 
+    # do check for custom repos here
+    if component == "submission":
+
+
+        user = ThreadLocal.get_current_user()
+        repo_ids = user.userdetails.repo_submitter
+        all_repos = Repository().get_by_ids(repo_ids)
+        correct_repos = list()
+        for repo in all_repos:
+            for r_id in repo_ids:
+                    if r_id == str(repo["_id"]):
+                        correct_repos.append(repo)
+
+        for repo in correct_repos:
+            repo["_id"] = str(repo["_id"])
+
+
     return_dict = dict(dataSet=data_set,
-                       columns=columns
+                       columns=columns,
+                       repos=correct_repos
                        )
 
     return return_dict

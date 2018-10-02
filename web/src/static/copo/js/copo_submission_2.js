@@ -81,7 +81,7 @@ $(document).ready(function () {
     //******************************Functions Block******************************//
     function do_render_submission_table(d) {
         var dtd = d.table_data.dataSet;
-
+        var repos = d.table_data.repos;
         set_empty_component_message(dtd.length); //display empty submission message.
 
         if (dtd.length == 0) {
@@ -180,9 +180,7 @@ $(document).ready(function () {
                 option["record_id"] = record_id;
                 option["complete"] = complete
                 option["published"] = published
-                if (data.hasOwnProperty("repos")) {
-                    option["repos"] = data.repos
-                }
+
                 dataSet.push(option);
             }
         }
@@ -281,7 +279,7 @@ $(document).ready(function () {
                                 else {
                                     colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label" style="margin-bottom: 10px;">' + data.destination_repo.url + '</span></div>')
                                 }
-                                if (data.hasOwnProperty("repos")) {
+                                if (repos.length) {
                                     /*if data has repos attached then this user has permission to submit to one or more
                                     institutional repos, so add them into a dropdown here*/
 
@@ -291,8 +289,8 @@ $(document).ready(function () {
                                     var ul = $('<ul class="dropdown-menu" aria-labelledby="">')
                                     var li_default = $('<li><a data-repo-id="default" data-submission_id="' + data.record_id + '" class="target_repo_option" href="#">Default ' + data.repository + '</a></li>')
                                     ul.append(li_default)
-                                    for (r in data.repos) {
-                                        row = data.repos[r]
+                                    for (r in repos) {
+                                        row = repos[r]
                                         var li = $('<li><a data-repo-id="' + row._id + '" data-submission_id="' + data.record_id + '" class="target_repo_option" href="#">' + row.name + ' - ' + row.url + '</a></li>')
                                         ul.append(li)
                                     }
