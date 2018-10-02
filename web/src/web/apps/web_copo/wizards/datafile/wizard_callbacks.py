@@ -132,7 +132,7 @@ class WizardCallbacks:
         if next_stage_index < len(stages):
             stage = stages[next_stage_index]
 
-        target_repository = attributes.get("target_repository", dict()).get("target_repository", str())
+        target_repository = attributes.get("target_repository", dict()).get("deposition_context", str())
 
         if not target_repository:
             # no target repository specified, we can't really do anything but signal abort
