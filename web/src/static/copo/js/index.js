@@ -43,7 +43,7 @@ $(document).ready(function () {
     function do_render_profile_table(data) {
         var dtd = data.table_data.dataSet;
 
-        set_empty_component_message(dtd); //display empty profile message for potential first time users
+        set_empty_component_message(dtd.length); //display empty profile message for potential first time users
 
         if (dtd.length == 0) {
             return false;

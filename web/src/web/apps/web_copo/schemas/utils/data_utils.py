@@ -267,6 +267,7 @@ def get_samples_json(target_id=None):
 
     return elem_json
 
+
 def get_datafiles_json(target_id=None):
     """
     returns all datafile record
@@ -353,6 +354,7 @@ def get_user_id():
     else:
         return ThreadLocal.get_current_user().id
 
+
 def get_current_user():
     if settings.UNIT_TESTING:
         return settings.TEST_USER
@@ -369,7 +371,7 @@ def get_datetime():
     provides a consistent way of storing fields of this type across modules
     :return:
     """
-    return datetime.now()
+    return datetime.utcnow()
 
 
 def get_not_deleted_flag():
@@ -514,7 +516,6 @@ def get_copo_schema(component, as_object=False):
 def object_type_control_map():
     """
     function keeps a mapping of object type controls to schema names
-    so, technically, all object type controls, to be made available as a service, should be registered here!
     :return:
     """
     control_dict = dict()
@@ -524,6 +525,16 @@ def object_type_control_map():
     control_dict["copo-duration"] = "duration"
     control_dict["copo-environmental-characteristics"] = "environment_variables"
     control_dict["copo-phenotypic-characteristics"] = "phenotypic_variables"
+
+    return control_dict
+
+
+def get_object_array_schema():
+    control_dict = dict()
+    control_dict["copo-characteristics"] = get_copo_schema("material_attribute_value")
+    control_dict["copo-comment"] = get_copo_schema("comment")
+    control_dict["copo-environmental-characteristics"] = get_copo_schema("environment_variables")
+    control_dict["copo-phenotypic-characteristics"] = get_copo_schema("phenotypic_variables")
 
     return control_dict
 
@@ -576,6 +587,7 @@ class DecoupleFormSubmission:
         self.auto_fields = auto_fields
         self.schema = schema
         self.object_has_value = False
+        self.global_key_split = "___0___"
 
     def get_schema_fields_updated(self):
         from converters.ena.copo_isa_ena import ISAHelpers
@@ -611,7 +623,7 @@ class DecoupleFormSubmission:
                         for key in decoupled_list:
                             if key in self.auto_fields.keys():
 
-                                c = [k for k in self.auto_fields.keys() if k.startswith(key + "_")]
+                                c = [k for k in self.auto_fields.keys() if k.startswith(key + self.global_key_split)]
                                 if c:
                                     secondary_data_list.append(c)
 
@@ -671,10 +683,10 @@ class DecoupleFormSubmission:
 
                                     key_split = (key.split(f.id + ".")[-1]).split(".")
                                     if len(key_split) == 1:
-                                        primary_data[(key_split[0]).rsplit("_", 1)[0]] = self.auto_fields[key]
+                                        primary_data[(key_split[0]).rsplit(self.global_key_split, 1)[0]] = self.auto_fields[key]
                                     else:
                                         key_list.append(key_split[:-1])
-                                        key_split[-1] = key_split[-1].rsplit("_", 1)[0]
+                                        key_split[-1] = key_split[-1].rsplit(self.global_key_split, 1)[0]
                                         key_value_list.append(dict(keys=key_split, value=self.auto_fields[key]))
 
                             if key_list:
@@ -710,7 +722,8 @@ class DecoupleFormSubmission:
                     # get the primary field...and secondary data
                     if f.id in self.auto_fields.keys():
                         value_list.append(self.auto_fields[f.id])
-                        secondary_data_list = [k for k in self.auto_fields.keys() if k.startswith(f.id + "_")]
+                        secondary_data_list = [k for k in self.auto_fields.keys() if
+                                               k.startswith(f.id + self.global_key_split)]
 
                         # sort secondary data, keeping the input order
                         if secondary_data_list:
@@ -790,6 +803,227 @@ class DecoupleFormSubmission:
 
         return auto_dict
 
+    def get_schema_fields_updated_dict(self):
+        """
+        this is an alternative to the '.' object version - converting to object '.' seems expensive
+        :return:
+        """
+        from converters.ena.copo_isa_ena import ISAHelpers
+
+        auto_dict = dict()
+
+        for f in self.schema:
+            f_id = f['id']
+            f_type = f['type']
+            f_control = f['control']
+            if f_type == "array":
+                # handle array types
+                value_list = list()
+
+                object_type_control = object_type_control_map().get(f_control.lower(), str())
+
+                if object_type_control:
+                    # handle object type controls e.g., ontology term, comment
+
+                    object_fields = get_copo_schema(object_type_control)
+
+                    # get the primary data...and secondary data
+                    primary_data = dict()
+                    secondary_data_list = list()
+
+                    for o_f in object_fields:
+                        comp_key = f_id + "." + o_f['id'].split(".")[-1]
+
+                        # and even the field may very well be of type object, decouple further...
+                        decoupled_list = self.decouple_object_dict(comp_key, list(), o_f)
+
+                        # match decoupled elements
+                        key_list = list()
+                        key_value_list = list()
+
+                        for key in decoupled_list:
+                            if key in self.auto_fields.keys():
+
+                                c = [k for k in self.auto_fields.keys() if k.startswith(key + self.global_key_split)]
+                                if c:
+                                    secondary_data_list.append(c)
+
+                                key_split = (key.split(f_id + ".")[-1]).split(".")
+                                if len(key_split) == 1:
+                                    primary_data[key_split[0]] = self.auto_fields[key]
+                                else:
+                                    key_list.append(key_split[:-1])
+                                    key_value_list.append(dict(keys=key_split, value=self.auto_fields[key]))
+
+                        if key_list:
+                            object_model = self.form_object_model(dict(), key_list)
+
+                            for kvl in key_value_list:
+                                object_model = self.set_object_fields(object_model, kvl["keys"], kvl["value"])
+
+                            for kk, vv in object_model.items():
+                                primary_data[kk] = vv
+
+                    # don't save empty objects
+                    self.object_has_value = False
+                    self.has_value(primary_data)
+
+                    if self.object_has_value:
+
+                        # sanitise schema: make it compliant with schema provider's specifications
+                        target_schema = get_db_json_schema(object_type_control)
+                        if target_schema:
+                            for kx in target_schema:
+                                target_schema = ISAHelpers().resolve_schema_key(target_schema, kx, object_type_control,
+                                                                                primary_data)
+                            value_list.append(target_schema)
+                        else:
+                            value_list.append(primary_data)
+
+                    # sort secondary data
+                    if secondary_data_list:
+                        for s in secondary_data_list:
+                            s.sort()
+
+                        grouped_indx = list()
+                        for i in range(0, len(secondary_data_list[0])):
+                            h_indx = list()
+
+                            for sdl in secondary_data_list:
+                                h_indx.append(sdl[i])
+
+                            grouped_indx.append(h_indx)
+
+                        for g_i in grouped_indx:
+                            primary_data = dict()
+                            key_list = list()
+                            key_value_list = list()
+
+                            for key in g_i:
+                                if key in self.auto_fields.keys():
+
+                                    key_split = (key.split(f_id + ".")[-1]).split(".")
+                                    if len(key_split) == 1:
+                                        primary_data[(key_split[0]).rsplit(self.global_key_split, 1)[0]] = self.auto_fields[key]
+                                    else:
+                                        key_list.append(key_split[:-1])
+                                        key_split[-1] = key_split[-1].rsplit(self.global_key_split, 1)[0]
+                                        key_value_list.append(dict(keys=key_split, value=self.auto_fields[key]))
+
+                            if key_list:
+                                object_model = self.form_object_model(dict(), key_list)
+
+                                for kvl in key_value_list:
+                                    object_model = self.set_object_fields(object_model, kvl["keys"], kvl["value"])
+
+                                for kk, vv in object_model.items():
+                                    primary_data[kk] = vv
+
+                            # don't save empty objects
+                            self.object_has_value = False
+                            self.has_value(primary_data)
+
+                            if self.object_has_value:
+                                # sanitise schema: make it compliant with schema provider's specifications
+                                target_schema = get_db_json_schema(object_type_control)
+
+                                if target_schema:
+                                    for kx in target_schema:
+                                        target_schema = ISAHelpers().resolve_schema_key(target_schema, kx,
+                                                                                        object_type_control,
+                                                                                        primary_data)
+                                    value_list.append(target_schema)
+                                else:
+                                    value_list.append(primary_data)
+
+                    auto_dict[f_id.split(".")[-1]] = value_list
+                else:
+                    # handle array non-object type control
+
+                    # get the primary field...and secondary data
+                    if f_id in self.auto_fields.keys():
+                        value_list.append(self.auto_fields[f_id])
+                        secondary_data_list = [k for k in self.auto_fields.keys() if
+                                               k.startswith(f_id + self.global_key_split)]
+
+                        # sort secondary data, keeping the input order
+                        if secondary_data_list:
+                            secondary_data_list.sort()
+
+                            for sdl in secondary_data_list:
+                                value_list.append(self.auto_fields[sdl])
+
+                        auto_dict[f_id.split(".")[-1]] = value_list
+            else:
+                # handle non-array types
+                object_type_control = object_type_control_map().get(f_control.lower(), str())
+
+                if object_type_control:
+                    # handle object type controls e.g., ontology term, comment
+
+                    object_fields = get_copo_schema(object_type_control)
+
+                    # get the data
+                    primary_data = dict()
+
+                    for o_f in object_fields:
+                        comp_key = f_id + "." + o_f['id'].split(".")[-1]
+
+                        # and even the field may, also, very well be of type object, decouple further...
+                        decoupled_list = self.decouple_object_dict(comp_key, list(), o_f)
+
+                        # match decoupled elements
+                        key_list = list()
+                        key_value_list = list()
+
+                        for key in decoupled_list:
+                            if key in self.auto_fields.keys():
+
+                                key_split = (key.split(f_id + ".")[-1]).split(".")
+                                if len(key_split) == 1:
+                                    primary_data[key_split[0]] = self.auto_fields[key]
+                                else:
+                                    key_list.append(key_split[:-1])
+                                    key_value_list.append(dict(keys=key_split, value=self.auto_fields[key]))
+
+                        if key_list:
+                            object_model = self.form_object_model(dict(), key_list)
+
+                            for kvl in key_value_list:
+                                object_model = self.set_object_fields(object_model, kvl["keys"], kvl["value"])
+
+                            for kk, vv in object_model.items():
+                                primary_data[kk] = vv
+
+                        # don't save empty objects
+                        self.object_has_value = False
+                        auto_dict[f_id.split(".")[-1]] = dict()
+
+                        self.has_value(primary_data)
+
+                        if self.object_has_value:
+                            auto_dict[f_id.split(".")[-1]] = primary_data
+
+                    # sanitise schema: make it compliant with schema provider's specifications
+                    target_schema = get_db_json_schema(object_type_control)
+
+                    if target_schema:
+                        for kx in target_schema:
+                            target_schema = ISAHelpers().resolve_schema_key(target_schema, kx, object_type_control,
+                                                                            primary_data)
+                        auto_dict[f_id.split(".")[-1]] = target_schema
+                    else:
+                        auto_dict[f_id.split(".")[-1]] = primary_data
+
+
+                else:
+                    # not an object type control
+
+                    if f_id in self.auto_fields.keys():
+                        auto_dict[f_id.split(".")[-1]] = self.auto_fields[f_id]
+
+        return auto_dict
+
     def decouple_object(self, comp_key, decoupled_list, field):
         base_key = comp_key
 
@@ -801,6 +1035,29 @@ class DecoupleFormSubmission:
             for o_f in object_fields:
                 comp_key = base_key + "." + o_f.id.split(".")[-1]
                 decoupled_list = self.decouple_object(comp_key, decoupled_list, o_f)
+        else:
+            decoupled_list.append(comp_key)
+
+        return decoupled_list
+
+    def decouple_object_dict(self, comp_key, decoupled_list, field):
+        """
+        this function mirrors the '.' notation function with similar name (without _dict)
+        :param comp_key:
+        :param decoupled_list:
+        :param field:
+        :return:
+        """
+        base_key = comp_key
+
+        object_type_control = object_type_control_map().get(field['control'].lower(), str())
+
+        if object_type_control:  # handle object type controls e.g., ontology term, comment
+            object_fields = get_copo_schema(object_type_control)
+
+            for o_f in object_fields:
+                comp_key = base_key + "." + o_f['id'].split(".")[-1]
+                decoupled_list = self.decouple_object_dict(comp_key, decoupled_list, o_f)
         else:
             decoupled_list.append(comp_key)
 

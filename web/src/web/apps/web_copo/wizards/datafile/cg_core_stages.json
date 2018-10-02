@@ -1,0 +1,54 @@
+{
+  "title": "CG Core",
+  "description": "Configuration for CG Core schema based description",
+  "properties": [
+    {
+      "ref": "cg_type",
+      "title": "Type",
+      "message": "Information product type",
+      "apply_to_all": true,
+      "callback": "get_cg_type",
+      "items": [
+        {
+          "id": "type",
+          "type": "string",
+          "help_tip": "Select a type for your information product",
+          "label": "Type",
+          "hidden": "false",
+          "required": "true",
+          "control": "copo-multi-select",
+          "data_maxItems": 1,
+          "default_value": "",
+          "option_values": []
+        }
+      ]
+    },
+    {
+      "ref": "cg_subtype",
+      "title": "Subtype",
+      "message": "You can (optionally) refine your type with a subtype. In such case, the metadata requirements of the subtype will apply. What is called subtype can have the character of an attribute such as internal, template or interactive, which tells the user more about the kind of usage.",
+      "apply_to_all": true,
+      "callback": "get_cg_subtype",
+      "items": [
+        {
+          "id": "subtype",
+          "type": "string",
+          "help_tip": "Select a subtype for your information product type",
+          "label": "Subtype",
+          "hidden": "false",
+          "required": "false",
+          "control": "copo-multi-select",
+          "field_constraint": "recommended",
+          "data_maxItems": 1,
+          "default_value": "",
+          "option_values": []
+        }
+      ]
+    },
+    {
+      "ref": "cg_dynamic_ref",
+      "callback": "get_cg_dynamic_stages"
+    }
+  ]
+}
+

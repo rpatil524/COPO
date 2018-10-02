@@ -416,32 +416,37 @@ DROP_DOWNS = {
         {
             'value': 'ena',
             'label': 'ENA - Sequence Reads',
-            'description': 'This repository option defines metadata for submission of <strong>raw sequence reads</strong> to the European Nucleotide Archive (Sequence Reads)'
+            'description': 'This repository option defines metadata for submission of <strong>raw sequence reads</strong> to the European Nucleotide Archive (ENA)'
         },
         {
             'value': 'ena-asm',
-            'label': 'ENA - Assemblies',
-            'description': 'This repository option defines metadata for submission of <strong>sequence assemblies</strong> to the European Nucleotide Archive (Sequence Reads)'
+            'label': 'ENA - Sequence Assemblies',
+            'description': 'This repository option defines metadata for submission of <strong>sequence assemblies</strong> to the European Nucleotide Archive (ENA)'
         },
         {
             'value': 'ena-ant',
-            'label': 'ENA - Annotations',
-            'description': 'This repository option defines metadata for submission of <strong>assembly annotations</strong> to the European Nucleotide Archive (Sequence Reads) and is currently <strong>NOT SUPPORTED</strong> though COPO.'
+            'label': 'ENA - Sequence Annotations',
+            'description': 'This repository option defines metadata for submission of <strong>sequence annotations</strong> to the European Nucleotide Archive (ENA)'
         },
         {
             'value': 'figshare',
             'label': 'Figshare',
-            'description': 'Figshare accepts many file formats, and can be used to submit file types including <strong>PDFs, image, audio, and video files</stong>.'
+            'description': 'Figshare accepts many file formats, and can be used to submit file types including PDFs, image, audio, and video files'
         },
         {
             'value': 'miappe',
             'label': 'MIAPPE Compliant',
-            'description': '<strong>MIAPPE</strong> is a Minimum Information (MI) standard for plant phenotyping. This repository option defines a list of attributes for describing a phenotyping experiment.'
+            'description': 'MIAPPE is a Minimum Information (MI) standard for plant phenotyping. This repository option defines a list of attributes for describing a phenotyping experiment'
         },
         {
-            'value': 'dataverse',
+            'value': 'dcterms',
             'label': 'Dataverse',
-            'description': 'This option is for labelling data using the <strong>Dublin Core</strong> standard, compatible with Dataverse instances.'
+            'description': 'A Dataverse is an open source data management repository for a community or an institution. It allows data to be federated with a growing list of Dataverse repositories worldwide for increased discoverability'
+        },
+        {
+            'value': 'cg_core',
+            'label': 'CG Core',
+            'description': 'CG compliant data object description template - this is a placeholder text'
         }
         # {
         #     'value': 'MetaboLights',
@@ -493,7 +498,7 @@ DROP_DOWNS = {
         },
         {
             "label": "Open_Top_Chamber",
-            "value": "open top chamber, OTC"
+            "value": "open top chamber"
         },
         {
             "value": "experimental_garden",
@@ -653,6 +658,7 @@ WIZARD_FILES = {
     'sample_start': os.path.join(RESOLVER['wizards_sample'], 'start_stages.json'),
     'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json'),
     'dataverse': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
+    'cg_core': os.path.join(RESOLVER['wizards_datafile'], 'cg_core_stages.json')
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
@@ -677,8 +683,7 @@ MESSAGES_LKUPS = {
         'global': os.path.join(RESOLVER['lookup'], 'help_messages', 'global_help.json'),
         'context_help': os.path.join(RESOLVER['lookup'], 'help_messages', 'context_help.json'),
     },
-    'datafile_wizard': os.path.join(RESOLVER['wizards_datafile'], 'messages', 'wizard_messages.json'),
-    'sample_wizard_messages': os.path.join(RESOLVER['wizards_sample'], 'messages', 'wizard_messages.json'),
+    'wizards_messages': os.path.join(RESOLVER['wizards_messages'], 'wizard_messages.json'),
     'lookup_messages': os.path.join(RESOLVER['lookup'], 'messages.json'),
     'message_templates': os.path.join(RESOLVER['lookup'], 'message_templates.json'),
     'exception_messages': os.path.join(RESOLVER['copo_exceptions'], 'messages.json')

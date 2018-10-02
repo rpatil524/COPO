@@ -34,7 +34,8 @@
           "help_tip": "Select the type of file you have uploaded.",
           "label": "Article Type",
           "hidden": "false",
-          "control": "select",
+          "control": "copo-multi-select",
+          "data_maxItems": 1,
           "default_value": "",
           "option_values": {
             "callback": {
@@ -45,7 +46,7 @@
         },
         {
           "id": "categories",
-          "help_tip": "Select a relevant category.",
+          "help_tip": "Select relevant categories",
           "label": "Categories",
           "hidden": "false",
           "control": "copo-multi-select",
@@ -124,7 +125,8 @@
           "help_tip": "Select the license you want this file to be published under.",
           "label": "License",
           "hidden": "false",
-          "control": "select",
+          "control": "copo-multi-select",
+          "data_maxItems": 1,
           "default_value": "",
           "option_values": {
             "callback": {
@@ -145,41 +147,13 @@
           "help_tip": "Select the license you want this file to be published under.",
           "label": "Publish?",
           "hidden": "false",
-          "control": "select",
+          "control": "copo-multi-select",
+          "data_maxItems": 1,
           "default_value": "",
           "option_values": {
             "callback": {
               "function": "get_figshare_publish_options",
               "parameter": ""
-            }
-          }
-        }
-      ]
-    },
-    {
-      "ref": "oauth_authorisation",
-      "is_conditional_stage": true,
-      "title": "OAuth Authorisation",
-      "message": "Click below to be grant COPO access to your Figshare account",
-      "callback": {
-        "function": "validate_figshare_token",
-        "parameter": ""
-      },
-      "items": [
-        {
-          "id": "oauth_authorisation",
-          "help_tip": "",
-          "label": "Figshare",
-          "hidden": "false",
-          "control": "oauth_required",
-          "additional_class": "",
-          "default_value": "",
-          "trigger": {
-            "type": "repo",
-            "message": "",
-            "callback": {
-              "function": "finish_oauth_authentication",
-              "parameter": "new_value"
             }
           }
         }

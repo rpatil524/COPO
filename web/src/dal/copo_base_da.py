@@ -134,10 +134,26 @@ class DataSchemas:
                 doc = None
         return doc
 
-    def get_ui_template_as_obj(self):
-        """obj_type specifies how the document should be returned: as 'dict' - python dictionary or
-         'obj' - an object-typed notation"""
-        doc = self.get_ui_template()
+    def get_ui_template_node(self, identifier):
+        projection = {'data.copo.' + identifier: 1}
+        filter_by = dict(schemaName=self.schema, schemaType="UI")
+
+        doc = Schemas.find_one(filter_by, projection)
+
+        template = list()
+
         if doc:
-            return d_utils.json_to_object(doc)
-        return doc
+            template = doc.get('data', dict()).get('copo', dict()).get(identifier, dict()).get('fields', list())
+        else:
+            # try generating the template
+            temp_dict = DataFormats(self.schema).generate_ui_template()
+
+            # store a copy in the DB
+            if temp_dict["status"] == "success" and temp_dict["data"]:
+                self.add_ui_template(temp_dict["data"])
+                doc = temp_dict["data"]
+
+                if doc:
+                    template = doc.get('copo', dict()).get(identifier, dict()).get('fields', list())
+
+        return template

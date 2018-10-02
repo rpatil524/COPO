@@ -1,1151 +1,609 @@
 var wizardMessages;
-var samplesGenerated = false; //flag to indicate if samples have been generated
-var wizardStages;
-var stagesFormValues = {};
-var formEditableElements = {};
-var validateSetter = {};
-var negotiatedStages = []; //holds info about stages resolved to be rendered
-var currentIndx = 0;
-var generatedSamples = [];
-var activeDescription = false; //whether there's an active description
-var stepIntercept = false; //flag indicates if activation of the last stage of the wizard has been intercepted
-var descriptionWizSummary = {}; //wizard summary stage content
-var initialSampleAttributes = {}; //holds initial attributes shared by all samples before editing
-var dataTableDataSource = []; // the data-source used for sample table generation
-var displayedMessages = {}; //holds stage messages already displayed
-var tabShownStore = Object();
+var sampleDescriptionToken = '';
+var sampleTableInstance = null;
 
 $(document).ready(function () {
-        //****************************** Event Handlers Block *************************//
+    //****************************** Event Handlers Block *************************//
 
-        //page global variables
-        var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
-        var component = "sample";
-        var wizardURL = "/rest/sample_wiz/";
-        var copoFormsURL = "/copo/copo_forms/";
-        var resolvedAccessionData = null; //holds data from sample accession resolution
+    // test begins
 
-        //get component metadata
-        var componentMeta = get_component_meta(component);
-
-        //load records
-        load_records(componentMeta);
+    // test ends
 
 
-        // handle/attach events to table buttons
-        $('body').on('addbuttonevents', function (event) {
-            do_record_task(event);
+    //page global variables
+    var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
+    var component = "sample";
+    var wizardURL = "/rest/sample_wiz/";
+    var copoFormsURL = "/copo/copo_forms/";
+    var copoVisualsURL = "/copo/copo_visualize/";
+
+    var wizardElement = $('#sampleWizard');
+
+    //get component metadata
+    var componentMeta = get_component_meta(component);
+
+    //load records
+    load_records(componentMeta);
+
+    //load pending description
+    pending_sample_description();
+
+    //description table data
+    var dtRows = [];
+    var dtColumns = [];
+
+    //wizard help tip switch
+    var wizhlptipchk = 'wizard-help-checkbox';
+    $("[name='" + wizhlptipchk + "']").bootstrapSwitch(
+        {
+            size: "mini",
+            onColor: "primary",
+            state: true
         });
 
-        //trigger refresh of table
-        $('body').on('refreshtable', function (event) {
-            do_render_component_table(globalDataBuffer, componentMeta);
-        });
-
-        //add new component button
-        $(document).on("click", ".new-samples-template", function (event) {
-            add_new_samples();
-        });
-
-        //details button hover
-        $(document).on("mouseover", ".detail-hover-message", function (event) {
-            $(this).prop('title', 'Click to view ' + component + ' details');
-        });
-
-        //description tab loading event
-        $('#sample-display-tabs.nav-tabs a').on('shown.bs.tab', function (event) {
-            if ($(event.target).attr("href") == "#descriptionWizardComponent") {
-                if (!$.isEmptyObject(tabShownStore)) {
-                    if (tabShownStore.method == "do_post_stage_retrieval2") {
-                        $("#description_panel").css("display", "block");
-                        do_post_stage_retrieval2(tabShownStore.data);
-
-                        tabShownStore = Object();
-                    }
-                }
-            }
-        });
+    $('input[name="' + wizhlptipchk + '"]').on('switchChange.bootstrapSwitch', function (event, state) {
+        toggle_display_help_tips(state, wizardElement);
+    });
 
 
-        //test
+    // handle/attach events to table buttons
+    $('body').on('addbuttonevents', function (event) {
+        do_record_task(event);
+    });
 
-        //end test
+    //trigger refresh of table
+    $('body').on('refreshtable', function (event) {
+        do_render_component_table(globalDataBuffer, componentMeta);
+    });
 
+    //add new component button
+    $(document).on("click", ".new-samples-template", function (event) {
+        initiate_description({});
+    });
 
-        //******************************* wizard events *******************************//
-
-        //handle event for discarding current description...
-        $('#remove_act').on('click', function (event) {
-            //confirm user decision
-            BootstrapDialog.show({
-                title: wizardMessages.exit_wizard_message.title,
-                message: wizardMessages.exit_wizard_message.text,
-                cssClass: 'copo-modal3',
-                closable: false,
-                animate: true,
-                type: BootstrapDialog.TYPE_DANGER,
-                buttons: [
-                    {
-                        label: 'Cancel',
-                        cssClass: 'tiny ui basic button',
-                        action: function (dialogRef) {
-                            dialogRef.close();
-                        }
-                    },
-                    {
-                        label: '<i class="copo-components-icons fa fa-times"></i> Discard',
-                        cssClass: 'tiny ui basic red button',
-                        action: function (dialogRef) {
-                            dialogRef.close();
-                            window.location.reload();
-                        }
-                    }
-                ]
-            });
-
-        });
-
-        $('#info_act').on('click', function (event) {
-            //user wants information on current stage
-            var item = $(this);
-            var activeStageIndx = $('#sampleWizard').wizard('selectedItem').step; //active stage index
-
-            var messageTitle = "Undocumented stage";
-            var messageContent = "There is currently no information for this stage";
-
-            var reviewElem = $('.steps li:last-child');
-            if (reviewElem.hasClass('active')) {
-                //last stage of the wizard
-                messageTitle = "Review";
-                messageContent = "Review and modify your samples as appropriate. Click 'Finish!' when done.";
-            } else {
-                var current_stage = $('#wizard_form_' + activeStageIndx).find("#current_stage").val();
-                if (current_stage) {
-                    for (var i = 0; i < negotiatedStages.length; ++i) {
-                        if (negotiatedStages[i].ref == current_stage) {
-                            messageTitle = negotiatedStages[i].title;
-                            messageContent = negotiatedStages[i].message;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            item.webuiPopover('destroy');
-            item.webuiPopover({
-                title: messageTitle,
-                content: '<div class="webpop-content-div">' + messageContent + '</div>',
-                trigger: 'sticky',
-                width: 300,
-                arrow: true,
-                closeable: true,
-                placement: 'auto-right',
-                backdrop: true,
-            });
-        });
+    //details button hover
+    $(document).on("mouseover", ".detail-hover-message", function (event) {
+        $(this).prop('title', 'Click to view ' + component + ' details');
+    });
 
 
-        //handle event for clicking an previously visited step, intercept here to save entries
-        $('#sampleWizard').on('stepclicked.fu.wizard', function (evt, data) {
-            evt.preventDefault();
+    //avoid enter key to submit wizard forms
+    $(document).on("keyup keypress", ".wizard-dynamic-form", function (event) {
+        var keyCode = event.keyCode || event.which;
+        if (keyCode === 13) {
+            event.preventDefault();
+            return false;
+        }
+    });
 
-            // get the proposed or intended state for which action is intercepted
-            before_step_back(data.step);
-        });
+    //delete an incomplete description
+    $(document).on("click", ".delete-description-i", function (event) {
+        event.preventDefault();
+        delete_incomplete_description($(this), $(this).attr("data-target"));
+    });
 
-        //handle events for step change
-        $('#sampleWizard').on('actionclicked.fu.wizard', function (evt, data) {
-            $(self).data('step', data.step);
+    //reload an incomplete description
+    $(document).on("click", ".reload-description-i", function (event) {
+        event.preventDefault();
+        var parameters = {'description_token': $(this).attr("data-target"), 'info_object': $(this)};
+        initiate_description(parameters);
+    });
 
-            stage_navigate(evt, data);
-        });
+    //custom stage renderers
+    var dispatchStageRenderer = {
+        perform_sample_generation: function (stage) {
+            generate_sample_edit_table(stage);
+        }
+    }; //end of dispatchStageCallback
 
-        //handle events for step change
-        $('#sampleWizard').on('changed.fu.wizard', function (evt, data) {
-            var currentStep = data.step;
-
-            if (currentStep > 0
-                && $('#wizard_form_' + currentStep).length
-                && $('#wizard_form_' + currentStep).find("#current_stage").length) {
-                var current_stage = $('#wizard_form_' + currentStep).find("#current_stage").val();
-                var current_stage_object = null;
-
-                for (var i = 0; i < negotiatedStages.length; ++i) {
-                    if (current_stage == negotiatedStages[i].ref) {
-                        display_stage_message(negotiatedStages[i].message, negotiatedStages[i].title, negotiatedStages[i].ref);
-                        current_stage_object = negotiatedStages[i];
-                        break;
-                    }
-                }
-
-                //some initial 'reactions' here; first for sample clone stage
-                if (current_stage == "sample_clone") {
-                    var radios = document.getElementsByName("sample_clone_route_input");
-                    var existingRadioObject = null; //keep a reference to the existing and resolve radio button for further validation down the line
-                    var resolveRadioObject = null;
-
-                    for (var i = 0; i < radios.length; ++i) {
-                        $('#wizard_form_' + currentStep).find("#" + radios[i].value).closest(".copo-form-group").hide();
-
-                        if (radios[i].value == "clone_existing") {
-                            existingRadioObject = radios[i];
-                        }
-
-                        if (radios[i].value == "clone_resolved") {
-                            resolveRadioObject = radios[i];
-                        }
-                    }
-
-                    //disable option if no existing samples to clone
-                    var disableExistingOption = false;
-                    for (var i = 0; i < current_stage_object.items.length; ++i) {
-                        if (current_stage_object.items[i].id == "clone_existing" && (current_stage_object.items[i].option_values.options.length == 0)) {
-                            disableExistingOption = true;
-                        }
-                    }
-
-                    if (disableExistingOption) {
-                        existingRadioObject.disabled = true;
-
-                        //default to another radio option
-                        resolveRadioObject.checked = true;
-                        $('#wizard_form_' + currentStep).find("#sample_clone_route").val(resolveRadioObject.value);
-                    }
-
-                    //show corresponding form element
-                    $('#wizard_form_' + currentStep).find("#" + $('#wizard_form_' + currentStep).find("#sample_clone_route").val()).closest(".copo-form-group").show();
-
-                } else if (current_stage == "sample_name") {
-                    var radios = document.getElementsByName("sample_name_route_input");
-                    for (var i = 0; i < radios.length; ++i) {
-                        $('#wizard_form_' + currentStep).find("#" + radios[i].value).closest(".copo-form-group").hide();
-                    }
-
-                    //show corresponding form element
-                    $('#wizard_form_' + currentStep).find("#" + $('#wizard_form_' + currentStep).find("#sample_name_route").val()).closest(".copo-form-group").show();
-                }
-            }
-        });
-
-
-        //toggle show radio buttons corresponding input
-        $(document).on("click", ".copo-radio-option", function (event) {
-
-            if ($(this).attr("name") == "sample_clone_route_input") {
-                var radios = document.getElementsByName("sample_clone_route_input");
-                for (var i = 0; i < radios.length; i++) {
-                    $(this).closest("form").find("#" + radios[i].value).closest(".copo-form-group").hide();
-                }
-
-                $(this).closest("form").find("#" + $(this).val()).closest(".copo-form-group").show();
-            }
-
-            if ($(this).attr("name") == "sample_name_route_input") {
-                var radios = document.getElementsByName("sample_name_route_input");
-                for (var i = 0; i < radios.length; i++) {
-                    $(this).closest("form").find("#" + radios[i].value).closest(".copo-form-group").hide();
-                }
-
-                $(this).closest("form").find("#" + $(this).val()).closest(".copo-form-group").show();
-            }
-        });
-
-        //sample accession resolution
-        $(document).on("click", ".resolver-submit", function (event) {
+    //Enter-key event for table cell update...
+    $(document).on('keypress', '.cell-edit-panel', function (event) {
+        var keyCode = event.keyCode || event.which;
+        if (keyCode === 13) {
             event.preventDefault();
 
-            var dataElem = $(this).closest(".input-group").find(".resolver-data");
-            var resolverValue = dataElem.val();
-            resolverValue = resolverValue.replace(/^\s+|\s+$/g, '');
-            dataElem.val('');
+            var cells = sampleTableInstance.cells('.focus');
 
-            var parentElem = $(this).closest(".copo-form-group");
+            if (cells && cells[0].length > 0) {
+                $(document).find(".copo-form-group").webuiPopover('destroy');
 
-            if (resolverValue.length == 0) {
-                return false;
+                var cell = cells[0];
+                var targetCell = sampleTableInstance.cell(cell[0].row, cell[0].column);
+
+                manage_cell_edit(sampleTableInstance, targetCell);
             }
 
-            var spinnerElem = $('<button/>',
+            return false;
+        }
+    });
+
+
+    //******************************* wizard events *******************************//
+
+    //handle event for saving description for later...
+    $('#reload_act').on('click', function (event) {
+        window.location.reload();
+    });
+
+    //handle event for discarding current description...
+    $('#remove_act').on('click', function (event) {
+        //confirm user decision
+        BootstrapDialog.show({
+            title: "Discard description",
+            message: "Are you sure you want to discard the current description?",
+            cssClass: 'copo-modal3',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_DANGER,
+            buttons: [
                 {
-                    type: "button",
-                    class: "btn btn-default",
-                    html: '<i class="fa fa-spinner fa-pulse fa-1x"></i>'
-                });
-
-            spinnerElem.insertBefore($(this));
-
-            //get resolver uri
-            var resolverURL = dataElem.attr("data-resolve-uri") + resolverValue;
-
-            //get resolver component
-            var resolverComponent = dataElem.attr("data-resolve-component");
-
-            parentElem.find(".resolver-feedback").remove(); //remove feedback element
-
-            var rFeedback = $('<i class="fa fa-commenting-o resolver-feedback" aria-hidden="true" style="padding-left: 5px; font-size: 20px;"></i>');
-            var meta_extra = {placement: "auto-right", height: 300};
-
-            if (resolverComponent.toLowerCase() == "sample") {
-                $.ajax({
-                    url: resolverURL,
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        // name: query,
-                    },
-                    success: function (data) {
-                        resolvedAccessionData = data;
-                        var resolvedData = build_resolved_data(data);
-                        parentElem.webuiPopover('destroy');
-                        refresh_webpop(parentElem, "Resolved Sample [" + resolverValue + "]", resolvedData, meta_extra);
-                        parentElem.webuiPopover('show');
-
-                        rFeedback.insertAfter(parentElem.find("label"));
-                        rFeedback.css("color", "green");
-
-                        refresh_webpop(rFeedback, "Resolved Sample [" + resolverValue + "]", resolvedData, meta_extra);
-
-                        //remove visual cues
-                        spinnerElem.remove();
-                        parentElem.removeClass("has-error has-danger");
-                        parentElem.find(".help-block").html("");
-                    },
-                    error: function () {
-                        spinnerElem.remove();
-                        parentElem.addClass("has-error has-danger");
-                        parentElem.find(".help-block").html("Couldn't resolve " + resolverValue + "!");
-                        resolvedAccessionData = null;
-
-                        rFeedback.insertAfter(parentElem.find("label"));
-                        rFeedback.css("color", "red");
-                        meta_extra.height = 100;
-
-                        refresh_webpop(rFeedback, "Sample [" + resolverValue + "]", "Couldn't resolve the target sample accession!", meta_extra);
+                    label: 'Cancel',
+                    cssClass: 'tiny ui basic button',
+                    action: function (dialogRef) {
+                        dialogRef.close();
                     }
-                });
-            }//end of sample resolver
+                },
+                {
+                    label: '<i class="copo-components-icons fa fa-times"></i> Discard',
+                    cssClass: 'tiny ui basic red button',
+                    action: function (dialogRef) {
+                        if (sampleDescriptionToken == '') {
+                            dialogRef.close();
+                            window.location.reload();
+                        } else {
+                            $.ajax({
+                                url: wizardURL,
+                                type: "POST",
+                                headers: {
+                                    'X-CSRFToken': csrftoken
+                                },
+                                data: {
+                                    'request_action': "discard_description",
+                                    'description_token': sampleDescriptionToken
 
+                                },
+                                success: function (data) {
+                                    dialogRef.close();
+                                    window.location.reload();
+
+                                },
+                                error: function () {
+                                    alert("An error occurred!");
+                                }
+                            });
+                        }
+                    }
+                }
+            ]
         });
 
+    });
 
-        //instantiate/refresh tooltips
+    $('.wiz-showme').on('click', function (e) {
+        e.preventDefault();
+
+        var target = $(this).attr("data-target");
+        var label = $(this).attr("data-label");
+        var item = null;
+
+        if ($("#" + target).length) {
+            item = $("#" + target);
+        } else if ($("." + target).length) {
+            item = $("." + target)[0];
+        }
+
+        if (item) {
+            item.webuiPopover('destroy');
+            item.webuiPopover({
+                title: label,
+                content: '<div class="webpop-content-div">Click x to dismiss</div>',
+                trigger: 'sticky',
+                width: 200,
+                arrow: true,
+                closeable: true,
+                backdrop: true
+            });
+        }
+    });
+
+
+    //handle events for step change
+    wizardElement.on('actionclicked.fu.wizard', function (evt, data) {
+        $(self).data('step', data.step);
+
+        stage_navigate(evt, data);
+    });
+
+    //handle events for step change
+    wizardElement.on('changed.fu.wizard', function (evt, data) {
+        toggle_display_help_tips($('input[name="' + wizhlptipchk + '"]').bootstrapSwitch('state'), wizardElement);
+
+        //form controls help tip
         refresh_tool_tips();
+        var activeStageIndx = wizardElement.wizard('selectedItem').step;
+
+        //set up validator
+        set_up_validator($("#wizard_form_" + activeStageIndx));
+    });
+
+    //sample accession resolution
+    $(document).on("click", ".resolver-submit", function (event) {
+        event.preventDefault();
+
+        var parentElem = $(this).closest(".copo-form-group");
+        var dataElem = parentElem.find(".resolver-data");
+        var resolverValue = dataElem.val().replace(/^\s+|\s+$/g, '');
 
 
-        //****************************** Functions Block ******************************//
-        function add_step(auto_fields) {
-            //step being requested
-            currentIndx += 1;
-
-            //first, make call to resolve the active stage data
-            var stage_data = collate_stage_data();
-
-            do_post_stage_retrieval(stage_data);
-
-            //if no data, just go ahead and retrieve stage
-
+        if (resolverValue.length == 0) {
+            return false;
         }
 
-        function stage_navigate(evt, data) {
-
-            if (data.direction == 'next') {
-
-                //trigger form validation
-                if ($("#wizard_form_" + data.step).length) {
-                    $('#wizard_form_' + data.step).trigger('submit');
-
-                    if ($('#wizard_form_' + data.step).find("#bcopovalidator").val() == "false") {
-                        $('#wizard_form_' + data.step).find("#bcopovalidator").val("true");
-                        evt.preventDefault();
-                        return false;
-                    }
-                }
-
-
-                var lastElementIndx = $('.steps li').last().index() + 1;
-                var activeElementIndx = $('#sampleWizard').wizard('selectedItem').step; //active stage index
-
-                stepIntercept = false;
-
-                if (lastElementIndx - activeElementIndx == 1) {
-                    evt.preventDefault();
-                    stepIntercept = true;
-                }
-
-                // get form inputs
-                var form_values = Object();
-
-                $('#wizard_form_' + data.step).find(":input").each(function () {
-                    form_values[this.id] = $(this).val();
-                });
-
-                //trigger event for setting initial sample attributes
-                if (form_values.hasOwnProperty("current_stage") && form_values["current_stage"] == "sample_attributes") {
-                    initialSampleAttributes = form_values;
-                }
-
-                var auto_fields = JSON.stringify(form_values);
-
-                //trap review stage here, which, in essence, provides a signal to wrap up the wizard
-                var reviewElem = $('.steps li:last-child');
-
-                if (reviewElem.hasClass('active')) {
-                    evt.preventDefault();
-                    //finalise
-
-                    //interrupt, nay, refuse if there is an active cell edit
-                    if ($.fn.dataTable.isDataTable('#generated_samples_table')) {
-                        var table = $('#generated_samples_table').DataTable();
-                        var cells = table.cells('.cell-currently-engaged');
-
-                        if (cells && cells[0].length > 0) {
-                            var dialog = new BootstrapDialog({
-                                buttons: [
-                                    {
-                                        label: 'OK',
-                                        action: function (dialogRef) {
-                                            dialogRef.close();
-                                        }
-                                    }
-                                ]
-                            });
-
-                            //dialog_display(dialog, "Active Edit", wizardMessages.save_cell_message.text, "danger");
-                            return false;
-                        }
-                    }
-
-                    //if it reaches here, then all is clear to quit the wizard
-
-                    window.location.reload();
-                    return false;
-                }
-
-                //set current stage
-                currentIndx = data.step;
-                add_step(auto_fields);
-
-            } else if (data.direction == 'previous') {
-                // get the proposed or intended state, for which action is intercepted
-                evt.preventDefault();
-
-                before_step_back(data.step - 1);
-            }
-
-        }
-
-        //trigger save action before navigating back a stage
-        function before_step_back(proposedState) {
-            $('#sampleWizard').wizard('selectedItem', {
-                step: proposedState
+        var spinnerElem = $('<button/>',
+            {
+                type: "button",
+                class: "btn btn-default",
+                html: '<i class="fa fa-spinner fa-pulse fa-1x"></i>'
             });
 
-            return;
+        spinnerElem.insertBefore($(this));
 
-        }
+        //get resolver uri
+        var resolverURL = dataElem.attr("data-resolve-uri") + resolverValue;
 
+        //get resolver component
+        var resolverComponent = dataElem.attr("data-resolve-component");
 
-        function do_post_stage_retrieval2(data) {
-            if (!data.stage_ref) {//this should indicate call to display first stage of the wizard
-                if (currentIndx > 0) {
-                    if (($('#sampleWizard').is(":visible"))) {
-                        reset_wizard();
-                    }
-                } else {
-                    currentIndx += 1;
-                    initiate_wizard();
-                }
-
-            }
-
-            // wizard 'staging' process
-            if (!($('#sampleWizard').is(":visible"))) {
-
-
-                $('#sampleWizard').show();
-
-                $('.steps li:last-child').hide(); //hide the last (static) stage of the wizard
-
-                //show wizard exit button
-                $('#remove_act').parent().show();
-            }
-
-            process_wizard_stage(data);
-
-
-            //toggle show 'Review' stage
-            var elem = $('.steps li:last-child');
-
-            if (elem.hasClass('active') && !samplesGenerated) {
-                //call to set description summary data...
-
-                //but first, interrupt and, ask for confirmation
-
-                $('#sampleWizard').wizard('selectedItem', {
-                    step: currentIndx - 1
-                });
-
-
-                BootstrapDialog.show({
-                    title: wizardMessages.confirm_initial_sample_generation.title,
-                    message: wizardMessages.confirm_initial_sample_generation.text,
-                    cssClass: 'copo-modal2',
-                    closable: false,
-                    animate: true,
-                    type: BootstrapDialog.TYPE_INFO,
-                    buttons: [
-                        {
-                            label: 'Review',
-                            cssClass: 'tiny ui basic button',
-                            action: function (dialogRef) {
-                                dialogRef.close();
-                                return false;
-                            }
-                        },
-                        {
-                            label: '<i class="copo-components-icons fa fa-check"></i> Continue',
-                            cssClass: 'tiny ui basic teal button',
-                            action: function (dialogRef) {
-                                $('#sampleWizard').wizard('selectedItem', {
-                                    step: currentIndx
-                                });
-
-                                elem.show();
-
-                                set_generated_samples();
-                                samplesGenerated = true;
-                                dialogRef.close();
-                            }
-                        }
-                    ]
-                });
-            } else {
-                elem.hide();
-            }
-
-            //form controls help tip
-            refresh_tool_tips()
-
-            //autocomplete
-            auto_complete();
-        }
-
-        function do_post_stage_retrieval(data) {
-            //update items with data
-
-            if (($('#sampleWizard').is(":visible"))) {
-                do_post_stage_retrieval2(data);
-            } else {
-                var tabShown = false; //check if describe tab is already visible
-                $('#sample-display-tabs > li').each(function () {
-                    if ($(this).hasClass("active") && $(this).find('a:first').attr("href") == "#descriptionWizardComponent") {
-                        tabShown = true;
-                        return false;
-                    }
-                });
-
-                //hide wizard getting started
-                $(".page-wizard-message").hide();
-
-                if (tabShown) {//tab already shown, go ahead and display display wizard
-                    $("#description_panel").css("display", "block");
-                    do_post_stage_retrieval2(data);
-                } else {//display tab, add loader, and go ahead to display wizard
-                    $('#sample-display-tabs.nav-tabs a[href="#descriptionWizardComponent"]').tab('show');
-                    tabShownStore.data = data;
-                    tabShownStore.method = "do_post_stage_retrieval2";
-                }
-            }
-
-
-        }
-
-        function process_wizard_stage(data) {
-            var stage = Object();
-            if (data.hasOwnProperty("stage_ref")) {
-                var stage = stage_description(data.stage_ref);
-            }
-
-            var stageCopy = Object();
-
-
-            if (stage.hasOwnProperty("ref")) {
-                stageCopy = $.extend(true, Object(), stage);
-                var stage_pane = get_pane_content(wizardStagesForms(stage), currentIndx, stage.message);
-
-                $('#sampleWizard').wizard('addSteps', currentIndx, [
-                    {
-                        label: '<span class=wiz-title>' + stage.title + '</span>',
-                        pane: stage_pane
-                    }
-                ]);
-
-                //give focus to the added step
-                $('#sampleWizard').wizard('selectedItem', {
-                    step: currentIndx
-                });
-
-                //delay validation activation for stages that may need to rebuild their forms
-                var delayValArray = ["sample_attributes", "assigned_sample_name"];
-
-                if (delayValArray.indexOf(stage.ref) === -1) {
-                    set_up_validator($("#wizard_form_" + currentIndx));
-                }
-
-                //refresh tooltips
-                refresh_tool_tips();
-
-            } else {
-                if (stepIntercept) {
-                    $('#sampleWizard').wizard('selectedItem', {
-                        step: $('#sampleWizard').wizard('selectedItem').step + 1
-                    });
-                }
-            }
-
-            //refresh tooltips
-            refresh_tool_tips();
-
-            //we might need to rebuild stage form for certain stages...
-            if (stage.hasOwnProperty("ref")) {
-                if (stage.ref == "sample_attributes") {
-                    var clone_data = get_clone_data();
-                    if (clone_data) {
-                        //rebuild stage form with data from the cloned target
-
-                        var ajaxData = {
-                            'task': "component_record",
-                            'component': component,
-                            'target_id': clone_data
-                        };
-                        var ajaxUrl = copoFormsURL;
-
-                        if (Object.prototype.toString.call(clone_data) === '[object Object]') {
-                            //possibly dealing with a resolved sample; the resolved data is provided
-
-                            ajaxData = {
-                                'request_action': "resolved_object",
-                                'component': component,
-                                'resolved_object': JSON.stringify(clone_data)
-                            }
-
-                            ajaxUrl = wizardURL;
-                        }
-
-                        $("#wizard_form_" + currentIndx).html(get_spinner_image());
-
-                        //fetch record and rebuild stage form...this time with data
-                        $.ajax({
-                            url: ajaxUrl,
-                            type: "POST",
-                            headers: {'X-CSRFToken': csrftoken},
-                            data: ajaxData,
-                            success: function (data) {
-                                stageCopy["data"] = data.component_record;
-                                $("#wizard_form_" + currentIndx).html(wizardStagesForms(stageCopy));
-                                //
-                                refresh_tool_tips();
-
-                                set_up_validator($("#wizard_form_" + currentIndx));
-                            },
-                            error: function () {
-                                alert("Couldn't retrieve clone record!");
-                            }
-                        });
-                    } else {
-                        stageCopy["data"] = null;
-                        $("#wizard_form_" + currentIndx).html(wizardStagesForms(stageCopy));
-                        //
-
-                        refresh_tool_tips();
-
-                        set_up_validator($("#wizard_form_" + currentIndx));
-                    }
-                } else if (stage.ref == "assigned_sample_name") {
-                    //rebuild stage form with generated names
-
-                    $("#wizard_form_" + currentIndx).html(get_spinner_image());
-
-                    //get required number of samples to generate
-                    var requestedNumberOfSamples = get_stage_inputs_by_ref("number_of_samples");
-
-                    if ($.isEmptyObject(requestedNumberOfSamples)) {
-                        requestedNumberOfSamples = 1;
-                    } else {
-                        requestedNumberOfSamples = parseInt(requestedNumberOfSamples["number_of_samples"]);
-                    }
-
-                    //get sample name
-                    var sampleName = get_stage_inputs_by_ref("sample_name");
-                    var genNameObject = '';
-
-                    if (!$.isEmptyObject(sampleName) && (sampleName.hasOwnProperty('sample_name_route'))) {
-                        if (sampleName['sample_name_route'].trim().toString() == "bundle_name"
-                            && (sampleName.hasOwnProperty('bundle_name'))) {
-                            var bundle_name = sampleName['bundle_name'].trim().toString();
-                            if (bundle_name) {
-                                genNameObject = bundle_name;
-                            }
-                        } else if (sampleName['sample_name_route'].trim().toString() == "provided_names"
-                            && (sampleName.hasOwnProperty('provided_names'))) {
-                            var provided_names = sampleName['provided_names'].trim().toString();
-
-                            if (provided_names) {
-                                if (provided_names.indexOf(',') != -1) {//it is comma separated...
-                                    genNameObject = provided_names.split(',');
-                                } else {// tab separated
-                                    genNameObject = provided_names.split(/\s+/);
-                                }
-                            }
-                        }
-                    }
-
-                    $.ajax({
-                        url: wizardURL,
-                        type: "POST",
-                        headers: {'X-CSRFToken': csrftoken},
-                        data: {
-                            'request_action': 'sample_name_schema',
-                            'profile_id': $('#profile_id').val()
-                        },
-                        success: function (data) {
-                            $("#wizard_form_" + currentIndx).html('');
-                            stageCopy.items = generate_sample_names(data.sample_name_schema, requestedNumberOfSamples, genNameObject);
-
-                            //refresh negotiated stages with new stage items
-                            for (var i = 0; i < negotiatedStages.length; ++i) {
-                                if (negotiatedStages[i].ref == stage.ref) {
-                                    negotiatedStages[i].items = stageCopy.items;
-                                    break;
-                                }
-                            }
-
-                            //generate controls based on stage items and append to the stage form
-                            $("#wizard_form_" + currentIndx).html(wizardStagesForms(stageCopy));
-
-                            refresh_tool_tips();
-
-                            set_up_validator($("#wizard_form_" + currentIndx));
-                        },
-                        error: function () {
-                            alert("Couldn't generate sample names!");
-                        }
-                    });
-                }
-            }
-
-
-        } //end of func
-
-        function generate_sample_names(sampleSchema, requestedNumberOfSamples, genNameObject) {
-            var generatedSampleNames = [];
-
-            for (var i = 1; i < requestedNumberOfSamples + 1; ++i) {
-                var schemaCopy = $.extend(true, Object(), sampleSchema);
-                schemaCopy.id = "assigned_sample_" + i.toString();
-                if (genNameObject) {
-                    if (Object.prototype.toString.call(genNameObject) === '[object String]') {
-                        schemaCopy.default_value = genNameObject + "_" + i.toString();
-                    } else if (Object.prototype.toString.call(genNameObject) === '[object Array]' && genNameObject[i - 1] !== undefined) {
-                        schemaCopy.default_value = genNameObject[i - 1].trim();
-                    }
-                }
-
-                schemaCopy.control_meta.input_group_addon_label = i.toString() + ".";
-                generatedSampleNames.push(schemaCopy);
-            }
-
-            return generatedSampleNames
-        }
-
-
-        function set_up_validator(theForm) {
-            if (theForm.find("#current_stage").length) {
-
-                var current_stage = theForm.find("#current_stage").val();
-
-                if (!validateSetter.hasOwnProperty(current_stage)) {
-
-                    custom_validate(theForm);
-                    refresh_validator(theForm);
-
-                    var bvalidator = $('<input/>',
-                        {
-                            type: "hidden",
-                            id: "bcopovalidator",
-                            name: "bcopovalidator",
-                            value: "true"
-                        });
-
-                    //add validator flag
-                    theForm.append(bvalidator);
-
-
-                    theForm.validator().on('submit', function (e) {
-                        if (e.isDefaultPrevented()) {
-                            $(this).find("#bcopovalidator").val("false");
-                            return false;
-                        } else {
-                            e.preventDefault();
-                            $(this).find("#bcopovalidator").val("true");
-                        }
-                    });
-
-                    validateSetter[current_stage] = "1";
-                }
-
-            }
-
-        }
-
-        var dispatchStageCallback = {
-            get_sample_type_stages: function (param) {
-                var stages = null;
-
-                if (stagesFormValues.hasOwnProperty(param)) {
-                    stages = wizardStages[stagesFormValues[param][param]];
-                }
-
-                return stages;
-            },
-            display_sample_clone: function (param) {
-                //param is confirmation of sample clone
-                //function decides whether to display the clone stage given user's choice
-                var displayStage = false;
-
-                if (stagesFormValues.hasOwnProperty(param)) {
-                    displayStage = stagesFormValues[param][param];
-
-                    if (displayStage == "yes") {
-                        displayStage = true;
-                    } else {
-                        displayStage = false;
-                    }
-                }
-
-                return displayStage;
-            },
-            confirm_sample_clone: function (param) {
-                //function decides if sample-clone-confirmation stage should be displayed or not
-                //should this be based on the presence of samples in the profile?
-                //suppressing this condition for now...as one might want to resolve/clone a sample from
-                //remote sources like, say, biosample
-
-                var displayStage = true;
-
-                return displayStage;
-            }
-        }; //end of dispatchStageCallback
-
-        function stage_description(current_stage) {
-            var stage = null;
-            if (current_stage == "") {
-                //start first stage in the description process
-                $.each(wizardStages.start, function (key, val) {
-                    negotiatedStages.push(val);
-                });
-
-                stage = negotiatedStages[0];
-                negotiatedStages[0].activated = true;
-
-            } else {
-                //there is a previous stage, use this to resolve next stage
-
-                //...but, has this stage been previously rendered?
-
-                var currIndx = -1;
-                for (var i = 0; i < negotiatedStages.length; ++i) {
-                    if (current_stage == negotiatedStages[i].ref) {
-                        currIndx = i + 1;
-                        break;
-                    }
-                }
-
-                if (currIndx < negotiatedStages.length) {
-                    if (negotiatedStages[currIndx].hasOwnProperty("activated") && negotiatedStages[currIndx].activated) {
-                        stage = Object(); //no stage to return
-                    } else {
-                        stage = negotiatedStages[currIndx];
-                        negotiatedStages[currIndx].activated = true;
-
-                        //check if it is a stage stub
-                        if (stage.hasOwnProperty("is_stage_stub") && stage.is_stage_stub) {
-                            var new_stages = dispatchStageCallback[stage.callback.function](stage.callback.parameter);
-                            if (new_stages) {
-                                new_stages.forEach(function (item) {
-                                    negotiatedStages.push(item);
-                                });
-                            }
-
-                            //verify next stage validity...again!
-                            if ((currIndx + 1) < negotiatedStages.length) {
-                                currIndx = currIndx + 1;
-                                stage = negotiatedStages[currIndx];
-                                negotiatedStages[currIndx].activated = true;
-                            } else {
-                                stage = Object(); //no stage to return
-                            }
-                        }
-
-                        //check for conditional stage
-                        if (stage.hasOwnProperty("is_conditional_stage") && stage.is_conditional_stage) {
-                            var flag = dispatchStageCallback[stage.callback.function](stage.callback.parameter);
-
-                            if (!flag) {
-                                //move one step forward
-                                if ((currIndx + 1) < negotiatedStages.length) {
-                                    currIndx = currIndx + 1;
-                                    stage = negotiatedStages[currIndx];
-                                    negotiatedStages[currIndx].activated = true;
-                                } else {
-                                    stage = Object(); //no stage to return
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    //this should signal end of stages
-
-                    stage = Object(); //no stage to return
-                }
-            }
-
-            if (stage.hasOwnProperty("ref")) {
-
-                stage.data = Object(); //no data needed...at least for now
-
-            }
-
-            return stage;
-        }
-
-        function get_clone_data() {
-            var sampleClone = get_stage_inputs_by_ref("sample_clone");
-            var genCloneObject = null;
-
-            if (!$.isEmptyObject(sampleClone) && (sampleClone.hasOwnProperty('sample_clone_route'))) {
-                if (sampleClone['sample_clone_route'].trim().toString() == "clone_existing"
-                    && (sampleClone.hasOwnProperty('clone_existing'))) {
-                    var clone_existing = sampleClone['clone_existing'];
-                    if (clone_existing) {
-                        genCloneObject = clone_existing;
-                    }
-                } else if (sampleClone['sample_clone_route'].trim().toString() == "clone_resolved"
-                    && (resolvedAccessionData)) {
-                    genCloneObject = resolvedAccessionData;
-                }
-            }
-
-            return genCloneObject;
-        }
-
-        function get_pane_content(stage_content, currentIndx, stage_message) {
-            var stageHTML = $('<div/>');
-
-            //form controls
-            var formPanel = $('<div/>', {
-                style: "margin-top: 5px; font-size: 14px;"
-            });
-
-
-            stageHTML.append(formPanel);
-
-            var formPanelBody = $('<div/>');
-
-            formPanel.append(formPanelBody);
-
-            var formDiv = $('<div/>', {
-                style: "margin-top: 20px;"
-            });
-
-            formPanelBody.append(formDiv);
-
-            var formCtrl = $('<form/>',
-                {
-                    id: "wizard_form_" + currentIndx
-                });
-
-            formCtrl.append(stage_content);
-
-            formDiv.append(formCtrl);
-
-            return stageHTML;
-        }
-
-        function initiate_wizard() {
-            $('#sampleWizard').wizard();
-
-            //add review step, then other steps
-            $('#sampleWizard').wizard('addSteps', -1, [
-                descriptionWizSummary
-            ]);
-        }
-
-        function reset_wizard() {//resets wizard
-            $('#sampleWizard').wizard('removeSteps', 1, currentIndx + 1);
-
-            //add review step, then other steps
-            $('#sampleWizard').wizard('addSteps', -1, [
-                descriptionWizSummary
-            ]);
-
-            currentIndx = 1;
-        }
-
-        function collate_stage_data() {
-            //get active stage
-            var activeStageIndx = $('#sampleWizard').wizard('selectedItem').step; //active stage index
-
-            if (activeStageIndx == -1) {
-                return false;
-            }
-
-
-            //get form elements for current stage
-            var form_values = Object();
-
-            $('#wizard_form_' + activeStageIndx).find(":input").each(function () {
-                form_values[this.id] = $(this).val();
-            });
-
-            var data = {"stage_ref": ""};
-
-            if (form_values.hasOwnProperty("current_stage")) {
-                stagesFormValues[form_values.current_stage] = form_values;
-                data = {"stage_ref": form_values.current_stage};
-            }
-
-            return data;
-
-        }
-
-
-        function add_new_samples() {
-            //set in motion the wizard process...
-
-            if (activeDescription) {
-                $('#sample-display-tabs a[href="#descriptionWizardComponent"]').tab('show');
-                return false;
-            }
-
-            activeDescription = true;
-
-            // retrieve wizard messages
+        if (resolverComponent.toLowerCase() == "biosample") {
             $.ajax({
                 url: wizardURL,
                 type: "POST",
-                headers: {'X-CSRFToken': csrftoken},
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
                 data: {
-                    'request_action': 'sample_wizard_components',
-                    'profile_id': $('#profile_id').val()
+                    'request_action': "resolve_uri",
+                    'resolver_uri': resolverURL
+
                 },
                 success: function (data) {
-                    wizardStages = data.wizard_stages;
-                    wizardMessages = data.wiz_message;
-                    set_wizard_summary();
-
-                    //load stages
-                    do_post_stage_retrieval({"stage_ref": ""});
+                    spinnerElem.remove();
+                    if (data.resolved_output.status == 'success') {
+                        //set hidden value, and display result to user
+                        parentElem.removeClass("has-error has-danger");
+                        parentElem.find(".help-block").html("Successfully resolved accession. Resolved sample has been registered, and also displayed below. Click 'Next' to proceed.");
+                        $('#' + dataElem.attr('id') + "_hidden").val(JSON.stringify(data.resolved_output.value));
+                        parentElem.find(".feedback-element").html(JSON.stringify(data.resolved_output.value));
+                    } else {
+                        $('#' + dataElem.attr('id') + "_hidden").val('');
+                        parentElem.find(".feedback-element").html('');
+                        parentElem.addClass("has-error has-danger");
+                        parentElem.find(".help-block").html("Couldn't resolve " + resolverValue + "!");
+                    }
                 },
                 error: function () {
-                    alert("Couldn't retrieve wizard components!");
+                    alert("Error while attempting to resolve accession!");
                 }
             });
         }
+    });
+
+    $(document).on("change", ".copo-input-data", function () {
+        if (["provided_names", "bundle_name"].indexOf(this.id) > -1) {
+            var shownValue = $(this).val().trim();
+            var hiddenValue = $('#' + this.id + "_hidden").val().trim();
+
+            if (shownValue != hiddenValue) {
+                $(this).closest(".copo-form-group").find(".help-block").html('');
+                $('#' + this.id + "_hidden").val('');
+                return false;
+            }
+        }
+    });
+
+    //copo-trigger-submit control handling
+    $(document).on("click", ".copo-trigger-submit", function (event) {
+        event.preventDefault();
+
+        var parentElem = $(this).closest(".copo-form-group");
+        var triggerTarget = $(this).attr("data-target");
+        var dataElem = parentElem.find(".copo-input-data");
+        var inputValue = dataElem.val().replace(/^\s+|\s+$/g, '');
 
 
-        //handles button events on a record or group of records
-        function do_record_task(event) {
-            var task = event.task.toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
-            var tableID = event.tableID; //get target table
+        if (inputValue.length == 0) {
+            parentElem.find(".feedback-element").html('');
+            parentElem.addClass("has-error has-danger");
+            parentElem.find(".help-block").html('');
+            parentElem.find(".help-block").eq(0).html("Please enter a value for " + parentElem.find("label").html() + "!");
+            return false;
+        }
 
-            //retrieve target records and execute task
-            var table = $('#' + tableID).DataTable();
-            var records = []; //
-            $.map(table.rows('.selected').data(), function (item) {
-                records.push(item);
+        parentElem.find(".spinner-element").remove();
+
+        var spinnerElem = $('<button/>',
+            {
+                type: "button",
+                class: "btn btn-default spinner-element",
+                html: '<i class="fa fa-spinner fa-pulse fa-1x"></i>'
             });
 
-            //add task
-            if (task == "describe") {
-                add_new_samples();
+        spinnerElem.insertBefore($(this));
+
+
+        if (triggerTarget == "provided_names") {
+            $.ajax({
+                url: wizardURL,
+                type: "POST",
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                data: {
+                    'request_action': "validate_sample_names",
+                    'sample_names': inputValue,
+                    'description_token': sampleDescriptionToken
+
+                },
+                success: function (data) {
+                    spinnerElem.remove();
+                    if (data.validation_result.status == "success") {
+                        //set hidden value, and give all clear signal
+                        parentElem.find(".help-block").html('');
+                        parentElem.removeClass("has-error has-danger");
+                        parentElem.find(".help-block").eq(0).html("Supplied names are valid and have been registered! Click 'Next' to proceed.");
+                        $('#' + dataElem.attr('id') + "_hidden").val(inputValue);
+                        parentElem.find(".feedback-element").html('');
+                        dataElem.trigger('change'); //this was needed to properly propagate error reporting
+                    } else {
+                        parentElem.find(".help-block").html('');
+                        $('#' + dataElem.attr('id') + "_hidden").val('');
+                        parentElem.find(".feedback-element").html('');
+                        parentElem.addClass("has-error has-danger");
+                        parentElem.find(".help-block").eq(0).html("Validation error! Please see below for details.");
+
+                        var tbl = $('<table/>',
+                            {
+                                id: "feedback_provided_names",
+                                "class": "ui celled table hover copo-noborders-table",
+                                cellspacing: "0",
+                                width: "100%"
+                            });
+
+                        var dataSet = data.validation_result.errors;
+
+                        parentElem.find(".feedback-element").append(tbl);
+
+
+                        $('#feedback_provided_names').DataTable({
+                            data: dataSet,
+                            "paging": false,
+                            "lengthChange": false,
+                            "searching": false,
+                            columns: data.validation_result.error_columns
+                        });
+                    }
+                },
+                error: function () {
+                    alert("Error while attempting to validate sample names!");
+                }
+            });
+        } else if (triggerTarget == "bundle_name") {
+            $.ajax({
+                url: wizardURL,
+                type: "POST",
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                data: {
+                    'request_action': "validate_bundle_name",
+                    'bundle_name': inputValue,
+                    'description_token': sampleDescriptionToken
+
+                },
+                success: function (data) {
+                    spinnerElem.remove();
+                    if (data.validation_status == "success") {
+                        //set hidden value, and give all clear signal
+                        parentElem.find(".help-block").html('');
+                        parentElem.removeClass("has-error has-danger");
+                        parentElem.find(".help-block").eq(0).html("Bundle name is valid and will be used to generate sample names of the form: " + inputValue + "_1, " + inputValue + "_2,...! " + " Click 'Next' to proceed.");
+                        $('#' + dataElem.attr('id') + "_hidden").val(inputValue);
+                        dataElem.trigger('change'); //this was needed to properly propagate error reporting
+                    } else {
+                        parentElem.find(".help-block").html('');
+                        $('#' + dataElem.attr('id') + "_hidden").val('');
+                        parentElem.addClass("has-error has-danger");
+                        parentElem.find(".help-block").eq(0).html("Generating sample names from bundle name will violate unique constraint! Please enter another bundle name and click 'Validate!'");
+                    }
+                },
+                error: function () {
+                    alert("Error while attempting to validate bundle name!");
+                }
+            });
+        }
+    });
+
+
+    //instantiate/refresh tooltips
+    refresh_tool_tips();
+
+
+    //****************************** Functions Block ******************************//
+    function add_step(auto_fields) {
+
+        // retrieve and/or re-validate next stage
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {'X-CSRFToken': csrftoken},
+            data: {
+                'request_action': 'next_stage',
+                'description_token': sampleDescriptionToken,
+                'auto_fields': auto_fields
+            },
+            success: function (data) {
+                var wizard_components = data.next_stage;
+                if (wizard_components.hasOwnProperty('abort') && wizard_components.abort) {
+                    //abort the description
+
+                    BootstrapDialog.show({
+                        title: 'Wizard Error!',
+                        message: "Can't continue with description due to incomplete control information. Please restart the description process.",
+                        cssClass: 'copo-modal3',
+                        closable: false,
+                        animate: true,
+                        type: BootstrapDialog.TYPE_DANGER,
+                        buttons: [
+                            {
+                                label: '<i class="copo-components-icons fa fa-times"></i> OK',
+                                cssClass: 'tiny ui basic red button',
+                                action: function (dialogRef) {
+                                    dialogRef.close();
+                                    window.location.reload();
+                                }
+                            }
+                        ]
+                    });
+
+                    return false;
+                }
+
+                //call to refresh wizard
+                if (wizard_components.hasOwnProperty('refresh_wizard') && wizard_components.refresh_wizard) {
+                    refresh_wizard();
+                }
+
+                //check for and set stage
+                if (wizard_components.hasOwnProperty('stage')) {
+                    process_wizard_stage(wizard_components.stage);
+                }
+            },
+            error: function () {
+                alert("Couldn't retrieve next stage!");
+            }
+        });
+    }
+
+    function stage_navigate(evt, data) {
+        if (data.direction == 'next') {
+
+            evt.preventDefault();
+
+            //end of wizard intercept
+            if (wizardElement.find('.steps li.active:first').attr('data-name') == 'review') {
+                finalise_description();
                 return false;
             }
 
-            //edit task
-            if (task == "edit") {
-                $.ajax({
-                    url: copoFormsURL,
-                    type: "POST",
-                    headers: {'X-CSRFToken': csrftoken},
-                    data: {
-                        'task': 'form',
-                        'component': component,
-                        'target_id': records[0].record_id //only allowing row action for edit, hence first record taken as target
-                    },
-                    success: function (data) {
-                        json2HtmlForm(data);
-                    },
-                    error: function () {
-                        alert("Couldn't build sample form!");
-                    }
+            //get referenced stage
+            var activeStageIndx = wizardElement.wizard('selectedItem').step;
+
+            // get form inputs
+            var form_values = {};
+
+            //trigger form validation
+            var stageForm = $("#wizard_form_" + activeStageIndx);
+            if (stageForm.length) {
+                stageForm.trigger('submit');
+
+                if (stageForm.find("#bcopovalidator").val() == "false") {
+                    stageForm.find("#bcopovalidator").val("true");
+                    return false;
+                }
+
+                $('#wizard_form_' + activeStageIndx).find(":input").each(function () {
+                    form_values[this.id] = $(this).val();
                 });
             }
 
-            //table.rows().deselect(); //deselect all rows
+            //call to load next stage
+
+            add_step(JSON.stringify(form_values));
+
+        } else if (data.direction == 'previous') {
+            // get the proposed or intended state, for which action is intercepted
+            evt.preventDefault();
+
+            set_wizard_stage(data.step - 1);
+        }
+
+    }
+
+    function set_wizard_stage(proposedState) {
+        wizardElement.wizard('selectedItem', {
+            step: proposedState
+        });
+    }
+
+    function refresh_wizard() {
+        //get referenced stage
+        var activeStageIndx = wizardElement.wizard('selectedItem').step;
+
+        //remove steps from wizard to start from current step
+        var numSteps = wizardElement.find('.steps li').length;
+        var stepIndex = activeStageIndx + 1;
+        var howMany = numSteps - stepIndex;
+
+        wizardElement.wizard('removeSteps', stepIndex, howMany);
+        wizardElement.find('.steps li:last-child').hide();
+    }
 
 
-        } //end of func
+    function process_wizard_stage(stage) {
+        // get next step index
+        var numSteps = wizardElement.find('.steps li').length;
 
-        function wizardStagesForms(stage) {
-            var formValue = stage.data;
 
-            var formDiv = $('<div/>');
+        if (!stage.hasOwnProperty("ref")) {
+            //no stage returned, signalling last stage
+            wizardElement.find('.steps li:last-child').show();
+            set_wizard_stage(numSteps);
 
-            //build form elements
-            for (var i = 0; i < stage.items.length; ++i) {
-                var formElem = stage.items[i];
-                var control = formElem.control;
+            return false;
+        }
 
-                var elemValue = null;
+        //check stage has not been rendered already
+        var foundStage = false;
 
-                //set default values
-                if (formElem.default_value) {
-                    elemValue = formElem.default_value;
-                } else {
-                    elemValue = "";
-                }
-
-                if (formValue) {
-                    var elem = formElem.id.split(".").slice(-1)[0];
-                    if (formValue[elem]) {
-                        elemValue = formValue[elem];
-                    }
-                }
-
-                if (formElem.hidden == "true") {
-                    control = "hidden";
-                }
-
-                try {
-                    formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
-                }
-                catch (err) {
-                    formDiv.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + formElem.label + '): Cannot resolve form control!</div>');
-                }
-
-                //any triggers?
-                if (formElem.trigger) {
-                    try {
-                        dispatchSampleEventHandler[formElem.trigger.callback.function](formElem);
-                    }
-                    catch (err) {
-                    }
-                }
-
+        wizardElement.find('.steps li').each(function () {
+            if ($(this).find(".wiz-title").attr("data-stage") == stage.ref) {
+                foundStage = true;
+                return false;
             }
+        });
 
-            //add current stage to form
+        if (foundStage) {
+            set_wizard_stage(wizardElement.wizard('selectedItem').step + 1);
+            return false;
+        }
+
+
+        //generate stage content
+        var stage_pane = '<div id="custom-renderer_' + stage.ref + '"></div>';
+
+        if (!stage.hasOwnProperty("renderer")) {
+            stage_pane = get_pane_content(wizardStagesForms(stage), numSteps, stage.message);
+        }
+
+        wizardElement.wizard('addSteps', numSteps, [
+            {
+                label: '<span data-stage="' + stage.ref + '" class=wiz-title>' + stage.title + '</span>',
+                pane: stage_pane
+            }
+        ]);
+
+
+        //set focus to the currently added stage
+        set_wizard_stage(numSteps);
+
+        //get custom renderer
+        if (stage.hasOwnProperty("renderer")) {
+            //custom content will sit here...
+
+            $('#custom-renderer_' + stage.ref).append('<div class="stage-content"></div>');
+
+            //add form to stage to capture current_stage and other required properties
+            var formDiv = $('<div/>');
             var hiddenCtrl = $('<input/>',
                 {
                     type: "hidden",
@@ -1154,474 +612,620 @@ $(document).ready(function () {
                     value: stage.ref
                 });
 
-            formDiv.append(hiddenCtrl);
+            //append to this form, if need be, within a renderer
 
-            return formDiv;
+            var formCtrl = $('<form/>',
+                {
+                    id: "wizard_form_" + numSteps,
+                    class: "wizard-dynamic-form"
+                });
+
+            formCtrl.append(hiddenCtrl);
+
+            formDiv.append(formCtrl);
+            $('#custom-renderer_' + stage.ref).append(formDiv);
+
+            dispatchStageRenderer[stage.renderer](stage);
+
+            set_up_validator($("#wizard_form_" + numSteps)); //needed here to account for delay in content display
         }
 
+    } //end of func
 
-        var dispatchSampleEventHandler = {
-            place_holder: function (formElem) {
-                var previousValue = null;
 
-                $(document)
-                    .off("focus", "#" + formElem.id)
-                    .on("focus", "#" + formElem.id, function () {
-                        previousValue = this.value;
-                    });
+    function set_up_validator(theForm) {
+        //validate on submit event
 
-                $(document)
-                    .off(formElem.trigger.type, "#" + formElem.id)
-                    .on(formElem.trigger.type, "#" + formElem.id, function () {
-                        ;//call to a function here
-                    });
+        if (!theForm.length) {
+            return false;
+        }
+
+        if (!theForm.find("#bcopovalidator").length) {
+            custom_validate(theForm);
+            refresh_validator(theForm);
+
+            var bvalidator = $('<input/>',
+                {
+                    type: "hidden",
+                    id: "bcopovalidator",
+                    name: "bcopovalidator",
+                    value: "true"
+                });
+
+            //add validator flag
+            theForm.append(bvalidator);
+
+            theForm.validator().on('submit', function (e) {
+                if (e.isDefaultPrevented()) {
+                    $(this).find("#bcopovalidator").val("false");
+                    return false;
+                } else {
+                    e.preventDefault();
+                    $(this).find("#bcopovalidator").val("true");
+                }
+            });
+        }
+
+    } //end set_up_validator()
+
+    function get_pane_content(stage_content, step, stage_message) {
+        var row = $('<div/>', {
+            class: "row"
+        });
+
+        var left = $('<div/>', {
+            class: "col-sm-8"
+        });
+
+        var right = $('<div/>', {
+            class: "col-sm-4"
+        });
+
+        var message = $('<div/>', {class: "webpop-content-div"});
+        message.append(stage_message);
+
+        var panel = get_panel('info');
+        panel.find('.panel-body').append(message);
+        panel.find('.panel-heading')
+            .append('<i style="font-size: 20px;" class="fa fa-info-circle text-info"></i>')
+            .css({"padding-top": "5px", "padding-bottom": "5px"});
+        panel.find(".panel-footer").remove();
+        right.append(panel);
+
+        row
+            .append(left)
+            .append(right);
+
+
+        var stageHTML = $('<div/>');
+
+        left.append(stageHTML);
+
+        //form controls
+        var formPanel = $('<div/>', {
+            style: "margin-top: 5px; font-size: 14px;"
+        });
+
+
+        stageHTML.append(formPanel);
+
+        var formPanelBody = $('<div/>');
+
+        formPanel.append(formPanelBody);
+
+        var formDiv = $('<div/>', {
+            style: "margin-top: 20px;"
+        });
+
+        formPanelBody.append(formDiv);
+
+        var formCtrl = $('<form/>',
+            {
+                id: "wizard_form_" + step,
+                class: "wizard-dynamic-form"
+            });
+
+        formCtrl.append(stage_content);
+
+        formDiv.append(formCtrl);
+
+        return row;
+    }
+
+    function initiate_description(parameters) {
+        $('[data-toggle="tooltip"]').tooltip('destroy');
+
+        if (!$("#wizard_toggle").is(":visible")) {
+            var $dialogContent = $('<div/>');
+            var notice_div = $('<div/>').html("Initiating description...");
+            var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader"></div>'));
+
+            var description_token = '';
+            if (parameters.hasOwnProperty('description_token')) {
+                description_token = parameters.description_token;
             }
-        };
 
+            var dialog = new BootstrapDialog({
+                type: BootstrapDialog.TYPE_PRIMARY,
+                size: BootstrapDialog.SIZE_NORMAL,
+                title: function () {
+                    return $('<span>Samples description</span>');
+                },
+                closable: false,
+                animate: true,
+                draggable: false,
+                onhide: function (dialogRef) {
+                    //nothing to do for now
+                },
+                onshown: function (dialogRef) {
+                    $.ajax({
+                        url: wizardURL,
+                        type: "POST",
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
+                        data: {
+                            'request_action': "initiate_description",
+                            'description_token': description_token,
+                            'profile_id': $('#profile_id').val()
+                        },
+                        success: function (data) {
+                            if (data.result.status == 'success') {
+                                //set description token
+                                sampleDescriptionToken = data.result.description_token;
 
-        function set_wizard_summary() {
-            descriptionWizSummary = {
-                label: '<span class=wiz-title>Review</span>',
-                pane: '<div class="alert alert-default">' +
-                '<div style="line-height: 150%;" class="' + wizardMessages.review_message.text_class + '">' +
-                wizardMessages.review_message.text + '</div><div id="summary_stage_loader"></div>' +
-                '<div style="margin-top: 10px; max-width: 100%; overflow-x: auto;">' +
-                '<table id="generated_samples_table" class="ui celled table hover copo-noborders-table" cellspacing="0" width="100%"></table>' +
-                '</div></div>'
-            };
-        }
+                                //set wizard messages
+                                wizardMessages = data.result.wiz_message;
 
-        function do_generated_samples_display(data) {
-            //builds generated sample display
+                                //display wizard
+                                $("#wizard_toggle").collapse("toggle");
 
-            generatedSamples = data.generated_samples.generated_samples;
-            formEditableElements = data.generated_samples.form_elements;
+                                //hide the review stage -- to be redisplayed when all the dynamic stages are displayed
+                                wizardElement.find('.steps li:last-child').hide();
 
-            //flag error if no samples were generated
-            if (generatedSamples.length < 1) {
-                BootstrapDialog.show({
-                    title: 'Sample Generation Error!',
-                    message: "Couldn't generate samples. Possible duplicates in provided names.",
-                    cssClass: 'copo-modal3',
-                    closable: false,
-                    animate: true,
-                    type: BootstrapDialog.TYPE_DANGER,
-                    buttons: [
-                        {
-                            label: '<i class="copo-components-icons fa fa-times"></i> OK',
-                            cssClass: 'tiny ui basic red button',
-                            action: function (dialogRef) {
+                                //remove sample incomplete description object from info pane
+                                if (parameters.hasOwnProperty('info_object')) {
+                                    parameters.info_object.closest(".inc-desc-badge").remove();
+                                }
+
+                                set_up_validator($("#wizard_form_1"));
+
                                 dialogRef.close();
-                                window.location.reload();
-                            }
-                        }
-                    ]
-                });
 
-                return false;
-            }
+                            } else {
+                                var $feeback = $('<div/>', {
+                                    "class": "webpop-content-div",
+                                    style: "padding-bottom: 15px;"
+                                }).html("Please resolve the following issue to proceed with your description.<div style='margin-top: 10px; margin-bottom: 15px;'>" + data.result.message + "</div>");
+                                var $button = $('<div class="tiny ui basic red button">Resolve issue</div>');
+                                $button.on('click', {dialogRef: dialogRef}, function (event) {
+                                    event.data.dialogRef.close();
+                                });
 
-            //generate table columns
-            var sampleTableColumns = generate_sample_table_columns(generatedSamples);
-
-            //set up data source
-            dataTableDataSource = generate_sample_table_data_source(generatedSamples);
-
-            //remove loader
-            $("#summary_stage_loader").html('');
-
-            var table = null;
-            if ($.fn.dataTable.isDataTable('#generated_samples_table')) {
-                //if table instance already exists, then do refresh
-                table = $('#generated_samples_table').DataTable();
-            }
-
-
-            if (table) {
-                //clear old, set new data
-                table
-                    .clear()
-                    .draw();
-                table
-                    .rows
-                    .add(dataTableDataSource);
-                table
-                    .columns
-                    .adjust()
-                    .draw();
-                table
-                    .search('')
-                    .columns()
-                    .draw();
-            } else {
-                table = $('#generated_samples_table').DataTable({
-                    data: dataTableDataSource,
-                    "dom": '<"top"if>rt<"bottom"p><"clear">',
-                    select: {
-                        style: 'multi'
-                    },
-                    language: {
-                        "info": " _START_ to _END_ of _TOTAL_ samples",
-                    },
-                    order: [[0, "asc"]],
-                    columns: sampleTableColumns,
-                    "columnDefs": [
-                        {"orderData": 0,}
-                    ],
-                    keys: {
-                        columns: ':not(:first-child)',
-                        focus: ':eq(2)', // cell that will receive focus when the table is initialised, set to the first editable cell defined
-                        keys: [9, 13, 37, 39, 38, 40],
-                        blurable: false
-                    },
-                    scrollX: true,
-                    scroller: true,
-                    scrollY: 300,
-                });
-
-                table
-                    .on('key', function (e, datatable, key, cell, originalEvent) {
-                        if (key == 13) {//trap enter key for editing a cell
-                            var node = cell.node();
-
-                            //bypass non-editable cells or ones that are currently being edited
-                            if (!$(node).hasClass('copo-editable-cell')) {
-                                return false;
+                                dialog.setType(BootstrapDialog.TYPE_DANGER);
+                                dialog.getModalBody().html('').append($feeback).append($button);
                             }
 
-                            table.keys.disable();
-                            $(node).addClass('cell-currently-engaged'); //cell locked for edit, unlock with the TAB key
-
-                            //set cell edit form
-                            set_cell_form(node, cell, table, '');
+                        },
+                        error: function () {
+                            alert("Error instantiating description!");
                         }
                     });
-            }
-
-            //Enter-key event for table cell update...
-            $(document).on('keypress', '.copo-form-group', function (event) {
-                var code = (event.keyCode ? event.keyCode : event.which);
-                if (code == 13 && ($($(event.target)).closest("#generated_samples_table").length)) {
-                    var table = $('#generated_samples_table').DataTable();
-
-                    var cells = table.cells('.cell-currently-engaged');
-
-                    if (cells && cells[0].length > 0) {
-                        $(document).find(".copo-form-group").webuiPopover('destroy');
-
-                        var cell = cells[0];
-                        var targetCell = table.cell(cell[0].row, cell[0].column);
-                        var node = targetCell.node();
-                        $(node).find(".cell-apply").webuiPopover('destroy');
-
-                        var cellParams = Object();
-                        cellParams["datatable"] = table;
-                        cellParams["cell"] = targetCell;
-                        cellParams["action"] = "current";
-
-                        var form_values = Object();
-                        $(node).find(":input").each(function () {
-                            try {
-                                form_values[this.id] = $(this).val().trim();
-                            }
-                            catch (err) {
-                                form_values[this.id] = $(this).val();
-                            }
-                        });
-                        cellParams["form_values"] = form_values;
-
-                        set_cell_dynamic(cellParams);
-                    }
-                }
-            });
-        }
-
-        function set_generated_samples() {
-            $("#summary_stage_loader").append(get_spinner_image());
-
-            //get assigned sample name
-            var assignedSampleName = get_stage_inputs_by_ref("assigned_sample_name");
-
-            var generatedSampleNames = [];
-            $.each(assignedSampleName, function (key, val) {
-                var partSplit = key.split("assigned_sample_");
-                if (partSplit.length > 1) {
-                    generatedSampleNames.push(val);
-                }
+                },
+                buttons: []
             });
 
-            $.ajax({
-                url: wizardURL,
-                type: "POST",
-                headers: {'X-CSRFToken': csrftoken},
-                data: {
-                    'request_action': 'save_generated_samples',
-                    'generated_samples': JSON.stringify(generatedSampleNames),
-                    'sample_type': get_stage_inputs_by_ref("sample_type")["sample_type"],
-                    'initial_sample_attributes': JSON.stringify(initialSampleAttributes),
-                    'profile_id': $('#profile_id').val()
-                },
-                success: function (data) {
-                    do_generated_samples_display(data);
-                },
-                error: function () {
-                    alert("Couldn't generate requested samples!");
-                }
-            });
 
-        }//end of func
+            $dialogContent.append(notice_div).append(spinner_div);
+            dialog.realize();
+            dialog.setMessage($dialogContent);
+            dialog.open();
 
-        function generate_sample_table_columns(generatedSamples) {
-            //generates sample table column, beginning with static columns
+        } else {//wizard is already visible
+            var message = "<div class='webpop-content-div'>There's an ongoing description. Terminate the current description, before attempting to initiate a new description or reload a previous one.</div>";
 
-            var sampleTableColumns = [
-                {title: "S/N", data: 'rank', visible: true, name: "rank"},
-                {title: "Attributes", data: 'attributes', visible: false, name: "attributes"},
-            ];
-
-            //now, set the dynamic columns
-
-            // get a reference record in generated samples to use as basis for generating dynamic columns
-            var referenceRecord = generatedSamples[0]._recordMeta;
-
-            for (var i = 0; i < referenceRecord.length; ++i) {
-                var col = referenceRecord[i];
-                var dynamicCol = Object();
-
-                dynamicCol["title"] = col.title;
-                dynamicCol["data"] = col.derived_id;
-                dynamicCol["render"] = function (data, type, row, meta) {
-                    var displaYData = '';
-                    var sampleCols = row.attributes._recordMeta;
-
-                    for (var j = 0; j < sampleCols.length; ++j) {
-                        if (sampleCols[j].derived_id == data) {
-                            displaYData = sampleCols[j].data;
-                            break;
-                        }
-                    }
-
-                    return displaYData;
-                }
-
-                dynamicCol["className"] = "copo-editable-cell"; // column editable flag
-
-                sampleTableColumns.push(dynamicCol);
-            }
-
-            return sampleTableColumns;
-        }
-
-        function generate_sample_table_data_source(generatedSamples) {
-            //generates sample data source
-            var sampleTableDataSource = [];
-
-            for (var i = 0; i < generatedSamples.length; ++i) {
-
-                var sample = generatedSamples[i];
-                var option = Object();
-
-                option["rank"] = i + 1;
-                option["attributes"] = sample;
-
-                //set dynamic
-                var sampleCols = sample._recordMeta;
-
-                for (var j = 0; j < sampleCols.length; ++j) {
-                    option[sampleCols[j].derived_id] = sampleCols[j].derived_id;
-                }
-
-                sampleTableDataSource.push(option);
-            }
-
-            return sampleTableDataSource;
-        }
-
-        function set_error_div(error_message) {
-            if (!error_message) {
-                return false;
-            }
-
-            var ctrlsDiv = $('<div/>',
-                {
-                    class: "row",
-                    style: "color:#a94442;"
-                });
-
-            var sp = $('<div/>',
-                {
-                    class: "col-sm-12 col-md-12 col-lg-12 error-div",
-                    html: error_message
-                });
-
-            return ctrlsDiv.append(sp);
-        }
-
-        function set_dynamic_cell_data(formElem) {
-            var parentObject = $('<div/>');
-
-            var violationList = []; //list allows button display filtering
-
-            //unique violation
-            if (formElem.hasOwnProperty("unique") && (formElem.unique.toString().toLowerCase() == "true")) {
-                violationList.push('unique');
-            }
-
-            var components = [
-                {
-                    title: "Apply to current",
-                    action: "current",
-                    description: "Apply this update to current cell.",
-                    className: "btn btn-primary btn-xs",
-                    style: "margin-right: 2px;",
-                    violations: []
-                },
-                {
-                    title: "Apply to selected",
-                    action: "selected",
-                    description: "Apply this update to selected records. Do remember to highlight the records for which you intend to apply the update.",
-                    className: "btn btn-primary btn-xs",
-                    style: "margin-right: 2px;",
-                    violations: ['unique']
-                },
-                {
-                    title: "Apply to all",
-                    action: "all",
-                    description: "Apply this update to all records.",
-                    className: "btn btn-primary btn-xs",
-                    style: "margin-right: 2px;",
-                    violations: ['unique']
-                },
-                {
-                    title: "Cancel",
-                    action: "cancel",
-                    description: "Cancel this update.",
-                    className: "btn btn-warning btn-xs pull-right",
-                    style: "",
-                    violations: []
-                }
-            ];
-
-            for (var i = 0; i < components.length; ++i) {
-                var option = components[i];
-
-                var render = true;
-
-                violationList.forEach(function (item) {
-                    if ($.inArray(item, option.violations) !== -1) {
-                        render = false;
-                        return false;
-                    }
-                });
-
-                if (!render) {
-                    continue;
-                }
-
-                var elem = $('<button/>',
+            BootstrapDialog.show({
+                title: 'Description instantiation',
+                message: message,
+                // cssClass: 'copo-modal3',
+                closable: false,
+                animate: true,
+                type: BootstrapDialog.TYPE_WARNING,
+                buttons: [
                     {
-                        class: "cell-apply " + option.className,
-                        style: "border-radius:0; background-image:none; " + option.style,
-                        type: "button",
-                        html: option.title,
-                        "data-title": option.title,
-                        "data-desc": option.description,
-                        "data-action": option.action,
-                    });
-
-                elem.webuiPopover('destroy');
-                var meta_extra = {width: 300, placement: 'bottom'};
-                refresh_webpop(elem, elem.attr("data-title"), elem.attr("data-desc"), meta_extra);
-
-                parentObject.append(elem);
-            }
-
-            return parentObject;
+                        label: 'OK',
+                        cssClass: 'tiny ui basic orange button',
+                        action: function (dialogRef) {
+                            dialogRef.close();
+                        }
+                    }
+                ]
+            });
         }
 
-        function get_cell_edit_panel() {
-            var attributesPanel = $('<div/>', {
-                class: "panel panel-default cell-edit-panel",
-                style: "min-width:450px;"
+        $("[data-toggle='tooltip']").tooltip();
+    }
+
+
+    function show_sample_source() {
+        //show description bundle
+
+        var tableID = 'sample_source_view_tbl';
+        var tbl = $('<table/>',
+            {
+                id: tableID,
+                "class": "ui celled table hover copo-noborders-table",
+                cellspacing: "0",
+                width: "100%"
             });
 
-            var attributesPanelBody = $('<div/>', {
-                class: "panel-body"
-            });
+        var $dialogContent = $('<div/>');
+        var table_div = $('<div/>').append(tbl);
+        var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader"></div>'));
 
-            var attributesPanelFooter = $('<div/>', {
-                class: "panel-footer",
-                style: "background-color: rgba(245, 245, 245, 0.4);"
-            });
+        var dialog = new BootstrapDialog({
+            type: BootstrapDialog.TYPE_PRIMARY,
+            size: BootstrapDialog.SIZE_NORMAL,
+            title: function () {
+                return $('<span>Sample source</span>');
+            },
+            closable: false,
+            animate: true,
+            draggable: false,
+            onhide: function (dialogRef) {
+                //nothing to do for now
+            },
+            onshown: function (dialogRef) {
+                $.ajax({
+                    url: copoVisualsURL,
+                    type: "POST",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    data: {
+                        'task': "table_data",
+                        'component': "source"
+                    },
+                    success: function (data) {
+                        var dataSet = data.table_data.dataSet;
+                        var cols = data.table_data.columns;
+                        spinner_div.remove();
 
-            attributesPanel.append(attributesPanelBody).append(attributesPanelFooter);
+                        var dtd = dataSet;
+                        var cols = cols;
 
-            return attributesPanel;
+                        var table = null;
+
+                        table = $('#' + tableID).DataTable({
+                            data: dtd,
+                            searchHighlight: true,
+                            "lengthChange": false,
+                            order: [
+                                [1, "asc"]
+                            ],
+                            scrollY: "300px",
+                            scrollX: true,
+                            scrollCollapse: true,
+                            paging: false,
+                            language: {
+                                "info": " _START_ to _END_ of _TOTAL_ sources",
+                                "search": " "
+                            },
+                            select: {
+                                style: 'multi',
+                                selector: 'td:first-child'
+                            },
+                            columns: cols,
+                            dom: 'lfit<"row">rp'
+                        });
+
+                        $('#' + tableID + '_wrapper')
+                            .find(".dataTables_filter")
+                            .find("input")
+                            .removeClass("input-sm")
+                            .attr("placeholder", "Search sample source");
+
+                        //handle event for table details
+    $('#' + tableID + ' tbody')
+        .off('click', 'td.summary-details-control')
+        .on('click', 'td.summary-details-control', function (event) {
+            event.preventDefault();
+
+            var event = jQuery.Event("posttablerefresh"); //individual compnents can trap and handle this event as they so wish
+            $('body').trigger(event);
+
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+            tr.addClass('showing');
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child('');
+                row.child.hide();
+                tr.removeClass('showing');
+                tr.removeClass('shown');
+            } else {
+                $.ajax({
+                    url: copoVisualsURL,
+                    type: "POST",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    data: {
+                        'task': "attributes_display",
+                        'component': "source",
+                        'target_id': row.data().record_id
+                    },
+                    success: function (data) {
+                        if (data.component_attributes.columns) {
+                            // expand row
+
+                            var contentHtml = $('<table/>', {
+                                // cellpadding: "5",
+                                cellspacing: "0",
+                                border: "0",
+                                // style: "padding-left:50px;"
+                            });
+
+                            for (var i = 0; i < data.component_attributes.columns.length; ++i) {
+                                var colVal = data.component_attributes.columns[i];
+
+                                var colTR = $('<tr/>');
+                                contentHtml.append(colTR);
+
+                                colTR
+                                    .append($('<td/>').append(colVal.title))
+                                    .append($('<td/>').append(data.component_attributes.data_set[colVal.data]));
+
+                            }
+
+                            row.child($('<div></div>').append(contentHtml).html()).show();
+                            tr.removeClass('showing');
+                            tr.addClass('shown');
+                        }
+                    },
+                    error: function () {
+                        alert("Couldn't retrieve " + component + " attributes!");
+                        return '';
+                    }
+                });
+            }
+        });
+
+                    },
+                    error: function () {
+                        alert("Couldn't sample source!");
+                        dialogRef.close();
+                    }
+                });
+            },
+            buttons: [{
+                label: 'OK',
+                cssClass: 'tiny ui basic primary button',
+                action: function (dialogRef) {
+                    dialogRef.close();
+                }
+            }]
+        });
+
+
+        $dialogContent.append(table_div).append(spinner_div);
+        dialog.realize();
+        dialog.setMessage($dialogContent);
+        dialog.open();
+    } // end of function
+
+    //handles button events on a record or group of records
+    function do_record_task(event) {
+        var task = event.task.toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
+        var tableID = event.tableID; //get target table
+
+        //describe task
+        if (task == "describe") {
+            initiate_description({});
+            return false;
         }
 
-        function set_cell_form(node, cell, table, error_message) {
-            //get cell's derived id
-            var derived_id = cell.data();
+        //show sample source table
+        //sample-source
+        if (task == "sample-source") {
+            show_sample_source();
+            return false;
+        }
 
-            //get cell's actual id
-            var rowMeta = table.row(cell.index().row).data().attributes._recordMeta;
-            var rowMetaResult = $.grep(rowMeta, function (e) {
-                return e.derived_id == derived_id;
-            });
+        //retrieve target records and execute task
+        var table = $('#' + tableID).DataTable();
+        var records = []; //
+        $.map(table.rows('.selected').data(), function (item) {
+            records.push(item);
+        });
 
-            //get record id
-            var recordId = table.row(cell.index().row).data().attributes._id;
 
-            //get spec for the cell form element
-            var formEditableElementsCopy = $.extend(true, Object(), formEditableElements);
-            var formElem = formEditableElementsCopy[rowMetaResult[0].actual_id];
-            var control = formElem.control;
-
-            //in certain cases with object type kind of controls,
-            //only some entities generated via formElem spec might need to be displayed
-            //the presence of such will be flagged by 'meta'
-            if (rowMetaResult[0].hasOwnProperty("meta")) {
-                formElem["_displayOnlyThis"] = rowMetaResult[0].meta;
-            }
-
-            //retrieve record to obtain element value
+        //edit task
+        if (task == "edit") {
             $.ajax({
                 url: copoFormsURL,
                 type: "POST",
                 headers: {'X-CSRFToken': csrftoken},
                 data: {
-                    'task': "component_record",
+                    'task': 'form',
                     'component': component,
-                    'target_id': recordId
+                    'target_id': records[0].record_id //only allowing row action for edit, hence first record taken as target
                 },
                 success: function (data) {
-                    //get element value
-                    var rowAttributes = data.component_record;
-                    var elemValue = rowAttributes[rowMetaResult[0].actual_id];
+                    json2HtmlForm(data);
+                },
+                error: function () {
+                    alert("Couldn't build sample form!");
+                }
+            });
+        }
 
-                    //get specific index to pass through
-                    var removeAddButton = false;
-                    if (rowMetaResult[0].hasOwnProperty("indx") && Object.prototype.toString.call(elemValue) === '[object Array]') {
-                        var newElemValue = [];
-                        newElemValue.push(elemValue[parseInt(rowMetaResult[0].indx)]);
-                        elemValue = newElemValue;
-                        removeAddButton = true; //remove add button for array type elements
+        //table.rows().deselect(); //deselect all rows
+
+
+    } //end of func
+
+    function wizardStagesForms(stage) {
+        var formValue = stage.data;
+
+        var formDiv = $('<div/>');
+
+        //build form elements
+        for (var i = 0; i < stage.items.length; ++i) {
+            var formElem = stage.items[i];
+            var control = formElem.control;
+
+            var elemValue = null;
+
+            //set default values
+            if (formElem.default_value) {
+                elemValue = formElem.default_value;
+            } else {
+                elemValue = "";
+            }
+
+            if (formValue) {
+                var elem = formElem.id.split(".").slice(-1)[0];
+                if (formValue[elem]) {
+                    elemValue = formValue[elem];
+                }
+            }
+
+            if (formElem.hidden == "true") {
+                control = "hidden";
+            }
+
+            try {
+                formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
+            }
+            catch (err) {
+                formDiv.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + formElem.label + '): Cannot resolve form control!</div>');
+            }
+
+        }
+
+        //add current stage to form
+        var hiddenCtrl = $('<input/>',
+            {
+                type: "hidden",
+                id: "current_stage",
+                name: "current_stage",
+                value: stage.ref
+            });
+
+        formDiv.append(hiddenCtrl);
+
+        return formDiv;
+    }
+
+    function manage_cell_edit(table, cell) {
+        // function handles editing of cell
+
+        var node = cell.node();
+
+        //does cell have 'focus'?
+        var nodeClass = node.className.split(" ");
+
+        if (nodeClass.indexOf("focus") == -1) {
+            return false;
+        }
+
+        //get record id of target cell
+        var recordID = table.row(cell.index().row).id().split("row_")[1];
+
+
+        //is it a call to edit or save?
+        if ($(node).find(".cell-edit-panel").length) { // call to save
+            //get cell form data
+            var form_values = {};
+            $(node).find(".cell-edit-panel").find(":input").each(function () {
+                try {
+                    form_values[this.id] = $(this).val().trim();
+                }
+                catch (err) {
+                    form_values[this.id] = $(this).val();
+                }
+            });
+
+            $(node).find("#cell-loader").show();
+            $(node).find(".cell-edit-panel").hide();
+
+            $.ajax({
+                url: wizardURL,
+                type: "POST",
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                data: {
+                    'request_action': "save_cell_data",
+                    'cell_reference': dtColumns[cell.index().column].data,
+                    'target_id': recordID,
+                    'auto_fields': JSON.stringify(form_values),
+                    'description_token': sampleDescriptionToken
+
+                },
+                success: function (data) {
+                    if (data.cell_update.status == 'success') {
+
+                        //set data and redraw table
+                        table
+                            .cell(cell.index().row, cell.index().column)
+                            .data(data.cell_update.value)
+                            .invalidate()
+                            .draw();
+
+                        //refresh search box
+                        table
+                            .search('')
+                            .draw();
+
+
+                        //re-enable table navigation keys
+                        table.keys.enable();
+
+                        //deselect previously selected rows
+                        table.rows('.selected').deselect();
+
+                        //set focus on next row
+                        table.cell(cell.index().row + 1, cell.index().column).focus();
+                    } else {
+                        $(node).find("#cell-loader").hide();
+                        $(node).find(".cell-edit-panel").show();
+                        alert("Error: " + data.cell_update.message);
                     }
+                },
+                error: function () {
+                    alert("Error while attempting to update sample cell!");
+                }
+            });
 
-                    var htmlCtrl = dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue);
-                    htmlCtrl.find("label").remove();
+        } else { // call to edit
+            //disable table navigation keys
+            table.keys.disable();
 
-                    if (removeAddButton) {
-                        htmlCtrl.find(".array-add-new-button-div").remove();
-                    }
+            $.ajax({
+                url: wizardURL,
+                type: "POST",
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                data: {
+                    'request_action': "get_cell_control",
+                    'cell_reference': dtColumns[cell.index().column].data,
+                    'target_id': recordID,
+                    'description_token': sampleDescriptionToken
 
-                    //create cell edit panel
+                },
+                success: function (data) {
+                    var formElem = data.cell_control.control_schema;
+                    var elemValue = data.cell_control.schema_data;
+                    var htmlCtrl = dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue);
+                    // htmlCtrl.find("label").remove();
+
                     var cellEditPanel = get_cell_edit_panel();
-
-                    //set cell edit data
-                    cellEditPanel.find(".panel-body").append(htmlCtrl).append(set_error_div(error_message)); //attach form control
-                    cellEditPanel.find(".panel-footer").append(set_dynamic_cell_data(formElem)); //attach action buttons
-
+                    cellEditPanel.find("#cell-loader").hide();
+                    cellEditPanel.find(".cell-edit-panel").append(htmlCtrl);
                     $(node)
                         .html('')
                         .append(cellEditPanel);
@@ -1634,343 +1238,581 @@ $(document).ready(function () {
                     }
 
                     refresh_tool_tips();
+                    toggle_display_help_tips($('input[name="' + wizhlptipchk + '"]').bootstrapSwitch('state'), wizardElement);
 
                     //set focus to selectize control
                     if (selectizeObjects.hasOwnProperty(formElem.id)) {
                         var selectizeControl = selectizeObjects[formElem.id];
                         selectizeControl.focus();
                     }
-
-
-                    //build cell edit function parameter object
-                    var cellParams = Object();
-                    cellParams["datatable"] = table;
-                    cellParams["cell"] = cell;
-                    cellParams["action"] = "current";
-
-                    cellEditPanel.find(".cell-apply").click(function () {
-                        $(document).find(".copo-form-group").webuiPopover('destroy');
-
-                        cellParams["action"] = $(this).attr("data-action");
-                        cellParams["selectedRows"] = table.rows('.selected').indexes();
-                        cellParams["allRows"] = table.rows().indexes();
-                        cellEditPanel.find(".cell-apply").webuiPopover('destroy');
-
-                        var form_values = Object();
-                        cellEditPanel.find(":input").each(function () {
-                            try {
-                                form_values[this.id] = $(this).val().trim();
-                            }
-                            catch (err) {
-                                form_values[this.id] = $(this).val();
-                            }
-                        });
-
-                        cellParams["form_values"] = form_values;
-                        set_cell_dynamic(cellParams);
-                    });
                 },
                 error: function () {
-                    alert("Couldn't retrieve cell value!");
+                    alert("Error while attempting to build cell form!");
+                    table.keys.enable();
+                    return false;
                 }
             });
-
         }
+    }
 
-        function set_cell_dynamic(cellParams) {
-            var datatable = cellParams.datatable;
-            var cell = cellParams.cell;
-            var action = cellParams.action;
+    function get_cell_edit_panel() {
+        var attributesPanel = $('<div/>', {
+            class: "cell-edit-panel",
+            style: "min-width:450px; border:none; margin-bottom:0px; padding:5px;"
+        });
 
-            var node = cell.node();
+        var loaderObject = $('<div>', {
+            style: 'text-align: center; margin-top: 3px;',
+            id: "cell-loader",
+            html: "<span class='fa fa-spinner fa-pulse fa-2x'></span>"
+        });
 
-            $(node).html(get_spinner_image());
+        return $('<div>').append(attributesPanel).append(loaderObject);
+    }
 
-            var rowIndx = cell.index().row;
+    function generate_sample_edit_table(stage) {
+        //function provides stage information for sample attribute editing
+        var tableID = stage.ref + "_table";
+        var stageHTML = $('<div/>', {"class": "alert alert-default"});
 
-            //perform action
-            if (action == "cancel") {
-                //re-enable keys
-                datatable.keys.enable();
 
-                //remove cell's edit status
-                $(node).removeClass('cell-currently-engaged'); //unlock cell
+        var messageDiv = $('<a/>',
+            {
+                html: '<i class="fa fa-2x fa-info-circle text-info"></i><span class="action-label" style="padding-left: 8px;">Attributes editing tips...</span>',
+                class: "text-info",
+                style: "line-height: 150%; display:none;",
+                href: "#attributes-edit",
+                "data-toggle": "collapse"
+            });
 
-                //deselect previously selected rows
-                datatable.rows('.selected').deselect();
+        //add info for user
+        var message = $('<div/>', {class: "webpop-content-div"});
+        message.append(stage.message);
 
-                datatable
-                    .row(rowIndx)
-                    .invalidate()
-                    .draw();
+        var panel = get_panel('info');
+        panel.addClass('edit-sample-badge');
+        panel.find('.panel-body').append(message);
+        panel.find('.panel-heading').remove();
+        panel.find(".panel-footer").remove();
 
-            } else {
-                //get form values
-                var form_values = cellParams.form_values;
+        var messageDivContent = $('<div/>',
+            {
+                class: "collapse",
+                id: "attributes-edit"
+            }
+        );
 
-                // get all target rows
-                var targetRows = [];
+        messageDivContent.append(panel);
 
-                targetRows.push({rowID: rowIndx, recordID: dataTableDataSource[rowIndx].attributes._id});
 
-                //get drilled-down save action
-                var actionRows = [];
-                if (action == "selected" && cellParams.hasOwnProperty("selectedRows")) {
-                    actionRows = cellParams.selectedRows;
-                } else if (action == "all" && cellParams.hasOwnProperty("allRows")) {
-                    actionRows = cellParams.allRows;
-                }
+        // refresh dynamic content
+        $('#custom-renderer_' + stage.ref).find(".stage-content").html('');
+        $('#custom-renderer_' + stage.ref).find(".stage-content").append(stageHTML);
 
-                for (var i = 0; i < actionRows.length; ++i) {
-                    rowIndx = actionRows[i];
-                    targetRows.push({rowID: rowIndx, recordID: dataTableDataSource[rowIndx].attributes._id});
-                }
+        stageHTML.append($('<div/>', {style: "margin-bottom: 10px;"}).append(messageDiv));
+        stageHTML.append(messageDivContent);
 
-                //define metadata object and gather relevant information for save action
-                var update_metadata = Object();
+        //table element
+        var tableDiv = $('<div/>');
+        stageHTML.append(tableDiv);
 
-                //get cell's derived id
-                var derived_id = cell.data();
+        var tbl = $('<table/>',
+            {
+                id: tableID,
+                "class": "ui celled table hover copo-noborders-table",
+                cellspacing: "0",
+                width: "100%"
+            });
 
-                //get cell's actual id
-                var rowMeta = datatable.row(cell.index().row).data().attributes._recordMeta;
-                var rowMetaResult = $.grep(rowMeta, function (e) {
-                    return e.derived_id == derived_id;
+        tableDiv.append(tbl);
+
+        //loader element
+        var loaderHTML = $('<div/>');
+        var loaderMessage = $('<div/>', {
+            class: "text-primary",
+            style: "margin-top: 5px; font-weight:bold;",
+            html: "Generating samples..."
+        });
+
+        loaderHTML.append(loaderMessage);
+        loaderHTML.append(get_spinner_image());
+        stageHTML.append(loaderHTML);
+
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'request_action': "get_discrete_attributes",
+                'description_token': sampleDescriptionToken
+
+            },
+            success: function (data) {
+                loaderHTML.remove();
+                messageDiv.show();
+
+                dtColumns = data.table_data.columns;
+                dtRows = data.table_data.rows;
+
+                var table = $('#' + tableID).DataTable({
+                    data: dtRows,
+                    dom: 'Bfr<"row"><"row info-rw" i>tlp',
+                    searchHighlight: true,
+                    lengthChange: true,
+                    select: {
+                        style: 'multi',
+                        selector: 'td:first-child'
+                    },
+                    order: [[0, 'asc']],
+                    buttons: [
+                        'selectAll',
+                        {
+                            text: 'Select filtered',
+                            action: function (e, dt, node, config) {
+                                var filteredRows = dt.rows({order: 'index', search: 'applied'});
+                                if (filteredRows.count() > 0) {
+                                    dt.rows().deselect();
+                                    filteredRows.select();
+                                }
+                            }
+                        },
+                        'selectNone',
+                        {
+                            extend: 'excel',
+                            text: 'Spreadsheet',
+                            title: null,
+                            filename: "copo_samples_" + String(sampleDescriptionToken)
+                        }
+                    ],
+                    language: {
+                        "info": " _START_ to _END_ of _TOTAL_ samples",
+                        buttons: {
+                            selectAll: "Select all",
+                            selectNone: "Select none",
+                        },
+                        select: {
+                            rows: {
+                                _: "%d selected records can be <strong>batch-updated using focused cell value</strong><span class='focused-table-info'></span>",
+                                0: "<span>Select one or more records to batch-update</span><span class='focused-table-info'></span>",
+                                1: "%d selected record can be updated using focused cell value<span class='focused-table-info'></span>"
+                            }
+                        }
+                    },
+                    keys: {
+                        columns: ':not(:first-child)',
+                        focus: ':eq(1)', // cell that will receive focus when the table is initialised, set to the first editable cell defined
+                        keys: [9, 13, 37, 39, 38, 40],
+                        blurable: false
+                    },
+                    scrollX: true,
+                    // scroller: true,
+                    // scrollY: 300,
+                    columns: dtColumns
                 });
 
-                update_metadata["column_reference"] = rowMetaResult[0].actual_id; //id of the update element
-                update_metadata["sample_type"] = get_stage_inputs_by_ref("sample_type")["sample_type"];
+                sampleTableInstance = table;
 
-                if (rowMetaResult[0].hasOwnProperty("indx")) {
-                    update_metadata["update_element_indx"] = rowMetaResult[0].indx; //in the case of arrays, index of the update element value
-                    update_metadata["update_meta"] = rowMetaResult[0].meta; //the sub-key of the update element
-                }
+                table
+                    .buttons()
+                    .nodes()
+                    .each(function (value) {
+                        $(this)
+                            .removeClass("btn btn-default")
+                            .addClass('tiny ui basic button');
+                    });
 
-                update_metadata = JSON.stringify(update_metadata);
+                //add custom buttons
 
+                var customButtons = $('<span/>', {
+                    style: "padding-left: 15px;",
+                    class: "copo-table-cbuttons"
+                });
+
+
+                $(table.buttons().container()).append(customButtons);
+
+                //apply to selected rows button
+                var applyButton = $('<button/>',
+                    {
+                        class: "tiny ui basic primary button",
+                        id: "updating_cell_button",
+                        type: "button",
+                        html: '<span>Update selected records</span>',
+                        click: function (event) {
+                            event.preventDefault();
+
+                            if (!$(this).hasClass('updating')) {
+                                $(this).addClass('updating');
+                                batch_update_records(table);
+                            }
+                        }
+                    });
+
+                customButtons.append(applyButton);
+
+                refresh_tool_tips();
+
+                //add event for enter key press and cell double-click
+                table
+                    .on('dblclick', 'td', function () {
+                        var cell = table.cell($(this));
+                        manage_cell_edit(table, cell);
+                    });
+
+                table
+                    .on('key', function (e, datatable, key, cell, originalEvent) {
+                        if (key == 13) {//trap enter key for editing a cell
+                            manage_cell_edit(table, cell);
+                        }
+                    });
+
+                //add event for cell focus
+                table
+                    .on('key-focus', function (e, datatable, cell, originalEvent) {
+                        var rowIndx = cell.index().row + 1;
+                        $('.focused-table-info').html($('<span style="margin-left: 5px; padding: 5px; font-size: 14px;"> Focused cell in row ' + rowIndx + '</span>'));
+                    })
+                    .on('key-blur', function (e, datatable, cell) {
+                        //;
+                    });
+
+                //add event for column highlighting and tooltip
+                $('#' + tableID + ' tbody')
+                    .on('mouseenter', 'td', function () {
+                        var colIdx = table.cell(this).index().column;
+
+                        $(this).prop("title", "[" + dtRows[table.cell(this).index().row].name + ", " + dtColumns[colIdx].title + "" + "]");
+
+                        $(table.cells().nodes()).removeClass('copo-higlighted-column');
+                        $(table.column(colIdx).nodes()).addClass('copo-higlighted-column');
+                    });
+            },
+            error: function () {
+                alert("Couldn't generate samples!");
+            }
+        });
+    }
+
+    function batch_update_records(table) {
+        //function uses value from focused cell to update selected records
+        var cells = table.cells('.focus');
+        var cell = null;
+
+        //get referenced cell
+        if (cells && cells[0].length > 0) {
+            cell = cells[0];
+            cell = table.cell(cell[0].row, cell[0].column);
+        } else {
+            $("#updating_cell_button").removeClass('updating');
+            return false;
+        }
+
+        //var node = cell.node();
+
+        //get record id of target cell
+        var recordID = table.row(cell.index().row).id().split("row_")[1];
+
+        //get selected rows ids for batch update
+        var target_rows = table.rows('.selected').ids().toArray();
+
+
+        if (target_rows.length == 0) {
+            BootstrapDialog.show({
+                title: "Batch update action",
+                message: "Select one or more records to update corresponding cells",
+                cssClass: 'copo-modal3',
+                closable: false,
+                animate: true,
+                type: BootstrapDialog.TYPE_WARNING,
+                buttons: [{
+                    label: 'OK',
+                    cssClass: 'tiny ui basic orange button',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                        $("#updating_cell_button").removeClass('updating');
+                        return false;
+                    }
+                }]
+            });
+
+            $("#updating_cell_button").removeClass('updating');
+            return false;
+        }
+
+        //ask user confirmation
+        if (target_rows.length > 0) {
+            BootstrapDialog.show({
+                title: "Confirm batch update",
+                message: "Corresponding cells in column <span style='color: #ff0000;'>" + dtColumns[cell.index().column].title + "</span> for the selected records will be assigned the value: <span style='color: #ff0000;'>" + dtRows[cell.index().row][dtColumns[cell.index().column].data] + "</span>.<div style='margin-top: 10px;'>Do you want to continue?</div>",
+                // cssClass: 'copo-modal3',
+                closable: false,
+                animate: true,
+                type: BootstrapDialog.TYPE_WARNING,
+                buttons: [
+                    {
+                        label: 'Cancel',
+                        cssClass: 'tiny ui basic button',
+                        action: function (dialogRef) {
+                            table.rows().deselect();
+                            $("#updating_cell_button").removeClass('updating');
+                            dialogRef.close();
+                            return false;
+                        }
+                    },
+                    {
+                        label: 'Continue',
+                        cssClass: 'tiny ui basic orange button',
+                        action: function (dialogRef) {
+                            dialogRef.close();
+
+                            //disable table navigation keys
+                            table.keys.disable();
+
+                            var loaderObject = $('<div>', {
+                                style: 'text-align: center; margin-top: 3px;',
+                                html: "<span class='fa fa-spinner fa-pulse fa-2x'></span>"
+                            });
+
+                            $("#updating_cell_button").html("");
+                            $("#updating_cell_button").append("<span>Updating records, please wait</span>");
+                            $("#updating_cell_button").append(loaderObject);
+
+
+                            $.ajax({
+                                url: wizardURL,
+                                type: "POST",
+                                headers: {
+                                    'X-CSRFToken': csrftoken
+                                },
+                                data: {
+                                    'request_action': "batch_update",
+                                    'cell_reference': dtColumns[cell.index().column].data,
+                                    'target_id': recordID,
+                                    'target_rows': JSON.stringify(target_rows),
+                                    'description_token': sampleDescriptionToken
+
+                                },
+                                success: function (data) {
+                                    if (data.batch_update) {
+                                        if (data.batch_update.status == "success") {
+                                            if (data.batch_update.data_set) {
+                                                dtRows = data.batch_update.data_set;
+
+                                                table.rows().deselect();
+
+                                                table
+                                                    .clear()
+                                                    .draw();
+                                                table
+                                                    .rows
+                                                    .add(dtRows);
+                                                table
+                                                    .columns
+                                                    .adjust()
+                                                    .draw();
+                                                table
+                                                    .search('')
+                                                    .columns()
+                                                    .search('')
+                                                    .draw();
+                                            } else {
+                                                //get selected rows indexes for batch update
+
+                                                var rowIndexes = table.rows('.selected').indexes().toArray(); //get selected rows index
+
+                                                var cellNodes = table.cells(rowIndexes, cell.index().column).nodes(); //get target cells node
+                                                $(cellNodes).html(data.batch_update.value); //batch update cells display with new value
+
+                                                var col = dtColumns[cell.index().column].data; //get target column
+
+                                                for (var i = 0; i < rowIndexes.length; ++i) { //update data-source
+                                                    dtRows[rowIndexes[i]][col] = data.batch_update.value;
+                                                }
+
+                                                table.rows().deselect();
+
+                                                table
+                                                    .rows()
+                                                    .invalidate()
+                                                    .draw();
+
+                                                //refresh search box
+                                                table
+                                                    .search('')
+                                                    .draw();
+                                            }
+
+                                            table.cell(cell.index().row, cell.index().column).focus();
+
+                                        } else {
+                                            alert(data.batch_update.message);
+                                        }
+
+                                        table.keys.enable();
+
+                                        $("#updating_cell_button").html("");
+                                        $("#updating_cell_button").append("<span>Update selected records</span>");
+
+                                    }
+
+                                    $("#updating_cell_button").removeClass('updating');
+                                },
+                                error: function () {
+                                    alert("Batch update error!");
+                                    table.keys.enable();
+
+                                    $("#updating_cell_button").html("");
+                                    $("#updating_cell_button").append("<span>Update selected records</span>");
+                                    $("#updating_cell_button").removeClass('updating');
+                                }
+                            });
+                        }
+                    }
+                ]
+            });
+        }
+    }
+
+    function finalise_description() {
+        var $dialogContent = $('<div/>');
+        var notice_div = $('<div/>').html("Finalising description...");
+        var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader"></div>'));
+
+        var dialog = new BootstrapDialog({
+            type: BootstrapDialog.TYPE_PRIMARY,
+            size: BootstrapDialog.SIZE_NORMAL,
+            title: function () {
+                return $('<span>Sample description</span>');
+            },
+            closable: false,
+            animate: true,
+            draggable: false,
+            onhide: function (dialogRef) {
+                //nothing to do for now
+            },
+            onshown: function (dialogRef) {
                 $.ajax({
                     url: wizardURL,
                     type: "POST",
-                    headers: {'X-CSRFToken': csrftoken},
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
                     data: {
-                        'request_action': 'sample_cell_update',
-                        'target_rows': JSON.stringify(targetRows),
-                        'update_metadata': update_metadata,
-                        'auto_fields': JSON.stringify(form_values),
-                        'profile_id': $('#profile_id').val()
+                        'request_action': "finalise_description",
+                        'description_token': sampleDescriptionToken
+
                     },
                     success: function (data) {
-                        if (data.updated_samples.status && data.updated_samples.status == "error") {
-                            //re-display edit form with error message
-                            set_cell_form(node, cell, datatable, data.updated_samples.message);
+                        if (data.finalise_result.status == 'success') {
+                            window.location.reload();
                         } else {
-                            //re-enable keys
-                            datatable.keys.enable();
+                            var $feeback = $('<div/>', {
+                                "class": "webpop-content-div",
+                                style: "padding-bottom: 15px;"
+                            }).html("The following error was encountered while finalising description! Please click the review button to effect changes.");
+                            var $button = $('<div class="tiny ui red button">Review description</div>');
+                            $button.on('click', {dialogRef: dialogRef}, function (event) {
+                                event.data.dialogRef.close();
+                            });
 
-                            //remove cell's edit status
-                            $(node).removeClass('cell-currently-engaged'); //unlock cell
-
-                            //deselect previously selected rows
-                            datatable.rows('.selected').deselect();
-
-                            var updatedSamples = data.updated_samples.generated_samples;
-                            formEditableElements = data.updated_samples.form_elements; //refresh form elements
-
-                            //set updated and refresh display
-                            for (var i = 0; i < targetRows.length; ++i) {
-                                dataTableDataSource[targetRows[i].rowID].attributes._recordMeta[cell.index().columnVisible - 1] = updatedSamples[0]._recordMeta[cell.index().columnVisible - 1];
-
-                                datatable
-                                    .row(targetRows[i].rowID)
-                                    .invalidate()
-                                    .draw();
-
-                            }
-
-                            //set focus on next row
-                            datatable.cell(cell.index().row + 1, cell.index().column).focus();
+                            dialog.setType(BootstrapDialog.TYPE_DANGER);
+                            dialog.getModalBody().html('').append($feeback).append($button);
                         }
 
                     },
                     error: function () {
-                        alert("Couldn't update record!");
+                        alert("Error finalising description!");
                     }
                 });
+            },
+            buttons: []
+        });
 
-            }
-        }
 
-
-        function get_stage_inputs_by_ref(ref) {
-            var form_values = Object();
-
-            if (stagesFormValues.hasOwnProperty(ref)) {
-                form_values = stagesFormValues[ref];
-            }
-
-            return form_values;
-
-        }
-
-        function display_stage_message(stageMessage, stageTitle, stageRef) {
-            if (stageMessage && !displayedMessages.hasOwnProperty(stageRef)) {
-                var alertType = "info";
-                var alertMessage = "<div style='margin-bottom: 10px;'><strong>" + stageTitle + "</strong></div><div>" + stageMessage + "</div>";
-                display_copo_alert(alertType, alertMessage, 20000);
-                displayedMessages[stageRef] = 1;
-            }
-        }
-
-        function build_resolved_data(data) {
-            var resolvedDiv = $('<div/>');
-
-            var omitList = ["_links", "accession"]; //keys to omit from the report
-
-            $.each(data, function (k, v) {
-
-                if (!(omitList.indexOf(k) === -1)) {
-                    return true;
-                }
-
-                if (Object.prototype.toString.call(v) === '[object String]') {
-                    var iRow = $('<div/>',
-                        {
-                            class: "row",
-                            style: "border-bottom: 1px solid #ddd;"
-                        });
-
-                    resolvedDiv.append(iRow);
-
-                    var labelCol = $('<div/>',
-                        {
-                            class: "col-sm-5 col-md-5 col-lg-5"
-                        });
-
-                    var valueCol = $('<div/>',
-                        {
-                            class: "col-sm-7 col-md-7 col-lg-7"
-                        });
-
-                    iRow.append(labelCol);
-                    iRow.append(valueCol);
-
-                    labelCol.append(format_camel_case(k));
-                    valueCol.append(v);
-                } else if (Object.prototype.toString.call(v) === '[object Object]') {
-                    if (k == "characteristics") {
-                        $.each(v, function (key, val) {
-                            var iRow = $('<div/>',
-                                {
-                                    class: "row",
-                                    style: "border-bottom: 1px solid #ddd;"
-                                });
-
-                            resolvedDiv.append(iRow);
-
-                            var labelCol = $('<div/>',
-                                {
-                                    class: "col-sm-5 col-md-5 col-lg-5"
-                                });
-
-                            var valueNode = [];
-
-                            if (Object.prototype.toString.call(val) === '[object Array]') {
-                                val.forEach(function (item) {
-                                    if (Object.prototype.toString.call(item) === '[object Object]') {
-                                        $.each(item, function (key22, val22) {
-                                            if (key22 == "text") {
-                                                valueNode.push(val22);
-                                            }
-                                        });
-                                    } else if (Object.prototype.toString.call(val2) === '[object String]') {
-                                        ;
-                                    } else if (Object.prototype.toString.call(val2) === '[object Array]') {
-                                        ;
-                                    }
-                                });
-                            }
-
-                            var valueCol = $('<div/>',
-                                {
-                                    class: "col-sm-7 col-md-7 col-lg-7"
-                                });
-
-                            labelCol.append(format_camel_case(key));
-
-                            var breakr = $('<div/>',
-                                {
-                                    style: "border-top: 1px solid #e2e2e2;"
-                                });
-
-                            if (valueNode.length > 1) {
-                                valueCol.append(valueNode[0]);
-                                for (var i = 1; i < valueNode.length; ++i) {
-                                    valueCol.append(breakr.clone().append(valueNode[i]));
-                                }
-                            } else {
-                                valueCol.append(valueNode.join("<br/>"));
-                            }
-
-                            iRow.append(labelCol);
-                            iRow.append(valueCol);
-                        });
-                    }
-
-                } else if (Object.prototype.toString.call(v) === '[object Array]') {
-                    var iRow = $('<div/>',
-                        {
-                            class: "row",
-                            style: "border-bottom: 1px solid #ddd;"
-                        });
-                    resolvedDiv.append(iRow);
-
-                    var labelCol = $('<div/>',
-                        {
-                            class: "col-sm-5 col-md-5 col-lg-5"
-                        });
-                    labelCol.append(format_camel_case(k));
-                    iRow.append(labelCol);
-
-                    var valueNode = [];
-                    if (Object.prototype.toString.call(v) === '[object Array]') {
-                        v.forEach(function (item) {
-                            if (Object.prototype.toString.call(item) === '[object Object]') {
-                                $.each(item, function (key22, val22) {
-                                    valueNode.push(format_camel_case(key22) + ":  " + val22);
-                                });
-                            } else if (Object.prototype.toString.call(val2) === '[object String]') {
-                                ;
-                            } else if (Object.prototype.toString.call(val2) === '[object Array]') {
-                                ;
-                            }
-                        });
-                    }
-
-                    var valueCol = $('<div/>',
-                        {
-                            class: "col-sm-7 col-md-7 col-lg-7"
-                        });
-
-                    var breakr = $('<div/>',
-                        {
-                            style: "border-top: 1px solid #e2e2e2;"
-                        });
-
-                    if (valueNode.length > 1) {
-                        valueCol.append(valueNode[0]);
-                        for (var i = 1; i < valueNode.length; ++i) {
-                            valueCol.append(breakr.clone().append(valueNode[i]));
-                        }
-                    } else {
-                        valueCol.append(valueNode.join("<br/>"));
-                    }
-
-                    iRow.append(valueCol);
-                }
-            });
-
-            return resolvedDiv.html();
-        }
-
+        $dialogContent.append(notice_div).append(spinner_div);
+        dialog.realize();
+        dialog.setMessage($dialogContent);
+        dialog.open();
     }
-)//end document ready
+
+    function pending_sample_description() {
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'request_action': "pending_description",
+                'profile_id': $('#profile_id').val()
+            },
+            success: function (data) {
+                if (data.pending.length) {
+                    var infoPanelElement = trigger_global_notification();
+
+                    for (var i = 0; i < data.pending.length; ++i) {
+                        var rec = data.pending[i];
+                        var message = $('<div/>', {class: "webpop-content-div"});
+                        message.append("<span>Modified on: </span>");
+                        message.append(rec.created_on);
+                        message.append("<div></div>");
+                        message.append("<span>Number of samples: </span>");
+                        message.append(rec.number_of_samples);
+                        message.append("<div></div>");
+                        message.append("<span>Last visited stage: </span>");
+                        message.append(rec.last_rendered_stage);
+                        message.append("<div style='margin-top: 5px;'></div>");
+                        message.append("<span style='color: #c93c00'>" + rec.grace_period + " before automatic deletion</span>");
+                        message.append("<div style='margin-top: 5px;'></div>");
+
+                        var deletedesc = '<a class="delete-description-i pull-right" href="#" role="button" ' +
+                            'style="text-decoration: none; color:  #c93c00;" data-target="' + rec._id + '" title="delete description" aria-haspopup="true" aria-expanded="false">' +
+                            '<i class="fa fa-times-circle" aria-hidden="true">' +
+                            '</i>&nbsp; Delete</a>';
+
+                        var reloaddesc = '<a class="reload-description-i" href="#" role="button" ' +
+                            'style="text-decoration: none; color: #35637e;" data-target="' + rec._id + '" title="reload description" aria-haspopup="true" aria-expanded="false">' +
+                            '<i class="fa fa-refresh" aria-hidden="true">' +
+                            '</i>&nbsp; Reload</a>';
+
+
+                        var panel = get_panel('info');
+                        panel.addClass('inc-desc-badge');
+                        panel.find('.panel-body').append(message);
+                        panel.find('.panel-footer').append(deletedesc);
+                        panel.find('.panel-footer').append(reloaddesc);
+                        panel.find('.panel-heading').append('Incomplete description');
+
+                        infoPanelElement.prepend(panel);
+                    }
+                }
+            },
+            error: function () {
+                console.log("Couldn't complete request for pending description");
+            }
+        });
+    }
+
+    function delete_incomplete_description(elem, description_token) {
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'request_action': "delete_pending_description",
+                'description_token': description_token
+            },
+            success: function (data) {
+                elem.closest(".inc-desc-badge").remove();
+            },
+            error: function () {
+                console.log("Couldn't complete request for deleting description");
+            }
+        });
+    }
+
+}); //end document ready

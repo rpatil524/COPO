@@ -5,7 +5,7 @@
     {
       "ref": "attach_samples",
       "title": "Attach Samples",
-      "message": "",
+      "message": "A sample represents major outputs resulting from a protocol application other than the special case outputs of Extract or a Labeled Extract.",
       "items": [
         {
           "id": "study_samples",
@@ -30,7 +30,7 @@
     {
       "ref": "experiment_details",
       "title": "Experiment Details",
-      "is_singular_stage": true,
+      "apply_to_all": false,
       "message": "",
       "items": [
         {
@@ -49,7 +49,7 @@
           "versions": [
             "start_date"
           ],
-          "help_tip": "The Date this experiment commenced",
+          "help_tip": "Date the experiment commenced",
           "label": "Start Date"
         },
         {
@@ -68,7 +68,7 @@
           "versions": [
             "duration"
           ],
-          "help_tip": "How many long the experiment lasted",
+          "help_tip": "How long the experiment lasted",
           "label": "Experiment Duration"
         },
         {
@@ -114,7 +114,8 @@
               "parameter": ""
             }
           },
-          "control": "select",
+          "control": "copo-multi-select",
+          "data_maxItems": 1,
           "versions": [
             "rooting_medium"
           ],
@@ -146,7 +147,8 @@
               "parameter": "item_id,new_value,stage"
             }
           },
-          "control": "select",
+          "control": "copo-multi-select",
+          "data_maxItems": 1,
           "versions": [
             "growth_facility"
           ],
@@ -370,7 +372,8 @@
               "parameter": ""
             }
           },
-          "control": "select",
+          "control": "copo-multi-select",
+          "data_maxItems": 1,
           "versions": [
             ""
           ],
@@ -409,7 +412,8 @@
           },
           "id": "copo.miappe.irrigation_type",
           "show_in_table": true,
-          "control": "select",
+          "control": "copo-multi-select",
+          "data_maxItems": 1,
           "versions": [
             "irrigation_type"
           ],

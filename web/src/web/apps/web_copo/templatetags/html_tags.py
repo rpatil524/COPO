@@ -1,15 +1,18 @@
 __author__ = 'tonietuk'
 
+import time
 import json
 import copy
 import pandas as pd
 from uuid import uuid4
+from bson import ObjectId
 from django import template
 from django.urls import reverse
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.lookup.lookup import HTML_TAGS
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
+from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from dal.copo_base_da import DataSchemas
 from dal.copo_da import ProfileInfo, Profile, DAComponent, Repository
 from allauth.socialaccount import providers
@@ -81,21 +84,30 @@ def get_control_options(f):
 
     option_values = list()
 
-    if "option_values" in f:
-        if isinstance(f["option_values"], list):
-            option_values = f["option_values"]
-        elif isinstance(f["option_values"], dict):
-            if not f.get("option_values").get("callback"):
-                option_values = f["option_values"]
-            else:
-                call_back_function = f.get("option_values", dict()).get("callback", dict()).get("function", str())
-                call_back_parameter = f.get("option_values", dict()).get("callback", dict()).get("parameter", str())
+    if f.get("control", str()) == "copo-lookup":
+        return COPOLookup(accession=f.get('data', str()),
+                          data_source=f.get('data_source', str())).broker_component_search()['result']
 
-                if call_back_function:
-                    if call_back_parameter:
-                        option_values = getattr(d_utils, call_back_function)(call_back_parameter.format(**locals()))
-                    else:
-                        option_values = getattr(d_utils, call_back_function)()
+    if "option_values" not in f:  # you shouldn't be here
+        return option_values
+
+    # return existing option values
+    if isinstance(f["option_values"], list) and f["option_values"]:
+        return f["option_values"]
+
+    # resolve option values from a data source
+    if f.get("data_source", str()):
+        return COPOLookup(data_source=f.get('data_source', str())).broker_data_source()
+
+    if isinstance(f["option_values"], dict):
+        if f.get("option_values", dict()).get("callback", dict()).get("function", str()):
+            call_back_function = f.get("option_values", dict()).get("callback", dict()).get("function", str())
+            option_values = getattr(d_utils, call_back_function)()
+        else:
+            # e.g., multi-search has this format
+            option_values = f["option_values"]
+
+        return option_values
 
     return option_values
 
@@ -211,41 +223,145 @@ def generate_unique_items(component=str(), profile_id=str(), elem_id=str(), reco
     return component_records
 
 
-@register.filter("generate_table_records")
-def generate_table_records(profile_id=str(), component=str()):
-    # generates component records for for building an UI table
+@register.filter("generate_table_columns")
+def generate_table_columns(component=str()):
+    da_object = DAComponent(component=component)
+
+    # get and filter schema elements based on displayable columns
+    schema = [x for x in da_object.get_schema().get("schema_dict") if x.get("show_in_table", True)]
+
+    columns = list()
+    columns.append(dict(data="record_id", visible=False))
+    detail_dict = dict(className='summary-details-control detail-hover-message', orderable=False, data=None,
+                       title='', defaultContent='', width="5%")
+
+    if component == "datafile":
+        special_dict = dict(className='describe-status', orderable=False, data=None,
+                            title='', width="1%",
+                            defaultContent='<span title="Click for description info" data-desc="" style="cursor: '
+                                           'pointer;" class="metadata-rating uncertain">'
+                                           '<i class="fa fa-square" aria-hidden="true"></i></span>')
+        columns.insert(0, special_dict)
+
+    columns.insert(0, detail_dict)
+
+    # get indexed fields - only fields that are indexed can be ordered when using server-side processing
+    indexed_fields = list()
+
+    for k, v in da_object.get_collection_handle().index_information().items():
+        indexed_fields.append(v['key'][0][0])
+
+    for x in schema:
+        x["id"] = x["id"].split(".")[-1]
+        orderable = False
+        if x["id"] in indexed_fields:
+            orderable = True
+        columns.append(dict(data=x["id"], title=x["label"], orderable=orderable))
+
+    return columns
+
+
+@register.filter("generate_server_side_table_records")
+def generate_server_side_table_records(profile_id=str(), component=str(), request=dict()):
+    # function generates component records for building an UI table using server-side processing
+    # - please note that for effective data display,
+    # all array and object-type fields (e.g., characteristics) are deferred to sub-table display.
+    # please define such in the schema as "show_in_table": false and "show_as_attribute": true
+
+    data_set = list()
+
+    n_size = int(request.get("length", 10))  # assumes 10 records per page if length not set
+    draw = int(request.get("draw", 1))
+    start = int(request.get("start", 0))
 
     # instantiate data access object
     da_object = DAComponent(profile_id, component)
 
-    # get schema
-    schema = da_object.get_schema().get("schema_dict")
+    return_dict = dict()
 
-    data_set = list()
+    records_total = da_object.get_collection_handle().count(
+        {'profile_id': profile_id, 'deleted': data_utils.get_not_deleted_flag()})
 
-    # filter schema by columns to be displayed
-    schema = [x for x in schema if x.get("show_in_table", True)]
+    # get and filter schema elements based on displayable columns
+    schema = [x for x in da_object.get_schema().get("schema_dict") if x.get("show_in_table", True)]
 
     # build db column projection
     projection = [(x["id"].split(".")[-1], 1) for x in schema]
 
-    # build UI table column
-    columns = [dict(data=x["id"].split(".")[-1], title=x.get("label", str())) for x in schema]
+    # order by
+    sort_by = request.get('order[0][column]', '0')
+    sort_by = request.get('columns[' + sort_by + '][data]', '')
+    sort_direction = request.get('order[0][dir]', 'asc')
 
-    # add record id column
-    columns.append(dict(data="record_id"))
+    sort_by = '_id' if not sort_by else sort_by
+    sort_direction = 1 if sort_direction == 'asc' else -1
 
-    # retrieve records
+    # search
+    search_term = request.get('search[value]', '').strip()
+
+    # retrieve and process records
+    records = da_object.get_all_records_columns_server(sort_by=sort_by, sort_direction=sort_direction,
+                                                       search_term=search_term, projection=dict(projection),
+                                                       limit=n_size, skip=start)
+
+    records_filtered = records_total
+
+    if search_term:
+        records_filtered = da_object.get_collection_handle().count(
+            {'profile_id': profile_id, 'deleted': data_utils.get_not_deleted_flag(),
+             'name': {'$regex': search_term, "$options": 'i'}})
+
+    if records:
+        df = pd.DataFrame(records)
+
+        df['record_id'] = df._id.astype(str)
+        df["DT_RowId"] = df.record_id
+        df.DT_RowId = 'row_' + df.DT_RowId
+        df = df.drop('_id', axis='columns')
+
+        for x in schema:
+            x["id"] = x["id"].split(".")[-1]
+            df[x["id"]] = df[x["id"]].apply(resolve_control_output_apply, args=(x,)).astype(str)
+
+        data_set = df.to_dict('records')
+
+    return_dict["records_total"] = records_total
+    return_dict["records_filtered"] = records_filtered
+    return_dict["data_set"] = data_set
+    return_dict["draw"] = draw
+
+    return return_dict
+
+
+@register.filter("generate_table_records")
+def generate_table_records(profile_id=str(), component=str()):
+    # function generates component records for building an UI table - please note that for effective tabular display,
+    # all array and object-type fields (e.g., characteristics) are deferred to sub-table display.
+    # please define such in the schema as "show_in_table": false and "show_as_attribute": true
+
+    columns = list()
+    data_set = list()
+
+    # instantiate data access object
+    da_object = DAComponent(profile_id, component)
+
+    # get and filter schema elements based on displayable columns
+    schema = [x for x in da_object.get_schema().get("schema_dict") if x.get("show_in_table", True)]
+
+    # build db column projection
+    projection = [(x["id"].split(".")[-1], 1) for x in schema]
+
+    # retrieve and process records
     records = da_object.get_all_records_columns(projection=dict(projection))
 
-    # get records
-    for pr in records:
+    if len(records):
 
-        option = [(x["id"].split(".")[-1], resolve_control_output(pr, x)) for x in schema]
-        option = dict(option)
+        df = pd.DataFrame(records)
 
-        # add record id
-        option["record_id"] = str(pr["_id"])
+        df['record_id'] = df._id.astype(str)
+        df["DT_RowId"] = df.record_id
+        df.DT_RowId = 'row_' + df.DT_RowId
+        df = df.drop('_id', axis='columns')
 
         # do check for custom repos here
         if component == "submission":
@@ -267,9 +383,29 @@ def generate_table_records(profile_id=str(), component=str()):
                     repo["_id"] = str(repo["_id"])
                 option["repos"] = correct_repos
         data_set.append(option)
+        columns.append(dict(data="record_id", visible=False))
+        detail_dict = dict(className='summary-details-control detail-hover-message', orderable=False, data=None,
+                           title='', defaultContent='', width="5%")
+
+        if component == "datafile":
+            special_dict = dict(className='describe-status', orderable=False, data=None,
+                                title='', width="1%",
+                                defaultContent='<span title="Click for description info" data-desc="" style="cursor: '
+                                               'pointer;" class="metadata-rating uncertain">'
+                                               '<i class="fa fa-square" aria-hidden="true"></i></span>')
+            columns.insert(0, special_dict)
+
+        columns.insert(0, detail_dict)
+
+        for x in schema:
+            x["id"] = x["id"].split(".")[-1]
+            columns.append(dict(data=x["id"], title=x["label"]))
+            df[x["id"]] = df[x["id"]].apply(resolve_control_output_apply, args=(x,))
+
+        data_set = df.to_dict('records')
 
     return_dict = dict(dataSet=data_set,
-                       columns=columns,
+                       columns=columns
                        )
 
     return return_dict
@@ -488,65 +624,82 @@ def generate_submission_accessions_data(submission_record):
 @register.filter("generate_attributes")
 def generate_attributes(component, target_id):
     da_object = DAComponent(component=component)
-    schema = da_object.get_schema().get("schema_dict")
 
-    columns = list()
-    record = da_object.get_record(target_id)
+    # get and filter schema elements based on displayable columns
+    schema = [x for x in da_object.get_schema().get("schema_dict") if x.get("show_as_attribute", False)]
 
-    filter_attributes = dict(component=component)  # holds parameters for filtering out display columns
+    # build db column projection
+    projection = [(x["id"].split(".")[-1], 1) for x in schema]
 
-    if component == "sample":  # sample decides what to show based on sample type
-        sample_types = list()
+    # account for description metadata in datafiles
+    if component == "datafile":
+        projection.append(('description', 1))
 
-        for s_t in d_utils.get_sample_type_options():
-            sample_types.append(s_t["value"])
+    filter_by = dict(_id=ObjectId(target_id))
+    record = da_object.get_all_records_columns(projection=dict(projection), filter_by=filter_by)
 
-        sample_type = record.get("sample_type", str())
-        filter_attributes["sample_types"] = sample_types
-        filter_attributes["sample_type"] = sample_type
+    result = dict()
 
-    for f in schema:
-        # get relevant attributes based on filter
-        filter_attributes["elem"] = f
+    if len(record):
+        record = record[0]
 
-        if attribute_filter(filter_attributes):
+        if component == "sample":  # filter based on sample type
+            sample_types = [s_t['value'] for s_t in d_utils.get_sample_type_options()]
+            sample_type = record.get("sample_type", str())
+            schema = [x for x in schema if sample_type in x.get("specifications", sample_types)]
 
-            # get short-form id
-            f["id"] = f["id"].split(".")[-1]
-            col = dict(title=f["label"], id=f["id"], control=f["control"])
+        for x in schema:
+            x['id'] = x["id"].split(".")[-1]
 
-            # if required, resolve data source for select-type controls,
-            # i.e., if a callback is defined on the 'option_values' field
-            if "option_values" in f:
-                f["option_values"] = get_control_options(f)
+        if component == "datafile":
+            key_split = "___0___"
+            attributes = record.get("description", dict()).get("attributes", dict())
+            stages = record.get("description", dict()).get("stages", list())
 
-            col["data"] = resolve_control_output(record, f)
+            datafile_attributes = dict()
+            datafile_items = list()
 
-            columns.append(col)
+            for st in stages:
+                for item in st.get("items", list()):
+                    if str(item.get("hidden", False)).lower() == "false":
+                        atrib_val = attributes.get(st["ref"], dict()).get(item["id"], str())
+                        item["id"] = st["ref"] + key_split + item["id"]
+                        datafile_attributes[item["id"]] = atrib_val
+                        datafile_items.append(item)
 
-    return columns
+            record.update(datafile_attributes)
+            schema = schema + datafile_items
+
+        result = resolve_display_data(schema, record)
+
+    return result
 
 
-def attribute_filter(filter_attributes):
-    """
-    filters attribute for display
-    :param filter_attributes:
-    :return:
-    """
-    clear_attribute = True
+def resolve_control_output_apply(data, args):
+    if args.get("type", str()) == "array":  # resolve array data types
+        resolved_value = list()
+        for d in data:
+            resolved_value.append(get_resolver(d, args))
+    else:  # non-array types
+        resolved_value = get_resolver(data, args)
 
-    elem = filter_attributes["elem"]
-    component = filter_attributes["component"]
+    return resolved_value
 
-    if not elem.get("show_as_attribute", False):
-        return False
 
-    # do component-specific test here
-    if component == "sample":
-        if filter_attributes["sample_type"] not in elem.get("specifications", filter_attributes["sample_types"]):
-            return False
+def resolve_control_output_description(data, args):
+    key_split = "___0___"
+    st_key_split = args.id.split(key_split)
 
-    return clear_attribute
+    data = data['attributes'][st_key_split[0]][st_key_split[1]]
+
+    if args.get("type", str()) == "array":  # resolve array data types
+        resolved_value = list()
+        for d in data:
+            resolved_value.append(get_resolver(d, args))
+    else:  # non-array types
+        resolved_value = get_resolver(data, args)
+
+    return resolved_value
 
 
 def resolve_control_output(data_dict, elem):
@@ -581,6 +734,7 @@ def get_resolver(data, elem):
     func_map["copo-comment"] = resolve_copo_comment_data
     func_map["copo-multi-select"] = resolve_copo_multi_select_data
     func_map["copo-multi-search"] = resolve_copo_multi_search_data
+    func_map["copo-lookup"] = resolve_copo_lookup_data
     func_map["select"] = resolve_select_data
     func_map["copo-button-list"] = resolve_select_data
     func_map["ontology term"] = resolve_ontology_term_data
@@ -599,49 +753,98 @@ def get_resolver(data, elem):
     return resolved_data
 
 
+def resolve_display_data(datafile_items, datafile_attributes):
+    data = list()
+    columns = list()
+    key_split = "___0___"
+    object_controls = d_utils.get_object_array_schema()
+
+    schema_df = pd.DataFrame(datafile_items)
+
+    for index, row in schema_df.iterrows():
+        resolved_data = resolve_control_output(datafile_attributes, row)
+        label = row["label"]
+
+        if row['control'] in object_controls.keys():
+            # get object-type-control schema
+            control_df = pd.DataFrame(object_controls[row['control']])
+            control_df['id2'] = control_df['id'].apply(lambda x: x.split(".")[-1])
+
+            if resolved_data:
+                object_array_keys = [list(x.keys())[0] for x in resolved_data[0]]
+                object_array_df = pd.DataFrame([dict(pair for d in k for pair in d.items()) for k in resolved_data])
+
+                for o_indx, o_row in object_array_df.iterrows():
+                    # add primary header/value - first element in object_array_keys taken as header, second value
+                    # e.g., category, value in material_attribute_value schema
+                    # a slightly different implementation will be needed for an object-type-control
+                    # that require a different display structure
+
+                    class_name = key_split.join((row.id, str(o_indx), object_array_keys[1]))
+                    columns.append(dict(title=label + " [{0}]".format(o_row[object_array_keys[0]]), data=class_name))
+                    data.append({class_name: o_row[object_array_keys[1]]})
+
+                    # add other headers/values e.g., unit in material_attribute_value schema
+                    for subitem in object_array_keys[2:]:
+                        class_name = key_split.join((row.id, str(o_indx), subitem))
+                        columns.append(dict(
+                            title=control_df[control_df.id2.str.lower() == subitem.lower()].iloc[0].label,
+                            data=class_name))
+                        data.append({class_name: o_row[subitem]})
+        else:
+            # account for array types
+            if row["type"] == "array":
+                for tt_indx, tt_val in enumerate(resolved_data):
+                    shown_keys = (row["id"], str(tt_indx))
+                    class_name = key_split.join(shown_keys)
+                    columns.append(
+                        dict(title=label + " [{0}]".format(str(tt_indx + 1)), data=class_name))
+
+                    if isinstance(tt_val, list):
+                        tt_val = ', '.join(tt_val)
+
+                    data_attribute = dict()
+                    data_attribute[class_name] = tt_val
+                    data.append(data_attribute)
+            else:
+                shown_keys = row["id"]
+                class_name = shown_keys
+                columns.append(dict(title=label, data=class_name))
+                val = resolved_data
+
+                if isinstance(val, list):
+                    val = ', '.join(val)
+
+                data_attribute = dict()
+                data_attribute[class_name] = val
+                data.append(data_attribute)
+
+    data_record = dict(pair for d in data for pair in d.items())
+
+    # for k in columns:
+    #     k["data"] = data_record[k["data"]]
+
+    return dict(columns=columns, data_set=data_record)
+
+
 def resolve_description_data(data, elem):
-    resolved_value = list()
-
-    # get attributes
     attributes = data.get("attributes", dict())
+    stages = data.get("stages", list())
 
-    # retrieve stages data
-    for stage in data.get("stages", list()):
-        ref = stage.get("ref", str())
-        stage_data = attributes.get(ref, dict())
+    datafile_attributes = dict()
+    datafile_items = list()
+    key_split = "___0___"
 
-        if stage_data:
-            stage_dict = dict(
-                ref=ref,
-                title=stage.get("title", str()),
-                data=list()
-            )
+    for st in stages:
+        attributes[st["ref"]] = attributes.get(st["ref"], dict())
+        for item in st.get("items", list()):
+            if str(item.get("hidden", False)).lower() == "false":
+                atrib_val = attributes.get(st["ref"], dict()).get(item["id"], str())
+                item["id"] = st["ref"] + key_split + item["id"]
+                datafile_attributes[item["id"]] = atrib_val
+                datafile_items.append(item)
 
-            # drill down to stage items
-            for item in stage.get("items", list()):
-                item_id = item.get("id", str())
-                item_id = item_id.split(".")[-1]
-                item_dict = dict(label=item.get("label", str()), data=str())
-
-                resolved_value_sub = str()
-                if item_id in stage_data:
-                    # resolve array data types
-                    if item.get("type", str()) == "array":
-                        resolved_value_sub = list()
-                        data = stage_data[item_id]
-                        for d in data:
-                            resolved_value_sub.append(get_resolver(d, item))
-                    else:
-                        # non-array types
-                        resolved_value_sub = get_resolver(stage_data[item_id], item)
-
-                    item_dict["data"] = resolved_value_sub
-
-                stage_dict.get("data").append(item_dict)
-
-            resolved_value.append(stage_dict)
-
-    return resolved_value
+    return resolve_display_data(datafile_items, datafile_attributes)
 
 
 def resolve_copo_characteristics_data(data, elem):
@@ -668,10 +871,10 @@ def resolve_environmental_characteristics_data(data, elem):
         if f.get("show_in_table", True):
             a = dict()
             if f["id"].split(".")[-1] in data:
-                a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
+                a[f["id"].split(".")[-1]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
                 resolved_data.append(a)
 
-    return str(resolved_data)  # turn this casting off after merge
+    return resolved_data  # turn this casting off after merge
 
 
 def resolve_phenotypic_characteristics_data(data, elem):
@@ -683,10 +886,10 @@ def resolve_phenotypic_characteristics_data(data, elem):
         if f.get("show_in_table", True):
             a = dict()
             if f["id"].split(".")[-1] in data:
-                a[f["label"]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
+                a[f["id"].split(".")[-1]] = resolve_ontology_term_data(data[f["id"].split(".")[-1]], elem)
                 resolved_data.append(a)
 
-    return str(resolved_data)  # turn this casting off after merge
+    return resolved_data  # turn this casting off after merge
 
 
 def resolve_copo_comment_data(data, elem):
@@ -751,6 +954,18 @@ def resolve_copo_multi_search_data(data, elem):
     return resolved_value
 
 
+def resolve_copo_lookup_data(data, elem):
+    resolved_value = str()
+
+    elem['data'] = data
+    option_values = get_control_options(elem)
+
+    if option_values:
+        resolved_value = option_values[0]['label']
+
+    return resolved_value
+
+
 def resolve_select_data(data, elem):
     option_values = None
     resolved_value = str()
@@ -795,8 +1010,13 @@ def resolve_copo_select_data(data, elem):
 
 def resolve_datetime_data(data, elem):
     resolved_value = str()
+
     if data:
-        resolved_value = data.strftime('%d %b, %Y, %H:%M')
+        if data.date:
+            try:
+                resolved_value = time.strftime('%a, %d %b %Y %H:%M', data.timetuple())
+            except ValueError:
+                pass
     return resolved_value
 
 

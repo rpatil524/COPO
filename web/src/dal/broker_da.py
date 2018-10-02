@@ -7,7 +7,8 @@ from django.contrib.auth.models import User
 import web.apps.web_copo.lookup.lookup as lkup
 from api.doi_metadata import DOI2Metadata
 import web.apps.web_copo.templatetags.html_tags as htags
-from dal.copo_da import Profile, Publication, Source, Person, Sample, Submission, DataFile, DAComponent, Annotation
+from dal.copo_da import Profile, Publication, Source, Person, Sample, Submission, DataFile, DAComponent, Annotation, \
+    Description
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.metadata_rater import MetadataRater
 from web.apps.web_copo.schemas.utils import data_utils
@@ -225,6 +226,7 @@ class BrokerVisuals:
             person=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             datafile=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             sample=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
+            source=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             submission=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             repository=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_all_profiles())),
@@ -237,6 +239,18 @@ class BrokerVisuals:
             self.context["table_data"] = table_data_dict[self.component][0](**kwargs)
 
         self.context["component"] = self.component
+
+        return self.context
+
+    def do_server_side_table_data(self):
+        self.context["component"] = self.component
+        request = self.param_dict.get("request", dict())
+
+        data = htags.generate_server_side_table_records(self.profile_id, component= self.component, request=request.POST)
+        self.context["draw"] = data["draw"]
+        self.context["records_total"] = data["records_total"]
+        self.context["records_filtered"] = data["records_filtered"]
+        self.context["data_set"] = data["data_set"]
 
         return self.context
 
@@ -304,8 +318,20 @@ class BrokerVisuals:
         return self.context
 
     def do_description_summary(self):
-        self.context['description'] = htags.resolve_description_data(
-            DataFile().get_record(self.param_dict.get("target_id")).get("description", dict()), dict())
+        record = DataFile().get_record(self.param_dict.get("target_id"))
+        self.context['description'] = htags.resolve_description_data(record.get("description", dict()), dict())
+
+        description_token = record.get('description_token', str())
+        self.context['description']['description_record'] = dict()
+
+        if description_token:
+            description_record = Description().GET(description_token)
+            if description_record:
+                if not description_record["name"]:
+                    description_record["name"] = "N/A"
+                self.context['description']['description_record'] = dict(name=description_record["name"],
+                                                                     id=str(description_record["_id"]))
+
         return self.context
 
     def do_un_describe(self):
@@ -318,9 +344,6 @@ class BrokerVisuals:
         return self.context
 
     def do_attributes_display(self):
-        if self.component == "datafile":  # datafile attributes are rendered differently
-            return self.do_description_summary()
-
         target_id = self.param_dict.get("target_id", str())
         self.context['component_attributes'] = htags.generate_attributes(self.component, target_id)
         self.context['component_label'] = htags.get_labels().get(self.component, dict()).get("label", str())

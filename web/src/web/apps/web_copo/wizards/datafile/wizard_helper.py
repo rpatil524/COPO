@@ -1,1378 +1,1559 @@
 __author__ = 'etuka'
 
+import ast
+import json
+import copy
+import difflib
+import numpy as np
+import pandas as pd
 from bson import ObjectId
 from dal import cursor_to_list
-
-import difflib
 from operator import itemgetter
-import web.apps.web_copo.lookup.lookup as lkup
-import web.apps.web_copo.schemas.utils.data_utils as d_utils
-import web.apps.web_copo.templatetags.html_tags as htags
-from converters.ena.copo_isa_ena import ISAHelpers
-from dal.copo_base_da import DataSchemas
+from django.conf import settings
+from pandas.io.json import json_normalize
+
 from dal.copo_da import DataFile, Description
-from dal.figshare_da import Figshare
+import web.apps.web_copo.lookup.lookup as lkup
+import web.apps.web_copo.templatetags.html_tags as htags
+import web.apps.web_copo.schemas.utils.data_utils as d_utils
+from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
+import web.apps.web_copo.wizards.datafile.wizard_callbacks as wizcb
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
-from web.apps.web_copo.schemas.utils import data_utils
+from web.apps.web_copo.wizards.utils.process_wizard_schemas import WizardSchemas
+
+lg = settings.LOGGER
 
 
 class WizardHelper:
-    def __init__(self, description_token=str(), description_targets=list()):
-        self.datafile_id = str()
+    def __init__(self, description_token, profile_id):
         self.description_token = description_token
-        self.description_targets = description_targets
-        self.targets_datafiles = self.set_targets_datafiles()
-        self.profile_id = data_utils.get_current_request().session['profile_id']
-        self.rendered_stages = list()
+        self.profile_id = self.set_profile_id(profile_id)
+        self.wiz_message = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["wizards_messages"])["properties"]
 
-    def set_rendered_stages(self, rendered_stages=list()):
+        self.key_split = "___0___"
+        self.object_key = settings.DATAFILE_OBJECT_PREFIX + self.description_token
+        self.store_name = settings.DATAFILE_OBJECT_STORE
+        self.component = 'datafile'
+
+    def set_profile_id(self, profile_id):
+        p_id = profile_id
+        if not p_id and self.description_token:
+            description = Description().GET(self.description_token)
+            p_id = description.get("profile_id", str())
+
+        return p_id
+
+    def initiate_description(self, description_targets):
         """
-        sets stages rendered on the UI
-        :param rendered_stages:
-        :return:
-        """
-        self.rendered_stages = rendered_stages
-
-    def get_rendered_stages(self):
-        return self.rendered_stages
-
-    def set_targets_datafiles(self):
-        targets_datafiles = dict()
-
-        object_list = list()
-        for target in self.description_targets:
-            object_list.append(ObjectId(target["recordID"]))
-
-        datafiles = cursor_to_list(DataFile().get_collection_handle().find({"_id": {"$in": object_list}}))
-
-        for df in datafiles:
-            targets_datafiles[str(df["_id"])] = df
-
-        return targets_datafiles
-
-    def update_targets_datafiles(self):
-        bulk = DataFile().get_collection_handle().initialize_unordered_bulk_op()
-        for k, v in self.targets_datafiles.items():
-            bulk.find({'_id': ObjectId(k)}).update({'$set': {"description": v.get("description", dict())}})
-        bulk.execute()
-
-    def set_datafile_id(self, datafile_id):
-        self.datafile_id = datafile_id
-
-    def set_description_targets(self, description_targets):
-        self.description_targets = description_targets
-        self.targets_datafiles = self.set_targets_datafiles()
-
-    def get_description_token(self):
-        return self.description_token
-
-    def get_datafile_description(self):
-        description = self.targets_datafiles.get(self.datafile_id, dict()).get("description", dict())
-
-        for k in [dict(key="stages", type=list()), dict(key="attributes", type=dict())]:
-            if k["key"] not in description:
-                description[k["key"]] = k["type"]
-
-        return description
-
-    def get_datafile_attributes(self):
-        return self.get_datafile_description().get("attributes")
-
-    def get_datafile_stages(self):
-        return self.get_datafile_description().get("stages")
-
-    def get_datafile_stage(self, ref):
-        stage = dict()
-        stages = [x for x in self.get_datafile_stages() if x['ref'] == ref]
-        if stages:
-            stage = stages[0]
-
-        return stage
-
-    def get_batch_attributes(self):
-        return Description().GET(self.description_token).get("attributes", dict())
-
-    def set_batch_attributes(self, attributes):
-        Description().edit_description(self.description_token, dict(attributes=attributes))
-
-    def get_batch_stages(self):
-        return Description().GET(self.description_token).get("stages", list())
-
-    def set_batch_stages(self, stages):
-        fields = dict(stages=list())
-
-        # one or two other housekeeping tasks before saving stage
-
-        # set default type, if not already set on stage items
-        for stage in stages:
-            stage = self.set_items_type(stage)
-            fields.get("stages").append(stage)
-
-        Description().edit_description(self.description_token, fields)
-
-    def get_batch_stage(self, ref):
-        stages = self.get_batch_stages()
-        listed_stage = [indx for indx, stage in enumerate(stages) if stage['ref'] == ref]
-
-        return stages[listed_stage[0]]
-
-    def update_description(self, description):
-        if self.datafile_id in self.targets_datafiles:
-            self.targets_datafiles[self.datafile_id]["description"] = description
-
-        return
-
-    def activate_stage(self, elem):
-        """
-        function indicates that stage has been treated for rendering (by the wizard)
-        :param elem: stage to be activated
-        :return:
-        """
-        stages = self.get_batch_stages()
-        listed_stage = [indx for indx, stage in enumerate(stages) if stage['ref'] == elem['ref']]
-
-        elem['activated'] = True
-        stages[listed_stage[0]] = elem
-        self.set_batch_stages(stages)
-
-    def deactivate_stage(self, elem):
-        """
-        function indicates that stage has been treated for rendering (by the wizard)
-        :param elem: stage to be activated
-        :return:
-        """
-        stages = self.get_batch_stages()
-        listed_stage = [indx for indx, stage in enumerate(stages) if stage['ref'] == elem['ref']]
-
-        if 'activated' in elem:
-            del elem['activated']
-
-        stages[listed_stage[0]] = elem
-        self.set_batch_stages(stages)
-
-    def is_activated(self, elem):
-        """
-        function checks if stage has previously been activated
-        :param elem: the stage dictionary
-        :return: boolean
-        """
-
-        return elem.get("activated", False)
-
-    def is_stage_stub(self, elem):
-        """
-        function checks if stage (i.e. elem) is a stub (i.e. metadata for generating actual stages)
-        :param elem: the stage dictionary
+        using the description targets as basis, function attempts to initiate a new description...
+        :param description_targets: datafiles to be described
         :return:
         """
 
-        return elem.get("is_stage_stub", False)
+        initiate_result = dict(status="success", message="")
+        initiate_result['wiz_message'] = self.wiz_message
 
-    def is_conditional_stage(self, elem):
+        if self.description_token:  # this is a call to reload an existing description
+            description = Description().GET(self.description_token)
+
+            if not description:  # validate token
+                # description record doesn't exist; flag error
+                initiate_result['status'] = "error"
+                initiate_result['message'] = self.wiz_message["invalid_token_message"]["text"]
+                initiate_result.pop('wiz_message', None)
+            else:
+                # reset timestamp, which will also reset the 'grace period' for the description
+                Description().edit_description(self.description_token, dict(created_on=d_utils.get_datetime()))
+                initiate_result['description_token'] = self.description_token
+
+                # get name of description and pass on
+                initiate_result["description_label"] = description.get("name", str())
+
+        else:  # this is a call to instantiate a new description; create record, and issue token
+            # validate description targets for bundling - based on existing bundle membership
+            trgts_df = pd.DataFrame(description_targets, columns=['id'])
+            trgts_df['idsplit'] = trgts_df['id'].apply(lambda x: ObjectId(x.split("row_")[-1]))
+
+            records_count = DataFile().get_collection_handle().find({"$and": [
+                {"_id": {"$in": list(trgts_df.idsplit)}},
+                {'description_token': {"$exists": True, "$ne": ""}},
+                {'deleted': d_utils.get_not_deleted_flag()}]}).count()
+
+            if records_count > 0:
+                initiate_result['status'] = "error"
+                initiate_result['message'] = self.wiz_message["new_bundling_alert"]["text"]
+                initiate_result.pop('wiz_message', None)
+
+                return initiate_result
+
+            # get initial stages - other stages will be dynamically determined along the line
+            wizard_stages = WizardSchemas().get_wizard_template("start")
+
+            # resolve type and data source for generated stages
+            self.sanitise_stages(wizard_stages)
+
+            meta = dict(rendered_stages=list())
+
+            initiate_result['description_token'] = str(
+                Description().create_description(stages=wizard_stages, attributes=dict(),
+                                                 profile_id=self.profile_id,
+                                                 component=self.component, meta=meta)['_id'])
+
+            # save description token against bundle items
+            update_dict = dict(description_token=initiate_result['description_token'])
+
+            DataFile().get_collection_handle().update_many(
+                {"_id": {"$in": list(trgts_df.idsplit)}},
+                {'$set': update_dict})
+
+        return initiate_result
+
+    def validate_description_targets(self, next_stage_dict):
         """
-        function checks if the presentation of a stage (i.e. elem) is conditioned in some manner
-        :param elem: the stage dictionary
+        function validates description bundle against stage for consistency
+        :param next_stage_dict:
         :return:
         """
 
-        return elem.get("is_conditional_stage", False)
-
-    def get_stage_data(self, stage_id):
-        return self.get_datafile_attributes().get(stage_id, None)
-
-    def refresh_targets_data(self):
-        for indx, target in enumerate(self.description_targets):
-            self.set_datafile_id(target["recordID"])
-            self.description_targets[indx]["attributes"] = self.get_datafile_attributes()
-
-        return self.description_targets
-
-    def get_stage_display(self, stage):
-        """
-        function resolve UI components for stage
-        :param stage: is the dictionary that captures the stage metadata
-        :return: stage, with UI-ready components set
-        """
-
-        if "data" not in stage:
-            stage['data'] = self.get_stage_data(stage['ref'])
-
-        # resolve other html components
-
-        if "items" in stage:
-            for st in stage['items']:
-
-                # resolve option_values for select-type controls,
-                if "option_values" in st:
-                    st["option_values"] = htags.get_control_options(st)
-
-        stage_dict = dict(stage=stage)
-
-        return stage_dict
-
-    def display_stage(self, elem):
-        """
-        function decides if a stage should be displayed or not. it assumes that conditional stages have
-        callbacks defined in order to resolve the validity of the condition.
-        however, if no callback is defined, function defaults to a decision
-        to display the stage (i.e., True), except in the case where the said stage is a 'stub' (stage used
-        to generate other stages, but not themselves displayable), in that case function
-        will always default to a False.
-        :param elem: is the dictionary that captures the stage metadata
-        :return: is a boolean; if true stage is displayed
-        """
-
-        display = True
-
-        # define a parameter dictionary and collect any required parameter value here...
-        # or elsewhere before before the actual call to the callback function
-        param_dict = dict()
-
-        # any restrictions imposed?
-        if self.is_conditional_stage(elem):
-            call_back_function = elem.get("callback", dict()).get("function", str())
-            call_back_parameter = elem.get("callback", dict()).get("parameter", str())
-
-            args = d_utils.get_args_from_parameter(call_back_parameter, param_dict)
-            try:
-                display = getattr(WizardHelper, call_back_function)(self, *args)
-            except:
-                pass
-
-        # stage_stub are non-displayable
-        if self.is_stage_stub(elem):
-            display = False
-
-        return display
-
-    def fire_on_create_triggers(self, stage):
-        """
-        functions fires defined triggers, where requested, to set initial values and/or controls.
-        NB:this should only be needed the first time the stage is activated for display, as the display agent (UI)
-        takes care of firing the trigger after display
-        :param elem: stage dictionary
-        :return:
-        """
-
-        # define param dictionary and collect relevant parameter values for callback functions
-        param_dict = dict()
-
-        param_dict["stage"] = stage  # parameter value
-        param_dict["stage_ref"] = stage.get("ref", str())  # parameter value
-
-        for sti in stage.get("items", list()):
-            param_dict["item_id"] = sti['id']  # parameter value
-
-            trigger_elem = sti.get("trigger", dict())
-            if trigger_elem and trigger_elem.get("fire_on_create", False):
-                param_dict["new_value"] = None  # parameter value
-                param_dict["old_value"] = None  # parameter value
-
-                # get callback function
-                call_back_function = trigger_elem.get("callback", dict()).get("function", str())
-
-                # get callback parameters and sort out callback function arguments
-                call_back_parameter = trigger_elem.get("callback", dict()).get("parameter", str())
-
-                # resolve relevant arguments for this call
-                args = d_utils.get_args_from_parameter(call_back_parameter, param_dict)
-
-                try:
-                    getattr(WizardHelper, call_back_function)(self, *args)
-                except:
-                    pass
-
-    def get_stages_display(self):
-        """
-        function displays all previously activated stages
-        :return: stages to be displayed
-        """
-        stages = list()
-        batch_stages = self.get_batch_stages()
-
-        for sta in batch_stages:
-            if self.display_stage(sta) and self.is_activated(sta):
-                stages.append(self.get_stage_display(sta))
-
-        return stages
-
-    def get_item_stage_display(self, stage_id, target_id=str()):
-        """
-        function resolves a 'localised' stage display for an item in the description batch
-        if a target_id isn't supplied, then a 'default' form (i.e., without user-specified data) is returned
-        :param stage_id: id of the requested stage
-        :param target_id: id of the item for which the stage html is requested
-        :return: stage html
-        """
-        # get target stage dictionary
-        stage = self.get_batch_stage(stage_id)
-
-        if target_id:
-            self.set_datafile_id(target_id)
-
-        stage_html = None
-        if self.display_stage(stage) and self.is_activated(stage):
-            if not target_id:
-                stage["data"] = None
-            stage_html = self.get_stage_display(stage)
-
-        return stage_html
-
-    def resolve_deposition_context(self):
-        """
-        this returns an inferred deposition destination for a datafile.
-        we assume here that the target destination of the file can be inferred based on its type
-        :param:
-        :return string destination:
-        """
-
-        # get file details
-        datafile = DataFile().get_record(self.datafile_id)
-        ft = datafile.get("file_type", "unknown")
-
-        if ft == '':
-            ft = 'unknown'
-
-        deposition_context = 'default'
-
-        # match against documented destinations
-        for k, v in lkup.REPO_FILE_EXTENSIONS.items():
-            if ft in v:
-                deposition_context = k
-                break
-
-        return deposition_context
-
-    def update_datafile_attributes(self, stage_description):
-        if stage_description:
-            description = self.get_datafile_description()
-
-            # soft validation...only allow stage attribute entry if there is an actual value assigned
-            save_stage = False
-            for k, v in stage_description['data'].items():
-                if v:
-                    save_stage = True
-                    break
-
-            if save_stage:
-                description['attributes'][stage_description['ref']] = stage_description['data']
-
-            self.update_description(description)
-
-    def update_datafile_stage(self, stages):
-        if stages:
-            description = self.get_datafile_description()
-            description['stages'] = stages
-
-            self.update_description(description)
-
-    def initiate_process(self):
-        process = dict()
-
-        """
-        In initiating a description process, it may well be the case that the target items (to be described) already
-        have metadata recorded (from a previous description session). Try bootstrapping the
-        current description using available metadata. Specifically, the target (item in description bundle)
-        with the highest number of (recorded) stages takes precedence over others, and, thus is used for initiating
-        the current description. Of course, there are obvious implications to this. For instance, do we assume
-        other (potentially less described) items in the current bundle adopt the 'difference' in the metadata? Also,
-        we poll the attributes metadata from every target, the result of which might be used in making suggestions
-        for new items added to the bundle at a later stage in the current description pipeline.
-        """
-
-        batch_stages = list()
-        targets_attributes = list()
-        for target in self.description_targets:
-            self.set_datafile_id(target["recordID"])
-
-            datafile_attributes = self.get_datafile_attributes()
-            if datafile_attributes:
-                targets_attributes.append(datafile_attributes)
-
-            if len(self.get_datafile_stages()) > len(batch_stages):
-                batch_stages = self.get_datafile_stages()
-
-        # create a description instance, hence token
-        # but first, sort out the pooled attributes
-
-        batch_attributes = dict()
-        for attribute in targets_attributes:
-            for key, value in attribute.items():
-                if not key in batch_attributes:
-                    batch_attributes[key] = list()
-
-                batch_attributes[key].append(value)
-
-        description_token = self.get_description_token()  # if there is a valid description token, use it -
-        # ...it might well be a call to re-invalidate displayed stages
-
-        if description_token:
-            Description().edit_description(self.description_token, dict(attributes=batch_attributes))
-            Description().edit_description(self.description_token, dict(stages=batch_stages))
-        else:
-            self.description_token = str(
-                Description(self.profile_id).create_description(batch_stages, batch_attributes)['_id'])
-
-        current_stage = str()
-
-        # load all previously activated stages to determine UI display 'take-off' point
-        stages = self.get_stages_display()
-        if stages:
-            current_stage = stages[-1].get("stage", dict()).get("ref", str())
-
-        self.stage_description(current_stage)
-        process['process_name'] = 'stages'
-        process['process_data'] = self.get_stages_display()
-
-        return process
-
-    def resolve_stage_stub(self, elem):
-        """
-        function allows new stages to be realised from a stub
-        :param elem: the stub stage that holds the metadata for resolving the new stages
-        :return: new stages realised
-        """
-
-        stub_ref = elem['ref']
-        new_stages = list()
-
-        # define a parameter dictionary and collect any required parameter value here...
-        # or elsewhere before before the actual call to the callback function
-        param_dict = dict()
-        param_dict["stub_ref"] = stub_ref
-
-        if self.is_stage_stub(elem):
-            call_back_function = elem.get("callback", dict()).get("function", str())
-            call_back_parameter = elem.get("callback", dict()).get("parameter", str())
-
-            args = d_utils.get_args_from_parameter(call_back_parameter, param_dict)
-            try:
-                new_stages = getattr(WizardHelper, call_back_function)(self, *args)
-            except:
-                pass
-
-        return new_stages
-
-    def stage_description(self, current_stage):
-        # get current stage, output next-in-line
-        stage_dict = dict()
-
-        if current_stage:
-            stage_list = self.get_batch_stages()
-        else:
-            # likely no recorded stage
-            stage_list = d_utils.json_to_pytype(lkup.WIZARD_FILES["start"])['properties']
-            self.set_batch_stages(stage_list)
-
-        # next, determine the stage in line to be rendered
-        next_stage_indx = 0
-        listed_stage = [indx for indx, elem in enumerate(stage_list) if elem['ref'] == current_stage]
-        if listed_stage:
-            next_stage_indx = listed_stage[0] + 1
-
-        if next_stage_indx < len(stage_list):  # given a valid index, there is a stage to render!
-            elem = stage_list[next_stage_indx]
-
-            if not self.is_activated(elem):  # stage not previously activated
-
-                # now, the retrieved stage may very well be a stage_stub (metadata for bootstrapping actual stage(s))
-                # check for stage stubs and resolve accordingly
-                new_stages = self.resolve_stage_stub(elem)
-                if new_stages:
-                    self.activate_stage(elem)
-                    # insert generated stages into the stage list
-                    stage_gap = next_stage_indx + 1
-                    stage_list = stage_list[:stage_gap] + new_stages + stage_list[stage_gap:]
-                    self.set_batch_stages(stage_list)
-                    elem = stage_list[stage_gap]  # refresh elem
-
-                # determine whether stage should be displayed based on satisfaction of defined constraints
-                if self.display_stage(elem):
-                    self.activate_stage(elem)
-                    stage_dict = self.get_stage_display(elem)
-
-                    # any fire_on_create trigger?
-                    self.fire_on_create_triggers(elem)
-
-        return stage_dict
-
-    def revalidate_stage_display(self):
-        """
-        function re-validates stage to verify front-end to backend description stages alignment
-        :param elem: the requested stage to be displayed
-        :return:
-        """
-
-        is_valid_stage_sequence = True
-
-        validation_dict = dict()
-
-        rendered_stages = self.get_rendered_stages()
-        display_stages = list()
-
-        for stage in list(self.get_stages_display()):
-            stage_ref = stage.get("stage", dict()).get("ref", str())
-            stage_items = stage.get("stage", dict()).get("items", list())
-
-            items = list()
-
-            for item in stage_items:
-                items.append(item.get("id", str()))
-
-            display_stages.append(dict(ref=stage_ref, items=items))
-
-        # first check, are the lengths same? - if not, it reflects a non-synchronisation between backend and frontend?
-        is_valid_stage_sequence = len(rendered_stages) == len(display_stages)
-
-        if is_valid_stage_sequence:
-            # todo: other tests here...for instance, are the actual stages the same? -
-            # todo: examine the stage refs; activation status; items list etc.
-            pass
-
-        if not is_valid_stage_sequence:
-            # resolve valid stage sequence
-            process = self.initiate_process()
-            validation_dict["stages"] = process['process_data']
-
-        validation_dict["is_valid_stage_sequence"] = is_valid_stage_sequence
-
-        return validation_dict
-
-    def save_stage_data(self, auto_fields):
-        """
-        function saves stage data
-        auto_fields: data to be applied to description targets
-        :return:
-        """
-
-        # get target stage reference
-        current_stage = auto_fields.get("current_stage", str())
-
-        # get target stage dictionary
-        stage = self.get_batch_stage(current_stage)
-
-        # extract and save values for items in the description target
-
-        # build data dictionary and apply to all targets
-        data = DecoupleFormSubmission(auto_fields, d_utils.json_to_object(stage).items).get_schema_fields_updated()
-
-        for target in self.description_targets:
-            # 'focus' on target
-            self.set_datafile_id(target["recordID"])
-
-            # use batch stages to update targets
-            self.update_datafile_stage(self.get_batch_stages())
-
-            # retrieve previously saved data for the stage
-            old_stage_data = self.get_stage_data(stage['ref']) or dict()
-
-            # call to handle triggers defined on items
-            triggers_kwargs = dict(old_data=old_stage_data,
-                                   new_data=data,
-                                   stage=self.get_datafile_stage(stage['ref']))
-            self.handle_save_triggers(**triggers_kwargs)
-
-            # update attribute given data. Note: this does not actually commit to the db yet.
-            # a bulk commit of all description target's attributes to the db is done at a later stage
-            self.update_datafile_attributes({'ref': stage["ref"], 'data': data})
-
-        # get batch attributes
-        batch_attributes = self.get_batch_attributes()
-        if not stage["ref"] in batch_attributes:
-            batch_attributes[stage["ref"]] = list()
-
-        # append targets' data to the batch aggregate
-        batch_attributes[stage['ref']].append(data)
-
-        # update batch description
-        self.set_batch_attributes(batch_attributes)
-
-        # update description targets
-        self.update_targets_datafiles()
+        current_stage = next_stage_dict['stage']['ref']
+
+        # get records in bundle
+        records = cursor_to_list(DataFile().get_collection_handle().find({"$and": [
+            {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
+            {'description.attributes.' + current_stage: {"$exists": True}}]},
+            {'description.attributes.' + current_stage: 1}))
+
+        if not records:
+            return True
+
+        if len(records) == 1:
+            return True
+
+        apply_to_all = next_stage_dict["stage"].get("apply_to_all", False)
+
+        if not apply_to_all:  # no constraint in stage
+            return True
+
+        stage_items = dict()
+        st = copy.deepcopy(next_stage_dict["stage"])
+
+        for item in st.get("items", list()):
+            if str(item.get("hidden", False)).lower() == "false":
+                item["id"] = st["ref"] + self.key_split + item["id"]
+                stage_items[item["id"]] = item["label"]
+
+        normalized_records = json_normalize(data=records, sep=self.key_split)
+        normalized_columns = list(normalized_records.columns)
+
+        # get stage controls to determine consistency in metadata for bundle items
+        incompatible_list = set()
+
+        for i in stage_items.keys():
+            for j in normalized_columns:
+                if i in j:
+                    column_series = normalized_records[j].dropna()
+                    if len(column_series) > 1:
+                        if isinstance(column_series.iloc[0], str):  # string value test
+                            if len(list(column_series.unique())) > 1:  # incompatible values
+                                incompatible_list.add(stage_items[i])
+                        else:  # object value test
+                            ref_obj = column_series.iloc[0]
+                            compatible_test = []
+                            column_series.apply(
+                                lambda x: compatible_test.append(True) if x == ref_obj else compatible_test.append(
+                                    False))
+                            if len(set(compatible_test)) > 1:
+                                incompatible_list.add(stage_items[i])
+
+        if incompatible_list:
+            next_stage_dict["stage"]["bundle_violation"] = self.wiz_message["bundling_violation_alert_message"][
+                "text"].format(", ".join(incompatible_list))
 
         return True
 
-    def target_repo_change(self, old_value, new_value):
+    def set_stage_data(self, next_stage_dict):
         """
-        function checks if the target repository value has changed and clears up the description metadata accordingly
-
-        :param old_value: value before the trigger was fired
-        :param new_value: new target repository value giving rise to the trigger
+        function tries to resolve stage data from records in description bundle
+        :param next_stage_dict:
         :return:
         """
 
-        if old_value == new_value or not old_value or not new_value:  # no change in target repository
-            return False
+        current_stage = next_stage_dict['stage']['ref']
 
-        description = self.get_datafile_description()
+        # get records in bundle
+        records = cursor_to_list(DataFile().get_collection_handle().find({"$and": [
+            {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
+            {'description.attributes.' + current_stage: {"$exists": True}}]},
+            {'description.attributes.' + current_stage: 1}))
 
-        # reset batch stages
-        Description().edit_description(self.description_token, dict(attributes=dict()))
-        Description().edit_description(self.description_token, dict(stages=list()))
+        if not records:
+            return True
 
-        stage_list = d_utils.json_to_pytype(lkup.WIZARD_FILES["start"])['properties']
+        # set data in the single-record case
+        if len(records) == 1:
+            next_stage_dict['stage']['data'] = records[0].get("description", dict()).get("attributes", dict()).get(
+                current_stage, dict())
 
-        # activate the target repository stage
-        listed_stage = [indx for indx, stage in enumerate(stage_list) if stage['ref'] == "target_repository"]
-        stage_list[listed_stage[0]]['activated'] = True
+            return True
 
-        description['stages'] = stage_list
-        retained_attributes = dict()
+        records_df = pd.DataFrame(records)
+        data_dict = dict()
 
-        for stage in list(description['stages']):
-            if stage['ref'] in description['attributes']:
-                retained_attributes[stage['ref']] = description['attributes'][stage['ref']]
-                del description['attributes'][stage['ref']]
+        for item in next_stage_dict["stage"].get("items", list()):
+            if str(item.get("hidden", False)).lower() == "true":
+                continue
 
-        description['attributes'] = retained_attributes
-        self.update_description(description)
+            item_id = item["id"]
+            item_series = records_df['description'].apply(
+                lambda x: x.get('attributes', dict()).get(current_stage, dict()).get(item_id, np.nan))
+            item_series = item_series.dropna()
 
-    def growth_facility_change(self, item_id, new_value, stage):
+            if not len(item_series):
+                continue
+
+            # string instance
+            if isinstance(item_series[0], str) and len(item_series[item_series != str()]):
+                data_dict[item_id] = list(item_series.value_counts().index)[0]
+
+            # list instance
+            elif isinstance(item_series[0], list) and len(item_series[item_series.astype(str) != '[]']):
+                new_list = [[]]
+                item_series.apply(lambda x: new_list.append(x) if len(x) > len(new_list[-1]) else '')
+                data_dict[item_id] = new_list[-1]
+
+            # dict instance
+            elif isinstance(item_series[0], dict) and len(item_series[item_series.astype(str) != '{}']):
+                data_dict[item_id] = list(item_series[
+                                              item_series.astype(str) ==
+                                              item_series[item_series.astype(str)].index.value_counts().index[0]])[0]
+
+        next_stage_dict['stage']['data'] = data_dict
+
+        # message to alert the user to how we arrived at data
+        if data_dict:
+            next_stage_dict["stage"]["message"] = next_stage_dict["stage"]["message"] + \
+                                                  self.wiz_message["pooled_data_message"]["text"]
+
+        return True
+
+    def resolve_select_data(self, stages):
         """
-        function refreshes the stage items in response to a value change
-        :param item_id: item or control that originated the trigger
-        :param new_value: the new value that led to the trigger, if none is provided, then we might be dealing
-                            an initial instantiation of the stage
-        :param stage: parent stage of the trigger element
+        function resolves data source for select-type controls
+        :param stages:
         :return:
         """
 
-        # remove potentially obsolete items from the stage items list
-        for schema_name in [x['schema'] for x in lkup.DROP_DOWNS['GROWTH_AREAS'] if x.get('schema', str())]:
-            target_schema = d_utils.get_copo_schema(schema_name)
+        for stage in stages:
+            for st in stage.get("items", list()):
+                if st["control"] == "copo-lookup":
+                    continue
+                if st.get("option_values", False) == False:
+                    st.pop('option_values', None)
+                    continue
 
-            for f in target_schema:
-                stage["items"] = [item for item in stage.get("items", list()) if
-                                  not item["id"].split(".")[-1] == f["id"].split(".")[-1]]
+                st["option_values"] = htags.get_control_options(st)
 
-        # now get the required schema name
-        if not new_value:
-            # possibly an initial stage setting, set new value to the first value of the drop down
-            new_value = lkup.DROP_DOWNS['GROWTH_AREAS'][0]['value']
+        return True
 
-        growth_areas = [x for x in lkup.DROP_DOWNS['GROWTH_AREAS'] if
-                        x['value'] == new_value and x.get("schema", str())]
-
-        if not growth_areas:  # no associated schema, nothing to do!
-            return
-        else:
-            # resolve actual schema to be inserted given the schema name or reference
-            insert_schema = d_utils.get_copo_schema(growth_areas[0]['schema'])
-
-            # get the index of the reference item (trigger originator) from the stage dictionary,
-            # and use this to inform the insertion of the new items.
-            # it is assumed that the new items will be inserted just after the trigger originator.
-            # feel free, however, to change the position (index) accordingly to reflect
-            # what is required on the rendering agent
-            item_indx = [indx for indx, item in enumerate(stage.get("items", list())) if
-                         item["id"].split(".")[-1] == item_id.split(".")[-1]]
-            if item_indx:
-                insert_indx = item_indx[0]
-                stage["items"][insert_indx + 1:insert_indx + 1] = insert_schema[:]
-
-                # and finally...a little stage housekeeping...and we are good!
-                self.set_items_type(stage)
-
-    def get_nutrient_controls(self, item_id, new_value, stage):
+    def set_items_type(self, stages):
         """
-        function refreshes the stage items in response to a value change
-        :param item_id: item or control that originated the trigger
-        :param new_value: the new value that led to the trigger, if none is provided, then we might be dealing
-                            an initial instantiation of the stage
-        :param stage: parent stage of the trigger element
+        function ensures all stage controls have a type
+        :param stages:
         :return:
         """
 
-        # remove potentially obsolete items from the stage items list
-        for schema_name in [x['schema'] for x in lkup.DROP_DOWNS['GROWTH_NUTRIENTS'] if x.get('schema', str())]:
-            target_schema = d_utils.get_copo_schema(schema_name)
+        for stage in stages:
+            for st in stage.get("items", list()):
+                if not st.get("type"):
+                    st["type"] = "string"
 
-            for f in target_schema:
-                stage["items"] = [item for item in stage.get("items", list()) if
-                                  not item["id"].split(".")[-1] == f["id"].split(".")[-1]]
+                # also get id in the desired format
+                st["id"] = st["id"].split(".")[-1]
 
-        # now get the required schema name
-        if not new_value:
-            # possibly an initial stage setting, set new value to the first value of the drop down
-            new_value = lkup.DROP_DOWNS['GROWTH_NUTRIENTS'][0]['value']
+        return True
 
-        growth_areas = [x for x in lkup.DROP_DOWNS['GROWTH_NUTRIENTS'] if
-                        x['value'] == new_value and x.get("schema", str())]
+    def sanitise_stages(self, stages):
+        self.set_items_type(stages)
+        self.resolve_select_data(stages)
 
-        if not growth_areas:  # no associated schema, nothing to do!
-            return
-        else:
-            # resolve actual schema to be inserted given the schema name or reference
-            insert_schema = d_utils.get_copo_schema(growth_areas[0]['schema'])
+        return True
 
-            # get the index of the reference item (trigger originator) from the stage dictionary,
-            # and use this to inform the insertion of the new items.
-            # it is assumed that the new items will be inserted just after the trigger originator.
-            # feel free, however, to change the position (index) accordingly to reflect
-            # what is required on the rendering agent
-            item_indx = [indx for indx, item in enumerate(stage.get("items", list())) if
-                         item["id"].split(".")[-1] == item_id.split(".")[-1]]
-            if item_indx:
-                insert_indx = item_indx[0]
-                stage["items"][insert_indx + 1:insert_indx + 1] = insert_schema[:]
-
-                # and finally...a little stage housekeeping...and we are good!
-                self.set_items_type(stage)
-
-    def confirm_pairing(self):
+    def set_stage_dependency(self, stages):
         """
-        function determines if the pairing of datafiles should be performed given the 'library_layout' value
-        also function has the task of cleaning up unpaired targets with dangling metadata (from previous description)
+        for dynamically generated stages, function sets their dependency
+        :param stages:
         :return:
         """
 
-        # the test to be carried out will return True, if at least one of the description targets has a value 'PAIRED'
-        do_pairing = False
+        for stage in stages:
+            stage['dependency'] = "resolved_stage"
 
-        # if no accompanying description targets, then we can't do a confirmatory test.
-        # if len(self.description_targets) == 0:
-        #     return True # need to think through this again!!!
+        return True
 
-        self.refresh_targets_data()
-        for target in self.description_targets:
-            if target.get('attributes', dict()).get('library_construction', dict()).get('library_layout',
-                                                                                        str()).upper() == 'PAIRED':
-                do_pairing = True
+    def verify_lookup_items(self, stage):
+        """
+        function verifies if stage items have lookups to be resolved
+        :param stage:
+        :return:
+        """
+
+        for item in stage.get("items", list()):
+            if item.get("control", str()) == "copo-lookup":
+                item['data'] = stage['data'].get(item["id"].split(".")[-1], str())
+                item["option_values"] = htags.get_control_options(item)
+
+        return True
+
+    def remove_stage_dependency(self, indx):
+        """
+        function removes resolved stages preceding 'indx'
+        :param stages:
+        :param indx:
+        :return:
+        """
+
+        description = Description().GET(self.description_token)
+
+        stages = description["stages"]
+
+        indx = indx + 1
+
+        safe_stages = stages[:indx]
+        targeted_stages = stages[indx:]
+        cleared_stages = [st for st in targeted_stages if not st.get('dependency', str()) == 'resolved_stage']
+
+        return safe_stages + cleared_stages
+
+    def resolve_next_stage(self, auto_fields):
+        """
+        given data from a stage, function tries to resolve the next stage to be displayed to the user by the wizard
+        :param auto_fields:
+        :return:
+        """
+
+        next_stage_dict = dict(abort=False)
+        current_stage = auto_fields.get("current_stage", str())
+
+        if not current_stage:
+            # no current stage; send signal to abort the wizard
+            next_stage_dict["abort"] = True
+            return next_stage_dict
+
+        # get the description record
+        description = Description().GET(self.description_token)
+
+        if not description:
+            # invalid description; send signal to abort the wizard
+            next_stage_dict["abort"] = True
+            return next_stage_dict
+
+        stages = description["stages"]
+        attributes = description["attributes"]
+        meta = description.get("meta", dict())
+
+        # get next stage index
+        next_stage_index = [indx for indx, stage in enumerate(stages) if stage['ref'] == current_stage]
+
+        if not next_stage_index and not current_stage == 'intro':  # invalid current stage; send abort signal
+            next_stage_dict["abort"] = True
+            return next_stage_dict
+
+        next_stage_index = next_stage_index[0] + 1 if len(next_stage_index) else 0
+
+        # save in-coming stage data, check for changes, re-validate wizard, serve next stage
+        current_stage_dict = stages[next_stage_index - 1]
+        previous_data = attributes.get(current_stage, dict())
+        current_data = DecoupleFormSubmission(auto_fields, current_stage_dict['items']).get_schema_fields_updated_dict()
+
+        # save stage data
+        if current_data and not (current_data == previous_data):
+            attributes[current_stage] = current_data
+            save_dict = dict(attributes=attributes)
+
+            # bundle name saved differently
+            if current_stage == "description_bundle_name":
+                save_dict["name"] = current_data["description_bundle_name"]
+
+            Description().edit_description(self.description_token, save_dict)
+
+            # stage data has changed, refresh wizard
+            next_stage_dict['refresh_wizard'] = True
+
+            # ...also, update rendered stages list
+            if current_stage in meta["rendered_stages"]:
+                srch_indx = meta["rendered_stages"].index(current_stage)
+                meta["rendered_stages"] = meta["rendered_stages"][:srch_indx + 1]
+
+            # generate discrete attributes
+            # if current_stage_dict.get("is_metadata", True):
+            #     self.generate_discrete_stage_attribute(current_stage)
+
+            # remove store object, if any, associated with this description
+            # Description().remove_store_object(store_name=self.store_name, object_key=self.object_key)
+
+            # update meta
+            # meta["generated_columns"] = list()
+
+        # get next stage
+        next_stage_dict['stage'] = self.serve_stage(next_stage_index)
+
+        # refresh values from db after obtaining next stage; there's the chance that things may have changed db-side
+        description = Description().GET(self.description_token)
+        attributes = description["attributes"]
+        meta = description.get("meta", dict())
+
+        if not next_stage_dict['stage']:
+            # no stage to retrieve, this should signal end
+            return next_stage_dict
+
+        # build data dictionary for stage
+        if next_stage_dict['stage']['ref'] in attributes and "data" not in next_stage_dict['stage']:
+            next_stage_dict['stage']['data'] = attributes[next_stage_dict['stage']['ref']]
+
+        # save reference to rendered stage
+        if next_stage_dict['stage']['ref']:
+            meta["last_rendered_stage"] = next_stage_dict['stage']['ref']
+
+            if not next_stage_dict['stage']['ref'] in meta["rendered_stages"]:
+                meta["rendered_stages"].append(next_stage_dict['stage']['ref'])
+
+                # validate description bundle against this stage
+                self.validate_description_targets(next_stage_dict)
+
+                # if we didn't succeed to set stage data from description attributes, try from bundle data
+                if "data" not in next_stage_dict['stage']:
+                    self.set_stage_data(next_stage_dict)
+
+        Description().edit_description(self.description_token, dict(meta=meta))
+
+        if next_stage_dict["stage"].get("apply_to_all", False):  # report constraint in stage
+            next_stage_dict["stage"]["message"] = next_stage_dict["stage"]["message"] + \
+                                                  self.wiz_message["constrained_stage_alert_message"]["text"]
+
+        # get name of description and pass on
+        next_stage_dict["description_label"] = Description().GET(self.description_token).get("name", str())
+
+        # check and resolve value for lookup fields
+        if "data" in next_stage_dict['stage']:
+            self.verify_lookup_items(next_stage_dict['stage'])
+
+        return next_stage_dict
+
+    def serve_stage(self, next_stage_index):
+        """
+        function determines how a given stage should be served
+        :param stage:
+        :return:
+        """
+
+        # start by getting the description record
+        description = Description().GET(self.description_token)
+        stages = description["stages"]
+
+        stage = dict()
+
+        if next_stage_index < len(stages):
+            stage = stages[next_stage_index]
+
+        while True:
+            if "callback" in stage:
+                # resolve stage from callback function
+                try:
+                    wizard_callbacks = wizcb.WizardCallbacks(self)  # callbacks are defined in 'WizardCallbacks'
+                    stage = getattr(wizard_callbacks, stage["callback"])(next_stage_index)
+                except Exception as e:
+                    print('Stage resolution error. Next stage index: ' + str(next_stage_index) + " " + str(e))
+                    stage = dict()
+
+            # we expect a stage that cannot be directly rendered to return a False, thus prompting
+            # progression to the next
+            # stage in the sequence of stages (see below). Such non-renderable stages
+            # may just be processes or stubs meant for resolving other dynamic stages
+            if isinstance(stage, dict):
                 break
 
-        # deactivate dependent stage if not pairing
-        if not do_pairing:
-            stages = self.get_batch_stages()
-            elem = [stage for stage in self.get_batch_stages() if stage['ref'] == "datafiles_pairing"]
+            # refresh stages and index of the next stage - why do this? callbacks can potentially modify things
+            description = Description().GET(self.description_token)
+            stages = description["stages"]
 
-        return do_pairing
+            next_stage_index = next_stage_index + 1  # progress to next index in this very quest for a valid next stage
 
-    def study_type_change(self, item_id, old_value, new_value):
+            if next_stage_index < len(stages):
+                stage = stages[next_stage_index]
+            else:
+                stage = dict()
+                break
+
+        if stage:  # resolve type and data source for stage
+            self.sanitise_stages([stage])
+
+        return stage
+
+    def get_unbundled_datafiles(self):
         """
-        function reacts to a change in the study type (ENA repo-specific), and alters the stages accordingly
-        :param item_id: the item giving rise to the trigger
-        :param old_value:
-        :param new_value:
+        function returns datafiles that are not bundled
         :return:
         """
 
-        if old_value == new_value or not old_value or not new_value:  # no change in target repository
-            return False
+        data_set = list()
 
-        description = self.get_datafile_description()
+        records = cursor_to_list(DataFile().get_collection_handle().find({"$and": [
+            {"profile_id": self.profile_id, 'deleted': d_utils.get_not_deleted_flag()},
+            {"description_token": {"$in": [None, False, ""]}}]},
+            {'name': 1}))
 
-        # now let's deal with changes pertaining to specific items
-        if item_id:
-            blacklist = list()  # list of stages to discard
-            stubs = list()  # the stub that initiated creation of the elements
-            for stage in self.get_datafile_stages():
-                if stage.get("dependent_on", str()) == item_id:
-                    blacklist.append(stage['ref'])
-                    if 'stub_ref' in stage:
-                        stubs.append(stage['stub_ref'])
+        if len(records):
+            df = pd.DataFrame(records)
+            df['_id'] = df._id.astype(str)
+            df["DT_RowId"] = df._id
+            df["chk_box"] = ''
+            df.DT_RowId = 'row_' + df.DT_RowId
+            df = df.drop('_id', axis='columns')
+            data_set = df.to_dict('records')
 
-            # remove blacklisted elements from description stages...
-            description['stages'] = [stage for stage in description['stages'] if stage['ref'] not in blacklist]
+        return data_set
 
-            # also, update the batch stages
-            batch_stages = [stage for stage in description['stages'] if stage['ref'] not in blacklist]
-
-            # ...and from description
-            for bkl in blacklist:
-                if bkl in description['attributes']:
-                    del description['attributes'][bkl]
-
-            # reset batch description object
-            Description().edit_description(self.description_token, dict(attributes=dict()))
-            Description().edit_description(self.description_token, dict(stages=list()))
-
-            # reset from the first stage stub onward to force re-entry into stage activation process
-            stubs = set(stubs)
-            for stage_ref in stubs:
-                listed_stage = [indx for indx, stage in enumerate(description['stages']) if stage['ref'] == stage_ref]
-                if listed_stage:
-                    for i in range(listed_stage[0], len(description['stages'])):
-                        description['stages'][i]['activated'] = False
-
-            # ...and update the db
-            self.update_description(description)
-
-    def library_layout_change(self, item_id, old_value, new_value):
+    def get_description_bundle(self):
         """
-        function reacts to a change in the library layout: basically to clean up metadata
-        :param item_id: the item giving rise to the trigger
-        :param old_value:
-        :param new_value:
+        function returns description bundles
         :return:
         """
 
-        if old_value == new_value or not old_value or not new_value:  # no change in library layout
-            return False
+        data_set = list()
 
-        if new_value.upper() == 'SINGLE':
-            description = self.get_datafile_description()
-            if "datafiles_pairing" in description.get("attributes", dict()):
-                del description['attributes']["datafiles_pairing"]
-                self.update_description(description)
+        records = cursor_to_list(
+            DataFile().get_collection_handle().find(
+                {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
+                {'name': 1}))
 
-        return
+        if len(records):
+            df = pd.DataFrame(records)
+            df['_id'] = df._id.astype(str)
+            df["DT_RowId"] = df._id
+            df["chk_box"] = ''
+            df.DT_RowId = 'row_' + df.DT_RowId
+            df = df.drop('_id', axis='columns')
+            data_set = df.to_dict('records')
 
-    def discard_description(self):
-        object_list = [ObjectId(target["recordID"]) for target in self.description_targets]
+        return data_set
+
+    def generate_discrete_stage_attribute(self, current_stage):
+        """
+        function generates discrete attribute for stage whose stage_ref is provided
+        :param current_stage:
+        :return:
+        """
+
+        description = Description().GET(self.description_token)
+
+        stage = [x for x in description["stages"] if x['ref'] == current_stage]
+        stage = stage[0] if stage else {}
+        attributes = description["attributes"].get(current_stage, dict())
+
+        # object type controls and their corresponding schemas
+        object_controls = d_utils.get_object_array_schema()
+
+        # data and columns lists
+        data = list()
+
+        columns = [dict(title=' ', name='s_n', data="s_n", className='select-checkbox'),
+                   dict(title='Name', name='name', data="name")]
+
+        # aggregate items and data from all rendered stages
+        datafile_items = list()
+        datafile_attributes = dict()  # will be used for generating tabular data
+
+        apply_to_all = stage.get("apply_to_all", False)
+
+        for item in stage.get("items", list()):
+            if str(item.get("hidden", False)).lower() == "false":
+                atrib_val = attributes.get(item["id"], str())
+                item["id"] = stage["ref"] + self.key_split + item["id"]
+                item["apply_to_all"] = apply_to_all
+                datafile_attributes[item["id"]] = atrib_val
+                datafile_items.append(item)
+
+        schema_df = pd.DataFrame(datafile_items)
+
+        for index, row in schema_df.iterrows():
+            resolved_data = htags.resolve_control_output(datafile_attributes, row)
+            label = row["label"]
+
+            # 'apply_to_all' columns are flagged as non-editable in table view
+            column_class = 'locked-column' if row.get("apply_to_all") else ''
+
+            if row['control'] in object_controls.keys():
+                # get object-type-control schema
+                control_df = pd.DataFrame(object_controls[row['control']])
+                control_df['id2'] = control_df['id'].apply(lambda x: x.split(".")[-1])
+
+                if resolved_data:
+                    object_array_keys = [list(x.keys())[0] for x in resolved_data[0]]
+                    object_array_df = pd.DataFrame([dict(pair for d in k for pair in d.items()) for k in resolved_data])
+
+                    for o_indx, o_row in object_array_df.iterrows():
+                        # add primary header/value - first element in object_array_keys taken as header, second value
+                        # e.g., category, value in material_attribute_value schema
+                        # a slightly different implementation will be needed for an object-type-control
+                        # that require a different display structure
+
+                        class_name = self.key_split.join((row.id, str(o_indx), object_array_keys[1]))
+                        columns.append(dict(title=label + " [{0}]".format(o_row[object_array_keys[0]]), data=class_name,
+                                            className=column_class))
+                        data.append({class_name: o_row[object_array_keys[1]]})
+
+                        # add other headers/values e.g., unit in material_attribute_value schema
+                        for subitem in object_array_keys[2:]:
+                            class_name = self.key_split.join((row.id, str(o_indx), subitem))
+                            columns.append(dict(
+                                title=control_df[control_df.id2.str.lower() == subitem.lower()].iloc[0].label,
+                                data=class_name, className=column_class))
+                            data.append({class_name: o_row[subitem]})
+            elif row["type"] == "array":
+                for tt_indx, tt_val in enumerate(resolved_data):
+                    shown_keys = (row["id"], str(tt_indx))
+                    class_name = self.key_split.join(shown_keys)
+                    columns.append(
+                        dict(title=label + " [{0}]".format(str(tt_indx + 1)), data=class_name,
+                             className=column_class))
+
+                    if isinstance(tt_val, list):
+                        tt_val = ', '.join(tt_val)
+
+                    data.append({class_name: tt_val})
+            else:
+                shown_keys = row["id"]
+                class_name = shown_keys
+                columns.append(dict(title=label, data=class_name, className=column_class))
+                val = resolved_data
+
+                if isinstance(val, list):
+                    val = ', '.join(val)
+
+                data.append({class_name: val})
+
+        # get records in bundle
+        records = cursor_to_list(
+            DataFile().get_collection_handle().find(
+                {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
+                {'name': 1, 'description.attributes.' + current_stage: 1}))
+
+        datafiles_df = pd.DataFrame(records)
+        datafiles_df["DT_RowId"] = datafiles_df._id.astype(str)
+        datafiles_df.DT_RowId = 'row_' + datafiles_df.DT_RowId
+
+        datafiles_df.index = datafiles_df._id
+
+        # build display dataset
+        data_record = dict(pair for d in data for pair in d.items())
+        for k, v in data_record.items():
+            datafiles_df[k] = v
+
+        datafiles_df.insert(loc=0, column='s_n', value=[''] * len(records))
+
+        # any record lacking stage data?
+        item_series = datafiles_df['description'].apply(
+            lambda x: x.get('attributes', dict()).get(current_stage, np.nan))
+
+        # split records to those with/out data for current_stage
+        no_description_list = list(item_series[item_series.isna()].index)
+        has_description_series = item_series[~item_series.index.isin(no_description_list)].copy()
+
+        # process datafiles info...
+        # get rendered stages
+        meta = description["meta"]
+        rendered_stages_ref = meta["rendered_stages"]
+        rendered_stages = [x for x in description["stages"] if
+                           x['ref'] in rendered_stages_ref and x.get("is_metadata", True)]
+
+        df_attributes = dict()  # will be copied to records with no previous description data
+
+        for st in rendered_stages:
+            df_attributes[st["ref"]] = description["attributes"].get(st["ref"], dict())
+
+        # copy across wizard's data to records without description or single record case
+        if len(no_description_list) or len(has_description_series) == 1:
+            update_dict = dict(description=dict(stages=rendered_stages, attributes=df_attributes))
+            no_description_list = no_description_list + list(has_description_series.index)
+            DataFile().get_collection_handle().update_many(
+                {"_id": {"$in": no_description_list}},
+                {'$set': update_dict})
+
+        if len(has_description_series) > 1:
+            if apply_to_all:
+                # check for data consistency if apply_to_all stage, where all records in bundle must have same data
+                item_series = has_description_series[has_description_series.astype(str) != str(attributes)]
+
+                if len(item_series):
+                    trgt_list = list(item_series.index)
+
+                    DataFile().get_collection_handle().update_many(
+                        {"_id": {"$in": trgt_list}},
+                        {'$set': {"description.attributes." + current_stage: attributes}})
+
+                # update stage list
+                DataFile().get_collection_handle().update_many(
+                    {"_id": {"$in": list(has_description_series.index)}},
+                    {'$set': {"description.stages": rendered_stages}})
+
+            else:
+                for index, row in schema_df.iterrows():
+                    st_key_split = row.id.split(self.key_split)  # will give [0]: stage ref; [1]: control id
+
+                    # any record lacking current item?
+                    item_series = has_description_series.apply(lambda x: x.get(st_key_split[1], np.nan))
+
+                    trgt_list = list(item_series[item_series.isna()].index)
+
+                    if len(trgt_list):
+                        # update our running series by excluding trgt_list; save data for records in trgt_list
+                        item_series = item_series[~item_series.index.isin(trgt_list)]
+
+                        DataFile().get_collection_handle().update_many(
+                            {"_id": {"$in": list(trgt_list)}},
+                            {'$set': {"description.attributes." + st_key_split[0] + "." + st_key_split[1]: attributes[
+                                st_key_split[1]]}})
+
+                    if not len(item_series):
+                        continue
+
+                    # get records having data different from the wizard's
+                    item_series = item_series[item_series.astype(str) != str(attributes[st_key_split[1]])]
+
+                    if not len(item_series):
+                        continue
+
+                    # records have data different from the wizard's need to resolve this to the attributes dataframe
+                    retained_row_id = row.id
+                    row.id = st_key_split[1]  # update row id momentarily for data resolution
+
+                    item_series_resolved = has_description_series[
+                        has_description_series.index.isin(item_series.index)].apply(htags.resolve_control_output,
+                                                                                    args=(row,))
+
+                    row.id = retained_row_id
+
+                    if row.control in object_controls.keys() or row.type == "array":
+                        # resolve wizard's data, using it to align data for the records
+                        retained_row_id = row.id
+                        row.id = st_key_split[1]  # update row id momentarily for data resolution
+                        df_resolved_data = htags.resolve_control_output(attributes, row)
+
+                        row.id = retained_row_id
+
+                        if not df_resolved_data:
+                            continue
+
+                        # align records - i.e., same number of items in records' data as in wizard's
+                        # we assume here that items having the same length with the wizard's points to a consistent
+                        # set of features (e.g., host, height in sample characteristics)
+
+                        item_series_resolved_less = item_series_resolved[
+                            item_series_resolved.apply(lambda x: len(x)) < len(df_resolved_data)]
+
+                        # align entries, update db, drop column and update resolved dataframe
+                        if len(item_series_resolved_less):
+                            # augment _less items
+                            item_series_resolved_less = item_series_resolved_less.apply(
+                                lambda x: x + df_resolved_data[len(x):])
+
+                            # ...also align actual data and save to db
+                            bulk = DataFile().get_collection_handle().initialize_unordered_bulk_op()
+                            for ser_indx in list(item_series_resolved_less.index):
+                                ser_val = item_series[ser_indx] + attributes[st_key_split[1]][
+                                                                  len(item_series[ser_indx]):]
+                                bulk.find({'_id': ser_indx}).update({'$set': {
+                                    "description.attributes." + st_key_split[0] + "." + st_key_split[
+                                        1]: ser_val}})
+                            bulk.execute()
+
+                            # merge back to item_series_resolved
+                            item_series_resolved = item_series_resolved.loc[
+                                item_series_resolved_less.index] = item_series_resolved_less
+
+                        # update ui-bound dataframe for object controls
+                        if row.control in object_controls.keys():
+                            object_array_keys = [list(x.keys())[0] for x in df_resolved_data[0]]
+
+                            for ii in range(0, len(df_resolved_data)):
+                                class_name = self.key_split.join((row.id, str(ii), object_array_keys[1]))
+                                item_series_resolved_ui = item_series_resolved.apply(
+                                    lambda x: x[ii][1][object_array_keys[1]])
+
+                                datafiles_df.loc[
+                                    list(item_series_resolved_ui.index), class_name] = item_series_resolved_ui
+
+                                for subitem in object_array_keys[2:]:
+                                    class_name = self.key_split.join((row.id, str(ii), subitem))
+                                    sub_index = object_array_keys.index(subitem)
+
+                                    item_series_resolved_ui = item_series_resolved.apply(
+                                        lambda x: x[ii][sub_index][subitem])
+
+                                    datafiles_df.loc[
+                                        list(item_series_resolved_ui.index), class_name] = item_series_resolved_ui
+                        else:
+                            #  update ui-bound dataset for arrays
+                            for tt_indx in range(len(df_resolved_data)):
+                                class_name = self.key_split.join((row.id, str(tt_indx)))
+                                item_series_resolved_ui = item_series_resolved.apply(
+                                    lambda x: ', '.join(x[tt_indx]) if isinstance(x[tt_indx], list) else x[tt_indx])
+
+                                datafiles_df.loc[
+                                    list(item_series_resolved_ui.index), class_name] = item_series_resolved_ui
+                    else:
+                        class_name = row.id
+                        item_series_resolved_ui = item_series_resolved.apply(
+                            lambda x: ', '.join(x) if isinstance(x, list) else x)
+                        datafiles_df.loc[
+                            list(item_series_resolved_ui.index), class_name] = item_series_resolved_ui
+
+        # generate dataset for UI
+        datafiles_df = datafiles_df.drop(['_id', 'description'], axis='columns')
+        data_set = datafiles_df.to_dict('records')
+
+        return dict(columns=columns, rows=data_set)
+
+    def generate_discrete_attributes(self):
+        """
+        function generate discrete attributes for individual datafile editing
+        :return:
+        """
+
+        description = Description().GET(self.description_token)
+
+        # object type controls and their corresponding schemas
+        object_controls = d_utils.get_object_array_schema()
+
+        # data and columns lists
+        data = list()
+
+        columns = [dict(title=' ', name='s_n', data="s_n", className='select-checkbox'),
+                   dict(title='Name', name='name', data="name")]
+
+        attributes = description["attributes"]
+        meta = description["meta"]
+
+        # get rendered stages
+        rendered_stages_ref = meta["rendered_stages"]
+        rendered_stages = [x for x in description["stages"] if
+                           x['ref'] in rendered_stages_ref and x.get("is_metadata", True)]
+        rendered_stages_copy = copy.deepcopy(rendered_stages)  # copy for updating individual records
+
+        # aggregate items and data from all rendered stages
+        datafile_items = list()
+        datafile_attributes = dict()  # will be used for generating tabular data
+        df_attributes = dict()  # will be copied to records with no previous description data
+
+        for st in rendered_stages:
+            apply_to_all = st.get("apply_to_all", False)
+            df_attributes[st["ref"]] = attributes.get(st["ref"], dict())
+            for item in st.get("items", list()):
+                if str(item.get("hidden", False)).lower() == "false":
+                    atrib_val = attributes.get(st["ref"], dict()).get(item["id"], str())
+                    item["id"] = st["ref"] + self.key_split + item["id"]
+                    item["apply_to_all"] = apply_to_all
+                    datafile_attributes[item["id"]] = atrib_val
+                    datafile_items.append(item)
+
+        meta["aggregated_items"] = datafile_items
+        Description().edit_description(self.description_token, dict(meta=meta))
+
+        schema_df = pd.DataFrame(datafile_items)
+
+        for index, row in schema_df.iterrows():
+            resolved_data = htags.resolve_control_output(datafile_attributes, row)
+            label = row["label"]
+
+            # 'apply_to_all' columns are flagged as non-editable in table view
+            column_class = 'locked-column' if row.get("apply_to_all") else ''
+
+            if row['control'] in object_controls.keys():
+                # get object-type-control schema
+                control_df = pd.DataFrame(object_controls[row['control']])
+                control_df['id2'] = control_df['id'].apply(lambda x: x.split(".")[-1])
+
+                if resolved_data:
+                    object_array_keys = [list(x.keys())[0] for x in resolved_data[0]]
+                    object_array_df = pd.DataFrame([dict(pair for d in k for pair in d.items()) for k in resolved_data])
+
+                    for o_indx, o_row in object_array_df.iterrows():
+                        # add primary header/value - first element in object_array_keys taken as header, second value
+                        # e.g., category, value in material_attribute_value schema
+                        # a slightly different implementation will be needed for an object-type-control
+                        # that require a different display structure
+
+                        class_name = self.key_split.join((row.id, str(o_indx), object_array_keys[1]))
+                        columns.append(dict(title=label + " [{0}]".format(o_row[object_array_keys[0]]), data=class_name,
+                                            className=column_class))
+                        data.append({class_name: o_row[object_array_keys[1]]})
+
+                        # add other headers/values e.g., unit in material_attribute_value schema
+                        for subitem in object_array_keys[2:]:
+                            class_name = self.key_split.join((row.id, str(o_indx), subitem))
+                            columns.append(dict(
+                                title=control_df[control_df.id2.str.lower() == subitem.lower()].iloc[0].label,
+                                data=class_name, className=column_class))
+                            data.append({class_name: o_row[subitem]})
+            elif row["type"] == "array":
+                for tt_indx, tt_val in enumerate(resolved_data):
+                    shown_keys = (row["id"], str(tt_indx))
+                    class_name = self.key_split.join(shown_keys)
+                    columns.append(
+                        dict(title=label + " [{0}]".format(str(tt_indx + 1)), data=class_name,
+                             className=column_class))
+
+                    if isinstance(tt_val, list):
+                        tt_val = ', '.join(tt_val)
+
+                    data.append({class_name: tt_val})
+            else:
+                shown_keys = row["id"]
+                class_name = shown_keys
+                columns.append(dict(title=label, data=class_name, className=column_class))
+                val = resolved_data
+
+                if isinstance(val, list):
+                    val = ', '.join(val)
+
+                data.append({class_name: val})
+
+        # get records in bundle
+        records = cursor_to_list(
+            DataFile().get_collection_handle().find(
+                {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
+                {'name': 1, 'description.attributes': 1}))
+
+        datafiles_df = pd.DataFrame(records)
+        datafiles_df["DT_RowId"] = datafiles_df._id.astype(str)
+        datafiles_df.DT_RowId = 'row_' + datafiles_df.DT_RowId
+
+        datafiles_df.index = datafiles_df._id
+
+        # build display dataset
+        data_record = dict(pair for d in data for pair in d.items())
+        for k, v in data_record.items():
+            datafiles_df[k] = v
+
+        datafiles_df.insert(loc=0, column='s_n', value=[''] * len(records))
+
+        no_description_list = list(datafiles_df[datafiles_df.description == {}]['_id'])
+        has_description_df = datafiles_df[datafiles_df.description != {}]
+
+        # copy across wizard's data to records without description or single record case
+        if len(no_description_list) or len(has_description_df) == 1:
+            update_dict = dict(description=dict(stages=rendered_stages_copy, attributes=df_attributes))
+            no_description_list = no_description_list + list(has_description_df['_id'])
+            DataFile().get_collection_handle().update_many(
+                {"_id": {"$in": no_description_list}},
+                {'$set': update_dict})
+
+        if len(has_description_df) > 1:
+            # update stage list
+            DataFile().get_collection_handle().update_many(
+                {"_id": {"$in": list(has_description_df['_id'])}},
+                {'$set': {"description.stages": rendered_stages_copy}})
+
+            for index, row in schema_df.iterrows():
+                st_key_split = row.id.split(self.key_split)  # will give [0]: stage ref; [1]: control id
+
+                # keep track of treatments on records
+                affected_list = list()
+
+                # any record lacking stage data?
+                item_series = has_description_df['description'].apply(
+                    lambda x: x.get('attributes', dict()).get(st_key_split[0], np.nan))
+
+                trgt_list = list(item_series[item_series.isna()].index)
+
+                if len(trgt_list):
+                    affected_list = affected_list + trgt_list
+
+                    DataFile().get_collection_handle().update_many(
+                        {"_id": {"$in": trgt_list}},
+                        {'$set': {"description.attributes." + st_key_split[0]: df_attributes[st_key_split[0]]}})
+
+                # any record lacking current item?
+                item_series = has_description_df['description'].apply(
+                    lambda x: x.get('attributes', dict()).get(st_key_split[0], dict()).get(st_key_split[1], np.nan))
+
+                # filter out already treated records
+                item_series = item_series[~item_series.index.isin(affected_list)]
+                item_series_copy = item_series.copy()
+                trgt_list = list(item_series[item_series.isna()].index)
+
+                if len(trgt_list):
+                    affected_list = affected_list + trgt_list
+
+                    DataFile().get_collection_handle().update_many(
+                        {"_id": {"$in": list(trgt_list)}},
+                        {'$set': {"description.attributes." + st_key_split[0] + "." + st_key_split[1]:
+                                      df_attributes[st_key_split[0]][st_key_split[1]]}})
+
+                # get records having different data from wizard's
+                item_series = item_series_copy
+                item_series = item_series[
+                    item_series.astype(str) != str(df_attributes[st_key_split[0]][st_key_split[1]])]
+
+                item_series = item_series.dropna()
+
+                # filter out already treated records
+                item_series = item_series[~item_series.index.isin(affected_list)]
+
+                if not len(item_series):
+                    continue
+
+                trgt_list = list(item_series.index)
+
+                # check for data consistency if row.apply_to_all
+                # since 'apply_to_all' applies to stage rather than individual controls, update entire stage data
+                if row.apply_to_all:
+                    DataFile().get_collection_handle().update_many(
+                        {"_id": {"$in": trgt_list}},
+                        {'$set': {"description.attributes." + st_key_split[0]: df_attributes[st_key_split[0]]}})
+
+                    continue
+
+                row_resolved_id = row.id + self.key_split + "_resolved"
+
+                has_description_df_resolved = has_description_df[has_description_df.index.isin(trgt_list)].copy()
+                has_description_df_resolved[row_resolved_id] = has_description_df_resolved[
+                    'description'].apply(htags.resolve_control_output_description, args=(row,))
+
+                if row.control in object_controls.keys() or row.type == "array":
+                    # resolve wizard's data, using it to align data for the records
+                    retained_row_id = row.id
+                    row.id = st_key_split[1]  # update row id momentarily for data resolution
+                    df_resolved_data = htags.resolve_control_output(df_attributes[st_key_split[0]], row)
+
+                    row.id = retained_row_id
+
+                    if not df_resolved_data:
+                        continue
+
+                    # align records - i.e., same number of items in records' data as in wizard's
+                    # we assume here that items having the same length with the wizard's data capture a consistent
+                    # set of features (e.g., host, height in sample characteristics)
+                    row_count_val_id = row.id + self.key_split + "_count_val"
+
+                    has_description_df_resolved[row_count_val_id] = has_description_df_resolved[row_resolved_id].apply(
+                        lambda x: len(x))
+                    has_description_df_resolved_2 = has_description_df_resolved[
+                        has_description_df_resolved[row_count_val_id] < len(df_resolved_data)]
+
+                    # align entries, update db, drop column and update resolved dataframe
+                    if len(has_description_df_resolved_2):
+                        # align resolved items
+                        has_description_df_resolved_2[row_resolved_id] = has_description_df_resolved_2[
+                            row_resolved_id].apply(lambda x: x + df_resolved_data[len(x):])
+
+                        # ...also align actual data
+                        has_description_df_resolved_2['_description'] = has_description_df_resolved_2[
+                            'description'].apply(lambda x: x['attributes'][st_key_split[0]][st_key_split[1]] +
+                                                           df_attributes[st_key_split[0]][st_key_split[1]][
+                                                           len(x['attributes'][st_key_split[0]][st_key_split[1]]):])
+
+                        # ...and save to db
+                        bulk = DataFile().get_collection_handle().initialize_unordered_bulk_op()
+                        for xindex, xrow in has_description_df_resolved_2.iterrows():
+                            bulk.find({'_id': xrow._id}).update({'$set': {
+                                "description.attributes." + st_key_split[0] + "." + st_key_split[
+                                    1]: xrow._description}})
+                        bulk.execute()
+
+                        # merge back to has_description_df_resolved
+                        has_description_df_resolved_2 = has_description_df_resolved_2.drop([row_count_val_id],
+                                                                                           axis='columns')
+                        has_description_df_resolved.loc[
+                            has_description_df_resolved_2.index] = has_description_df_resolved_2
+
+                        has_description_df_resolved = has_description_df_resolved.drop([row_count_val_id],
+                                                                                       axis='columns')
+
+                    # update ui-bound dataset for object controls
+                    if row.control in object_controls.keys():
+                        object_array_keys = [list(x.keys())[0] for x in df_resolved_data[0]]
+
+                        for ii in range(0, len(df_resolved_data)):
+                            class_name = self.key_split.join((row.id, str(ii), object_array_keys[1]))
+                            has_description_df_resolved[class_name] = has_description_df_resolved[
+                                row_resolved_id].apply(
+                                lambda x: x[ii][1][object_array_keys[1]])
+
+                            datafiles_df.loc[list(has_description_df_resolved.index), class_name] = \
+                                has_description_df_resolved.loc[list(has_description_df_resolved.index), class_name]
+
+                            for subitem in object_array_keys[2:]:
+                                class_name = self.key_split.join((row.id, str(ii), subitem))
+                                sub_index = object_array_keys.index(subitem)
+
+                                has_description_df_resolved[class_name] = has_description_df_resolved[
+                                    row_resolved_id].apply(lambda x: x[ii][sub_index][subitem])
+
+                                datafiles_df.loc[list(has_description_df_resolved.index), class_name] = \
+                                    has_description_df_resolved.loc[list(has_description_df_resolved.index), class_name]
+                    else:
+                        #  update ui-bound dataset for arrays
+                        for tt_indx in range(len(df_resolved_data)):
+                            class_name = self.key_split.join((row.id, str(tt_indx)))
+                            has_description_df_resolved[class_name] = has_description_df_resolved[
+                                row_resolved_id].apply(
+                                lambda x: ', '.join(x[tt_indx]) if isinstance(x[tt_indx], list) else x[tt_indx])
+
+                            datafiles_df.loc[list(has_description_df_resolved.index), class_name] = \
+                                has_description_df_resolved.loc[list(has_description_df_resolved.index), class_name]
+                else:
+                    class_name = row.id
+                    has_description_df_resolved[row_resolved_id] = has_description_df_resolved[row_resolved_id].apply(
+                        lambda x: ', '.join(x) if isinstance(x, list) else x)
+                    has_description_df_resolved[class_name] = has_description_df_resolved[row_resolved_id]
+
+                    datafiles_df.loc[list(has_description_df_resolved.index), class_name] = \
+                        has_description_df_resolved.loc[list(has_description_df_resolved.index), class_name]
+
+        # generate dataset for UI
+        datafiles_df = datafiles_df.drop(['_id', 'description'], axis='columns')
+        data_set = datafiles_df.to_dict('records')
+
+        return dict(columns=columns, rows=data_set)
+
+    def get_cell_control(self, cell_reference, record_id):
+        """
+        function builds control for a UI data cell
+        :param cell_reference:
+        :param row_data:
+        :return:
+        """
+
+        # object type controls and their corresponding schemas
+        object_controls = d_utils.get_object_array_schema()
+
+        # get constituent parts of the cell id - use this to determine stage and control of interest
+        key = cell_reference.split(self.key_split)
+
+        # get description record and retrieve relevant schema
+        description = Description().GET(self.description_token)
+        meta = description["meta"]
+        schema = meta["aggregated_items"]
+
+        parent_schema = [f for f in schema if f["id"] == key[0] + self.key_split + key[1]]
+        parent_schema = parent_schema[0] if parent_schema else {}
+        control_schema = parent_schema
+
+        if parent_schema.get("control", str()) in object_controls.keys():
+            control_schema = [f for f in object_controls[control_schema['control']] if
+                              f["id"].split(".")[-1] == key[3]]
+            control_schema = control_schema[0] if control_schema else {}
+
+        # compose return object
+        result_dict = dict()
+
+        # get target record
+        record_attributes = DataFile().get_record(record_id)['description']['attributes']
+        result_dict["schema_data"] = record_attributes[key[0]][key[1]]
+
+        if "option_values" in control_schema:
+            control_schema["data"] = result_dict["schema_data"]
+            control_schema["option_values"] = htags.get_control_options(control_schema)
+
+        result_dict["control_schema"] = control_schema
+
+        if parent_schema.get("control", str()) in object_controls.keys():
+            result_dict["schema_data"] = record_attributes[key[0]][key[1]][int(key[2])][key[3]]
+        elif parent_schema["type"] == "array":
+            result_dict["control_schema"]["type"] = "string"  # constraints control to be rendered as an non-array
+            result_dict["schema_data"] = record_attributes[key[0]][key[1]][int(key[2])]
+
+        return result_dict
+
+    def save_cell_data(self, cell_reference, record_id, auto_fields):
+        """
+        function save updated cell data; for the target record_id
+        :param cell_reference:
+        :param record_id:
+        :param auto_fields:
+        :return:
+        """
+        result = dict(status='success', value='')
+
+        # object type controls and their corresponding schemas
+        object_controls = d_utils.get_object_array_schema()
+
+        # get cell schema
+        control_schema = dict()
+
+        key = cell_reference.split(self.key_split)
+
+        # gather parameters for validation
+        validation_parameters = dict(schema=dict(), data=str())
+
+        # get description record and retrieve relevant schema
+        description = Description().GET(self.description_token)
+        meta = description["meta"]
+        schema = meta["aggregated_items"]
+
+        parent_schema = [f for f in schema if f["id"] == self.key_split.join((key[0], key[1]))]
+        parent_schema = parent_schema[0] if parent_schema else {}
+        control_schema = parent_schema
+        validation_parameters["schema"] = control_schema
+
+        if parent_schema.get("control", str()) in object_controls.keys():
+            control_schema = [f for f in object_controls[control_schema['control']] if
+                              f["id"].split(".")[-1] == key[3]]
+            control_schema = control_schema[0] if control_schema else {}
+
+        # resolve the new entry using the control schema
+        resolved_data = DecoupleFormSubmission(auto_fields, [control_schema]).get_schema_fields_updated_dict()
+
+        # get target record
+        record = DataFile().get_record(record_id)
+        record_attributes = record['description']['attributes']
+
+        if parent_schema.get("control", str()) in object_controls.keys():
+            # i.e., [stage-dict][control-dict][index][sub-control-dict]
+            record_attributes[key[0]][key[1]][int(key[2])][key[3]] = resolved_data[key[3]]
+            validation_parameters["data"] = record_attributes[key[0]][key[1]][int(key[2])]
+            result["value"] = htags.get_resolver(resolved_data[key[3]], control_schema)
+        elif parent_schema["type"] == "array":
+            record_attributes[key[0]][key[1]][int(key[2])] = resolved_data[self.key_split.join((key[0], key[1]))][0]
+            validation_parameters["data"] = resolved_data[self.key_split.join((key[0], key[1]))][0]
+            result["value"] = htags.get_resolver(resolved_data[self.key_split.join((key[0], key[1]))][0],
+                                                 control_schema)
+        else:
+            record_attributes[key[0]][key[1]] = resolved_data[self.key_split.join((key[0], key[1]))]
+            validation_parameters["data"] = resolved_data[self.key_split.join((key[0], key[1]))]
+            result["value"] = htags.get_resolver(resolved_data[self.key_split.join((key[0], key[1]))], control_schema)
+
+        # ...this to get lists to render properly
+        if isinstance(result["value"], list):
+            result["value"] = " ".join(result["value"])
+
+        # kick in some validation here before proceeding to save!
+        validate_status = self.do_validation(validation_parameters)
+
+        result["status"] = validate_status["status"]
+        result["message"] = validate_status["message"]
+
+        # return if error
+        if result["status"] == "error":
+            return result
+
+        _id = record.pop('_id', None)
+
+        if _id:
+            DataFile().get_collection_handle().update(
+                {"_id": _id},
+                {'$set': record})
+
+        # refresh stored dataset with new display value
+        # try:
+        #     with pd.HDFStore(self.store_name) as store:
+        #         gd_df = store[self.object_key]
+        #         gd_df.loc[gd_df.loc[gd_df['DT_RowId'].isin(["row_" + record_id])].index, cell_reference] = result[
+        #             "value"]
+        #         store[self.object_key] = gd_df
+        # except Exception as e:
+        #     lg.log('HDF5 Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+
+        return result
+
+    def batch_update_cells(self, cell_reference, record_id, target_rows):
+        """
+        function uses a reference cell to update a batch of records
+        :param cell_reference:
+        :param record_id:
+        :param target_rows:
+        :return:
+        """
+
+        # to enhance performance UI-side, use the refresh_threshold to decide if to send back the entire dataset
+        refresh_threshold = 1000
+
+        result = dict(status='success', value='')
+
+        # object type controls and their corresponding schemas
+        object_controls = d_utils.get_object_array_schema()
+
+        key = cell_reference.split(self.key_split)
+
+        # gather parameters for validation
+        validation_parameters = dict(schema=dict(), data=str())
+
+        # get description record and retrieve relevant schema
+        description = Description().GET(self.description_token)
+        meta = description["meta"]
+        schema = meta["aggregated_items"]
+
+        parent_schema = [f for f in schema if f["id"] == self.key_split.join((key[0], key[1]))]
+        parent_schema = parent_schema[0] if parent_schema else {}
+        control_schema = parent_schema
+        validation_parameters["schema"] = control_schema
+
+        if parent_schema.get("control", str()) in object_controls.keys():
+            control_schema = [f for f in object_controls[control_schema['control']] if
+                              f["id"].split(".")[-1] == key[3]]
+            control_schema = control_schema[0] if control_schema else {}
+
+        # get target record
+        record = DataFile().get_record(record_id)
+        record_attributes = record['description']['attributes']
+
+        if parent_schema.get("control", str()) in object_controls.keys():
+            # i.e., [stage-dict][control-dict][index][sub-control-dict]
+            resolved_data = record_attributes[key[0]][key[1]][int(key[2])][key[3]]
+            validation_parameters["data"] = record_attributes[key[0]][key[1]][int(key[2])]
+            result["value"] = htags.get_resolver(resolved_data, control_schema)
+        elif parent_schema["type"] == "array":
+            resolved_data = record_attributes[key[0]][key[1]][int(key[2])]
+            validation_parameters["data"] = resolved_data
+            result["value"] = htags.get_resolver(resolved_data, control_schema)
+        else:
+            resolved_data = record_attributes[key[0]][key[1]]
+            validation_parameters["data"] = resolved_data
+            result["value"] = htags.get_resolver(resolved_data, control_schema)
+
+        # ...this to get lists to render properly
+        if isinstance(result["value"], list):
+            result["value"] = " ".join(result["value"])
+
+        # kick in some validation here before proceeding to save!
+        validate_status = self.do_validation(validation_parameters)
+
+        result["status"] = validate_status["status"]
+        result["message"] = validate_status["message"]
+
+        # terminate if error
+        if result["status"] == "error":
+            return result
+
+        # update db records
+        object_ids = [ObjectId(x.split("row_")[-1]) for x in target_rows]
+
+        if parent_schema.get("control", str()) in object_controls.keys():
+            DataFile().get_collection_handle().update_many(
+                {"_id": {"$in": object_ids}},
+                {'$set': {"description" + "." + "attributes" + "." + key[0] + "." + key[1] + "." + key[2] + "." + key[
+                    3]: resolved_data}})
+        elif parent_schema["type"] == "array":
+            DataFile().get_collection_handle().update_many(
+                {"_id": {"$in": object_ids}},
+                {'$set': {
+                    "description" + "." + "attributes" + "." + key[0] + "." + key[1] + "." + key[2]: resolved_data}})
+        else:
+            DataFile().get_collection_handle().update_many(
+                {"_id": {"$in": object_ids}},
+                {'$set': {"description" + "." + "attributes" + "." + key[0] + "." + key[1]: resolved_data}})
+
+        # refresh stored dataset with new display value
+        # try:
+        #     with pd.HDFStore(self.store_name) as store:
+        #         gd_df = store[self.object_key]
+        #         gd_df.loc[gd_df.loc[gd_df['DT_RowId'].isin(target_rows)].index, cell_reference] = result["value"]
+        #         store[self.object_key] = gd_df
+        #
+        #         if len(target_rows) > refresh_threshold:
+        #             result["data_set"] = gd_df.to_dict('records')
+        # except Exception as e:
+        #     lg.log('HDF5 Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+
+        return result
+
+    def discard_description(self, description_targets):
+        """
+        function deletes description metadata from target records
+        :param description_targets:
+        :return:
+        """
+        object_list = [ObjectId(x.split("row_")[-1]) for x in description_targets]
 
         DataFile().get_collection_handle().update_many(
             {"_id": {"$in": object_list}}, {"$set": {"description": dict()}}
         )
 
-    def get_description_stages(self):
-        stages = list()
-        target_repository = self.get_batch_attributes()["target_repository"][0]
-        if target_repository:
-            stages = d_utils.json_to_pytype(lkup.WIZARD_FILES[target_repository['deposition_context']])['properties']
-
-        return stages
-
-    def is_same_metadata(self, stage_ref):
+    def do_validation(self, validation_parameters):
         """
-        function checks if same metadata is shared by the description targets in a given description stage
-        :param stage_ref: reference of the target stage
-        :return: boolean; True if same metadata is shared
-        """
-        same_metadata = True
-        targets_data = list()
-        for target in self.description_targets:
-            self.set_datafile_id(target["recordID"])
-            target_description = self.get_datafile_description()['attributes']
-            if stage_ref in target_description:
-                targets_data.append(target_description[stage_ref])
-            else:
-                targets_data.append(dict())
-
-        for td in targets_data[1:]:
-            if td != targets_data[0]:
-                same_metadata = False
-                break
-
-        return same_metadata
-
-    def inherit_metadata(self, reference_target_id):
-        """
-        using reference_target as the basis, copy metadata across to description targets
-        :param reference_target_id:
+        validates supplied entry
+        :param validation_parameters: dict(schema=dict(), data=str())
         :return:
         """
+        validation_result = dict(status="success", message="")
 
-        reference_description = DataFile().get_record(reference_target_id).get("description", dict())
-        reference_description = self.remove_suppressed_stages(reference_description)
+        schema = validation_parameters.get("schema", dict())
+        data = validation_parameters.get("data", str())
 
-        reference_attributes = reference_description.get("attributes", dict())
-        reference_stages = reference_description.get("stages", list())
+        # validate required attributes
+        if "required" in schema and str(schema["required"]).lower() == "true":
+            if isinstance(data, str) and data.strip() == str():
+                validation_result["status"] = "error"
+                validation_result["message"] = "This is a required attribute!"
 
-        for target in self.description_targets:
-            # 'focus' on target
-            self.set_datafile_id(target["recordID"])
+                return validation_result
 
-            # use batch stages to update targets
-            self.update_datafile_stage(reference_stages)
+                # should probably add validation for object types here, that might need some thinking with nested dicts
 
-            # add attributes from the reference datafile
-            for k, v in reference_attributes.items():
-                if k not in self.get_datafile_attributes():
-                    self.update_datafile_attributes({'ref': k, 'data': v})
+        # validate unique attributes
+        if "unique" in schema and str(schema["unique"]).lower() == "true":
+            if isinstance(data, str) and DataFile().get_collection_handle().find(
+                    {schema["id"].split(".")[-1]: {'$regex': "^" + data + "$",
+                                                   "$options": 'i'}}).count() >= 1:
+                validation_result["status"] = "error"
+                validation_result["message"] = "This is a unique attribute!"
 
-        self.update_targets_datafiles()
-        return
+                return validation_result
 
-    def datafile_pairing(self):
-        """
-        pair datafiles - in the context of an ENA description. file to be paired must
-        satisfy the following constraints:
-            1. mutually exclusive - isn't already paired to another file
-            2. symmetric - given two files 'file1', 'file2'. if file1 is paired to file2, file2 must be paired to file1
-            3. must have the same metadata
-        :return:
-        """
+                # should probably add validation for object types here, that might need some thinking though
 
-        paired_list = list()
-        for pairing_target in self.description_targets:
-            paired_list.append(pairing_target)
-            if len(paired_list) == 2:
-                # first test - are both files unpaired?
-                paired_files = list()
-                for target in paired_list:
-                    # set 'focus' to target
-                    self.set_datafile_id(target["recordID"])
+        # validate characteristics attributes
+        if schema.get("control", str()) == "copo-characteristics":
+            if set(['value', 'unit']) < set(data.keys()):
+                value = data['value']['annotationValue'].strip()
+                unit = data['unit']['annotationValue'].strip()
 
-                    paired_file = self.get_datafile_attributes().get("datafiles_pairing", dict()).get("paired_file",
-                                                                                                      str())
-                    paired_files.append(paired_file)
-
-                if len(set(paired_files)) == 1 and list(set(paired_files))[0] == str():  # i.e., no previous pairing
-                    # do pairing
-                    self.set_datafile_id(paired_list[0]["recordID"])
-                    description = self.get_datafile_description()
-
-                    description['attributes']["datafiles_pairing"] = dict(paired_file=paired_list[1]["recordID"])
-                    self.update_description(description)
-
-                    self.set_datafile_id(paired_list[1]["recordID"])
-                    description = self.get_datafile_description()
-
-                    description['attributes']["datafiles_pairing"] = dict(paired_file=paired_list[0]["recordID"])
-                    self.update_description(description)
-
-                    # paired files must have the same metadata too...
-
-                paired_list = list()
-
-        self.update_targets_datafiles()
-
-        return True
-
-    def datafile_unpairing(self):
-        """
-        performs unpairing of datafiles in the context of an ENA description.
-        :return:
-        """
-
-        unpaired = True
-
-        # first test, are both files free of previous pairing?
-        paired_files = list()
-        for target in self.description_targets:
-            # set 'focus' to target
-            self.set_datafile_id(target["recordID"])
-            description = self.get_datafile_description()
-            del description['attributes']["datafiles_pairing"]
-
-            self.update_description(description)
-
-        self.update_targets_datafiles()
-
-        return unpaired
-
-    def validate_bundle_candidates(self, description_bundle):
-        """
-        validates candidates to be added to description bundle to ascertain 'compatibility' between
-        new description targets and already existing items in the description bundle
-        :param description_bundle:
-        :return: validation result
-        """
-
-        # maintain a copy of the original targets
-        original_targets = list(self.description_targets)
-
-        # validate targets against one another
-        result_dict = self.validate_prospective_targets()
-
-        if description_bundle:
-            # validate targets against one another as well as existing items in the bundle
-            validation_code = result_dict["validation_code"]
-            if validation_code in ["100", "101"]:
-                # targets are compatible with one another, also there may be some datafiles ahead
-                # in description metadata,
-                # it should now be sufficient only to verify that
-                # at least one of the targets is compatible with at least one item in the bundle
-
-                selected_bundle_item = description_bundle[0]
-                selected_target = self.description_targets[0]
-
-                if validation_code == "101":
-                    # "101": "Some targets are ahead of others! Inherit metadata?"
-                    # item with the most metadata is preferred here for obvious reason
-
-                    selected_target = result_dict["extra_information"]["target"]
-
-                description_targets = [selected_bundle_item, selected_target]
-                self.set_description_targets(description_targets)
-
-                result_dict = self.validate_prospective_targets()
-
-                # resolve results
-                if result_dict["validation_code"] == "100" and validation_code == "101":
-                    result_dict = self.get_validation_result("101")
-                    self.set_datafile_id(selected_target["recordID"])
-
-                    reference_description = self.remove_suppressed_stages(self.get_datafile_description())
-                    summary = htags.resolve_description_data(reference_description, dict())
-
-                    result_dict["extra_information"] = dict(summary=summary, target=selected_target)
-                elif result_dict["validation_code"] == "101":
-                    local_target = result_dict["extra_information"]["target"]
-                    if local_target["recordID"] == selected_target["recordID"]:
-                        result_dict = self.get_validation_result("103")
-                    elif local_target["recordID"] == selected_bundle_item["recordID"]:
-                        result_dict = self.get_validation_result("101")
-
-                    self.set_datafile_id(local_target["recordID"])
-
-                    reference_description = self.remove_suppressed_stages(self.get_datafile_description())
-                    summary = htags.resolve_description_data(reference_description, dict())
-
-                    result_dict["extra_information"] = dict(summary=summary, target=local_target)
-
-        # set data for candidates
-        self.set_description_targets(original_targets)
-        self.refresh_targets_data()
-        result_dict["extra_information"]["candidates_data"] = self.description_targets
-
-        return result_dict
-
-    def remove_suppressed_stages(self, description_object):
-        """
-        function removes stage data, not to be cloned, from description_object
-        :param description_object: description dictionary comprising of stages and attributes
-        :return:
-        """
-        stages = list(description_object.get("stages", list()))
-
-        for indx, stage in enumerate(stages):
-            ref = stage.get("ref", str())
-            if not stage.get("is_clonable", True):
-                description_object.get("attributes", dict()).pop(ref, None)
-
-        return description_object
-
-    def get_validation_result(self, code):
-        validation_codes = {
-            "100": "Targets are compatible, and may be described as a bundle!",
-            "101": "Some targets are ahead of others! Inherit metadata?",
-            "102": "Targets have incompatible metadata!",
-            "103": "Some targets are ahead of bundle items! Inherit metadata?",
-        }
-
-        result_dict = dict(
-            validation_code=code,
-            validation_message=validation_codes.get(code),
-            extra_information=dict()
-        )
-
-        return result_dict
-
-    def validate_prospective_targets(self):
-        """
-        validates candidates to be added to description bundle to ascertain compatibility
-        :return: validation result
-        """
-
-        result_dict = self.get_validation_result("100")
-
-        # extract useful attributes for validation
-        stages_union = dict()
-        attributes_counts = list()
-        benchmark_target = None
-        benchmark_count = -1
-
-        for target in self.description_targets:
-            # 'focus' on target
-            self.set_datafile_id(target["recordID"])
-
-            target["attributes"] = self.get_datafile_attributes()
-
-            # store count of attributes
-            if len(target["attributes"]) not in attributes_counts:
-                attributes_counts.append(len(target["attributes"]))
-
-            if len(target["attributes"]) > benchmark_count:
-                benchmark_target = target
-                benchmark_count = len(target["attributes"])
-
-            for stage in self.get_datafile_stages():
-                if stage.get("is_singular_stage", False) and stage.get("ref") not in stages_union.keys():
-                    stages_union[stage.get("ref")] = list()
-
-            for su in stages_union:
-                if su in target["attributes"]:
-                    stages_union[su].append(target["attributes"].get(su))
-
-        # perform metadata compatibility test
-        compatible = True
-        for k, v in stages_union.items():
-            if len(v) > 1 and not all(x == v[0] for x in v):
-                compatible = False
-                result_dict = self.get_validation_result("102")
-                break
-
-        if compatible:
-            # perform metadata alignment test
-            if len(attributes_counts) > 1 and benchmark_target:
-                # there is at least one target with metadata ahead of the rest
-                result_dict = self.get_validation_result("101")
-                self.set_datafile_id(benchmark_target["recordID"])
-
-                reference_description = self.remove_suppressed_stages(self.get_datafile_description())
-                summary = htags.resolve_description_data(reference_description, dict())
-
-                result_dict["extra_information"] = dict(summary=summary, target=benchmark_target)
-
-        return result_dict
-
-    def is_target_member(self, datafile_id):
-        """
-        function checks if datafile_id is in the description target
-        :param datafile_id:
-        :return:
-        """
-
-        in_target = False
-
-        l = [x for x in self.description_targets if x["recordID"] == datafile_id]
-
-        if len(l) != 0:
-            in_target = True
-
-        return in_target
-
-    def negotiate_datafile_pairing(self):
-        """
-        separate description targets groups of into paired, need to be paired, don't pair
-        :return:
-        """
-        unpaired_list = list()  # datafiles that need to be paired
-        paired_in_bundle_list = list()  # already paired and the pair is in bundle
-        paired_not_in_bundle_list = list()  # paired, but one of the pair isn't in the bundle
-        do_not_pair_list = list()  # not to be paired
-        targets_record_ids = list()
-        add_to_bundle = list()  # will be used to dynamically update bundle
-        self.refresh_targets_data()  # update with current db state
-        for target in self.description_targets:
-            targets_record_ids.append(target.get('recordID'))
-            if target.get('attributes', dict()).get('library_construction', dict()).get('library_layout',
-                                                                                        str()) != 'PAIRED':
-                do_not_pair_list.append(target)
-            else:
-                # paired or needs to be paired
-                paired_file = target.get('attributes', dict()).get('datafiles_pairing', dict()).get('paired_file',
-                                                                                                    str())
-                if paired_file == str():
-                    # not yet paired, needs to be paired
-                    unpaired_list.append(target.get('recordID'))
-                else:
-                    # paired...keep unique pairs (pairing is commutative)
-                    temp_list = [target.get('recordID'), paired_file]
-
-                    if self.is_target_member(paired_file):
-                        temp_list.sort()  # sort here for uniqueness test
-                        paired_in_bundle_list.append(temp_list) if temp_list not in paired_in_bundle_list else ''
-                    else:
-                        paired_not_in_bundle_list.append(temp_list)
-
-        # are there any paired but not in bundle?
-        if paired_not_in_bundle_list:
-            pass
-            # here we will attempt to validate pairs in the list:
-            # i.e., where possible, add missing pair member to the bundle
-            # (if they can be found, and are not paired to another file).
-            # where we can't validate a pair, we unpair the member which is part of the description target.
-
-            for pnb in paired_not_in_bundle_list:
-                paired_member_0_id = pnb[0]  # datafile in description targets
-                paired_member_1_id = pnb[1]  # datafile not in description targets, needs to be resolved
+                is_numeric = False
                 try:
-                    paired_member_1 = DataFile().get_record(paired_member_1_id)
-                    paired_file = paired_member_1.get("description", dict()).get('attributes', dict()).get(
-                        'datafiles_pairing', dict()).get('paired_file',
-                                                         str())
-                    if paired_file and paired_file == paired_member_0_id:  # paired, add to description bundle
-                        option = dict(recordLabel=paired_member_1.get("name", str()),
-                                      recordID=str(paired_member_1.get("_id", str())),
-                                      attributes=paired_member_1.get("description", dict()).get("attributes", dict())
-                                      )
-                        add_to_bundle.append(option)
-                        # also, add to paired list
-                        pnb.sort()
-                        paired_in_bundle_list.append(pnb) if pnb not in paired_in_bundle_list else ''
-                    else:  # paired to another, or not at all
-                        #  add the file to unpaired list, making it available for pairing
-                        unpaired_list.append(paired_member_0_id)
-                except:
-                    # can't resolve, add member to unpaired list
-                    unpaired_list.append(paired_member_0_id)
-
-        self.description_targets.extend(add_to_bundle)  # update description targets with new members
-        self.set_description_targets(list(self.description_targets))  # set and refresh targets data
-        self.refresh_targets_data()
-        pairing_dict = dict(
-            unpaired_list=[x for x in self.description_targets if x["recordID"] in unpaired_list],
-            paired_list=[[y for y in self.description_targets if y["recordID"] in x] for x in paired_in_bundle_list],
-            add_to_bundle=add_to_bundle,
-            do_not_pair_list=do_not_pair_list
-        )
-
-        # can we try to suggest potential pairings for files in the unpaired list?
-
-        suggested_pairings = list()
-        copied_unpaired_list = list(pairing_dict["unpaired_list"])
-
-        #  let's assume 'R1.fastq.gz' and 'R2.fastq.gz' naming convention, then ordinary 'sort' should suffice
-        new_sorted_list = sorted(copied_unpaired_list, key=itemgetter('recordLabel'))
-
-        if len(new_sorted_list) > 1:
-            if len(new_sorted_list) % 2 != 0:
-                # uneven number of files to be paired
-                # we might have to remove a file from the start or end of the list before suggesting pairing
-                # to do that, we compute how similar the top three files are and use that metric to decide
-                d01 = difflib.SequenceMatcher(None, new_sorted_list[0]["recordLabel"],
-                                              new_sorted_list[1]["recordLabel"]).ratio()
-                d12 = difflib.SequenceMatcher(None, new_sorted_list[1]["recordLabel"],
-                                              new_sorted_list[2]["recordLabel"]).ratio()
-                if d01 > d12:
-                    new_sorted_list = new_sorted_list[:-1]
-                else:
-                    new_sorted_list = new_sorted_list[1:]
-
-            while len(new_sorted_list) >= 2:
-                suggested_pairings.append([new_sorted_list.pop(0), new_sorted_list.pop(0)])
-
-        pairing_dict["suggested_pairings"] = suggested_pairings
-
-        return pairing_dict
-
-    def is_description_mismatch(self, auto_fields):
-        """
-        function verifies if description targets have any mismatch with submitted stage description
-        :param auto_fields: form entries
-        :return: boolean; True if there is a mismatch
-        """
-        # get target stage reference
-        current_stage = auto_fields["current_stage"]
-
-        # get target stage dictionary
-        stage = self.get_batch_stage(current_stage)
-
-        # build data dictionary
-        data = DecoupleFormSubmission(auto_fields, d_utils.json_to_object(stage).items).get_schema_fields_updated()
-
-        description_mismatch = False
-        for target in self.description_targets:
-            self.set_datafile_id(target["recordID"])
-            target_description = self.get_datafile_description()['attributes']
-            if current_stage in target_description:
-                if data != target_description[current_stage]:
-                    description_mismatch = True
-                    break
-
-        return description_mismatch
-
-    def get_dynamic_elements_ena(self, stub_ref):
-        """
-        function generates dynamic stages for ENA based on the study type
-        :param stub_ref: the reference of the stub stage
-        :return:
-        """
-
-        study_type = self.get_batch_attributes()["study_type"][0]
-        if not study_type:
-            return list()
-
-        study_type = study_type['study_type']
-
-        # get protocols
-        protocols = ISAHelpers().get_protocols_parameter_values(study_type)
-
-        # get study assay schema
-        schema_fields = getattr(DataSchemas("COPO").get_ui_template_as_obj().copo, study_type).fields
-
-        # generate dynamic stages from protocols
-        dynamic_stages = list()
-
-        # get message dictionary
-        message_dict = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["datafile_wizard"])["properties"]
-
-        for pr in protocols:
-            if len(pr.get("parameterValues", list())) > 0:
-
-                title = pr.get("name", str()).title()
-                ref = pr.get("name", str()).replace(" ", "_")
-                message = message_dict.get(ref + "_message", dict()).get("text", str())
-
-                stage_dict = dict(title=title,
-                                  ref=ref,
-                                  message=message,
-                                  dependent_on=str("study_type"),
-                                  stub_ref=stub_ref,
-                                  items=list()
-                                  )
-
-                for f in schema_fields:
-                    if f.ref in pr.get("parameterValues", list()):
-                        if f.show_in_form:
-                            elem = htags.get_element_by_id(f.id)
-                            elem["id"] = elem['id'].strip(".").rsplit(".", 1)[1]
-                            del elem['ref']
-                            stage_dict.get("items").append(elem)
-
-                            # define trigger for library layout: better to maintain in here than in multiple assay files
-                            if elem["id"] == "library_layout":
-                                elem["trigger"] = {
-                                    "type": "change",
-                                    "message": "Changing the library layout will lead to some adjustments in the wizard to reflect update to the metadata requirements. <br/><br/>Please note that previous entries may be lost as a result of the change.",
-                                    "callback": {
-                                        "function": "library_layout_change",
-                                        "parameter": "item_id,old_value,new_value"
-                                    }
-                                }
-
-                dynamic_stages.append(stage_dict)
-
-        return dynamic_stages
-
-    def validate_figshare_token(self):
-        t = Figshare().get_token_for_user(user_id=data_utils.get_current_user().id)
-        if t:
-            return False
-        else:
-            return True
-
-    def set_items_type(self, stage):
-        for item in stage.get("items", list()):
-            if not item.get("type"):
-                item["type"] = "string"
-
-            # also get id in the desired order
-            item["id"] = item["id"].split(".")[-1]
-
-        return stage
-
-    def handle_save_triggers(self, **param_dict):
-        """
-        takes care of dispatching calls to trigger functions
-        :param param_dict:
-        :return:
-        """
-
-        # use param dictionary to collect relevant parameter values for callback functions
-        stage = param_dict.get("stage", dict())
-        old_data = param_dict.get("old_data", dict())
-        new_data = param_dict.get("new_data", dict())
-
-        stage_ref = stage.get("ref", str())
-
-        param_dict["stage_ref"] = stage_ref
-
-        # go through all items in the stage and fire any defined triggers
-        for sti in stage.get("items", list()):
-            param_dict["item_id"] = sti['id']  # parameter value
-
-            trigger_elem = sti.get("trigger", dict())
-            if trigger_elem:
-                param_dict["new_value"] = new_data[sti['id']]  # parameter value
-                param_dict["old_value"] = str()  # parameter value
-                if old_data.get(sti['id'], str()):
-                    param_dict["old_value"] = old_data[sti['id']]  # parameter value
-
-                # get callback function
-                call_back_function = trigger_elem.get("callback", dict()).get("function", str())
-
-                # get callback parameters and sort out callback function arguments
-                call_back_parameter = trigger_elem.get("callback", dict()).get("parameter", str())
-
-                # resolve relevant arguments for this call
-                args = d_utils.get_args_from_parameter(call_back_parameter, param_dict)
-
-                try:
-                    getattr(WizardHelper, call_back_function)(self, *args)
-                except:
+                    float(value)
+                    is_numeric = True
+                except ValueError:
                     pass
 
-        return
+                if is_numeric and not unit:
+                    validation_result["status"] = "error"
+                    validation_result["message"] = "Numeric value requires a unit!"
+
+                    # commenting out the 'elif' condition below prevents an update lock up;
+                    # a case where you can't update the value because of the unit, and vice versa
+
+                    return validation_result
+
+        return validation_result
+
+    def get_description_records(self):
+        """
+        function returns description records
+        :return:
+        """
+
+        data_set = list()
+
+        projection = dict(name=1)
+        filter_by = dict(profile_id=self.profile_id, component=self.component)
+
+        if self.description_token:
+            filter_by["_id"] = ObjectId(self.description_token)
+
+        records = Description().get_all_records_columns(sort_by='created_on', sort_direction=1, projection=projection,
+                                                        filter_by=filter_by)
+
+        if records:
+            df = pd.DataFrame(records)
+            df['id'] = df._id.astype(str)
+            df['name'] = df['name'].replace('', 'N/A')
+
+            data_set = df.to_dict('records')
+
+        return data_set
+
+    def get_description_record_details(self):
+        """
+        function returns description detail
+        :return:
+        """
+
+        description = Description().GET(self.description_token)
+
+        number_of_datafiles = DataFile().get_collection_handle().count(
+            {'description_token': str(description['_id']), 'deleted': d_utils.get_not_deleted_flag()})
+
+        name = description['name']
+        created_on = htags.resolve_datetime_data(description['created_on'], dict())
+
+        attributes = description['attributes']
+        meta = description["meta"]
+
+        # get rendered stages
+        rendered_stages_ref = meta["rendered_stages"]
+        rendered_stages = [x for x in description["stages"] if
+                           x['ref'] in rendered_stages_ref and x.get("is_metadata", True)]
+
+        datafile_attributes = dict()
+        datafile_items = list()
+
+        for st in rendered_stages:
+            attributes[st["ref"]] = attributes.get(st["ref"], dict())
+            for item in st.get("items", list()):
+                if str(item.get("hidden", False)).lower() == "false":
+                    atrib_val = attributes.get(st["ref"], dict()).get(item["id"], str())
+                    item["id"] = st["ref"] + self.key_split + item["id"]
+                    datafile_attributes[item["id"]] = atrib_val
+                    datafile_items.append(item)
+
+        resolved_element = htags.resolve_display_data(datafile_items, datafile_attributes)
+        target_repository = resolved_element['data_set']['target_repository___0___target_repository']
+
+        data_set = list()
+
+        for indx, col in enumerate(resolved_element['columns']):
+            data_set.append([indx, col['title'], resolved_element['data_set'][col['data']]])
+
+        return dict(data_set=data_set, name=name, number_of_datafiles=number_of_datafiles, created_on=created_on,
+                    target_repository=target_repository)
+
+    def match_to_description(self, target_rows):
+        """
+        function matches target_rows to their corresponding description record
+        :param target_rows:
+        :return:
+        """
+
+        trgts_df = pd.DataFrame(target_rows, columns=['id'])
+        trgts_df['idsplit'] = trgts_df['id'].apply(lambda x: ObjectId(x.split("row_")[-1]))
+
+        records = cursor_to_list(DataFile().get_collection_handle().find({"$and": [
+            {"_id": {"$in": list(trgts_df.idsplit)}},
+            {'description_token': {"$exists": True, "$ne": ""}}]}))
+
+        all_targets_series = list()
+
+        if len(records):
+            all_targets_df = pd.DataFrame(records)
+            all_targets_df['record'] = all_targets_df['_id'].apply(lambda x: 'row_' + str(x))
+            all_targets_series = list(all_targets_df['record'])
+
+        return all_targets_series
+
+    def delete_description_record(self):
+        """
+        function removes description record - datafiles are once more 'free agents'
+        :return:
+        """
+
+        result = dict(status='success')
+
+        update_dict = dict(description_token=str())
+
+        DataFile().get_collection_handle().update_many(
+            {"description_token": self.description_token},
+            {'$set': update_dict})
+
+        Description().delete_description([self.description_token])
+
+        return result
+
+    def unbundle_datafiles(self, description_targets):
+        """
+        function disassociates description_targets from their respective bundles
+        :return:
+        """
+
+        trgts_df = pd.DataFrame(description_targets, columns=['id'])
+        trgts_df['idsplit'] = trgts_df['id'].apply(lambda x: ObjectId(x.split("row_")[-1]))
+
+        result = dict(status='success')
+
+        update_dict = dict(description_token=str())
+
+        DataFile().get_collection_handle().update_many(
+            {"_id": {"$in": list(trgts_df.idsplit)}},
+            {'$set': update_dict})
+
+        return result

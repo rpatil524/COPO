@@ -328,11 +328,39 @@
             <span class="action-label" style="padding-left: 3px;">Describe</span>
         </div>
 
+        <div class="show_sample_source tiny ui basic dtables-dbuttons olive button copo-dt"
+             data-toggle="tooltip"
+             data-container="body"
+             data-action="sample-source"
+             data-error-message=""
+             data-btntype="all"
+             title="Source list"
+             tabindex="0">
+            <i style="font-size: 12px;" class=" glyphicon glyphicon-grain"></i>
+            <span class="action-label" style="margin-left: -5px;">Source list</span>
+        </div>
+
+        <div class="btn-group description_bundle_button" style="margin-left: 10px; margin-bottom: 10px;">
+            <a style="background-image: none;" class="btn btn-sm btn-default bundle-name-i" href="#"><i style="padding-right: 10px;" class="fa fa-tags fa-fw"></i></a>
+            <a style="background-image: none;" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"
+               href="#">
+                <span class="fa fa-caret-down" title="Show bundle tasks"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="reload-bundle" href="#"><i style="padding-right: 5px;" class="redo alternate brown icon"></i> Reload</a></li>
+                <li><a class="metadata-bundle" href="#"><i style="padding-right: 5px;" class="tags blue icon"></i> Metadata</a></li>
+                <li><a class="files-in-bundle" href="#"><i style="padding-right: 5px;" class="database icon"></i>Bundle items</a></li>
+                <li><a class="submit-in-bundle" href="#"><i style="padding-right: 5px;" class="mail green outline icon"></i> Submit</a></li>
+                <li class="divider"></li>
+                <li><a class="delete-bundle" style="color:#DB2828;" href="#"><i style="padding-right: 5px;" class="trash alternate outline icon"></i> Delete</a></li>
+            </ul>
+        </div>
+
         <div class="describe_record_multi tiny ui basic dtables-dbuttons  blue button copo-dt"
              data-toggle="tooltip"
              data-container="body"
              data-action="describe"
-             data-error-message="Please select one or more records to describe"
+             data-error-message="Please select one or more datafiles to describe"
              data-btntype="multi"
              title="Describe datafiles"
              tabindex="0">
@@ -344,7 +372,7 @@
              data-toggle="tooltip"
              data-container="body"
              data-action="discard"
-             data-error-message="Please select one or more datafiles to discard metadata"
+             data-error-message="Please select target datafiles to discard metadata"
              data-btntype="multi"
              title="Discard description metadata"
              tabindex="0">
@@ -352,11 +380,23 @@
             <span class="action-label" style="padding-left: 3px;">Discard Metadata</span>
         </div>
 
+        <div class="unbundle_record_multi tiny ui basic dtables-dbuttons red button copo-dt"
+             data-toggle="tooltip"
+             data-container="body"
+             data-action="unbundle"
+             data-error-message="Please select target datafiles to [un]bundle"
+             data-btntype="multi"
+             title="[Un]bundle datafiles"
+             tabindex="0">
+            <i class=" fa fa-tags"></i>
+            <span class="action-label" style="padding-left: 3px;">[Un]bundle</span>
+        </div>
+
         <div class="edit_record_single tiny ui basic dtables-dbuttons  green button copo-dt"
              data-toggle="tooltip"
              data-container="body"
              data-action="edit"
-             data-error-message="Please select a single record to edit"
+             data-error-message="Please select a record to edit"
              data-btntype="single"
              title="Edit record"
              tabindex="0">
@@ -473,13 +513,13 @@
         </div>
     </div>
 
-    <!-- Quick tour button template -->
+    <!-- quick tour button template -->
     <button data-toggle="tooltip" title="Quick tour"
             class="big circular ui icon orange button takeatour quick-tour-template">
         <i class="icon lightbulb"></i>
     </button>
 
-    <!-- New component button template -->
+    <!-- new component button template -->
     <button data-toggle="tooltip" title="Add new record"
             class="big circular ui icon primary button new-component-template">
         <i class="icon add sign"></i>
@@ -490,7 +530,6 @@
             class="big circular ui icon primary button new-samples-template">
         <i class="icon plus sign"></i>
     </button>
-
 
     <!-- record tasks button -->
     <button data-toggle="tooltip" title="Record tasks" class="big circular ui icon button record-tasks-template">
@@ -530,8 +569,11 @@
         <ul class="nav nav-tabs copo-sidebar-tabs">
             <li class=" copo-sidebar-info"><a data-toggle="tab" href="#copo-sidebar-info"
                                               data-copo-tour-id="page_alert_panel">Info</a></li>
+            <li class=" copo-sidebar-upload"><a data-toggle="tab" href="#copo-sidebar-upload"
+                                                data-copo-tour-id="copo_data_upload_tab">Upload</a></li>
             <li class="active copo-sidebar-help"><a data-toggle="tab" href="#copo-sidebar-help"
-                                                    data-copo-tour-id="page_context_help_panel">Help</a></li>
+                                                    data-copo-tour-id="page_context_help_panel" id="copo-context-help">Help</a>
+            </li>
             <li class="copo-sidebar-annotate"><a data-toggle="tab" href="#copo-sidebar-annotate"
                                                  data-copo-tour-id="copo_annotation_panel">Annotate</a></li>
         </ul>
@@ -542,6 +584,43 @@
                     <div class="col-sm-12 col-md-12 col-lg-12">
                         <div class="panel panel-dtables">
                             <div class="panel-body collapse in" id="page_alert_panel"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="copo-sidebar-upload" class="tab-pane fade copo-sidebar-upload">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="panel panel-dtables">
+                            <div class="panel-body collapse in" id="copo_data_upload_tab">
+                                <div style="display: inline-block; text-indent: 0.5em; margin-top: 15px;">
+                                    <form enctype="multipart/form-data" id="upload_0" method="POST"
+                                          action="/rest/receive_data_file_chunked/"
+                                          style="margin-right:40px">
+                                        {% csrf_token %}
+                                        <span data-copo-tour-id="copo_data_upload_file_button" id="upload_files_button"
+                                              class="tiny ui basic teal button fileinput-button"
+                                              style="background-image: none; border-color:transparent;">
+                                                <span>Select files...</span>
+                                                <input type="file" name="file"
+                                                       onchange="get_chunk_size(event)" multiple/>
+                                                <input type="hidden" name="upload_id" value=""/>
+                                                <input type="hidden" name="panel_ordering"
+                                                       value="0"/>
+                                                <input type="hidden" name="exp_id" value=""/>
+                                        </span>
+                                    </form>
+                                    <div class="CyVerse Files"><br/><br/>
+                                        <a id="cyverse_files_link" href="{% url 'copo:agave_oauth' %}">Click to View
+                                            Files in CyVerse</a>
+                                        <!--<a target="_blank" href="https://agave.iplantc.org/oauth2/authorize?response_type=code&client_id=KOm9gFBPVwq6sfCMgumZRJG5j8wa&redirect_uri=http://127.0.0.1:8000/copo/agave_oauth" class="get_files">Click to View Files in CyVerse</a>-->
+                                    </div>
+
+                                    <div id="file_tree" style="visibility:hidden"></div>
+
+                                    <div class="file_status_label" style="margin-top: 8px;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -12,6 +12,7 @@ from jsonpickle import encode
 from dateutil import parser
 from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
+from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from django.conf import settings
 from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, CopoGroup, Annotation, \
     Repository, Person
@@ -55,9 +56,27 @@ def search_ontology_ebi(request, ontology_names):
     fields = ol.ONTOLOGY_LKUPS['fields_to_search']
     query = ol.ONTOLOGY_LKUPS['ebi_ols_autocomplete'].format(**locals())
     print(query)
-    data = requests.get(query, timeout=1).text
+    data = requests.get(query, timeout=2).text
     # TODO - add return here for when OLS is down
     return HttpResponse(data)
+
+
+def search_copo_components(request, data_source):
+    """
+    function does local lookup of items given data_source
+    :param request:
+    :param data_source:
+    :return:
+    """
+
+    data = COPOLookup(
+        search_term=request.POST.get("q", str()),
+        accession=request.POST.get("accession", str()),
+        data_source=data_source,
+        profile_id=request.POST.get("profile_id", str())
+    ).broker_component_search()
+
+    return HttpResponse(jsonpickle.encode(data), content_type='application/json')
 
 
 def test_ontology(request):

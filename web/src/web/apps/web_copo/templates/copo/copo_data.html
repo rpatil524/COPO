@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="{% static 'copo/treeview/bootstrap-treeview.min.css' %}">
 
     <style>
-        .check-icon{
+        .check-icon {
             margin-right: 20px !important;
         }
     </style>
@@ -41,6 +41,9 @@
         <input type="hidden" id="figshare_check_creds_url" value="{% url 'rest:check_figshare_credentials' %}"/>
         <input type="hidden" id="zipping_image" size="24px" value="{% static 'copo/img/ajax.gif' %}"/>
         <input type="hidden" id="hashing_image" size="24px" value="{% static 'copo/img/ajax.gif' %}"/>
+        <input type="hidden" id="profile_id" value="{{ profile_id }}"/>
+        <input type="hidden" id="profile_title" value="{{ profile.title }}"/>
+        <input type="hidden" id="table_columns" value="{{ table_columns }}"/>
         <input type="hidden" value="{% url 'copo:copo_submissions' profile_id=profile_id %}" name="submission_url"
                id="submission_url"/>
         <input type="hidden" value="{{ cyverse_files }}" name="cyverse_file_data"
@@ -60,284 +63,229 @@
 
     <!--test ends -->
 
-    <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-12" style="padding-right: 0px !important;">
-            <ul id="copo-datafile-tabs" class="nav nav-tabs">
-                <li>
-                    <a data-toggle="tab" href="#fileUploadComponent"
-                       data-component="fileUploadComponent">
-                <span class="copo-data-panel-title">
-                    <i class="fa fa-upload"></i>
-                    <span class="icon_text" data-copo-tour-id="copo_data_upload_tab">Upload</span>
-                </span>
-                    </a>
-                </li>
-                <li class="active"><a data-toggle="tab" href="#fileListComponent" data-component="fileListComponent">
-            <span class="copo-data-panel-title">
-                <i class="fa fa-file"></i>
-                <span class="icon_text" data-copo-tour-id="copo_data_inspect_tab">Inspect</span>
-            </span>
-                </a></li>
-                <li><a data-toggle="tab" href="#descriptionWizardComponent" data-component="descriptionWizardComponent">
-            <span class="copo-data-panel-title">
-                <i class="fa fa-tags"></i>
-                <span class="icon_text" data-copo-tour-id="copo_data_describe_tab">Describe</span>
-            </span>
-                </a></li>
-                <li><a data-toggle="tab" href="#emptyTab" data-component="emptyTab"
-                       style="border-color: transparent; background: none !important; cursor:default;">
-                    <!--false tab for wizard refresh-->
-                </a></li>
-            </ul>
 
-            <div class="tab-content">
-                <div id="fileUploadComponent" class="tab-pane fade">
-                    <div style="display: inline-block; text-indent: 0.5em; margin-top: 15px;">
-                        <form enctype="multipart/form-data" id="upload_0" method="POST"
-                              action="/rest/receive_data_file_chunked/"
-                              style="margin-right:40px">
-                            {% csrf_token %}
-                            <span data-copo-tour-id="copo_data_upload_file_button" id="upload_files_button"
-                                  class="tiny ui basic teal button fileinput-button"
-                                  style="background-image: none; border-color:transparent;">
-            <span>Select files...</span>
-            <input type="file" name="file"
-                   onchange="get_chunk_size(event)" multiple/>
-            <input type="hidden" name="upload_id" value=""/>
-            <input type="hidden" name="panel_ordering"
-                   value="0"/>
-            <input type="hidden" name="exp_id" value=""/>
-        </span>
-                        </form>
-
-                        <div class="CyVerse Files"><br/><br/>
-                            <!--<a id="cyverse_files_link" href="{% url 'copo:agave_oauth' %}">Click to View Files in CyVerse</a>-->
-                            <!--<a target="_blank" href="https://agave.iplantc.org/oauth2/authorize?response_type=code&client_id=KOm9gFBPVwq6sfCMgumZRJG5j8wa&redirect_uri=http://127.0.0.1:8000/copo/agave_oauth" class="get_files">Click to View Files in CyVerse</a>-->
+    <!-- datafile wizard section -->
+    <div id="wizard_toggle" class="collapse" style="margin-bottom: 20px;">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Datafile Description <span id="datafile_description_panel_title"></span></div>
+            <div class="panel-body">
+                <div class="fuelux" style="margin-bottom: 5px;">
+                    <div class="row action-rw">
+                        <!-- save for later description button -->
+                        <div id="reload_act" class=" tiny ui basic secondary button"
+                             data-toggle="tooltip"
+                             title="Save description for later"
+                             tabindex="0">
+                            <span style="padding-left: 3px;">Return later</span>
                         </div>
 
-                        <div id="file_tree" style="visibility:hidden"></div>
-
-                        <div class="file_status_label" style="margin-top: 8px;"></div>
-                    </div>
-                </div>
-                <div id="fileListComponent" class="tab-pane fade in active">
-                    <div style="margin-top: 15px;">
-                        <!-- getting started section -->
-                        <div class="row">
-                            <div class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-0 page-welcome-message"
-                                 style="display: none;">
-                                <div class="copo-webui-popover">
-                                    <div class="webui-popover-inner">
-                                        <h3 class="copo-webui-popover-title">Datafiles - Getting started</h3>
-                                        <div class="copo-webui-popover-content">
-                                            <div class="webpop-content-div">
-                                                The datafiles component enables the user to upload datafiles to COPO,
-                                                and also attribute metadata to the uploaded files.
-                                                <br/><br/>
-                                                Specifically, three main processes can be identified within this page,
-                                                which are in turn represented by the following user-interface tabs:
-                                                <ol>
-                                                    <li>
-                                                        <div><strong><i class="fa fa-upload"></i> Upload: </strong>
-                                                            The first step in the sequence of tasks is to upload
-                                                            datafiles to COPO.
-                                                            Click on this tab to
-                                                            access the file upload button.
-                                                            Select one or multiple files to upload.
-                                                            COPO will attempt to compress (larger files) and hash the
-                                                            uploaded files.
-                                                            <br/>
-                                                            <span style="color:red;">For better user experience,
-                                            we advise that large files (e.g., size >=1GB)
-                                            be compressed ('gzipped') before attempting an
-                                            upload to COPO.
-                                        </span>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div><strong><i class="fa fa-file"></i> Inspect: </strong>
-                                                            All uploaded files can be viewed or inspected under this
-                                                            tab.
-                                                            The inspect tab also provides action buttons, such as
-                                                            'Describe', for manipulating files in COPO.
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div><strong><i class="fa fa-tags"></i> Describe: </strong>
-                                                            The description wizard can
-                                                            be initiated by highlighting or selecting one or more target
-                                                            files under the inspect tab, and clicking the 'Describe'
-                                                            button.
-                                                            The wizard will then guide the user through a sequence of
-                                                            steps of metadata attribution.
-                                                        </div>
-                                                    </li>
-                                                </ol>
-                                                <div><strong>Quick Tour: </strong>To explore the various
-                                                    controls available on this page, click the
-                                                    <button class="circular tiny ui icon orange button">
-                                                        <i class="icon lightbulb"></i>
-                                                    </button>
-                                                    icon.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <!-- show description bundle button -->
+                        <div id="bundle_act" class=" tiny ui basic blue button"
+                             data-toggle="tooltip"
+                             title="View description bundle"
+                             tabindex="0">
+                            <span style="padding-left: 3px;">View bundle</span>
                         </div>
 
-                        <!-- datafile table -->
-                        <div id="component_table_loader" class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"
-                             data-copo-tour-id="datafile_table"></div> <!-- div used by the quick tour agent -->
-                        <table id="datafile_table"
-                               class="ui celled table hover copo-noborders-table"
-                               cellspacing="0" width="100%">
-                        </table>
+                        <!-- add to bundle button -->
+                        <div id="bundle_add_act" class=" tiny ui basic teal button"
+                             data-toggle="tooltip"
+                             title="Add datafiles to bundle"
+                             tabindex="0">
+                            <span style="padding-left: 3px;">Add to bundle</span>
+                        </div>
+
+                        <!-- Help tip -->
+                        <div class="pull-right">
+                            <label style="font-weight: normal; margin-right: 5px;"> Help tips </label>
+                            <input id="wizard-help-checkbox" type="checkbox" name="wizard-help-checkbox" checked>
+                        </div>
 
                     </div>
-                </div>
-                <div id="descriptionWizardComponent" class="tab-pane fade">
-                    <div id="data_wizard_data" style="margin-top: 15px;">
-                        <div class="wizard-loader col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"></div>
-                        <!-- description wizard getting started section -->
-                        <div class="row">
-                            <div class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-0 page-wizard-message"
-                                 style="display: block;">
-                                <div class="copo-webui-popover">
-                                    <div class="webui-popover-inner">
-                                        <h3 class="copo-webui-popover-title">Description - Getting started</h3>
-                                        <div class="copo-webui-popover-content">
-                                            <div class="webpop-content-div">
-                                                Select one or more files
-                                                under the <strong><i class="fa fa-file"></i> Inspect </strong> tab,
-                                                and click the <span class=" tiny ui basic blue button">
-                                                            <i class="copo-components-icons fa fa-tags"></i>
-                                                            <span style="padding-left: 3px;">Describe</span>
-                                                        </span> button. The view should switch to
-                                                <strong><i class="fa fa-tags"></i> Describe </strong> tab, with the
-                                                description wizard initialised.
-                                                Follow the sequence of steps presented by the wizard to add your
-                                                metadata.
-                                                <br/><br/>
-                                                <ol>
-                                                    <li>
-                                                        <span class=" tiny ui basic red button">
-                                                            <i class="copo-components-icons fa fa-times"></i>
-                                                            <span style="padding-left: 3px;">Discard</span>
-                                                        </span>
-                                                        You can discard the current description at any time by
-                                                        clicking the discard button.
-                                                        <br/>
-                                                        <span style="color:red;">If followed through, the current
-                                                                description will be terminated, and all metadata
-                                                                associated with datafiles in the description bundle
-                                                                will be permanently removed.
-                                                            </span>
-                                                    </li>
-                                                    <li>
-                                                       <span class=" tiny ui basic orange button">
-                                                            <i class="copo-components-icons fa fa-power-off"></i>
-                                                            <span style="padding-left: 3px;">Exit</span>
-                                                        </span>
-                                                        Use this button to exit the current description. The current
-                                                        description will be terminated, however, metadata attributed to
-                                                        datafiles in the course of the description will be retained.
-
-                                                    </li>
-                                                    <li>
-                                                        <span class=" tiny ui basic blue button">
-                                                            <i class="copo-components-icons fa fa-info"></i>
-                                                            <span style="padding-left: 3px;">Info</span>
-                                                        </span>
-                                                        Use the info (information) button to access relevant
-                                                        messages in each stage of the description.
-
-                                                    </li>
-                                                </ol>
-                                                The <strong>'Info'</strong> side pane will be employed to display
-                                                relevant messages through different stages of a description.
-                                                <br/>
-                                                Use the <strong>'Help'</strong> side pane to access more information
-                                                on describing datafiles.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="wizard" data-initialize="wizard" id="dataFileWizard">
+                        <div class="steps-container">
+                            <ul class="steps">
+                                <li data-step="1" data-name="intro" class="active">
+                                    <span class="badge">1</span>Intro
+                                    <span class="chevron"></span>
+                                </li>
+                                <li data-step="2" data-name="review">
+                                    <span class="badge">2</span>Review
+                                    <span class="chevron"></span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="actions">
+                            <div class="large ui buttons">
+                                <button id="wiz_prev_btn" class="ui button btn-prev">Prev</button>
+                                <div class="or"></div>
+                                <button id="wiz_next_btn" class="ui primary button btn-next" data-last="Finish!">Next
+                                </button>
                             </div>
                         </div>
+                        <div class="step-content"
+                             style="margin-bottom: 45px; border: 0.1em solid rgba(229, 239, 255, 1.0); border-radius: 4px;">
+                            <div class="step-pane active datafile-pane" data-step="1">
 
-                        <!-- Description wizard-->
-                        <div id="description_panel" style="display: none;">
-                            <div class="row action-rw">
-                                <!-- Discard description button -->
-                                <div id="discard_act" class=" tiny ui basic red button"
-                                     data-toggle="tooltip"
-                                     title="Discard description"
-                                     tabindex="0">
-                                    <i class="copo-components-icons fa fa-times"></i>
-                                    <span style="padding-left: 3px;">Discard Description</span>
+                                <form id="wizard_form_1" class="wizard-dynamic-form">
+                                    <input id="current_stage"
+                                           name="current_stage"
+                                           value="intro" type="hidden">
+                                </form>
+
+                                <!-- description wizard getting started section -->
+                                <div class="webpop-content-div">
+                                    <h4>Getting started...</h4>
+                                    The following tips are provided to help you navigate the wizard:
+                                    <div style="margin-top: 10px;"></div>
+                                    <ol>
+                                        <li>
+                                            Use the <strong><a class="wiz-showme" data-target="wiz_next_btn"
+                                                               data-label="Next stage" href="#"
+                                                               title="show me">Next</a></strong> button to proceed
+                                            to
+                                            the next
+                                            stage of the wizard,
+                                            and the <strong><a class="wiz-showme" data-target="wiz_prev_btn"
+                                                               data-label="Previous stage" href="#"
+                                                               title="show me">Prev</a></strong> button to return to
+                                            a
+                                            previous
+                                            stage
+                                        </li>
+                                        <li>
+                                            Use the <a class="wiz-showme" data-target="wizard-help-checkbox"
+                                                       data-label="Help tips" href="#"
+                                                       title="show me"><strong>help tips</strong></a> button to
+                                            toggle
+                                            display of help
+                                            tips
+                                        </li>
+                                        <li>
+                                            The <a class="wiz-showme" data-target="copo-documentation"
+                                                   data-label="Documentation" href="#"
+                                                   title="show me"><strong>documentation</strong></a> page offers a
+                                            more
+                                            detailed guide
+                                            to datafile description
+                                        </li>
+                                        <li>
+                                            Click the <a class="wiz-showme" data-target="remove_act"
+                                                         data-label="Discard description" href="#"
+                                                         title="show me"><strong>discard button</strong></a> to
+                                            terminate the description
+                                            (and exit the wizard)
+
+                                        </li>
+                                    </ol>
                                 </div>
-
-                                <!-- Exit description button -->
-                                <div id="exit_act" class=" tiny ui basic orange button"
-                                     data-toggle="tooltip"
-                                     title="Exit description"
-                                     tabindex="0">
-                                    <i class="copo-components-icons fa fa-power-off"></i>
-                                    <span style="padding-left: 3px;">Exit Description</span>
-                                </div>
-
-                                <!-- Info button -->
-                                <div id="info_act" class=" tiny ui basic blue button"
-                                     data-toggle="tooltip"
-                                     title="Wizard stage information"
-                                     tabindex="0">
-                                    <i class="copo-components-icons fa fa-info"></i>
-                                    <span style="padding-left: 3px;">Stage Info</span>
-                                </div>
-
                             </div>
-
-                            <div class="panel panel-dtables">
-                                <div class="panel-body" style="padding: 0px;">
-                                    <div class="fuelux" style="margin-bottom: 5px;">
-                                        <div class="wizard" data-initialize="wizard" id="dataFileWizard"
-                                             style="display: block; background-color: #fff !important;">
-                                            <div class="steps-container">
-                                                <ul class="steps">
-
-                                                </ul>
-                                            </div>
-                                            <div class="actions">
-                                                <button type="button" class="tiny ui left labeled icon button btn-prev">
-                                                    <i class="left arrow icon"></i>
-                                                    Prev
-                                                </button>
-                                                <button type="button"
-                                                        class="tiny ui primary right labeled icon button btn-next"
-                                                        data-last="Finish!">
-                                                    <i class="right arrow icon"></i>
-                                                    Next
-                                                </button>
-                                            </div>
-{#                                            <div class="row">#}
-{#                                                <div class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5">#}
-                                                    <div class="step-content">
-                                                    </div>
-{#                                                </div>#}
-{#                                            </div>#}
-                                        </div>
-                                    </div>
+                            <div class="step-pane" data-step="2">
+                                <h4>Wrap up!</h4>
+                                <p>
+                                <div class="webpop-content-div">You have reached the final stage of the wizard.<br/>
+                                    If you are satisfied with the entries you have made, click the
+                                    <strong>Finish!</strong>
+                                    button to finalise your description and terminate the wizard.<br/> You can still use
+                                    the <strong>Prev</strong> button to go back and make changes.
                                 </div>
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div id="emptyTab" class="tab-pane fade"></div>
             </div>
         </div>
     </div>
+
+    <!-- description bundle section -->
+    <div class="desc-bundle-display-div" style="display: none;">
+        <hr/>
+        <div style="font-size: 18px; margin-bottom: 15px;">Description bundles
+            <i style="font-size: 15px; padding-left: 3px; cursor: pointer;"
+               class="fa fa-info-circle description-bundle-explained"></i>
+        </div>
+        <div class="desc-bundle-display-div-2"></div>
+        <hr/>
+        <div style="margin-bottom: 15px;">&nbsp;</div>
+    </div>
+
+    <!-- datafile table section -->
+    <div style="margin-top: 15px;">
+        <!-- getting started section -->
+        <div class="row">
+            <div class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-0 page-welcome-message"
+                 style="display: none;">
+                <div class="copo-webui-popover">
+                    <div class="webui-popover-inner">
+                        <h3 class="copo-webui-popover-title">Datafiles - Getting started</h3>
+                        <div class="copo-webui-popover-content">
+                            <div class="webpop-content-div">
+                                The datafiles component enables the user to upload datafiles to COPO,
+                                and also attribute metadata to the uploaded files.
+                                <div style="margin-top: 10px;"></div>
+                                <ol>
+                                    <li>
+                                        <div><strong>Upload: </strong>
+                                            Use the <i>Upload</i> tab on the right-hand side to
+                                            access the file upload functionality.
+                                            Single or multiple files can be uploaded at once.
+                                            COPO attempts to compress (larger files) and <i>hash</i>
+                                            uploaded datafiles.
+                                            <br/>
+                                            <span style="color:#ff0000;">For improved user experience, large files (e.g., size >=1GB)
+                                                should be compressed (<i>gzipped</i>) before attempting an
+                                            upload to COPO.
+                                        </span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div><strong>View: </strong>
+                                            Information about uploaded files is displayed in a tabular format,
+                                            with
+                                            different functions (e.g., <i>describe</i>), to facilitate
+                                            manipulation of
+                                            uploaded datafiles.
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div><strong>Describe: </strong>
+                                            Using the describe functionality, the user can attribute metadata to
+                                            datafiles
+                                            with the aid of a <i>description wizard</i>.
+                                            The description wizard can
+                                            be initiated by selecting one or more target
+                                            files, and clicking the <i>Describe</i>
+                                            button.
+                                            The wizard guides the user through a sequence of
+                                            steps of metadata attribution.
+                                        </div>
+                                    </li>
+                                </ol>
+                                <div><strong>Quick Tour: </strong>To explore the various
+                                    controls available on this page, click the
+                                    <button class="circular tiny ui icon orange button">
+                                        <i class="icon lightbulb"></i>
+                                    </button>
+                                    icon.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- datafile table -->
+    <div id="component_table_loader" class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"
+         data-copo-tour-id="datafile_table"></div> <!-- div used by the quick tour agent -->
+    <table id="datafile_table"
+           class="ui celled table hover copo-noborders-table"
+           cellspacing="0" width="100%">
+    </table>
+    <br/><br/>
+
 
 {% endblock %}
 

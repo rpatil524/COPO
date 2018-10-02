@@ -1,4 +1,3 @@
-import json
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
@@ -27,6 +26,7 @@ from web.apps.web_copo.utils import EnaImports as eimp
 from submission.enaSubmission import EnaSubmit
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.decorators import user_is_staff
+import web.apps.web_copo.templatetags.html_tags as htags
 
 LOGGER = settings.LOGGER
 
@@ -166,11 +166,13 @@ def copo_samples(request, profile_id):
 
 
 @login_required
-def copo_data(request, profile_id, cyverse_file_data=None):
+def copo_data(request, profile_id):
     request.session['datafile_url'] = request.path
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
-    return render(request, 'copo/copo_data.html', {'profile_id': profile_id, 'profile': profile})
+    table_columns = htags.generate_table_columns("datafile")
+    return render(request, 'copo/copo_data.html',
+                  {'profile_id': profile_id, 'profile': profile, 'table_columns': jsonpickle.encode(table_columns)})
 
 
 
@@ -183,6 +185,12 @@ def copo_docs(request):
 def copo_visualize(request):
     context = dict()
 
+    # test
+    # request.session.get("profile_id", str())
+    # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+    # vext = CgCoreSchemas().extract_dublin_core("5ba0b949d127fd313b62677c")
+    # test ends
+
     task = request.POST.get("task", str())
 
     profile_id = request.session.get("profile_id", str())
@@ -192,6 +200,7 @@ def copo_visualize(request):
 
     broker_visuals = BrokerVisuals(context=context,
                                    profile_id=profile_id,
+                                   request=request,
                                    component=request.POST.get("component", str()),
                                    target_id=request.POST.get("target_id", str()),
                                    quick_tour_flag=request.POST.get("quick_tour_flag", False),
@@ -199,6 +208,7 @@ def copo_visualize(request):
                                    )
 
     task_dict = dict(table_data=broker_visuals.do_table_data,
+                     server_side_table_data=broker_visuals.do_server_side_table_data,
                      profiles_counts=broker_visuals.do_profiles_counts,
                      wizard_messages=broker_visuals.do_wizard_messages,
                      metadata_ratings=broker_visuals.do_metadata_ratings,
@@ -280,7 +290,7 @@ def copo_submissions(request, profile_id):
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
 
-    return render(request, 'copo/copo_submission_2.html', {'profile_id': profile_id, 'profile': profile})
+    return render(request, 'copo/copo_submission.html', {'profile_id': profile_id, 'profile': profile})
 
 
 @login_required
@@ -443,13 +453,15 @@ def import_ena_accession(request):
             output.append(eimp.do_import_ena_accession(acc))
         return HttpResponse(output)
 
+
 @login_required()
 def view_groups(request):
-    #g = Group().create_group(description="test descrition")
+    # g = Group().create_group(description="test descrition")
     profile_list = cursor_to_list(Profile().get_for_user())
     group_list = cursor_to_list(CopoGroup().get_by_owner(request.user.id))
     print(group_list)
-    return render(request, 'copo/copo_group.html', {'request': request, 'profile_list': profile_list, 'group_list': group_list})
+    return render(request, 'copo/copo_group.html',
+                  {'request': request, 'profile_list': profile_list, 'group_list': group_list})
 
 #@login_required()
 @user_is_staff

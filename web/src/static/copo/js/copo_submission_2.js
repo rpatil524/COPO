@@ -82,7 +82,7 @@ $(document).ready(function () {
     function do_render_submission_table(d) {
         var dtd = d.table_data.dataSet;
 
-        set_empty_component_message(dtd); //display empty submission message.
+        set_empty_component_message(dtd.length); //display empty submission message.
 
         if (dtd.length == 0) {
             return false;
@@ -432,15 +432,18 @@ $(document).ready(function () {
     }
 
     function get_submission_bundle_table(submissionRecord) {
+        var bundle = submissionRecord["bundle"];
         //set up data source
         var dtd = [];
-        submissionRecord.bundle.forEach(function (item) {
+        for (var i = 0; i < bundle.length; ++i) {
+            var item = bundle[i];
+
             var option = {};
-            option["target_label"] = item.recordLabel;
-            option["target_id"] = item.recordID;
-            option["target_status"] = '';
+            option.target_label = item.recordLabel;
+            option.target_id = item.recordID;
+            option.target_status = '';
             dtd.push(option);
-        });
+        }
 
         var tableID = 'submission_bundle_table_' + submissionRecord.record_id;
 
@@ -880,7 +883,12 @@ $(document).ready(function () {
                                             }
                                         ],
                                         buttons: [
-                                            'copy', 'csv', 'excel'
+                                            'copy', 'csv',
+                                            {
+                                                extend: 'excel',
+                                                text: 'Spreadsheet',
+                                                title: null
+                                            }
                                         ],
                                         dom: 'Bfr<"row"><"row info-rw" i>tlp',
                                     });

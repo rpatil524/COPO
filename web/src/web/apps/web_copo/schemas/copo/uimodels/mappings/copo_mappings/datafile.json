@@ -99,6 +99,24 @@
     },
     {
       "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "description_token"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "true",
+      "label": "Profile ID",
+      "show_in_form": false,
+      "id": "copo.datafile.description_token",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
       "required": "false",
       "default_value": "",
       "control_meta": {},
@@ -185,7 +203,8 @@
       "show_in_form": false,
       "id": "copo.datafile.file_hash",
       "type": "string",
-      "show_in_table": true,
+      "show_in_table": false,
+      "show_as_attribute": true,
       "control": "text"
     },
     {

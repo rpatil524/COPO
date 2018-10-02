@@ -12,6 +12,7 @@ from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 from django.contrib.auth.models import User
 from django.conf import settings
+import pandas as pd
 
 PubCollection = 'PublicationCollection'
 PersonCollection = 'PersonCollection'
@@ -129,7 +130,8 @@ class DAComponent:
 
         # set auto fields
         if auto_fields:
-            fields = DecoupleFormSubmission(auto_fields, self.get_schema().get("schema")).get_schema_fields_updated()
+            fields = DecoupleFormSubmission(auto_fields,
+                                            self.get_schema().get("schema_dict")).get_schema_fields_updated_dict()
 
         # should have target_id for updates and return empty string for inserts
         target_id = kwargs.pop("target_id", str())
@@ -161,7 +163,6 @@ class DAComponent:
         # if True, then the database action (to save/update) is never performed, but validated 'fields' are returned
         validate_only = kwargs.pop("validate_only", False)
 
-        # use the equality (==) test to save-guard against all sorts of value the 'validate_only' can assume
         if validate_only == True:
             return fields
         else:
@@ -185,12 +186,34 @@ class DAComponent:
 
         return cursor_to_list(self.get_collection_handle().find(doc).sort([[sort_by, sort_direction]]))
 
-    def get_all_records_columns(self, sort_by='_id', sort_direction=-1, projection=dict()):
-        doc = dict(deleted=data_utils.get_not_deleted_flag())
+    def get_all_records_columns(self, sort_by='_id', sort_direction=-1, projection=dict(), filter_by=dict()):
+        filter_by["deleted"] = data_utils.get_not_deleted_flag()
         if self.profile_id:
-            doc["profile_id"] = self.profile_id
+            filter_by["profile_id"] = self.profile_id
 
-        return cursor_to_list(self.get_collection_handle().find(doc, projection).sort([[sort_by, sort_direction]]))
+        return cursor_to_list(
+            self.get_collection_handle().find(filter_by, projection).sort([[sort_by, sort_direction]]))
+
+    def get_all_records_columns_server(self, sort_by='_id', sort_direction=-1, projection=dict(), filter_by=dict(),
+                                       search_term=str(),
+                                       limit=0, skip=0):
+
+        filter_by["deleted"] = data_utils.get_not_deleted_flag()
+
+        # 'name' seems to be the only reasonable field to restrict searching; others fields are resolved
+        filter_by["name"] = {'$regex': search_term, "$options": 'i'}
+
+        if self.profile_id:
+            filter_by["profile_id"] = self.profile_id
+
+        if skip > 0:
+            records = self.get_collection_handle().find(filter_by, projection).sort([[sort_by, sort_direction]]).skip(
+                skip).limit(limit)
+        else:
+            records = self.get_collection_handle().find(filter_by, projection).sort([[sort_by, sort_direction]]).limit(
+                limit)
+
+        return cursor_to_list(records)
 
     def execute_query(self, query_dict=dict()):
         if self.profile_id:
@@ -872,6 +895,7 @@ class Description:
     def __init__(self, profile_id=None):
         self.DescriptionCollection = get_collection_ref(DescriptionCollection)
         self.profile_id = profile_id
+        self.component = str()
 
     def GET(self, id):
         doc = self.DescriptionCollection.find_one({"_id": ObjectId(id)})
@@ -879,15 +903,20 @@ class Description:
             pass
         return doc
 
-    def create_description(self, stages=list(), attributes=dict()):
-        self.purge_descriptions()
+    def create_description(self, stages=list(), attributes=dict(), profile_id=str(), component=str(), meta=dict(),
+                           name=str()):
+        self.component = component
 
         fields = dict(
             stages=stages,
             attributes=attributes,
+            profile_id=profile_id,
+            component=component,
+            meta=meta,
+            name=name,
             created_on=data_utils.get_datetime(),
-            user_id=data_utils.get_current_user().id
         )
+
         doc = self.DescriptionCollection.insert(fields)
 
         # return inserted record
@@ -899,8 +928,18 @@ class Description:
             {"_id": ObjectId(description_id)},
             {'$set': fields})
 
+    def delete_description(self, description_ids=list()):
+        object_ids = []
+        for id in description_ids:
+            object_ids.append(ObjectId(id))
+
+        self.DescriptionCollection.remove({"_id": {"$in": object_ids}})
+
     def get_all_descriptions(self):
         return cursor_to_list(self.DescriptionCollection.find())
+
+    def get_all_records_columns(self, sort_by='_id', sort_direction=-1, projection=dict(), filter_by=dict()):
+        return cursor_to_list(self.DescriptionCollection.find(filter_by, projection).sort([[sort_by, sort_direction]]))
 
     def is_valid_token(self, description_token):
         is_valid = False
@@ -911,14 +950,51 @@ class Description:
 
         return is_valid
 
-    def purge_descriptions(self):
+    def purge_descriptions(self, component=str()):
         """
-        purges the Description collection of all 'obsolete' tokens
+        remove 'obsolete' tokens - where date created is more than 'no_of_days' days
         :return:
         """
 
-        user_id = data_utils.get_current_user().id
+        if not component == "sample":  # samples gets purge, but not other components e.g., datafiles
+            return True
 
-        bulk = self.DescriptionCollection.initialize_unordered_bulk_op()
-        bulk.find({'user_id': user_id}).remove()
-        bulk.execute()
+        no_of_days = settings.DESCRIPTION_GRACE_PERIOD
+
+        description_df = self.get_elapsed_time_dataframe()
+
+        if len(description_df):
+            object_ids = description_df[description_df.diff_days > no_of_days]['_id'].tolist()
+
+            self.DescriptionCollection.remove({"_id": {"$in": object_ids}})
+
+            # remove records associated with the description_tokens from the collection
+            SampleCollection = get_collection_ref('SampleCollection')
+
+            store_name = settings.SAMPLE_OBJECT_STORE
+
+            for id in object_ids:
+                SampleCollection.delete_many(
+                    {"description_token": str(id), "deleted": data_utils.get_deleted_flag()})
+
+                # delete store object
+                object_key = settings.SAMPLE_OBJECT_PREFIX + str(id)
+                self.remove_store_object(store_name=store_name, object_key=object_key)
+
+        return True
+
+    def get_elapsed_time_dataframe(self):
+        pipeline = [{"$project": {"_id": 1, "diff_days": {
+            "$divide": [{"$subtract": [data_utils.get_datetime(), "$created_on"]}, 1000 * 60 * 60 * 24]}}}]
+
+        description_df = pd.DataFrame(cursor_to_list(self.DescriptionCollection.aggregate(pipeline)))
+
+        return description_df
+
+    def remove_store_object(self, store_name, object_key):
+        try:
+            with pd.HDFStore(store_name) as store:
+                if object_key in store:
+                    del store[object_key]
+        except Exception as e:
+            print('HDF5 Access Error: ' + str(e))

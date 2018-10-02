@@ -5,6 +5,7 @@ import re
 import json
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
+from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 
 
 class DataFormats:
@@ -27,7 +28,7 @@ class DataFormats:
         configuration elsewhere.
 
         Also, order matters! That is, the order of items in the properties list is preserved when those items are
-        rendered on the UI.
+        rendered in the UI.
         '''
 
         self.dispatch = {
@@ -38,6 +39,9 @@ class DataFormats:
 
     # generates template for UI rendering
     def generate_ui_template(self):
+        # update cg core
+        CgCoreSchemas().process_schema()
+
         new_list = []
         json_files_handle = self.get_mapping_files()
         for file_name in json_files_handle:
@@ -60,6 +64,7 @@ class DataFormats:
             self.set_form_display()
             self.set_table_display()
             self.set_ontologies()
+            self.set_option_values()
 
             # self.update_original_resource()
             self.refactor_deprecated_controls()
@@ -218,9 +223,14 @@ class DataFormats:
 
     def set_ontologies(self):
         for elem_dict in self.generated_controls:
-            if elem_dict.get("control", str()).lower() == "ontology term":
-                if not elem_dict.get("ontology_names"):
-                    elem_dict["ontology_names"] = list()
+            if elem_dict.get("control", str()).lower() == "ontology term" and "ontology_names" not in elem_dict:
+                elem_dict["ontology_names"] = list()
+
+    def set_option_values(self):
+        for elem_dict in self.generated_controls:
+            if elem_dict.get("control", str()).lower() in ['copo-lookup', 'copo-multi-select',
+                                                           'copo-button-list'] and "option_values" not in elem_dict:
+                elem_dict["option_values"] = list()
 
     def update_original_resource(self):
         """
