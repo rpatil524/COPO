@@ -28,7 +28,7 @@
       "apply_to_all": true,
       "items": [
         {
-          "id": "target_repository",
+          "id": "deposition_context",
           "help_tip": "Select a target repository",
           "label": "Target Repository",
           "hidden": "false",

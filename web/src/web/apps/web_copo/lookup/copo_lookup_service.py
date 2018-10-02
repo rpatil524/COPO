@@ -3,6 +3,7 @@ __author__ = 'etuka'
 import os
 import glob
 import json
+import requests
 import pandas as pd
 from dal.copo_da import Sample
 from web.apps.web_copo.lookup.resolver import RESOLVER
@@ -30,6 +31,7 @@ class COPOLookup:
             'agrovoclabels': self.get_agrovoclabels,
             'countrieslist': self.get_countrieslist,
             'mediatypelabels': self.get_mediatypelabels,
+            'fundingbodies': self.get_fundingbodies,
             'isa_samples_lookup': self.get_isasamples
         }
 
@@ -112,7 +114,7 @@ class COPOLookup:
 
     def get_mediatypelabels(self):
         """
-        function generates and performs lookup of media types - to regenerate, delete 'all_list.json'
+        function generates and performs lookup of media types - to regenerate, delete 'media_types/all_list.json'
         see: https://www.iana.org/assignments/media-types/media-types.xml
         :return:
         """
@@ -155,13 +157,37 @@ class COPOLookup:
 
         return result
 
-    def get_samples(self):
+    def get_fundingbodies(self):
         """
-        lookup of sample
+        function performs a lookup on funding bodies'
+        see: https://www.crossref.org/services/funder-registry/; https://github.com/CrossRef/rest-api-doc
         :return:
         """
 
-        return None
+        REQUEST_BASE_URL = 'https://api.crossref.org/funders'
+        BASE_HEADERS = {'Accept': 'application/json'}
+
+        all_list = list()
+
+        if self.accession:
+            bn = list()
+            bn.append(self.accession) if isinstance(self.accession, str) else bn.extend(self.accession)
+
+            for acc in bn:
+                resp = requests.get(acc)
+                json_body = resp.json()
+                label = json_body.get("prefLabel", dict()).get("Label", dict()).get("literalForm", dict()).get("content",
+                                                                                                               "n/a")
+                all_list.append(dict(accession=acc, label=label, description=''))
+        elif self.search_term:
+            resp = requests.get(REQUEST_BASE_URL, params={'query': str(self.search_term)}, headers=BASE_HEADERS)
+            json_body = resp.json()
+
+            resolved_items = json_body['message'].get('items', list())
+            for item in resolved_items:
+                all_list.append(dict(accession=item["uri"], label=item["name"], description=''))
+
+        return all_list
 
     def get_isasamples(self):
         """

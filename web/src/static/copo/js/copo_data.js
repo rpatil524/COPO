@@ -98,7 +98,7 @@ $(document).ready(function () {
         initiate_datafile_description({'description_token': $(this).closest(".description-bundles-list").attr("data-record")});
     });
 
-    //show bundle details
+    // //show bundle details
     $(document).on("click", ".bundle-more-info", function (event) {
         event.preventDefault();
         WebuiPopovers.hideAll();
@@ -167,7 +167,7 @@ $(document).ready(function () {
 
         var $dialogContent = $('<div/>');
         var table_div = $('<div/>').append(tbl);
-        var filter_message = $('<div style="margin-bottom: 20px; font-weight: bold;">Note: Listed datafiles are those that do not belong to any description bundle!</div>');
+        var filter_message = $('<div style="margin-bottom: 20px; font-weight: bold;">Note: Listed datafiles are those that are not associated with any bundle!</div>');
         var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader"></div>'));
 
         var dialog = new BootstrapDialog({
@@ -482,7 +482,7 @@ $(document).ready(function () {
 
             //end of wizard intercept
             if (wizardElement.find('.steps li.active:first').attr('data-name') == 'review') {
-                finalise_description();
+                finalise_description(datafileDescriptionToken);
                 return false;
             }
 
@@ -593,8 +593,32 @@ $(document).ready(function () {
         });
     } //end add_step()
 
-    function finalise_description() {
-        alert('finalise...');
+    function finalise_description(description_token) {
+        $("#cover-spin").css("display", "block");
+
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'request_action': 'initiate_submission',
+                'description_token': description_token,
+                'profile_id': $('#profile_id').val()
+            },
+            success: function (data) {
+                window.location.replace($("#submission_url").val());
+                return false;
+            },
+            error: function () {
+                $("#cover-spin").css("display", "none");
+                alert("Couldn't initiate submission!");
+            }
+        });
+
+        return false;
+
     } //end finalise_description()
 
     function set_wizard_stage(proposedState) {
@@ -1168,6 +1192,11 @@ $(document).ready(function () {
 
     function generate_datafile_edit_table(stage) {
         //function provides stage information for datafile attributes editing
+
+        var btnNext = $(".btn-next");
+        btnNext.addClass("loading");
+        btnNext.prop('disabled', true);
+
         var tableID = stage.ref + "_table";
         var stageHTML = $('<div/>', {"class": "alert alert-default"});
 
@@ -1247,6 +1276,9 @@ $(document).ready(function () {
                 dtRows = data.table_data.rows;
 
                 render_datafile_attributes_table(tableID);
+
+                btnNext.removeClass("loading");
+                btnNext.prop('disabled', false);
 
             }
         });
@@ -1901,7 +1933,7 @@ $(document).ready(function () {
             type: BootstrapDialog.TYPE_PRIMARY,
             size: BootstrapDialog.SIZE_NORMAL,
             title: function () {
-                return $('<span>Bundle metadata</span>');
+                return $('<span>Bundle summary</span>');
             },
             closable: false,
             animate: true,
@@ -1924,9 +1956,9 @@ $(document).ready(function () {
                         spinner_div.remove();
 
                         meta_div.append("<div class='webpop-content-div'><strong>Name:</strong> " + data.result.name + "</div>");
-                        meta_div.append("<div class='webpop-content-div'><strong>Modified:</strong> " + data.result.created_on + "</div>");
                         meta_div.append("<div class='webpop-content-div'><strong>Bundle size:</strong> " + data.result.number_of_datafiles + "</div>");
-                        meta_div.append("<div class='webpop-content-div'><strong>Description Template:</strong> " + data.result.target_repository + "</div>");
+                        meta_div.append("<div class='webpop-content-div'><strong>Metadata Template:</strong> " + data.result.target_repository + "</div>");
+                        meta_div.append("<div class='webpop-content-div'><strong>Modified:</strong> " + data.result.created_on + "</div>");
 
                         var dtd = data.result.data_set;
                         var cols = [
@@ -1952,10 +1984,10 @@ $(document).ready(function () {
                                 // "info": " _START_ to _END_ of _TOTAL_ entries",
                                 // "search": " "
                             },
-                            select: {
-                                style: 'multi',
-                                selector: 'td:first-child'
-                            },
+                            // select: {
+                            //     style: 'multi',
+                            //     selector: 'td:first-child'
+                            // },
                             columns: cols,
                             dom: 'lfit<"row">rp'
                         });
@@ -2182,7 +2214,7 @@ $(document).ready(function () {
                             title: "reload description",
                             "aria-haspopup": "true",
                             "aria-expanded": "false"
-                        }).append('<i class="redo alternate brown icon" aria-hidden="true"></i>&nbsp; Reload bundle');
+                        }).append('<i class="redo alternate icon" aria-hidden="true"></i>&nbsp; Reload bundle');
 
                     reloaddesc.append(reloader).append("<hr/>");
 
@@ -2316,6 +2348,9 @@ $(document).ready(function () {
             view_bundle_metadata(bundle_id);
         } else if (task == "files-in-bundle") {
             do_view_description(bundle_id);
+        } else if (task == "submit-in-bundle") {
+            //todo: validate bundle first, then call finalise_description to initiate submission
+            finalise_description(bundle_id);
         }
     }
 

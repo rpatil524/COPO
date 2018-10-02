@@ -1,7 +1,5 @@
 __author__ = 'etuka'
 
-import ast
-import json
 import copy
 import difflib
 import numpy as np
@@ -12,7 +10,7 @@ from operator import itemgetter
 from django.conf import settings
 from pandas.io.json import json_normalize
 
-from dal.copo_da import DataFile, Description
+from dal.copo_da import DataFile, Description, Submission
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.templatetags.html_tags as htags
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
@@ -1488,7 +1486,7 @@ class WizardHelper:
                     datafile_items.append(item)
 
         resolved_element = htags.resolve_display_data(datafile_items, datafile_attributes)
-        target_repository = resolved_element['data_set']['target_repository___0___target_repository']
+        target_repository = resolved_element['data_set']['target_repository___0___deposition_context']
 
         data_set = list()
 
@@ -1557,3 +1555,32 @@ class WizardHelper:
             {'$set': update_dict})
 
         return result
+
+    def initiate_submission(self):
+        """
+        function initiates submission of datafiles in bundle
+        :return:
+        """
+
+        records = cursor_to_list(
+            DataFile().get_collection_handle().find(
+                {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
+                {'_id': 1, 'file_location': 1}))
+
+        description = Description().GET(self.description_token)
+        target_repository = description["attributes"].get("target_repository", dict()).get("deposition_context", str())
+
+        if len(records):
+            df = pd.DataFrame(records)
+            df['file_id'] = df._id.astype(str)
+            df['file_path'] = df['file_location'].fillna('')
+            df['upload_status'] = False
+
+        df = df[['file_id', 'file_path', 'upload_status']]
+        bundle = list(df.file_id)
+        bundle_meta = df.to_dict('records')
+        kwarg = dict(bundle=bundle, bundle_meta=bundle_meta, repo=target_repository)
+
+        submission_id = str(Submission(profile_id=self.profile_id).save_record(dict(), **kwarg).get("_id", str()))
+
+        return submission_id

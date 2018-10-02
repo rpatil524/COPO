@@ -350,23 +350,8 @@ class Submission(DAComponent):
         return doc
 
     def save_record(self, auto_fields=dict(), **kwargs):
-        if kwargs.get("datafile_ids", list()):
-            datafile_ids = kwargs.get("datafile_ids")
-            kwargs["bundle"] = datafile_ids
-
-            bundle_meta = list()
-
-            # store bundle metadata also, this will be used to capture richer context e.g., upload status
-            for file_id in datafile_ids:
-                datafile = DataFile().get_record(file_id)
-                if datafile:
-                    bundle_meta.append(
-                        dict(file_id=file_id, file_path=datafile.get("file_location", str()), upload_status=False))
-
-            kwargs["bundle_meta"] = bundle_meta
-
-            # get the target repository from one of the files
-            repo = DataFile().get_record_property(datafile_ids[0], "target_repository")
+        if kwargs.get("bundle", list()):
+            repo = kwargs.pop("repo")
             for k, v in dict(
                     repository=repo,
                     status=False,
