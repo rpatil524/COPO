@@ -579,7 +579,7 @@ function expand_table(event) {
                 html: "Identifier"
             })
             var publisher = $("<th/>", {
-                html: "Publisher"
+                html: "Name"
             })
             var description = $("<th/>", {
                 html: "Description"
@@ -603,6 +603,7 @@ function expand_table(event) {
                 $(colTR).attr('data-id', el.id)
                 $(colTR).attr('data-identifier', el.identifier)
                 $(colTR).attr('data-persistent', el.persistentUrl)
+                $(colTR).attr('data-publisher', el.publisher)
                 var col1 = $('<td/>').append(el.identifier);
                 var col11 = $('<td/>').append(el.publisher);
                 //var col2 = $('<td/>').append(el.dsDescription[0].dsDescriptionValue.value);
@@ -693,6 +694,7 @@ function select_dataset(e) {
         var persistent = $(row).data('persistent')
         var identifier = $(row).data('identifier')
         var entity_id = $(row).data('id')
+        var publisher = $(row).data('publisher')
         $('#dataset_id').val(dataset_id)
         var label = $(document).data('current-label')
         $(label).html(identifier + " - " + persistent)
@@ -704,7 +706,8 @@ function select_dataset(e) {
                 'dataset_id': dataset_id,
                 'identifier': identifier,
                 'dataverse_alias': $(document).data('dv_alias'),
-                'dataverse_id': $(document).data('entity_id')
+                'dataverse_id': $(document).data('entity_id'),
+                'publisher': publisher
             })
         }
     }

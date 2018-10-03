@@ -59,7 +59,7 @@ class DataverseSubmit(object):
         doi = self.truncate_url(sub['meta']['doi'])
         ds = dv.get_dataset_by_doi(doi)
         if ds == None:
-            ds = dv.get_dataset_by_title(sub['meta']['identifier'])
+            ds = dv.get_dataset_by_string_in_entry(str.encode(sub['meta']['identifier']))
             if ds == None:
                 ds = dv.get_dataset_by_string_in_entry(str(sub['meta']['doi']).encode())
 

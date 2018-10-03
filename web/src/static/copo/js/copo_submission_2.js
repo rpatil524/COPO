@@ -41,7 +41,8 @@ $(document).ready(function () {
             success: function (data) {
                 console.log(data)
             },
-            error: function () {
+            error: function (data) {
+                console.log(data)
             }
         });
     })
