@@ -35,7 +35,7 @@ DJANGO_APPS = [
 
 # user-defined applications definition
 PROJECT_APPS = [
-    'web_copo',
+    'web.apps.web_copo',
     'web.apps.web_copo.rest',
     'allauth',
     'allauth.account',

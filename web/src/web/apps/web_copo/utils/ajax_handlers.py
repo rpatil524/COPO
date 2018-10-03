@@ -22,7 +22,7 @@ from dal import mongo_util as util
 from pandas import read_excel
 from submission.dataverseSubmission import DataverseSubmit
 from django.contrib.auth.models import User
-from web_copo.models import UserDetails
+from web.apps.web_copo.models import UserDetails
 from django.db.models import Q
 from django.contrib.auth.models import Group
 from django.core import serializers

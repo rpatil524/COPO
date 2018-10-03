@@ -185,12 +185,6 @@ def copo_docs(request):
 def copo_visualize(request):
     context = dict()
 
-    # test
-    # request.session.get("profile_id", str())
-    # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
-    # vext = CgCoreSchemas().extract_dublin_core("5ba0b949d127fd313b62677c")
-    # test ends
-
     task = request.POST.get("task", str())
 
     profile_id = request.session.get("profile_id", str())
@@ -459,7 +453,6 @@ def view_groups(request):
     # g = Group().create_group(description="test descrition")
     profile_list = cursor_to_list(Profile().get_for_user())
     group_list = cursor_to_list(CopoGroup().get_by_owner(request.user.id))
-    print(group_list)
     return render(request, 'copo/copo_group.html',
                   {'request': request, 'profile_list': profile_list, 'group_list': group_list})
 

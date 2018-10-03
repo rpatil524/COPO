@@ -353,7 +353,7 @@ class Submission(DAComponent):
 
     def save_record(self, auto_fields=dict(), **kwargs):
         if kwargs.get("bundle", list()):
-            repo = kwargs.pop("repository")
+            repo = kwargs.pop("repository", str())
             for k, v in dict(
                     repository=repo,
                     status=False,
@@ -768,8 +768,10 @@ class Repository(DAComponent):
         return doc
 
     def get_by_ids(self, uids):
-        oids = list(map(lambda x: ObjectId(x), uids))
-        doc = self.get_collection_handle().find({"_id": {"$in": oids}})
+        doc = list()
+        if(uids):
+            oids = list(map(lambda x: ObjectId(x), uids))
+            doc = self.get_collection_handle().find({"_id": {"$in": oids}})
         return cursor_to_list(doc)
 
     def get_by_username(self, username):
