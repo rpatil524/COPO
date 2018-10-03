@@ -27,7 +27,10 @@ class UserDetails(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserDetails.objects.create(user=instance)
-
+    try:
+        ud = instance.userdetails
+    except:
+        UserDetails.objects.create(user=instance)
 
 @receiver(post_save, sender=User)
 def save_user_details(sender, instance, **kwargs):

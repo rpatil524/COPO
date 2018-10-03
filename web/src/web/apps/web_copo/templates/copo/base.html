@@ -335,8 +335,8 @@
                 <a href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
                    aria-expanded="false">
                     {% if user.is_authenticated %}<i class="fa fa-gear" aria-hidden="true"></i>
-                        <!--<span data-copo-tour-id="global_user_authenticated_button">{{ user }}<span
-                                class="caret" style="margin-left: 5px;"></span></span>-->
+                        <span data-copo-tour-id="global_user_authenticated_button">{{ user }}<span
+                                class="caret" style="margin-left: 5px;"></span></span>
                         {% if not user.email %}
                             <script type="text/javascript">
                                 do_email_form();
