@@ -354,16 +354,18 @@ def generate_table_records(profile_id=str(), component=str()):
     # retrieve and process records
     records = da_object.get_all_records_columns(projection=dict(projection))
 
-
-
     if len(records):
-
         df = pd.DataFrame(records)
 
         df['record_id'] = df._id.astype(str)
         df["DT_RowId"] = df.record_id
         df.DT_RowId = 'row_' + df.DT_RowId
         df = df.drop('_id', axis='columns')
+
+        if component == "submission":
+            df["special_repositories"] = df["repository"]
+            columns.append(dict(data="special_repositories", visible=False))
+
 
         columns.append(dict(data="record_id", visible=False))
         detail_dict = dict(className='summary-details-control detail-hover-message', orderable=False, data=None,
@@ -379,9 +381,14 @@ def generate_table_records(profile_id=str(), component=str()):
 
         columns.insert(0, detail_dict)
 
+        df_columns = list(df.columns)
+
         for x in schema:
             x["id"] = x["id"].split(".")[-1]
             columns.append(dict(data=x["id"], title=x["label"]))
+            if x["id"] not in df_columns:
+                df[x["id"]] = str()
+            df[x["id"]] = df[x["id"]].fillna('')
             df[x["id"]] = df[x["id"]].apply(resolve_control_output_apply, args=(x,))
 
         data_set = df.to_dict('records')
@@ -390,19 +397,17 @@ def generate_table_records(profile_id=str(), component=str()):
     # do check for custom repos here
     if component == "submission":
 
-
         user = ThreadLocal.get_current_user()
         repo_ids = user.userdetails.repo_submitter
         all_repos = Repository().get_by_ids(repo_ids)
 
         for repo in all_repos:
             for r_id in repo_ids:
-                    if r_id == str(repo["_id"]):
-                        correct_repos.append(repo)
+                if r_id == str(repo["_id"]):
+                    correct_repos.append(repo)
 
         for repo in correct_repos:
             repo["_id"] = str(repo["_id"])
-
 
     return_dict = dict(dataSet=data_set,
                        columns=columns,

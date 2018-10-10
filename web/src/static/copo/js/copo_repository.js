@@ -18,7 +18,7 @@ $(document).ready(function () {
         $(document).data('selected_row_name', $(this).data('name'))
         $('#selected_row_label').html($(document).data('selected_row_name'))
         $('#users_control').removeClass('hidden')
-        get_users_in_repo()
+        get_users_in_repo();
     });
 
     $('#repoForm').validator().on('submit', function (e) {

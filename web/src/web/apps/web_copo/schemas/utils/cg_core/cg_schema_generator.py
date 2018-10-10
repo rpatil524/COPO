@@ -47,7 +47,7 @@ class CgCoreSchemas:
         df['match_type_subtype_x'] = df['in cgc2 typelist'].astype(str) + df['in cgc2 subtypelist'].astype(str)
         df = df[(df['match_type_subtype_x'] == '01') | (df['match_type_subtype_x'] == '10')]
 
-        # # substitute value todo: might have to revisit this - for now user gets to decide
+        # # substitute value todo: example dc.creator affiliation depends on dc.creator use this infer dependency
         # df = df.replace('required if applicable', 'required')
         df = df.replace('required if applicable', 'required-if-applicable')
 

@@ -905,7 +905,8 @@ var dispatchFormControl = {
 
         var ctrlsDiv = $('<div/>',
             {
-                class: "ctrlDIV form-inline row"
+                class: "ctrlDIV form-inline row",
+                style: "margin-top: 10px;"
             });
 
         for (var i = 0; i < commentSchema.length; ++i) {
@@ -980,7 +981,8 @@ var dispatchFormControl = {
     do_copo_lookup_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
-                class: "ctrlDIV"
+                class: "ctrlDIV",
+                style: "margin-top:10px;"
             });
 
         ctrlsDiv = get_lookup_span(ctrlsDiv, formElem);
@@ -992,7 +994,8 @@ var dispatchFormControl = {
     do_copo_multi_select_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
-                class: "ctrlDIV"
+                class: "ctrlDIV",
+                style: "margin-top:10px;"
             });
 
         //build hidden fields to hold selected options, and supply control data
@@ -1872,17 +1875,9 @@ function get_element_clone(ctrlsDiv, counter) {
         }
     });
 
-    // ctrlClone.find(':input').each(function () {
-    //     if (this.id) {
-    //         var elemID = this.id;
-    //         $(this).attr("id", elemID + global_key_split + counter);
-    //         $(this).attr("name", elemID + global_key_split + counter);
-    //     }
-    // });
-
     var cloneDiv = $('<div/>',
         {
-            style: 'margin-top:20px;'
+            style: 'margin-top:30px;'
         });
 
 

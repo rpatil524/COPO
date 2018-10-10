@@ -118,7 +118,7 @@ function check_repo_id(e) {
     // check for repo_id
     var sub_id = $(e.currentTarget).data('submission_id')
     // get repo info
-    $(document).data('current-label', $(e.currentTarget).siblings('.dataset-label').find('.badge'))
+    $(document).data('current-label', $(e.currentTarget).siblings('.dataset-label'))
     $.getJSON("/copo/get_repo_info/", {'sub_id': sub_id}, function (data) {
         if (data.repo_type == 'dataverse') {
             // load dataverse repo html into modal

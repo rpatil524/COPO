@@ -1579,7 +1579,7 @@ class WizardHelper:
         df = df[['file_id', 'file_path', 'upload_status']]
         bundle = list(df.file_id)
         bundle_meta = df.to_dict('records')
-        kwarg = dict(bundle=bundle, bundle_meta=bundle_meta, repo=target_repository)
+        kwarg = dict(bundle=bundle, bundle_meta=bundle_meta, repository=target_repository)
 
         submission_id = str(Submission(profile_id=self.profile_id).save_record(dict(), **kwarg).get("_id", str()))
 

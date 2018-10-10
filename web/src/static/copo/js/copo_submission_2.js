@@ -168,6 +168,12 @@ $(document).ready(function () {
                 status = data.complete.toString().toLowerCase();
             }
 
+            //get special repositories
+            var special_repositories = '';
+            if (data.hasOwnProperty("special_repositories")) {
+                special_repositories = data.special_repositories.toString().toLowerCase();
+            }
+
             if (record_id) {
                 var option = {};
                 option["accessions"] = accessions;
@@ -179,6 +185,7 @@ $(document).ready(function () {
                 option["bundle_meta"] = bundle_meta;
                 option["date_created"] = date_created;
                 option["record_id"] = record_id;
+                option["special_repositories"] = special_repositories;
                 option["complete"] = complete
                 option["published"] = published
 
@@ -214,169 +221,199 @@ $(document).ready(function () {
                 .draw();
         } else {
             table = $('#' + tableID).DataTable({
-                data: dataSet,
-                searchHighlight: true,
-                ordering: true,
-                lengthChange: true,
-                buttons: [
-                    'selectAll',
-                    'selectNone'
-                ],
-                select: {
-                    style: 'multi', //os, multi, api
-                    items: 'row' //row, cell, column
-                },
-                language: {
-                    "info": "Showing _START_ to _END_ of _TOTAL_ submissions",
-                    "search": " ",
-                    //"lengthMenu": "show _MENU_ records",
-                    buttons: {
-                        selectAll: "Select all",
-                        selectNone: "Select none",
-                    }
-                },
-                order: [
-                    [2, "desc"]
-                ],
-                columns: [
-                    {
-                        "data": null,
-                        "orderable": false,
-                        "render": function (data) {
-
-
-                            var renderHTML = $(".datatables3-panel-template")
-                                .clone()
-                                .removeClass("datatables3-panel-template")
-                                .addClass("copo-records-panel");
-
-                            //set heading
-                            renderHTML.find(".panel-heading").find(".row-title").html('<span>' + data.repository + '</span>');
-
-
-                            //set body
-                            var bodyRow = $('<div class="row" style="margin-bottom: 10px;"></div>');
-
-                            var colsFirstHTML = $('<div class="col-sm-6 col-md-6 col-lg-6" id="submission_firstcol_' + data.record_id + '"></div>')
-                                .append('<div>Created:</div>')
-                                .append('<div style="margin-bottom: 10px;">' + data.date_created + '</div>')
-                                .append('<div class="firstcol-completed1" style="display: none;">Completed:</div>')
-                                .append('<div class="firstcol-completed2" style="margin-bottom: 10px; display: none;"></div>')
-
-                            var repo_selected = false
-                            if (data.destination_repo != undefined) {
-                                repo_selected = true
-                            }
-
-                            if (data.complete == 'true') {
-                                // add publish button to table if complete
-                                colsFirstHTML.append('<button style="margin-left: 5px"  data-submission_id="' + data.record_id + '" class="btn btn-default" type="button" id="publish_dataset">Publish</button>')
-                            }
-                            else {
-
-                                if (jQuery.isEmptyObject(data.destination_repo)) {
-                                    colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label" style="margin-bottom: 10px;"></span></div>')
-                                }
-                                else {
-                                    colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label" style="margin-bottom: 10px;">' + data.destination_repo.url + '</span></div>')
-                                }
-                                if (repos.length) {
-                                    /*if data has repos attached then this user has permission to submit to one or more
-                                    institutional repos, so add them into a dropdown here*/
-
-                                    colsFirstHTML.append('<div id="target_repo_dropdown" class="dropdown">')
-                                        .append('<button class="btn btn-default dropdown-toggle" type="button" id="target_repo_option_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Choose Repository<span class="caret"></span></button>')
-
-                                    var ul = $('<ul class="dropdown-menu" aria-labelledby="">')
-                                    var li_default = $('<li><a data-repo-id="default" data-submission_id="' + data.record_id + '" class="target_repo_option" href="#">Default ' + data.repository + '</a></li>')
-                                    ul.append(li_default)
-                                    for (r in repos) {
-                                        row = repos[r]
-                                        var li = $('<li><a data-repo-id="' + row._id + '" data-submission_id="' + data.record_id + '" class="target_repo_option" href="#">' + row.name + ' - ' + row.url + '</a></li>')
-                                        ul.append(li)
-                                    }
-                                    colsFirstHTML.append(ul)
-                                }
-
-                                if (repo_selected == true) {
-                                    colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
-                                }
-                                else {
-                                    colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default disabled" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
-
-                                }
-                                if (data.accessions == undefined) {
-                                } else if (!jQuery.isEmptyObject(data.meta) && $(data.meta)[0].hasOwnProperty('identifier')) {
-                                    if (data.destination_repo['type'] == 'dspace') {
-                                        colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' - ' + data.meta.dspace_item_name + '</span></div>')
-                                    } else if (data.destination_repo['type'] == 'dataverse') {
-                                        colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' - ' + data.meta.doi + '</span></div>')
-                                    }
-                                }
-                                else {
-                                    colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">New Dataverse: ' + data.meta.dvName + '</span></div>')
-                                }
-                            }
-                            // set submission status
-                            var colsSecondHTML = $('<div class="col-sm-4 col-md-4 col-lg-4" style="padding-right: 2px; margin-left: 50px;"></div>')
-                                .append($(".submission-progess-wrapper").clone().attr("id", "submission_progress_" + data.record_id));
-
-
-                            var colsThirdHTML = $('<div class="col-sm-2 col-md-2 col-lg-2" style="padding-left: 2px; margin-left: -50px;"></div>')
-                                .append('<div data-repo-selected="' + repo_selected + '" class="pull-right" id="submission_control_' + data.record_id + '"></div>');
-
-
-                            $(colsThirdHTML).attr('data-repo-selected', repo_selected)
-
-                            bodyRow.append(colsFirstHTML);
-                            bodyRow.append(colsSecondHTML);
-                            bodyRow.append(colsThirdHTML);
-
-
-                            //set datafiles bundle
-                            var bundleRow = $('<div class="row"></div>');
-                            var bundleCol = $('<div class="col-sm-12 col-md-12 col-lg-12"></div>')
-                            bundleCol.append('<table id="submission_bundle_table_' + data.record_id + '" class="ui celled stripe table hover copo-noborders-table" cellspacing="0" width="100%"></table>');
-                            bundleRow.append(bundleCol);
-
-                            renderHTML.find(".panel-body")
-                                .html('')
-                                .append(bodyRow)
-                                .append(bundleRow);
-
-                            return $('<div/>').append(renderHTML).html();
+                    data: dataSet,
+                    searchHighlight: true,
+                    ordering: true,
+                    lengthChange: true,
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    select: {
+                        style: 'multi', //os, multi, api
+                        items: 'row' //row, cell, column
+                    },
+                    language: {
+                        "info": "Showing _START_ to _END_ of _TOTAL_ submissions",
+                        "search": " ",
+                        //"lengthMenu": "show _MENU_ records",
+                        buttons: {
+                            selectAll: "Select all",
+                            selectNone: "Select none",
                         }
                     },
-                    {
-                        "data": "repository",
-                        "title": "Repository",
-                        "visible": false
-                    },
-                    {
-                        "data": "date_created",
-                        "title": "Created",
-                        "visible": false
-                    },
-                    {
-                        "data": "status",
-                        "visible": false
-                    },
-                    {
-                        "data": "record_id",
-                        "visible": false
-                    }
-                ],
-                "columnDefs": [],
-                fnDrawCallback: function () {
-                    dataSet.forEach(function (item) {
-                        get_submission_bundle_table(item);
-                    });
+                    order: [
+                        [2, "desc"]
+                    ],
+                    columns: [
+                        {
+                            "data": null,
+                            "orderable": false,
+                            "render": function (data) {
 
-                    refresh_tool_tips();
-                    get_submission_information();
-                },
-                dom: 'Bfr<"row"><"row info-rw" i>tlp',
-            });
+
+                                var renderHTML = $(".datatables3-panel-template")
+                                    .clone()
+                                    .removeClass("datatables3-panel-template")
+                                    .addClass("copo-records-panel");
+
+                                //set heading
+                                renderHTML.find(".panel-heading").find(".row-title").html('<span>' + data.repository + '</span>');
+
+
+                                //set body
+                                var bodyRow = $('<div class="row" style="margin-bottom: 10px;"></div>');
+
+                                var colsFirstHTML = $('<div class="col-sm-6 col-md-6 col-lg-6" id="submission_firstcol_' + data.record_id + '"></div>')
+                                    .append('<div>Created:</div>')
+                                    .append('<div style="margin-bottom: 10px;">' + data.date_created + '</div>')
+                                    .append('<div class="firstcol-completed1" style="display: none;">Completed:</div>')
+                                    .append('<div class="firstcol-completed2" style="margin-bottom: 10px; display: none;"></div>')
+
+                                var repo_selected = false
+                                if (data.destination_repo != undefined) {
+                                    repo_selected = true;
+                                }
+
+                                if (data.complete == 'true') {
+                                    if (data.special_repositories == 'dcterms' || data.special_repositories == 'ckan' || data.special_repositories == 'dataverse' || data.special_repositories == 'dspace') {
+                                        // add publish button to table if complete
+                                        colsFirstHTML.append('<button style="margin-left: 5px"  data-submission_id="' + data.record_id + '" class="btn btn-default" type="button" id="publish_dataset">Publish</button>')
+                                    }
+                                    else {
+                                        ;
+                                    }
+                                } else {
+                                    if (jQuery.isEmptyObject(data.destination_repo)) {
+                                        colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label" style="margin-bottom: 10px;"></span></div>')
+                                    }
+                                    else {
+                                        colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label" style="margin-bottom: 10px;">' + data.destination_repo.url + '</span></div>')
+                                    }
+
+                                    if (data.special_repositories == 'dcterms' || data.special_repositories == 'ckan' || data.special_repositories == 'dataverse' || data.special_repositories == 'dspace') {
+
+                                        if (repos.length) {
+
+                                            /*if data has repos attached then this user has permission to submit to one or more
+                                            institutional repos, so add them into a dropdown here*/
+
+                                            colsFirstHTML.append('<div id="target_repo_dropdown" class="dropdown">')
+                                                .append('<button class="btn btn-default dropdown-toggle" type="button" id="target_repo_option_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Choose Repository<span class="caret"></span></button>')
+
+                                            var ul = $('<ul class="dropdown-menu" aria-labelledby="">')
+                                            var li_default = $('<li><a data-repo-id="default" data-submission_id="' + data.record_id + '" class="target_repo_option" href="#">Default ' + data.repository + '</a></li>')
+                                            ul.append(li_default)
+                                            for (r in repos) {
+                                                row = repos[r]
+                                                var li = $('<li><a data-repo-id="' + row._id + '" data-submission_id="' + data.record_id + '" class="target_repo_option" href="#">' + row.name + ' - ' + row.url + '</a></li>')
+                                                ul.append(li)
+                                            }
+                                            colsFirstHTML.append(ul)
+                                        }
+                                        if (repo_selected == true) {
+                                            colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
+                                        }
+                                        else {
+                                            colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default disabled" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
+
+                                        }
+
+                                        if (data.accessions == undefined) {
+                                            ;
+                                        } else if (!jQuery.isEmptyObject(data.meta) && $(data.meta)[0].hasOwnProperty('identifier')) {
+                                            if (data.destination_repo['type'] == 'dspace') {
+                                                colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' - ' + data.meta.dspace_item_name + '</span></div>')
+                                            } else if (data.destination_repo['type'] == 'dataverse') {
+                                                colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' - ' + data.meta.doi + '</span></div>')
+                                            }
+                                        }
+                                        else {
+                                            colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Choose Submission Target</span></div>')
+                                        }
+                                    }
+
+                                }
+
+
+                                var colsThirdHTML = $('<div class="col-sm-2 col-md-2 col-lg-2" style="padding-left: 2px; margin-left: -50px;"></div>')
+                                    .append('<div data-repo-selected="' + repo_selected + '" class="pull-right" id="submission_control_' + data.record_id + '"></div>');
+
+
+                                // set submission status
+                                var colsSecondHTML = $('<div class="col-sm-4 col-md-4 col-lg-4" style="padding-right: 2px; margin-left: 50px;"></div>')
+                                    .append($(".submission-progess-wrapper").clone().attr("id", "submission_progress_" + data.record_id));
+
+                                $(colsThirdHTML).attr('data-repo-selected', repo_selected);
+
+                                bodyRow.append(colsFirstHTML);
+                                bodyRow.append(colsSecondHTML);
+                                bodyRow.append(colsThirdHTML);
+
+
+                                //set datafiles bundle
+                                var bundleRow = $('<div class="row"></div>');
+                                var bundleCol = $('<div class="col-sm-12 col-md-12 col-lg-12"></div>')
+                                bundleCol.append('<table id="submission_bundle_table_' + data.record_id + '" class="ui celled stripe table hover copo-noborders-table" cellspacing="0" width="100%"></table>');
+                                bundleRow.append(bundleCol);
+
+                                renderHTML.find(".panel-body")
+                                    .html('')
+                                    .append(bodyRow)
+                                    .append(bundleRow);
+
+                                return $('<div/>').append(renderHTML).html();
+                            }
+                        },
+                        {
+                            "data":
+                                "repository",
+                            "title":
+                                "Repository",
+                            "visible":
+                                false
+                        }
+                        ,
+                        {
+                            "data":
+                                "date_created",
+                            "title":
+                                "Created",
+                            "visible":
+                                false
+                        }
+                        ,
+                        {
+                            "data":
+                                "status",
+                            "visible":
+                                false
+                        }
+                        ,
+                        {
+                            "data":
+                                "record_id",
+                            "visible":
+                                false
+                        }
+                    ],
+                    "columnDefs":
+                        [],
+                    fnDrawCallback:
+
+                        function () {
+                            dataSet.forEach(function (item) {
+                                get_submission_bundle_table(item);
+                            });
+
+                            refresh_tool_tips();
+                            get_submission_information();
+                        }
+
+                    ,
+                    dom: 'Bfr<"row"><"row info-rw" i>tlp',
+                }
+            );
 
             table
                 .buttons()
@@ -924,7 +961,7 @@ $(document).ready(function () {
         return actionButton
     }
 
-    //handles button events on a record or group of records
+//handles button events on a record or group of records
     function do_record_task(event) {
         var task = event.task.toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
         var tableID = event.tableID; //get target table

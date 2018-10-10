@@ -5,7 +5,9 @@ import glob
 import json
 import requests
 import pandas as pd
+from dal import cursor_to_list
 from dal.copo_da import Sample
+from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.lookup.resolver import RESOLVER
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 
@@ -15,6 +17,8 @@ Each resolver should provide a mechanism for:
 1. resolving a search term to valid objects
 2. resolving accessions (i.e., id, values, etc.) to obtain matching or corresponding objects
 """
+
+Dropdowns = get_collection_ref("Dropdowns")
 
 
 class COPOLookup:
@@ -28,9 +32,9 @@ class COPOLookup:
 
     def broker_component_search(self):
         dispatcher = {
-            'agrovoclabels': self.get_agrovoclabels,
-            'countrieslist': self.get_countrieslist,
-            'mediatypelabels': self.get_mediatypelabels,
+            'agrovoclabels': self.get_lookup_type,
+            'countrieslist': self.get_lookup_type,
+            'mediatypelabels': self.get_lookup_type,
             'fundingbodies': self.get_fundingbodies,
             'isa_samples_lookup': self.get_isasamples
         }
@@ -69,91 +73,27 @@ class COPOLookup:
 
         return data
 
-    def get_agrovoclabels(self):
-        data = d_utils.json_to_pytype(os.path.join(self.drop_downs_pth, 'agrovocLabels.json'))["bindings"]
-        data_df = pd.DataFrame(data)
+    def get_lookup_type(self):
 
-        data_df['accession'] = data_df['uri'].apply(lambda x: x.get('value', str()))
-        data_df['label'] = data_df['label'].apply(lambda x: x.get('value', str()))
-        data_df['description'] = ' '
+        result = list()
 
-        if self.accession:
-            bn = list()
-            bn.append(self.accession) if isinstance(self.accession, str) else bn.extend(self.accession)
-            data_df = data_df[data_df['accession'].isin(bn)]
-        elif self.search_term:
-            data_df = data_df[data_df['label'].str.lower().str.contains(self.search_term, regex=False)]
-
-        data_df = data_df[['accession', 'label', 'description']]
-        result = data_df.to_dict('records')
-
-        return result
-
-    def get_countrieslist(self):
-        data = d_utils.json_to_pytype(os.path.join(self.drop_downs_pth, 'countries.json'))["bindings"]
-        data_df = pd.DataFrame(data)
+        projection = dict(label=1, accession=1, description=1)
+        filter_by = dict(type=self.data_source)
 
         if self.accession:
             bn = list()
             bn.append(self.accession) if isinstance(self.accession, str) else bn.extend(self.accession)
-            data_df = data_df[data_df['iso_3166-2'].isin(bn)]
+            filter_by["accession"] = {'$in': bn}
+
         elif self.search_term:
-            data_df = data_df[data_df['name'].str.lower().str.contains(self.search_term, regex=False)]
+            filter_by["label"] = {'$regex': self.search_term, "$options": 'i'}
 
-        data_df['accession'] = data_df['iso_3166-2']
-        data_df['label'] = data_df['name']
-        data_df['description'] = '<table style="width:100%"><tr><td>Code</td><td>' + data_df[
-            'country-code'] + '</td></tr><tr><td>Region</td><td>' + data_df[
-                                     'region'] + '</td></tr><tr><td>Sub-region</td><td>' + data_df[
-                                     'sub-region'] + '</td></tr></table>'
+        records = cursor_to_list(Dropdowns.find(filter_by, projection))
 
-        data_df = data_df[['accession', 'label', 'description']]
-        result = data_df.to_dict('records')
-
-        return result
-
-    def get_mediatypelabels(self):
-        """
-        function generates and performs lookup of media types - to regenerate, delete 'media_types/all_list.json'
-        see: https://www.iana.org/assignments/media-types/media-types.xml
-        :return:
-        """
-        if not os.path.exists(os.path.join(self.drop_downs_pth, 'media_types', 'all_list.json')):
-            pth = os.path.join(self.drop_downs_pth, 'media_types')
-            all_files = glob.glob(os.path.join(pth, "*.csv"))
-
-            all_list = list()
-            for f in all_files:
-                df = pd.read_csv(f)
-                df['type'] = df['Template'].str.split("/").str.get(0)
-                stem_part = set(df['type'][~df['type'].isna()]).pop()
-                df['type'] = stem_part
-                vv = df['Template'][df['Template'].isna()].index
-                tt = df['Name'][vv]
-                df.loc[list(vv), 'Template'] = stem_part + '/' + tt
-                df = df[['Name', 'Template', 'type']]
-                all_list = all_list + df.to_dict('records')
-
-                with open(os.path.join(self.drop_downs_pth, 'media_types', 'all_list.json'), 'w') as fout:
-                    json.dump(all_list, fout)
-
-        data_df = pd.read_json(os.path.join(self.drop_downs_pth, 'media_types', 'all_list.json'))
-
-        data_df['accession'] = data_df['Template']
-        data_df['label'] = data_df['Template']
-
-        if self.accession:
-            bn = list()
-            bn.append(self.accession) if isinstance(self.accession, str) else bn.extend(self.accession)
-            data_df = data_df[data_df['accession'].isin(bn)]
-        elif self.search_term:
-            data_df = data_df[data_df['label'].str.lower().str.contains(self.search_term, regex=False)]
-
-        data_df['description'] = '<table style="width:100%"><tr><td>Category</td><td>' + data_df[
-            'type'] + '</td></tr></table>'
-
-        data_df = data_df[['accession', 'label', 'description']]
-        result = data_df.to_dict('records')
+        if records:
+            df = pd.DataFrame(records)
+            df = df[['accession', 'label', 'description']]
+            result = df.to_dict('records')
 
         return result
 

@@ -56,7 +56,7 @@ mccabe==0.6.1
 mzml2isa==0.5.1
 networkx==2.0
 numexpr==2.6.5
-numpy==1.14.1
+numpy==1.11.0
 oauthlib==2.0.6
 openpyxl==2.4.9
 pandas==0.22.0

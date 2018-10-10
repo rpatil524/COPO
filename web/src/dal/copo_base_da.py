@@ -8,7 +8,6 @@ from django.urls import reverse
 
 from web.apps.web_copo.vocab.status_vocab import STATUS_CODES
 from web.apps.web_copo.schemas.utils.data_formats import DataFormats
-import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from dal.mongo_util import get_collection_ref
 from dal.base_resource import Resource
 
