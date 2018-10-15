@@ -18,7 +18,7 @@ Each resolver should provide a mechanism for:
 2. resolving accessions (i.e., id, values, etc.) to obtain matching or corresponding objects
 """
 
-Dropdowns = get_collection_ref("Dropdowns")
+Lookups = get_collection_ref("Lookups")
 
 
 class COPOLookup:
@@ -35,7 +35,7 @@ class COPOLookup:
             'agrovoclabels': self.get_lookup_type,
             'countrieslist': self.get_lookup_type,
             'mediatypelabels': self.get_lookup_type,
-            'fundingbodies': self.get_fundingbodies,
+            'fundingbodies': self.get_lookup_type,
             'isa_samples_lookup': self.get_isasamples
         }
 
@@ -48,6 +48,7 @@ class COPOLookup:
                 message = 'success'
             except Exception as e:
                 message = 'error'
+                print(e)
 
         return dict(result=result, message=message)
 
@@ -88,14 +89,14 @@ class COPOLookup:
         elif self.search_term:
             filter_by["label"] = {'$regex': self.search_term, "$options": 'i'}
 
-        records = cursor_to_list(Dropdowns.find(filter_by, projection))
+        records = cursor_to_list(Lookups.find(filter_by, projection))
 
-        if records:
-            df = pd.DataFrame(records)
-            df = df[['accession', 'label', 'description']]
-            result = df.to_dict('records')
+        # if records:
+        #     df = pd.DataFrame(records)
+        #     df = df[['accession', 'label', 'description']]
+        #     result = df.to_dict('records')
 
-        return result
+        return records
 
     def get_fundingbodies(self):
         """

@@ -1,3 +1,6 @@
+"""
+process generates schemas and lookup datasources and stores in db
+"""
 import os
 from django.core.wsgi import get_wsgi_application
 
@@ -7,13 +10,14 @@ application = get_wsgi_application()
 
 import glob
 import pandas as pd
+import xml.etree.ElementTree as ET
 from dal.copo_base_da import DataSchemas
 from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.lookup.resolver import RESOLVER
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 
 Schemas = get_collection_ref("Schemas")
-Dropdowns = get_collection_ref("Dropdowns")
+Lookups = get_collection_ref("Lookups")
 
 drop_downs_pth = RESOLVER['copo_drop_downs']
 
@@ -22,7 +26,7 @@ def main():
     # generate ui schemas
     ui_schemas()
 
-    # todo: automatically create index: db.getCollection('Dropdowns').createIndex( { accession: 1, type:1, label:1} )
+    # todo: automatically create index: db.Lookups.createIndex( { accession: 1, type:1, label: 1} )
 
     # generate agrovoc data source
     agrovoc_datasource("agrovoclabels")
@@ -32,6 +36,9 @@ def main():
 
     # generate media types
     mediatype_datasource("mediatypelabels")
+
+    # funding bodies
+    fundingbodies_datasource("fundingbodies")
 
 
 def ui_schemas():
@@ -58,7 +65,7 @@ def agrovoc_datasource(type):
     """
 
     # drop existing records of type
-    Dropdowns.remove({"type": type})
+    Lookups.remove({"type": type})
 
     data = d_utils.json_to_pytype(os.path.join(drop_downs_pth, 'agrovocLabels.json'))["bindings"]
     data_df = pd.DataFrame(data)
@@ -67,11 +74,12 @@ def agrovoc_datasource(type):
     data_df['label'] = data_df['label'].apply(lambda x: x.get('value', str()))
     data_df['description'] = ' '
     data_df['type'] = type
+    data_df['tags'] = [''] * len(data_df)
 
-    data_df = data_df[['accession', 'label', 'description', 'type']]
+    data_df = data_df[['accession', 'label', 'description', 'type', 'tags']]
     result = data_df.to_dict('records')
 
-    Dropdowns.insert_many(result)
+    Lookups.insert_many(result)
 
     return True
 
@@ -83,7 +91,7 @@ def countrieslist_datasource(type):
     """
 
     # drop existing records of type
-    Dropdowns.remove({"type": type})
+    Lookups.remove({"type": type})
 
     data = d_utils.json_to_pytype(os.path.join(drop_downs_pth, 'countries.json'))["bindings"]
     data_df = pd.DataFrame(data)
@@ -97,10 +105,12 @@ def countrieslist_datasource(type):
                                  'region'] + '</td></tr><tr><td>Sub-region</td><td>' + data_df[
                                  'sub-region'] + '</td></tr></table>'
 
-    data_df = data_df[['accession', 'label', 'description', 'type']]
+    data_df['tags'] = [''] * len(data_df)
+
+    data_df = data_df[['accession', 'label', 'description', 'type', 'tags']]
     result = data_df.to_dict('records')
 
-    Dropdowns.insert_many(result)
+    Lookups.insert_many(result)
 
     return True
 
@@ -112,7 +122,7 @@ def mediatype_datasource(type):
     """
 
     # drop existing records of type
-    Dropdowns.remove({"type": type})
+    Lookups.remove({"type": type})
 
     # get all mediatype files
     pth = os.path.join(drop_downs_pth, 'media_types')
@@ -137,10 +147,64 @@ def mediatype_datasource(type):
         'type'] + '</td></tr></table>'
     data_df['type'] = type
 
-    data_df = data_df[['accession', 'label', 'description', 'type']]
+    data_df['tags'] = [''] * len(data_df)
+
+    data_df = data_df[['accession', 'label', 'description', 'type', 'tags']]
     result = data_df.to_dict('records')
 
-    Dropdowns.insert_many(result)
+    Lookups.insert_many(result)
+
+    return True
+
+
+def fundingbodies_datasource(type):
+    """
+    function generates data source for lookup of funding bodies
+    see: https://github.com/CrossRef/open-funder-registry/releases/tag/v1.22
+    :return:
+    """
+
+    # drop existing records of type
+    Lookups.remove({"type": type})
+
+    xml_pth = os.path.join(drop_downs_pth, 'open-funder-registry', 'registry.rdf')
+    tree = ET.parse(xml_pth)
+    root = tree.getroot()
+
+    namespaces = {'skos': 'http://www.w3.org/2004/02/skos/core#',
+                  'skosxl': 'http://www.w3.org/2008/05/skos-xl#',
+                  'svf': 'http://data.crossref.org/fundingdata/xml/schema/grant/grant-1.2/'}
+
+    tags = []
+
+    for child in root.findall('skos:Concept', namespaces):
+        label = child.find('skosxl:prefLabel', namespaces).find('skosxl:Label', namespaces).find('skosxl:literalForm',
+                                                                                                 namespaces).text
+        accession = list(child.attrib.values())[0]
+        fundingBodyType = child.find('svf:fundingBodyType', namespaces).text
+        fundingBodySubType = child.find('svf:fundingBodySubType', namespaces).text
+
+        altLabels = list()
+
+        for altLabel in child.findall('skosxl:altLabel', namespaces):
+            altlabel = altLabel.find('skosxl:Label', namespaces).find('skosxl:literalForm', namespaces).text
+            altLabels.append(altlabel)
+
+        tags.append(dict(label=label, accession=accession, fundingBodyType=fundingBodyType,
+                         fundingBodySubType=fundingBodySubType, altLabels=altLabels))
+
+    data_df = pd.DataFrame(tags)
+
+    data_df['tags'] = data_df['altLabels']
+    data_df['type'] = type
+
+    data_df['description'] = '<table style="width:100%"><tr><td>Funding body type:</td><td><div>' + data_df[
+        'fundingBodyType'] + '</div><div>'+data_df['fundingBodySubType']+'</div></td></tr></table>'
+
+    data_df = data_df[['accession', 'label', 'description', 'type', 'tags']]
+    result = data_df.to_dict('records')
+
+    Lookups.insert_many(result)
 
     return True
 
