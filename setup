@@ -314,6 +314,8 @@ then
       /$local_dir/web/src/manage.py makemigrations chunked_upload
       /$local_dir/web/src/manage.py makemigrations allauth
       /$local_dir/web/src/manage.py migrate
+      /$local_dir/web/src/manage.py setup_groups
+      /$local_dir/web/src/manage.py setup_schemas
 
       # add social account records
       psql $POSTGRES_DB $POSTGRES_USER -c "DELETE FROM socialaccount_socialapp_sites"
@@ -390,6 +392,8 @@ then
       /$local_dir/web/src/manage.py makemigrations chunked_upload
       /$local_dir/web/src/manage.py makemigrations allauth
       /$local_dir/web/src/manage.py migrate
+      /$local_dir/web/src/manage.py setup_groups
+      /$local_dir/web/src/manage.py setup_schemas
 
       # add social account records
       psql $POSTGRES_DB $POSTGRES_USER -c "DELETE FROM socialaccount_socialapp_sites"
