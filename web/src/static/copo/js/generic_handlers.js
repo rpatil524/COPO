@@ -99,8 +99,9 @@ function set_selectize_select_event() {
                 var label = activeElem.attr("data-label");
                 var accession = activeElem.attr("data-accession");
                 var url = activeElem.attr("data-url");
+                var serverSide = activeElem.attr("data-serverside");
 
-                showlkup(item, label, desc, accession, url);
+                showlkup(item, label, desc, accession, url, serverSide);
 
             }
         }
@@ -135,79 +136,91 @@ function set_selectize_select_event() {
             var accession = $(this).find(".lookup-label").attr("data-accession");
 
             var url = $(this).find(".lookup-label").attr("data-url");
+            var serverSide = $(this).find(".lookup-label").attr("data-serverside");
 
-            showlkup(item, label, desc, accession, url);
+            showlkup(item, label, desc, accession, url, serverSide);
         }
 
     });
 }
 
-function showlkup(item, label, desc, accession, url) {
-    $.ajax({
-        url: url,
-        type: "POST",
-        headers: {
-            'X-CSRFToken': csrftoken
-        },
-        data: {
-            "accession": accession
-        },
-        success: function (data) {
+function showlkup(item, label, desc, accession, url, serverSide) {
 
-            if (data.hasOwnProperty('result') && data.result.length > 0) {
-                desc = data.result[0].description;
+    var show_lkup_details = function () {
+
+        var result = $('<div/>',
+            {
+                class: "limit-text"
+            });
+
+        item.webuiPopover('destroy');
+
+        if (String(accession) != 'undefined' && String(label) != 'undefined') {
+
+            //ontology accession
+            var lookupAccession = $('<div/>');
+
+            if (accession != '') {
+                lookupAccession.css('margin-top', '5px')
+                $('<span>', {
+                    class: "ontology-accession-link",
+                    html: "<span style='text-decoration-line: underline; color:#2759a5'>" + accession + "</span>"
+                }).appendTo(lookupAccession);
             }
 
-            var result = $('<div/>',
-                {
-                    class: "limit-text"
-                });
-
-            item.webuiPopover('destroy');
-
-            if (String(accession) != 'undefined' && String(label) != 'undefined') {
-
-                //ontology accession
-                var lookupAccession = $('<div/>');
-
-                if (accession != '') {
-                    lookupAccession.css('margin-top', '5px')
-                    $('<span>', {
-                        class: "ontology-accession-link",
-                        html: "<span style='text-decoration-line: underline; color:#2759a5'>" + accession + "</span>"
-                    }).appendTo(lookupAccession);
-                }
-
-                result.append(lookupAccession);
+            result.append(lookupAccession);
 
 
-                //ontology description
-                var lookupDescription = $('<div/>');
+            //ontology description
+            var lookupDescription = $('<div/>');
 
-                if (desc != '') {
-                    lookupDescription.css('margin-top', '5px');
-                    lookupDescription.html(desc);
+            if (desc != '') {
+                lookupDescription.css('margin-top', '5px');
+                lookupDescription.html(desc);
 
-                }
-
-                result.append(lookupDescription);
-
-                item.webuiPopover({
-                    title: label,
-                    content: '<div class="webpop-content-div">' + $('<div/>').append(result).html() + '</div>',
-                    trigger: 'sticky',
-                    width: 300,
-                    arrow: true,
-                    placement: 'right',
-                    dismissible: true
-                });
             }
 
-        },
-        error: function () {
-            alert("Couldn't retrieve item's details!");
+            result.append(lookupDescription);
+
+            item.webuiPopover({
+                title: label,
+                content: '<div class="webpop-content-div">' + $('<div/>').append(result).html() + '</div>',
+                trigger: 'sticky',
+                width: 300,
+                arrow: true,
+                placement: 'right',
+                dismissible: true
+            });
         }
-    });
+    }
+
+    if (serverSide) {//resolve item description from the server
+        $.ajax({
+            url: url,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                "accession": accession
+            },
+            success: function (data) {
+                if (data.hasOwnProperty('result') && data.result.length > 0) {
+                    desc = data.result[0].description;
+                    show_lkup_details();
+                }
+
+            },
+            error: function () {
+                console.log("Couldn't retrieve item's details!");
+            }
+        });
+
+    } else {
+        show_lkup_details();
+    }
+
+
 }
 
 function showontopop(item, label, prefix, desc, accession) {
@@ -884,9 +897,13 @@ function refresh_copo_lookup() {
                         var desc = escape(item.description);
                         var accession = escape(item.accession);
                         var label = escape(item.label);
+                        var serverSide = false;
+                        if (item.hasOwnProperty('server-side')) {
+                            serverSide = item['server-side'];
+                        }
 
                         return '<div>' +
-                            '<span data-url="' + url + '" data-accession="' + accession + '"  data-label="' + label + '" data-desc="' + desc + '" class="webpop-content-div ontology-label lookup-label">' + escape(item.label) + '</span></div>';
+                            '<span  data-serverside="' + serverSide + '" data-url="' + url + '" data-accession="' + accession + '"  data-label="' + label + '" data-desc="' + desc + '" class="webpop-content-div ontology-label lookup-label">' + escape(item.label) + '</span></div>';
 
                     }
                 },
@@ -905,13 +922,13 @@ function refresh_copo_lookup() {
                             'profile_id': profile_id
                         },
                         success: function (data) {
-                            var ontologies = [];
+                            var items = [];
 
                             if (data.hasOwnProperty('result') && data.result.length > 0) {
-                                ontologies = data.result;
+                                items = data.result;
                             }
 
-                            callback(ontologies);
+                            callback(items);
                         },
                         error: function () {
                             callback();
@@ -1757,7 +1774,7 @@ function get_profile_components() {
             tableID: 'person_table',
             recordActions: ["add_record_all", "edit_record_single"],
             visibleColumns: 5
-        },/* TODO - these need to be reactivated in the future sometime
+        }, /* TODO - these need to be reactivated in the future sometime
         {
             component: 'annotation',
             title: 'Generic Annotations',

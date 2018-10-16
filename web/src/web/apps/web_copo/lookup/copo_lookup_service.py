@@ -75,9 +75,6 @@ class COPOLookup:
         return data
 
     def get_lookup_type(self):
-
-        result = list()
-
         projection = dict(label=1, accession=1, description=1)
         filter_by = dict(type=self.data_source)
 
@@ -90,11 +87,6 @@ class COPOLookup:
             filter_by["label"] = {'$regex': self.search_term, "$options": 'i'}
 
         records = cursor_to_list(Lookups.find(filter_by, projection))
-
-        # if records:
-        #     df = pd.DataFrame(records)
-        #     df = df[['accession', 'label', 'description']]
-        #     result = df.to_dict('records')
 
         return records
 
@@ -156,6 +148,7 @@ class COPOLookup:
                     html += "</tr>"
                 html += "</table>"
                 df['description'] = html
+                df['server-side'] = True  # ...to request callback to server for resolving item description
 
         elif self.search_term:
             projection = dict(name=1)
@@ -173,10 +166,10 @@ class COPOLookup:
             df = pd.DataFrame(records)
             df['accession'] = df._id.astype(str)
             df['label'] = df['name']
-            df['description'] = '<table style="width:100%"><tr><td>Name</td><td>' + df[
-                'name'] + '</td></tr></table>'
+            df['description'] = ''
+            df['server-side'] = True  # ...to request callback to server for resolving item description
 
-        df = df[['accession', 'label', 'description']]
+        df = df[['accession', 'label', 'description', 'server-side']]
         result = df.to_dict('records')
 
         return result
