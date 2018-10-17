@@ -129,7 +129,7 @@ class DataSchemas:
                 self.add_ui_template(temp_dict["data"])
                 doc = temp_dict["data"]
             else:
-                # todo: we could do with some human intervention, report error!
+                # todo: we could do with some error reporting here!
                 doc = None
         return doc
 

@@ -142,7 +142,7 @@ $(document).ready(function () {
         item.webuiPopover('destroy');
 
         item.webuiPopover({
-            content: '<div class="webpop-content-div limit-text">A description bundle is a collection of datafiles with similar attributes, which can potentially be described as a single unit.</div>',
+            content: '<div class="webpop-content-div limit-text">A description bundle is a collection of datafiles with similar attributes, which can potentially be described together.</div>',
             trigger: 'sticky',
             width: 300,
             arrow: true,
@@ -1956,7 +1956,7 @@ $(document).ready(function () {
                         spinner_div.remove();
 
                         meta_div.append("<div class='webpop-content-div'><strong>Name:</strong> " + data.result.name + "</div>");
-                        meta_div.append("<div class='webpop-content-div'><strong>Bundle size:</strong> " + data.result.number_of_datafiles + "</div>");
+                        meta_div.append("<div class='webpop-content-div'><strong>Files in bundle:</strong> " + data.result.number_of_datafiles + "</div>");
                         meta_div.append("<div class='webpop-content-div'><strong>Metadata Template:</strong> " + data.result.target_repository + "</div>");
                         meta_div.append("<div class='webpop-content-div'><strong>Modified:</strong> " + data.result.created_on + "</div>");
 
