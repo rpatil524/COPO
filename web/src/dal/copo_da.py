@@ -399,6 +399,21 @@ class Submission(DAComponent):
 
         return doc.get("complete", False)
 
+    def insert_dspace_accession(self, sub, accessions):
+        # check if submission accessions are not a list, if not delete as multiple accessions cannot be added to object
+        doc = self.get_collection_handle().find_one({"_id": ObjectId(sub["_id"])})
+        if type(doc['accessions']) != type(list()):
+            self.get_collection_handle().update(
+                {"_id": ObjectId(sub["_id"])},
+                {"$unset": {"accessions": ""}}
+            )
+
+        doc = self.get_collection_handle().update(
+            {"_id": ObjectId(sub["_id"])},
+            {"$push":{"accessions": accessions}}
+        )
+        return doc
+
     def mark_submission_complete(self, sub_id, article_id=None):
         if article_id:
             if not type(article_id) is list:
