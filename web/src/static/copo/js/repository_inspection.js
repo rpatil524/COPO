@@ -48,6 +48,17 @@ function handle_radio(el) {
     get_existing_communites()
 }
 
+function make_dspace_item_metadata_table(sub_id) {
+    $.ajax({
+        url: '/copo/get_dspace_item_metadata/',
+        data: {'submission_id': $(document).data('submission_id')},
+        type: 'GET',
+        dataType: 'json',
+    }).done(function(data){
+        console.log(data)
+    })
+}
+
 function get_existing_communites() {
 
     $('.ajax-loading-div').show()

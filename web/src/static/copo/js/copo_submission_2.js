@@ -887,6 +887,7 @@ $(document).ready(function () {
                             'component': component
                         },
                         success: function (data) {
+                            console.log(data)
                             BootstrapDialog.show({
                                 title: "Submission Accessions",
                                 message: $('<div></div>').append('<table id="submission_accession_table_' + targetID + '" class="ui celled stripe table hover copo-noborders-table" cellspacing="0" width="100%"></table>'),

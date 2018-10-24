@@ -64,7 +64,7 @@ def delegate_submission(request):
             dataFile_ids=sub['bundle']
         )
         if result == True:
-            return HttpResponse(jsonpickle.dumps({'status': 1}))
+            return HttpResponse(jsonpickle.dumps({'status': 0}))
         else:
             return HttpResponse(jsonpickle.dumps({'status': result}))
 
@@ -75,9 +75,9 @@ def delegate_submission(request):
             dataFile_ids=sub['bundle']
         )
         if result == True:
-            return HttpResponse(jsonpickle.dumps({'status': 1}))
+            return HttpResponse(jsonpickle.dumps({'status': 0}))
         else:
-            return HttpResponse(jsonpickle.dumps({'status': result}))
+            return HttpResponse(result)
 
     # return default
     return HttpResponse({'status': 0})

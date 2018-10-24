@@ -581,3 +581,6 @@ def get_dspace_items(request):
     collection_id = request.GET['collection_id']
     resp = dspace(sub_id).get_dspace_items(collection_id)
     return HttpResponse(resp)
+
+def get_dspace_item_metadata(request):
+    return json.dumps({"hello":"world"})

@@ -17,6 +17,7 @@ from dal.copo_base_da import DataSchemas
 from dal.copo_da import ProfileInfo, Profile, DAComponent, Repository
 from allauth.socialaccount import providers
 from django_tools.middlewares import ThreadLocal
+import hurry
 
 register = template.Library()
 
@@ -618,6 +619,13 @@ def generate_submission_accessions_data(submission_record):
                 [accessions["dataset_doi"], accessions["dataverse_title"], accessions["dataverse_alias"],
                  accessions["dataset_title"]]
             )
+
+        elif repository == "dspace":
+            columns = [{"title": "Format"}, {"title": "uuid"}, {"title": "dSpace URL"}, {"title": "Name"}, {"title": "File Size"}]
+            for a in accessions:
+                data_set.append(
+                    [ a["format"], a["uuid"], a["dspace_instance"], a["name"], (hurry.filesize.size(a["sizeBytes"]))]
+                )
 
     return_dict = dict(dataSet=data_set,
                        columns=columns,
