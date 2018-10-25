@@ -10,26 +10,80 @@
 
             </div>
             <div class="create_add_dataverse">
-                <label>Add to Existing&nbsp</label><input type="radio" checked="true" name="create_repo_radio" value="existing">
+                <label>Add to Existing&nbsp</label><input type="radio" checked="true" name="create_repo_radio"
+                                                          value="existing">
 
 
             </div>
             <hr/>
+
+            <div class="row new-controls" style="display:none">
+                <!-- new dspace controls -->
+                <h5>Item will be created with the following metadata</h5>
+                <div style="width: 600px">
+                    <div class="form-group">
+                        <label for="dsTitle">Title</label>
+                        <input type="text" class="form-control" name="dsTitle" id="dsTitle"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="dsAbstract">Abstract</label>
+                        <textarea type="text" class="form-control" name="dsAbstract" id="dsAbstract"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="dsType">Type</label>
+                        <input type="text" class="form-control" name="dsType" id="dsType"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="dsSubject">Subject</label>
+                        <input type="text" class="form-control" name="dsSubject" id="dsSubject"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="dsCreator">Creator</label>
+                        <input type="text" class="form-control" name="dsCreator" id="dsCreator"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="dsCreated">Created</label>
+                        <input type="text" class="form-control" name="dsCreated" id="dsCreated"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="dsAvailable">Available</label>
+                        <input type="text" class="form-control" name="dsAvailable" id="dsAvailable"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="dsAccessioned">Accessioned</label>
+                        <input type="text" class="form-control" name="dsAccessioned" id="dsAccessioned"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="dsIssued">Issued</label>
+                        <input type="text" class="form-control" name="dsIssued" id="dsIssued"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="dsIssn">Issn</label>
+                        <input type="text" class="form-control" name="dsIssn" id="dsIssn">
+                    </div>
+                    <div class="form-group">
+                        <label for="dsUri">Uri</label>
+                        <input type="text" class="form-control" name="dsUri" id="dsUri"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="dsLanguage">Language</label>
+                        <input type="text" class="form-control" name="dsLanguage" id="dsLanguage"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="dsRights">Rights</label>
+                        <input type="text" class="form-control" name="dsRights" id="dsRights"/>
+                    </div>
+                </div>
+                <h5>Choose which collection this item should be added to</h5>
+            </div>
+
             <span class="input-group ajax-loading-div">
                     <img style="height: 24px; margin-left:5px;" src="{% static 'copo/img/loading.gif' %}"></span>
             <div id="table-div-dataverse" class="table table-striped table-bordered"
                  style="padding: 10px;width:100%">
 
             </div>
-            <div class="row new-controls" style="display:none">
-                <!-- new dspace controls -->
-                <h5>Dataverse Details</h5>
-                <div class="form-group">
-                    <label for="dvName">Name</label>
-                    <input type="text" class="form-control" name="dvName" id="dvName">
-                </div>
 
-            </div>
             <div class="existing-controls" style="display: block">
                 <!-- existing dspace controls -->
                 <div class="form-inline">
@@ -258,7 +312,8 @@
         </div>
 
         <div class="btn-group description_bundle_button" style="margin-left: 10px; margin-bottom: 10px;">
-            <a style="background-image: none; border-color: #265a88;" class="btn btn-sm btn-primary bundle-name-i" href="#"><i
+            <a style="background-image: none; border-color: #265a88;" class="btn btn-sm btn-primary bundle-name-i"
+               href="#"><i
                     style="padding-right: 10px;" class="fa fa-tags fa-fw"></i></a>
             <a style="background-image: none;" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"
                href="#">

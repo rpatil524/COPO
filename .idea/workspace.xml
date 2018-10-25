@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="update of table for adding to existing dpsace collections working">
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/submission/submissionDelegator.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/submissionDelegator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/static/copo/css/copo/submission.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/css/copo/submission.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" afterDir="false" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <ignored path="$PROJECT_DIR$/.idea/httpRequests/" />
@@ -95,38 +90,38 @@
       <file leaf-file-name="dspaceSubmission.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="223">
+            <state relative-caret-position="1965">
               <caret line="136" column="35" selection-start-line="136" selection-start-column="35" selection-end-line="136" selection-end-column="35" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="submissionDelegator.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
+      <file leaf-file-name="dataverseSubmission.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="314">
-              <caret line="74" selection-start-line="74" selection-end-line="74" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="copo_da.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="672">
-              <caret line="401" column="31" selection-start-line="401" selection-start-column="8" selection-end-line="401" selection-end-column="31" />
+            <state relative-caret-position="474">
+              <caret line="96" column="6" selection-start-line="96" selection-start-column="6" selection-end-line="96" selection-end-column="6" />
               <folding>
-                <element signature="e#49#78#0" expanded="true" />
+                <element signature="e#50#59#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="repository_inspection.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="connection.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/src/dataverse/dataverse/connection.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="465">
+              <caret line="38" selection-start-line="38" selection-end-line="38" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="repository_inspection.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="335">
-              <caret line="64" column="47" lean-forward="true" selection-start-line="64" selection-start-column="47" selection-end-line="64" selection-end-column="47" />
+            <state relative-caret-position="448">
+              <caret line="105" column="14" selection-start-line="105" selection-start-column="14" selection-end-line="105" selection-end-column="14" />
               <folding>
                 <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
@@ -143,42 +138,17 @@
       <file leaf-file-name="components_template.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="20" column="50" selection-start-line="20" selection-start-column="50" selection-end-line="20" selection-end-column="50" />
-              <folding>
-                <element signature="n#style#0;n#img#0;n#span#0;n#form#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-              </folding>
+            <state relative-caret-position="290">
+              <caret line="22" column="36" selection-start-line="22" selection-start-column="36" selection-end-line="22" selection-end-column="36" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="copo_submission_2.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
+      <file leaf-file-name="submission.css" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/static/copo/css/copo/submission.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="212">
-              <caret line="912" column="49" lean-forward="true" selection-start-line="912" selection-start-column="49" selection-end-line="912" selection-end-column="49" />
-              <folding>
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#i#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
-              </folding>
+            <state relative-caret-position="1380">
+              <caret line="92" selection-start-line="92" selection-end-line="92" />
             </state>
           </provider>
         </entry>
@@ -186,8 +156,8 @@
       <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="399">
-              <caret line="85" column="59" selection-start-line="85" selection-start-column="59" selection-end-line="85" selection-end-column="59" />
+            <state relative-caret-position="1110">
+              <caret line="76" column="54" selection-start-line="76" selection-start-column="54" selection-end-line="76" selection-end-column="54" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -198,17 +168,17 @@
       <file leaf-file-name="broker_da.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/dal/broker_da.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="235">
+            <state relative-caret-position="4065">
               <caret line="281" selection-start-line="281" selection-end-line="281" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="html_tags.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="html_tags.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="8392">
-              <caret line="626" column="79" selection-start-line="626" selection-start-column="79" selection-end-line="626" selection-end-column="79" />
+            <state relative-caret-position="1125">
+              <caret line="92" column="28" selection-start-line="92" selection-start-column="28" selection-end-line="92" selection-end-column="28" />
               <folding>
                 <element signature="e#25#36#0" expanded="true" />
               </folding>
@@ -219,8 +189,8 @@
       <file leaf-file-name="ajax_handlers.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="459">
-              <caret line="585" column="37" selection-start-line="585" selection-start-column="37" selection-end-line="585" selection-end-column="37" />
+            <state relative-caret-position="7050">
+              <caret line="498" selection-start-line="498" selection-end-line="498" />
               <folding>
                 <element signature="e#137#148#0" expanded="true" />
               </folding>
@@ -243,7 +213,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find />
       <find>retrieve</find>
       <find>conte</find>
       <find>select_dataset</find>
@@ -273,6 +242,7 @@
       <find>get_</find>
       <find>sub</find>
       <find>Accept:</find>
+      <find>get_dataverse/</find>
     </findStrings>
     <replaceStrings>
       <replace>context-help-ctrl</replace>
@@ -306,7 +276,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_profile.json" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/component_navbar.html" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_group.js" />
@@ -349,7 +318,6 @@
         <option value="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/dal/copo_da.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" />
@@ -357,6 +325,8 @@
         <option value="$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" />
         <option value="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
+        <option value="$PROJECT_DIR$/web/src/static/copo/css/copo/submission.css" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" />
       </list>
     </option>
   </component>
@@ -381,7 +351,7 @@
       <path value="$PROJECT_DIR$/web/src/static/copo/lou-multi-select-e052211/package.json" />
     </packageJsonPaths>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="23" />
     <option name="width" value="1920" />
     <option name="height" value="981" />
@@ -410,6 +380,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -427,6 +398,40 @@
               <item name="COPO" type="462c0819:PsiDirectoryNode" />
               <item name="web" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
+              <item name="COPO" type="462c0819:PsiDirectoryNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
+              <item name="COPO" type="462c0819:PsiDirectoryNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+              <item name="copo" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
+              <item name="COPO" type="462c0819:PsiDirectoryNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+              <item name="copo" type="462c0819:PsiDirectoryNode" />
+              <item name="css" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
+              <item name="COPO" type="462c0819:PsiDirectoryNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+              <item name="copo" type="462c0819:PsiDirectoryNode" />
+              <item name="css" type="462c0819:PsiDirectoryNode" />
+              <item name="copo" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
@@ -498,12 +503,11 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
-    <property name="SearchEverywhereHistoryKey" value="urls&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/urls.py&#10;ajax&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;templates&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates&#10;submission.json&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_submission.json&#10;copo_sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_submission_2.js&#10;rep&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/repository_inspection.js&#10;lookup&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/lookup/lookup.py&#10;copo_lookup&#9;null&#9;null&#10;generic&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/generic_handlers.js&#10;generic handlers&#9;null&#9;null&#10;groups&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/management/commands/setup_groups.py&#10;setup&#9;RUN_CONFIGURATION&#9;setup_groups" />
+    <property name="SearchEverywhereHistoryKey" value="dataverse&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/dataverseSubmission.py&#10;urls&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/urls.py&#10;ajax&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;templates&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates&#10;submission.json&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_submission.json&#10;copo_sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_submission_2.js&#10;rep&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/repository_inspection.js&#10;lookup&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/lookup/lookup.py&#10;copo_lookup&#9;null&#9;null&#10;generic&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/generic_handlers.js&#10;generic handlers&#9;null&#9;null&#10;groups&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/management/commands/setup_groups.py&#10;setup&#9;RUN_CONFIGURATION&#9;setup_groups" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="settings.editor.selected.configurable" value="configurable.group.build" />
   </component>
@@ -1389,13 +1393,6 @@
       <option name="presentableId" value="Default" />
       <updated>1480591260906</updated>
     </task>
-    <task id="LOCAL-00011" summary="comments added to annotator">
-      <created>1489597870667</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1489597870667</updated>
-    </task>
     <task id="LOCAL-00012" summary="selection and change of annotation from list elements now possible">
       <created>1489680129799</created>
       <option name="number" value="00012" />
@@ -1732,7 +1729,14 @@
       <option name="project" value="LOCAL" />
       <updated>1539775888190</updated>
     </task>
-    <option name="localTasksCounter" value="60" />
+    <task id="LOCAL-00060" summary="submission to cgspace working">
+      <created>1540394660650</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1540394660650</updated>
+    </task>
+    <option name="localTasksCounter" value="61" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1755,10 +1759,9 @@
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.3235955" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49767134" weight="0.32577905" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32545045" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6329114" visible="true" weight="0.1485623" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6329114" visible="true" weight="0.15015975" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" weight="0.25181347" />
       <window_info anchor="right" id="Database" order="4" />
-      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49767134" weight="0.27200902" />
       <window_info anchor="right" id="SciView" order="5" weight="0.3297568" />
       <window_info id="Structure" order="1" sideWeight="0.36708862" side_tool="true" weight="0.14696486" />
       <window_info id="Favorites" order="2" sideWeight="0.50817883" side_tool="true" weight="0.12552084" />
@@ -1774,6 +1777,7 @@
       <window_info anchor="bottom" id="Messages" order="7" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49767134" weight="0.27200902" />
       <window_info anchor="right" id="Data View" order="6" />
     </layout>
   </component>
@@ -1818,7 +1822,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="pushing after merge for phenoharmis server version" />
     <MESSAGE value="adding functionality to create institutional repos" />
     <MESSAGE value="adding more functionality for admins to assign datamanagers to repos" />
     <MESSAGE value="adding custom repos functionality for data managers" />
@@ -1843,7 +1846,8 @@
     <MESSAGE value="bugfixes for kenya" />
     <MESSAGE value="bugfixes for dataverse submission" />
     <MESSAGE value="update of table for adding to existing dpsace collections working" />
-    <option name="LAST_COMMIT_MESSAGE" value="update of table for adding to existing dpsace collections working" />
+    <MESSAGE value="submission to cgspace working" />
+    <option name="LAST_COMMIT_MESSAGE" value="submission to cgspace working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1869,7 +1873,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="1110" />
+      <option name="time" value="1113" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
@@ -1944,12 +1948,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/web/src/web/settings/chunked_upload.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/management/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/management/commands/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -2184,16 +2182,6 @@
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_submission.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="990">
-          <caret line="78" column="60" selection-start-line="78" selection-start-column="60" selection-end-line="78" selection-end-column="60" />
-          <folding>
-            <element signature="e#50#59#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/lookup.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="6705">
@@ -2205,16 +2193,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1352">
           <caret line="391" column="43" lean-forward="true" selection-start-line="391" selection-start-column="43" selection-end-line="391" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" column="50" selection-start-line="20" selection-start-column="50" selection-end-line="20" selection-end-column="50" />
-          <folding>
-            <element signature="n#style#0;n#img#0;n#span#0;n#form#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2232,55 +2210,95 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="212">
           <caret line="912" column="49" lean-forward="true" selection-start-line="912" selection-start-column="49" selection-end-line="912" selection-end-column="49" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#i#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
+    <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="585" column="37" selection-start-line="585" selection-start-column="37" selection-end-line="585" selection-end-column="37" />
+        <state relative-caret-position="1035">
+          <caret line="74" selection-start-line="74" selection-end-line="74" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/dal/broker_da.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4065">
+          <caret line="281" selection-start-line="281" selection-end-line="281" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1965">
+          <caret line="136" column="35" selection-start-line="136" selection-start-column="35" selection-end-line="136" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1125">
+          <caret line="92" column="28" selection-start-line="92" selection-start-column="28" selection-end-line="92" selection-end-column="28" />
           <folding>
-            <element signature="e#137#148#0" expanded="true" />
+            <element signature="e#25#36#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="85" column="59" selection-start-line="85" selection-start-column="59" selection-end-line="85" selection-end-column="59" />
+        <state relative-caret-position="1110">
+          <caret line="76" column="54" selection-start-line="76" selection-start-column="54" selection-end-line="76" selection-end-column="54" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7050">
+          <caret line="498" selection-start-line="498" selection-end-line="498" />
+          <folding>
+            <element signature="e#137#148#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/css/copo/submission.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1380">
+          <caret line="92" selection-start-line="92" selection-end-line="92" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="290">
+          <caret line="22" column="36" selection-start-line="22" selection-start-column="36" selection-end-line="22" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="474">
+          <caret line="96" column="6" selection-start-line="96" selection-start-column="6" selection-end-line="96" selection-end-column="6" />
+          <folding>
+            <element signature="e#50#59#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/src/dataverse/dataverse/connection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="38" selection-start-line="38" selection-end-line="38" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="335">
-          <caret line="64" column="47" lean-forward="true" selection-start-line="64" selection-start-column="47" selection-end-line="64" selection-end-column="47" />
+        <state relative-caret-position="448">
+          <caret line="105" column="14" selection-start-line="105" selection-start-column="14" selection-end-line="105" selection-end-column="14" />
           <folding>
             <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
@@ -2289,37 +2307,6 @@
             <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="314">
-          <caret line="74" selection-start-line="74" selection-end-line="74" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/dal/broker_da.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="235">
-          <caret line="281" selection-start-line="281" selection-end-line="281" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="136" column="35" selection-start-line="136" selection-start-column="35" selection-end-line="136" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8392">
-          <caret line="626" column="79" selection-start-line="626" selection-start-column="79" selection-end-line="626" selection-end-column="79" />
-          <folding>
-            <element signature="e#25#36#0" expanded="true" />
           </folding>
         </state>
       </provider>
