@@ -40,6 +40,7 @@ function handle_radio(el) {
     if (checked == 'new') {
         $('.new-controls').show()
         $('.existing-controls').hide()
+        get_new_dspace_item_details()
     }
     else {
         $('.new-controls').hide()
@@ -48,14 +49,25 @@ function handle_radio(el) {
     get_existing_communites()
 }
 
-function make_dspace_item_metadata_table(sub_id) {
+
+function get_new_dspace_item_details(sub_id) {
     $.ajax({
         url: '/copo/get_dspace_item_metadata/',
         data: {'submission_id': $(document).data('submission_id')},
-        type: 'GET',
         dataType: 'json',
-    }).done(function(data){
+    }).done(function (data) {
         console.log(data)
+        $("#repo_modal").find("#dsTitle").val(data.title)
+        $("#repo_modal").find("#dsAbstract").val(data.abstract)
+        $("#repo_modal").find("#dsType").val(data.type)
+        $("#repo_modal").find("#dsSubject").val(data.subject)
+        $("#repo_modal").find("#dsCreator").val(data.creator)
+        $("#repo_modal").find("#dsCreated").val(data.created)
+        $("#repo_modal").find("#dsAvailable").val(data.available)
+        $("#repo_modal").find("#dsAccessioned").val(data.accessioned)
+        $("#repo_modal").find("#dsIssued").val(data.issued)
+        $("#repo_modal").find("#dsLanguage").val(data.language)
+        $("#repo_modal").find("#dsRights").val(data.rights)
     })
 }
 
@@ -137,7 +149,7 @@ function check_repo_id(e) {
             // load dspace repo html into modal
             $('.ajax-loading-div').show()
             $('#repo_modal-body').html()
-            var form_html = $('#template_dspace_form').find('form').clone()
+            var form_html = $('#template_dspace_form').find('.form_content').clone()
             $(form_html).attr('id', 'dspace_form')
             $('#repo_modal-body').html(form_html)
             $('#repo_modal-body').data('repo', data.repo_type)
@@ -638,7 +650,7 @@ function do_new_dataverse_fields() {
 function save_inspection_info(e) {
     //e.preventDefault()
     var sub_id = $(document).data('submission_id')
-    var jsondata = JSON.stringify($('#repo_modal').find('#repo_metadata_form form').serializeFormJSON())
+    var jsondata = JSON.stringify($('#repo_modal').find('form').serializeFormJSON())
     $.ajax({
         url: "/copo/update_submission_repo_data/",
         type: "POST",
@@ -664,13 +676,15 @@ function save_inspection_info(e) {
 function select_dataset(e) {
     var sub_id = $(document).data('submission_id')
     var row = $(e.currentTarget).closest('tr')
-    if ($(row).data('type') == 'dspace') {
+    var type = $(row).data('type')
+    if (type == 'dspace') {
         var identifier = $(row).data('alias')
         var name = $(row).find('.name').html()
         var handle = $(row).find('.name').html()
         var label = $(document).data('current-label')
         $(label).html(identifier + " - " + name)
         data = {
+            'type': type,
             'submission_id': sub_id,
             'task': 'change_meta',
             'meta': JSON.stringify({
@@ -689,6 +703,7 @@ function select_dataset(e) {
         var label = $(document).data('current-label')
         $(label).html(identifier + " - " + persistent)
         data = {
+            'type': type,
             'submission_id': sub_id,
             'task': 'change_meta',
             'meta': JSON.stringify({
@@ -701,6 +716,21 @@ function select_dataset(e) {
             })
         }
     }
+
+    // if we are dealing with a dspace submission, decide whether or not to append form data containing new item data
+    if(type == "dspace") {
+
+        var new_or_existing = $('#repo_modal').find('input[name=create_repo_radio]:checked').val()
+        if (new_or_existing == "new") {
+            var formdata = JSON.stringify($('#repo_modal').find('#new_dspace_form').serializeFormJSON())
+            data.new_or_existing = "new"
+            data.form_data = formdata
+        }
+        else {
+            data.new_or_existing = "existing"
+        }
+    }
+
 
     $.ajax({
         url: "/copo/update_submission_repo_data/",

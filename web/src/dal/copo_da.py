@@ -512,7 +512,7 @@ class Submission(DAComponent):
             {'_id': ObjectId(submission_id)}, {'destination_repo': 1}
         )
         default_dataverse = {'url': settings.DATAVERSE["HARVARD_TEST_API"],
-                             'apikey': settings.DATAVERSE["HARVARD_TEST_TOKEN"]}
+                             'apikey': settings.DATAVERSE["HARVARD_TEST_TO KEN"]}
         if 'destination_repo' in doc:
             if doc['destination_repo'] == 'default':
                 return default_dataverse
