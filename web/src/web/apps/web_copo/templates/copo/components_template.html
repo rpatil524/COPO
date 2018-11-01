@@ -313,29 +313,37 @@
             <span class="action-label" style="margin-left: -5px;">Source list</span>
         </div>
 
-        <div class="btn-group description_bundle_button" style="margin-left: 10px; margin-bottom: 10px;">
-            <a style="background-image: none; border-color: #265a88;" class="btn btn-sm btn-primary bundle-name-i"
-               href="#"><i
-                    style="padding-right: 10px;" class="fa fa-tags fa-fw"></i></a>
-            <a style="background-image: none;" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"
-               href="#">
-                <span class="fa fa-caret-down" title="Show bundle tasks"></span>
-            </a>
-            <ul class="dropdown-menu">
-                <li><a class="reload-bundle" href="#"><i style="padding-right: 5px;"
-                                                         class="redo alternate brown icon"></i> Reload</a></li>
-                <li><a class="metadata-bundle" href="#"><i style="padding-right: 5px;"
-                                                           class="list alternate outline blue icon"></i> Summary</a>
-                </li>
-                <li><a class="files-in-bundle" href="#"><i style="padding-right: 5px;"
-                                                           class="database icon"></i>Items</a></li>
-                <li><a class="submit-in-bundle" href="#"><i style="padding-right: 5px;"
-                                                            class="mail green outline icon"></i> Submit</a></li>
-                <li class="divider"></li>
-                <li><a class="delete-bundle" style="color:#DB2828;" href="#"><i style="padding-right: 5px;"
-                                                                                class="trash alternate outline icon"></i>
-                    Delete</a></li>
-            </ul>
+        <div class="btn-group description_bundle_button"
+             style="margin-left: 10px; margin-bottom: 10px;">
+            <div class="ui icon buttons">
+
+
+                <ul class="dropdown-menu">
+                    <li><a class="reload-bundle" href="#"><i style="padding-right: 5px; color: #2a66a2;"
+                                                             class="redo alternate icon"></i> Reload</a></li>
+                    <li><a class="metadata-bundle" href="#"><i style="padding-right: 5px;"
+                                                               class="list alternate outline blue icon"></i> Summary</a>
+                    </li>
+                    <li><a class="files-in-bundle" href="#"><i style="padding-right: 5px;"
+                                                               class="database icon"></i>Bundle items</a></li>
+                    <li><a class="submit-in-bundle" href="#"><i style="padding-right: 5px;"
+                                                                class="mail green outline icon"></i> Submit</a></li>
+                    <li class="divider"></li>
+                    <li><a class="delete-bundle" style="color:#DB2828;" href="#"><i style="padding-right: 5px;"
+                                                                                    class="trash alternate outline icon"></i>
+                        Delete</a></li>
+                </ul>
+
+                <button class="tiny ui button bundle-name-i">
+                    {#                <i class="fa fa-tags"></i>#}
+                </button>
+                <button class="tiny ui button active dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <button class="ui button" style="background-color: #f5f5f0;">
+                    <i class="circle orange icon"></i>
+                </button>
+            </div>
         </div>
 
         <div class="describe_record_multi tiny ui basic dtables-dbuttons  blue button copo-dt"

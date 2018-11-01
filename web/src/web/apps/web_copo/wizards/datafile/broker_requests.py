@@ -34,14 +34,16 @@ class BrokerRequests:
                             batch_update=self.do_batch_update,
                             un_describe=self.do_un_describe,
                             get_description_records=self.do_description_records,
-                            datafile_pairing=self.do_datafile_pairing,
-                            datafile_unpairing=self.do_datafile_unpairing,
                             match_to_description=self.do_match_to_description,
                             unbundle_datafiles=self.do_unbundle_datafiles,
                             delete_description_record=self.do_delete_description_record,
                             get_unbundled_datafiles=self.do_get_unbundled_datafiles,
                             get_description_bundle_details=self.do_get_description_bundle_details,
-                            initiate_submission=self.do_initiate_submission
+                            initiate_submission=self.do_initiate_submission,
+                            add_to_bundle=self.do_add_to_bundle,
+                            validate_datafile_pairing=self.do_validate_datafile_pairing,
+                            get_unpaired_datafiles=self.do_get_unpaired_datafiles,
+                            pair_datafiles=self.do_pair_datafiles
                             )
 
         return request_dict
@@ -81,14 +83,6 @@ class BrokerRequests:
     def do_un_describe(self):
         self.context['result'] = self.wizard_helper.discard_description(self.description_targets)
 
-    def do_datafile_pairing(self):
-        # call to pair datafiles - having library layout set to 'PAIRED'
-        self.context['result'] = self.wizard_helper.datafile_pairing()
-
-    def do_datafile_unpairing(self):
-        # call to unpair datafiles
-        self.context['result'] = self.wizard_helper.datafile_unpairing()
-
     def do_batch_update(self):
         cell_reference = self.param_dict.get("cell_reference", str())
         self.context['batch_update'] = self.wizard_helper.batch_update_cells(cell_reference, self.target_id,
@@ -114,3 +108,15 @@ class BrokerRequests:
 
     def do_initiate_submission(self):
         self.context['result'] = self.wizard_helper.initiate_submission()
+
+    def do_add_to_bundle(self):
+        self.context['result'] = self.wizard_helper.add_to_bundle(self.description_targets)
+
+    def do_validate_datafile_pairing(self):
+        self.context['result'] = self.wizard_helper.validate_datafile_pairing(self.auto_fields)
+
+    def do_get_unpaired_datafiles(self):
+        self.context['result'] = self.wizard_helper.get_unpaired_datafiles(self.auto_fields)
+
+    def do_pair_datafiles(self):
+        self.context['result'] = self.wizard_helper.pair_datafiles(self.auto_fields)

@@ -437,7 +437,7 @@ class EnaSubmit(object):
 
 # ************************ Submission for ENA Sequence Reads  *************************#
 # The following class handles submission for raw sequence reads
-# It divides the submission process to callable micro-tasks to overcome request timeout issues
+# It divides the submission process to micro-tasks
 
 
 class EnaSubmit4Reads(object):
