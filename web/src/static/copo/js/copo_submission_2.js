@@ -71,6 +71,7 @@ $(document).ready(function () {
                 $('#view_repo_structure_' + data.record_id).removeClass('disabled').addClass('enabled')
                 $('#submission_control_' + data.record_id).children('.disabled').removeClass('disabled').addClass('enabled')
                 $('#submission_firstcol_' + submission_id).find('.badge').html('')
+                $('#target_repo_label_' + submission_id).html(data.url)
             },
             error: function () {
             }
@@ -277,7 +278,7 @@ $(document).ready(function () {
                                 }
 
                                 if (data.complete == 'true') {
-                                    if (data.special_repositories == 'dcterms' || data.special_repositories == 'ckan' || data.special_repositories == 'dataverse' || data.special_repositories == 'dspace') {
+                                    if (data.special_repositories == 'dataverse') {
                                         // add publish button to table if complete
                                         colsFirstHTML.append('<button style="margin-left: 5px"  data-submission_id="' + data.record_id + '" class="btn btn-default" type="button" id="publish_dataset">Publish</button>')
                                     }
@@ -286,10 +287,10 @@ $(document).ready(function () {
                                     }
                                 } else {
                                     if (jQuery.isEmptyObject(data.destination_repo)) {
-                                        colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label" style="margin-bottom: 10px;"></span></div>')
+                                        colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label_' + data.record_id + '" style="margin-bottom: 10px;"></span></div>')
                                     }
                                     else {
-                                        colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label" style="margin-bottom: 10px;">' + data.destination_repo.url + '</span></div>')
+                                        colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label_' + data.record_id + '" style="margin-bottom: 10px;">' + data.destination_repo.url + '</span></div>')
                                     }
 
                                     if (data.special_repositories == 'dcterms' || data.special_repositories == 'ckan' || data.special_repositories == 'dataverse' || data.special_repositories == 'dspace') {
@@ -312,12 +313,14 @@ $(document).ready(function () {
                                             }
                                             colsFirstHTML.append(ul)
                                         }
-                                        if (repo_selected == true) {
-                                            colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
-                                        }
-                                        else {
-                                            colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default disabled" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
+                                        if (data.complete != true) {
+                                            if (repo_selected == true) {
+                                                colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
+                                            }
+                                            else {
+                                                colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default disabled" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
 
+                                            }
                                         }
 
                                         if (data.accessions == undefined) {
@@ -845,6 +848,10 @@ $(document).ready(function () {
                                             data = JSON.parse(data);
                                             if (data.status.hasOwnProperty("ena_status")) {
                                                 treat_ena_status(data.status.ena_status, targetID);
+                                            }
+                                            if (data.hasOwnProperty("status") && data.status == 1) {
+                                                alert(data.message)
+                                                return false
                                             }
                                         } catch (err) {
                                             console.log(err)

@@ -512,7 +512,7 @@ class Submission(DAComponent):
             {'_id': ObjectId(submission_id)}, {'destination_repo': 1}
         )
         default_dataverse = {'url': settings.DATAVERSE["HARVARD_TEST_API"],
-                             'apikey': settings.DATAVERSE["HARVARD_TEST_TO KEN"]}
+                             'apikey': settings.DATAVERSE["HARVARD_TEST_TOKEN"]}
         if 'destination_repo' in doc:
             if doc['destination_repo'] == 'default':
                 return default_dataverse
@@ -988,7 +988,6 @@ class Description:
     def get_elapsed_time_dataframe(self):
         pipeline = [{"$project": {"_id": 1, "diff_days": {
             "$divide": [{"$subtract": [data_utils.get_datetime(), "$created_on"]}, 1000 * 60 * 60 * 24]}}}]
-
         description_df = pd.DataFrame(cursor_to_list(self.DescriptionCollection.aggregate(pipeline)))
 
         return description_df

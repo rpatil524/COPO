@@ -369,11 +369,22 @@ function expand_dspace_table(event) {
                         var col1 = $('<td/>').append(el.name);
                         var col11 = $('<td/>').append(el.handle);
                         var col111 = $('<td>').append(el.type)
+                        var new_or_existing = $('#repo_modal').find('input[name=create_repo_radio]:checked').val()
+                        if (new_or_existing == "new") {
+                            var colCheck = $('<td>/').append("<div class='pretty p-default' style='font-size: 26px'>" +
+                                "<input type='checkbox' class='dataset-checkbox'/>" +
+                                "<div class='state  p-success'>" +
+                                "<label></label>" +
+                                "</div>" +
+                                "</div>")
+                            colTR.append(colCheck).append(col1).append(col11).append(col11).append(col111)
+                        }
+                        else if (new_or_existing == "existing") {
+                            var plus = "<td class='summary-details-control' style='vertical-align: top; text-align:center'></td>"
+                            colTR.append(plus).append(col1).append(col11).append(col11).append(col111)
 
-                        var plus = "<td class='summary-details-control' style='vertical-align: top; text-align:center'></td>"
-                        colTR.append(plus).append(col1).append(col11).append(col11).append(col111)
+                        }
                         contentHtml.append(colTR);
-
                     })
 
                     $('.shown').removeClass('shown')
@@ -400,6 +411,7 @@ function expand_dspace_table(event) {
                 })
             }
             else if (dspace_type == "collection") {
+
                 $.get("/copo/get_dspace_items/",
                     {
                         'collection_id': entity_id,
@@ -681,8 +693,7 @@ function select_dataset(e) {
         var identifier = $(row).data('alias')
         var name = $(row).find('.name').html()
         var handle = $(row).find('.name').html()
-        var label = $(document).data('current-label')
-        $(label).html(identifier + " - " + name)
+
         data = {
             'type': type,
             'submission_id': sub_id,
@@ -691,6 +702,20 @@ function select_dataset(e) {
                 'identifier': identifier,
                 'dspace_item_name': name
             })
+        }
+        // if we are dealing with a dspace submission, decide whether or not to append form data containing new item data
+        var new_or_existing = $('#repo_modal').find('input[name=create_repo_radio]:checked').val()
+        if (new_or_existing == "new") {
+            var formdata = JSON.stringify($('#repo_modal').find('#new_dspace_form').serializeFormJSON())
+            data.new_or_existing = "new"
+            data.form_data = formdata
+            var label = $(document).data('current-label')
+            $(label).html(identifier + " - " + JSON.parse(formdata).dsTitle)
+        }
+        else {
+            data.new_or_existing = "existing"
+            var label = $(document).data('current-label')
+            $(label).html(identifier + " - " + name)
         }
     }
     else {
@@ -714,20 +739,6 @@ function select_dataset(e) {
                 'dataverse_id': $(document).data('entity_id'),
                 'publisher': publisher
             })
-        }
-    }
-
-    // if we are dealing with a dspace submission, decide whether or not to append form data containing new item data
-    if(type == "dspace") {
-
-        var new_or_existing = $('#repo_modal').find('input[name=create_repo_radio]:checked').val()
-        if (new_or_existing == "new") {
-            var formdata = JSON.stringify($('#repo_modal').find('#new_dspace_form').serializeFormJSON())
-            data.new_or_existing = "new"
-            data.form_data = formdata
-        }
-        else {
-            data.new_or_existing = "existing"
         }
     }
 
