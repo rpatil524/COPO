@@ -10,7 +10,7 @@ from dal import cursor_to_list
 import web.apps.web_copo.lookup.lookup as lookup
 import web.apps.web_copo.templatetags.html_tags as htags
 from web.apps.web_copo.schemas.utils import data_utils as d_utils
-from dal.copo_da import Submission, DataFile, DAComponent, Person, Sample
+from dal.copo_da import Submission, DataFile, DAComponent, Person, Sample, Description
 
 
 class Investigation:
@@ -32,7 +32,8 @@ class Investigation:
                 else:
                     try:
                         properties[k] = getattr(Investigation, "_" + k)(self, properties[k])
-                    except:
+                    except Exception as e:
+                        print(e)
                         properties[k] = ISAHelpers().get_schema_key_type(properties.get(k, dict()))
 
         return properties
@@ -140,7 +141,8 @@ class Study:
                 else:
                     try:
                         properties[k] = getattr(Study, "_" + k)(self, properties[k])
-                    except:
+                    except Exception as e:
+                        print(e)
                         properties[k] = ISAHelpers().get_schema_key_type(properties.get(k, dict()))
 
             schemas.append(properties)
@@ -494,7 +496,8 @@ class Assay:
                 else:
                     try:
                         properties[k] = getattr(Assay, "_" + k)(self, properties[k])
-                    except:
+                    except Exception as e:
+                        print(e)
                         properties[k] = ISAHelpers().get_schema_key_type(properties.get(k, dict()))
 
             schemas.append(properties)
@@ -568,43 +571,53 @@ class Assay:
         return unitCategories
 
     def _processSequence(self, spec=dict()):
-
         # get relevant protocols
         protocol_list_temp = list(self.copo_isa_records["protocol_list"])
         protocol_list_temp[:] = [d for d in protocol_list_temp if d.get('name') not in ["sample collection"]]
 
-        # get datafiles
-        dfile_list = list()
-        seen_list = list()
+        # get pairing map, if it exists
+        description_token = self.copo_isa_records["submission_record"].get("description_token", str())
+        pairing_info = list()
 
-        # sort files into pairs - we might as well do it here, since we are always going perform the check anyway
-        for df in self.copo_isa_records["datafile"]:
-            if str(df["_id"]) not in seen_list:
-                df_pair = df.get("description", dict()).get("attributes", dict()).get('datafiles_pairing', dict()).get(
-                    'paired_file', str())
-                if df_pair:
-                    seen_list.append(df_pair)
-                    df_pair = [x for x in self.copo_isa_records["datafile"] if str(x["_id"]) == df_pair]
-                    df_pair = df_pair[0] if df_pair else ''
+        if description_token:
+            pairing_info = Description().GET(description_token).get("attributes", dict()).get("datafiles_pairing",
+                                                                                              list())
 
-                dfile_list.append([df, df_pair])
+        pairing_info = pd.DataFrame(pairing_info)
+        pairing_info.columns = ["file1","file2"]
+        pairing_info['combined'] = pairing_info.file1 + "," + pairing_info.file2
 
-        for indx, dfile in enumerate(dfile_list):
-            self.get_assay_process_sequence(dfile, protocol_list_temp, indx)
+        datafiles_df = pd.DataFrame(self.copo_isa_records["datafile"])
+        datafiles_df._id = datafiles_df['_id'].astype(str)
+        datafiles_df.index = datafiles_df._id
+        datafiles_df['treated'] = 'false'
+        datafiles_df['paired_status'] = datafiles_df['description'].apply(
+            lambda x: x.get('attributes', dict()).get('library_construction', dict()).get('library_layout', str()))
+
+        datafiles_df['paired_status'] = datafiles_df.paired_status.str.upper()
+
+        # to avoid the risk of obfuscation of the file name, modify path to reflect actual saved name
+        datafiles_df['file_location'] = datafiles_df['file_location'].apply(lambda x: os.path.split(x)[-1])
+        datafiles_df["name"] = datafiles_df['file_location']
+
+        indx = 0
+        while True:
+            if len(datafiles_df[datafiles_df['treated'] == 'false']) == 0:
+                break
+
+            indx = indx + 1
+            self.get_assay_process_sequence(protocol_list_temp, indx, pairing_info, datafiles_df)
 
         return self.process_sequence
 
-    def get_assay_process_sequence(self, datafile_pair, protocol_list_temp, indx):
-        datafile = datafile_pair[0]
-
-        # modify to reflect actual saved name, in case of any obfuscation of the file name
-        datafile["name"] = os.path.split(datafile["file_location"])[-1]
+    def get_assay_process_sequence(self, protocol_list_temp, indx, pairing_info, datafiles_df):
+        # get file...
+        datafile = datafiles_df[datafiles_df.treated == 'false'].iloc[0].to_dict()
+        datafiles_df.loc[datafile["_id"], 'treated'] = 'true'
 
         # get description attributes
         attributes = datafile.get("description", dict()).get("attributes", dict())
         datafile_samples = attributes.get("attach_samples", dict()).get("study_samples", list())
-
-        indx = indx + 1
 
         samples = list()
         materials = list()
@@ -646,11 +659,16 @@ class Assay:
             if revised_name in ["nucleic_acid_sequencing"]:
                 outputs.append({"@id": ISAHelpers().get_id_field("datafile", datafile)})
 
-                # is this a paired read?
-                if datafile_pair[1]:
-                    paired_datafile = datafile_pair[1]
-                    paired_datafile["name"] = os.path.split(paired_datafile["file_location"])[-1]
-                    outputs.append({"@id": ISAHelpers().get_id_field("datafile", paired_datafile)})
+                # is this file paired
+                if datafile["paired_status"] == "PAIRED" and len(pairing_info):
+                    paired_data = [x for x in list(pairing_info['combined']) if datafile["_id"] in x]
+                    if paired_data:
+                        paired_data = paired_data[0].split(",")
+                        paired_data.remove(datafile["_id"])
+                        if paired_data[0] in datafiles_df.index:
+                            paired_datafile = datafiles_df.loc[paired_data[0]].to_dict()
+                            datafiles_df.loc[paired_data[0], 'treated'] = 'true'
+                            outputs.append({"@id": ISAHelpers().get_id_field("datafile", paired_datafile)})
 
             if protocol_list[pr_indx - 1].get("name", str()).replace(" ", "_") == "nucleic_acid_extraction":
                 inputs = materials
@@ -789,6 +807,7 @@ class ISAHelpers:
 
         # submission_token
         copo_records["submission_token"] = submission_token
+        copo_records["submission_record"] = DAComponent(component="submission").get_record(submission_token)
 
         # profile
         copo_records["profile"] = DAComponent(component="profile").get_record(profile_id)
@@ -802,7 +821,7 @@ class ISAHelpers:
         copo_records["person"] = DAComponent(profile_id=profile_id, component="person").get_all_records()
 
         # datafile and samples, sources, study_type and seq_instruments
-        df_ids_list = DAComponent(component="submission").get_record(submission_token).get("bundle", list())
+        df_ids_list = copo_records["submission_record"].pop("bundle", list())
 
         df_ids_object_list = [ObjectId(element) for element in df_ids_list]
         datafiles = cursor_to_list(

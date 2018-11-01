@@ -294,6 +294,7 @@ class CgCoreSchemas:
         df.loc['HELP_TIP'] = df.loc['HELP_TIP'].fillna('n/a')
         df.loc['COPO_CONTROL'] = df.loc['COPO_CONTROL'].fillna('text')
         df.loc['TYPE'] = df.loc['TYPE'].fillna('string')
+        df.loc['DEPENDENCY'] = df.loc['DEPENDENCY'].fillna('')
         df.loc['COPO_DATA_SOURCE'] = df.loc['COPO_DATA_SOURCE'].fillna('')
         df.loc['Wizard_Stage_ID'] = df.loc['Wizard_Stage_ID'].fillna('-1')
 
@@ -314,6 +315,7 @@ class CgCoreSchemas:
         df["id"] = df['COPO_ID'].apply(lambda x: ".".join(("copo", "cgCore", x)))
         df["label"] = df['LABEL']
         df["help_tip"] = df['HELP_TIP']
+        df["dependency"] = df['DEPENDENCY']
         df["control"] = df['COPO_CONTROL']
         df["stage_id"] = df['Wizard_Stage_ID']
 
@@ -321,12 +323,15 @@ class CgCoreSchemas:
         df["type"] = df['TYPE'].replace({'1': 'string', 'm': 'array'})
 
         # set data source for relevant controls
-        df['data_source'] = np.where(df['control'].isin(['copo-lookup', 'copo-multi-select', 'copo-button-list']), df['COPO_DATA_SOURCE'],
+        df['data_source'] = np.where(df['control'].isin(['copo-lookup', 'copo-multi-select', 'copo-button-list']),
+                                     df['COPO_DATA_SOURCE'],
                                      '')
         df['data_maxItems'] = np.where(df['control'] == 'copo-multi-select', 1, '')
 
-        df = df.loc[:,
-             ["ref", "id", "label", "help_tip", "control", "type", "stage_id", "data_source", "data_maxItems"]]
+        filtered_columns = ["ref", "id", "label", "help_tip", "control", "type", "stage_id", "data_source",
+                            "data_maxItems", "dependency"]
+
+        df = df.loc[:, filtered_columns]
 
         df["required"] = False
         df["field_constraint"] = "optional"

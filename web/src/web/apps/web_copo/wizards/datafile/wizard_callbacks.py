@@ -1,12 +1,15 @@
 """ module defines callbacks for wizard stages """
 __author__ = 'etuka'
 
+import numpy as np
 import pandas as pd
+from dal import cursor_to_list
 
-from dal.copo_da import Description
+from dal.copo_da import Description, DataFile
 from dal.copo_base_da import DataSchemas
 from converters.ena.copo_isa_ena import ISAHelpers
 import web.apps.web_copo.templatetags.html_tags as htags
+import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.wizards.utils.process_wizard_schemas import WizardSchemas
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 
@@ -217,6 +220,18 @@ class WizardCallbacks:
             # get fields schema
             schema_df = CgCoreSchemas().get_type_constraints(cg_type)
 
+            # get dependencies
+            # todo: revisit this once there is more clarification from the CG Core folks
+            # dependencies = schema_df[~schema_df['dependency'].isin([''])]['dependency'].unique()
+            #
+            # # filter out dependants - these are fields that are to be displayed via their parent field
+            # schema_df = schema_df[schema_df['dependency'].isin([''])]
+            # schema_df["is_composite_field"] = False
+            #
+            # composite_field_df = schema_df[schema_df['ref'].isin(dependencies)]
+            # schema_df.loc[composite_field_df.index, "is_composite_field"] = True
+            # schema_df.loc[composite_field_df.index, "control"] = "copo-select"
+
             # get stage id groups
             stage_ids = list(schema_df.stage_id.unique())
 
@@ -379,3 +394,143 @@ class WizardCallbacks:
             stage = stages[next_stage_index]
 
         return stage
+
+    def perform_datafile_pairing(self, next_stage_index):
+        """
+        stage callback function: determines if the pairing of datafiles should be performed given the 'library_layout'
+        :param next_stage_index:
+        :return:
+        """
+
+        description = Description().GET(self.__wzh.description_token)
+        stages = description["stages"]
+        attributes = description["attributes"]
+        meta = description.get("meta", dict())
+
+        # validate stage
+        stage = dict()
+
+        if next_stage_index < len(stages):
+            stage = stages[next_stage_index]
+
+        # first, target repository
+        relevant_repos = ["ena"]  # add a repo to this list if it requires datafile pairing
+
+        target_repository = attributes.get("target_repository", dict()).get("deposition_context", str())
+
+        if target_repository not in relevant_repos:
+            # no items to pair, clear any previous pairing information
+            self.remove_pairing_info(stage["ref"], attributes, meta)
+
+            return False
+
+        # get records in bundle
+        records = cursor_to_list(DataFile().get_collection_handle().find({"$and": [
+            {"description_token": self.__wzh.description_token, 'deleted': d_utils.get_not_deleted_flag()},
+            {'description.attributes.library_construction': {"$exists": True}}]},
+            {'description.attributes.library_construction': 1, 'name': 1}))
+
+        if not records:
+            # no items to pair, clear any previous pairing information
+            self.remove_pairing_info(stage["ref"], attributes, meta)
+
+            return False
+
+        df = pd.DataFrame(records)
+        df._id = df['_id'].astype(str)
+        df.index = df._id
+
+        df['pairing'] = df['description'].apply(
+            lambda x: x.get('attributes', dict()).get('library_construction', dict()).get('library_layout', np.nan))
+
+        df = df.dropna()
+        df['pairing'] = df.pairing.str.upper()
+
+        df = df[df['pairing'] == 'PAIRED']
+
+        if not len(df):
+            # no items to pair, clear any previous pairing information
+            self.remove_pairing_info(stage["ref"], attributes, meta)
+
+            return False
+
+        # remove extraneous columns
+        df = df.drop(columns=['description'])
+
+        if not len(df) % 2 == 0:
+            stage["error"] = "Pairing requires even number of datafiles!"
+            stage["refresh_wizard"] = True
+        else:
+            # get previously pairing candidates
+            paired_candidates_old = meta.get(stage["ref"] + "_paired_candidates", list())
+            paired_candidates = list(df.index)
+
+            paired_candidates_old.sort()
+            paired_candidates.sort()
+
+            if not paired_candidates_old == paired_candidates:
+                stage["refresh_wizard"] = True
+
+            # if there's a valid stored map, use it
+            stage_data = list()
+            saved_copy = attributes.get(stage["ref"], list())
+
+            if saved_copy:
+                stored_pairs_df = pd.DataFrame(saved_copy)
+                stored_pairs_list = list(stored_pairs_df._id) + list(stored_pairs_df._id2)
+                stored_pairs_list.sort()
+
+                if stored_pairs_list == paired_candidates:
+                    df_dict = df.to_dict()
+                    df_dict = df_dict["name"]
+
+                    stored_pairs_df["name"] = stored_pairs_df['_id'].apply(lambda x: str(df_dict[x]))
+                    stored_pairs_df["name2"] = stored_pairs_df['_id2'].apply(lambda x: str(df_dict[x]))
+
+                    df_result = stored_pairs_df[['name', 'name2']]
+                    df_result.columns = ['file1', 'file2']
+
+                    stage_data = df_result.to_dict('records')
+
+            if not stage_data:
+                # define fresh pairing map
+
+                # sort by file name to reflect pairing
+                df = df.sort_values(by=['name'])
+
+                s_even = df._id.iloc[1::2]
+                s_odd = df._id.iloc[::2]
+                df_odd = df[df.index.isin(s_odd)].copy()
+                df_even = df[df.index.isin(s_even)].copy()
+                df_even['_id2'] = df_even['_id']
+                df_even['name2'] = df_even['name']
+                df_even = df_even[['_id2', 'name2']]
+                df_odd = df_odd[['_id', 'name']]
+                df_odd.index = range(0, len(df_odd))
+                df_even.index = range(0, len(df_even))
+                df_result = pd.concat([df_odd, df_even], axis=1, join_axes=[df_odd.index])
+                saved_copy = df_result[['_id', '_id2']].to_dict('records')
+                df_result = df_result[['name', 'name2']]
+                df_result.columns = ['file1', 'file2']
+
+                stage_data = df_result.to_dict('records')
+
+            stage["data"] = stage_data
+
+            # save state
+            attributes[stage["ref"]] = saved_copy
+            meta[stage["ref"] + "_paired_candidates"] = paired_candidates
+
+            save_dict = dict(attributes=attributes, meta=meta)
+            Description().edit_description(self.__wzh.description_token, save_dict)
+
+            stage["message"] = self.__wzh.wiz_message["datafiles_pairing_message"]["text"]
+
+        return stage
+
+    def remove_pairing_info(self, stage_ref, attributes, meta):
+        attributes[stage_ref] = list()
+        meta[stage_ref + "_paired_candidates"] = list()
+        save_dict = dict(attributes=attributes, meta=meta)
+
+        Description().edit_description(self.__wzh.description_token, save_dict)

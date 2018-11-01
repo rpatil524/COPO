@@ -112,6 +112,25 @@
             "default_value": "",
             "control_meta": {},
             "versions": [
+                "description_token"
+            ],
+            "description": "The description ID that led to this submission record",
+            "deprecated": false,
+            "hidden": "true",
+            "id": "copo.submission.description_token",
+            "label": "Description token",
+            "show_in_form": false,
+            "ref": "",
+            "type": "string",
+            "show_in_table": false,
+            "control": "text"
+        },
+        {
+            "help_tip": "",
+            "required": "true",
+            "default_value": "",
+            "control_meta": {},
+            "versions": [
                 "article_id"
             ],
             "description": "The article ID, applies to figshare submission",

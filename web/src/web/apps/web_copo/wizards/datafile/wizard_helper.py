@@ -1,12 +1,11 @@
 __author__ = 'etuka'
 
 import copy
-import difflib
 import numpy as np
 import pandas as pd
+from io import StringIO
 from bson import ObjectId
 from dal import cursor_to_list
-from operator import itemgetter
 from django.conf import settings
 from pandas.io.json import json_normalize
 
@@ -14,7 +13,6 @@ from dal.copo_da import DataFile, Description, Submission
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.templatetags.html_tags as htags
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
-from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
 import web.apps.web_copo.wizards.datafile.wizard_callbacks as wizcb
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 from web.apps.web_copo.wizards.utils.process_wizard_schemas import WizardSchemas
@@ -103,6 +101,32 @@ class WizardHelper:
             DataFile().get_collection_handle().update_many(
                 {"_id": {"$in": list(trgts_df.idsplit)}},
                 {'$set': update_dict})
+
+        return initiate_result
+
+    def add_to_bundle(self, description_targets):
+        trgts_df = pd.DataFrame(description_targets, columns=['id'])
+        trgts_df['idsplit'] = trgts_df['id'].apply(lambda x: ObjectId(x.split("row_")[-1]))
+
+        initiate_result = dict(status="success", message="")
+
+        records_count = DataFile().get_collection_handle().find({"$and": [
+            {"_id": {"$in": list(trgts_df.idsplit)}},
+            {'description_token': {"$exists": True, "$ne": ""}},
+            {'deleted': d_utils.get_not_deleted_flag()}]}).count()
+
+        if records_count > 0:
+            initiate_result['status'] = "error"
+            initiate_result['message'] = self.wiz_message["new_bundling_alert"]["text"]
+
+            return initiate_result
+
+        # save description token against bundle items
+        update_dict = dict(description_token=self.description_token)
+
+        DataFile().get_collection_handle().update_many(
+            {"_id": {"$in": list(trgts_df.idsplit)}},
+            {'$set': update_dict})
 
         return initiate_result
 
@@ -403,6 +427,10 @@ class WizardHelper:
         if not next_stage_dict['stage']:
             # no stage to retrieve, this should signal end
             return next_stage_dict
+
+        # signal to refresh wizard coming from stage resolution overrides previous setting
+        if "refresh_wizard" in next_stage_dict['stage']:
+            next_stage_dict['refresh_wizard'] = next_stage_dict['stage']['refresh_wizard']
 
         # build data dictionary for stage
         if next_stage_dict['stage']['ref'] in attributes and "data" not in next_stage_dict['stage']:
@@ -1579,8 +1607,203 @@ class WizardHelper:
         df = df[['file_id', 'file_path', 'upload_status']]
         bundle = list(df.file_id)
         bundle_meta = df.to_dict('records')
-        kwarg = dict(bundle=bundle, bundle_meta=bundle_meta, repository=target_repository)
+        kwarg = dict(bundle=bundle, bundle_meta=bundle_meta, repository=target_repository,
+                     description_token=self.description_token)
 
         submission_id = str(Submission(profile_id=self.profile_id).save_record(dict(), **kwarg).get("_id", str()))
 
         return submission_id
+
+    def pair_datafiles(self, auto_fields):
+        """
+        function handles pairing of two datafiles and updating ui display
+        :param autofields:
+        :return:
+        """
+        validation_result = dict(status="success", message="")
+
+        description = Description().GET(self.description_token)
+        attributes = description["attributes"]
+
+        pairing_targets = [x.split("row_")[-1] for x in auto_fields.get("pairing_targets", list())]
+        unpaired_datafiles = [x.split("row_")[-1] for x in auto_fields.get("unpaired_datafiles", list())]
+
+        current_stage = auto_fields.get("current_stage", str())
+
+        # get stored mapping
+        saved_mapping = attributes.get(current_stage, list())
+        saved_mapping_df = pd.DataFrame(saved_mapping)
+
+        # filter out unpaired files
+        filtered_df = saved_mapping_df[(~saved_mapping_df['_id'].isin(unpaired_datafiles)) | (
+            ~saved_mapping_df['_id2'].isin(unpaired_datafiles))].copy()
+
+        # append new pair
+        filtered_df = filtered_df.append({'_id': pairing_targets[0], '_id2': pairing_targets[1]}, ignore_index=True)
+
+        # remove pairing targets from unpaired datafiles
+        unpaired_datafiles = [ObjectId(x) for x in unpaired_datafiles if x not in pairing_targets]
+
+        # generate display datasets
+        filtered_df['_idObject'] = filtered_df["_id"].apply(lambda x: ObjectId(x))
+        filtered_df['_id2Object'] = filtered_df["_id2"].apply(lambda x: ObjectId(x))
+        object_ids = list(filtered_df._idObject) + list(filtered_df._id2Object)
+
+        records = cursor_to_list(DataFile().get_collection_handle().find({"_id": {"$in": object_ids}}, {'name': 1}))
+        records_df = pd.DataFrame(records)
+
+        records_df.index = records_df._id
+        records_dict = records_df.to_dict()
+        records_dict = records_dict["name"]
+
+        filtered_df["name"] = filtered_df['_idObject'].apply(lambda x: str(records_dict[x]))
+        filtered_df["name2"] = filtered_df['_id2Object'].apply(lambda x: str(records_dict[x]))
+
+        paired_dataset = filtered_df[['name', 'name2']]
+        paired_dataset.columns = ['file1', 'file2']
+        validation_result["paired_dataset"] = paired_dataset.to_dict('records')
+
+        validation_result["unpaired_dataset"] = list()
+
+        # prepare pairing dataframe for saving
+        filtered_df = filtered_df[['_id', '_id2']]
+
+        if unpaired_datafiles:
+            records = cursor_to_list(
+                DataFile().get_collection_handle().find({"_id": {"$in": unpaired_datafiles}}, {'name': 1}))
+            df = pd.DataFrame(records)
+            df['_id'] = df._id.astype(str)
+            df["DT_RowId"] = df._id
+            df["chk_box"] = ''
+            df.DT_RowId = 'row_' + df.DT_RowId
+            df = df.drop('_id', axis='columns')
+            validation_result["unpaired_dataset"] = df.to_dict('records')
+
+            # save overall pairing information - including unpaired ones. we need to make sure all files are paired!
+            chunks = np.array_split(unpaired_datafiles, len(unpaired_datafiles) / 2)
+            chunks = pd.DataFrame(chunks, columns=['_id', '_id2'])
+            chunks._id = chunks['_id'].astype(str)
+            chunks._id2 = chunks['_id2'].astype(str)
+            filtered_df = pd.concat([filtered_df, chunks])
+
+        attributes[current_stage] = filtered_df.to_dict('records')
+
+        save_dict = dict(attributes=attributes)
+        Description().edit_description(self.description_token, save_dict)
+
+        return validation_result
+
+    def get_unpaired_datafiles(self, auto_fields):
+        """
+        given name of datafiles that have been unpaired, function return record information
+        :param auto_fields:
+        :return:
+        """
+
+        validation_result = dict(status="success", message="", data_set=list())
+
+        description = Description().GET(self.description_token)
+        meta = description.get("meta", dict())
+
+        pairing_info = auto_fields.get("pairing_info", list())
+        pairs_df = pd.DataFrame(pairing_info)
+
+        datafile_names = list(pairs_df.file1) + list(pairs_df.file2)
+
+        # get paired candidates
+        current_stage = auto_fields.get("current_stage", str())
+        paired_candidates = meta.get(current_stage + "_paired_candidates", list())
+
+        object_ids = [ObjectId(x) for x in paired_candidates]
+
+        records = cursor_to_list(DataFile().get_collection_handle().find({"_id": {"$in": object_ids}}, {'name': 1}))
+        records_df = pd.DataFrame(records)
+
+        df = records_df[records_df.name.isin(datafile_names)].copy()
+
+        if len(df):
+            df['_id'] = df._id.astype(str)
+            df["DT_RowId"] = df._id
+            df["chk_box"] = ''
+            df.DT_RowId = 'row_' + df.DT_RowId
+            df = df.drop('_id', axis='columns')
+            validation_result["data_set"] = df.to_dict('records')
+
+        return validation_result
+
+    def validate_datafile_pairing(self, auto_fields):
+        """
+        function validate user supplied pairing map
+        :param auto_fields:
+        :return:
+        """
+
+        validation_result = dict(status="success", message="")
+
+        description = Description().GET(self.description_token)
+        meta = description.get("meta", dict())
+
+        pairing_info = auto_fields.get("pairing_info", str())
+
+        if not pairing_info:
+            validation_result["status"] = "error"
+            validation_result["message"] = "Couldn't find valid pairing information."
+
+            return validation_result
+
+        # get paired candidates
+        current_stage = auto_fields.get("current_stage", str())
+        paired_candidates = meta.get(current_stage + "_paired_candidates", list())
+
+        object_ids = [ObjectId(x) for x in paired_candidates]
+
+        records = cursor_to_list(DataFile().get_collection_handle().find({"_id": {"$in": object_ids}}, {'name': 1}))
+
+        records_df = pd.DataFrame(records)
+
+        pairing_info = StringIO(pairing_info)
+        df = pd.read_csv(pairing_info)
+
+        # remove spaces that could have come with the file name
+        df["File1"] = df.File1.str.strip()
+        df["File2"] = df.File2.str.strip()
+
+        # get all the file names involved
+        revised_file_names = list(df.File1) + list(df.File2)
+        stored_file_names = list(records_df["name"])
+
+        revised_file_names.sort()
+        stored_file_names.sort()
+
+        # now compare files in revised list and stored files - a mismatch should be reported as error
+        if not stored_file_names == revised_file_names:
+            validation_result["status"] = "error"
+            validation_result[
+                "message"] = "Pairing mismatch! This could be caused by repeating file names or introducing extraneous file names not in the exported list."
+
+            return validation_result
+
+        # form the new map - for storing and ui display
+        records_df.index = records_df.name
+        records_dict = records_df.to_dict()
+        records_dict = records_dict["_id"]
+
+        df["_id"] = df['File1'].apply(lambda x: str(records_dict[x]))
+        df["_id2"] = df['File2'].apply(lambda x: str(records_dict[x]))
+
+        # save revised pairing
+        saved_copy = df[['_id', '_id2']].to_dict('records')
+
+        attributes = description["attributes"]
+        attributes[current_stage] = saved_copy
+        save_dict = dict(attributes=attributes)
+
+        Description().edit_description(self.description_token, save_dict)
+
+        # ui display
+        df = df[['File1', 'File2']]
+        df.columns = ['file1', 'file2']
+
+        validation_result["data"] = df.to_dict('records')
+
+        return validation_result

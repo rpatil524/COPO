@@ -66,6 +66,7 @@ def backdoor_login(request):
         return render(request, 'copo/index.html', {})
     '''
 
+
 def test_pdf(request):
     return render(request, 'copo/test_page.html', {})
 
@@ -91,10 +92,12 @@ def test_submission(request):
     delegate_submission(request)
     return render(request, 'copo/test_page.html', {})
 
+
 @login_required
 def copo_repository(request, profile_id):
     profile = Profile().get_record(profile_id)
     return render(request, 'copo/copo_repo.html', {'profile_id': profile_id, 'profile': profile})
+
 
 def forward_to_info(request):
     message = request.GET['message']
@@ -173,7 +176,6 @@ def copo_data(request, profile_id):
     table_columns = htags.generate_table_columns("datafile")
     return render(request, 'copo/copo_data.html',
                   {'profile_id': profile_id, 'profile': profile, 'table_columns': jsonpickle.encode(table_columns)})
-
 
 
 def copo_docs(request):
@@ -341,7 +343,7 @@ def copo_register(request):
 @login_required
 def view_user_info(request):
     user = data_utils.get_current_user()
-    #op = Orcid().get_orcid_profile(user)
+    # op = Orcid().get_orcid_profile(user)
     d = SocialAccount.objects.get(user_id=user.id)
     op = json.loads(json.dumps(d.extra_data).replace("-", "_"))
 
@@ -456,10 +458,12 @@ def view_groups(request):
     return render(request, 'copo/copo_group.html',
                   {'request': request, 'profile_list': profile_list, 'group_list': group_list})
 
-#@login_required()
+
+# @login_required()
 @user_is_staff
 def administer_repos(request):
     return render(request, 'copo/copo_repository.html', {'request': request})
+
 
 def manage_repos(request):
     return render(request, 'copo/copo_repo_management.html', {'request': request})

@@ -60,6 +60,7 @@
     {
       "ref": "datafiles_pairing",
       "title": "Datafiles Pairing",
+      "is_metadata": false,
       "callback": "perform_datafile_pairing",
       "renderer": "perform_datafile_pairing",
       "message": "Pair up datafiles in the description bundle for which the library layout has been set to 'PAIRED'..</span>",

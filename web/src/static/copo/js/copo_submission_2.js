@@ -454,8 +454,6 @@ $(document).ready(function () {
             selected_records.push(item);
         });
 
-        console.log(selected_records);
-
         $('#' + tableID + ' > tbody > tr').each(function () {
             $(this).find(".panel:first").find(".row-select-icon").children('i').eq(0).removeClass("fa fa-check-square-o");
             $(this).find(".panel:first").find(".row-select-icon").children('i').eq(0).addClass("fa fa-square-o");
@@ -789,7 +787,8 @@ $(document).ready(function () {
 
     function get_submit_action(submission_id, element, typeMessage) {
         var buttonLabel = 'Submit';
-        var is_enabled = 'disabled'
+        var is_enabled = 'disabled'; //toni's comments - this will force even ENA based submission to be disabled, so overriding
+        is_enabled = '';
         if ($(element).data('repo-selected')) {
             is_enabled = 'enabled'
         }

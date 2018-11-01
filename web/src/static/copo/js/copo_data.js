@@ -86,7 +86,7 @@ $(document).ready(function () {
     });
 
     //bundle list menu items tasks
-    $(document).on('click', '.description-bundles-list > ul > li > a', function (event) {
+    $(document).on('click', '.dropdown-menu a', function (event) {
         event.preventDefault();
         dispatch_bundle_events($(this));
     });
@@ -142,7 +142,7 @@ $(document).ready(function () {
         item.webuiPopover('destroy');
 
         item.webuiPopover({
-            content: '<div class="webpop-content-div limit-text">A description bundle is a collection of datafiles with similar attributes, which can potentially be described together.</div>',
+            content: '<div class="webpop-content-div limit-text">A description bundle is a collection of datafiles with similar attributes, which can potentially be described together. <hr/><span style="color: #35637e;">Click on a bundle to access bundle tasks, including reloading the description.</span></div>',
             trigger: 'sticky',
             width: 300,
             arrow: true,
@@ -157,6 +157,7 @@ $(document).ready(function () {
         event.preventDefault();
 
         var tableID = 'bundle_add_view_tbl';
+        var table = null;
         var tbl = $('<table/>',
             {
                 id: tableID,
@@ -167,7 +168,7 @@ $(document).ready(function () {
 
         var $dialogContent = $('<div/>');
         var table_div = $('<div/>').append(tbl);
-        var filter_message = $('<div style="margin-bottom: 20px; font-weight: bold;">Note: Listed datafiles are those that are not associated with any bundle!</div>');
+        var filter_message = $('<div style="margin-bottom: 20px;"><div style="font-weight: bold; margin-bottom: 5px;">Note: Only unbundled datafiles are listed.</div><div style="color: orangered;">This action will reset the wizard to the first stage to account for the change! </div></div>');
         var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader"></div>'));
 
         var dialog = new BootstrapDialog({
@@ -203,8 +204,6 @@ $(document).ready(function () {
                             {title: "Datafiles", data: "name"}
                         ];
 
-                        var table = null;
-
                         table = $('#' + tableID).DataTable({
                             data: dtd,
                             searchHighlight: true,
@@ -216,6 +215,10 @@ $(document).ready(function () {
                             scrollX: true,
                             scrollCollapse: true,
                             paging: false,
+                            buttons: [
+                                'selectAll',
+                                'selectNone'
+                            ],
                             language: {
                                 "info": " _START_ to _END_ of _TOTAL_ datafiles",
                                 "search": " "
@@ -225,8 +228,17 @@ $(document).ready(function () {
                                 selector: 'td:first-child'
                             },
                             columns: cols,
-                            dom: 'lfit<"row">rp'
+                            dom: 'Bfr<"row"><"row info-rw" i>tlp'
                         });
+
+                        table
+                            .buttons()
+                            .nodes()
+                            .each(function (value) {
+                                $(this)
+                                    .removeClass("btn btn-default")
+                                    .addClass('tiny ui basic button');
+                            });
 
                         $('#' + tableID + '_wrapper')
                             .find(".dataTables_filter")
@@ -252,7 +264,39 @@ $(document).ready(function () {
                     label: 'Add selected',
                     cssClass: 'tiny ui basic teal button',
                     action: function (dialogRef) {
-                        dialogRef.close();
+                        var target_rows = table.rows('.selected').ids().toArray();
+
+                        if (target_rows.length > 0) {
+                            dialog.getModalBody().html('').append(spinner_div);
+
+                            $.ajax({
+                                url: wizardURL,
+                                type: "POST",
+                                headers: {
+                                    'X-CSRFToken': csrftoken
+                                },
+                                data: {
+                                    'request_action': 'add_to_bundle',
+                                    'description_token': datafileDescriptionToken,
+                                    'description_targets': JSON.stringify(target_rows)
+                                },
+                                success: function (data) {
+                                    set_wizard_stage(1); //reset to first stage of the wizard
+                                    var elem = $(".btn-next");
+                                    if (elem.hasClass("loading")) {
+                                        elem.removeClass("loading");
+                                        elem.prop('disabled', false);
+                                    }
+                                    refresh_wizard(); //refresh wizard to account for the change
+                                    refresh_inDescription_flag();
+                                    dialogRef.close();
+                                },
+                                error: function () {
+                                    alert("Couldn't add datafiles to bundle!");
+                                    dialogRef.close();
+                                }
+                            });
+                        }
                     }
                 }]
         });
@@ -372,6 +416,9 @@ $(document).ready(function () {
     var dispatchStageRenderer = {
         perform_datafile_generation: function (stage) {
             generate_datafile_edit_table(stage);
+        },
+        perform_datafile_pairing: function (stage) {
+            display_pairing_info(stage);
         }
     }; //end of dispatchStageCallback
 
@@ -1190,6 +1237,241 @@ $(document).ready(function () {
         });
     }
 
+    function display_pairing_info(stage) {
+        //function handles display of pairing information
+
+        if (stage.hasOwnProperty("error") && stage.error) {
+            BootstrapDialog.show({
+                title: "Pairing error",
+                message: stage.error,
+                cssClass: 'copo-modal3',
+                closable: false,
+                animate: true,
+                type: BootstrapDialog.TYPE_DANGER,
+                buttons: [{
+                    label: 'OK',
+                    cssClass: 'tiny ui basic orange button',
+                    action: function (dialogRef) {
+                        set_wizard_stage(wizardElement.wizard('selectedItem').step - 1); //reset to first stage of the wizard
+                        var elem = $(".btn-next");
+                        if (elem.hasClass("loading")) {
+                            elem.removeClass("loading");
+                            elem.prop('disabled', false);
+                        }
+                        refresh_wizard(); //refresh wizard to account for the change
+
+                        dialogRef.close();
+                        return false;
+                    }
+                }]
+            });
+
+            return false;
+        }
+
+        var stageHTML = $('<div/>', {"class": "alert alert-default"});
+
+        stageHTML.append($('<div/>', {style: "margin-bottom: 10px;"}));
+
+        var messageDiv = $('<div/>',
+            {
+                html: '<i class="fa fa-info-circle text-info"></i><span class="action-label" style="padding-left: 8px;">' + stage.message + '</span>',
+                class: "text-info",
+                style: "line-height: 150%; display:none;",
+                href: "#attributes-edit"
+            });
+
+
+        var tableID = 'datafile_pairing_tbl';
+        var tbl = $('<table/>',
+            {
+                id: tableID,
+                "class": "ui celled table hover copo-noborders-table",
+                cellspacing: "0",
+                width: "100%"
+            });
+
+        $('#custom-renderer_' + stage.ref).find(".stage-content")
+            .html('')
+            .append(stageHTML);
+
+        stageHTML.append($('<div/>', {style: "margin-bottom: 25px;"}).append(messageDiv));
+
+        stageHTML.append(tbl);
+
+        var dtd = stage.data;
+        var cols = [
+            {title: "File1", data: "file1"},
+            {title: "File2", data: "file2"}
+        ];
+
+        var table = null;
+
+        table = $('#' + tableID).DataTable({
+            data: dtd,
+            searchHighlight: true,
+            "lengthChange": false,
+            order: [
+                [1, "asc"]
+            ],
+            scrollY: "300px",
+            scrollX: true,
+            scrollCollapse: true,
+            paging: false,
+            buttons: [
+                'selectAll',
+                'selectNone',
+                {
+                    extend: 'csv',
+                    text: 'Export & revise',
+                    title: null,
+                    filename: "copo_datafiles_pairs_" + String(datafileDescriptionToken)
+                },
+                {
+                    text: 'Paste revised',
+                    action: function (e, dt, node, config) {
+                        BootstrapDialog.show({
+                            title: "Revised pairing",
+                            message: '<div id="pairing_info_message_div" style="margin-bottom: 10px; color: #ff0000;"></div><div>Copy and paste the revised pairing below: <textarea id="pairing_info_val" rows="10" cols="50" class="form-control"></textarea></div>',
+                            buttons: [
+                                {
+                                    label: 'Cancel',
+                                    cssClass: 'tiny ui basic button',
+                                    action: function (dialogRef) {
+                                        dialogRef.close();
+                                    }
+                                },
+                                {
+                                    icon: 'glyphicon glyphicon-refresh',
+                                    label: 'Validate',
+                                    cssClass: 'tiny ui basic primary button',
+                                    action: function (dialogRef) {
+                                        var pairing_info = $.trim(dialogRef.getModalBody().find("#pairing_info_val").val());
+                                        var form_values = {};
+                                        var activeStageIndx = wizardElement.wizard('selectedItem').step;
+                                        $('#wizard_form_' + activeStageIndx).find(":input").each(function () {
+                                            form_values[this.id] = $(this).val();
+                                        });
+
+                                        form_values.pairing_info = pairing_info;
+
+                                        var $button = this;
+                                        $button.spin();
+
+                                        dialogRef.enableButtons(false);
+                                        dialogRef.setClosable(false);
+
+                                        //validate pairing and give feedback
+                                        $.ajax({
+                                            url: wizardURL,
+                                            data: {
+                                                "request_action": "validate_datafile_pairing",
+                                                "auto_fields": JSON.stringify(form_values),
+                                                "description_token": datafileDescriptionToken
+                                            },
+                                            type: "POST",
+                                            beforeSend: function (xhr) {
+                                                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                                            },
+                                            success: function (data) {
+                                                if (data.result.status == "error") {
+                                                    $button.stopSpin();
+                                                    dialogRef.enableButtons(true);
+                                                    dialogRef.setClosable(true);
+                                                    dialogRef.getModalBody().find("#pairing_info_message_div").html(data.result.message);
+                                                    return false;
+                                                } else {
+                                                    dialogRef.getModalBody().find("#pairing_info_message_div").html('');
+
+                                                    table.rows().deselect();
+                                                    table
+                                                        .clear()
+                                                        .draw();
+                                                    table
+                                                        .rows
+                                                        .add(data.result.data);
+                                                    table
+                                                        .columns
+                                                        .adjust()
+                                                        .draw();
+                                                    table
+                                                        .search('')
+                                                        .columns()
+                                                        .search('')
+                                                        .draw();
+
+                                                    dialogRef.close();
+                                                }
+                                            }
+                                        });
+                                    }
+                                }]
+                        });
+
+                    }
+                }
+            ],
+            select: {
+                style: 'multi'
+            },
+            language: {
+                "info": " _START_ to _END_ of _TOTAL_ datafile pairs",
+                "search": " ",
+                buttons: {
+                    selectAll: "Select all",
+                    selectNone: "Clear selection"
+                }
+            },
+            columns: cols,
+            dom: 'Bfr<"row"><"row info-rw" i>tlp'
+        });
+
+        table
+            .buttons()
+            .nodes()
+            .each(function (value) {
+                $(this)
+                    .removeClass("btn btn-default")
+                    .addClass('tiny ui basic button');
+            });
+
+        $('#' + tableID + '_wrapper')
+            .find(".dataTables_filter")
+            .find("input")
+            .removeClass("input-sm")
+            .attr("placeholder", "Search pairs");
+
+        //add custom buttons
+
+        var customButtons = $('<span/>', {
+            style: "padding-left: 15px;",
+            class: "copo-table-cbuttons"
+        });
+
+
+        $(table.buttons().container()).append(customButtons);
+        $('#' + tableID + '_wrapper').css({"margin-top": "10px"});
+        $('#' + tableID + '_wrapper').find(".info-rw").css({"margin-top": "10px"});
+
+        //apply to selected rows button
+        var unpairButton = $('<button/>',
+            {
+                class: "tiny ui basic red button",
+                type: "button",
+                html: '<i class="fa fa-chain-broken" aria-hidden="true" style=" font-size: 12px !important; padding-right: 5px;"></i>Unpair selected records',
+                click: function (event) {
+                    event.preventDefault();
+                    unpair_datafiles(table);
+                }
+            });
+
+        customButtons.append(unpairButton);
+
+        refresh_tool_tips();
+
+        messageDiv.show();
+    }
+
     function generate_datafile_edit_table(stage) {
         //function provides stage information for datafile attributes editing
 
@@ -1205,7 +1487,7 @@ $(document).ready(function () {
                 html: '<i class="fa fa-2x fa-info-circle text-info"></i><span class="action-label" style="padding-left: 8px;">Attributes editing tips...</span>',
                 class: "text-info",
                 style: "line-height: 150%; display:none;",
-                href: "#attributes-edit",
+                href: "#dfilepairing-info",
                 "data-toggle": "collapse"
             });
 
@@ -1222,7 +1504,7 @@ $(document).ready(function () {
         var messageDivContent = $('<div/>',
             {
                 class: "collapse",
-                id: "attributes-edit"
+                id: "dfilepairing-info"
             }
         );
 
@@ -2383,6 +2665,7 @@ $(document).ready(function () {
         var parentElem = elem.closest(".description-bundles-list");
 
         var bundle_name = parentElem.find(".bundle-name-i").text();
+        bundle_name = String(bundle_name).replace(/^\s+|\s+$/g, '');
         var bundle_html = parentElem.find(".bundle-name-i").html();
         parentElem.find(".bundle-name-i").text("Deleting...");
         parentElem.prop('disabled', true);
@@ -2435,6 +2718,237 @@ $(document).ready(function () {
                 }
             ]
         });
+    }
+
+    function unpair_datafiles(parentTable) {
+        //function manages the unpairing and manual pairing of datafiles
+
+        if (!parentTable.rows('.selected').data().length) {
+            return false;
+        }
+
+        var unpairedCandidates = parentTable.rows('.selected').data().toArray();
+        parentTable
+            .rows('.selected')
+            .remove()
+            .draw();
+
+
+        var form_values = {};
+        var activeStageIndx = wizardElement.wizard('selectedItem').step;
+        $('#wizard_form_' + activeStageIndx).find(":input").each(function () {
+            form_values[this.id] = $(this).val();
+        });
+
+        form_values.pairing_info = unpairedCandidates;
+
+        var tableID = 'unpairing_tbl';
+        var tbl = $('<table/>',
+            {
+                id: tableID,
+                "class": "ui celled table hover copo-noborders-table",
+                cellspacing: "0",
+                width: "100%"
+            });
+
+        var $dialogContent = $('<div/>');
+        var table_div = $('<div/>').append(tbl);
+        var filter_message = $('<div style="margin-bottom: 20px;"><div style="font-weight: bold; margin-bottom: 5px;">Click any two files to pair</div>');
+        var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader"></div>'));
+
+        var dialog = new BootstrapDialog({
+            type: BootstrapDialog.TYPE_PRIMARY,
+            size: BootstrapDialog.SIZE_NORMAL,
+            title: "Datafiles pairing",
+            closable: false,
+            animate: true,
+            draggable: false,
+            onhide: function (dialogRef) {
+                //nothing to do for now
+            },
+            onshown: function (dialogRef) {
+                $.ajax({
+                    url: wizardURL,
+                    type: "POST",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    data: {
+                        'request_action': 'get_unpaired_datafiles',
+                        'description_token': datafileDescriptionToken,
+                        'auto_fields': JSON.stringify(form_values)
+                    },
+                    success: function (data) {
+                        spinner_div.remove();
+
+                        var dtd = data.result.data_set;
+
+                        var cols = [
+                            {title: "", className: 'select-checkbox', data: "chk_box", orderable: false},
+                            {title: "Datafiles", data: "name"}
+                        ];
+
+                        var table = null;
+
+                        table = $('#' + tableID).DataTable({
+                            data: dtd,
+                            searchHighlight: true,
+                            "lengthChange": false,
+                            order: [
+                                [1, "asc"]
+                            ],
+                            scrollY: "300px",
+                            scrollX: true,
+                            scrollCollapse: true,
+                            paging: false,
+                            language: {
+                                "info": " _START_ to _END_ of _TOTAL_ datafiles",
+                                "search": " "
+                            },
+                            select: {
+                                style: 'multi'
+                            },
+                            columns: cols,
+                            dom: 'lfit<"row">rp'
+                        });
+
+                        $('#' + tableID + '_wrapper')
+                            .find(".dataTables_filter")
+                            .find("input")
+                            .removeClass("input-sm")
+                            .attr("placeholder", "Search datafiles");
+
+                        //pairing event
+
+                        table
+                            .off('select')
+                            .on('select', function (e, dt, type, indexes) {
+                                var selectedRows = dt.rows({
+                                    selected: true
+                                }).data();
+
+                                if (selectedRows.length == 2) {//pair selected datafiles
+                                    var dialog2 = new BootstrapDialog({
+                                        // title: "Datafiles pairing",
+                                        message: 'Do you want to pair the selected datafiles?',
+                                        cssClass: 'copo-modal3',
+                                        closable: false,
+                                        animate: true,
+                                        type: BootstrapDialog.TYPE_PRIMARY,
+                                        buttons: [{
+                                            label: 'Cancel',
+                                            cssClass: 'tiny ui basic button',
+                                            action: function (dialogRef2) {
+                                                table.rows('.selected').deselect();
+                                                dialogRef2.close();
+                                            }
+                                        }, {
+                                            label: '<i class="copo-components-icons fa fa-link"></i> Pair',
+                                            cssClass: 'tiny ui basic primary button',
+                                            action: function (dialogRef2) {
+                                                var $button2 = this;
+                                                $button2.disable();
+                                                $button2.spin();
+
+                                                var form_values = {};
+                                                var activeStageIndx = wizardElement.wizard('selectedItem').step;
+                                                $('#wizard_form_' + activeStageIndx).find(":input").each(function () {
+                                                    form_values[this.id] = $(this).val();
+                                                });
+
+                                                form_values.unpaired_datafiles = table.rows().ids().toArray();
+                                                form_values.pairing_targets = table.rows('.selected').ids().toArray();
+
+                                                $.ajax({
+                                                    url: wizardURL,
+                                                    type: "POST",
+                                                    headers: {
+                                                        'X-CSRFToken': csrftoken
+                                                    },
+                                                    data: {
+                                                        'request_action': 'pair_datafiles',
+                                                        'description_token': datafileDescriptionToken,
+                                                        'auto_fields': JSON.stringify(form_values)
+                                                    },
+                                                    success: function (data) {
+
+                                                        parentTable.rows().deselect();
+                                                        parentTable
+                                                            .clear()
+                                                            .draw();
+                                                        parentTable
+                                                            .rows
+                                                            .add(data.result.paired_dataset);
+                                                        parentTable
+                                                            .columns
+                                                            .adjust()
+                                                            .draw();
+                                                        parentTable
+                                                            .search('')
+                                                            .columns()
+                                                            .search('')
+                                                            .draw();
+
+                                                        if (data.result.unpaired_dataset.length > 0) {
+                                                            table.rows().deselect();
+                                                            table
+                                                                .clear()
+                                                                .draw();
+                                                            table
+                                                                .rows
+                                                                .add(data.result.unpaired_dataset);
+                                                            table
+                                                                .columns
+                                                                .adjust()
+                                                                .draw();
+                                                            table
+                                                                .search('')
+                                                                .columns()
+                                                                .search('')
+                                                                .draw();
+                                                        } else {
+                                                            dialog.close();
+                                                        }
+
+                                                        dialogRef2.close();
+                                                    },
+                                                    error: function () {
+                                                        console.log("Couldn't complete datafiles pairing!");
+                                                        dialogRef2.close();
+                                                    }
+                                                });
+
+                                            }
+                                        }]
+                                    });
+
+                                    dialog2.realize();
+                                    dialog2.getModalHeader().hide();
+                                    dialog2.open();
+                                }
+                            });
+
+                    },
+                    error: function () {
+                        alert("Couldn't display datafiles!");
+                        dialogRef.close();
+                    }
+                });
+            },
+            buttons: [{
+                label: 'OK',
+                cssClass: 'tiny ui basic button',
+                action: function (dialogRef) {
+                    dialogRef.close();
+                }
+            }]
+        });
+
+
+        $dialogContent.append(filter_message).append(table_div).append(spinner_div);
+        dialog.realize();
+        dialog.setMessage($dialogContent);
+        dialog.open();
     }
 
 }); //end document ready
