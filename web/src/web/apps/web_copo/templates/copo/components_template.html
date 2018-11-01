@@ -4,128 +4,97 @@
 
     <!-- dspace modal template -->
     <div id="template_dspace_form">
-        <form>
+        <div class="form_content">
             <div class="create_add_dataverse">
-                <label><input type="radio" name="create_repo_radio" value="new">&nbsp
-                    Create
-                    New dspace Object</label>
+                <label>Create New dSpace items&nbsp</label><input type="radio" name="create_repo_radio" value="new">
+
             </div>
             <div class="create_add_dataverse">
-                <label><input type="radio" checked="true" name="create_repo_radio" value="existing">&nbsp Add to
-                    Existing</label>
+                <label>Add to Existing&nbsp</label><input type="radio" checked="true" name="create_repo_radio"
+                                                          value="existing">
+
+
             </div>
             <hr/>
+
             <div class="row new-controls" style="display:none">
                 <!-- new dspace controls -->
-                <div class="fuelux">
-                    <div class="wizard" data-initialize="wizard" id="dspace_wizard">
-                        <div class="steps-container">
-                            <ul class="steps">
-                                <li data-step="1" data-name="community" class="active">
-                                    <span class="badge">1</span>Community
-                                    <span class="chevron"></span>
-                                </li>
-                                <li data-step="2" data-name="collection">
-                                    <span class="badge">2</span>Collection
-                                    <span class="chevron"></span>
-                                </li>
-                                <li data-step="3" data-name="template">
-                                    <span class="badge">3</span>Item
-                                    <span class="chevron"></span>
-                                </li>
-                            </ul>
+                <h5>Item will be created with the following metadata</h5>
+                <div style="width: 600px">
+                    <form id="new_dspace_form">
+                        <div class="form-group">
+                            <label for="dsTitle">Title</label>
+                            <input type="text" class="form-control" name="dsTitle" id="dsTitle"/>
                         </div>
-                        <div class="actions">
-                            <button type="button" class="btn btn-default btn-prev">
-                                <span class="glyphicon glyphicon-arrow-left"></span>Prev
-                            </button>
-                            <button type="button" class="btn btn-primary btn-next" data-last="Complete">Next
-                                <span class="glyphicon glyphicon-arrow-right"></span>
-                            </button>
+                        <div class="form-group">
+                            <label for="dsAbstract">Abstract</label>
+                            <textarea type="text" class="form-control" name="dsAbstract" id="dsAbstract"></textarea>
                         </div>
-                        <div class="step-content">
-                            <div class="step-pane active sample-pane alert" data-step="1">
-                                <h4>Choose Community</h4>
-                                <p>
-                                <div class="create_add_community_radio_div">
-                                    <div class="form-group">
-                                        <input type="radio" class="create_community_radio" checked="true"
-                                               name="create_community_radio"
-                                               value="new">&nbsp<label>Create New Community</label>
-
-
-                                        <input type="radio" class="create_community_radio" name="create_community_radio"
-                                               value="existing">&nbsp<label>Add To Existing Community</label>
-                                    </div>
-
-                                </div>
-                                </p>
-
-                                <hr/>
-                                <div class="new_community_controls">
-
-                                    <!-- new Community controls -->
-                                    <div class="form-group">
-                                        <label for="dspName">Name</label>
-                                        <input type="text" class="form-control" name="dspName" id="dspName">
-                                        <label for="dspDescription">Description</label>
-                                        <input type="text" class="form-control" name="dspDescription"
-                                               id="dspDescription">
-                                        <label for="dspIntroductoryText">Introductory Text</label>
-                                        <input type="text" class="form-control" name="dspIntroductoryText"
-                                               id="dspIntroductoryText">
-                                    </div>
-                                    <!-- Existing Community table -->
-
-                                </div>
-                                <div id="existing_community_table_div" style="display: block">
-                                    <table id="existing_community_table">
-                                        <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Name</th>
-                                            <th>Handle</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td></td>
-                                            <td>Toni</td>
-                                            <td>Tbone</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div class="step-pane sample-pane alert" data-step="2">
-                                <h4>Choose Collection</h4>
-                                <p></p>
-                            </div>
-                            <div class="step-pane sample-pane alert" data-step="3">
-                                <h4>Choose Item</h4>
-                                <p></p>
-                            </div>
+                        <div class="form-group">
+                            <label for="dsType">Type</label>
+                            <input type="text" class="form-control" name="dsType" id="dsType"/>
                         </div>
-
-
-                    </div>
+                        <div class="form-group">
+                            <label for="dsSubject">Subject</label>
+                            <input type="text" class="form-control" name="dsSubject" id="dsSubject"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="dsCreator">Creator</label>
+                            <input type="text" class="form-control" name="dsCreator" id="dsCreator"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="dsCreated">Created</label>
+                            <input type="text" class="form-control" name="dsCreated" id="dsCreated"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="dsAvailable">Available</label>
+                            <input type="text" class="form-control" name="dsAvailable" id="dsAvailable"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="dsAccessioned">Accessioned</label>
+                            <input type="text" class="form-control" name="dsAccessioned" id="dsAccessioned"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="dsIssued">Issued</label>
+                            <input type="text" class="form-control" name="dsIssued" id="dsIssued"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="dsIssn">Issn</label>
+                            <input type="text" class="form-control" name="dsIssn" id="dsIssn">
+                        </div>
+                        <div class="form-group">
+                            <label for="dsUri">Uri</label>
+                            <input type="text" class="form-control" name="dsUri" id="dsUri"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="dsLanguage">Language</label>
+                            <input type="text" class="form-control" name="dsLanguage" id="dsLanguage"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="dsRights">Rights</label>
+                            <input type="text" class="form-control" name="dsRights" id="dsRights"/>
+                        </div>
+                    </form>
                 </div>
+                <h5>Choose which collection this item should be added to</h5>
             </div>
+
+            <span class="input-group ajax-loading-div">
+                    <img style="height: 24px; margin-left:5px;" src="{% static 'copo/img/loading.gif' %}"></span>
+            <div id="table-div-dataverse" class="table table-striped table-bordered"
+                 style="padding: 10px;width:100%">
+
+            </div>
+
             <div class="existing-controls" style="display: block">
                 <!-- existing dspace controls -->
                 <div class="form-inline">
 
 
                 </div>
-                <span class="input-group ajax-loading-div">
-                    <img style="height: 24px; margin-left:5px;" src="{% static 'copo/img/loading.gif' %}"></span>
-                <div id="table-div-dataverse" class="table table-striped table-bordered"
-                     style="padding: 10px;width:100%">
 
-                </div>
             </div>
-        </form>
+        </div>
     </div>
 
     <!-- dataverse modal template -->

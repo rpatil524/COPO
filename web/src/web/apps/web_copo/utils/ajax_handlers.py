@@ -515,6 +515,7 @@ def get_dataverse_content(request):
 
 
 def get_info_for_new_dataverse(request):
+    # method to prepopulate dataverse creation form with currently available metadata values
     out = dict()
     p_id = request.session['profile_id']
     profile = Profile().get_record(p_id)
@@ -550,8 +551,16 @@ def update_submission_repo_data(request):
         clear_submission_metadata(request)
         return HttpResponse(json_util.dumps(s))
     elif task == 'change_meta':
-        meta = request.POST['meta']
+        meta = json.loads(request.POST['meta'])
+        if request.POST["type"] == "dspace":
+            if request.POST["new_or_existing"] == "new":
+                # need to get form metadata for creating new dspace item
+                form_data = json.loads(request.POST['form_data'])
+                meta.update(form_data)
+        # now update submission record
         submission_id = request.POST['submission_id']
+        if type(meta) == type(dict()):
+            meta = json.dumps(meta)
         s = Submission().update_meta(submission_id=submission_id, meta=meta)
         return HttpResponse(json.dumps(s))
 
@@ -570,14 +579,40 @@ def get_dspace_communities(request):
     resp = dspace(sub_id).get_dspace_communites()
     return HttpResponse(resp)
 
+
 def get_dspace_collection(request):
     sub_id = request.GET['submission_id']
     collection_id = request.GET['collection_id']
     resp = dspace(sub_id).get_dspace_collection(collection_id)
     return HttpResponse(resp)
 
+
 def get_dspace_items(request):
     sub_id = request.GET['submission_id']
     collection_id = request.GET['collection_id']
     resp = dspace(sub_id).get_dspace_items(collection_id)
     return HttpResponse(resp)
+
+
+def get_dspace_item_metadata(request):
+    # get base metadata for view showing new dspace item
+    sub_id = request.GET["submission_id"]
+    sub = Submission().get_record(ObjectId(sub_id))
+    df_id = sub["bundle"][0]
+    df = DataFile().get_record(ObjectId(df_id))
+    out = dict()
+    out["creator"] = df.get("description", {}).get("attributes", {}) \
+        .get("title_author_contributor", {}).get("creator", "")
+    out["accessioned"] = str(datetime.now())
+    out["created"] = str(datetime.now())
+    out["available"] = str(datetime.now())
+    out["issued"] = str(datetime.now())
+    out["abstract"] = Profile().get_record(ObjectId(sub["profile_id"]))['description']
+    out["language"] = "en_US"
+    out["rights"] = df.get("description", {}).get("attributes", {}).get("optional_fields", {}).get("license", "")
+    out["subject"] = df.get("description", {}).get("attributes", {}).get("subject_description", {}).get("subject", "")
+    out["title"] = df.get("description", {}).get("attributes", {}) \
+        .get("title_author_contributor", {}).get("subject", "")
+    out["type"] = df.get("description", {}).get("attributes", {}) \
+        .get("optional_fields", {}).get("type", "")
+    return HttpResponse(json.dumps(out))

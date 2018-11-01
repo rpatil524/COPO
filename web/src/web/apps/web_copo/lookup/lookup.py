@@ -445,7 +445,7 @@ DROP_DOWNS = {
         },
         {
             'value': 'dcterms',
-            'label': 'Dataverse',
+            'label': 'Dublin Core',
             'description': 'A Dataverse is an open source data management repository for a community or an institution. It allows data to be federated with a growing list of Dataverse repositories worldwide for increased discoverability'
         },
 

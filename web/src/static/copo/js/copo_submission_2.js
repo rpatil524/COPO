@@ -50,8 +50,9 @@ $(document).ready(function () {
     $(document).on('click', '.target_repo_option', function (event) {
         event.preventDefault()
         var e = event.currentTarget
-        $('#custom_repo_id').val($(e).data('repoId'))
-        $('#target_repo_label').html(e.innerHTML)
+        $('#custom_repo_id').val(e.innerHTML)
+        var text = $(e).html()
+        $(e).closest($('#target_repo_label').html(text))
         var submission_id = $(e).data('submission_id')
 
         $.ajax({
@@ -885,6 +886,7 @@ $(document).ready(function () {
                             'component': component
                         },
                         success: function (data) {
+                            console.log(data)
                             BootstrapDialog.show({
                                 title: "Submission Accessions",
                                 message: $('<div></div>').append('<table id="submission_accession_table_' + targetID + '" class="ui celled stripe table hover copo-noborders-table" cellspacing="0" width="100%"></table>'),

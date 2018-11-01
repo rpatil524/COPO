@@ -10,7 +10,7 @@ from bson import ObjectId
 class DspaceSubmit(object):
     host = None
     headers = None
-
+    numeric_limit = 50
     error_msg = "Cannot communicate with server. Are you connected to a network?"
     not_found = "Nothing Found for Entry"
 
@@ -31,25 +31,32 @@ class DspaceSubmit(object):
         #  we are creating a new dataset
         if 'dspace_item_name' in s['meta']:
             # submit to existing
-            self._add_to_dspace(s)
+            return self._add_to_dspace(s)
         else:
             # create new
-            self._create_and_add_to_dspace(s)
+            return self._create_and_add_to_dspace(s)
         return True
 
     def _add_to_dspace(self, sub):
 
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         # get data required and perform login
         dspace_url = sub['destination_repo']['url']
         email = sub['destination_repo']['username']
-        print(email)
         password = sub['destination_repo']['password']
         login_url = dspace_url + "/rest/login"
-        resp = requests.post(login_url, {"email": email, "password": password})
-
-        #store session identifier for future requests
-        login_details = resp.cookies["JSESSIONID"]
-
+        params = {"email": email, "password": password}
+        resp = requests.post(login_url, json=params)
+        # store session identifier for future requests
+        if resp.status_code != 200:
+            return {"status": 1, "message": "error logging into dSpace"}
+        else:
+            try:
+                login_details = resp.cookies["JSESSIONID"]
+                dspace_type = 6
+            except KeyError:
+                login_details = resp.content
+                dspace_type = 5
         # get item identifier, this is where we will deposit bitstream
         item_id = sub['meta']['identifier']
 
@@ -61,10 +68,13 @@ class DspaceSubmit(object):
             # location is path/filename
             location = f['file_location']
             # get description from dc metadata
-            description = f['description']['attributes']['subject_description']['description']
+            try:
+                description = f['description']['attributes']['subject_description']['description']
+            except KeyError:
+                description = "No Description Provided"
 
             # make bitstream first, n.b. that name and description need to be added as url params, not json data
-            bitstream_url = dspace_url + "/rest/items/" + item_id + "/bitstreams?name=" + name + "&description=" + description
+            bitstream_url = dspace_url + "/rest/items/" + str(item_id) + "/bitstreams?name=" + name + "&description=" + description
             # make sure json is set here or dspace will return XML response
             headers = {"Content-Type": "application/json", "accept": "application/json"}
             policy = [{"action": "DEFAULT_*", "epersonId": -1, "groupId": 0, "resourceId": 47166,
@@ -77,28 +87,40 @@ class DspaceSubmit(object):
                          }
 
             # request new bitstream
-            resp = requests.post(bitstream_url, data=bitstream, headers=headers, cookies={"JSESSIONID": login_details})
+            if dspace_type == 6:
+                resp = requests.post(bitstream_url, data=bitstream, headers=headers, cookies={"JSESSIONID": login_details})
+            elif dspace_type == 5:
+                resp = requests.post(bitstream_url, json=bitstream, headers={"rest-dspace-token": login_details, "accept": "application/json"})
+
             if resp.status_code == 200:
                 # get bitstream id and open file to be uploaded
                 c = resp.content.decode('utf-8')
                 data = json.loads(c)
 
                 if "uuid" in data:
-                    data_url = dspace_url + "/rest/bitstreams/" + data["uuid"] + "/data"
+                    data_id = data["uuid"]
                 else:
-                    data_url = dspace_url + "/rest/bitstreams/" + data["id"] + "/data"
+                    data_id = data["id"]
+
+                data_url = dspace_url + "/rest/bitstreams/" + str(data_id) + "/data"
 
                 # upload file
                 with open(location, 'rb') as file_stream:
-                    data_resp = requests.put(data_url, data=file_stream, headers=headers, cookies={"JSESSIONID": login_details})
+                    if dspace_type == 6:
+                        data_resp = requests.put(data_url, data=file_stream, headers=headers,
+                                             cookies={"JSESSIONID": login_details})
+                    elif dspace_type == 5:
+                        data_resp = requests.put(data_url, data=file_stream, headers={"rest-dspace-token": login_details})
                 if data_resp.status_code == 200:
-                    self._update_submission(sub, data_resp)
+                    self._update_dspace_submission(sub, dspace_url, data_id)
             else:
-                print(str(resp.status_code) + " ," + resp.reason)
                 return (str(resp.status_code) + " ," + resp.reason + " ," + resp.content.decode('utf-8'))
         logout_url = dspace_url + '/rest/logout'
-        requests.post(logout_url, cookies={"JSESSIONID": login_details})
-
+        if dspace_type == 6:
+            requests.post(logout_url, cookies={"JSESSIONID": login_details})
+        elif dspace_type == 5:
+            requests.post(logout_url, headers={"rest-dspace-token": login_details})
+        Submission().mark_submission_complete(sub["_id"])
         return True
 
     def _create_and_add_to_dspace(self, sub):
@@ -108,9 +130,17 @@ class DspaceSubmit(object):
     def _update_submission(self, sub, data_resp):
         print(data_resp)
 
+    def _update_dspace_submission(self, sub, dspace_url, data_id):
+        data_url = dspace_url + "/rest/bitstreams/" + str(data_id)
+        resp = requests.get(data_url)
+        data = json.loads(resp.content.decode('utf-8'))
+        data["uuid"] = data.pop("id")
+        data['dspace_instance'] = dspace_url
+        Submission().insert_dspace_accession(sub, data)
+
     def get_dspace_communites(self):
         url = self.host['url']
-        url = url + '/rest/communities?limit=1000'
+        url = url + '/rest/communities?limit=' + str(self.numeric_limit)
         resp = requests.get(url)
 
         if resp.status_code == 200:
