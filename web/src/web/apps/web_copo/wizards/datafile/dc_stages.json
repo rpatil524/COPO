@@ -1,291 +1,1549 @@
 {
-  "title": "Dublin Core (dc) Metadata schema used by Dataverse",
-  "description": "The Dublin Core Metadata Initiative (DCMI) supports shared innovation in metadata design and best practices across a broad range of purposes and business models.",
-  "properties": [
-    {
-      "ref": "title_author_contributor",
-      "title": "Contacts",
-      "message": "",
-      "items": [
+    "title": "Dublin Core (dc) Metadata schema used by Dataverse",
+    "description": "The Dublin Core Metadata Initiative (DCMI) supports shared innovation in metadata design and best practices across a broad range of purposes and business models.",
+    "properties": [
         {
-          "type": "string",
-          "required": "true",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": "",
-          "show_in_form": true,
-          "id": "title",
-          "show_in_table": true,
-          "control": "text",
-          "versions": [
-            "title"
-          ],
-          "help_tip": "Enter a name for this item.",
-          "label": "Title *"
+            "ref": "title_author_contributor",
+            "title": "Contacts",
+            "message": "",
+            "items": [
+                {
+                    "type": "string",
+                    "required": "true",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": "",
+                    "show_in_form": true,
+                    "id": "title",
+                    "show_in_table": true,
+                    "control": "text",
+                    "versions": [
+                        "title"
+                    ],
+                    "help_tip": "Enter a name for this item.",
+                    "label": "Title *"
+                },
+                {
+                    "type": "string",
+                    "required": "true",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": "",
+                    "show_in_form": true,
+                    "id": "creator",
+                    "show_in_table": true,
+                    "control": "text",
+                    "versions": [
+                        "creator"
+                    ],
+                    "help_tip": "Enter an author for this item. (Lastname/Firstname)",
+                    "label": "Creator (comma separated) *"
+                },
+                {
+                    "type": "string",
+                    "required": "true",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": "",
+                    "show_in_form": true,
+                    "id": "contributor",
+                    "show_in_table": true,
+                    "control": "text",
+                    "versions": [
+                        "contributor"
+                    ],
+                    "help_tip": "Enter a contact email address for this item.",
+                    "label": "Contributor Email *"
+                }
+            ]
         },
         {
-          "type": "string",
-          "required": "true",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": "",
-          "show_in_form": true,
-          "id": "creator",
-          "show_in_table": true,
-          "control": "text",
-          "versions": [
-            "creator"
-          ],
-          "help_tip": "Enter an author for this item. (Lastname/Firstname)",
-          "label": "Author (comma separated) *"
+            "ref": "subject_description",
+            "title": "Description",
+            "message": "",
+            "items": [
+                {
+                    "type": "string",
+                    "required": "true",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": "",
+                    "show_in_form": true,
+                    "id": "description",
+                    "show_in_table": true,
+                    "control": "text",
+                    "versions": [
+                        "description"
+                    ],
+                    "help_tip": "Describe the purpose, scope or nature of this item.",
+                    "label": "Description *"
+                },
+                {
+                    "type": "string",
+                    "required": "true",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": "",
+                    "show_in_form": true,
+                    "id": "subject",
+                    "show_in_table": true,
+                    "control": "select",
+                    "option_values": {
+                        "callback": {
+                            "function": "get_dataverse_subject_dropdown",
+                            "parameter": ""
+                        }
+                    },
+                    "versions": [
+                        "subject"
+                    ],
+                    "help_tip": "Enter subject from dropdown.",
+                    "label": "Subject *"
+                }
+            ]
         },
         {
-          "type": "string",
-          "required": "true",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": "",
-          "show_in_form": true,
-          "id": "contributor",
-          "show_in_table": true,
-          "control": "text",
-          "versions": [
-            "contributor"
-          ],
-          "help_tip": "Enter a contact email address for this item.",
-          "label": "Contributor Email *"
+            "ref": "optional_fields",
+            "title": "Further details where applicable",
+            "message": "",
+            "items": [
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": "",
+                    "show_in_form": true,
+                    "id": "identifier",
+                    "show_in_table": true,
+                    "control": "string",
+                    "other_schemas": {
+                    },
+                    "versions": [
+                        "identifier"
+                    ],
+                    "help_tip": "An unambiguous reference to the resource within a given context.",
+                    "label": "Identifier"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": "",
+                    "show_in_form": true,
+                    "id": "publisher",
+                    "show_in_table": true,
+                    "control": "text",
+                    "other_schemas": {
+                        "dataverse": {
+                            "name": "producerName",
+                            "version": "4.6.1"
+                        }
+                    },
+                    "versions": [
+                        "publisher"
+                    ],
+                    "help_tip": "Person or agency financially or administratively responsible for the Dataset.",
+                    "label": "Producer"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": "",
+                    "show_in_form": true,
+                    "id": "date",
+                    "show_in_table": true,
+                    "control": "date-picker",
+                    "other_schemas": {
+                        "dataverse": {
+                            "name": "productionDate",
+                            "version": "4.6.1"
+                        }
+                    },
+                    "versions": [
+                        "date"
+                    ],
+                    "help_tip": "Production date of Dataset.",
+                    "label": "Production Date"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": "",
+                    "show_in_form": true,
+                    "id": "type",
+                    "show_in_table": true,
+                    "control": "text",
+                    "other_schemas": {
+                        "dataverse": {
+                            "name": "kindOfData",
+                            "version": "4.6.1"
+                        }
+                    },
+                    "versions": [
+                        "type"
+                    ],
+                    "help_tip": "Type of data included in the file: survey data, census/enumeration data, aggregate data, clinical.",
+                    "label": "Kind of Data"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "source",
+                    "show_in_table": true,
+                    "control": "text",
+                    "other_schemas": {
+                        "dataverse": {
+                            "name": "dataSources",
+                            "version": "4.6.1"
+                        }
+                    },
+                    "versions": [
+                        "source"
+                    ],
+                    "help_tip": "List of books, articles, data files if any that served as the sources for the Dataset.",
+                    "label": "Data Sources (comma separated)"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "relation",
+                    "show_in_table": true,
+                    "control": "text",
+                    "other_schemas": {
+                        "dataverse": {
+                            "name": "relatedMaterial",
+                            "version": "4.6.1"
+                        }
+                    },
+                    "versions": [
+                        "relation"
+                    ],
+                    "help_tip": "Any related material (journal article citation is not included here - see: isReferencedBy below).",
+                    "label": "Related Material (comma separated)"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": "",
+                    "show_in_form": true,
+                    "id": "rights",
+                    "show_in_table": true,
+                    "control": "text",
+                    "versions": [
+                        "rights"
+                    ],
+                    "help_tip": "Information about rights held in and over the resource.",
+                    "label": "rights"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": "CC0",
+                    "show_in_form": true,
+                    "id": "license",
+                    "show_in_table": true,
+                    "control": "text",
+                    "versions": [
+                        "license"
+                    ],
+                    "help_tip": "Set the license to CC0 (default in Dataverse for new Datasets), otherwise enter “NONE” and fill in the Terms of Use field.",
+                    "label": "License"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": "",
+                    "show_in_form": true,
+                    "id": "termsofuse",
+                    "show_in_table": true,
+                    "control": "text",
+                    "versions": [
+                        "termsofuse"
+                    ],
+                    "help_tip": "If not using CC0, enter any terms of use or restrictions for the Dataset.",
+                    "label": "Terms of Use"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "isReferencedBy",
+                    "show_in_table": true,
+                    "control": "text",
+                    "other_schemas": {
+                        "dataverse": {
+                            "name": "publicationCitation",
+                            "version": "4.6.1"
+                        }
+                    },
+                    "versions": [
+                        "isReferencedBy"
+                    ],
+                    "help_tip": "The publication (journal article, book, other work) that uses this dataset (include citation, permanent identifier (DOI), and permanent URL).",
+                    "label": "Referenced by (comma separated)"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "coverage",
+                    "show_in_table": true,
+                    "versions": [
+                        "coverage"
+                    ],
+                    "help_tip": "The spatial or temporal topic of the resource, the spatial applicability of the resource, or the jurisdiction under which the resource is relevant.",
+                    "label": "Coverage"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "format",
+                    "show_in_table": true,
+                    "versions": [
+                        "format"
+                    ],
+                    "help_tip": "The file format, physical medium, or dimensions of the resource.",
+                    "label": "Format"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "language",
+                    "show_in_table": true,
+                    "versions": [
+                        "language"
+                    ],
+                    "help_tip": "A language of the resource.",
+                    "label": "Language"
+                }
+            ]
+        },
+        {
+            "ref": "other_fields",
+            "title": "Any additional information",
+            "message": "",
+            "items": [
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "agent",
+                    "show_in_table": true,
+                    "versions": [
+                        "agent"
+                    ],
+                    "help_tip": "A resource that acts or has the power to act.",
+                    "label": "Agent"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "agentClass",
+                    "show_in_table": true,
+                    "versions": [
+                        "agentClass"
+                    ],
+                    "help_tip": "A group of agents.",
+                    "label": "Agent Class"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "BibliographicResource",
+                    "show_in_table": true,
+                    "versions": [
+                        "BibliographicResource"
+                    ],
+                    "help_tip": "",
+                    "label": "Bibliographic Resource"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "Box",
+                    "show_in_table": true,
+                    "versions": [
+                        "Box"
+                    ],
+                    "help_tip": "The set of regions in space defined by their geographic coordinates according to the DCMI Box Encoding Scheme.",
+                    "label": "Box"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "DCMIType",
+                    "show_in_table": true,
+                    "versions": [
+                        "DCMIType"
+                    ],
+                    "help_tip": "The set of classes specified by the DCMI Type Vocabulary, used to categorize the nature or genre of the resource.",
+                    "label": "DCMI Type"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "DDC",
+                    "show_in_table": true,
+                    "versions": [
+                        "DDC"
+                    ],
+                    "help_tip": "The set of conceptual resources specified by the Dewey Decimal Classification.",
+                    "label": "DDC"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "FileFormat",
+                    "show_in_table": true,
+                    "versions": [
+                        "FileFormat"
+                    ],
+                    "help_tip": "A digital resource format.",
+                    "label": "File Format"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "Frequency",
+                    "show_in_table": true,
+                    "versions": [
+                        "Frequency"
+                    ],
+                    "help_tip": "A rate at which something occurs.",
+                    "label": "Frequency"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "IMT",
+                    "show_in_table": true,
+                    "versions": [
+                        "IMT"
+                    ],
+                    "help_tip": "The set of media types specified by the Internet Assigned Numbers Authority.",
+                    "label": "IMT"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "Jurisdiction",
+                    "show_in_table": true,
+                    "versions": [
+                        "Jurisdiction"
+                    ],
+                    "help_tip": "The extent or range of judicial, law enforcement, or other authority.",
+                    "label": "Jurisdiction"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "LLC",
+                    "show_in_table": true,
+                    "versions": [
+                        "LLC"
+                    ],
+                    "help_tip": "The set of conceptual resources specified by the Library of Congress Classification.",
+                    "label": "LLC"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "LCSH",
+                    "show_in_table": true,
+                    "versions": [
+                        "LCSH"
+                    ],
+                    "help_tip": "The set of labeled concepts specified by the Library of Congress Subject Headings.",
+                    "label": "LCSH"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "LicenseDocument",
+                    "show_in_table": true,
+                    "versions": [
+                        "LicenseDocument"
+                    ],
+                    "help_tip": "A legal document giving official permission to do something with a Resource.",
+                    "label": "License Document"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "LinguisticSystem",
+                    "show_in_table": true,
+                    "versions": [
+                        "LinguisticSystem"
+                    ],
+                    "help_tip": "A system of signs, symbols, sounds, gestures, or rules used in communication.",
+                    "label": "Linguistic System"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "Location",
+                    "show_in_table": true,
+                    "versions": [
+                        "Location"
+                    ],
+                    "help_tip": "A spatial region or named place.",
+                    "label": "Location"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "LocationPeriodOrJurisdiction",
+                    "show_in_table": true,
+                    "versions": [
+                        "LocationPeriodOrJurisdiction"
+                    ],
+                    "help_tip": "A location, period of time, or jurisdiction.",
+                    "label": "Location Period Or Jurisdiction"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "MESH",
+                    "show_in_table": true,
+                    "versions": [
+                        "MESH"
+                    ],
+                    "help_tip": "The set of labeled concepts specified by the Medical Subject Headings.",
+                    "label": "MESH"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "MediaType",
+                    "show_in_table": true,
+                    "versions": [
+                        "MediaType"
+                    ],
+                    "help_tip": "A file format or physical medium.",
+                    "label": "Media Type"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "MediaTypeOrExtent",
+                    "show_in_table": true,
+                    "versions": [
+                        "MediaTypeOrExtent"
+                    ],
+                    "help_tip": "A file format or physical medium.",
+                    "label": "Media Type Or Extent"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "MethodOfAccrual",
+                    "show_in_table": true,
+                    "versions": [
+                        "MethodOfAccrual"
+                    ],
+                    "help_tip": "A method by which resources are added to a collection.",
+                    "label": "Method Of Accrual"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "MethodOfInstruction",
+                    "show_in_table": true,
+                    "versions": [
+                        "MethodOfInstruction"
+                    ],
+                    "help_tip": "A process that is used to engender knowledge, attitudes, and skills.",
+                    "label": "Method Of Instruction"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "NLM",
+                    "show_in_table": true,
+                    "versions": [
+                        "NLM"
+                    ],
+                    "help_tip": "The set of conceptual resources specified by the National Library of Medicine Classification.",
+                    "label": "NLM"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "Period",
+                    "show_in_table": true,
+                    "versions": [
+                        "Period"
+                    ],
+                    "help_tip": "The set of time intervals defined by their limits according to the DCMI Period Encoding Scheme.",
+                    "label": "Period"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "PeriodOfTime",
+                    "show_in_table": true,
+                    "versions": [
+                        "PeriodOfTime"
+                    ],
+                    "help_tip": "An interval of time that is named or defined by its start and end dates.",
+                    "label": "Period Of Time"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "PhysicalMedium",
+                    "show_in_table": true,
+                    "versions": [
+                        "PhysicalMedium"
+                    ],
+                    "help_tip": "A physical material or carrier.",
+                    "label": "Physical Medium"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "PhysicalResource",
+                    "show_in_table": true,
+                    "versions": [
+                        "PhysicalResource"
+                    ],
+                    "help_tip": "A material thing.",
+                    "label": "Physical Resource"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "Point",
+                    "show_in_table": true,
+                    "versions": [
+                        "Point"
+                    ],
+                    "help_tip": "The set of points in space defined by their geographic coordinates according to the DCMI Point Encoding Scheme.",
+                    "label": "Point"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "Policy",
+                    "show_in_table": true,
+                    "versions": [
+                        "Policy"
+                    ],
+                    "help_tip": "A plan or course of action by an authority, intended to influence and determine decisions, actions, and other matters.",
+                    "label": "Policy"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "ProvenanceStatement",
+                    "show_in_table": true,
+                    "versions": [
+                        "ProvenanceStatement"
+                    ],
+                    "help_tip": "A statement of any changes in ownership and custody of a resource since its creation that are significant for its authenticity, integrity, and interpretation.",
+                    "label": "Provenance Statement"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "RightsStatement",
+                    "show_in_table": true,
+                    "versions": [
+                        "RightsStatement"
+                    ],
+                    "help_tip": "A statement about the intellectual property rights (IPR) held in or over a Resource, a legal document giving official permission to do something with a resource, or a statement about access rights.",
+                    "label": "Rights Statement"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "SizeOrDuration",
+                    "show_in_table": true,
+                    "versions": [
+                        "SizeOrDuration"
+                    ],
+                    "help_tip": "A dimension or extent, or a time taken to play or execute.",
+                    "label": "Size Or Duration"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "Standard",
+                    "show_in_table": true,
+                    "versions": [
+                        "Standard"
+                    ],
+                    "help_tip": "A basis for comparison; a reference point against which other things can be evaluated.",
+                    "label": "Standard"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "TGN",
+                    "show_in_table": true,
+                    "versions": [
+                        "TGN"
+                    ],
+                    "help_tip": "The set of places specified by the Getty Thesaurus of Geographic Names.",
+                    "label": "TGN"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "UDC",
+                    "show_in_table": true,
+                    "versions": [
+                        "UDC"
+                    ],
+                    "help_tip": "The set of conceptual resources specified by the Universal Decimal Classification.",
+                    "label": "UDC"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "URI",
+                    "show_in_table": true,
+                    "versions": [
+                        "URI"
+                    ],
+                    "help_tip": "The set of identifiers constructed according to the generic syntax for Uniform Resource Identifiers as specified by the Internet Engineering Task Force.",
+                    "label": "URI"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "W3CDTF",
+                    "show_in_table": true,
+                    "versions": [
+                        "W3CDTF"
+                    ],
+                    "help_tip": "The set of dates and times constructed according to the W3C Date and Time Formats Specification.",
+                    "label": "W3CDTF"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "accrualMethod",
+                    "show_in_table": true,
+                    "versions": [
+                        "accrualMethod"
+                    ],
+                    "help_tip": "The method by which items are added to a collection.",
+                    "label": "Accrual Method"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "accrualPeriodicity",
+                    "show_in_table": true,
+                    "versions": [
+                        "accrualPeriodicity"
+                    ],
+                    "help_tip": "The frequency with which items are added to a collection.",
+                    "label": "Accrual Periodicity"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "accrualPolicy",
+                    "show_in_table": true,
+                    "versions": [
+                        "accrualPolicy"
+                    ],
+                    "help_tip": "The policy governing the addition of items to a collection.",
+                    "label": "Accrual Policy"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "alternative",
+                    "show_in_table": true,
+                    "versions": [
+                        "alternative"
+                    ],
+                    "help_tip": "An alternative name for the resource.",
+                    "label": "Alternative"
+                },
+                {
+                    "type": "string",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "audience",
+                    "show_in_table": true,
+                    "versions": [
+                        "audience"
+                    ],
+                    "help_tip": "A class or entity for whom the resource is intended or useful.",
+                    "label": "Audience"
+                },
+                {
+                    "type": "date",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "available",
+                    "show_in_table": true,
+                    "versions": [
+                        "available"
+                    ],
+                    "help_tip": "Date that the resource became or will become available.",
+                    "label": "available"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "bibliographicCitation",
+                    "show_in_table": true,
+                    "versions": [
+                        "bibliographicCitation"
+                    ],
+                    "help_tip": "A bibliographic reference for the resource",
+                    "label": "Bibliographic Citation"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "conformsTo",
+                    "show_in_table": true,
+                    "versions": [
+                        "conformsTo"
+                    ],
+                    "help_tip": "An established standard to which the described resource conforms.",
+                    "label": "Conforms To"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "conformsTo",
+                    "show_in_table": true,
+                    "versions": [
+                        "conformsTo"
+                    ],
+                    "help_tip": "An established standard to which the described resource conforms.",
+                    "label": "Conforms To"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "dateAccepted",
+                    "show_in_table": true,
+                    "versions": [
+                        "dateAccepted"
+                    ],
+                    "help_tip": "Date of acceptance of the resource.",
+                    "label": "Date Accepted"
+                },
+                {
+                    "type": "date",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "dateAccepted",
+                    "show_in_table": true,
+                    "versions": [
+                        "dateAccepted"
+                    ],
+                    "help_tip": "Date of acceptance of the resource.",
+                    "label": "Date Accepted"
+                },
+                {
+                    "type": "date",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "dateCopyrighted",
+                    "show_in_table": true,
+                    "versions": [
+                        "dateCopyrighted"
+                    ],
+                    "help_tip": "Date of copyright.",
+                    "label": "Date Copyrighted"
+                },
+                {
+                    "type": "date",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "dateSubmitted",
+                    "show_in_table": true,
+                    "versions": [
+                        "dateSubmitted"
+                    ],
+                    "help_tip": "Date Submitted",
+                    "label": "Date Submitted"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "educationLevel",
+                    "show_in_table": true,
+                    "versions": [
+                        "educationLevel"
+                    ],
+                    "help_tip": "A class of entity, defined in terms of progression through an educational or training context, for which the described resource is intended.",
+                    "label": "Education Level"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "extent",
+                    "show_in_table": true,
+                    "versions": [
+                        "extent"
+                    ],
+                    "help_tip": "The size or duration of the resource.",
+                    "label": "Extent"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "extent",
+                    "show_in_table": true,
+                    "versions": [
+                        "extent"
+                    ],
+                    "help_tip": "The size or duration of the resource.",
+                    "label": "Extent"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "hasFormat",
+                    "show_in_table": true,
+                    "versions": [
+                        "hasFormat"
+                    ],
+                    "help_tip": "A related resource that is substantially the same as the pre-existing described resource, but in another format.",
+                    "label": "Has Format"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "hasPart",
+                    "show_in_table": true,
+                    "versions": [
+                        "hasPart"
+                    ],
+                    "help_tip": "A related resource that is included either physically or logically in the described resource.",
+                    "label": "Has Part"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "hasVersion",
+                    "show_in_table": true,
+                    "versions": [
+                        "hasVersion"
+                    ],
+                    "help_tip": "A related resource that is a version, edition, or adaptation of the described resource.",
+                    "label": "Has Version"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "instructionalMethod",
+                    "show_in_table": true,
+                    "versions": [
+                        "instructionalMethod"
+                    ],
+                    "help_tip": "A process, used to engender knowledge, attitudes and skills, that the described resource is designed to support.",
+                    "label": "Instructional Method"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "isFormatOf",
+                    "show_in_table": true,
+                    "versions": [
+                        "isFormatOf"
+                    ],
+                    "help_tip": "A related resource that is substantially the same as the described resource, but in another format.",
+                    "label": "Is Format Of"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "isPartOf",
+                    "show_in_table": true,
+                    "versions": [
+                        "isPartOf"
+                    ],
+                    "help_tip": "A related resource in which the described resource is physically or logically included.",
+                    "label": "Is Part Of"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "isReferencedBy",
+                    "show_in_table": true,
+                    "versions": [
+                        "isReferencedBy"
+                    ],
+                    "help_tip": "A related resource that references, cites, or otherwise points to the described resource.",
+                    "label": "Is Referenced By"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "isReplacedBy",
+                    "show_in_table": true,
+                    "versions": [
+                        "isReplacedBy"
+                    ],
+                    "help_tip": "A related resource that supplants, displaces, or supersedes the described resource.",
+                    "label": "Is Replaced By"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "isRequiredBy",
+                    "show_in_table": true,
+                    "versions": [
+                        "isRequiredBy"
+                    ],
+                    "help_tip": "A related resource that requires the described resource to support its function, delivery, or coherence.",
+                    "label": "Is Required By"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "isVersionOf",
+                    "show_in_table": true,
+                    "versions": [
+                        "isVersionOf"
+                    ],
+                    "help_tip": "A related resource of which the described resource is a version, edition, or adaptation.",
+                    "label": "Is Version Of"
+                },
+                {
+                    "type": "date",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "issued",
+                    "show_in_table": true,
+                    "versions": [
+                        "issued"
+                    ],
+                    "help_tip": "Date of formal issuance (e.g., publication) of the resource.",
+                    "label": "Date Issued"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "medium",
+                    "show_in_table": true,
+                    "versions": [
+                        "medium"
+                    ],
+                    "help_tip": "The material or physical carrier of the resource.",
+                    "label": "Medium"
+                },
+                {
+                    "type": "date",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "modified",
+                    "show_in_table": true,
+                    "versions": [
+                        "modified"
+                    ],
+                    "help_tip": "Date on which the resource was changed.",
+                    "label": "Modified"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "provenance",
+                    "show_in_table": true,
+                    "versions": [
+                        "provenance"
+                    ],
+                    "help_tip": "A statement of any changes in ownership and custody of the resource since its creation that are significant for its authenticity, integrity, and interpretation.",
+                    "label": "Provenance"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "replaces",
+                    "show_in_table": true,
+                    "versions": [
+                        "replaces"
+                    ],
+                    "help_tip": "A related resource that is supplanted, displaced, or superseded by the described resource.",
+                    "label": "Replaces"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "requires",
+                    "show_in_table": true,
+                    "versions": [
+                        "requires"
+                    ],
+                    "help_tip": "A related resource that is required by the described resource to support its function, delivery, or coherence.",
+                    "label": "Requires"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "rightsHolder",
+                    "show_in_table": true,
+                    "versions": [
+                        "rightsHolder"
+                    ],
+                    "help_tip": "A person or organization owning or managing rights over the resource.",
+                    "label": "Rights Holder"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "spatial",
+                    "show_in_table": true,
+                    "versions": [
+                        "spatial"
+                    ],
+                    "help_tip": "Spatial characteristics of the resource.",
+                    "label": "Spatial"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "tableOfContents",
+                    "show_in_table": true,
+                    "versions": [
+                        "tableOfContents"
+                    ],
+                    "help_tip": "A list of subunits of the resource.",
+                    "label": "Table Of Contents"
+                },
+                {
+                    "type": "text",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "temporal",
+                    "show_in_table": true,
+                    "versions": [
+                        "temporal"
+                    ],
+                    "help_tip": "Temporal characteristics of the resource.",
+                    "label": "Temporal"
+                },
+                {
+                    "type": "date",
+                    "required": "false",
+                    "ref": "",
+                    "hidden": "false",
+                    "deprecated": false,
+                    "default_value": [],
+                    "show_in_form": true,
+                    "id": "valid",
+                    "show_in_table": true,
+                    "versions": [
+                        "valid"
+                    ],
+                    "help_tip": "Date of validity of a resource.",
+                    "label": "Valid"
+                }
+            ]
         }
-      ]
-    },
-    {
-      "ref": "subject_description",
-      "title": "Description",
-      "message": "",
-      "items": [
-        {
-          "type": "string",
-          "required": "true",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": "",
-          "show_in_form": true,
-          "id": "description",
-          "show_in_table": true,
-          "control": "text",
-          "versions": [
-            "description"
-          ],
-          "help_tip": "Describe the purpose, scope or nature of this item.",
-          "label": "Description *"
-        },
-        {
-          "type": "string",
-          "required": "true",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": "",
-          "show_in_form": true,
-          "id": "subject",
-          "show_in_table": true,
-          "control": "select",
-          "option_values": {
-            "callback": {
-              "function": "get_dataverse_subject_dropdown",
-              "parameter": ""
-            }
-          },
-          "versions": [
-            "subject"
-          ],
-          "help_tip": "Enter subject from dropdown.",
-          "label": "Subject *"
-        }
-      ]
-    },
-    {
-      "ref": "optional_fields",
-      "title": "Further details where applicable",
-      "message": "",
-      "items": [
-        {
-          "type": "string",
-          "required": "false",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": "",
-          "show_in_form": true,
-          "id": "publisher",
-          "show_in_table": true,
-          "control": "text",
-          "other_schemas":{
-            "dataverse":{
-              "name": "producerName",
-              "version": "4.6.1"
-            }
-          },
-          "versions": [
-            "publisher"
-          ],
-          "help_tip": "Person or agency financially or administratively responsible for the Dataset.",
-          "label": "Producer"
-        },
-        {
-          "type": "string",
-          "required": "false",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": "",
-          "show_in_form": true,
-          "id": "date",
-          "show_in_table": true,
-          "control": "date-picker",
-          "other_schemas": {
-            "dataverse": {
-              "name": "productionDate",
-              "version": "4.6.1"
-            }
-          },
-          "versions": [
-            "date"
-          ],
-          "help_tip": "Production date of Dataset.",
-          "label": "Production Date"
-        },
-        {
-          "type": "string",
-          "required": "false",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": "",
-          "show_in_form": true,
-          "id": "type",
-          "show_in_table": true,
-          "control": "text",
-          "other_schemas": {
-            "dataverse": {
-              "name": "kindOfData",
-              "version": "4.6.1"
-            }
-          },
-          "versions": [
-            "type"
-          ],
-          "help_tip": "Type of data included in the file: survey data, census/enumeration data, aggregate data, clinical.",
-          "label": "Kind of Data"
-        },
-        {
-          "type": "string",
-          "required": "false",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": [],
-          "show_in_form": true,
-          "id": "source",
-          "show_in_table": true,
-          "control": "text",
-          "other_schemas": {
-            "dataverse": {
-              "name": "dataSources",
-              "version": "4.6.1"
-            }
-          },
-          "versions": [
-            "source"
-          ],
-          "help_tip": "List of books, articles, data files if any that served as the sources for the Dataset.",
-          "label": "Data Sources (comma separated)"
-        },
-        {
-          "type": "string",
-          "required": "false",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": [],
-          "show_in_form": true,
-          "id": "relation",
-          "show_in_table": true,
-          "control": "text",
-          "other_schemas": {
-            "dataverse": {
-              "name": "relatedMaterial",
-              "version": "4.6.1"
-            }
-          },
-          "versions": [
-            "relation"
-          ],
-          "help_tip": "Any related material (journal article citation is not included here - see: isReferencedBy below).",
-          "label": "Related Material (comma separated)"
-        },
-
-        {
-          "type": "string",
-          "required": "false",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": "CC0",
-          "show_in_form": true,
-          "id": "license",
-          "show_in_table": true,
-          "control": "text",
-          "versions": [
-            "license"
-          ],
-          "help_tip": "Set the license to CC0 (default in Dataverse for new Datasets), otherwise enter “NONE” and fill in the Terms of Use field.",
-          "label": "License"
-        },
-        {
-          "type": "string",
-          "required": "false",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": "",
-          "show_in_form": true,
-          "id": "termsofuse",
-          "show_in_table": true,
-          "control": "text",
-          "versions": [
-            "termsofuse"
-          ],
-          "help_tip": "If not using CC0, enter any terms of use or restrictions for the Dataset.",
-          "label": "Terms of Use"
-        },
-        {
-          "type": "string",
-          "required": "false",
-          "ref": "",
-          "hidden": "false",
-          "deprecated": false,
-          "default_value": [],
-          "show_in_form": true,
-          "id": "isReferencedBy",
-          "show_in_table": true,
-          "control": "text",
-          "other_schemas": {
-            "dataverse": {
-              "name": "publicationCitation",
-              "version": "4.6.1"
-            }
-          },
-          "versions": [
-            "isReferencedBy"
-          ],
-          "help_tip": "The publication (journal article, book, other work) that uses this dataset (include citation, permanent identifier (DOI), and permanent URL).",
-          "label": "Referenced by (comma separated)"
-        }
-      ]
-    }
-  ]
+    ]
 }
