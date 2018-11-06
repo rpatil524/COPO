@@ -77,7 +77,7 @@ def delegate_submission(request):
         if result == True:
             return HttpResponse(jsonpickle.dumps({'status': 0}))
         else:
-            return HttpResponse(result)
+            return HttpResponse(jsonpickle.dumps(result))
 
     # return default
     return HttpResponse({'status': 0})

@@ -446,7 +446,7 @@ DROP_DOWNS = {
         {
             'value': 'dcterms',
             'label': 'Dublin Core',
-            'description': 'A Dataverse is an open source data management repository for a community or an institution. It allows data to be federated with a growing list of Dataverse repositories worldwide for increased discoverability'
+            'description': 'Dublin Core is a generic community stardard metadata set for describing digital objects (such as images, video, pdfs, webpages) and physical objects (such as books or CDs). Items described with this schema can be submitted to Dataverse or dSpace instances'
         },
 
         # {

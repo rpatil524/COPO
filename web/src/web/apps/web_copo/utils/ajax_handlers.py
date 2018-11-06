@@ -556,7 +556,11 @@ def update_submission_repo_data(request):
             if request.POST["new_or_existing"] == "new":
                 # need to get form metadata for creating new dspace item
                 form_data = json.loads(request.POST['form_data'])
+                new_or_existing = request.POST["new_or_existing"]
+                r_type = request.POST["type"]
                 meta.update(form_data)
+                meta["new_or_existing"] = new_or_existing
+                meta["repo_type"] = r_type
         # now update submission record
         submission_id = request.POST['submission_id']
         if type(meta) == type(dict()):
