@@ -222,15 +222,15 @@ class WizardCallbacks:
 
             # get dependencies
             # todo: revisit this once there is more clarification from the CG Core folks
-            # dependencies = schema_df[~schema_df['dependency'].isin([''])]['dependency'].unique()
+            dependencies = schema_df[~schema_df['dependency'].isin([''])]['dependency'].unique()
             #
             # # filter out dependants - these are fields that are to be displayed via their parent field
-            # schema_df = schema_df[schema_df['dependency'].isin([''])]
-            # schema_df["is_composite_field"] = False
-            #
-            # composite_field_df = schema_df[schema_df['ref'].isin(dependencies)]
-            # schema_df.loc[composite_field_df.index, "is_composite_field"] = True
-            # schema_df.loc[composite_field_df.index, "control"] = "copo-select"
+            schema_df = schema_df[schema_df['dependency'].isin([''])]
+            schema_df["show_create_button"] = False
+
+            composite_field_df = schema_df[schema_df['ref'].isin(dependencies)]
+            schema_df.loc[composite_field_df.index, "show_create_button"] = True
+            schema_df.loc[composite_field_df.index, "control"] = "copo-select"
 
             # get stage id groups
             stage_ids = list(schema_df.stage_id.unique())

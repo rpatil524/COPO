@@ -267,7 +267,7 @@ class WizardHelper:
 
         for stage in stages:
             for st in stage.get("items", list()):
-                if st["control"] == "copo-lookup":
+                if st.get("control", "text") == "copo-lookup":
                     continue
                 if st.get("option_values", False) == False:
                     st.pop('option_values', None)
@@ -279,7 +279,7 @@ class WizardHelper:
 
     def set_items_type(self, stages):
         """
-        function ensures all stage controls have a type
+        function sets default type and control for all stage item
         :param stages:
         :return:
         """
@@ -288,6 +288,9 @@ class WizardHelper:
             for st in stage.get("items", list()):
                 if not st.get("type"):
                     st["type"] = "string"
+
+                if not st.get("control"):
+                    st["control"] = "text"
 
                 # also get id in the desired format
                 st["id"] = st["id"].split(".")[-1]
@@ -488,6 +491,7 @@ class WizardHelper:
                     wizard_callbacks = wizcb.WizardCallbacks(self)  # callbacks are defined in 'WizardCallbacks'
                     stage = getattr(wizard_callbacks, stage["callback"])(next_stage_index)
                 except Exception as e:
+                    print(stage["ref"])
                     print('Stage resolution error. Next stage index: ' + str(next_stage_index) + " " + str(e))
                     stage = dict()
 

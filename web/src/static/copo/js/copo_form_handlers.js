@@ -1113,8 +1113,38 @@ var dispatchFormControl = {
         ctrlsDiv.append(txt);
         ctrlsDiv.append(vM.errorHelpDiv);
 
+        var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
 
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        if (formElem.hasOwnProperty("show_create_button") && (formElem.show_create_button.toString() == "true")) {
+            var addBtn = $('<button/>',
+                {
+                    style: "border-radius:0;",
+                    type: "button",
+                    class: "btn btn-sm btn-primary copo-component-control",
+                    "data-component": formElem.option_component,
+                    "data-element-id": formElem.id,
+                    html: '<i class="fa fa-plus-circle"></i> Create & Assign ' + formElem.label,
+                    click: function (event) {
+                        event.preventDefault();
+                        create_attachable_component(formElem);
+                    },
+                });
+
+            var addbtnDiv = $('<div/>',
+                {
+                    class: "col-sm-12 col-md-12 col-lg-12"
+                }).append(addBtn);
+
+            var addbtnDivRow = $('<div/>',
+                {
+                    class: "row btn-row",
+                }).append(addbtnDiv);
+
+            returnDiv.append(addbtnDivRow);
+        }
+
+
+        return returnDiv
     },
     do_hidden_ctrl: function (formElem, elemValue) {
 
@@ -1442,8 +1472,7 @@ var dispatchFormControl = {
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv)
 
-    }
-    ,
+    },
     do_copo_item_slider_ctrl: function (formElem, elemValue) {
 
         var ctrlsDiv = $('<div/>',
