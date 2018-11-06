@@ -108,8 +108,6 @@ def get_control_options(f):
             # e.g., multi-search has this format
             option_values = f["option_values"]
 
-        return option_values
-
     return option_values
 
 
