@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/drop_downs/cgiar_centres.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/drop_downs/cgiar_centres.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_callbacks.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_callbacks.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py" afterDir="false" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <ignored path="$PROJECT_DIR$/.idea/httpRequests/" />
@@ -94,11 +87,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.5">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="wizard_helper.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="wizard_helper.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="434">
-                  <caret line="294" column="51" lean-forward="true" selection-start-line="294" selection-start-column="51" selection-end-line="294" selection-end-column="51" />
+                <state relative-caret-position="479">
+                  <caret line="297" column="19" lean-forward="true" selection-start-line="297" selection-start-column="19" selection-end-line="297" selection-end-column="19" />
                   <folding>
                     <element signature="e#22#33#0" expanded="true" />
                     <element signature="e#787#1204#0" expanded="true" />
@@ -108,6 +101,7 @@
                     <element signature="e#5776#8368#0" expanded="true" />
                     <element signature="e#8425#11071#0" expanded="true" />
                     <element signature="e#11124#11626#0" expanded="true" />
+                    <element signature="e#11679#12076#0" expanded="true" />
                     <element signature="e#12125#12214#0" expanded="true" />
                     <element signature="e#12268#12498#0" expanded="true" />
                     <element signature="e#12550#12958#0" expanded="true" />
@@ -158,11 +152,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="dc_stages.json" pinned="false" current-in-tab="false">
+          <file leaf-file-name="dc_stages.json" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-4045">
-                  <caret line="292" column="28" selection-start-line="292" selection-start-column="21" selection-end-line="292" selection-end-column="28" />
+                <state relative-caret-position="337">
+                  <caret line="62" column="9" lean-forward="true" selection-start-line="62" selection-start-column="9" selection-end-line="62" selection-end-column="9" />
                 </state>
               </provider>
             </entry>
@@ -449,7 +443,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>process_se</find>
       <find>Description</find>
       <find>while</find>
       <find>﻿enumerate</find>
@@ -479,6 +472,7 @@
       <find>Exceptio</find>
       <find>control</find>
       <find>san</find>
+      <find>*</find>
     </findStrings>
     <replaceStrings>
       <replace>context-help-ctrl</replace>
@@ -559,10 +553,10 @@
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/drop_downs/cgiar_centres.json" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_callbacks.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json" />
       </list>
     </option>
   </component>
@@ -588,10 +582,10 @@
     </packageJsonPaths>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-1797" />
-    <option name="y" value="-94" />
-    <option name="width" value="1444" />
-    <option name="height" value="830" />
+    <option name="x" value="-1921" />
+    <option name="y" value="23" />
+    <option name="width" value="1920" />
+    <option name="height" value="1057" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -2994,13 +2988,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4045">
-          <caret line="292" column="28" selection-start-line="292" selection-start-column="21" selection-end-line="292" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_callbacks.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="178">
@@ -3022,8 +3009,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="434">
-          <caret line="294" column="51" lean-forward="true" selection-start-line="294" selection-start-column="51" selection-end-line="294" selection-end-column="51" />
+        <state relative-caret-position="479">
+          <caret line="297" column="19" lean-forward="true" selection-start-line="297" selection-start-column="19" selection-end-line="297" selection-end-column="19" />
           <folding>
             <element signature="e#22#33#0" expanded="true" />
             <element signature="e#787#1204#0" expanded="true" />
@@ -3033,6 +3020,7 @@
             <element signature="e#5776#8368#0" expanded="true" />
             <element signature="e#8425#11071#0" expanded="true" />
             <element signature="e#11124#11626#0" expanded="true" />
+            <element signature="e#11679#12076#0" expanded="true" />
             <element signature="e#12125#12214#0" expanded="true" />
             <element signature="e#12268#12498#0" expanded="true" />
             <element signature="e#12550#12958#0" expanded="true" />
@@ -3058,6 +3046,13 @@
             <element signature="e#76464#77789#0" expanded="true" />
             <element signature="e#77853#80540#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="337">
+          <caret line="62" column="9" lean-forward="true" selection-start-line="62" selection-start-column="9" selection-end-line="62" selection-end-column="9" />
         </state>
       </provider>
     </entry>
