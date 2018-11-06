@@ -485,6 +485,7 @@ class WizardHelper:
             if "callback" in stage:
                 # resolve stage from callback function
                 try:
+
                     wizard_callbacks = wizcb.WizardCallbacks(self)  # callbacks are defined in 'WizardCallbacks'
                     stage = getattr(wizard_callbacks, stage["callback"])(next_stage_index)
                 except Exception as e:
