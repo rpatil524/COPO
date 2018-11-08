@@ -1,0 +1,89 @@
+{
+    "deleted" : "0",
+    "test_file": true,
+    "date_created" : "2018-09-06T13:40:38.191Z",
+    "type" : "Raw Data File",
+    "file_size" : "109.91 KB",
+    "date_modified" : "2018-09-06T13:40:38.405Z",
+    "file_type" : "unknown",
+    "profile_id" : "",
+    "file_hash" : "6adf9908fb94f90b4e84399dc4530b13",
+    "name" : "",
+    "file_location" : "",
+    "comments" : [],
+    "file_id" : "22",
+    "description" : {
+        "attributes" : {
+            "target_repository" : {
+                "deposition_context" : "dcterms"
+            },
+            "datafiles_editing" : {}
+        },
+        "stages" : [
+            {
+                "apply_to_all" : true,
+                "items" : [
+                    {
+                        "option_values" : [
+                            {
+                                "value" : "cg_core",
+                                "label" : "CG Core",
+                                "description" : "CG compliant data object description template - this is a placeholder text"
+                            },
+                            {
+                                "value" : "ena",
+                                "label" : "ENA - Sequence Reads",
+                                "description" : "This repository option defines metadata for submission of <strong>raw sequence reads</strong> to the European Nucleotide Archive (ENA)"
+                            },
+                            {
+                                "value" : "ena-asm",
+                                "label" : "ENA - Sequence Assemblies",
+                                "description" : "This repository option defines metadata for submission of <strong>sequence assemblies</strong> to the European Nucleotide Archive (ENA)"
+                            },
+                            {
+                                "value" : "ena-ant",
+                                "label" : "ENA - Sequence Annotations",
+                                "description" : "This repository option defines metadata for submission of <strong>sequence annotations</strong> to the European Nucleotide Archive (ENA)"
+                            },
+                            {
+                                "value" : "figshare",
+                                "label" : "Figshare",
+                                "description" : "Figshare accepts many file formats, and can be used to submit file types including PDFs, image, audio, and video files"
+                            },
+                            {
+                                "value" : "miappe",
+                                "label" : "MIAPPE Compliant",
+                                "description" : "MIAPPE is a Minimum Information (MI) standard for plant phenotyping. This repository option defines a list of attributes for describing a phenotyping experiment"
+                            },
+                            {
+                                "value" : "dcterms",
+                                "label" : "Dublin Core",
+                                "description" : "Dublin Core is a generic community stardard metadata set for describing digital objects (such as images, video, pdfs, webpages) and physical objects (such as books or CDs). Items described with this schema can be submitted to Dataverse or dSpace instances"
+                            }
+                        ],
+                        "hidden" : "false",
+                        "default_value" : "ena",
+                        "required" : "true",
+                        "help_tip" : "Select a target repository",
+                        "type" : "string",
+                        "control" : "copo-button-list",
+                        "label" : "Target Repository",
+                        "id" : "deposition_context"
+                    }
+                ],
+                "title" : "Repository",
+                "ref" : "target_repository",
+                "message" : "Select the target repository for which this description is intended. The target repository choice helps inform the wizard on an appropriate metadata template for your description."
+            },
+            {
+                "callback" : "perform_datafile_generation",
+                "renderer" : "perform_datafile_generation",
+                "ref" : "datafiles_editing",
+                "items" : [],
+                "message" : "In this stage each attribute value that describes a datafile is represented in a column, allowing specific attribute values for individual datafiles to be easily accessed and modified. You can also batch-update attribute values for groups of datafiles. <ul><li>To update attribute value for a single datafile: <ol><li>Click to focus on a cell (note: this action is different from row selection)</li><li>Double-click or press 'Enter' on a focused cell to make it editable</li><li>Make your changes and double-click or press 'Enter' again to save your changes</li></ol><li>To batch-update corresponding attribute values for a group of datafiles:<ol><li>Click to focus on a target cell, the value of which will be used to update corresponding cells of selected records</li><li>Select one or more rows that will form the update batch</li><li>Click the 'Update selected records' button</li></ol></li><li>Click <strong>Next</strong>, when done editing, to proceed to the final stage</li></ul>",
+                "title" : "Datafile Attributes"
+            }
+        ]
+    },
+    "description_token" : "5be177e868236b4124f8bda3"
+}

@@ -42,7 +42,6 @@ def index(request):
     else:
         context['partial_submission_redirect_url'] = None
 
-    context['haha'] = 'testing123'
 
     return render(request, 'copo/index.html', context)
 
@@ -53,18 +52,6 @@ def login(request):
     }
     return render(request, 'copo/auth/login.html', context)
 
-
-def backdoor_login(request):
-    pass
-    '''
-    from django.contrib.auth import authenticate
-    username = request.GET['username']
-    password = request.GET['password']
-    user = authenticate(username=username, password=password)
-    if user is not None:
-    # A backend authenticated the credentials
-        return render(request, 'copo/index.html', {})
-    '''
 
 
 def test_pdf(request):
