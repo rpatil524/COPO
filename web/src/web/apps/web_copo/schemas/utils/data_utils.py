@@ -4,6 +4,7 @@ import os
 import json
 import copy
 import requests
+import pandas as pd
 from datetime import datetime
 from bson.json_util import dumps
 from collections import namedtuple
@@ -105,17 +106,27 @@ def get_samples_options():
 
 
 def get_figshare_category_options():
-    r = requests.get('https://api.figshare.com/v2/categories')
-    l = json.loads(r.text)
-    output = list()
+    # r = requests.get('https://api.figshare.com/v2/categories')
+    # l = json.loads(r.text)
+    # output = list()
+    #
+    # for x in l:
+    #     st = dict()
+    #     st['value'] = x['id']
+    #     st['label'] = x['title']
+    #     output.append(st)
+    # todo: stored locally to overcome network issues - feel free to uncomment to return to remote resolution
 
-    for x in l:
-        st = dict()
-        st['value'] = x['id']
-        st['label'] = x['title']
-        output.append(st)
+    drop_downs_pth = RESOLVER['copo_drop_downs']
 
-    return output
+    df = pd.DataFrame(json_to_pytype(os.path.join(drop_downs_pth, 'figshare_categories.json')).get("properties", list()))
+    df["label"] = df["title"]
+    df['value'] = df['id']
+
+    df = df[['value', 'label']]
+    result = df.to_dict('records')
+
+    return result
 
 def get_repo_type_options():
     return lookup.DROP_DOWNS['REPO_TYPE_OPTIONS']

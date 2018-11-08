@@ -582,10 +582,11 @@ class Assay:
         if description_token:
             pairing_info = Description().GET(description_token).get("attributes", dict()).get("datafiles_pairing",
                                                                                               list())
-
         pairing_info = pd.DataFrame(pairing_info)
-        pairing_info.columns = ["file1","file2"]
-        pairing_info['combined'] = pairing_info.file1 + "," + pairing_info.file2
+
+        if len(pairing_info):
+            pairing_info.columns = ["file1","file2"]
+            pairing_info['combined'] = pairing_info.file1 + "," + pairing_info.file2
 
         datafiles_df = pd.DataFrame(self.copo_isa_records["datafile"])
         datafiles_df._id = datafiles_df['_id'].astype(str)
