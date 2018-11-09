@@ -147,7 +147,10 @@ class DataverseSubmit(object):
         x = x + '<summary type="text"></summary>'
         x = x + '<dcterms:title>' + meta['dsTitle'] + '</dcterms:title>'
         x = x + '<dcterms:creator>' + meta['dsAuthorLastname'] + ', ' + meta['dsAuthorFirstname'] + '</dcterms:creator>'
-        x = x + '<dcterms:date>' + sub['date_modified'].strftime('%Y-%m-%d') + '</dcterms:date>'
+        if settings.UNIT_TESTING:
+            x = x + '<dcterms:date>' + sub['date_modified'] + '</dcterms:date>'
+        else:
+            x = x + '<dcterms:date>' + sub['date_modified'].strftime('%Y-%m-%d') + '</dcterms:date>'
         x = x + '<dcterms:rights>' + df['optional_fields']['license'] + '</dcterms:rights>'
         # this should be an array
         x = x + '<dcterms:bibliographicCitation>' + df['optional_fields']['source'] + '</dcterms:bibliographicCitation>'

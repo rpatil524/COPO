@@ -552,7 +552,7 @@ def update_submission_repo_data(request):
         return HttpResponse(json_util.dumps(s))
     elif task == 'change_meta':
         meta = json.loads(request.POST['meta'])
-        if request.POST["type"] == "dspace":
+        if request.POST.get("type") == "dspace":
             if request.POST["new_or_existing"] == "new":
                 # need to get form metadata for creating new dspace item
                 form_data = json.loads(request.POST['form_data'])
