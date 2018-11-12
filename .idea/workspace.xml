@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="adding tests">
-      <change afterPath="$PROJECT_DIR$/web/src/tests/fixtures/dummy_dataverse_repo.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/src/tests/fixtures/dummy_submission.json" afterDir="false" />
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/tests/test_dv.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/tests/test_dv.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/settings/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/settings/logger.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/tests/test_dv.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/tests/test_respositories.py" afterDir="false" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <ignored path="$PROJECT_DIR$/.idea/httpRequests/" />
@@ -22,7 +17,7 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/COPO$Test__tests_test_dataverse_DataverseTestClass.coverage" NAME="Test: tests.test_dataverse.DataverseTestClass Coverage Results" MODIFIED="1541515496028" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/COPO$dspaceSubmission.coverage" NAME="dspaceSubmission Coverage Results" MODIFIED="1541525122526" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/web/src/submission" />
-    <SUITE FILE_PATH="coverage/COPO$test_runner.coverage" NAME="test-runner Coverage Results" MODIFIED="1541783664927" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/web/src" />
+    <SUITE FILE_PATH="coverage/COPO$test_runner.coverage" NAME="test-runner Coverage Results" MODIFIED="1542019796853" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/web/src" />
     <SUITE FILE_PATH="coverage/COPO$py_test_for_test_dataverse_TestBasic.coverage" NAME="py.test for test_dataverse.TestBasic Coverage Results" MODIFIED="1541519881600" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/web/src/tests" />
     <SUITE FILE_PATH="coverage/COPO$Test__tests_testEnaSub_Ena_Tests.coverage" NAME="Test: tests.testEnaSub.Ena_Tests Coverage Results" MODIFIED="1541502650026" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/COPO$Test__tests_test_dataverse_testDataverse_testDataverse.coverage" NAME="Test: tests.test_dataverse.testDataverse.testDataverse Coverage Results" MODIFIED="1541519445932" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
@@ -99,11 +94,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="test_dv.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/web/src/tests/test_dv.py">
+      <file leaf-file-name="test_respositories.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/web/src/tests/test_respositories.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="201">
-              <caret line="72" column="40" lean-forward="true" selection-start-line="72" selection-start-column="40" selection-end-line="72" selection-end-column="40" />
+            <state relative-caret-position="351">
+              <caret line="82" column="12" lean-forward="true" selection-start-line="82" selection-start-column="12" selection-end-line="82" selection-end-column="12" />
               <folding>
                 <element signature="e#33#81#0" expanded="true" />
               </folding>
@@ -1285,7 +1280,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Django tests.test-runner">
+  <component name="RunManager" selected="Django server.copo-dev">
     <configuration name="Test: tests.test_dv.TestDataverse.test_create_datafile" type="DjangoTestsConfigurationType" factoryName="Django tests" temporary="true">
       <module name="COPO" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -1550,13 +1545,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1480591260906</updated>
-    </task>
-    <task id="LOCAL-00017" summary="Miscelaneous fixes following v.large merge. Minor changes to appearance of submission view and accessions. ISA conversion not working....AE to advise.">
-      <created>1513618942696</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1513618942696</updated>
     </task>
     <task id="LOCAL-00018" summary="description, defining node and class only now being returned by ols">
       <created>1523533324066</created>
@@ -1894,16 +1882,17 @@
       <option name="project" value="LOCAL" />
       <updated>1541505415513</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="completed test for dataverse submission">
+      <created>1541783755670</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1541783755671</updated>
+    </task>
+    <option name="localTasksCounter" value="67" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="test-runner - 2018.11.09 at 14h 21m 50s.xml">
-      <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
-    </history-entry>
-    <history-entry file="test-runner - 2018.11.09 at 14h 22m 14s.xml">
-      <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
-    </history-entry>
     <history-entry file="test-runner - 2018.11.09 at 16h 00m 39s.xml">
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
@@ -1926,6 +1915,12 @@
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
     <history-entry file="test-runner - 2018.11.09 at 17h 13m 32s.xml">
+      <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
+    </history-entry>
+    <history-entry file="test-runner - 2018.11.09 at 17h 14m 43s.xml">
+      <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
+    </history-entry>
+    <history-entry file="test-runner - 2018.11.12 at 10h 43m 24s.xml">
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
   </component>
@@ -2012,7 +2007,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="repo managers and submitter management working" />
     <MESSAGE value="custom repos showing on submission page" />
     <MESSAGE value="adding modeal and js/ajax for displaying repo file structure" />
     <MESSAGE value="web service for pinging dataverse for term search working" />
@@ -2037,7 +2031,8 @@
     <MESSAGE value="testing and bugfixes for dspace submission" />
     <MESSAGE value="adding full dublin core spec to schema" />
     <MESSAGE value="adding tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="adding tests" />
+    <MESSAGE value="completed test for dataverse submission" />
+    <option name="LAST_COMMIT_MESSAGE" value="completed test for dataverse submission" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2492,10 +2487,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/tests/test_dv.py">
+    <entry file="file://$PROJECT_DIR$/web/src/tests/test_respositories.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
-          <caret line="72" column="40" lean-forward="true" selection-start-line="72" selection-start-column="40" selection-end-line="72" selection-end-column="40" />
+        <state relative-caret-position="351">
+          <caret line="82" column="12" lean-forward="true" selection-start-line="82" selection-start-column="12" selection-end-line="82" selection-end-column="12" />
           <folding>
             <element signature="e#33#81#0" expanded="true" />
           </folding>

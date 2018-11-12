@@ -79,6 +79,9 @@ class TestDataverse(TestCase):
         self.assertTrue(s["accessions"]["dataset_doi"].startswith("doi"), "doi not present in submission")
         self.assertTrue(s["accessions"]["dataset_edit_uri"].startswith("http"), "edit uri not present in submission")
 
+    def test_dspace_submission(self):
+        pass
+
 
     @classmethod
     def tearDownClass(cls):
