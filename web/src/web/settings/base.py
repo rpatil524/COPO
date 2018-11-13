@@ -66,7 +66,6 @@ SOCIALACCOUNT_PROVIDERS = \
          {'SCOPE': ['profile', 'email'],
           'AUTH_PARAMS': {'access_type': 'online'}}}
 
-
 MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -76,9 +75,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware',
     # 'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth',
-    #'web.apps.web_copo.copo_middleware.OrcidMiddleware.OrcidOAuth',
+    # 'web.apps.web_copo.copo_middleware.OrcidMiddleware.OrcidOAuth',
 ]
-
 
 AUTHENTICATION_BACKENDS = (
     # Needed to auth by username in Django admin, regardless of `allauth`
@@ -187,4 +185,3 @@ TEST_USER = None
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400
 
-# check if correct groups exist
