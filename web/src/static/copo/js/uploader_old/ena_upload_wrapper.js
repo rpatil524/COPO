@@ -18,7 +18,7 @@ function get_chunk_size(event) {
         );
     }
     else {
-        chunk_size = chunk_threshold;
+        chunk_size >= chunk_threshold;
         $(event.currentTarget).parent().parent().fileupload(
             'option',
             {
@@ -372,3 +372,15 @@ function make_upload_div(file_name) {
 function resume_upload(e, data) {
 
 }
+/*
+var url_string = window.location.href
+var url = new URL(url_string);
+var c = url.searchParams.get("test");
+if (c == "yes") {
+    $('#copo_data_upload_tab').show()
+    $('form[id^=upload]').fileupload(
+        {
+            add: ["/small1_test.fastq"],
+
+        })
+}*/

@@ -6,7 +6,6 @@ app_name = 'web_copo'
 urlpatterns = [path('', views.index, name='index'),
                path('dataverse_submit/', views.test_dataverse_submit, name='test_dataverse_submit'),
                path('test_submission/', views.test_submission, name='test_submission'),
-               path('test_pdf/', views.test_pdf, name='test_pdf'),
                path('test/', views.test, name='test'),
                path('login/', views.login, name='auth'),
                path('logout/', views.copo_logout, name='logout'),

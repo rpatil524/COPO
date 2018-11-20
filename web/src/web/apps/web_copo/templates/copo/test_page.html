@@ -58,11 +58,7 @@
 
 
 
-    <button id="test_id">submit</button>
-
-    <div id="complete_div" hidden="hidden" style="height: 50px; width: 200px; border: 1px solid black; color: white; background-color: #0b5b98; text-align: center; vertical-align: middle">
-        COMPLETE
-    </div>
+    <input type="text" id="input_text" onchange="alert('here we go')"/>
 
 
 
@@ -76,17 +72,7 @@
     <script>
 
         $(document).ready(function () {
-            $('#test_id').on('click', function (e) {
-                $.ajax({
-                    url: "/rest/submit_to_repo/",
-                    data: {'sub_id': '59ce1dd468236b10eade7503'},
-                    headers: {'X-CSRFToken': $.cookie('csrftoken')},
-                    method: 'POST',
-                    dataType: 'json'
-                }).done(function (e) {
-                    $('#complete_div').fadeIn().fadeOut()
-                })
-            })
+
         })
 
 

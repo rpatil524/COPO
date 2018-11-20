@@ -1,11 +1,11 @@
 import threading
 
 def worker1():
-    for x in range(1,2000):
+    for x in range(1,20000):
         print('1: ' + str(x))
 
 def worker2():
-    for x in range(1,2000):
+    for x in range(1,20000):
         print('2: ' + str(x))
 
 t1 = threading.Thread(target=worker1)

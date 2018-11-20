@@ -37,9 +37,8 @@ class DspaceSubmit(object):
             new_or_existing = s['meta']['new_or_existing']
         return self._add_to_dspace(s, new_or_existing)
 
+
     def _add_to_dspace(self, sub, new_or_existing):
-
-
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         # get data required and perform login
         dspace_url = sub['destination_repo']['url']
@@ -155,6 +154,7 @@ class DspaceSubmit(object):
             requests.post(logout_url, headers={"rest-dspace-token": login_details})
         Submission().mark_submission_complete(sub["_id"])
         return True
+
 
     def _create_dspace_meta(self, sub):
         # need to create metadata fragment for dspace

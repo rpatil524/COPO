@@ -6,6 +6,7 @@ var key_split = "___0___";
 $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
 
+
     //page global variables
     var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
     var component = "datafile";
@@ -2951,4 +2952,7 @@ $(document).ready(function () {
         dialog.open();
     }
 
+
 }); //end document ready
+
+

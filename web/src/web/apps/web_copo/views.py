@@ -54,10 +54,10 @@ def login(request):
 
 
 
-def test_pdf(request):
+def test(request):
     return render(request, 'copo/test_page.html', {})
 
-
+'''
 def test(request):
     try:
         LOGGER.log('Test Error Message 123', type=Logtype.FILE, level=Loglvl.INFO)
@@ -73,7 +73,7 @@ def test(request):
     s['target_id'] = str(s.pop('_id'))
     Submission().save_record(dict(), **s)
     return HttpResponse(accessions)
-
+'''
 
 def test_submission(request):
     delegate_submission(request)
