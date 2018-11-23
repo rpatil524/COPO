@@ -29,6 +29,7 @@ from django.core import serializers
 from dal.orcid_da import Orcid
 from submission.dataverseSubmission import DataverseSubmit as ds
 from submission.dspaceSubmission import DspaceSubmit as dspace
+from submission.ckanSubmission import CkanSubmit as ckan
 
 DV_STRING = 'HARVARD_TEST_API'
 
@@ -620,3 +621,8 @@ def get_dspace_item_metadata(request):
     out["type"] = df.get("description", {}).get("attributes", {}) \
         .get("optional_fields", {}).get("type", "")
     return HttpResponse(json.dumps(out))
+
+def get_ckan_items(request):
+    s = request.GET["submission_id"]
+    resp = ckan(s)._get_all_datasets()
+    return HttpResponse(resp)

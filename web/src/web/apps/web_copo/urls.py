@@ -83,4 +83,7 @@ urlpatterns = [path('', views.index, name='index'),
                     name="publish_dataverse"),
                path('get_dspace_item_metadata/', ajax_handlers.get_dspace_item_metadata,
                     name="get_dspace_item_metadata"),
+
+               path('get_ckan_items/', ajax_handlers.get_ckan_items,
+                    name="get_ckan_items"),
                ]

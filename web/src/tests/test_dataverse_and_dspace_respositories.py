@@ -89,6 +89,7 @@ class TestDataverse(TestCase):
         p_dict["meta"]["identifier"] = item["uuid"]
         p_dict["item_id"] = item["uuid"]
         cls.s_ds_existing = Submission().get_collection_handle().insert(p_dict)
+        cls.ckan_api = "http://demo.ckan.org/api/3/action/"
 
     def test_get_user(self):
         u = self.user
