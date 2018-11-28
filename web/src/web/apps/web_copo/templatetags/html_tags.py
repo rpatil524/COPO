@@ -625,6 +625,14 @@ def generate_submission_accessions_data(submission_record):
                     [ a["format"], a["uuid"], a["dspace_instance"], a["name"], (hurry.filesize.size(a["sizeBytes"]))]
                 )
 
+        elif repository == "ckan":
+            columns = [{"title": "Format"}, {"title": "uuid"}, {"title": "dSpace URL"}, {"title": "Name"},
+                       {"title": "File Size"}]
+            for a in accessions:
+                data_set.append(
+                    [a["format"], a["uuid"], a["dspace_instance"], a["name"], (hurry.filesize.size(a["sizeBytes"]))]
+                )
+
     return_dict = dict(dataSet=data_set,
                        columns=columns,
                        repository=repository

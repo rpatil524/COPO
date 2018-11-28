@@ -1,6 +1,6 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 
-from datetime import datetime
+from datetime import datetime, date
 from bson import ObjectId, json_util
 from chunked_upload.models import ChunkedUpload
 from web.apps.web_copo.lookup.lookup import DB_TEMPLATES
@@ -13,6 +13,7 @@ from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 from django.contrib.auth.models import User
 from django.conf import settings
 import pandas as pd
+import pymongo.errors as pymongo_errors
 
 PubCollection = 'PublicationCollection'
 PersonCollection = 'PersonCollection'
@@ -359,6 +360,7 @@ class Submission(DAComponent):
                     status=False,
                     complete='false',
                     user_id=data_utils.get_current_user().id,
+                    date_created=date.today()
             ).items():
                 auto_fields[self.get_qualified_field(k)] = v
 
@@ -410,8 +412,20 @@ class Submission(DAComponent):
 
         doc = self.get_collection_handle().update(
             {"_id": ObjectId(sub["_id"])},
-            {"$push":{"accessions": accessions}}
+            {"$push": {"accessions": accessions}}
         )
+        return doc
+
+    def insert_ckan_accession(self, sub, accessions):
+
+        try:
+            doc = self.get_collection_handle().update(
+                {"_id": ObjectId(sub)},
+                {"$push": {"accessions": accessions}}
+            )
+        except pymongo_errors.WriteError:
+            self.get_collection_handle().update({"_id": ObjectId(sub)}, {"$unset": {"accessions": ""}})
+            doc = self.get_collection_handle().update({"_id": ObjectId(sub)}, {"$push": {"accessions": accessions}})
         return doc
 
     def mark_submission_complete(self, sub_id, article_id=None):
@@ -784,7 +798,7 @@ class Repository(DAComponent):
 
     def get_by_ids(self, uids):
         doc = list()
-        if(uids):
+        if (uids):
             oids = list(map(lambda x: ObjectId(x), uids))
             doc = self.get_collection_handle().find({"_id": {"$in": oids}})
         return cursor_to_list(doc)

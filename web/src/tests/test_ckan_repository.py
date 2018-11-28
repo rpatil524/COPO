@@ -74,6 +74,9 @@ class TestCKAN(TestCase):
         # pass to submit method
         s = Submission().get_record(self.s_ckan_new)
         request = self.client.post(path='/rest/submit_to_repo/', data={"sub_id": s["_id"]})
+        s = Submission().get_record(self.s_ckan_new)
+        self.assertTrue("result" in s["accessions"][0])
+        self.assertTrue("id" in s["accessions"][0]["result"])
 
     def test_dspace_new_submission(self):
         pass
@@ -83,7 +86,7 @@ class TestCKAN(TestCase):
         u = User.objects.get(pk=1)
         u.delete()
         Profile().get_collection_handle().remove({"copo_id": "000000000"})
-        DataFile().get_collection_handle().remove({"test_file": True})
+        DataFile().get_collection_handle().remove({"_id": cls.d})
         # Submission().get_collection_handle().remove({"_id": cls.s_dv})
         Submission().get_collection_handle().remove({"_id": cls.s_ckan_new})
         Submission().get_collection_handle().remove({"_id": cls.s_ckan_existing})

@@ -30,24 +30,51 @@ class CkanSubmit:
             dataset_id = s["item_id"]
         else:
             # create dataverse and get item_id
-            data = self._create_ckan_metadata(s)
-            fullurl = self.url + "package_create"
+            # data = self._create_ckan_metadata(s)
+            # fullurl = self.url + "package_create"
             # resp = requests.post(fullurl, json=data, headers=self.headers)
             # if resp.status_code != 200:
-            #    return json.dumps({"status": 1, "message": "error creating ckan dataset"})
+            #   return json.dumps({"status": 1, "message": resp.reason})
             # data = json.loads(resp.content.decode("utf-8"))
             # dataset_id = data["result"]["id"]
             # print(dataset_id)
-            # dataset_id = "52b88001-356d-42bd-88e4-b56c6b0fa1c5"
+            dataset_id = "919ad297-f8da-4e7b-b9b8-0bee3c9aabba"
         # now we have a dataset id to which to add the datafile
         for f in s["bundle"]:
             df = DataFile().get_record(ObjectId(f))
             # upload file
-            with open(df["file_location"], 'rb') as stream:
-                fullurl = self.url + "resource_create"
-                resp = requests.post(fullurl, headers=self.headers,
-                                     data={"upload": df["file_location"],
-                                           "package_id": "25fd451a-9a10-41de-8d67-ca028163cd46"})
+            f = open(df["file_location"], 'rb')
+            fullurl = self.url + "resource_create"
+            try:
+                ext = file_name, file_ext = os.path.splitext(df["name"])
+                ext = ext[1].split('.')[1]
+            except:
+                ext = ""
+            now = str(datetime.date.today())
+            data = {
+                "package_id": dataset_id
+            }
+            try:
+                resp = requests.post(fullurl,
+                                     data=data,
+                                     files=f,
+                                     headers=self.headers
+                                     )
+            except ValueError:
+                resp = requests.post(fullurl,
+                                     data=data,
+                                     files=f,
+                                     headers=self.headers
+                                     )
+            if resp.status_code == 200:
+                details = json.loads(resp.content.decode("utf-8"))
+                self._update_and_complete_submission(details, sub_id)
+            else:
+                return json.dumps({"status": 1, "message": resp.reason})
+        return Submission().mark_submission_complete(ObjectId(sub_id))
+
+    def _update_and_complete_submission(self, details, sub_id):
+        Submission(ObjectId(sub_id)).insert_ckan_accession(sub_id, details)
 
     def _get_all_datasets(self):
         fullurl = self.host['url'] + "package_list?"
