@@ -3,10 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/dal/copo_da.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/dal/copo_da.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/submission/ckanSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/ckanSubmission.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/tests/test_ckan_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/tests/test_ckan_repository.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/tests/fixtures/dummy_datafile.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/tests/fixtures/dummy_datafile.json" afterDir="false" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <ignored path="$PROJECT_DIR$/.idea/httpRequests/" />
@@ -21,7 +19,7 @@
     <SUITE FILE_PATH="coverage/COPO$Test__tests_test_dataverse_DataverseTestClass.coverage" NAME="Test: tests.test_dataverse.DataverseTestClass Coverage Results" MODIFIED="1541515496028" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/COPO$py_test_for_test_uploads_stresstest_UploadStressTest_test_login.coverage" NAME="py.test for test_uploads_stresstest.UploadStressTest.test_upload Coverage Results" MODIFIED="1542282512896" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/web/src/tests" />
     <SUITE FILE_PATH="coverage/COPO$dspaceSubmission.coverage" NAME="dspaceSubmission Coverage Results" MODIFIED="1541525122526" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/web/src/submission" />
-    <SUITE FILE_PATH="coverage/COPO$test_runner.coverage" NAME="test-runner Coverage Results" MODIFIED="1543413239770" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/web/src" />
+    <SUITE FILE_PATH="coverage/COPO$test_runner.coverage" NAME="test-runner Coverage Results" MODIFIED="1543419704009" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/web/src" />
     <SUITE FILE_PATH="coverage/COPO$py_test_for_test_dataverse_TestBasic.coverage" NAME="py.test for test_dataverse.TestBasic Coverage Results" MODIFIED="1541519881600" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/web/src/tests" />
     <SUITE FILE_PATH="coverage/COPO$Test__tests_testEnaSub_Ena_Tests.coverage" NAME="Test: tests.testEnaSub.Ena_Tests Coverage Results" MODIFIED="1541502650026" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/COPO$tests.coverage" NAME="tests Coverage Results" MODIFIED="1541603011503" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
@@ -101,11 +99,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="test_ckan_repository.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="dummy_dataverse_submission.json" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/tests/fixtures/dummy_dataverse_submission.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="510">
+              <caret line="34" selection-start-line="34" selection-end-line="34" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test_ckan_repository.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/tests/test_ckan_repository.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="78" column="58" selection-start-line="78" selection-start-column="58" selection-end-line="78" selection-end-column="58" />
+            <state relative-caret-position="118">
+              <caret line="77" selection-start-line="77" selection-end-line="77" />
               <folding>
                 <element signature="e#33#81#0" expanded="true" />
               </folding>
@@ -153,14 +160,35 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test_dataverse_and_dspace_respositories.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/tests/test_dataverse_and_dspace_respositories.py">
+      <file leaf-file-name="ckanSubmission.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/submission/ckanSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="162">
-              <caret line="128" column="80" selection-start-line="128" selection-start-column="8" selection-end-line="128" selection-end-column="80" />
+            <state relative-caret-position="-50">
+              <caret line="46" column="21" selection-start-line="46" selection-start-column="21" selection-end-line="46" selection-end-column="21" />
               <folding>
-                <element signature="e#33#81#0" expanded="true" />
+                <element signature="e#33#42#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ajax_handlers.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="265">
+              <caret line="627" selection-start-line="627" selection-end-line="627" />
+              <folding>
+                <element signature="e#137#148#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="base.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/site-packages/django/core/handlers/base.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="118">
+              <caret line="125" selection-start-line="125" selection-end-line="125" />
             </state>
           </provider>
         </entry>
@@ -177,32 +205,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ckanSubmission.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/submission/ckanSubmission.py">
+      <file leaf-file-name="dummy_datafile.json" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/web/src/tests/fixtures/dummy_datafile.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="66" column="57" lean-forward="true" selection-start-line="66" selection-start-column="57" selection-end-line="66" selection-end-column="57" />
-              <folding>
-                <element signature="e#33#42#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/site-packages/requests/models.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="312">
-              <caret line="140" selection-start-line="140" selection-end-line="140" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="dspaceSubmission.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2501">
-              <caret line="297" column="36" selection-start-line="297" selection-start-column="36" selection-end-line="297" selection-end-column="36" />
+            <state relative-caret-position="112">
+              <caret line="107" column="32" selection-start-line="107" selection-start-column="32" selection-end-line="107" selection-end-column="32" />
             </state>
           </provider>
         </entry>
@@ -215,15 +222,6 @@
               <folding>
                 <element signature="e#49#84#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="data_utils.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="284">
-              <caret line="384" column="28" lean-forward="true" selection-start-line="384" selection-start-column="28" selection-end-line="384" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -243,24 +241,24 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find />
-      <find />
+      <find>Dublin Core</find>
+      <find>Target Repository:</find>
       <find>cg</find>
       <find>dcterms</find>
       <find>update_submission_repo_data</find>
       <find>language</find>
       <find>rights</find>
       <find>Point</find>
-      <find />
+      <find>Stage resolution error.</find>
       <find>get_dataverse_subject_dropdown</find>
-      <find />
+      <find>Stage resolution error</find>
       <find>auth_user</find>
       <find>Migration</find>
       <find>saniti</find>
       <find>Profile</find>
       <find>profile</find>
-      <find />
-      <find />
+      <find>nikolas cruz interogation</find>
+      <find>COPO CWD is</find>
       <find>submission</find>
       <find>submit_to_repo</find>
       <find>s_ds</find>
@@ -334,7 +332,6 @@
         <option value="$PROJECT_DIR$/web/src/web/settings/base.py" />
         <option value="$PROJECT_DIR$/web/src/manage.py" />
         <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_dspace_submission.json" />
-        <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_datafile.json" />
         <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_dataverse_submission.json" />
         <option value="$PROJECT_DIR$/web/src/tests/test_respositories.py" />
         <option value="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" />
@@ -354,9 +351,10 @@
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
         <option value="$PROJECT_DIR$/web/src/submission/submissionDelegator.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
-        <option value="$PROJECT_DIR$/web/src/submission/ckanSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/dal/copo_da.py" />
         <option value="$PROJECT_DIR$/web/src/tests/test_ckan_repository.py" />
+        <option value="$PROJECT_DIR$/web/src/submission/ckanSubmission.py" />
+        <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_datafile.json" />
       </list>
     </option>
   </component>
@@ -1503,13 +1501,6 @@
       <option name="presentableId" value="Default" />
       <updated>1480591260906</updated>
     </task>
-    <task id="LOCAL-00023" summary="adding accessions collation for dataverse">
-      <created>1524066168240</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1524066168240</updated>
-    </task>
     <task id="LOCAL-00024" summary="adding accessions collation for dataverse">
       <created>1524066207425</created>
       <option name="number" value="00024" />
@@ -1846,38 +1837,45 @@
       <option name="project" value="LOCAL" />
       <updated>1542992405826</updated>
     </task>
-    <option name="localTasksCounter" value="72" />
+    <task id="LOCAL-00072" summary="ckan submission backend test working">
+      <created>1543413283400</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1543413283400</updated>
+    </task>
+    <option name="localTasksCounter" value="73" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="test-runner - 2018.11.28 at 11h 02m 15s.xml">
+    <history-entry file="test-runner - 2018.11.28 at 15h 33m 48s.xml">
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
-    <history-entry file="test-runner - 2018.11.28 at 11h 10m 18s.xml">
+    <history-entry file="test-runner - 2018.11.28 at 15h 34m 01s.xml">
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
-    <history-entry file="test-runner - 2018.11.28 at 11h 12m 44s.xml">
+    <history-entry file="test-runner - 2018.11.28 at 15h 37m 05s.xml">
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
-    <history-entry file="test-runner - 2018.11.28 at 11h 49m 08s.xml">
+    <history-entry file="test-runner - 2018.11.28 at 15h 37m 56s.xml">
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
-    <history-entry file="test-runner - 2018.11.28 at 11h 55m 36s.xml">
+    <history-entry file="test-runner - 2018.11.28 at 15h 38m 59s.xml">
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
-    <history-entry file="test-runner - 2018.11.28 at 11h 56m 09s.xml">
+    <history-entry file="test-runner - 2018.11.28 at 15h 39m 16s.xml">
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
-    <history-entry file="test-runner - 2018.11.28 at 11h 58m 19s.xml">
+    <history-entry file="test-runner - 2018.11.28 at 15h 39m 21s.xml">
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
-    <history-entry file="test-runner - 2018.11.28 at 12h 25m 33s.xml">
+    <history-entry file="test-runner - 2018.11.28 at 15h 39m 36s.xml">
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
-    <history-entry file="test-runner - 2018.11.28 at 12h 28m 03s.xml">
+    <history-entry file="test-runner - 2018.11.28 at 15h 41m 26s.xml">
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
-    <history-entry file="test-runner - 2018.11.28 at 12h 34m 55s.xml">
+    <history-entry file="test-runner - 2018.11.28 at 15h 41m 54s.xml">
       <configuration name="test-runner" configurationId="DjangoTestsConfigurationType" />
     </history-entry>
   </component>
@@ -1901,14 +1899,14 @@
       <window_info anchor="bottom" id="Python Console" order="11" weight="0.32356256" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49767134" weight="0.32130778" />
       <window_info anchor="bottom" id="Terminal" order="12" weight="0.26339287" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.36231884" visible="true" weight="0.21030043" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7294118" visible="true" weight="0.21030043" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" weight="0.25181347" />
       <window_info anchor="right" id="Database" order="4" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49767134" weight="0.2710911" />
       <window_info anchor="right" id="SciView" order="5" weight="0.3297568" />
-      <window_info id="Structure" order="1" sideWeight="0.6376812" side_tool="true" visible="true" weight="0.21030043" />
+      <window_info id="Structure" order="1" sideWeight="0.27058825" side_tool="true" visible="true" weight="0.21030043" />
       <window_info id="Favorites" order="2" sideWeight="0.14671163" side_tool="true" weight="0.20127796" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.7174535" visible="true" weight="0.33102494" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.7174535" visible="true" weight="0.41135734" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -1964,7 +1962,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="commenting" />
     <MESSAGE value="making views and autocomplete services for creating new dataverse/dataset" />
     <MESSAGE value="submission to existing custom dataverses and display of accessions working" />
     <MESSAGE value="more changes to submission ui" />
@@ -1989,7 +1986,8 @@
     <MESSAGE value="tests for dspace and dataverse now in place" />
     <MESSAGE value="adding selenium test to try and check multiple upload speed" />
     <MESSAGE value="creating of ckan datasets and resources working along with test harness" />
-    <option name="LAST_COMMIT_MESSAGE" value="creating of ckan datasets and resources working along with test harness" />
+    <MESSAGE value="ckan submission backend test working" />
+    <option name="LAST_COMMIT_MESSAGE" value="ckan submission backend test working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2009,16 +2007,6 @@
           <line>134</line>
           <option name="timeStamp" value="1168" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/web/src/tests/test_ckan_repository.py</url>
-          <line>76</line>
-          <option name="timeStamp" value="1288" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/web/src/dal/copo_da.py</url>
-          <line>146</line>
-          <option name="timeStamp" value="1289" />
-        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
@@ -2030,11 +2018,16 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="1290" />
+      <option name="time" value="1302" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
+      <expression>
+        <expression-string>requests.post(fullurl, json={&quot;id&quot;: data[&quot;name&quot;]})</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>request.c</expression-string>
         <language-id>Python</language-id>
@@ -2046,27 +2039,47 @@
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string />
+        <expression-string>doc = self.get_collection_handle().update(
+            {&quot;_id&quot;: ObjectId(sub)},
+            {&quot;$push&quot;: {&quot;accessions&quot;: accessions}}
+        )</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string />
+        <expression-string>requests.post(fullurl,
+                                     data=data,
+                                     files=stream,
+                                     headers=self.headers
+                                     )</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string />
+        <expression-string>requests.post(fullurl,
+                                     
+                                     
+                                     files=stream,
+                                     headers=self.headers
+                                     )</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string />
+        <expression-string>requests.post(fullurl,
+                                     data=data,
+                                     headers=self.headers
+                                     )</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string />
+        <expression-string>requests.post(fullurl,
+                                     data=data,
+                                     files=stream,
+                    
+                    
+                                     )</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
@@ -2075,20 +2088,10 @@
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
-      <expression>
-        <expression-string>data</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>fullurl</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string />
+        <expression-string>requests.post(fullurl,                                      files=stream,                                      headers=self.headers,                                      data={&quot;package_id&quot;: dataset_id,                                            &quot;name&quot;: df[&quot;name&quot;],                                            &quot;format&quot;: ext,                                            &quot;created&quot;: now}                                      )</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -2123,17 +2126,17 @@
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string />
+        <expression-string>requests.post(fullurl, files=stream, headers=self.headers, data={&quot;package_id&quot;: &quot;25fd451a-9a10-41de-8d67-ca028163cd46&quot;})</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string />
+        <expression-string>requests.post(fullurl, files=[{&quot;upload&quot;:stream}], headers=self.headers, data={&quot;package_id&quot;: &quot;25fd451a-9a10-41de-8d67-ca028163cd46&quot;})</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string />
+        <expression-string>requests.post(fullurl, upload=stream, headers=self.headers, data={&quot;package_id&quot;: &quot;25fd451a-9a10-41de-8d67-ca028163cd46&quot;})</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -2228,13 +2231,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/tests/fixtures/xml.xml">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/tests/fixtures/dummy_dataverse_submission.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="34" selection-start-line="34" selection-end-line="34" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/tools/update_submission_record_tool.py">
       <provider selected="true" editor-type-id="text-editor" />
@@ -2386,44 +2382,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="431">
-          <caret line="627" column="29" selection-start-line="627" selection-start-column="29" selection-end-line="627" selection-end-column="29" />
-          <folding>
-            <element signature="e#137#148#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/tests/fixtures/dummy_datafile.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="106" column="37" selection-start-line="106" selection-start-column="37" selection-end-line="106" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
           <caret line="633" column="17" selection-start-line="633" selection-start-column="17" selection-end-line="633" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/site-packages/django/core/handlers/base.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="443">
-          <caret line="125" selection-start-line="125" selection-end-line="125" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="281">
-          <caret line="85" selection-start-line="85" selection-end-line="85" />
-          <folding>
-            <element signature="e#51#87#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2441,16 +2403,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/ckanSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="66" column="57" lean-forward="true" selection-start-line="66" selection-start-column="57" selection-end-line="66" selection-end-column="57" />
-          <folding>
-            <element signature="e#33#42#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/tests/test_dataverse_and_dspace_respositories.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="162">
@@ -2465,16 +2417,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="284">
           <caret line="384" column="28" lean-forward="true" selection-start-line="384" selection-start-column="28" selection-end-line="384" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="227">
-          <caret line="146" selection-start-line="146" selection-end-line="146" />
-          <folding>
-            <element signature="e#49#84#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2514,13 +2456,74 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="227">
+          <caret line="146" selection-start-line="146" selection-end-line="146" />
+          <folding>
+            <element signature="e#49#84#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/tests/test_ckan_repository.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="78" column="58" selection-start-line="78" selection-start-column="58" selection-end-line="78" selection-end-column="58" />
+        <state relative-caret-position="118">
+          <caret line="77" selection-start-line="77" selection-end-line="77" />
           <folding>
             <element signature="e#33#81#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="281">
+          <caret line="85" selection-start-line="85" selection-end-line="85" />
+          <folding>
+            <element signature="e#51#87#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="265">
+          <caret line="627" selection-start-line="627" selection-end-line="627" />
+          <folding>
+            <element signature="e#137#148#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/site-packages/django/core/handlers/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="118">
+          <caret line="125" selection-start-line="125" selection-end-line="125" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/ckanSubmission.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-50">
+          <caret line="46" column="21" selection-start-line="46" selection-start-column="21" selection-end-line="46" selection-end-column="21" />
+          <folding>
+            <element signature="e#33#42#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/tests/fixtures/dummy_dataverse_submission.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="34" selection-start-line="34" selection-end-line="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/tests/fixtures/dummy_datafile.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="107" column="32" selection-start-line="107" selection-start-column="32" selection-end-line="107" selection-end-column="32" />
         </state>
       </provider>
     </entry>

@@ -30,30 +30,45 @@ class CkanSubmit:
             dataset_id = s["item_id"]
         else:
             # create dataverse and get item_id
-            # data = self._create_ckan_metadata(s)
-            # fullurl = self.url + "package_create"
-            # resp = requests.post(fullurl, json=data, headers=self.headers)
-            # if resp.status_code != 200:
-            #   return json.dumps({"status": 1, "message": resp.reason})
-            # data = json.loads(resp.content.decode("utf-8"))
-            # dataset_id = data["result"]["id"]
-            # print(dataset_id)
-            dataset_id = "919ad297-f8da-4e7b-b9b8-0bee3c9aabba"
+            data = self._create_ckan_metadata(s)
+            fullurl = self.url + "package_create"
+            resp = requests.post(fullurl, json=data, headers=self.headers)
+            if resp.status_code == 200:
+                # package was created normally
+                data = json.loads(resp.content.decode("utf-8"))
+                dataset_id = data["result"]["id"]
+                data = {
+                    "package_id": dataset_id
+                }
+                fullurl = self.url + "resource_create"
+            elif resp.status_code == 409:
+                # there is a conflict so update rather than create
+                fullurl = self.url + "package_show"
+                resp = requests.post(fullurl, json={"name_or_id": data["name"]})
+                data = json.loads(resp.content.decode("utf-8"))
+                dataset_id = data["result"]["id"]
+                data = {
+                    "package_id": dataset_id
+                }
+                fullurl = self.url + "resource_create"
+            else:
+                return json.dumps({"status": 1, "message": resp.reason})
+
         # now we have a dataset id to which to add the datafile
         for f in s["bundle"]:
             df = DataFile().get_record(ObjectId(f))
             # upload file
             f = open(df["file_location"], 'rb')
-            fullurl = self.url + "resource_create"
+
             try:
                 ext = file_name, file_ext = os.path.splitext(df["name"])
                 ext = ext[1].split('.')[1]
             except:
                 ext = ""
             now = str(datetime.date.today())
-            data = {
-                "package_id": dataset_id
-            }
+            data["name"] = df["name"]
+            data["created"] = now
+            data["format"] = ext
             try:
                 resp = requests.post(fullurl,
                                      data=data,
@@ -69,6 +84,12 @@ class CkanSubmit:
             if resp.status_code == 200:
                 details = json.loads(resp.content.decode("utf-8"))
                 self._update_and_complete_submission(details, sub_id)
+            elif resp.status_code == 409:
+                fullurl = self.url + "package_show"
+                resp = resp.post(fullurl, data={"id": dataset_id})
+                # now iterate through resources to get matching name
+                resources = json.dumps(resp.content.decode("utf-8"))["result"]["resources"]
+                fullurl = self.url + "resource_update"
             else:
                 return json.dumps({"status": 1, "message": resp.reason})
         return Submission().mark_submission_complete(ObjectId(sub_id))
@@ -82,7 +103,7 @@ class CkanSubmit:
         if resp.status_code == 200:
             return resp.content.decode('utf-8')
         else:
-            return json.dumps({"status": 1, "message": "error creating new dspace item"})
+            return json.dumps({"status": 1, "message": "error getting datasets"})
 
     def _create_ckan_metadata(self, s):
         # get file
@@ -91,7 +112,7 @@ class CkanSubmit:
         out["name"] = file.get("description", {}).get("attributes", {}).get("title_author_contributor", {}) \
             .get("title", "").replace(" ", "_")
 
-        out["name"] = str(uuid.uuid4())
+        #out["name"] = str(uuid.uuid4())
 
         out["private"] = False
         out["author"] = file.get("description", {}).get("attributes", {}).get("title_author_contributor", {}) \
