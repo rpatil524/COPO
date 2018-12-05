@@ -22,16 +22,19 @@ class CkanSubmit:
         if sub_id:
             self.host = Submission().get_dataverse_details(sub_id)
             self.headers = {'X-CKAN-API-Key': self.host['apikey']}
-            self.url = self.host["url"]
+
+            if self.host["url"].endswith(".org"):
+                self.host["url"] = self.host["url"] + "/api/3/action/"
+
 
     def submit(self, sub_id, dataFile_ids=None):
         s = Submission().get_record(ObjectId(sub_id))
         if s["meta"]["new_or_existing"] == "existing":
-            dataset_id = s["item_id"]
+            dataset_id = s["identifier"]
         else:
             # create dataverse and get item_id
             data = self._create_ckan_metadata(s)
-            fullurl = self.url + "package_create"
+            fullurl = self.host["url"] + "package_create"
             resp = requests.post(fullurl, json=data, headers=self.headers)
             if resp.status_code == 200:
                 # package was created normally
@@ -40,17 +43,17 @@ class CkanSubmit:
                 data = {
                     "package_id": dataset_id
                 }
-                fullurl = self.url + "resource_create"
+                fullurl = self.host["url"] + "resource_create"
             elif resp.status_code == 409:
                 # there is a conflict so update rather than create
-                fullurl = self.url + "package_show"
+                fullurl = self.host["url"] + "package_show"
                 resp = requests.post(fullurl, json={"name_or_id": data["name"]})
                 data = json.loads(resp.content.decode("utf-8"))
                 dataset_id = data["result"]["id"]
                 data = {
                     "package_id": dataset_id
                 }
-                fullurl = self.url + "resource_create"
+                fullurl = self.host["url"] + "resource_create"
             else:
                 return json.dumps({"status": 1, "message": resp.reason})
 
@@ -85,11 +88,11 @@ class CkanSubmit:
                 details = json.loads(resp.content.decode("utf-8"))
                 self._update_and_complete_submission(details, sub_id)
             elif resp.status_code == 409:
-                fullurl = self.url + "package_show"
+                fullurl = self.host["url"] + "package_show"
                 resp = resp.post(fullurl, data={"id": dataset_id})
                 # now iterate through resources to get matching name
                 resources = json.dumps(resp.content.decode("utf-8"))["result"]["resources"]
-                fullurl = self.url + "resource_update"
+                fullurl = self.host["url"] + "resource_update"
             else:
                 return json.dumps({"status": 1, "message": resp.reason})
         return Submission().mark_submission_complete(ObjectId(sub_id))

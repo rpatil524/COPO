@@ -26,7 +26,6 @@ $(document).ready(function () {
     // here we should call funcs for filling out other repo details
 
     $(document).on("shown.bs.modal", '#repo_modal', function (e) {
-        console.log(e.currentTarget)
         add_delay_keyup(e.currentTarget)
     })
 
@@ -36,7 +35,6 @@ $(document).ready(function () {
 // enable / disable inputs depending on which radio has been selected
 function handle_radio(el) {
     var checked = $(el.currentTarget).find('input[name=create_repo_radio]:checked').val();
-    console.log(checked)
     if (checked == 'new') {
         $('.new-controls').show()
         $('.existing-controls').hide()
@@ -56,7 +54,6 @@ function get_new_dspace_item_details(sub_id) {
         data: {'submission_id': $(document).data('submission_id')},
         dataType: 'json',
     }).done(function (data) {
-        console.log(data)
         $("#repo_modal").find("#dsTitle").val(data.title)
         $("#repo_modal").find("#dsAbstract").val(data.abstract)
         $("#repo_modal").find("#dsType").val(data.type)
@@ -156,13 +153,59 @@ function check_repo_id(e) {
             $.getJSON("/copo/get_dspace_communities/", {'submission_id': sub_id}).done(build_dspace_modal
             )
         }
+        else if (data.repo_type == 'ckan') {
+            $('.ajax-loading-div').show()
+            $('#repo_modal-body').html()
+            var form_html = $('#template_dspace_form').find('.form_content').clone()
+            $(form_html).attr('id', 'dspace_form')
+            $('#repo_modal-body').html(form_html)
+            $('#repo_modal-body').data('repo', data.repo_type)
+            $.getJSON("/copo/get_ckan_items/", {'submission_id': sub_id})
+                .done(build_ckan_modal)
+        }
     })
 }
 
 function mark_as_active_panel(e) {
+    $(document).data('current-label', $(e.currentTarget).siblings('.dataset-label'))
     var submission_id = $(e.currentTarget).data('submission_id')
     $(document).data('submission_id', submission_id)
-    console.log("Active Sub" + " " + submission_id)
+}
+
+// build panel to show ckan datasets
+function build_ckan_modal(resp) {
+    $('.ajax-loading-div').hide()
+    if (!resp) {
+        trow = "Repo returned an error. Please try again."
+        $(modal).find('.modal-body').append(trow)
+        return false
+    }
+    var t = $('#ckan-table-template').find('table').clone()
+    $(t).attr('id', 'ckan-table')
+    if (resp.status == 1) {
+        trow = "<tr><td colspan='5'>" + resp.message + "</td></tr>"
+    }
+    else if (resp.result.length > 0) {
+        var trow = ""
+        $(resp.result).each(function (idx, el) {
+            var colCheck = "<tr data-type='ckan' data-alias='" + el + "'><td><div class='pretty p-default' style='font-size: 26px'>" +
+                "<input type='checkbox'  class='dataset-checkbox'/>" +
+                "<div class='state  p-success'>" +
+                "<label></label>" +
+                "</div>" +
+                "</div>" +
+                "</td>" +
+                "<td>" + el + "</td>"
+            trow = trow + colCheck
+        })
+    }
+    else {
+        trow = "<tr><td colspan='5'>No Data to Show</td></tr>"
+    }
+    $(t).find('tbody').append(trow)
+    $('#repo_modal').find('#table-div-dataverse').append(t)
+    $('#repo_modal').find('#ckan-table').DataTable()
+
 }
 
 
@@ -517,7 +560,6 @@ function expand_dspace_table(event) {
 
 // when dataverse is expanded, fire off request to dataverse to get information on datasets contained within
 function expand_table(event) {
-    console.log("EXPAND TABLE")
     event.preventDefault();
     var dv_alias = $(event.currentTarget).closest('tr').data('alias')
     $(document).data('dv_alias', dv_alias)
@@ -689,19 +731,31 @@ function select_dataset(e) {
     var sub_id = $(document).data('submission_id')
     var row = $(e.currentTarget).closest('tr')
     var type = $(row).data('type')
-    if (type == 'dspace') {
+    if (type == 'dspace' || type == 'ckan') {
         var identifier = $(row).data('alias')
         var name = $(row).find('.name').html()
         var handle = $(row).find('.name').html()
 
-        data = {
-            'type': type,
-            'submission_id': sub_id,
-            'task': 'change_meta',
-            'meta': JSON.stringify({
-                'identifier': identifier,
-                'dspace_item_name': name
-            })
+        if (type == 'dspace') {
+            data = {
+                'type': type,
+                'submission_id': sub_id,
+                'task': 'change_meta',
+                'meta': JSON.stringify({
+                    'identifier': identifier,
+                    'dspace_item_name': name
+                })
+            }
+        }
+        else if (type == 'ckan') {
+            data = {
+                'type': type,
+                'submission_id': sub_id,
+                'task': 'change_meta',
+                'meta': JSON.stringify({
+                    'identifier': identifier,
+                })
+            }
         }
         // if we are dealing with a dspace submission, decide whether or not to append form data containing new item data
         var new_or_existing = $('#repo_modal').find('input[name=create_repo_radio]:checked').val()
@@ -715,9 +769,27 @@ function select_dataset(e) {
         else {
             data.new_or_existing = "existing"
             var label = $(document).data('current-label')
+            if(type == "dspace")
+                $(label).html(identifier + " - " + name)
+            else{
+                $(label).html(identifier)
+            }
+        }
+    }/*
+    else if(type == "ckan"){
+        if (new_or_existing == "new") {
+            var formdata = JSON.stringify($('#repo_modal').find('#new_dspace_form').serializeFormJSON())
+            data.new_or_existing = "new"
+            data.form_data = formdata
+            var label = $(document).data('current-label')
+            $(label).html(identifier + " - " + JSON.parse(formdata).dsTitle)
+        }
+        else {
+            data.new_or_existing = "existing"
+            var label = $(document).data('current-label')
             $(label).html(identifier + " - " + name)
         }
-    }
+    }*/
     else {
         var dataset_id = $(row).data('id')
         var persistent = $(row).data('persistent')
@@ -726,7 +798,12 @@ function select_dataset(e) {
         var publisher = $(row).data('publisher')
         $('#dataset_id').val(dataset_id)
         var label = $(document).data('current-label')
-        $(label).html(identifier + " - " + persistent)
+        if (type == "ckan") {
+            $(label).html(identifier)
+        }
+        else {
+            $(label).html(identifier + " - " + persistent)
+        }
         data = {
             'type': type,
             'submission_id': sub_id,

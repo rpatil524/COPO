@@ -61,7 +61,7 @@ class TestCKAN(TestCase):
         p_dict["profile_id"] = str(cls.pid["_id"])
         p_dict["bundle"].append(str(cls.d))
         p_dict["meta"]["new_or_existing"] = "new"
-        p_dict.pop("item_id")
+        p_dict.pop("identifier")
         cls.s_ckan_new = Submission().get_collection_handle().insert(p_dict)
 
     def test_get_ckan_datasets(self):

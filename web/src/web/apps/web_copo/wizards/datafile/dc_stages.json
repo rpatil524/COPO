@@ -1045,7 +1045,7 @@
                         "available"
                     ],
                     "help_tip": "Date that the resource became or will become available.",
-                    "label": "available"
+                    "label": "Available"
                 },
                 {
                     "type": "text",
@@ -1081,38 +1081,6 @@
                 },
                 {
                     "type": "text",
-                    "required": "false",
-                    "ref": "",
-                    "hidden": "false",
-                    "deprecated": false,
-                    "default_value": [],
-                    "show_in_form": true,
-                    "id": "conformsTo",
-                    "show_in_table": true,
-                    "versions": [
-                        "conformsTo"
-                    ],
-                    "help_tip": "An established standard to which the described resource conforms.",
-                    "label": "Conforms To"
-                },
-                {
-                    "type": "text",
-                    "required": "false",
-                    "ref": "",
-                    "hidden": "false",
-                    "deprecated": false,
-                    "default_value": [],
-                    "show_in_form": true,
-                    "id": "dateAccepted",
-                    "show_in_table": true,
-                    "versions": [
-                        "dateAccepted"
-                    ],
-                    "help_tip": "Date of acceptance of the resource.",
-                    "label": "Date Accepted"
-                },
-                {
-                    "type": "date",
                     "required": "false",
                     "ref": "",
                     "hidden": "false",
@@ -1174,22 +1142,6 @@
                     ],
                     "help_tip": "A class of entity, defined in terms of progression through an educational or training context, for which the described resource is intended.",
                     "label": "Education Level"
-                },
-                {
-                    "type": "text",
-                    "required": "false",
-                    "ref": "",
-                    "hidden": "false",
-                    "deprecated": false,
-                    "default_value": [],
-                    "show_in_form": true,
-                    "id": "extent",
-                    "show_in_table": true,
-                    "versions": [
-                        "extent"
-                    ],
-                    "help_tip": "The size or duration of the resource.",
-                    "label": "Extent"
                 },
                 {
                     "type": "text",

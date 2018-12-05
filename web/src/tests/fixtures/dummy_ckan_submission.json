@@ -14,7 +14,7 @@
     "article_id" : "",
     "date_created" : "2018-11-12T11:59:09.661Z",
     "complete" : "false",
-    "item_id": 12,
+    "identifier": 12,
     "bundle_meta" : [
         {
             "file_id" : "",
