@@ -1,16 +1,5 @@
 // FS - 5/07/18
 
-$.fn.delayKeyup = function (callback, ms) {
-    var timer = 0;
-    var el = $(this);
-    $(this).keyup(function () {
-        clearTimeout(timer);
-        timer = setTimeout(function () {
-            callback(el)
-        }, ms);
-    });
-    return $(this);
-};
 
 $(document).ready(function () {
     $('.ajax-loading-div').hide()
@@ -25,10 +14,41 @@ $(document).ready(function () {
     do_new_dataverse_fields()
     // here we should call funcs for filling out other repo details
 
-    $(document).on("shown.bs.modal", '#repo_modal', function (e) {
-        add_delay_keyup(e.currentTarget)
-    })
 
+    $(document).on('keyup', '#search_dataverse', function (el) {
+        //$(document).data('open_modal', modal
+        e = $(el.currentTarget)
+        var q = e.val()
+        var search_type = e.attr('id')
+        var box = "";
+        var repo_type = $('#repo_modal-body').data('repo')
+        $('.ajax-loading-div').fadeIn()
+
+        var url
+        var handler
+        if (repo_type == "dataverse") {
+            url = "/copo/get_dataverse/"
+            handler = build_dataverse_modal
+        }
+
+        $.ajax({
+            url: url,
+            data: {
+                'q': q,
+                'box': $('input[name="dataverse-radio"]:checked').val(),
+                'submission_id': $(document).data('submission_id')
+            },
+            dataType: 'json'
+        }).done(handler)
+            .error(function () {
+
+                trow = "Error Retieving Data. Are you connected to a network?"
+                $(modal).find('.modal-body').append(trow)
+            })
+
+
+    })
+    $('#repo_modal').find('input[value="existing"]').attr("checked", "checked")
 
 })
 
@@ -44,7 +64,6 @@ function handle_radio(el) {
         $('.new-controls').hide()
         $('.existing-controls').show()
     }
-    get_existing_communites()
 }
 
 
@@ -89,41 +108,6 @@ function get_existing_communites() {
 }
 
 // delayed keyup function to delay searching for n miliseconds before firing search off to dataverse
-function add_delay_keyup(modal) {
-
-    $(modal).find('#search_dataverse, #search_dspace').delayKeyup(function (e) {
-        $(document).data('open_modal', modal)
-        var q = e.val()
-        var search_type = e.attr('id')
-        var box = "";
-        var repo_type = $('#repo_modal-body').data('repo')
-        $('.ajax-loading-div').fadeIn()
-
-        var url
-        var handler
-        if (repo_type == "dataverse") {
-            url = "/copo/get_dataverse/"
-            handler = build_dataverse_modal
-        }
-
-        $.ajax({
-            url: url,
-            data: {
-                'q': q,
-                'box': $('input[name="dataverse-radio"]:checked').val(),
-                'submission_id': $(document).data('submission_id')
-            },
-            dataType: 'json'
-        }).done(handler)
-            .error(function () {
-
-                trow = "Error Retieving Data. Are you connected to a network?"
-                $(modal).find('.modal-body').append(trow)
-            })
-
-    }, 1000)
-
-}
 
 
 // function to get url for selected repo
@@ -140,7 +124,7 @@ function check_repo_id(e) {
             $(form_html).attr('id', 'repo_metadata_form')
             $('#repo_modal-body').html(form_html)
             $('#repo_modal-body').data('repo', data.repo_type)
-            add_delay_keyup('#search_dataverse')
+            //add_delay_keyup('#search_dataverse')
         }
         else if (data.repo_type == 'dspace') {
             // load dspace repo html into modal
@@ -205,7 +189,7 @@ function build_ckan_modal(resp) {
     $(t).find('tbody').append(trow)
     $('#repo_modal').find('#table-div-dataverse').append(t)
     $('#repo_modal').find('#ckan-table').DataTable()
-
+    $('#repo_modal').find('input[value="existing"]').trigger("click")
 }
 
 
@@ -264,7 +248,7 @@ function build_dataverse_modal(resp) {
         })
     }
 
-    var dt = $(modal).find('#table-div-dataverse')
+    var dt = $("#repo_modal").find('#table-div-dataverse')
     $(dt).empty().append(t)
 
     ///$('#dataverse-table .summary-details-control').on('click', expand_table)
@@ -273,6 +257,8 @@ function build_dataverse_modal(resp) {
     $('#dataverse-table tbody')
         .off('click', 'td.summary-details-control')
         .on('click', 'td.summary-details-control', expand_table);
+
+    $('#repo_modal').find('input[value="existing"]').trigger("click")
 
 }
 
@@ -302,6 +288,9 @@ function build_dspace_modal(data) {
     $('#dspace-table tbody')
         .off('click', 'td.summary-details-control')
         .on('click', 'td.summary-details-control', expand_dspace_table);
+
+    $('#repo_modal').find('input[value="existing"]').trigger("click")
+
 }
 
 /*
@@ -769,9 +758,9 @@ function select_dataset(e) {
         else {
             data.new_or_existing = "existing"
             var label = $(document).data('current-label')
-            if(type == "dspace")
+            if (type == "dspace")
                 $(label).html(identifier + " - " + name)
-            else{
+            else {
                 $(label).html(identifier)
             }
         }
