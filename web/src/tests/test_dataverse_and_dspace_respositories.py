@@ -25,7 +25,7 @@ class TestDataverse(TestCase):
         cls.user.save()
 
         # create profile
-        p_dict = {"copo_id": "000000000", "description": "Test Description", "user_id": 1, "title": "Test Title"}
+        p_dict = {"copo_id": "000000000", "description": "Test Description", "user_id": cls.user.id, "title": "Test Title"}
         cls.pid = Profile().save_record(dict(), **p_dict)
 
         # create datafile

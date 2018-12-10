@@ -36,11 +36,11 @@ class DataverseSubmit(object):
         #  we are creating a new dataset
         if 'dataverse_alias' in s['meta'] and 'doi' in s['meta']:
             # submit to existing
-            self._add_to_dataverse(s)
+            return self._add_to_dataverse(s)
         else:
             # create new
-            self._create_and_add_to_dataverse(s)
-        return True
+            return self._create_and_add_to_dataverse(s)
+
 
     def truncate_url(self, url):
         if url.startswith('https://'):
@@ -56,6 +56,8 @@ class DataverseSubmit(object):
     def _add_to_dataverse(self, sub):
         c = self._get_connection()
         dv = c.get_dataverse(sub['meta']['dataverse_alias'])
+        if dv == None:
+            return {"status": 1, "message": "error getting dataverse"}
         doi = self.truncate_url(sub['meta']['doi'])
         ds = dv.get_dataset_by_doi(doi)
         if ds == None:

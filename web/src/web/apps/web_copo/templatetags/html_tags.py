@@ -365,7 +365,6 @@ def generate_table_records(profile_id=str(), component=str()):
             df["special_repositories"] = df["repository"]
             columns.append(dict(data="special_repositories", visible=False))
 
-
         columns.append(dict(data="record_id", visible=False))
         detail_dict = dict(className='summary-details-control detail-hover-message', orderable=False, data=None,
                            title='', defaultContent='', width="5%")
@@ -619,18 +618,19 @@ def generate_submission_accessions_data(submission_record):
             )
 
         elif repository == "dspace":
-            columns = [{"title": "Format"}, {"title": "uuid"}, {"title": "dSpace URL"}, {"title": "Name"}, {"title": "File Size"}]
-            for a in accessions:
-                data_set.append(
-                    [ a["format"], a["uuid"], a["dspace_instance"], a["name"], (hurry.filesize.size(a["sizeBytes"]))]
-                )
-
-        elif repository == "ckan":
             columns = [{"title": "Format"}, {"title": "uuid"}, {"title": "dSpace URL"}, {"title": "Name"},
                        {"title": "File Size"}]
             for a in accessions:
                 data_set.append(
                     [a["format"], a["uuid"], a["dspace_instance"], a["name"], (hurry.filesize.size(a["sizeBytes"]))]
+                )
+
+        elif repository == "ckan":
+
+            columns = [{"title": "Name"}, {"title": "resource id"}, {"title": "package id"}, {"title": "Format"}]
+            for a in accessions:
+                data_set.append(
+                    [a["result"]["name"], a["result"]["id"], a["result"]["package_id"], a["result"]["format"]]
                 )
 
     return_dict = dict(dataSet=data_set,

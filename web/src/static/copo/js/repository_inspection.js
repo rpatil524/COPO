@@ -720,6 +720,7 @@ function select_dataset(e) {
     var sub_id = $(document).data('submission_id')
     var row = $(e.currentTarget).closest('tr')
     var type = $(row).data('type')
+    var new_or_existing = $('#repo_modal').find('input[name=create_repo_radio]:checked').val()
     if (type == 'dspace' || type == 'ckan') {
         var identifier = $(row).data('alias')
         var name = $(row).find('.name').html()
@@ -732,7 +733,8 @@ function select_dataset(e) {
                 'task': 'change_meta',
                 'meta': JSON.stringify({
                     'identifier': identifier,
-                    'dspace_item_name': name
+                    'dspace_item_name': name,
+                    'new_or_existing': new_or_existing
                 })
             }
         }
@@ -743,11 +745,12 @@ function select_dataset(e) {
                 'task': 'change_meta',
                 'meta': JSON.stringify({
                     'identifier': identifier,
+                    'new_or_existing': new_or_existing
                 })
             }
         }
         // if we are dealing with a dspace submission, decide whether or not to append form data containing new item data
-        var new_or_existing = $('#repo_modal').find('input[name=create_repo_radio]:checked').val()
+
         if (new_or_existing == "new") {
             var formdata = JSON.stringify($('#repo_modal').find('#new_dspace_form').serializeFormJSON())
             data.new_or_existing = "new"

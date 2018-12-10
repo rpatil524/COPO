@@ -1,5 +1,5 @@
 # Created by fshaw at 21/11/2018
-import os
+import os, re
 from django.conf import settings
 import uuid
 import requests
@@ -29,10 +29,9 @@ class CkanSubmit:
 
     def submit(self, sub_id, dataFile_ids=None):
         s = Submission().get_record(ObjectId(sub_id))
-        if s["meta"]["new_or_existing"] == "existing":
-            dataset_id = s["identifier"]
-        else:
-            # create dataverse and get item_id
+
+        if s["meta"]["new_or_existing"] == "new":
+            # create and get item_id
             data = self._create_ckan_metadata(s)
             fullurl = self.host["url"] + "package_create"
             resp = requests.post(fullurl, json=data, headers=self.headers)
@@ -56,9 +55,12 @@ class CkanSubmit:
                 fullurl = self.host["url"] + "resource_create"
             else:
                 return json.dumps({"status": 1, "message": resp.reason})
+        else:
+            data = {"package_id": s["meta"]["identifier"]}
 
         # now we have a dataset id to which to add the datafile
         for f in s["bundle"]:
+            #data = dict()
             df = DataFile().get_record(ObjectId(f))
             # upload file
             f = open(df["file_location"], 'rb')
@@ -72,6 +74,7 @@ class CkanSubmit:
             data["name"] = df["name"]
             data["created"] = now
             data["format"] = ext
+            fullurl = self.host["url"] + "resource_create"
             try:
                 resp = requests.post(fullurl,
                                      data=data,
@@ -87,15 +90,28 @@ class CkanSubmit:
             if resp.status_code == 200:
                 details = json.loads(resp.content.decode("utf-8"))
                 self._update_and_complete_submission(details, sub_id)
+            elif resp.status_code == 400:
+                # try again checking for https
+                instance = re.findall("https", fullurl)
+                if len(instance) == 0:
+                    fullurl = fullurl.replace("http", "https")
+                resp = requests.post(fullurl,
+                                     data=data,
+                                     files=f,
+                                     headers=self.headers
+                                     )
+                details = json.loads(resp.content.decode("utf-8"))
+                return self._update_and_complete_submission(details, sub_id)
             elif resp.status_code == 409:
                 fullurl = self.host["url"] + "package_show"
-                resp = resp.post(fullurl, data={"id": dataset_id})
+                resp = requests.post(fullurl, data={"id": dataset_id})
                 # now iterate through resources to get matching name
                 resources = json.dumps(resp.content.decode("utf-8"))["result"]["resources"]
                 fullurl = self.host["url"] + "resource_update"
+                return Submission().mark_submission_complete(ObjectId(sub_id))
             else:
                 return json.dumps({"status": 1, "message": resp.reason})
-        return Submission().mark_submission_complete(ObjectId(sub_id))
+
 
     def _update_and_complete_submission(self, details, sub_id):
         Submission(ObjectId(sub_id)).insert_ckan_accession(sub_id, details)
