@@ -1,6 +1,6 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 27/05/2016'
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from dal.copo_da import Submission
 import dal.figshare_da as fda
 from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission
@@ -22,6 +22,8 @@ def delegate_submission(request):
     sub = Submission().get_record(sub_id)
 
     repo = sub['repository']
+
+    error = None
 
     ## Submit to Figshare
     if repo == 'figshare':
@@ -55,7 +57,8 @@ def delegate_submission(request):
         if result == True:
             return HttpResponse(jsonpickle.dumps({'status': 1}))
         else:
-            return HttpResponse(jsonpickle.dumps({'status': result}))
+            error = result
+
 
     ## Submit to Dataverse
     elif repo == 'dataverse':
@@ -66,7 +69,7 @@ def delegate_submission(request):
         if result == True:
             return HttpResponse(jsonpickle.dumps({'status': 0}))
         else:
-            return HttpResponse(jsonpickle.dumps({'status': result}))
+            error = result
 
     ## Submit to dspace
     elif repo == 'dspace':
@@ -77,7 +80,8 @@ def delegate_submission(request):
         if result == True:
             return HttpResponse(jsonpickle.dumps({'status': 0}))
         else:
-            return HttpResponse(jsonpickle.dumps(result))
+            error = result
+
 
     # Submit to CKAN
     elif repo == 'ckan':
@@ -88,8 +92,9 @@ def delegate_submission(request):
         if result == True:
             return HttpResponse(jsonpickle.dumps({'status': 0}))
         else:
-            return HttpResponse(jsonpickle.dumps(result))
+            error = result
 
 
-    # return default
-    return HttpResponse({'status': 0})
+
+    # return error
+    return HttpResponse(error["error_msg"], status=error["status_code"])

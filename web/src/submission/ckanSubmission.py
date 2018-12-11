@@ -26,7 +26,6 @@ class CkanSubmit:
             if self.host["url"].endswith(".org"):
                 self.host["url"] = self.host["url"] + "/api/3/action/"
 
-
     def submit(self, sub_id, dataFile_ids=None):
         s = Submission().get_record(ObjectId(sub_id))
 
@@ -60,7 +59,7 @@ class CkanSubmit:
 
         # now we have a dataset id to which to add the datafile
         for f in s["bundle"]:
-            #data = dict()
+            # data = dict()
             df = DataFile().get_record(ObjectId(f))
             # upload file
             f = open(df["file_location"], 'rb')
@@ -82,6 +81,7 @@ class CkanSubmit:
                                      headers=self.headers
                                      )
             except ValueError:
+                # for some reason this fails the first time
                 resp = requests.post(fullurl,
                                      data=data,
                                      files=f,
@@ -100,21 +100,31 @@ class CkanSubmit:
                                      files=f,
                                      headers=self.headers
                                      )
+                if resp.status_code != 200:
+                    msg = json.loads(resp.content.decode("utf-8"))["error"]["message"]
+                    return {"success": False, "status_code": resp.status_code, "error_msg": msg}
                 details = json.loads(resp.content.decode("utf-8"))
-                return self._update_and_complete_submission(details, sub_id)
+                self._update_and_complete_submission(details, sub_id)
             elif resp.status_code == 409:
                 fullurl = self.host["url"] + "package_show"
                 resp = requests.post(fullurl, data={"id": dataset_id})
-                # now iterate through resources to get matching name
+                #  now iterate through resources to get matching name
                 resources = json.dumps(resp.content.decode("utf-8"))["result"]["resources"]
                 fullurl = self.host["url"] + "resource_update"
-                return Submission().mark_submission_complete(ObjectId(sub_id))
+                #Submission().mark_submission_complete(ObjectId(sub_id))
             else:
                 return json.dumps({"status": 1, "message": resp.reason})
 
+        Submission().mark_submission_complete(ObjectId(sub_id))
+        return True
 
     def _update_and_complete_submission(self, details, sub_id):
+        if details["success"] == False:
+            return False
         Submission(ObjectId(sub_id)).insert_ckan_accession(sub_id, details)
+
+        return True
+
 
     def _get_all_datasets(self):
         fullurl = self.host['url'] + "package_list?"
@@ -131,7 +141,7 @@ class CkanSubmit:
         out["name"] = file.get("description", {}).get("attributes", {}).get("title_author_contributor", {}) \
             .get("title", "").replace(" ", "_")
 
-        #out["name"] = str(uuid.uuid4())
+        # out["name"] = str(uuid.uuid4())
 
         out["private"] = False
         out["author"] = file.get("description", {}).get("attributes", {}).get("title_author_contributor", {}) \
