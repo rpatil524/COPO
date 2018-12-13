@@ -3,11 +3,8 @@ from django.test import TestCase, RequestFactory
 import os, json
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-import datetime
 from dal.copo_da import Profile, DataFile, Repository, Submission
 from django.conf import settings
-from submission.submissionDelegator import delegate_submission
-from django.http import request
 import requests
 
 
@@ -20,7 +17,7 @@ class TestDataverse(TestCase):
         settings.UNIT_TESTING = True
 
         # create user
-        cls.user = User.objects.create_user(username='jonny', first_name="jonny", last_name="appleseed",
+        cls.user = User.objects.create_user(username='jonny', first_name=settings.TEST_USER_NAME, last_name="appleseed",
                                             email='jonny@appleseed.com', password='jonnyappleseed')
         cls.user.save()
 
@@ -140,7 +137,7 @@ class TestDataverse(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        u = User.objects.get(pk=1)
+        u = User.objects.get(username=settings.TEST_USER_NAME)
         u.delete()
         Profile().get_collection_handle().remove({"copo_id": "000000000"})
         DataFile().get_collection_handle().remove({"test_file": True})

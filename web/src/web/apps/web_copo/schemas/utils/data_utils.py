@@ -361,14 +361,14 @@ def get_copo_id():
 
 def get_user_id():
     if settings.UNIT_TESTING:
-        return 1
+        User.objects.get(username=settings.TEST_USER_NAME).id
     else:
         return ThreadLocal.get_current_user().id
 
 
 def get_current_user():
     if settings.UNIT_TESTING:
-        return User.objects.get(pk=1)
+        return User.objects.get(username=settings.TEST_USER_NAME)
     else:
         return ThreadLocal.get_current_user()
 
