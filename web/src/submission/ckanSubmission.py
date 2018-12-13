@@ -1,16 +1,11 @@
 # Created by fshaw at 21/11/2018
-import os, re
-from django.conf import settings
-import uuid
+import os, re, string, json
 import requests
-from dal.copo_da import Submission, DataFile
-from web.apps.web_copo.schemas.utils import data_utils
-from dal.copo_da import Profile, DataFile
+from dal.copo_da import Submission
+from dal.copo_da import DataFile
 import datetime
-from bson import ObjectId, json_util
-import xml.etree.ElementTree as et
-from dataverse.exceptions import OperationFailedError
-import json
+from bson import ObjectId
+
 
 
 class CkanSubmit:
@@ -42,6 +37,26 @@ class CkanSubmit:
                     "package_id": dataset_id
                 }
                 fullurl = self.host["url"] + "resource_create"
+            elif resp.status_code == 400:
+                instance = re.findall("https", fullurl)
+                if len(instance) == 0:
+                    fullurl = fullurl.replace("http", "https")
+                resp = requests.post(fullurl, json=data, headers=self.headers)
+                if resp.status_code != 200:
+                    details = json.loads(resp.content.decode("utf-8"))
+                    try:
+                        msg = details["error"]["message"]
+                    except KeyError:
+                        msg = details["error"]["name"][0]
+
+                    return json.dumps({"status": resp.status_code, "message": msg})
+                else:
+                    data = json.loads(resp.content.decode("utf-8"))
+                    dataset_id = data["result"]["id"]
+                    data = {
+                        "package_id": dataset_id
+                    }
+                    fullurl = self.host["url"] + "resource_create"
             elif resp.status_code == 409:
                 # there is a conflict so update rather than create
                 fullurl = self.host["url"] + "package_show"
@@ -53,7 +68,7 @@ class CkanSubmit:
                 }
                 fullurl = self.host["url"] + "resource_create"
             else:
-                return json.dumps({"status": 1, "message": resp.reason})
+                return json.dumps({"status": 500, "message": resp.reason + " - " + resp.text})
         else:
             data = {"package_id": s["meta"]["identifier"]}
 
@@ -102,7 +117,7 @@ class CkanSubmit:
                                      )
                 if resp.status_code != 200:
                     msg = json.loads(resp.content.decode("utf-8"))["error"]["message"]
-                    return {"success": False, "status_code": resp.status_code, "error_msg": msg}
+                    return {"status": resp.status_code, "message": msg}
                 details = json.loads(resp.content.decode("utf-8"))
                 self._update_and_complete_submission(details, sub_id)
             elif resp.status_code == 409:
@@ -113,7 +128,7 @@ class CkanSubmit:
                 fullurl = self.host["url"] + "resource_update"
                 #Submission().mark_submission_complete(ObjectId(sub_id))
             else:
-                return json.dumps({"status": 1, "message": resp.reason})
+                return json.dumps({"status": resp.status_code, "message": resp.reason + " - " + resp.text})
 
         Submission().mark_submission_complete(ObjectId(sub_id))
         return True
@@ -132,7 +147,7 @@ class CkanSubmit:
         if resp.status_code == 200:
             return resp.content.decode('utf-8')
         else:
-            return json.dumps({"status": 1, "message": "error getting datasets"})
+            return json.dumps({"status": resp.status_code, "message": "error getting datasets"})
 
     def _create_ckan_metadata(self, s):
         # get file
@@ -162,4 +177,9 @@ class CkanSubmit:
         out["type"] = ""
         out["tags"] = []
         out["extras"] = []
+        for key in out:
+            # ckan throws a wobbly if there is punctuation in field values, so remove
+            if type(out[key]) == type(""):
+                out[key] = out[key].translate(str.maketrans("", "", string.punctuation))
+                out[key] = out[key].lower()
         return out

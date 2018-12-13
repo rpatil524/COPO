@@ -58,9 +58,13 @@ function handle_radio(el) {
     if (checked == 'new') {
         $('.new-controls').show()
         $('.existing-controls').hide()
+        if ($(document).data("selected_repo_type") == "ckan"){
+            $('#repo_modal').find('#table-div-dataverse').hide()
+        }
         get_new_dspace_item_details()
     }
     else {
+        $('#repo_modal').find('#table-div-dataverse').show()
         $('.new-controls').hide()
         $('.existing-controls').show()
     }
@@ -117,6 +121,7 @@ function check_repo_id(e) {
     // get repo info
     $(document).data('current-label', $(e.currentTarget).siblings('.dataset-label'))
     $.getJSON("/copo/get_repo_info/", {'sub_id': sub_id}, function (data) {
+        $(document).data("selected_repo_type", data.repo_type)
         if (data.repo_type == 'dataverse') {
             // load dataverse repo html into modal
             $('#repo_modal-body').html()
@@ -693,7 +698,9 @@ function do_new_dataverse_fields() {
 function save_inspection_info(e) {
     //e.preventDefault()
     var sub_id = $(document).data('submission_id')
-    var jsondata = JSON.stringify($('#repo_modal').find('form').serializeFormJSON())
+    var jsondata = $('#repo_modal').find('form').serializeFormJSON()
+    jsondata.new_or_existing = $('#repo_modal').find('input[name=create_repo_radio]:checked').val()
+    jsondata_s = JSON.stringify(jsondata)
     $.ajax({
         url: "/copo/update_submission_repo_data/",
         type: "POST",
@@ -703,7 +710,7 @@ function save_inspection_info(e) {
         data: {
             'submission_id': sub_id,
             'task': 'change_meta',
-            'meta': jsondata,
+            'meta': jsondata_s,
         },
         success: function (data) {
             var label = $(document).data('current-label')

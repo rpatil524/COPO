@@ -5,7 +5,7 @@ from dal.copo_da import Submission
 import dal.figshare_da as fda
 from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission
 from django.urls import reverse
-import jsonpickle
+import jsonpickle, json
 
 
 def delegate_submission(request):
@@ -92,9 +92,9 @@ def delegate_submission(request):
         if result == True:
             return HttpResponse(jsonpickle.dumps({'status': 0}))
         else:
-            error = result
+            error = json.loads(result)
 
 
 
     # return error
-    return HttpResponse(error["error_msg"], status=error["status_code"])
+    return HttpResponse(error["message"], status=error["status"])
