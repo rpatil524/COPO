@@ -7,7 +7,6 @@ import datetime
 from bson import ObjectId
 
 
-
 class CkanSubmit:
     host = None
     headers = None
@@ -126,7 +125,7 @@ class CkanSubmit:
                 #  now iterate through resources to get matching name
                 resources = json.dumps(resp.content.decode("utf-8"))["result"]["resources"]
                 fullurl = self.host["url"] + "resource_update"
-                #Submission().mark_submission_complete(ObjectId(sub_id))
+                # Submission().mark_submission_complete(ObjectId(sub_id))
             else:
                 return json.dumps({"status": resp.status_code, "message": resp.reason + " - " + resp.text})
 
@@ -139,7 +138,6 @@ class CkanSubmit:
         Submission(ObjectId(sub_id)).insert_ckan_accession(sub_id, details)
 
         return True
-
 
     def _get_all_datasets(self):
         fullurl = self.host['url'] + "package_list?"
@@ -183,3 +181,6 @@ class CkanSubmit:
                 out[key] = out[key].translate(str.maketrans("", "", string.punctuation))
                 out[key] = out[key].lower()
         return out
+
+    def cg_to_dc(self, sub_id):
+        pass

@@ -48,7 +48,7 @@ $(document).ready(function () {
 
 
     })
-    $('#repo_modal').find('input[value="existing"]').attr("checked", "checked")
+    //$('#repo_modal').find('input[value="existing"]').attr("checked", "checked")
 
 })
 
@@ -58,7 +58,7 @@ function handle_radio(el) {
     if (checked == 'new') {
         $('.new-controls').show()
         $('.existing-controls').hide()
-        if ($(document).data("selected_repo_type") == "ckan"){
+        if ($(document).data("selected_repo_type") == "ckan") {
             $('#repo_modal').find('#table-div-dataverse').hide()
         }
         get_new_dspace_item_details()
@@ -208,24 +208,45 @@ function build_dataverse_modal(resp) {
         $(modal).find('.modal-body').append(trow)
         return false
     }
-
+    var new_or_existing = $('#repo_modal').find('input[name=create_repo_radio]:checked').val()
+    console.log(new_or_existing)
     var t = $('#dataverse-table-template').find('table').clone()
     $(t).attr('id', 'dataverse-table')
     var checked = $('input[name=dataverse-radio]:checked').val();
     var trow
     if (checked == 'dataverse') {
         if (resp.data.items.length > 0) {
-            $(resp.data.items).each(function (idx, el) {
-                console.log(el)
-                trow = "<tr data-alias='" + el.identifier + "' data-type='" + el.type + "' data-entity_id='" + el.entity_id + "'>" +
-                    "<td class='summary-details-control' style='text-align:center'></td>" +
-                    "<td>" + el.name + "</td>" +
-                    "<td>" + el.identifier + "</td>" +
-                    "<td>" + el.description + "</td>" +
-                    "<td>" + el.published_at + "</td>" +
-                    "<td>" + el.type + "</td>"
-                "</tr>"
-            })
+            if (new_or_existing == "new") {
+                colCheck = "<td style='text-align: center'><div class='dataset-checkbox pretty p-default' style='font-size: 26px'>" +
+                    "<input type='checkbox'/>" +
+                    "<div class='state  p-success'>" +
+                    "<label></label>" +
+                    "</div>" +
+                    "</div></td>"
+                $(resp.data.items).each(function (idx, el) {
+                    trow = "<tr data-alias='" + el.identifier + "' data-type='" + el.type + "' data-entity_id='" + el.entity_id + "'>" +
+                        colCheck +
+                        "<td>" + el.name + "</td>" +
+                        "<td>" + el.identifier + "</td>" +
+                        "<td>" + el.description + "</td>" +
+                        "<td>" + el.published_at + "</td>" +
+                        "<td>" + el.type + "</td>"
+                    "</tr>"
+
+                })
+            }
+            else {
+                $(resp.data.items).each(function (idx, el) {
+                    trow = "<tr data-alias='" + el.identifier + "' data-type='" + el.type + "' data-entity_id='" + el.entity_id + "'>" +
+                        "<td class='summary-details-control' style='text-align:center'></td>" +
+                        "<td>" + el.name + "</td>" +
+                        "<td>" + el.identifier + "</td>" +
+                        "<td>" + el.description + "</td>" +
+                        "<td>" + el.published_at + "</td>" +
+                        "<td>" + el.type + "</td>"
+                    "</tr>"
+                })
+            }
         }
         else {
             trow = "<tr><td colspan='5'>No Data to Show</td></tr>"
@@ -263,7 +284,7 @@ function build_dataverse_modal(resp) {
         .off('click', 'td.summary-details-control')
         .on('click', 'td.summary-details-control', expand_table);
 
-    $('#repo_modal').find('input[value="existing"]').trigger("click")
+    //$('#repo_modal').find('input[value="existing"]').trigger("click")
 
 }
 
@@ -558,7 +579,7 @@ function expand_table(event) {
     var dv_alias = $(event.currentTarget).closest('tr').data('alias')
     $(document).data('dv_alias', dv_alias)
     var table = $(event.currentTarget).closest('table')
-
+    var new_or_existing = $('#repo_modal').find('input[name=create_repo_radio]:checked').val()
 
     var tid = $(table).attr('id')
 
@@ -569,19 +590,7 @@ function expand_table(event) {
     var type = $(tr).data('type')
     var entity_id = $(tr).data('alias')
     var dspace_type = $(tr).data('dspace_type')
-    /*
-    if (dspace_type == "community") {
-        table = $(table).DataTable({"sorting": false})
-    }
-    else if (dspace_type == "collection") {
-        table = $(table).DataTable({
-            "paging": false,
-            "sorting": false,
-            "searching": false,
-            "info": false
-        })
-    }
-    */
+
 
     var row = table.row(tr);
     row.deselect(); // remove selection on row
@@ -790,31 +799,46 @@ function select_dataset(e) {
         }
     }*/
     else {
-        var dataset_id = $(row).data('id')
-        var persistent = $(row).data('persistent')
-        var identifier = $(row).data('identifier')
-        var entity_id = $(row).data('id')
-        var publisher = $(row).data('publisher')
-        $('#dataset_id').val(dataset_id)
-        var label = $(document).data('current-label')
-        if (type == "ckan") {
-            $(label).html(identifier)
-        }
-        else {
-            $(label).html(identifier + " - " + persistent)
-        }
-        data = {
-            'type': type,
-            'submission_id': sub_id,
-            'task': 'change_meta',
-            'meta': JSON.stringify({
-                'doi': persistent,
-                'dataset_id': dataset_id,
-                'identifier': identifier,
-                'dataverse_alias': $(document).data('dv_alias'),
-                'dataverse_id': $(document).data('entity_id'),
-                'publisher': publisher
-            })
+        if (new_or_existing == "existing") {
+            var dataset_id = $(row).data('id')
+            var persistent = $(row).data('persistent')
+            var identifier = $(row).data('identifier')
+            var entity_id = $(row).data('id')
+            var publisher = $(row).data('publisher')
+            $('#dataset_id').val(dataset_id)
+            var label = $(document).data('current-label')
+            if (type == "ckan") {
+                $(label).html(identifier)
+            }
+            else {
+                $(label).html(identifier + " - " + persistent)
+            }
+            data = {
+                'type': type,
+                'submission_id': sub_id,
+                'task': 'change_meta',
+                'meta': JSON.stringify({
+                    'doi': persistent,
+                    'dataset_id': dataset_id,
+                    'identifier': identifier,
+                    'dataverse_alias': $(document).data('dv_alias'),
+                    'dataverse_id': $(document).data('entity_id'),
+                    'publisher': publisher
+                })
+            }
+        } else {
+            var alias = $(row).data('alias')
+            var entity_id = $(row).data('entity_id')
+            $(document).data('current-label').html(alias)
+            data = {
+                'type': type,
+                'submission_id': sub_id,
+                'task': 'change_meta',
+                'meta': JSON.stringify({
+                    'alias': alias,
+                    'entity_id': entity_id
+                })
+            }
         }
     }
 

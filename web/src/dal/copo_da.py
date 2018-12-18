@@ -359,6 +359,7 @@ class Submission(DAComponent):
                     repository=repo,
                     status=False,
                     complete='false',
+                    is_cg=str(repo=="cg_core"),
                     user_id=data_utils.get_current_user().id,
                     date_created=date.today()
             ).items():

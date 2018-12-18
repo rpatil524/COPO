@@ -221,3 +221,6 @@ class DataverseSubmit(object):
         doc = Submission().mark_as_published(sub_id)
 
         return doc
+
+    def cg_to_dc(self, sub_id):
+        pass

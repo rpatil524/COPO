@@ -359,3 +359,6 @@ class DspaceSubmit(object):
             return json.dumps({"error": self.not_found})
         else:
             return json.dumps({"error": self.error_msg})
+
+    def cg_to_dc(self, sub_id):
+        pass

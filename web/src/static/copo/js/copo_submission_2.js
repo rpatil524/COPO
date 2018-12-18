@@ -293,7 +293,7 @@ $(document).ready(function () {
                                         colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label_' + data.record_id + '" style="margin-bottom: 10px;">' + data.destination_repo.url + '</span></div>')
                                     }
 
-                                    if (data.special_repositories == 'dcterms' || data.special_repositories == 'ckan' || data.special_repositories == 'dataverse' || data.special_repositories == 'dspace') {
+                                    if (data.special_repositories == 'cg_core' || data.special_repositories == 'dcterms' || data.special_repositories == 'ckan' || data.special_repositories == 'dataverse' || data.special_repositories == 'dspace') {
 
                                         if (repos.length) {
 

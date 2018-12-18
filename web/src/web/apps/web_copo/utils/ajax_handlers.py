@@ -484,6 +484,15 @@ def get_repo_info(request):
 
     try:
         repo = s['destination_repo']
+        # if sub type is cg_core, do conversion from interim to dc
+        if s["is_cg"]:
+            if repo == "dataverse":
+                ds().cg_to_dc(sub_id)
+            elif repo == "ckan":
+                ckan().cg_to_dc(sub_id)
+            elif repo == "dspace":
+                dspace().cg_to_dc(sub_id)
+
         out = {'repo_type': repo['type'], 'repo_url': repo['url']}
     except:
         out = {}
@@ -555,7 +564,7 @@ def update_submission_repo_data(request):
         meta = json.loads(request.POST['meta'])
         if request.POST.get("type") == "dspace":
             if request.POST["new_or_existing"] == "new":
-                # need to get form metadata for creating new dspace item
+                #  need to get form metadata for creating new dspace item
                 form_data = json.loads(request.POST['form_data'])
                 new_or_existing = request.POST["new_or_existing"]
                 r_type = request.POST["type"]
@@ -621,6 +630,7 @@ def get_dspace_item_metadata(request):
     out["type"] = df.get("description", {}).get("attributes", {}) \
         .get("optional_fields", {}).get("type", "")
     return HttpResponse(json.dumps(out))
+
 
 def get_ckan_items(request):
     s = request.GET["submission_id"]
