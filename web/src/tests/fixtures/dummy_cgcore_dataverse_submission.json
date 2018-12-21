@@ -12,11 +12,6 @@
             "file_id" : "",
             "upload_status" : false,
             "file_path" : ""
-        },
-        {
-            "file_id" : "",
-            "upload_status" : false,
-            "file_path" : ""
         }
     ],
     "destination_repo" : {
@@ -39,10 +34,7 @@
     "profile_id" : "",
     "completed_on" : "",
     "accessions" : {},
-    "bundle" : [
-        "",
-        ""
-    ],
+    "bundle" : [],
     "description_token" : "5c191b0a68236b56fbcb7864",
     "is_cg" : "True",
     "published" : ""

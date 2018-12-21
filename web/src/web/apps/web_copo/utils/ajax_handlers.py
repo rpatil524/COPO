@@ -486,16 +486,16 @@ def get_repo_info(request):
         repo = s['destination_repo']
         # if sub type is cg_core, do conversion from interim to dc
         if s["is_cg"]:
-            if repo == "dataverse":
-                ds().cg_to_dc(sub_id)
-            elif repo == "ckan":
-                ckan().cg_to_dc(sub_id)
-            elif repo == "dspace":
-                dspace().cg_to_dc(sub_id)
-
-        out = {'repo_type': repo['type'], 'repo_url': repo['url']}
+            if repo["type"] == "dataverse":
+                ds().dc_dict_to_dc(sub_id)
+            elif repo["type"] == "ckan":
+                ckan().dc_dict_to_dc(sub_id)
+            elif repo["type"] == "dspace":
+                dspace().dc_dict_to_dc(sub_id)
     except:
-        out = {}
+        pass
+    out = {'repo_type': repo['type'], 'repo_url': repo['url']}
+
     return HttpResponse(json.dumps(out))
 
 
@@ -553,6 +553,7 @@ def get_info_for_new_dataverse(request):
 
 def update_submission_repo_data(request):
     task = request.POST['task']
+    submission_id = request.POST['submission_id']
     if task == 'change_destination':
         custom_repo_id = request.POST['custom_repo_id']
         submission_id = request.POST['submission_id']
@@ -562,17 +563,22 @@ def update_submission_repo_data(request):
         return HttpResponse(json_util.dumps(s))
     elif task == 'change_meta':
         meta = json.loads(request.POST['meta'])
+        new_or_existing = meta["new_or_existing"]
         if request.POST.get("type") == "dspace":
-            if request.POST["new_or_existing"] == "new":
+            if new_or_existing == "new":
                 #  need to get form metadata for creating new dspace item
                 form_data = json.loads(request.POST['form_data'])
-                new_or_existing = request.POST["new_or_existing"]
+
                 r_type = request.POST["type"]
                 meta.update(form_data)
                 meta["new_or_existing"] = new_or_existing
                 meta["repo_type"] = r_type
+        elif request.POST.get("type") == "dataverse":
+            if new_or_existing == "new":
+                m = Submission().get_record(ObjectId(submission_id))["meta"]
+                meta.update(m)
+
         # now update submission record
-        submission_id = request.POST['submission_id']
         if type(meta) == type(dict()):
             meta = json.dumps(meta)
         s = Submission().update_meta(submission_id=submission_id, meta=meta)
@@ -608,28 +614,35 @@ def get_dspace_items(request):
     return HttpResponse(resp)
 
 
-def get_dspace_item_metadata(request):
+def get_existing_metadata(request):
     # get base metadata for view showing new dspace item
-    sub_id = request.GET["submission_id"]
+    try:
+        sub_id = request.GET["submission_id"]
+    except KeyError:
+        return HttpResponse(json.dumps({}))
     sub = Submission().get_record(ObjectId(sub_id))
-    df_id = sub["bundle"][0]
-    df = DataFile().get_record(ObjectId(df_id))
-    out = dict()
-    out["creator"] = df.get("description", {}).get("attributes", {}) \
-        .get("title_author_contributor", {}).get("creator", "")
-    out["accessioned"] = str(datetime.now())
-    out["created"] = str(datetime.now())
-    out["available"] = str(datetime.now())
-    out["issued"] = str(datetime.now())
-    out["abstract"] = Profile().get_record(ObjectId(sub["profile_id"]))['description']
-    out["language"] = "en_US"
-    out["rights"] = df.get("description", {}).get("attributes", {}).get("optional_fields", {}).get("license", "")
-    out["subject"] = df.get("description", {}).get("attributes", {}).get("subject_description", {}).get("subject", "")
-    out["title"] = df.get("description", {}).get("attributes", {}) \
-        .get("title_author_contributor", {}).get("subject", "")
-    out["type"] = df.get("description", {}).get("attributes", {}) \
-        .get("optional_fields", {}).get("type", "")
+
+    out = sub["meta"]
     return HttpResponse(json.dumps(out))
+    # else:
+    #     df_id = sub["bundle"][0]
+    #     df = DataFile().get_record(ObjectId(df_id))
+    #     out = dict()
+    #     out["creator"] = df.get("description", {}).get("attributes", {}) \
+    #         .get("title_author_contributor", {}).get("creator", "")
+    #     out["accessioned"] = str(datetime.now())
+    #     out["created"] = str(datetime.now())
+    #     out["available"] = str(datetime.now())
+    #     out["issued"] = str(datetime.now())
+    #     out["abstract"] = Profile().get_record(ObjectId(sub["profile_id"]))['description']
+    #     out["language"] = "en_US"
+    #     out["rights"] = df.get("description", {}).get("attributes", {}).get("optional_fields", {}).get("license", "")
+    #     out["subject"] = df.get("description", {}).get("attributes", {}).get("subject_description", {}).get("subject", "")
+    #     out["title"] = df.get("description", {}).get("attributes", {}) \
+    #         .get("title_author_contributor", {}).get("subject", "")
+    #     out["type"] = df.get("description", {}).get("attributes", {}) \
+    #         .get("optional_fields", {}).get("type", "")
+    #return HttpResponse(json.dumps(out))
 
 
 def get_ckan_items(request):

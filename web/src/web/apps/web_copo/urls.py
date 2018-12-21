@@ -81,7 +81,7 @@ urlpatterns = [path('', views.index, name='index'),
                     name="update_submission_repo_data"),
                path('dataverse_publish/', ajax_handlers.publish_dataverse,
                     name="publish_dataverse"),
-               path('get_dspace_item_metadata/', ajax_handlers.get_dspace_item_metadata,
+               path('get_existing_metadata/', ajax_handlers.get_existing_metadata,
                     name="get_dspace_item_metadata"),
 
                path('get_ckan_items/', ajax_handlers.get_ckan_items,

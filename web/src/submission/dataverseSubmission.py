@@ -1,17 +1,15 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 19/04/2017'
-import os
+import os, uuid, requests, json, datetime
 from django.conf import settings
 from dataverse import Connection, Dataverse, Dataset, DataverseFile
 from dataverse.exceptions import ConnectionError
-import uuid
-import requests
 from dal.copo_da import Submission, DataFile
 from web.apps.web_copo.schemas.utils import data_utils
 from dal.copo_da import Profile
-import datetime
 from bson import ObjectId, json_util
 import xml.etree.ElementTree as et
 from dataverse.exceptions import OperationFailedError
+from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 
 
 class DataverseSubmit(object):
@@ -41,14 +39,12 @@ class DataverseSubmit(object):
             # create new
             return self._create_and_add_to_dataverse(s)
 
-
     def truncate_url(self, url):
         if url.startswith('https://'):
             url = url[8:]
         elif url.startswith('http://'):
             url = url[7:]
         return url
-
 
     def clear_submission_metadata(self, sub_id):
         Submission().clear_submission_metadata(sub_id)
@@ -222,5 +218,34 @@ class DataverseSubmit(object):
 
         return doc
 
-    def cg_to_dc(self, sub_id):
-        pass
+    def dc_dict_to_dc(self, sub_id):
+        # get file metadata, call converter to strip out dc fields
+        s = Submission().get_record(ObjectId(sub_id))
+        f_id = s["bundle"][0]
+        items = CgCoreSchemas().extract_dublin_core(str(f_id))
+        meta = list()
+        for i in items:
+            if i["dc"] == "dc.title":
+                i.update({"dvname": "dsTitle"})
+                meta.append(i)
+            elif i["dc"] == "dc.creator":
+                # need to split
+                fullname = i["vals"][0]
+                meta.append({"dvname":"dsAuthorFirstname", "vals":fullname.split(" ")[0], "dc":"dc.creator type=firstname"})
+                meta.append({"dvname":"dsAuthorLastname", "vals" :fullname.split(" ")[1], "dc":"dc.creator type=lastname"})
+            elif i["dc"] == "dc.date type=completion":
+                i.update({"dvname":"date_modified"})
+                meta.append(i)
+            elif i["dc"] == "dc.rights license":
+                i.update({"dvname": "license"})
+                meta.append(i)
+            elif i["dc"] == "dc.source":
+                i.update({"dvname": "source"})
+                meta.append(i)
+            elif i["dc"] == "dc.description":
+                i.update({"dvname": "description"})
+                meta.append(i)
+            elif i["dc"] == "dc.subject":
+                i.update({"dvname": "subject"})
+                meta.append(i)
+        Submission().update_meta(sub_id, json.dumps(meta))

@@ -182,5 +182,5 @@ class CkanSubmit:
                 out[key] = out[key].lower()
         return out
 
-    def cg_to_dc(self, sub_id):
+    def dc_dict_to_dc(self, sub_id):
         pass

@@ -6,6 +6,7 @@ $(document).ready(function () {
     $(document).data('url', 'default')
     $(document).on('click', '[id^=view_repo_structure]', check_repo_id)
     $(document).on('click', '[id^=view_repo_structure]', mark_as_active_panel)
+    $(document).on('click', '[id^=view_repo_structure]', get_existing_metadata)
     $(document).on('click', '.create_add_dataverse', handle_radio)
     $(document).on('click', '.dataset-checkbox', select_dataset)
     $(document).on('click', '#save_inspection_button', save_inspection_info)
@@ -61,33 +62,41 @@ function handle_radio(el) {
         if ($(document).data("selected_repo_type") == "ckan") {
             $('#repo_modal').find('#table-div-dataverse').hide()
         }
-        get_new_dspace_item_details()
+        $('#repo_modal').find('#existing_metadata_table_div').show()
+        get_existing_metadata()
     }
     else {
         $('#repo_modal').find('#table-div-dataverse').show()
         $('.new-controls').hide()
         $('.existing-controls').show()
+        $('#repo_modal').find('#existing_metadata_table_div').hide()
     }
 }
 
 
-function get_new_dspace_item_details(sub_id) {
+function get_existing_metadata() {
+    var sub_id = $(document).data('submission_id')
     $.ajax({
-        url: '/copo/get_dspace_item_metadata/',
+        url: '/copo/get_existing_metadata/',
         data: {'submission_id': $(document).data('submission_id')},
         dataType: 'json',
     }).done(function (data) {
-        $("#repo_modal").find("#dsTitle").val(data.title)
-        $("#repo_modal").find("#dsAbstract").val(data.abstract)
-        $("#repo_modal").find("#dsType").val(data.type)
-        $("#repo_modal").find("#dsSubject").val(data.subject)
-        $("#repo_modal").find("#dsCreator").val(data.creator)
-        $("#repo_modal").find("#dsCreated").val(data.created)
-        $("#repo_modal").find("#dsAvailable").val(data.available)
-        $("#repo_modal").find("#dsAccessioned").val(data.accessioned)
-        $("#repo_modal").find("#dsIssued").val(data.issued)
-        $("#repo_modal").find("#dsLanguage").val(data.language)
-        $("#repo_modal").find("#dsRights").val(data.rights)
+        if (!$.isEmptyObject(data)) {
+            var table = $("<table/>", {id: "existing_metadata_table"})
+            var hr = $("<tr/>")
+            $(hr).append($("<th/>", {text: "Fieldname"}), $("<th/>", {text: "Value"}))
+            $(table).append(hr)
+            for (el in data) {
+                var row = $("<tr/>")
+                item = data[el]
+                $(row).append($("<td/>", {text: item.dc}), $("<td/>", {text: item.vals}))
+                $(table).append(row)
+            }
+            $('#existing_metadata_table_div').empty()
+            $("#existing_metadata_table_div").append($("<h5/>",{text: "Submitting with the following metadata."}))
+            $("#existing_metadata_table_div").append(table)
+            $(table).DataTable()
+        }
     })
 }
 
@@ -153,6 +162,7 @@ function check_repo_id(e) {
                 .done(build_ckan_modal)
         }
     })
+    get_existing_metadata(sub_id)
 }
 
 function mark_as_active_panel(e) {
@@ -835,6 +845,7 @@ function select_dataset(e) {
                 'submission_id': sub_id,
                 'task': 'change_meta',
                 'meta': JSON.stringify({
+                    "new_or_existing": new_or_existing,
                     'alias': alias,
                     'entity_id': entity_id
                 })

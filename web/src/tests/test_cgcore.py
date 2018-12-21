@@ -1,6 +1,7 @@
 # Created by fshaw at 17/12/2018
 from django.test import TestCase
 from dal.copo_da import Submission, Profile, DataFile
+from submission.dataverseSubmission import DataverseSubmit
 from django.conf import settings
 from django.contrib.auth.models import User
 import os, json
@@ -49,6 +50,13 @@ class CGCoreTests(TestCase):
         tt = CgCoreSchemas().extract_dublin_core(str(self.d))
         self.assertIsInstance(tt, type([]))
         self.assertNotEqual(len(tt), 0)
+
+    def test_cg_core_to_dataverse_conversion(self):
+        # the method below will extract dc fields and add them to the meta field of the supplied sub id
+        DataverseSubmit().dc_dict_to_dc(self.s_dv)
+        s = Submission().get_record(self.s_dv)
+        self.assertGreater(len(s["meta"]), 0)
+        self.assertTrue("dsTitle" in s["meta"])
 
     @classmethod
     def tearDownClass(cls):

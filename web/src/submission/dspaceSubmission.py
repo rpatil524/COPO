@@ -360,5 +360,5 @@ class DspaceSubmit(object):
         else:
             return json.dumps({"error": self.error_msg})
 
-    def cg_to_dc(self, sub_id):
+    def dc_dict_to_dc(self, sub_id):
         pass
