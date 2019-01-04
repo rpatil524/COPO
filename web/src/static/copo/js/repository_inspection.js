@@ -4,13 +4,15 @@
 $(document).ready(function () {
     $('.ajax-loading-div').hide()
     $(document).data('url', 'default')
-    $(document).on('click', '[id^=view_repo_structure]', check_repo_id)
     $(document).on('click', '[id^=view_repo_structure]', mark_as_active_panel)
+    $(document).on('click', '[id^=view_repo_structure]', check_repo_id)
+
     $(document).on('click', '[id^=view_repo_structure]', get_existing_metadata)
     $(document).on('click', '.create_add_dataverse', handle_radio)
     $(document).on('click', '.dataset-checkbox', select_dataset)
     $(document).on('click', '#save_inspection_button', save_inspection_info)
     $(document).on('change', '.create_add_community_radio_div', get_existing_communites)
+    $(document).on('click', '.target_repo_option', get_existing_metadata)
     //check_repo_id()
     do_new_dataverse_fields()
     // here we should call funcs for filling out other repo details
@@ -74,11 +76,16 @@ function handle_radio(el) {
 }
 
 
-function get_existing_metadata() {
-    var sub_id = $(document).data('submission_id')
+function get_existing_metadata(e) {
+    if (e) {
+        var sub_id = $(e.currentTarget).attr('data-submission_id')
+    }
+    else {
+        var sub_id = $(document).data('submission_id')
+    }
     $.ajax({
         url: '/copo/get_existing_metadata/',
-        data: {'submission_id': $(document).data('submission_id')},
+        data: {'sub_id': $(document).data('submission_id')},
         dataType: 'json',
     }).done(function (data) {
         if (!$.isEmptyObject(data)) {
@@ -86,14 +93,14 @@ function get_existing_metadata() {
             var hr = $("<tr/>")
             $(hr).append($("<th/>", {text: "Fieldname"}), $("<th/>", {text: "Value"}))
             $(table).append(hr)
-            for (el in data) {
+            for (el in data.meta) {
                 var row = $("<tr/>")
-                item = data[el]
+                item = data.meta[el]
                 $(row).append($("<td/>", {text: item.dc}), $("<td/>", {text: item.vals}))
                 $(table).append(row)
             }
             $('#existing_metadata_table_div').empty()
-            $("#existing_metadata_table_div").append($("<h5/>",{text: "Submitting with the following metadata."}))
+            $("#existing_metadata_table_div").append($("<h5/>", {text: "Submitting with the following metadata."}))
             $("#existing_metadata_table_div").append(table)
             $(table).DataTable()
         }
@@ -673,6 +680,7 @@ function expand_table(event) {
                 $(colTR).attr('data-identifier', el.identifier)
                 $(colTR).attr('data-persistent', el.persistentUrl)
                 $(colTR).attr('data-publisher', el.publisher)
+                $(colTR).attr('data-type', "dataverse")
                 var col1 = $('<td/>').append(el.identifier);
                 var col11 = $('<td/>').append(el.publisher);
                 //var col2 = $('<td/>').append(el.dsDescription[0].dsDescriptionValue.value);
@@ -828,6 +836,7 @@ function select_dataset(e) {
                 'submission_id': sub_id,
                 'task': 'change_meta',
                 'meta': JSON.stringify({
+                    "new_or_existing": new_or_existing,
                     'doi': persistent,
                     'dataset_id': dataset_id,
                     'identifier': identifier,

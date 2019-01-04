@@ -1,5 +1,7 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 19/04/2017'
 import os, uuid, requests, json, datetime
+from datetime import datetime as dt
+from django_tools.middlewares import ThreadLocal
 from django.conf import settings
 from dataverse import Connection, Dataverse, Dataset, DataverseFile
 from dataverse.exceptions import ConnectionError
@@ -25,19 +27,22 @@ class DataverseSubmit(object):
 
         profile_id = data_utils.get_current_request().session.get('profile_id')
         s = Submission().get_record(ObjectId(sub_id))
-
+        # this flag tells us if we are dealing with a cg submission
+        isCg = s["is_cg"]
         # get url for dataverse
         self.host = Submission().get_dataverse_details(sub_id)
         self.headers = {'X-Dataverse-key': self.host['apikey']}
 
         # if dataset id in submission meta, we are adding to existing dataset, otherwise
         #  we are creating a new dataset
-        if 'dataverse_alias' in s['meta'] and 'doi' in s['meta']:
-            # submit to existing
-            return self._add_to_dataverse(s)
-        else:
+        if "fields" in s["meta"]:
             # create new
             return self._create_and_add_to_dataverse(s)
+        elif 'entity_id' in s['meta'] and 'alias' in s['meta'] or 'dataverse_alias' in s['meta'] and 'doi' in s['meta']:
+            # submit to existing
+            return self._add_to_dataverse(s)
+
+
 
     def truncate_url(self, url):
         if url.startswith('https://'):
@@ -51,7 +56,11 @@ class DataverseSubmit(object):
 
     def _add_to_dataverse(self, sub):
         c = self._get_connection()
-        dv = c.get_dataverse(sub['meta']['dataverse_alias'])
+        try:
+            alias = sub['meta']['dataverse_alias']
+        except KeyError:
+            alias = sub['meta']['alias']
+        dv = c.get_dataverse(alias)
         if dv == None:
             return {"status": 1, "message": "error getting dataverse"}
         doi = self.truncate_url(sub['meta']['doi'])
@@ -110,7 +119,16 @@ class DataverseSubmit(object):
 
     def _create_dataverse(self, meta, conn):
         alias = str(uuid.uuid4())
-        dv = conn.create_dataverse(alias, meta['dvName'], meta['dsContactEmail'])
+        email = ""
+        for f in meta["fields"]:
+            if f["dc"] == "dc.title":
+                name = f["vals"][0]
+            if f["dc"] == "dc.email":
+                email = f["vals"][0]
+        if email == "":
+            u = ThreadLocal.get_current_user()
+            email = u.email
+        dv = conn.create_dataverse(alias, name, email)
         return dv
 
     def _create_dataset(self, meta, dv, conn):
@@ -128,6 +146,14 @@ class DataverseSubmit(object):
 
     def _make_dataset_xml(self, sub):
         meta = sub['meta']
+
+        #iterate through meta to get fields
+        d = dict()
+        for e in sub["meta"]["fields"]:
+            if type(e["vals"]) == type(list()):
+                d[e["dvname"]] = e["vals"][0]
+            else:
+                d[e["dvname"]] = e["vals"]
         # get datafile for some dataverse specific metadata
         datafile = DataFile().get_record(ObjectId(sub['bundle'][0]))
         df = datafile['description']['attributes']
@@ -138,23 +164,28 @@ class DataverseSubmit(object):
         dcns = "http://purl.org/dc/terms/"
         x = "<?xml version='1.0'?>"
         x = x + '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/">'
-        x = x + '<title>' + meta['dsTitle'] + '</title>'
+        x = x + '<title>' + d.get('dsTitle', "") + '</title>'
         x = x + '<id>' + str(uuid.uuid4()) + '</id>'
         x = x + '<updated>' + datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') + '</updated>'
-        x = x + '<author><name>' + meta['dsAuthorLastname'] + ', ' + meta['dsAuthorFirstname'] + '</name></author>'
+        x = x + '<author><name>' + d.get('dsAuthorLastname',"") + ', ' + d.get('dsAuthorFirstname',"") + '</name></author>'
         x = x + '<summary type="text"></summary>'
-        x = x + '<dcterms:title>' + meta['dsTitle'] + '</dcterms:title>'
-        x = x + '<dcterms:creator>' + meta['dsAuthorLastname'] + ', ' + meta['dsAuthorFirstname'] + '</dcterms:creator>'
+        x = x + '<dcterms:title>' + d.get('dsTitle', "") + '</dcterms:title>'
+        x = x + '<dcterms:creator>' + d.get('dsAuthorLastname',"") + ', ' + d.get('dsAuthorFirstname',"") + '</dcterms:creator>'
         if settings.UNIT_TESTING:
-            x = x + '<dcterms:date>' + sub['date_modified'] + '</dcterms:date>'
+            x = x + '<dcterms:date>' + d.get('date_modified',"") + '</dcterms:date>'
         else:
-            x = x + '<dcterms:date>' + sub['date_modified'].strftime('%Y-%m-%d') + '</dcterms:date>'
-        x = x + '<dcterms:rights>' + df['optional_fields']['license'] + '</dcterms:rights>'
+            date = d.get('date_modified',"")
+            if type(date) == type(""):
+                date_obj = dt.strptime(date, '%d/%m/%Y')
+                x = x + '<dcterms:date>' + str(date_obj.strftime('%Y-%m-%dT%H:%M:%SZ')) + '</dcterms:date>'
+            else:
+                x = x + '<dcterms:date>' + str(date.get('date_modified',"").strftime('%Y-%m-%dT%H:%M:%SZ')) + '</dcterms:date>'
+        x = x + '<dcterms:rights>' + d.get('license',"") + '</dcterms:rights>'
         # this should be an array
-        x = x + '<dcterms:bibliographicCitation>' + df['optional_fields']['source'] + '</dcterms:bibliographicCitation>'
-        x = x + '<dcterms:description>' + df['subject_description']['description'] + '</dcterms:description>'
+        x = x + '<dcterms:bibliographicCitation>' + d.get('source',"") + '</dcterms:bibliographicCitation>'
+        x = x + '<dcterms:description>' + d.get('description',"") + '</dcterms:description>'
         x = x + '<dcterms:identifier>' + '' + '</dcterms:identifier>'
-        x = x + '<dcterms:subject>' + df['subject_description']['subject'] + '</dcterms:subject>'
+        x = x + '<dcterms:subject>' + d.get('subject',"") + '</dcterms:subject>'
         x = x + '</entry>'
         path = os.path.dirname(datafile['file_location'])
         xml_path = os.path.join(path, 'xml.xml')

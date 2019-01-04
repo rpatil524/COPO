@@ -479,10 +479,10 @@ def remove_repo_from_group(request):
 
 
 def get_repo_info(request):
-    sub_id = request.GET['sub_id']
-    s = Submission().get_record(ObjectId(sub_id))
-
+    # this ajax method is called when user clicks "inspect repo" button on submission view
     try:
+        sub_id = request.GET['sub_id']
+        s = Submission().get_record(ObjectId(sub_id))
         repo = s['destination_repo']
         # if sub type is cg_core, do conversion from interim to dc
         if s["is_cg"]:
@@ -493,8 +493,9 @@ def get_repo_info(request):
             elif repo["type"] == "dspace":
                 dspace().dc_dict_to_dc(sub_id)
     except:
-        pass
-    out = {'repo_type': repo['type'], 'repo_url': repo['url']}
+        return HttpResponse(json.dumps({"status": 1, "message": "error getting dataverse"}))
+    s = Submission().get_record(ObjectId(sub_id))
+    out = {'repo_type': repo['type'], 'repo_url': repo['url'], 'meta': s["meta"]}
 
     return HttpResponse(json.dumps(out))
 
@@ -568,15 +569,15 @@ def update_submission_repo_data(request):
             if new_or_existing == "new":
                 #  need to get form metadata for creating new dspace item
                 form_data = json.loads(request.POST['form_data'])
-
                 r_type = request.POST["type"]
+                # add meta to separate dict field
                 meta.update(form_data)
                 meta["new_or_existing"] = new_or_existing
                 meta["repo_type"] = r_type
         elif request.POST.get("type") == "dataverse":
             if new_or_existing == "new":
                 m = Submission().get_record(ObjectId(submission_id))["meta"]
-                meta.update(m)
+                meta["fields"] = m
 
         # now update submission record
         if type(meta) == type(dict()):

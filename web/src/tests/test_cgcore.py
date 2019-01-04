@@ -2,6 +2,7 @@
 from django.test import TestCase
 from dal.copo_da import Submission, Profile, DataFile
 from submission.dataverseSubmission import DataverseSubmit
+from submission.submissionDelegator import delegate_submission
 from django.conf import settings
 from django.contrib.auth.models import User
 import os, json
@@ -34,7 +35,7 @@ class CGCoreTests(TestCase):
 
         # create submission
         p = os.path.join(os.path.dirname(os.path.realpath(__file__)), "fixtures",
-                         "dummy_cgcore_dataverse_submission.json")
+                         "dummy_cgcore_dataverse_submission_existing.json")
         with open(p) as f:
             p_dict = json.loads(f.read())
         p_dict["bundle_meta"][0]["file_path"] = os.path.join(os.path.dirname(os.path.realpath(__file__)), "fixtures",
@@ -57,6 +58,16 @@ class CGCoreTests(TestCase):
         s = Submission().get_record(self.s_dv)
         self.assertGreater(len(s["meta"]), 0)
         self.assertTrue("dsTitle" in s["meta"])
+
+    def test_submit_existing_cgcore_dataverse(self):
+        # method will test the submission of a copo cgcore record to an existing dataset within a dataverse
+        s = Submission().get_record(self.s_dv)
+        request = self.client.post(path='/rest/submit_to_repo/', data={"sub_id": s["_id"]})
+        s = Submission().get_record(self.s_dv)
+        self.assertTrue("result" in s["accessions"][0])
+        self.assertTrue("id" in s["accessions"][0]["result"])
+
+
 
     @classmethod
     def tearDownClass(cls):
