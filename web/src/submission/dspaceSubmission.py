@@ -1,12 +1,11 @@
 # Created by fshaw at 13/09/2018
-from django.http import HttpResponse
 from dal.copo_da import Submission, DataFile
 import requests
 import json
 from web.apps.web_copo.schemas.utils import data_utils
 from bson import ObjectId
 from urllib.request import quote
-
+from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 
 
 class DspaceSubmit(object):
@@ -37,7 +36,6 @@ class DspaceSubmit(object):
             new_or_existing = s['meta']['new_or_existing']
         return self._add_to_dspace(s, new_or_existing)
 
-
     def _add_to_dspace(self, sub, new_or_existing):
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         # get data required and perform login
@@ -46,14 +44,13 @@ class DspaceSubmit(object):
         password = sub['destination_repo']['password']
         login_url = dspace_url + "/rest/login"
 
-
         # try to login using v6 method
         # special characters must be urlencoded (but only for version 6!)
         param_string = "?email=" + quote(email) + "&password=" + password
         resp = requests.post(login_url + param_string)
         # store session identifier for future requests
         if resp.status_code != 200:
-            # now try using v5 method
+            #  now try using v5 method
             params = {"email": email, "password": password}
             resp = requests.post(login_url, json=params)
             if resp.status_code != 200:
@@ -75,12 +72,14 @@ class DspaceSubmit(object):
             name = sub["meta"]["dsTitle"]
             new_item_url = dspace_url + "/rest/collections/" + str(collection_id) + "/items"
             if dspace_type == 6:
-                resp_item = requests.post(new_item_url, data=json.dumps(dspace_meta), headers={"Content-Type": "application/json",
-                                       "accept": "application/json"}, cookies={"JSESSIONID": login_details})
+                resp_item = requests.post(new_item_url, data=json.dumps(dspace_meta),
+                                          headers={"Content-Type": "application/json",
+                                                   "accept": "application/json"}, cookies={"JSESSIONID": login_details})
             elif dspace_type == 5:
                 resp_item = requests.post(new_item_url, data=json.dumps(dspace_meta),
-                              headers={"rest-dspace-token": login_details, "Content-Type": "application/json",
-                                       "accept": "application/json"})
+                                          headers={"rest-dspace-token": login_details,
+                                                   "Content-Type": "application/json",
+                                                   "accept": "application/json"})
             if resp_item.status_code == 200:
                 try:
                     item_id = json.loads(resp_item.content.decode('utf-8'))['id']
@@ -154,7 +153,6 @@ class DspaceSubmit(object):
             requests.post(logout_url, headers={"rest-dspace-token": login_details})
         Submission().mark_submission_complete(sub["_id"])
         return True
-
 
     def _create_dspace_meta(self, sub):
         # need to create metadata fragment for dspace
@@ -361,4 +359,32 @@ class DspaceSubmit(object):
             return json.dumps({"error": self.error_msg})
 
     def dc_dict_to_dc(self, sub_id):
-        pass
+        # get file metadata, call converter to strip out dc fields
+        s = Submission().get_record(ObjectId(sub_id))
+        f_id = s["bundle"][0]
+        items = CgCoreSchemas().extract_dublin_core(str(f_id))
+        meta = list()
+        for i in items:
+            if i["dc"] == "dc.title":
+                i.update({"dspacename": i["dc"]})
+                meta.append(i)
+            elif i["dc"] == "dc.creator":
+                meta.append(
+                    {"dc": "dc.creator", "dspacename": "dc.contributor.author", "vals": i["vals"][0]})
+
+            elif i["dc"] == "dc.date type=completion":
+                i.update({"dspacename": "dc.date.accessioned"})
+                meta.append(i)
+            elif i["dc"] == "dc.rights license":
+                i.update({"dspacename": "license"})
+                meta.append(i)
+            elif i["dc"] == "dc.source":
+                i.update({"dspacename": "source"})
+                meta.append(i)
+            elif i["dc"] == "dc.description":
+                i.update({"dspacename": i["dc"]})
+                meta.append(i)
+            elif i["dc"] == "dc.subject":
+                i.update({"dspacename": i["dc"]})
+                meta.append(i)
+        Submission().update_meta(sub_id, json.dumps(meta))

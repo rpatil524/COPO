@@ -334,6 +334,13 @@ function build_dspace_modal(data) {
 
     $('#repo_modal').find('input[value="existing"]').trigger("click")
 
+
+
+    var dt = $("#repo_modal").find('#table-div-dataverse')
+    $(dt).empty().append(t)
+
+///$('#dataverse-table .summary-details-control').on('click', expand_table)
+    $('#dataverse-table').DataTable();
 }
 
 /*

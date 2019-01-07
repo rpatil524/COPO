@@ -571,9 +571,10 @@ def update_submission_repo_data(request):
                 form_data = json.loads(request.POST['form_data'])
                 r_type = request.POST["type"]
                 # add meta to separate dict field
-                meta.update(form_data)
                 meta["new_or_existing"] = new_or_existing
                 meta["repo_type"] = r_type
+                m = Submission().get_record(ObjectId(submission_id))["meta"]
+                meta["fields"] = m
         elif request.POST.get("type") == "dataverse":
             if new_or_existing == "new":
                 m = Submission().get_record(ObjectId(submission_id))["meta"]

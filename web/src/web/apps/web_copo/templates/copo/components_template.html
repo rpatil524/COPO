@@ -20,65 +20,7 @@
 
             <div class="row new-controls" style="display:none">
                 <!-- new dspace controls -->
-                <h5>Item will be created with the following metadata</h5>
-                <div style="width: 600px">
-                    <form id="new_dspace_form">
-                        <div class="form-group">
-                            <label for="dsTitle">Title</label>
-                            <input type="text" class="form-control" name="dsTitle" id="dsTitle"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="dsAbstract">Abstract</label>
-                            <textarea type="text" class="form-control" name="dsAbstract" id="dsAbstract"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="dsType">Type</label>
-                            <input type="text" class="form-control" name="dsType" id="dsType"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="dsSubject">Subject</label>
-                            <input type="text" class="form-control" name="dsSubject" id="dsSubject"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="dsCreator">Creator</label>
-                            <input type="text" class="form-control" name="dsCreator" id="dsCreator"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="dsCreated">Created</label>
-                            <input type="text" class="form-control" name="dsCreated" id="dsCreated"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="dsAvailable">Available</label>
-                            <input type="text" class="form-control" name="dsAvailable" id="dsAvailable"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="dsAccessioned">Accessioned</label>
-                            <input type="text" class="form-control" name="dsAccessioned" id="dsAccessioned"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="dsIssued">Issued</label>
-                            <input type="text" class="form-control" name="dsIssued" id="dsIssued"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="dsIssn">Issn</label>
-                            <input type="text" class="form-control" name="dsIssn" id="dsIssn">
-                        </div>
-                        <div class="form-group">
-                            <label for="dsUri">Uri</label>
-                            <input type="text" class="form-control" name="dsUri" id="dsUri"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="dsLanguage">Language</label>
-                            <input type="text" class="form-control" name="dsLanguage" id="dsLanguage"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="dsRights">Rights</label>
-                            <input type="text" class="form-control" name="dsRights" id="dsRights"/>
-                        </div>
-                    </form>
-                </div>
 
-            </div>
 
             <span class="input-group ajax-loading-div">
                     <img style="height: 24px; margin-left:5px;" src="{% static 'copo/img/loading.gif' %}"></span>
@@ -87,6 +29,7 @@
                 <h5>Choose which collection this item should be added to</h5>
 
             </div>
+            <div id="existing_metadata_table_div"></div>
 
             <div class="existing-controls" style="display: block">
                 <!-- existing dspace controls -->
