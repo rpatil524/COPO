@@ -30,10 +30,7 @@ class DspaceSubmit(object):
 
         # if dataset id in submission meta, we are adding to existing dataset, otherwise
         #  we are creating a new dataset
-        if "item_id" not in s:
-            new_or_existing = "new"
-        else:
-            new_or_existing = s['meta']['new_or_existing']
+        new_or_existing = s['meta']['new_or_existing']
         return self._add_to_dspace(s, new_or_existing)
 
     def _add_to_dspace(self, sub, new_or_existing):

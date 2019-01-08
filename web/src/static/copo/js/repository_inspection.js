@@ -69,8 +69,8 @@ function handle_radio(el) {
     }
     else {
         $('#repo_modal').find('#table-div-dataverse').show()
-        $('.new-controls').hide()
-        $('.existing-controls').show()
+        //$('.new-controls').hide()
+        //$('.existing-controls').show()
         $('#repo_modal').find('#existing_metadata_table_div').hide()
     }
 }
@@ -99,9 +99,10 @@ function get_existing_metadata(e) {
                 $(row).append($("<td/>", {text: item.dc}), $("<td/>", {text: item.vals}))
                 $(table).append(row)
             }
-            $('#existing_metadata_table_div').empty()
-            $("#existing_metadata_table_div").append($("<h5/>", {text: "Submitting with the following metadata."}))
-            $("#existing_metadata_table_div").append(table)
+            $('#repo_modal').find('#existing_metadata_table_div').empty()
+            $('#repo_modal').find("#existing_metadata_table_div").append($("<h5/>", {text: "Submitting with the following metadata."}))
+            $('#repo_modal').find("#existing_metadata_table_div").append(table)
+            $('#repo_modal').find('#existing_metadata_table_div').show()
             $(table).DataTable()
         }
     })
@@ -169,7 +170,7 @@ function check_repo_id(e) {
                 .done(build_ckan_modal)
         }
     })
-    get_existing_metadata(sub_id)
+    //get_existing_metadata(sub_id)
 }
 
 function mark_as_active_panel(e) {
@@ -333,14 +334,6 @@ function build_dspace_modal(data) {
         .on('click', 'td.summary-details-control', expand_dspace_table);
 
     $('#repo_modal').find('input[value="existing"]').trigger("click")
-
-
-
-    var dt = $("#repo_modal").find('#table-div-dataverse')
-    $(dt).empty().append(t)
-
-///$('#dataverse-table .summary-details-control').on('click', expand_table)
-    $('#dataverse-table').DataTable();
 }
 
 /*
@@ -445,6 +438,7 @@ function expand_dspace_table(event) {
                             "data-alias": el.id,
                             "data-type": 'dspace',
                             "data-dspace_type": el.type,
+                            "data-name": el.name
                         })
                         $(colTR).attr('data-id', el.id)
 
@@ -555,6 +549,7 @@ function expand_dspace_table(event) {
                                 "data-alias": el.id,
                                 "data-type": 'dspace',
                                 "data-dspace_type": el.type,
+                                "data-name": el.name
                             })
                             $(colTR).attr('data-id', el.id)
 
@@ -764,8 +759,8 @@ function select_dataset(e) {
     var new_or_existing = $('#repo_modal').find('input[name=create_repo_radio]:checked').val()
     if (type == 'dspace' || type == 'ckan') {
         var identifier = $(row).data('alias')
-        var name = $(row).find('.name').html()
-        var handle = $(row).find('.name').html()
+        var name = $(row).data('name')
+        var handle = $(row).data('name')
 
         if (type == 'dspace') {
             data = {
@@ -797,7 +792,7 @@ function select_dataset(e) {
             data.new_or_existing = "new"
             data.form_data = formdata
             var label = $(document).data('current-label')
-            $(label).html(identifier + " - " + JSON.parse(formdata).dsTitle)
+            $(label).html(identifier + " - " + name)
         }
         else {
             data.new_or_existing = "existing"
