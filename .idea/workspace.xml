@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" afterDir="false" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
@@ -128,11 +126,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="dspaceSubmission.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="dspaceSubmission.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="363">
-              <caret line="101" selection-start-line="101" selection-end-line="101" />
+            <state relative-caret-position="240">
+              <caret line="151" selection-start-line="151" selection-end-line="151" />
               <folding>
                 <element signature="e#33#77#0" expanded="true" />
               </folding>
@@ -194,8 +192,8 @@
       <file leaf-file-name="repository_inspection.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="381">
-              <caret line="101" column="63" selection-start-line="101" selection-start-column="36" selection-end-line="101" selection-end-column="63" />
+            <state relative-caret-position="255">
+              <caret line="99" column="36" lean-forward="true" selection-start-line="99" selection-start-column="36" selection-end-line="99" selection-end-column="36" />
               <folding>
                 <element signature="n#style#0;n#div#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
@@ -213,11 +211,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="components_template.html" pinned="false" current-in-tab="false">
+      <file leaf-file-name="components_template.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="311">
-              <caret line="23" column="73" selection-start-line="23" selection-start-column="73" selection-end-line="23" selection-end-column="73" />
+            <state relative-caret-position="305">
+              <caret line="42" column="10" selection-start-line="42" selection-start-column="10" selection-end-line="42" selection-end-column="10" />
+              <folding>
+                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -348,9 +349,9 @@
         <option value="$PROJECT_DIR$/web/src/tests/test_cgcore.py" />
         <option value="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" />
         <option value="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html" />
       </list>
     </option>
   </component>
@@ -377,8 +378,8 @@
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="23" />
-    <option name="width" value="1440" />
-    <option name="height" value="804" />
+    <option name="width" value="1920" />
+    <option name="height" value="984" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -1628,13 +1629,6 @@
       <option name="presentableId" value="Default" />
       <updated>1480591260906</updated>
     </task>
-    <task id="LOCAL-00034" summary="adding more functionality for admins to assign datamanagers to repos">
-      <created>1529077812053</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1529077812053</updated>
-    </task>
     <task id="LOCAL-00035" summary="adding more functionality for admins to assign datamanagers to repos">
       <created>1529510379731</created>
       <option name="number" value="00035" />
@@ -1971,7 +1965,14 @@
       <option name="project" value="LOCAL" />
       <updated>1546881468744</updated>
     </task>
-    <option name="localTasksCounter" value="83" />
+    <task id="LOCAL-00083" summary="CGCore submissions for existing items to dSpace working">
+      <created>1546966439410</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1546966439410</updated>
+    </task>
+    <option name="localTasksCounter" value="84" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -2026,12 +2027,12 @@
       <window_info anchor="bottom" id="Python Console" order="11" weight="0.32142857" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49767134" weight="0.24971879" />
       <window_info anchor="bottom" id="Terminal" order="12" weight="0.2631579" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.33534136" visible="true" weight="0.10010649" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7128514" visible="true" weight="0.18317358" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" weight="0.25181347" />
       <window_info anchor="right" id="Database" order="4" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49767134" weight="0.27030814" />
       <window_info anchor="right" id="SciView" order="5" weight="0.3297568" />
-      <window_info id="Structure" order="1" sideWeight="0.6646586" side_tool="true" visible="true" weight="0.10010649" />
+      <window_info id="Structure" order="1" sideWeight="0.2871486" side_tool="true" visible="true" weight="0.18317358" />
       <window_info id="Favorites" order="2" sideWeight="0.14671163" side_tool="true" weight="0.20127796" />
       <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.7174535" visible="true" weight="0.43982002" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -2118,7 +2119,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="bugfixes for kenya" />
     <MESSAGE value="bugfixes for dataverse submission" />
     <MESSAGE value="update of table for adding to existing dpsace collections working" />
     <MESSAGE value="submission to cgspace working" />
@@ -2143,7 +2143,8 @@
     <MESSAGE value="updates to front end for dataverse/cgcore interaction" />
     <MESSAGE value="CGCore submissions to daverse instances working....need to investigate missing fields" />
     <MESSAGE value="implementing method to convert from cg to dc and showing meta in sub view for new submission" />
-    <option name="LAST_COMMIT_MESSAGE" value="implementing method to convert from cg to dc and showing meta in sub view for new submission" />
+    <MESSAGE value="CGCore submissions for existing items to dSpace working" />
+    <option name="LAST_COMMIT_MESSAGE" value="CGCore submissions for existing items to dSpace working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2185,6 +2186,21 @@
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
       <expression>
+        <expression-string>sub[&quot;meta&quot;]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>sub</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>s</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
         <expression-string>d.get('date_modified',&quot;&quot;)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
@@ -2211,21 +2227,6 @@
       </expression>
       <expression>
         <expression-string>c.get_dataverse('29277')</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>c.get_dataverse(29277)</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>Submission().get_collection_handle().insert(p_dict)</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>request.GET['sub_id']</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
@@ -2646,17 +2647,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html">
+    <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="311">
-          <caret line="23" column="73" selection-start-line="23" selection-start-column="73" selection-end-line="23" selection-end-column="73" />
+        <state relative-caret-position="240">
+          <caret line="151" selection-start-line="151" selection-end-line="151" />
+          <folding>
+            <element signature="e#33#77#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="381">
-          <caret line="101" column="63" selection-start-line="101" selection-start-column="36" selection-end-line="101" selection-end-column="63" />
+        <state relative-caret-position="255">
+          <caret line="99" column="36" lean-forward="true" selection-start-line="99" selection-start-column="36" selection-end-line="99" selection-end-column="36" />
           <folding>
             <element signature="n#style#0;n#div#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
@@ -2673,12 +2677,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="363">
-          <caret line="101" selection-start-line="101" selection-end-line="101" />
+        <state relative-caret-position="305">
+          <caret line="42" column="10" selection-start-line="42" selection-start-column="10" selection-end-line="42" selection-end-column="10" />
           <folding>
-            <element signature="e#33#77#0" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
           </folding>
         </state>
       </provider>
