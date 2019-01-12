@@ -384,4 +384,6 @@ class DspaceSubmit(object):
             elif i["dc"] == "dc.subject":
                 i.update({"dspacename": i["dc"]})
                 meta.append(i)
+            else:
+                meta.append(i)
         Submission().update_meta(sub_id, json.dumps(meta))

@@ -279,4 +279,6 @@ class DataverseSubmit(object):
             elif i["dc"] == "dc.subject":
                 i.update({"dvname": "subject"})
                 meta.append(i)
+            else:
+                meta.append(i)
         Submission().update_meta(sub_id, json.dumps(meta))

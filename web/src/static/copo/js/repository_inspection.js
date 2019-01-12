@@ -803,21 +803,7 @@ function select_dataset(e) {
                 $(label).html(identifier)
             }
         }
-    }/*
-    else if(type == "ckan"){
-        if (new_or_existing == "new") {
-            var formdata = JSON.stringify($('#repo_modal').find('#new_dspace_form').serializeFormJSON())
-            data.new_or_existing = "new"
-            data.form_data = formdata
-            var label = $(document).data('current-label')
-            $(label).html(identifier + " - " + JSON.parse(formdata).dsTitle)
-        }
-        else {
-            data.new_or_existing = "existing"
-            var label = $(document).data('current-label')
-            $(label).html(identifier + " - " + name)
-        }
-    }*/
+    }
     else {
         if (new_or_existing == "existing") {
             var dataset_id = $(row).data('id')
