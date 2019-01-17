@@ -10,20 +10,16 @@
         {
           "id": "study_samples",
           "type": "string",
-          "help_tip": "",
+          "help_tip": "Attach a sample",
           "label": "Sample",
           "hidden": "false",
           "required": "true",
-          "control": "copo-multi-search",
           "option_component": "sample",
-          "data_maxItems": 1,
           "default_value": "",
-          "option_values": {
-            "callback": {
-              "function": "get_isasamples_json",
-              "parameter": ""
-            }
-          }
+          "control": "copo-lookup2",
+          "data_maxItems": 1,
+          "data_source": "isa_samples_lookup",
+          "option_values": []
         }
       ]
     },
@@ -104,18 +100,13 @@
           "ref": "",
           "hidden": "false",
           "deprecated": false,
-          "default_value": "",
           "show_in_form": true,
           "id": "rooting_medium",
           "show_in_table": true,
-          "option_values": {
-            "callback": {
-              "function": "get_rooting_medium_options",
-              "parameter": ""
-            }
-          },
-          "control": "copo-multi-select",
-          "data_maxItems": 1,
+          "control": "copo-single-select",
+          "default_value": "",
+          "data_source": "rooting_medium_options",
+          "option_values": [],
           "versions": [
             "rooting_medium"
           ],
@@ -128,16 +119,13 @@
           "ref": "",
           "hidden": "false",
           "deprecated": false,
-          "default_value": "",
           "show_in_form": true,
           "id": "growth_facility",
           "show_in_table": true,
-          "option_values": {
-            "callback": {
-              "function": "get_growth_area_options",
-              "parameter": ""
-            }
-          },
+          "control": "copo-single-select",
+          "default_value": "",
+          "data_source": "growth_area_options",
+          "option_values": [],
           "trigger": {
             "type": "change",
             "fire_on_create": true,
@@ -147,8 +135,6 @@
               "parameter": "item_id,new_value,stage"
             }
           },
-          "control": "copo-multi-select",
-          "data_maxItems": 1,
           "versions": [
             "growth_facility"
           ],
@@ -362,18 +348,13 @@
           "ref": "",
           "hidden": "false",
           "deprecated": false,
-          "default_value": "",
           "show_in_form": true,
           "id": "nutrient_type",
           "show_in_table": true,
-          "option_values": {
-            "callback": {
-              "function": "get_nutrient_control_options",
-              "parameter": ""
-            }
-          },
-          "control": "copo-multi-select",
-          "data_maxItems": 1,
+          "control": "copo-single-select",
+          "default_value": "",
+          "data_source": "nutrient_control_options",
+          "option_values": [],
           "versions": [
             ""
           ],
@@ -402,18 +383,13 @@
           "ref": "",
           "hidden": "false",
           "deprecated": false,
-          "default_value": "",
           "show_in_form": true,
-          "option_values": {
-            "callback": {
-              "function": "get_watering_control_options",
-              "parameter": ""
-            }
-          },
+          "control": "copo-single-select",
+          "default_value": "",
+          "data_source": "watering_control_options",
+          "option_values": [],
           "id": "copo.miappe.irrigation_type",
           "show_in_table": true,
-          "control": "copo-multi-select",
-          "data_maxItems": 1,
           "versions": [
             "irrigation_type"
           ],

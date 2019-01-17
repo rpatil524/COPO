@@ -16,8 +16,7 @@
           "label": "Type",
           "hidden": "false",
           "required": "true",
-          "control": "copo-multi-select",
-          "data_maxItems": 1,
+          "control": "copo-single-select",
           "default_value": "",
           "option_values": []
         }
@@ -37,9 +36,8 @@
           "label": "Subtype",
           "hidden": "false",
           "required": "false",
-          "control": "copo-multi-select",
+          "control": "copo-single-select",
           "field_constraint": "recommended",
-          "data_maxItems": 1,
           "default_value": "",
           "option_values": []
         }

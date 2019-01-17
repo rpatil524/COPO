@@ -61,10 +61,6 @@
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
-      "control": "copo-multi-search",
-      "data_maxItems": 1,
-      "option_component": "source",
-      "show_create_button": true,
       "versions": [
         "derivesFrom"
       ],
@@ -76,15 +72,15 @@
       "label": "Source",
       "show_in_form": true,
       "ref": "",
-      "type": "array",
+      "type": "string",
       "show_in_table": false,
       "hidden": "false",
-      "option_values": {
-        "callback": {
-          "parameter": "",
-          "function": "generate_sources_json"
-        }
-      }
+      "control": "copo-lookup2",
+      "create_new_item": true,
+      "option_component": "source",
+      "data_maxItems": 1,
+      "data_source": "sample_source_lookup",
+      "option_values": []
     },
     {
       "help_tip": "Characteristics of the sample e.g., height, sex",

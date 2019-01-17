@@ -32,6 +32,8 @@ $(document).ready(function () {
 
     ontology_link_event();
 
+    select2_mouse_event();
+
 });
 
 function setup_autocomplete() {
@@ -49,6 +51,45 @@ function setup_autocomplete() {
         }
     })
     auto_complete();
+}
+
+function select2_mouse_event() {
+    $(document).on({
+            mouseover: function () {
+                var item = $(this);
+                var dataItem = item.find(".copo-select2-info");
+
+                if (dataItem.data("server")) {//resolve item description from the server
+
+                    WebuiPopovers.updateContent(item.closest(".copo-form-group"), '<div class="webpop-content-div"><span class="fa fa-spinner fa-pulse fa-2x"></span></div>');
+
+                    $.ajax({
+                        url: dataItem.data("url"),
+                        type: "GET",
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
+                        data: {
+                            "accession": dataItem.data("id")
+                        },
+                        success: function (data) {
+                            if (data.hasOwnProperty('result') && data.result.length > 0) {
+                                var desc = data.result[0].description;
+                                WebuiPopovers.updateContent(item.closest(".copo-form-group"), '<div class="webpop-content-div limit-text">' + desc + '</div>');
+                            }
+                        },
+                        error: function () {
+                            console.log("Couldn't retrieve item's details!");
+                        }
+                    });
+
+                } else if (dataItem.data("descr")) {//display item description
+                    WebuiPopovers.updateContent(item.closest(".copo-form-group"), '<div class="webpop-content-div limit-text">' + dataItem.data("descr") + '</div>');
+                }
+            }
+        },
+        '.select2-results__option.select2-results__option--highlighted'
+    );
 }
 
 function ontology_value_change() {
@@ -719,10 +760,14 @@ function refresh_tool_tips() {
 
     apply_color();
     refresh_selectbox();
+    refresh_select2box();
     refresh_multiselectbox();
+    refresh_multiselect2box();
+    refresh_singleselectbox();
     refresh_multisearch();
     refresh_ontology_select();
     refresh_copo_lookup();
+    refresh_copo_lookup2();
 
     refresh_range_slider();
     auto_complete();
@@ -791,7 +836,7 @@ function refresh_selectbox() {
         var elem = $(this);
 
         if (!(/selectize/i.test(elem.attr('class')))) { // if not already instantiated
-            var funSelect = elem.selectize({
+            elem.selectize({
                 delimiter: ',',
                 plugins: ['remove_button'],
                 persist: false,
@@ -803,6 +848,140 @@ function refresh_selectbox() {
                 }
             });
         }
+    });
+
+} //end of function
+
+//refreshes selectboxes to pick up events
+function refresh_select2box() {
+    $('.copo-select2').each(function () {
+        var elem = $(this);
+
+        if (!elem.hasClass("select2-hidden-accessible")) {
+            elem.select2({
+                tags: true,
+                data: JSON.parse(elem.attr("data-currentValue")),
+                dropdownParent: $(this).closest(".copo-form-group")
+            });
+        }
+
+    });
+
+} //end of function
+
+function refresh_multiselect2box() {
+    $('.copo-multi-select2').each(function () {
+        var elem = $(this);
+
+        if (!elem.hasClass("select2-hidden-accessible")) {
+            elem.select2({
+                data: JSON.parse(elem.attr("data-optionsList")),
+                maximumSelectionLength: elem.attr("data-maximumSelectionLength"),
+                dropdownParent: $(this).closest(".copo-form-group")
+            });
+
+            elem.val(JSON.parse(elem.attr("data-currentValue")));
+            elem.trigger('change');
+        }
+
+    });
+
+} //end of function
+
+
+function refresh_singleselectbox() {
+    $('.copo-single-select').each(function () {
+        var elem = $(this);
+
+        if (!elem.hasClass("select2-hidden-accessible")) {
+            elem.select2({
+                data: JSON.parse(elem.attr("data-optionsList")),
+                dropdownParent: $(this).closest(".copo-form-group"),
+                escapeMarkup: function (markup) {
+                    return markup;
+                }, // let our custom formatter work
+                templateResult: function (state) {
+                    if (!state.id) {
+                        return state.text;
+                    }
+
+                    var descr = state.description || '';
+
+                    var $state = $(
+                        '<span class="copo-select2-info" data-descr="' + descr + '">' + state.text + '</span>'
+                    );
+
+                    return $state;
+                }
+            });
+
+            elem.val(JSON.parse(elem.attr("data-currentValue")));
+            elem.trigger('change');
+        }
+
+    });
+
+} //end of function
+
+function refresh_copo_lookup2() {
+    var profile_id = '';
+    if ($('#profile_id').length) {
+        profile_id = $('#profile_id').val();
+    }
+
+    $('.copo-lookup2').each(function () {
+        var elem = $(this);
+
+        if (!elem.hasClass("select2-hidden-accessible")) {
+            elem.select2({
+                maximumSelectionLength: elem.attr("data-maximumSelectionLength"),
+                data: JSON.parse(elem.attr("data-currentValue")),
+                dropdownParent: $(this).closest(".copo-form-group"),
+                ajax: {
+                    url: elem.attr("data-url"),
+                    dataType: 'json',
+                    type: "GET",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term, // search term
+                            'profile_id': profile_id
+                        };
+                    },
+                    processResults: function (data) {
+                        var res = data.result.map(function (item) {
+                            var serverSide = false;
+                            if (item.hasOwnProperty('server-side')) {
+                                serverSide = item['server-side'];
+                            }
+                            return {
+                                id: item.accession,
+                                text: item.label,
+                                serverSide: serverSide,
+                                url: elem.attr("data-url")
+                            };
+                        });
+                        return {
+                            results: res
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                escapeMarkup: function (markup) {
+                    return markup;
+                }, // for our custom formatter to work
+                templateResult: function (state) {
+                    return '<span data-id="' + state.id + '" data-server="' + state.serverSide + '" data-url="' + state.url + '" class="copo-select2-info select2-minfo">' + state.text + '</span>';
+                }
+            });
+
+            selectizeObjects[elem.attr("id")] = elem;
+        }
+
     });
 
 } //end of function

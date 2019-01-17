@@ -1,12 +1,11 @@
 __author__ = 'etuka'
 
 import os
-import glob
-import json
 import requests
 import pandas as pd
+from bson import ObjectId
 from dal import cursor_to_list
-from dal.copo_da import Sample
+from dal.copo_da import Sample, Source
 from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.lookup.resolver import RESOLVER
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
@@ -36,7 +35,9 @@ class COPOLookup:
             'countrieslist': self.get_lookup_type,
             'mediatypelabels': self.get_lookup_type,
             'fundingbodies': self.get_lookup_type,
-            'isa_samples_lookup': self.get_isasamples
+            'isa_samples_lookup': self.get_isasamples,
+            'sample_source_lookup': self.get_samplesource,
+            'all_samples_lookup': self.get_allsamples
         }
 
         result = []
@@ -62,15 +63,24 @@ class COPOLookup:
             select_yes_no=os.path.join(self.drop_downs_pth, 'select_yes_no.json'),
             select_start_end=os.path.join(self.drop_downs_pth, 'select_start_end.json'),
             cgiar_centres=os.path.join(self.drop_downs_pth, 'cgiar_centres.json'),
-            languagelist=os.path.join(self.drop_downs_pth, 'language_list.json')
+            languagelist=os.path.join(self.drop_downs_pth, 'language_list.json'),
+            figshare_category_options=d_utils.get_figshare_category_options(),
+            figshare_article_options=d_utils.get_figshare_article_options(),
+            figshare_publish_options=d_utils.get_figshare_publish_options(),
+            figshare_license_options=d_utils.get_figshare_license_options(),
+            study_type_options=d_utils.get_study_type_options(),
+            rooting_medium_options=d_utils.get_rooting_medium_options(),
+            growth_area_options=d_utils.get_growth_area_options(),
+            nutrient_control_options=d_utils.get_nutrient_control_options(),
+            watering_control_options=d_utils.get_watering_control_options(),
+            dataverse_subject_dropdown=d_utils.get_dataverse_subject_dropdown(),
+            repository_options=d_utils.get_repository_options()
         )
 
-        data = list()
+        data = pths_map.get(self.data_source, str())
 
-        try:
-            data = d_utils.json_to_pytype(pths_map.get(self.data_source, str()))
-        except:
-            pass
+        if isinstance(data, str):  # it's only a path, resolve to get actual data
+            data = d_utils.json_to_pytype(data)
 
         return data
 
@@ -78,15 +88,18 @@ class COPOLookup:
         projection = dict(label=1, accession=1, description=1)
         filter_by = dict(type=self.data_source)
 
-        if self.accession:
-            bn = list()
-            bn.append(self.accession) if isinstance(self.accession, str) else bn.extend(self.accession)
-            filter_by["accession"] = {'$in': bn}
+        records = list()
 
-        elif self.search_term:
-            filter_by["label"] = {'$regex': self.search_term, "$options": 'i'}
+        if self.accession or self.search_term:
+            if self.accession:
+                bn = list()
+                bn.append(self.accession) if isinstance(self.accession, str) else bn.extend(self.accession)
+                filter_by["accession"] = {'$in': bn}
 
-        records = cursor_to_list(Lookups.find(filter_by, projection))
+            elif self.search_term:
+                filter_by["label"] = {'$regex': self.search_term, "$options": 'i'}
+
+            records = cursor_to_list(Lookups.find(filter_by, projection))
 
         return records
 
@@ -123,6 +136,57 @@ class COPOLookup:
 
         return all_list
 
+    def get_samplesource(self):
+        """
+        lookup sources related to a sample
+        :return:
+        """
+        import web.apps.web_copo.templatetags.html_tags as htags
+
+        df = pd.DataFrame()
+
+        if self.accession:
+            if isinstance(self.accession, str):
+                self.accession = self.accession.split(",")
+
+            object_ids = [ObjectId(x) for x in self.accession]
+            records = cursor_to_list(Source().get_collection_handle().find({"_id": {"$in": object_ids}}))
+
+            if records:
+                df = pd.DataFrame(records)
+                df['accession'] = df._id.astype(str)
+                df['label'] = df['name']
+                df['desc'] = df['accession'].apply(lambda x: htags.generate_attributes("source", x))
+                df['description'] = df['desc'].apply(lambda x: self.format_description(x))
+                df['server-side'] = True  # ...to request callback to server for resolving item description
+        elif self.search_term:
+            projection = dict(name=1)
+            filter_by = dict()
+            filter_by["name"] = {'$regex': self.search_term, "$options": 'i'}
+
+            sort_by = 'name'
+            sort_direction = -1
+
+            records = Source(profile_id=self.profile_id).get_all_records_columns(filter_by=filter_by,
+                                                                                 projection=projection,
+                                                                                 sort_by=sort_by,
+                                                                                 sort_direction=sort_direction)
+
+            if records:
+                df = pd.DataFrame(records)
+                df['accession'] = df._id.astype(str)
+                df['label'] = df['name']
+                df['description'] = ''
+                df['server-side'] = True  # ...to request callback to server for resolving item description
+
+        result = list()
+
+        if not df.empty:
+            df = df[['accession', 'label', 'description', 'server-side']]
+            result = df.to_dict('records')
+
+        return result
+
     def get_isasamples(self):
         """
         lookup for ISA-based (COPO standard) samples
@@ -134,20 +198,18 @@ class COPOLookup:
         df = pd.DataFrame()
 
         if self.accession:
-            record = Sample().get_record(self.accession)
-            if record:
-                df = pd.DataFrame([record])
+            if isinstance(self.accession, str):
+                self.accession = self.accession.split(",")
+
+            object_ids = [ObjectId(x) for x in self.accession]
+            records = cursor_to_list(Sample().get_collection_handle().find({"_id": {"$in": object_ids}}))
+
+            if records:
+                df = pd.DataFrame(records)
                 df['accession'] = df._id.astype(str)
                 df['label'] = df['name']
-                desc = df['accession'].apply(lambda x: htags.generate_attributes("sample", x))
-                desc = list(desc)[0]
-                html = """<table style="width:100%">"""
-                for col in desc['columns']:
-                    html += "<tr><td>{}</td>".format(col['title'])
-                    html += "<td>{}</td>".format(desc['data_set'][col['data']])
-                    html += "</tr>"
-                html += "</table>"
-                df['description'] = html
+                df['desc'] = df['accession'].apply(lambda x: htags.generate_attributes("sample", x))
+                df['description'] = df['desc'].apply(lambda x: self.format_description(x))
                 df['server-side'] = True  # ...to request callback to server for resolving item description
 
         elif self.search_term:
@@ -162,14 +224,78 @@ class COPOLookup:
                                                                                  projection=projection,
                                                                                  sort_by=sort_by,
                                                                                  sort_direction=sort_direction)
+            if records:
+                df = pd.DataFrame(records)
+                df['accession'] = df._id.astype(str)
+                df['label'] = df['name']
+                df['description'] = ''
+                df['server-side'] = True  # ...to request callback to server for resolving item description
 
-            df = pd.DataFrame(records)
-            df['accession'] = df._id.astype(str)
-            df['label'] = df['name']
-            df['description'] = ''
-            df['server-side'] = True  # ...to request callback to server for resolving item description
+        result = list()
 
-        df = df[['accession', 'label', 'description', 'server-side']]
-        result = df.to_dict('records')
+        if not df.empty:
+            df = df[['accession', 'label', 'description', 'server-side']]
+            result = df.to_dict('records')
 
         return result
+
+    def get_allsamples(self):
+        """
+        lookup for all samples irrespective of sample type
+        :return:
+        """
+
+        import web.apps.web_copo.templatetags.html_tags as htags
+
+        df = pd.DataFrame()
+
+        if self.accession:
+            if isinstance(self.accession, str):
+                self.accession = self.accession.split(",")
+
+            object_ids = [ObjectId(x) for x in self.accession]
+            records = cursor_to_list(Sample().get_collection_handle().find({"_id": {"$in": object_ids}}))
+
+            if records:
+                df = pd.DataFrame(records)
+                df['accession'] = df._id.astype(str)
+                df['label'] = df['name']
+                df['desc'] = df['accession'].apply(lambda x: htags.generate_attributes("sample", x))
+                df['description'] = df['desc'].apply(lambda x: self.format_description(x))
+                df['server-side'] = True  # ...to request callback to server for resolving item description
+        elif self.search_term:
+            projection = dict(name=1)
+            filter_by = dict()
+            filter_by["name"] = {'$regex': self.search_term, "$options": 'i'}
+
+            sort_by = 'name'
+            sort_direction = -1
+
+            records = Sample(profile_id=self.profile_id).get_all_records_columns(filter_by=filter_by,
+                                                                                 projection=projection,
+                                                                                 sort_by=sort_by,
+                                                                                 sort_direction=sort_direction)
+            if records:
+                df = pd.DataFrame(records)
+                df['accession'] = df._id.astype(str)
+                df['label'] = df['name']
+                df['description'] = ''
+                df['server-side'] = True  # ...to request callback to server for resolving item description
+
+        result = list()
+
+        if not df.empty:
+            df = df[['accession', 'label', 'description', 'server-side']]
+            result = df.to_dict('records')
+
+        return result
+
+    def format_description(self, desc):
+        html = """<table style="width:100%">"""
+        for col in desc['columns']:
+            html += "<tr><td>{}</td>".format(col['title'])
+            html += "<td>{}</td>".format(desc['data_set'][col['data']])
+            html += "</tr>"
+        html += "</table>"
+
+        return html

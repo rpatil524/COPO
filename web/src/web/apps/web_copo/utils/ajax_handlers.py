@@ -69,11 +69,20 @@ def search_copo_components(request, data_source):
     :return:
     """
 
+    search_term = request.GET.get("q", str())
+    accession = request.GET.get("accession", str())
+    profile_id = request.GET.get("profile_id", str())
+
+    if request.method == 'POST':
+        search_term = request.POST.get("q", str())
+        accession = request.POST.get("accession", str())
+        profile_id = request.POST.get("profile_id", str())
+
     data = COPOLookup(
-        search_term=request.POST.get("q", str()),
-        accession=request.POST.get("accession", str()),
+        search_term=search_term,
+        accession=accession,
         data_source=data_source,
-        profile_id=request.POST.get("profile_id", str())
+        profile_id=profile_id
     ).broker_component_search()
 
     return HttpResponse(jsonpickle.encode(data), content_type='application/json')

@@ -229,7 +229,7 @@
       "ref": "sample_attributes",
       "title": "Sample Attributes",
       "callback": "get_sample_attributes",
-      "message": "Enter the attributes that describe your sample(s). If attributes are from a cloned sample, please check to ensure that they are well aligned with your metadata requirements. <br/><br/>Please note: Attributes entered here will be used as an initial attribute assignment for the specified number of samples. In the next stage, you will have the opportunity to edit specific attribute values for individual samples.",
+      "message": "Enter the attributes that describe your sample(s). Check carefully to ensure that attributes from cloned samples meet your metadata requirement. <br/><br/>Please note: In the next stage, you will have the opportunity to edit attribute values for individual samples.",
       "items": [
 
       ]

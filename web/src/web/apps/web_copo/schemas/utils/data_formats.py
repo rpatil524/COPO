@@ -229,7 +229,8 @@ class DataFormats:
     def set_option_values(self):
         for elem_dict in self.generated_controls:
             if elem_dict.get("control", str()).lower() in ['copo-lookup', 'copo-multi-select',
-                                                           'copo-button-list'] and "option_values" not in elem_dict:
+                                                           'copo-button-list', 'copo-single-select',
+                                                           'copo-multi-select2'] and "option_values" not in elem_dict:
                 elem_dict["option_values"] = list()
 
     def update_original_resource(self):

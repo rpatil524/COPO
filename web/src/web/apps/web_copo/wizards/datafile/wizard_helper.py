@@ -323,7 +323,7 @@ class WizardHelper:
         """
 
         for item in stage.get("items", list()):
-            if item.get("control", str()) == "copo-lookup":
+            if item.get("control", str()) in ["copo-lookup", "copo-lookup2"]:
                 item['data'] = stage['data'].get(item["id"].split(".")[-1], str())
                 item["option_values"] = htags.get_control_options(item)
 
@@ -606,7 +606,7 @@ class WizardHelper:
         schema_df = pd.DataFrame(datafile_items)
 
         for index, row in schema_df.iterrows():
-            resolved_data = htags.resolve_control_output(datafile_attributes, row)
+            resolved_data = htags.resolve_control_output(datafile_attributes, dict(row.dropna()))
             label = row["label"]
 
             # 'apply_to_all' columns are flagged as non-editable in table view
@@ -892,7 +892,7 @@ class WizardHelper:
         schema_df = pd.DataFrame(datafile_items)
 
         for index, row in schema_df.iterrows():
-            resolved_data = htags.resolve_control_output(datafile_attributes, row)
+            resolved_data = htags.resolve_control_output(datafile_attributes, dict(row.dropna()))
             label = row["label"]
 
             # 'apply_to_all' columns are flagged as non-editable in table view

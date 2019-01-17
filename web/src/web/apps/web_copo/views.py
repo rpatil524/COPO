@@ -187,6 +187,12 @@ def copo_docs(request):
 def copo_visualize(request):
     context = dict()
 
+    # test
+    from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+    CgCoreSchemas().process_schema()
+    v = CgCoreSchemas().extract_repo_fields(datafile_id="5c0fb70bd127fdc41c80b8e8", repo="dataverse")
+    # test ends
+
     task = request.POST.get("task", str())
 
     profile_id = request.session.get("profile_id", str())
@@ -247,6 +253,7 @@ def copo_forms(request):
                          id_handle=request.POST.get("id_handle", str()),
                          user_id=request.user.id,
                          id_type=request.POST.get("id_type", str()),
+                         data_source=request.POST.get("data_source", str()),
                          user_email=request.POST.get("user_email", str())
                          )
 

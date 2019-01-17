@@ -2459,8 +2459,6 @@ $(document).ready(function () {
         item.find(".fa").addClass("fa-spin");
         item.webuiPopover('destroy');
 
-        console.log(item.html())
-
         $.ajax({
             url: copoVisualsURL,
             type: "POST",

@@ -4,6 +4,7 @@ import os
 import json
 import numpy as np
 import pandas as pd
+import web.apps.web_copo.lookup.lookup as lkup
 from web.apps.web_copo.lookup.resolver import RESOLVER
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 
@@ -68,7 +69,7 @@ class CgCoreSchemas:
 
     def get_type_constraints(self, type_name):
         """
-        given a type (or a subtype) function returns participating schemas and constraints
+        given a type (or a subtype) function returns relevant schemas and constraints
         :param type_name:
         :return:
         """
@@ -195,13 +196,34 @@ class CgCoreSchemas:
 
         return self.get_required_types('multiple item types')
 
-    def extract_dublin_core(self, datafile_id=str()):
+    def extract_repo_fields(self, datafile_id=str(), repo=str()):
         """
-        given a datafile id, function returns a list of dictionaries of dublin-core fields
+        given a datafile id, and repository type function returns a list of dictionaries of fields matching the repo
         :param datafile_id:
+        :param repo:
         :return:
         """
         from dal.copo_da import DataFile
+        from dal.copo_base_da import DataSchemas
+
+        if not repo:  # no repository to filter by
+            return list()
+
+        repo_type_option = lkup.DROP_DOWNS["REPO_TYPE_OPTIONS"]
+        repo_type_option = [x for x in repo_type_option if x["value"].lower() == repo.lower()]
+
+        if not repo_type_option:
+            return list()
+
+        repo_type_option = repo_type_option[0]
+
+        cg_schema = DataSchemas("COPO").get_ui_template_node('cgCore')
+
+        # filter by 'repo'
+        cg_schema = [x for x in cg_schema if
+                     x.get("target_repo", str()).strip() != str() and
+                     repo_type_option.get("abbreviation", str()) in [y.strip() for y in
+                                                                     x.get("target_repo").split(',')]]
 
         record = DataFile().get_record(datafile_id)
         description = record.get("description", dict())
@@ -210,25 +232,27 @@ class CgCoreSchemas:
         stages = description.get("stages", list())
 
         items_list = list()
+        stage_ref_list = list()
 
         for st in stages:
             for item in st.get("items", list()):
-                item['stage_ref'] = st["ref"]
-                items_list.append(item)
+                new_item = [x for x in cg_schema if x["id"].lower().split(".")[-1] == item.get("id", str()).lower().split(".")[-1]]
+                if new_item:
+                    stage_ref_list.append(st["ref"].lower())
+                    new_item[0]['id'] = new_item[0]['id'].lower().split(".")[-1]
+                    items_list.append(new_item[0])
+
 
         items_df = pd.DataFrame(items_list)
         items_df.index = items_df['id']
-        items_df = items_df[['ref', 'id', 'stage_ref']]
+        items_df = items_df[['ref', 'id']]
         items_df = items_df[~items_df['ref'].isna()]
-        items_df['dc'] = items_df['ref'].str.split(".").str.get(0)
-        items_df = items_df[items_df['dc'] == 'dc']
 
-        target_stages = list(items_df['stage_ref'].unique())
-
-        # first level filter - participating stages
+        # first level filter - relevant stages
+        target_stages = list(set(stage_ref_list))
         datafile_attributes = [v for k, v in attributes.items() if k in target_stages]
-        new_dict = dict()
 
+        new_dict = dict()
         for d in datafile_attributes:
             new_dict.update(d)
 
@@ -297,6 +321,7 @@ class CgCoreSchemas:
         df.loc['TYPE'] = df.loc['TYPE'].fillna('string')
         df.loc['DEPENDENCY'] = df.loc['DEPENDENCY'].fillna('')
         df.loc['COPO_DATA_SOURCE'] = df.loc['COPO_DATA_SOURCE'].fillna('')
+        df.loc['REPO'] = df.loc['REPO'].fillna('')
         df.loc['Wizard_Stage_ID'] = df.loc['Wizard_Stage_ID'].fillna('-1')
 
         return df
@@ -319,23 +344,34 @@ class CgCoreSchemas:
         df["dependency"] = df['DEPENDENCY']
         df["control"] = df['COPO_CONTROL']
         df["stage_id"] = df['Wizard_Stage_ID']
+        df["target_repo"] = df['REPO']
+        df["data_maxItems"] = -1
+
+        # set max item for lookup control
+        temp_df_1 = df[(df['control'] == 'copo-lookup2') & (df['TYPE'] == '1')]
+        if len(temp_df_1):
+            df.loc[temp_df_1.index, 'data_maxItems'] = 1
 
         # set cardinality
         df["type"] = df['TYPE'].replace({'1': 'string', 'm': 'array'})
 
         # set data source for relevant controls
-        df['data_source'] = np.where(df['control'].isin(['copo-lookup', 'copo-multi-select', 'copo-button-list']),
-                                     df['COPO_DATA_SOURCE'],
-                                     '')
-        df['data_maxItems'] = np.where(df['control'] == 'copo-multi-select', 1, '')
+        df['data_source'] = np.where(
+            df['control'].isin(['copo-lookup2', 'copo-multi-select2', 'copo-button-list', 'copo-single-select']),
+            df['COPO_DATA_SOURCE'],
+            '')
+
+        # reset 'type' to string for select2 controls
+        temp_df_1 = df[df['control'].isin(['copo-lookup2', 'copo-multi-select2', 'copo-single-select', 'copo-select2'])]
+        df.loc[temp_df_1.index, 'type'] = 'string'
 
         filtered_columns = ["ref", "id", "label", "help_tip", "control", "type", "stage_id", "data_source",
-                            "data_maxItems", "dependency"]
+                            "data_maxItems", "dependency", "target_repo"]
 
         df = df.loc[:, filtered_columns]
 
-        df["required"] = False
-        df["field_constraint"] = "optional"
+        df["required"] = False  # this will be set later
+        df["field_constraint"] = "optional"  # this will be set later
 
         schema_list = df.to_dict('records')
 

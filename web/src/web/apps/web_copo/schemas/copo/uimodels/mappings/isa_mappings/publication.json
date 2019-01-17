@@ -40,7 +40,7 @@
       "id": "copo.publication.authorList",
       "type": "string",
       "show_in_table": true,
-      "control": "copo-select"
+      "control": "copo-select2"
     },
     {
       "help_tip": "",

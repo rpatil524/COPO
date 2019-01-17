@@ -346,8 +346,7 @@ class WizardCallbacks:
 
                                 # convert select type controls to copo custom select
                                 if f.get("control", str()) == "select":
-                                    f["control"] = "copo-multi-select"
-                                    f["data_maxItems"] = 1
+                                    f["control"] = "copo-single-select"
 
                                 stage_dict.get("items").append(f)
 

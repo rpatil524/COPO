@@ -115,7 +115,7 @@ def get_figshare_category_options():
     #     st['value'] = x['id']
     #     st['label'] = x['title']
     #     output.append(st)
-    # todo: stored locally to overcome network issues - feel free to uncomment to return to remote resolution
+    # todo: resolved locally to mitigate network congestion - feel free to uncomment to return to remote resolution
 
     drop_downs_pth = RESOLVER['copo_drop_downs']
 
