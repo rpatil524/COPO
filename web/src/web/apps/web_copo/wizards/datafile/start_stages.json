@@ -33,14 +33,10 @@
           "label": "Target Repository",
           "hidden": "false",
           "required": "true",
-          "control": "copo-button-list",
+          "control": "copo-single-select",
           "default_value": "ena",
-          "option_values": {
-            "callback": {
-              "function": "get_repository_options",
-              "parameter": ""
-            }
-          }
+          "data_source": "repository_options",
+          "option_values": []
         }
       ]
     },

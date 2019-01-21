@@ -88,17 +88,13 @@
                     "ref": "",
                     "hidden": "false",
                     "deprecated": false,
-                    "default_value": "",
                     "show_in_form": true,
                     "id": "subject",
                     "show_in_table": true,
-                    "control": "select",
-                    "option_values": {
-                        "callback": {
-                            "function": "get_dataverse_subject_dropdown",
-                            "parameter": ""
-                        }
-                    },
+                    "control": "copo-single-select",
+                    "default_value": "",
+                        "data_source": "dataverse_subject_dropdown",
+                    "option_values": [],
                     "versions": [
                         "subject"
                     ],
@@ -1142,6 +1138,7 @@
                     ],
                     "help_tip": "A class of entity, defined in terms of progression through an educational or training context, for which the described resource is intended.",
                     "label": "Education Level"
+
                 },
                 {
                     "type": "text",

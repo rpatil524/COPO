@@ -15,15 +15,10 @@
           "hidden": "false",
           "required": "true",
           "type": "string",
-          "control": "copo-multi-select",
-          "data_maxItems": 1,
+          "control": "copo-single-select",
           "default_value": "",
-          "option_values": {
-            "callback": {
-              "function": "get_study_type_options",
-              "parameter": ""
-            }
-          }
+          "data_source": "study_type_options",
+          "option_values": []
         }
       ]
     },
@@ -39,7 +34,7 @@
           "label": "Sample",
           "hidden": "false",
           "required": "true",
-          "control": "copo-lookup",
+          "control": "copo-lookup2",
           "data_maxItems": 1,
           "data_source": "isa_samples_lookup",
           "option_values": []

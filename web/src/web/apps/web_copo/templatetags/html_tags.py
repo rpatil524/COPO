@@ -85,7 +85,7 @@ def get_control_options(f):
 
     option_values = list()
 
-    if f.get("control", str()) == "copo-lookup":
+    if f.get("control", str()) in ["copo-lookup", "copo-lookup2"]:
         return COPOLookup(accession=f.get('data', str()),
                           data_source=f.get('data_source', str())).broker_component_search()['result']
 
@@ -134,6 +134,7 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
             # if required, resolve data source for select-type controls,
             # i.e., if a callback is defined on the 'option_values' field
             if "option_values" in f:
+                f['data'] = form_value.get(f["id"].split(".")[-1], str())
                 f["option_values"] = get_control_options(f)
 
             # resolve values for unique items...
@@ -753,8 +754,11 @@ def get_resolver(data, elem):
     func_map["copo-phenotypic-characteristics"] = resolve_phenotypic_characteristics_data
     func_map["copo-comment"] = resolve_copo_comment_data
     func_map["copo-multi-select"] = resolve_copo_multi_select_data
+    func_map["copo-multi-select2"] = resolve_copo_multi_select_data
+    func_map["copo-single-select"] = resolve_copo_multi_select_data
     func_map["copo-multi-search"] = resolve_copo_multi_search_data
     func_map["copo-lookup"] = resolve_copo_lookup_data
+    func_map["copo-lookup2"] = resolve_copo_lookup2_data
     func_map["select"] = resolve_select_data
     func_map["copo-button-list"] = resolve_select_data
     func_map["ontology term"] = resolve_ontology_term_data
@@ -765,8 +769,9 @@ def get_resolver(data, elem):
     func_map["copo-duration"] = resolve_copo_duration_data
     func_map["copo-datafile-id"] = resolve_copo_datafile_id_data
 
-    if elem["control"].lower() in func_map:
-        resolved_data = func_map[elem["control"].lower()](data, elem)
+    control = elem.get("control", "text").lower()
+    if control in func_map:
+        resolved_data = func_map[control](data, elem)
     else:
         resolved_data = resolve_default_data(data)
 
@@ -782,7 +787,7 @@ def resolve_display_data(datafile_items, datafile_attributes):
     schema_df = pd.DataFrame(datafile_items)
 
     for index, row in schema_df.iterrows():
-        resolved_data = resolve_control_output(datafile_attributes, row)
+        resolved_data = resolve_control_output(datafile_attributes, dict(row.dropna()))
         label = row["label"]
 
         if row['control'] in object_controls.keys():
@@ -939,18 +944,19 @@ def resolve_copo_multi_select_data(data, elem):
     if "option_values" in elem:
         option_values = get_control_options(elem)
 
-    if option_values and data:
-        for option in option_values:
-            if isinstance(option, str):
-                sv = option
-                sl = option
-            elif isinstance(option, dict):
-                sv = option['value']
-                sl = option['label']
+    if data:
+        if isinstance(data, str):
+            data = data.split(",")
 
-            for d_v in data.split(","):
-                if str(sv) == str(d_v):
-                    resolved_value = resolved_value + [sl]
+        data = [str(x) for x in data]
+
+        if option_values:
+            if isinstance(option_values[0], str):
+                option_values = [dict(value=x, label=x) for x in option_values]
+
+            o_df = pd.DataFrame(option_values)
+            o_df.value = o_df.value.astype(str)
+            resolved_value = list(o_df[o_df.value.isin(data)].label)
 
     return resolved_value
 
@@ -982,6 +988,18 @@ def resolve_copo_lookup_data(data, elem):
 
     if option_values:
         resolved_value = option_values[0]['label']
+
+    return resolved_value
+
+
+def resolve_copo_lookup2_data(data, elem):
+    resolved_value = str()
+
+    elem['data'] = data
+    option_values = get_control_options(elem)
+
+    if option_values:
+        resolved_value = [x['label'] for x in option_values]
 
     return resolved_value
 

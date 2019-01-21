@@ -136,13 +136,13 @@ DROP_DOWNS = {
         {
             'value': 'genomeSeq',  # this matches the value defined in the object_model.py
             'label': 'Whole Genome Sequencing',
-            'description': 'genome sequencing',
+            'description': '',
             'config_source': 'genome_seq.xml'
         },
         {
             'value': 'metagenomeSeq',
             'label': 'Metagenomics',
-            'description': 'metagenome sequencing',
+            'description': '',
             'config_source': 'metagenome_seq.xml'
         },
         {
@@ -361,15 +361,18 @@ DROP_DOWNS = {
     "REPO_TYPE_OPTIONS": [
         {
             "value": "dataverse",
-            "label": "Dataverse"
+            "label": "Dataverse",
+            "abbreviation": "dv"
         },
         {
             "value": "dspace",
-            "label": "dSPACE"
+            "label": "dSPACE",
+            "abbreviation": "ds"
         },
         {
             "value": "ckan",
-            "label": "CKAN"
+            "label": "CKAN",
+            "abbreviation": "ck"
         }
     ],
     "LICENSE_TYPES": [

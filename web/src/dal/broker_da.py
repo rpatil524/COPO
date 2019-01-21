@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 import web.apps.web_copo.lookup.lookup as lkup
 from api.doi_metadata import DOI2Metadata
 import web.apps.web_copo.templatetags.html_tags as htags
+from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from dal.copo_da import Profile, Publication, Source, Person, Sample, Submission, DataFile, DAComponent, Annotation, \
     Description
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
@@ -93,7 +94,8 @@ class BrokerDA:
         # process visualisation context,
 
         # set extra parameters which will be passed along to the visualize object
-        self.broker_visuals.set_extra_params(dict(record_object=record_object))
+        self.broker_visuals.set_extra_params(
+            dict(record_object=record_object, data_source=self.param_dict.get("data_source", str())))
 
         # build dictionary of executable tasks/functions
         visualize_dict = dict(profiles_counts=self.broker_visuals.do_profiles_counts,
@@ -246,7 +248,7 @@ class BrokerVisuals:
         self.context["component"] = self.component
         request = self.param_dict.get("request", dict())
 
-        data = htags.generate_server_side_table_records(self.profile_id, component= self.component, request=request.POST)
+        data = htags.generate_server_side_table_records(self.profile_id, component=self.component, request=request.POST)
         self.context["draw"] = data["draw"]
         self.context["records_total"] = data["records_total"]
         self.context["records_filtered"] = data["records_filtered"]
@@ -292,17 +294,18 @@ class BrokerVisuals:
 
     def get_created_component_json(self):
         record_object = self.param_dict.get("record_object", dict())
+        data_source = self.param_dict.get("data_source", str())
 
         target_id = str(record_object.get("_id", str()))
-        option_values = dict()
+        option_values = list()
 
-        if self.component == "source":
-            option_values = d_utils.generate_sources_json(target_id)
-        elif self.component == "sample":
-            option_values = d_utils.get_samples_json(target_id)
+        if data_source:
+            option_values = COPOLookup(accession=[target_id],
+                                                       data_source=data_source).broker_component_search()['result']
 
         self.context["option_values"] = option_values
-        self.context["created_record_id"] = str(record_object.get("_id", str()))
+        self.context["created_record_id"] = target_id
+
         return self.context
 
     def get_last_record(self):
@@ -330,7 +333,7 @@ class BrokerVisuals:
                 if not description_record["name"]:
                     description_record["name"] = "N/A"
                 self.context['description']['description_record'] = dict(name=description_record["name"],
-                                                                     id=str(description_record["_id"]))
+                                                                         id=str(description_record["_id"]))
 
         return self.context
 

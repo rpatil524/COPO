@@ -65,12 +65,16 @@ var controlsMapping = {
     "textarea": "do_textarea_ctrl",
     "hidden": "do_hidden_ctrl",
     "copo-select": "do_copo_select_ctrl",
+    "copo-select2": "do_copo_select2_ctrl",
     "ontology term": "do_ontology_term_ctrl",
     "copo-lookup": "do_copo_lookup_ctrl",
+    "copo-lookup2": "do_copo_lookup2_ctrl",
     "select": "do_select_ctrl",
     "copo-onto-select": "do_onto_select_ctrl",
     "copo-multi-search": "do_copo_multi_search_ctrl",
     "copo-multi-select": "do_copo_multi_select_ctrl",
+    "copo-multi-select2": "do_copo_multi_select2_ctrl",
+    "copo-single-select": "do_copo_single_select_ctrl",
     "copo-comment": "do_copo_comment_ctrl",
     "copo-characteristics": "do_copo_characteristics_ctrl_2",
     "copo-environmental-characteristics": "do_copo_characteristics_ctrl_2",
@@ -991,6 +995,108 @@ var dispatchFormControl = {
 
         return returnDiv;
     },
+    do_copo_lookup2_ctrl: function (formElem, elemValue) {
+        formElem["type"] = "string"; //this, for the purposes of the UI, should be assigned a string temporarily, since multi_search takes care of the multiple values
+
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        var placeholder = "Lookup " + formElem.label + "...";
+        if (formElem.hasOwnProperty("placeholder")) {
+            placeholder = formElem.placeholder;
+        }
+
+        //lookup url
+        var localolsURL = lookupsURL;
+        if (formElem.hasOwnProperty('data_source')) {
+            localolsURL = lookupsURL.replace("999", formElem.data_source);
+        }
+
+        //maximum selection
+        var maximumSelectionLength = -1;
+        if (formElem.data_maxItems) {
+            maximumSelectionLength = formElem.data_maxItems;
+        }
+
+        //set current data
+        var currentValue = [];
+
+        if (formElem.option_values && formElem.option_values.length) {
+            currentValue = formElem.option_values.map(function (item) {
+                if (typeof item === "string") {
+                    var newItem = item;
+                    item = {};
+                    item.value = newItem;
+                    item.label = newItem;
+                }
+                return {
+                    id: item.accession || item.value,
+                    text: item.label,
+                    selected: true
+                };
+            });
+        }
+
+        //generate element controls
+        var ctrl = $('<select/>',
+            {
+                class: "copo-lookup2 input-copo form-control",
+                style: "width: 100%",
+                "multiple": "multiple",
+                id: formElem.id,
+                name: formElem.id,
+                "data-validate": true,
+                "data-placeholder": placeholder,
+                "data-url": localolsURL,
+                "data-maximumSelectionLength": maximumSelectionLength,
+                "data-currentValue": JSON.stringify(currentValue)
+            });
+
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, ctrl);
+
+        ctrlsDiv.append(ctrl);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
+        var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+
+        //create new item button
+        var newItemCreate = formElem.create_new_item || '';
+        var optionComponent = formElem.option_component || '';
+
+        if (newItemCreate.toString() == "true" && optionComponent != '') {
+            var addBtn = $('<button/>',
+                {
+                    style: "border-radius:0;",
+                    class: "btn btn-xs btn-primary",
+                    type: "button",
+                    "data-component": formElem.option_component,
+                    "data-element-id": formElem.id,
+                    html: '<i class="fa fa-plus-circle"></i> Create new ' + formElem.label,
+                    click: function (event) {
+                        event.preventDefault();
+                        create_attachable_component(formElem);
+                    },
+                });
+
+            var addbtnDiv = $('<div/>',
+                {
+                    class: "col-sm-12 col-md-12 col-lg-12"
+                }).append(addBtn);
+
+            var addbtnDivRow = $('<div/>',
+                {
+                    class: "row btn-row",
+                }).append(addbtnDiv);
+
+            returnDiv.append(addbtnDivRow);
+        }
+
+        return returnDiv
+    },
     do_copo_multi_select_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -1047,6 +1153,151 @@ var dispatchFormControl = {
         ctrlsDiv.append(vM.errorHelpDiv);
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
+    do_copo_multi_select2_ctrl: function (formElem, elemValue) {
+        formElem["type"] = "string"; //this, for the purposes of the UI, should be assigned a string temporarily, since multi_search takes care of the multiple values
+
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        var placeholder = "Select " + formElem.label + "...";
+        if (formElem.hasOwnProperty("placeholder")) {
+            placeholder = formElem.placeholder;
+        }
+
+        //maximum selection
+        var maximumSelectionLength = -1;
+        if (formElem.data_maxItems) {
+            maximumSelectionLength = formElem.data_maxItems;
+        }
+
+        //form options
+        var optionsList = [];
+
+        if (formElem.option_values && formElem.option_values.length) {
+            optionsList = formElem.option_values.map(function (item) {
+                if (typeof item === "string") {
+                    var newItem = item;
+                    item = {};
+                    item.value = newItem;
+                    item.label = newItem;
+                }
+                return {
+                    id: item.accession || item.value,
+                    text: item.label,
+                    selected: true
+                };
+            });
+        }
+
+        //set current data
+        var currentValue = [];
+
+        if (elemValue) {
+            if (typeof elemValue === "string") {
+                currentValue = elemValue.split(",");
+            } else if (typeof elemValue === "object") {
+                currentValue = elemValue;
+            }
+        }
+
+        //generate element controls
+        var ctrl = $('<select/>',
+            {
+                class: "input-copo form-control copo-multi-select2",
+                style: "width: 100%",
+                "multiple": "multiple",
+                id: formElem.id,
+                name: formElem.id,
+                "data-validate": true,
+                "data-placeholder": placeholder,
+                "data-maximumSelectionLength": maximumSelectionLength,
+                "data-currentValue": JSON.stringify(currentValue),
+                "data-optionsList": JSON.stringify(optionsList)
+            });
+
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, ctrl);
+
+        ctrlsDiv.append(ctrl);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
+        var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+
+        return returnDiv
+    },
+    do_copo_single_select_ctrl: function (formElem, elemValue) {
+        formElem["type"] = "string"; //this, for the purposes of the UI, should be assigned a string temporarily, since multi_search takes care of the multiple values
+
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        var placeholder = "Select " + formElem.label + "...";
+        if (formElem.hasOwnProperty("placeholder")) {
+            placeholder = formElem.placeholder;
+        }
+
+        //form options
+        var optionsList = [];
+
+        if (formElem.option_values && formElem.option_values.length) {
+            optionsList = formElem.option_values.map(function (item) {
+                if (typeof item === "string") {
+                    var newItem = item;
+                    item = {};
+                    item.value = newItem;
+                    item.label = newItem;
+                }
+                return {
+                    id: item.accession || item.value,
+                    text: item.label,
+                    selected: true,
+                    description: item.description || ''
+                };
+            });
+        }
+
+        //set current data
+        var currentValue = [];
+
+        if (elemValue) {
+            if (typeof elemValue === "string") {
+                currentValue = elemValue.split(",");
+            } else if (typeof elemValue === "object") {
+                currentValue = elemValue;
+            }
+
+            currentValue = currentValue[0];
+        }
+
+        //generate element controls
+        var ctrl = $('<select/>',
+            {
+                class: "input-copo form-control copo-single-select",
+                style: "width: 100%",
+                id: formElem.id,
+                name: formElem.id,
+                "data-validate": true,
+                "data-placeholder": placeholder,
+                "data-currentValue": JSON.stringify(currentValue),
+                "data-optionsList": JSON.stringify(optionsList)
+            });
+
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, ctrl);
+
+        ctrlsDiv.append(ctrl);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
+        var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+
+        return returnDiv
     },
     do_copo_multi_search_ctrl: function (formElem, elemValue) {
         formElem["type"] = "string"; //this, for the purposes of the UI, should be assigned a string temporarily, since multi_search takes care of the multiple values
@@ -1115,34 +1366,64 @@ var dispatchFormControl = {
 
         var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
 
-        if (formElem.hasOwnProperty("show_create_button") && (formElem.show_create_button.toString() == "true")) {
-            var addBtn = $('<button/>',
-                {
-                    style: "border-radius:0;",
-                    type: "button",
-                    class: "btn btn-sm btn-primary copo-component-control",
-                    "data-component": formElem.option_component,
-                    "data-element-id": formElem.id,
-                    html: '<i class="fa fa-plus-circle"></i> Create & Assign ' + formElem.label,
-                    click: function (event) {
-                        event.preventDefault();
-                        create_attachable_component(formElem);
-                    },
-                });
+        return returnDiv
+    },
+    do_copo_select2_ctrl: function (formElem, elemValue) {
+        formElem["type"] = "string"; //this, for the purposes of the UI, should be assigned a string temporarily, since multi_search takes care of the multiple values
 
-            var addbtnDiv = $('<div/>',
-                {
-                    class: "col-sm-12 col-md-12 col-lg-12"
-                }).append(addBtn);
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
 
-            var addbtnDivRow = $('<div/>',
-                {
-                    class: "row btn-row",
-                }).append(addbtnDiv);
+        var placeholder = "Enter " + formElem.label + "...";
 
-            returnDiv.append(addbtnDivRow);
+        if (formElem.hasOwnProperty("placeholder")) {
+            placeholder = formElem.placeholder;
         }
 
+        //set current data
+        var currentValue = [];
+
+        if (elemValue) {
+            var optionValues = [];
+
+            if (typeof elemValue === "string") {
+                optionValues = elemValue.split(",");
+            } else if (typeof elemValue === "object") {
+                optionValues = elemValue;
+            }
+
+            currentValue = optionValues.map(function (item) {
+                return {
+                    id: item,
+                    text: item,
+                    selected: true
+                };
+            });
+        }
+
+        //generate element controls
+        var ctrl = $('<select/>',
+            {
+                class: "copo-select2 input-copo form-control",
+                "multiple": "multiple",
+                style: "width: 100%",
+                id: formElem.id,
+                name: formElem.id,
+                "data-validate": true,
+                "data-placeholder": placeholder,
+                "data-currentValue": JSON.stringify(currentValue)
+            });
+
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, ctrl);
+
+        ctrlsDiv.append(ctrl);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
+        var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
 
         return returnDiv
     },
@@ -1683,16 +1964,41 @@ function create_attachable_component(formElem) {
                             'task': "save",
                             'auto_fields': auto_fields,
                             'component': formElem.option_component,
+                            'data_source': formElem.data_source || '',
                             'visualize': "created_component_json"
                         },
                         success: function (data) {
-                            //get the selectize control
-                            if (selectizeObjects.hasOwnProperty(formElem.id)) {
+                            //set returned record
+
+                            if (formElem.control == "copo-lookup2" && data.option_values.length) {
+                                var currentValue = data.option_values.map(function (item) {
+                                    if (typeof item === "string") {
+                                        var newItem = item;
+                                        item = {};
+                                        item.value = newItem;
+                                        item.label = newItem;
+                                    }
+                                    return {
+                                        id: item.accession || item.value,
+                                        text: item.label,
+                                        selected: true
+                                    };
+                                });
+
+                                var newOption = new Option(currentValue[0].text, currentValue[0].id, true, true);
+
+                                if (formElem.data_maxItems && formElem.data_maxItems.toString() == "1") {
+                                    selectizeObjects[formElem.id].val(null).trigger('change');
+                                }
+
+                                selectizeObjects[formElem.id].append(newOption).trigger('change');
+
+                            } else if (selectizeObjects.hasOwnProperty(formElem.id)) {
                                 var selectizeControl = selectizeObjects[formElem.id];
 
                                 //refresh options with the newly created record
                                 var options = formElem.option_values.options;
-                                options.unshift(data.option_values.options[0]); //expects one item in the returned options
+                                options.unshift(data.option_values[0]); //expects one item in the returned options
 
                                 //refresh the control
                                 selectizeControl.addOption(options);

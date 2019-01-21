@@ -9,18 +9,14 @@
       "items": [
         {
           "id": "study_samples",
-          "help_tip": "",
+          "help_tip": "Attach samples",
           "label": "Samples",
           "hidden": "false",
-          "control": "copo-multi-search",
+          "control": "copo-lookup2",
           "option_component": "sample",
+          "data_source": "all_samples_lookup",
           "default_value": "",
-          "option_values": {
-            "callback": {
-              "function": "get_samples_json",
-              "parameter": ""
-            }
-          }
+          "option_values": []
         }
       ]
     },
@@ -34,29 +30,20 @@
           "help_tip": "Select the type of file you have uploaded.",
           "label": "Article Type",
           "hidden": "false",
-          "control": "copo-multi-select",
-          "data_maxItems": 1,
+          "control": "copo-single-select",
           "default_value": "",
-          "option_values": {
-            "callback": {
-              "function": "get_figshare_article_options",
-              "parameter": ""
-            }
-          }
+          "data_source": "figshare_article_options",
+          "option_values": []
         },
         {
           "id": "categories",
           "help_tip": "Select relevant categories",
           "label": "Categories",
           "hidden": "false",
-          "control": "copo-multi-select",
+          "control": "copo-multi-select2",
           "default_value": "",
-          "option_values": {
-            "callback": {
-              "function": "get_figshare_category_options",
-              "parameter": ""
-            }
-          }
+          "data_source": "figshare_category_options",
+          "option_values": []
         }
       ]
     },
@@ -78,7 +65,7 @@
           "help_tip": "Enter Authors",
           "label": "Author/s",
           "hidden": "false",
-          "control": "copo-select",
+          "control": "copo-select2",
           "default_value": ""
         },
         {
@@ -101,7 +88,7 @@
           "help_tip": "Enter keywords which represent the main subject of your file.",
           "label": "Keywords",
           "hidden": "false",
-          "control": "copo-select",
+          "control": "copo-select2",
           "default_value": ""
         },
         {
@@ -109,7 +96,7 @@
           "help_tip": "Enter keywords which represent the main subject of your file.",
           "label": "Web References",
           "hidden": "false",
-          "control": "copo-select",
+          "control": "copo-select2",
           "default_value": ""
         },
         {
@@ -125,15 +112,10 @@
           "help_tip": "Select the license you want this file to be published under.",
           "label": "License",
           "hidden": "false",
-          "control": "copo-multi-select",
-          "data_maxItems": 1,
+          "control": "copo-single-select",
           "default_value": "",
-          "option_values": {
-            "callback": {
-              "function": "get_figshare_license_options",
-              "parameter": ""
-            }
-          }
+          "data_source": "figshare_license_options",
+          "option_values": []
         }
       ]
     },
@@ -147,15 +129,10 @@
           "help_tip": "Select the license you want this file to be published under.",
           "label": "Publish?",
           "hidden": "false",
-          "control": "copo-multi-select",
-          "data_maxItems": 1,
+          "control": "copo-single-select",
           "default_value": "",
-          "option_values": {
-            "callback": {
-              "function": "get_figshare_publish_options",
-              "parameter": ""
-            }
-          }
+          "data_source": "figshare_publish_options",
+          "option_values": []
         }
       ]
     }
