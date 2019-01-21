@@ -66,7 +66,11 @@ class DspaceSubmit(object):
             dspace_meta = self._create_dspace_meta(sub)
             # create item
             collection_id = sub["meta"]["identifier"]
-            name = sub["meta"]["dsTitle"]
+            # get name
+            for el in dspace_meta["metadata"]:
+                if el["key"] == "dc.title":
+                    name = el.get("value")
+
             new_item_url = dspace_url + "/rest/collections/" + str(collection_id) + "/items"
             if dspace_type == 6:
                 resp_item = requests.post(new_item_url, data=json.dumps(dspace_meta),
@@ -153,131 +157,35 @@ class DspaceSubmit(object):
 
     def _create_dspace_meta(self, sub):
         # need to create metadata fragment for dspace
+        used_keys = []
         out = dict()
-        metadata = [
-            {
-                "key": "dc.contributor.author",
-                "value": sub.get("meta", {}).get("dfCreator", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.date.accessioned",
-                "value": sub.get("meta", {}).get("dsAccessioned", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.date.available",
-                "value": sub.get("meta", {}).get("dsAvailable", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.date.issued",
-                "value": sub.get("meta", {}).get("dsIssued", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.identifier.citation",
-                "value": sub.get("meta", {}).get("dsCitation", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.identifier.govdoc",
-                "value": sub.get("meta", {}).get("dsGovdoc", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.identifier.isbn",
-                "value": sub.get("meta", {}).get("dsIsbn", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.identifier.issn",
-                "value": sub.get("meta", {}).get("dsIssn", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.identifier.ismn",
-                "value": sub.get("meta", {}).get("dsIsmn", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.identifier.other",
-                "value": sub.get("meta", {}).get("dsOther", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.identifier.uri",
-                "value": sub.get("meta", {}).get("dsUrl", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.description",
-                "value": sub.get("meta", {}).get("dsDescription", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.description.abstract",
-                "value": sub.get("meta", {}).get("dsAbstract", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
+        arr = []
+        #  get language of submission fields
+        for f in sub["meta"]["fields"]:
+            if f["dc"] == "dc.language":
+                lang = f.get("vals", "")
+                #  check if lang is array if so take first element
+                if type(lang) != type(""):
+                    lang = lang[0]
+        # iterate fields and convert to format required by dspace
+        for f in sub["meta"]["fields"]:
+            val = f.get("vals", "")
+            #  check if vals is array
+            if type(val) != type(""):
+                val = val[0]
 
-            {
-                "key": "dc.description.provenance",
-                "value": sub.get("meta", {}).get("dsProvenance", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.description.sponsorship",
-                "value": sub.get("meta", {}).get("dsSponsorship", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.format.extent",
-                "value": sub.get("meta", {}).get("dsExtent", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.format.medium",
-                "value": sub.get("meta", {}).get("dsMedium", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.format.mimetype",
-                "value": sub.get("meta", {}).get("dsMimetype", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.language",
-                "value": sub.get("meta", {}).get("dsLanguage", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.publisher",
-                "value": sub.get("meta", {}).get("dsPublisher", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.subject",
-                "value": sub.get("meta", {}).get("dsSubject", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.title",
-                "value": sub.get("meta", {}).get("dsTitle", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.title.alternative",
-                "value": sub.get("meta", {}).get("dsAlternative", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-            {
-                "key": "dc.type",
-                "value": sub.get("meta", {}).get("dsType", ""),
-                "language": sub.get("meta", {}).get("dsLanguage", "")
-            },
-        ]
-        out["metadata"] = metadata
+            #key = f.get("dc", "").replace(' type=', '.')
+            key = f.get("dc", "")
+            #if val != "":
+                #if key not in used_keys:
+            el = {
+                "key": key,
+                "value": val,
+                "language": lang
+            }
+            arr.append(el)
+            used_keys.append(key)
+        out["metadata"] = arr
         return out
 
     def _update_submission(self, sub, data_resp):
