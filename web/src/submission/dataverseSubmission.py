@@ -1,5 +1,5 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 19/04/2017'
-import os, uuid, requests, json, datetime
+import os, uuid, requests, json, datetime, sys
 from datetime import datetime as dt
 from django_tools.middlewares import ThreadLocal
 from django.conf import settings
@@ -12,6 +12,9 @@ from bson import ObjectId, json_util
 import xml.etree.ElementTree as et
 from dataverse.exceptions import OperationFailedError
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import ElementTree, Element, SubElement, Comment, tostring
+from xml.dom import minidom
 
 
 class DataverseSubmit(object):
@@ -41,8 +44,6 @@ class DataverseSubmit(object):
         elif 'entity_id' in s['meta'] and 'alias' in s['meta'] or 'dataverse_alias' in s['meta'] and 'doi' in s['meta']:
             # submit to existing
             return self._add_to_dataverse(s)
-
-
 
     def truncate_url(self, url):
         if url.startswith('https://'):
@@ -83,7 +84,8 @@ class DataverseSubmit(object):
 
     def _create_and_add_to_dataverse(self, sub):
         connection = self._get_connection()
-        dv = self._create_dataverse(sub['meta'], connection)
+        # dv = self._create_dataverse(sub['meta'], connection)
+        dv = connection.get_dataverse(sub["meta"]["alias"])
         xml_path = self._make_dataset_xml(sub)
         ds = Dataset.from_xml_file(xml_path)
         dv._add_dataset(ds)
@@ -147,46 +149,39 @@ class DataverseSubmit(object):
     def _make_dataset_xml(self, sub):
         meta = sub['meta']
 
-        #iterate through meta to get fields
+        # iterate through meta to get fields
         d = dict()
-        for e in sub["meta"]["fields"]:
-            if type(e["vals"]) == type(list()):
-                d[e["dvname"]] = e["vals"][0]
-            else:
-                d[e["dvname"]] = e["vals"]
+        # for e in sub["meta"]["fields"]:
+        #    if type(e["vals"]) == type(list()):
+        #        d[e["dvname"]] = e["vals"][0]
+        #    else:
+        #        d[e["dvname"]] = e["vals"]
         # get datafile for some dataverse specific metadata
         datafile = DataFile().get_record(ObjectId(sub['bundle'][0]))
         df = datafile['description']['attributes']
-        pth = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'blanks', 'dataset_xml.xml')
-        tree = et.parse(pth)
-        root = tree.getroot()
-        xmlns = "http://www.w3.org/2005/Atom"
-        dcns = "http://purl.org/dc/terms/"
-        x = "<?xml version='1.0'?>"
-        x = x + '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/">'
-        x = x + '<title>' + d.get('dsTitle', "") + '</title>'
-        x = x + '<id>' + str(uuid.uuid4()) + '</id>'
-        x = x + '<updated>' + datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') + '</updated>'
-        x = x + '<author><name>' + d.get('dsAuthorLastname',"") + ', ' + d.get('dsAuthorFirstname',"") + '</name></author>'
-        x = x + '<summary type="text"></summary>'
-        x = x + '<dcterms:title>' + d.get('dsTitle', "") + '</dcterms:title>'
-        x = x + '<dcterms:creator>' + d.get('dsAuthorLastname',"") + ', ' + d.get('dsAuthorFirstname',"") + '</dcterms:creator>'
-        if settings.UNIT_TESTING:
-            x = x + '<dcterms:date>' + d.get('date_modified',"") + '</dcterms:date>'
-        else:
-            date = d.get('date_modified',"")
-            if type(date) == type(""):
-                date_obj = dt.strptime(date, '%d/%m/%Y')
-                x = x + '<dcterms:date>' + str(date_obj.strftime('%Y-%m-%dT%H:%M:%SZ')) + '</dcterms:date>'
-            else:
-                x = x + '<dcterms:date>' + str(date.get('date_modified',"").strftime('%Y-%m-%dT%H:%M:%SZ')) + '</dcterms:date>'
-        x = x + '<dcterms:rights>' + d.get('license',"") + '</dcterms:rights>'
-        # this should be an array
-        x = x + '<dcterms:bibliographicCitation>' + d.get('source',"") + '</dcterms:bibliographicCitation>'
-        x = x + '<dcterms:description>' + d.get('description',"") + '</dcterms:description>'
-        x = x + '<dcterms:identifier>' + '' + '</dcterms:identifier>'
-        x = x + '<dcterms:subject>' + d.get('subject',"") + '</dcterms:subject>'
-        x = x + '</entry>'
+        # pth = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'blanks', 'dataset_xml.xml')
+        # tree = et.parse(pth)
+        # root = tree.getroot()
+        root = ET.Element("entry")
+        root.set("xmlns", "http://www.w3.org/2005/Atom")
+        root.set("xmlns:dcterms", "http://purl.org/dc/terms/")
+        # tree = ElementTree(root)
+        for item in meta["fields"]:
+            if type(item["vals"]) == type(""):
+                tail = item["dc"].split(".")[1]
+                term = "dcterms:" + tail
+                child = ET.SubElement(root, term)
+                child.text = item["vals"]
+                root.append(child)
+            elif type(item["vals"] == type(list())):
+                for val in item["vals"]:
+                    tail = item["dc"].split(".")[1]
+                    term = "dcterms:" + tail
+                    child = ET.SubElement(root, term)
+                    child.text = val
+                    root.append(child)
+
+        x = prettify(root)
         path = os.path.dirname(datafile['file_location'])
         xml_path = os.path.join(path, 'xml.xml')
         with open(xml_path, 'w+') as f:
@@ -253,32 +248,15 @@ class DataverseSubmit(object):
         # get file metadata, call converter to strip out dc fields
         s = Submission().get_record(ObjectId(sub_id))
         f_id = s["bundle"][0]
-        items = CgCoreSchemas().extract_dublin_core(str(f_id))
-        meta = list()
-        for i in items:
-            if i["dc"] == "dc.title":
-                i.update({"dvname": "dsTitle"})
-                meta.append(i)
-            elif i["dc"] == "dc.creator":
-                # need to split
-                fullname = i["vals"][0]
-                meta.append({"dvname":"dsAuthorFirstname", "vals":fullname.split(" ")[0], "dc":"dc.creator type=firstname"})
-                meta.append({"dvname":"dsAuthorLastname", "vals" :fullname.split(" ")[1], "dc":"dc.creator type=lastname"})
-            elif i["dc"] == "dc.date type=completion":
-                i.update({"dvname":"date_modified"})
-                meta.append(i)
-            elif i["dc"] == "dc.rights license":
-                i.update({"dvname": "license"})
-                meta.append(i)
-            elif i["dc"] == "dc.source":
-                i.update({"dvname": "source"})
-                meta.append(i)
-            elif i["dc"] == "dc.description":
-                i.update({"dvname": "description"})
-                meta.append(i)
-            elif i["dc"] == "dc.subject":
-                i.update({"dvname": "subject"})
-                meta.append(i)
-            else:
-                meta.append(i)
-        Submission().update_meta(sub_id, json.dumps(meta))
+        items = CgCoreSchemas().extract_repo_fields(str(f_id), "dataverse")
+        temp_id = "copo:" + str(sub_id)
+        # add the submission_id to the dataverse metadata to allow backwards treversal from dataverse
+        items.append({"dc": "dc.relation", "copo_id": "submission_id", "vals": temp_id})
+        Submission().update_meta(sub_id, json.dumps(items))
+
+
+def prettify(elem):
+    # Return a pretty-printed XML string for the Element.
+    rough_string = tostring(elem, "utf-8")
+    reparsed = minidom.parseString(rough_string)
+    return reparsed.toprettyxml(indent="  ")

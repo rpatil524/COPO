@@ -1,10 +1,11 @@
 # Created by fshaw at 21/11/2018
-import os, re, string, json
+import os, re, string, json, uuid
 import requests
 from dal.copo_da import Submission
 from dal.copo_da import DataFile
 import datetime
 from bson import ObjectId
+from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 
 
 class CkanSubmit:
@@ -149,38 +150,74 @@ class CkanSubmit:
 
     def _create_ckan_metadata(self, s):
         # get file
-        file = DataFile().get_record(ObjectId(s["bundle"][0]))
+
         out = dict()
-        out["name"] = file.get("description", {}).get("attributes", {}).get("title_author_contributor", {}) \
-            .get("title", "").replace(" ", "_")
-
-        # out["name"] = str(uuid.uuid4())
-
-        out["private"] = False
-        out["author"] = file.get("description", {}).get("attributes", {}).get("title_author_contributor", {}) \
-            .get("creator", "")
-        out["author_email"] = file.get("description", {}).get("attributes", {}).get("title_author_contributor", {}) \
-            .get("contributor", "")
-        out["maintainer"] = file.get("description", {}).get("attributes", {}).get("title_author_contributor", {}) \
-            .get("creator", "")
-        out["maintainer_email"] = file.get("description", {}).get("attributes", {}).get("title_author_contributor", {}) \
-            .get("contributor", "")
-        out["notes"] = file.get("description", {}).get("attributes", {}).get("subject_description", {}) \
-            .get("description", "")
-        out["url"] = file.get("description", {}).get("attributes", {}).get("other_fields", {}) \
-            .get("URI", "")
-        out["version"] = ""
-        # this can change to deleted to stop being shown in searches
+        out["name"] = str(uuid.uuid4())
         out["state"] = "active"
-        out["type"] = ""
+        out["format"] = "jpg"
         out["tags"] = []
-        out["extras"] = []
+        out["private"] = False
+        out["author_email"] = "felix.shaw@tgac.ac.uk"
+        out["maintainer_email"] = "felix.shaw@tgac.ac.uk"
+        out["url"] = "http://copo-project.org"
+
+        extras = list()
+
+        for item in s["meta"]["fields"]:
+            if item["dc"] == "dc.type":
+                out["type"] = item["vals"]
+            elif item["dc"] == "dc.title":
+                out["title"] = item["vals"][0]
+
+            elif item["dc"] == "dc.description":
+                out["notes"] = item["vals"]
+            elif item["dc"] == "dc.subject":
+                # subject can be a list so handle this
+                if type(item["vals"]) == type(list()):
+                    for idx, el in enumerate(item["vals"]):
+                        extras.append({"key": "subject_" + str(idx + 1), "value": el})
+                else:
+                    extras.append({"key": "subject", "value": el})
+            elif item["dc"] == "dc.creator":
+
+                for idx, author in enumerate(item["vals"]):
+                    if idx == 0:
+                        out["author"] = author
+                        out["maintainer"] = author
+                    else:
+                        extras.append({"key": "additional_author_" + str(idx + 1), "value": author})
+                        extras.append({"key": "additional_maintainer_" + str(idx + 1), "value": author})
+
+            elif item["dc"] == "dc.publisher":
+
+                for idx, pub in enumerate(item["vals"]):
+                    if idx == 0:
+                        out["publisher"] = pub
+                    else:
+                        extras.append({"key": "additional_publisher_" + str(idx + 1), "value": pub})
+
+            elif item["dc"] == "dc.language":
+                pass
+            else:
+                extras.append({"key": item["copo_id"], "value": item["vals"]})
+        out["extras"] = extras
+        #out["extras"] = []
+
+        '''
         for key in out:
             # ckan throws a wobbly if there is punctuation in field values, so remove
             if type(out[key]) == type(""):
                 out[key] = out[key].translate(str.maketrans("", "", string.punctuation))
                 out[key] = out[key].lower()
+        '''
         return out
 
     def dc_dict_to_dc(self, sub_id):
-        pass
+        # get file metadata, call converter to strip out dc fields
+        s = Submission().get_record(ObjectId(sub_id))
+        f_id = s["bundle"][0]
+        items = CgCoreSchemas().extract_repo_fields(str(f_id), "dataverse")
+        temp_id = "copo:" + str(sub_id)
+        # add the submission_id to the dataverse metadata to allow backwards treversal from dataverse
+        items.append({"dc": "relation", "copo_id": "relation", "vals": temp_id})
+        Submission().update_meta(sub_id, json.dumps(items))

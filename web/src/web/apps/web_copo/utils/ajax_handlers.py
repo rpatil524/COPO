@@ -501,7 +501,8 @@ def get_repo_info(request):
                 ckan().dc_dict_to_dc(sub_id)
             elif repo["type"] == "dspace":
                 dspace().dc_dict_to_dc(sub_id)
-    except:
+    except Exception as e:
+        print(e)
         return HttpResponse(json.dumps({"status": 1, "message": "error getting dataverse"}))
     s = Submission().get_record(ObjectId(sub_id))
     out = {'repo_type': repo['type'], 'repo_url': repo['url'], 'meta': s["meta"]}
@@ -584,7 +585,7 @@ def update_submission_repo_data(request):
                 meta["repo_type"] = r_type
                 m = Submission().get_record(ObjectId(submission_id))["meta"]
                 meta["fields"] = m
-        elif request.POST.get("type") == "dataverse":
+        elif request.POST.get("type") == "dataverse" or request.POST.get("type") == "ckan":
             if new_or_existing == "new":
                 m = Submission().get_record(ObjectId(submission_id))["meta"]
                 meta["fields"] = m

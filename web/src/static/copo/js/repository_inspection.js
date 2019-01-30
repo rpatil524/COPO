@@ -213,6 +213,7 @@ function build_ckan_modal(resp) {
     $('#repo_modal').find('#table-div-dataverse').append(t)
     $('#repo_modal').find('#ckan-table').DataTable()
     $('#repo_modal').find('input[value="existing"]').trigger("click")
+    $('#repo_modal').data("type", "ckan")
 }
 
 
@@ -729,6 +730,7 @@ function save_inspection_info(e) {
     var sub_id = $(document).data('submission_id')
     var jsondata = $('#repo_modal').find('form').serializeFormJSON()
     jsondata.new_or_existing = $('#repo_modal').find('input[name=create_repo_radio]:checked').val()
+
     jsondata_s = JSON.stringify(jsondata)
     $.ajax({
         url: "/copo/update_submission_repo_data/",
@@ -740,6 +742,7 @@ function save_inspection_info(e) {
             'submission_id': sub_id,
             'task': 'change_meta',
             'meta': jsondata_s,
+            'type': $('#repo_modal').data("type")
         },
         success: function (data) {
             var label = $(document).data('current-label')
@@ -814,10 +817,10 @@ function select_dataset(e) {
             $('#dataset_id').val(dataset_id)
             var label = $(document).data('current-label')
             if (type == "ckan") {
-                $(label).html(identifier)
+                $(label).html("Submitting to: <span class='badge'>" + identifier + "</span>")
             }
             else {
-                $(label).html(identifier + " - " + persistent)
+                $(label).html("Submitting to: <span class='badge'>" + identifier + " - " + persistent + "</span>")
             }
             data = {
                 'type': type,

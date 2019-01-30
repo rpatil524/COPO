@@ -73,11 +73,11 @@ class DspaceSubmit(object):
 
             new_item_url = dspace_url + "/rest/collections/" + str(collection_id) + "/items"
             if dspace_type == 6:
-                resp_item = requests.post(new_item_url, data=json.dumps(dspace_meta),
+                resp_item = requests.post(new_item_url, json=dspace_meta,
                                           headers={"Content-Type": "application/json",
                                                    "accept": "application/json"}, cookies={"JSESSIONID": login_details})
             elif dspace_type == 5:
-                resp_item = requests.post(new_item_url, data=json.dumps(dspace_meta),
+                resp_item = requests.post(new_item_url, json=dspace_meta,
                                           headers={"rest-dspace-token": login_details,
                                                    "Content-Type": "application/json",
                                                    "accept": "application/json"})
@@ -174,10 +174,10 @@ class DspaceSubmit(object):
             if type(val) != type(""):
                 val = val[0]
 
-            #key = f.get("dc", "").replace(' type=', '.')
+            # key = f.get("dc", "").replace(' type=', '.')
             key = f.get("dc", "")
-            #if val != "":
-                #if key not in used_keys:
+            # if val != "":
+            # if key not in used_keys:
             el = {
                 "key": key,
                 "value": val,
@@ -267,7 +267,8 @@ class DspaceSubmit(object):
         # get file metadata, call converter to strip out dc fields
         s = Submission().get_record(ObjectId(sub_id))
         f_id = s["bundle"][0]
-        items = CgCoreSchemas().extract_dublin_core(str(f_id))
+        items = CgCoreSchemas().extract_repo_fields(str(f_id), "dSpace")
+        '''
         meta = list()
         for i in items:
             if i["dc"] == "dc.title":
@@ -294,4 +295,5 @@ class DspaceSubmit(object):
                 meta.append(i)
             else:
                 meta.append(i)
-        Submission().update_meta(sub_id, json.dumps(meta))
+            '''
+        Submission().update_meta(sub_id, json.dumps(items))
