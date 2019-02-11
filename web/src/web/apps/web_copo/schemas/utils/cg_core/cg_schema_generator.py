@@ -245,7 +245,7 @@ class CgCoreSchemas:
 
         items_df = pd.DataFrame(items_list)
         items_df.index = items_df['id']
-        items_df = items_df[['ref', 'id']]
+        items_df = items_df[['ref', 'id', 'prefix']]
         items_df = items_df[~items_df['ref'].isna()]
 
         # first level filter - relevant stages
@@ -259,7 +259,7 @@ class CgCoreSchemas:
         new_dict_series = pd.Series(new_dict)
         items_df['vals'] = new_dict_series
 
-        items_df = items_df[['ref', 'id', 'vals']]
+        items_df = items_df[['ref', 'id', 'vals', 'prefix']]
 
         items_df.rename(index=str, columns={"ref": "dc", "id": "copo_id"}, inplace=True)
 
@@ -322,6 +322,7 @@ class CgCoreSchemas:
         df.loc['DEPENDENCY'] = df.loc['DEPENDENCY'].fillna('')
         df.loc['COPO_DATA_SOURCE'] = df.loc['COPO_DATA_SOURCE'].fillna('')
         df.loc['REPO'] = df.loc['REPO'].fillna('')
+        df.loc['REPO_PREFIX'] = df.loc['REPO_PREFIX'].fillna('')
         df.loc['Wizard_Stage_ID'] = df.loc['Wizard_Stage_ID'].fillna('-1')
 
         return df
@@ -345,6 +346,7 @@ class CgCoreSchemas:
         df["control"] = df['COPO_CONTROL']
         df["stage_id"] = df['Wizard_Stage_ID']
         df["target_repo"] = df['REPO']
+        df["prefix"] = df['REPO_PREFIX']
         df["data_maxItems"] = -1
 
         # set max item for lookup control
@@ -366,7 +368,7 @@ class CgCoreSchemas:
         df.loc[temp_df_1.index, 'type'] = 'string'
 
         filtered_columns = ["ref", "id", "label", "help_tip", "control", "type", "stage_id", "data_source",
-                            "data_maxItems", "dependency", "target_repo"]
+                            "data_maxItems", "dependency", "target_repo", "prefix"]
 
         df = df.loc[:, filtered_columns]
 

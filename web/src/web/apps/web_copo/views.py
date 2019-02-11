@@ -102,6 +102,12 @@ def authenticate_figshare(request):
 def test_dataverse_submit(request):
     from submission.dataverseSubmission import DataverseSubmit
 
+    # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+    #
+    # id = "5ba0b94ad127fd313b62677d"
+    # items = CgCoreSchemas().extract_repo_fields(id, "dataverse")
+
+
     DataverseSubmit().submit(dataFile_ids=["592ee1e668236b82e40b4c56"], sub_id="592ee7f168236b85d16510ef")
     return render(request, 'copo/test_page.html', {})
 
