@@ -71,13 +71,7 @@ class DataverseSubmit(object):
             if ds == None:
                 ds = dv.get_dataset_by_string_in_entry(str(sub['meta']['doi']).encode())
 
-        for id in sub['bundle']:
-            file = DataFile().get_record(ObjectId(id))
-            file_location = file['file_location']
-            file_name = file['name']
-            with open(file_location, 'rb') as f:
-                contents = f.read()
-                ds.upload_file(file_name, contents, zip_files=False)
+        self.send_files(sub, ds)
         meta = ds._metadata
         dv_storageIdentifier = meta['latest']['storageIdentifier']
         return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
@@ -89,6 +83,14 @@ class DataverseSubmit(object):
         xml_path = self._make_dataset_xml(sub)
         ds = Dataset.from_xml_file(xml_path)
         dv._add_dataset(ds)
+        #ds.publish()
+        self.send_files(sub, ds)
+        meta = ds._metadata
+        dv_storageIdentifier = meta['latest']['storageIdentifier']
+        return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
+
+    def send_files(self, sub, ds):
+
         for id in sub['bundle']:
             file = DataFile().get_record(ObjectId(id))
             file_location = file['file_location']
@@ -96,9 +98,6 @@ class DataverseSubmit(object):
             with open(file_location, 'rb') as f:
                 contents = f.read()
                 ds.upload_file(file_name, contents, zip_files=False)
-        meta = ds._metadata
-        dv_storageIdentifier = meta['latest']['storageIdentifier']
-        return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
 
     def _get_connection(self):
         dvurl = self.host['url']
@@ -151,41 +150,29 @@ class DataverseSubmit(object):
 
         # iterate through meta to get fields
         d = dict()
-        # for e in sub["meta"]["fields"]:
-        #    if type(e["vals"]) == type(list()):
-        #        d[e["dvname"]] = e["vals"][0]
-        #    else:
-        #        d[e["dvname"]] = e["vals"]
-        # get datafile for some dataverse specific metadata
         datafile = DataFile().get_record(ObjectId(sub['bundle'][0]))
         df = datafile['description']['attributes']
-        # pth = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'blanks', 'dataset_xml.xml')
-        # tree = et.parse(pth)
-        # root = tree.getroot()
-        root = ET.Element("entry")
-        root.set("xmlns", "http://www.w3.org/2005/Atom")
-        root.set("xmlns:dcterms", "http://purl.org/dc/terms/")
-        # tree = ElementTree(root)
+
+        xml = '<?xml version="1.0"?>'
+        xml = xml + '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/">'
+        xml = xml + '<dcterms:contributor>' + "felix.shaw@tgac.ac.uk" + '</dcterms:contributor>'
+
         for item in meta["fields"]:
+
             if type(item["vals"]) == type(""):
                 tail = item["dc"].split(".")[1]
-                term = "dcterms:" + tail
-                child = ET.SubElement(root, term)
-                child.text = item["vals"]
-                root.append(child)
+                xml = xml + "<dcterms:" + tail + '>' + item["vals"] + "</dcterms:" + tail + '>'
+
             elif type(item["vals"] == type(list())):
                 for val in item["vals"]:
                     tail = item["dc"].split(".")[1]
-                    term = "dcterms:" + tail
-                    child = ET.SubElement(root, term)
-                    child.text = val
-                    root.append(child)
+                    xml = xml + '<dcterms:' + tail +  '>' + val + '</dcterms:' + tail +  '>'
 
-        x = prettify(root)
+        xml = xml + "</entry>"
         path = os.path.dirname(datafile['file_location'])
         xml_path = os.path.join(path, 'xml.xml')
         with open(xml_path, 'w+') as f:
-            f.write(x)
+            f.write(xml)
         return xml_path
 
     def _update_submission_record(self, sub, dataset, dataverse, dv_storageIdentifier=None):

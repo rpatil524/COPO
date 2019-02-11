@@ -77,7 +77,7 @@ class CkanSubmit:
             # data = dict()
             df = DataFile().get_record(ObjectId(f))
             # upload file
-            f = open(df["file_location"], 'rb')
+            f = {'file': open(df["file_location"], 'rb')}
 
             try:
                 ext = file_name, file_ext = os.path.splitext(df["name"])
@@ -88,20 +88,26 @@ class CkanSubmit:
             data["name"] = df["name"]
             data["created"] = now
             data["format"] = ext
+            data["upload"] = f
             fullurl = self.host["url"] + "resource_create"
+            data["url"] = str(uuid.uuid4())
             try:
+                print(self.headers)
                 resp = requests.post(fullurl,
                                      data=data,
                                      files=f,
                                      headers=self.headers
                                      )
-            except ValueError:
+            except (TypeError, ValueError) as e:
+                print(e)
                 # for some reason this fails the first time
                 resp = requests.post(fullurl,
                                      data=data,
                                      files=f,
                                      headers=self.headers
                                      )
+            except TypeError as t:
+                print(t)
             if resp.status_code == 200:
                 details = json.loads(resp.content.decode("utf-8"))
                 self._update_and_complete_submission(details, sub_id)
@@ -154,12 +160,11 @@ class CkanSubmit:
         out = dict()
         out["name"] = str(uuid.uuid4())
         out["state"] = "active"
-        out["format"] = "jpg"
         out["tags"] = []
         out["private"] = False
         out["author_email"] = "felix.shaw@tgac.ac.uk"
         out["maintainer_email"] = "felix.shaw@tgac.ac.uk"
-        out["url"] = "http://copo-project.org"
+        out["url"] = "http://copo-project.org" + '/copo/resolve:' + str(s["_id"])
 
         extras = list()
 
@@ -201,7 +206,7 @@ class CkanSubmit:
             else:
                 extras.append({"key": item["copo_id"], "value": item["vals"]})
         out["extras"] = extras
-        #out["extras"] = []
+        # out["extras"] = []
 
         '''
         for key in out:

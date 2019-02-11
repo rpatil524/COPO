@@ -1,6 +1,6 @@
 # Created by fshaw at 13/09/2018
 from dal.copo_da import Submission, DataFile
-import requests
+import requests, os
 import json
 from web.apps.web_copo.schemas.utils import data_utils
 from bson import ObjectId
@@ -67,6 +67,7 @@ class DspaceSubmit(object):
             # create item
             collection_id = sub["meta"]["identifier"]
             # get name
+        for s in sub['bundle']:
             for el in dspace_meta["metadata"]:
                 if el["key"] == "dc.title":
                     name = el.get("value")
@@ -88,7 +89,7 @@ class DspaceSubmit(object):
                     item_id = json.loads(resp_item.content.decode('utf-8'))['uuid']
             else:
                 return {"status": 1, "message": "error creating new dspace item"}
-        for s in sub['bundle']:
+
             # for each file in submission bundle
             f = DataFile().get_record(ObjectId(s))
             # name is name without path
@@ -109,8 +110,11 @@ class DspaceSubmit(object):
             policy = [{"action": "DEFAULT_*", "epersonId": -1, "groupId": 0, "resourceId": 47166,
                        "resourceType": "bitstream", "rpDescription": None, "rpName": None, "rpType": "TYPE_INHERITED",
                        "startDate": None, "endDate": None}]
+            filename, file_extension = os.path.splitext(name)
             bitstream = {"name": name,
+                         "description": name,
                          "type": "bitstream",
+                         "format": file_extension,
                          "bundleName": "ORIGINAL",
                          "policies": policy,
                          }
