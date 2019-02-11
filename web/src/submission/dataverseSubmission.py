@@ -26,14 +26,153 @@ class DataverseSubmit(object):
             self.host = Submission().get_dataverse_details(sub_id)
             self.headers = {'X-Dataverse-key': self.host['apikey']}
 
+    def test_data(self):
+        """
+        using for quick test, should be deleted afterwards
+        :return:
+        """
+
+        test_data = dict()
+        test_data['sub_id'] = '5c5b0ab468236b4071ea488e'
+        test_data['sub_record'] = {
+            "_id": "5c5b0ab468236b4071ea488e",
+            "message": "",
+            "destination_repo": {
+                "name": "Test Dataverse Repo",
+                "isCG": True,
+                "password": "",
+                "url": "https://demo.dataverse.org",
+                "username": "",
+                "type": "dataverse",
+                "apikey": "fe6998df-c2a4-4103-9bf8-95200953fe0c",
+                "repo_id": "5b90027d453d9a9f1c5aa456"
+            },
+            "bundle_meta": [
+                {
+                    "file_path": "/Users/fshaw/Dropbox/dev/COPO/web/src/media/chunked_uploads/35/10_05_58_023798/Sad-Fish-300x243.png",
+                    "upload_status": False,
+                    "file_id": "5bffba0668236b4a939fde3f"
+                }
+            ],
+            "deleted": "0",
+            "user_id": 35,
+            "complete": "false",
+            "token_obtained": False,
+            "bundle": [
+                "5bffba0668236b4a939fde3f"
+            ],
+            "profile_id": "5beae06668236b1a8e2ede97",
+            "status": False,
+            "repository": "dataverse",
+            "transcript": {},
+            "date_modified": "2019-02-06T16:26:28.056Z",
+            "description_token": "5c5b0a0e68236b4071ea488d",
+            "article_id": "",
+            "is_cg": "True",
+            "completed_on": "2019-02-11T10:38:21.853Z",
+            "date_created": "2019-02-06T16:26:28.056Z",
+            "meta": {
+                "new_or_existing": "new",
+                "alias": "f94a8793-1bf2-4c16-8815-37328062a206",
+                "entity_id": 190041,
+                "fields": [
+                    {
+                        "dc": "dc.type",
+                        "vals": "Database",
+                        "copo_id": "type"
+                    },
+                    {
+                        "dc": "dc.title",
+                        "vals": [
+                            "Yon Posters"
+                        ],
+                        "copo_id": "title"
+                    },
+                    {
+                        "dc": "dc.description",
+                        "vals": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                        "copo_id": "description"
+                    },
+                    {
+                        "dc": "dc.subject",
+                        "vals": [
+                            "Publication",
+                            "Dark"
+                        ],
+                        "copo_id": "subject"
+                    },
+                    {
+                        "dc": "dc.creator",
+                        "vals": [
+                            "Felix Shaw"
+                        ],
+                        "copo_id": "creator"
+                    },
+                    {
+                        "dc": "dc.publisher",
+                        "vals": [
+                            "Hong Kong Ping Pong"
+                        ],
+                        "copo_id": "publisher"
+                    },
+                    {
+                        "dc": "dc.format",
+                        "vals": [
+                            "image/png"
+                        ],
+                        "copo_id": "format"
+                    },
+                    {
+                        "dc": "dc.language",
+                        "vals": [
+                            "eng",
+                            "fra"
+                        ],
+                        "copo_id": "language"
+                    },
+                    {
+                        "dc": "dc.relation",
+                        "vals": "copo:5c5b0ab468236b4071ea488e",
+                        "copo_id": "submission_id"
+                    }
+                ]
+            },
+            "published": "",
+            "accessions": []
+        }
+
+        test_data['destination_repo'] = {
+            "name": "Test Dataverse Repo",
+            "isCG": True,
+            "password": "",
+            "url": "https://demo.dataverse.org",
+            "username": "",
+            "type": "dataverse",
+            "apikey": "fe6998df-c2a4-4103-9bf8-95200953fe0c",
+            "repo_id": "5b90027d453d9a9f1c5aa456"
+        }
+
+        return test_data
+
     def submit(self, sub_id, dataFile_ids):
 
         profile_id = data_utils.get_current_request().session.get('profile_id')
         s = Submission().get_record(ObjectId(sub_id))
+
+        # test ####################
+        sub_id = self.test_data()['sub_id']
+        s = self.test_data()['sub_record']
+        # test ends ################
+
         # this flag tells us if we are dealing with a cg submission
         isCg = s["is_cg"]
         # get url for dataverse
-        self.host = Submission().get_dataverse_details(sub_id)
+        # self.host = Submission().get_dataverse_details(sub_id)
+
+        # test ####################
+        self.host = self.test_data()['destination_repo']
+        # test ends ################
+
         self.headers = {'X-Dataverse-key': self.host['apikey']}
 
         # if dataset id in submission meta, we are adding to existing dataset, otherwise
@@ -41,7 +180,7 @@ class DataverseSubmit(object):
         if "fields" in s["meta"]:
             # create new
             return self._create_and_add_to_dataverse(s)
-        elif 'entity_id' in s['meta'] and 'alias' in s['meta'] or 'dataverse_alias' in s['meta'] and 'doi' in s['meta']:
+        elif ('entity_id' in s['meta'] and 'alias' in s['meta']) or ('dataverse_alias' in s['meta'] and 'doi' in s['meta']):
             # submit to existing
             return self._add_to_dataverse(s)
 
@@ -80,10 +219,13 @@ class DataverseSubmit(object):
         connection = self._get_connection()
         # dv = self._create_dataverse(sub['meta'], connection)
         dv = connection.get_dataverse(sub["meta"]["alias"])
+
+        return False
+
         xml_path = self._make_dataset_xml(sub)
         ds = Dataset.from_xml_file(xml_path)
         dv._add_dataset(ds)
-        #ds.publish()
+        # ds.publish()
         self.send_files(sub, ds)
         meta = ds._metadata
         dv_storageIdentifier = meta['latest']['storageIdentifier']
@@ -166,7 +308,7 @@ class DataverseSubmit(object):
             elif type(item["vals"] == type(list())):
                 for val in item["vals"]:
                     tail = item["dc"].split(".")[1]
-                    xml = xml + '<dcterms:' + tail +  '>' + val + '</dcterms:' + tail +  '>'
+                    xml = xml + '<dcterms:' + tail + '>' + val + '</dcterms:' + tail + '>'
 
         xml = xml + "</entry>"
         path = os.path.dirname(datafile['file_location'])
