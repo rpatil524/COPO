@@ -81,7 +81,7 @@ class DspaceSubmit(object):
                 resp_item = requests.post(new_item_url, json=dspace_meta,
                                           headers={"rest-dspace-token": login_details,
                                                    "Content-Type": "application/json",
-                                                   "accept": "application/json"})
+                                                   "accept": "applica tion/json"})
             if resp_item.status_code == 200:
                 try:
                     item_id = json.loads(resp_item.content.decode('utf-8'))['id']
@@ -114,7 +114,7 @@ class DspaceSubmit(object):
             bitstream = {"name": name,
                          "description": name,
                          "type": "bitstream",
-                         "format": file_extension,
+                         "format": self.get_media_type_from_file_ext(file_extension),
                          "bundleName": "ORIGINAL",
                          "policies": policy,
                          }
@@ -267,6 +267,36 @@ class DspaceSubmit(object):
         else:
             return json.dumps({"error": self.error_msg})
 
+    def get_media_type_from_file_ext(self, ext):
+        if ext == "pdf":
+            return "application/pdf"
+        elif ext == "ai" or ext == "eps" or ext == "ps":
+            return "application/postscript"
+        elif ext == "xls":
+            return "application/vnd.ms-excel"
+        elif ext == "ppt":
+            return "application/vnd.ms-powerpoint"
+        elif ext == "gif":
+            return "image/gif"
+        elif ext == "jpg" or ext == "jpeg":
+            return "image/jpeg"
+        elif ext == "png":
+            return "image/png"
+        elif ext == "tif" or ext == "tiff":
+            return "image/tiff"
+        elif ext == "bmp":
+            return "image/x-ms-bmp"
+        elif ext == "html" or ext == "htm":
+            return "text/html"
+        elif ext == "asc" or ext == "txt":
+            return "text/plain"
+        elif ext == "xml":
+            return "text/xml"
+        elif ext == "doc" or ext == "docx":
+            return "application/msword"
+        else:
+            return ""
+
     def dc_dict_to_dc(self, sub_id):
         # get file metadata, call converter to strip out dc fields
         s = Submission().get_record(ObjectId(sub_id))
@@ -300,4 +330,6 @@ class DspaceSubmit(object):
             else:
                 meta.append(i)
             '''
+        for i in items:
+            i['dc'] = i['dc'].replace(" ", ".")
         Submission().update_meta(sub_id, json.dumps(items))
