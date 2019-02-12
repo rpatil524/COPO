@@ -67,28 +67,43 @@ class DspaceSubmit(object):
             # create item
             collection_id = sub["meta"]["identifier"]
             # get name
-        for s in sub['bundle']:
-            for el in dspace_meta["metadata"]:
-                if el["key"] == "dc.title":
-                    name = el.get("value")
 
-            new_item_url = dspace_url + "/rest/collections/" + str(collection_id) + "/items"
-            if dspace_type == 6:
-                resp_item = requests.post(new_item_url, json=dspace_meta,
-                                          headers={"Content-Type": "application/json",
-                                                   "accept": "application/json"}, cookies={"JSESSIONID": login_details})
-            elif dspace_type == 5:
-                resp_item = requests.post(new_item_url, json=dspace_meta,
-                                          headers={"rest-dspace-token": login_details,
-                                                   "Content-Type": "application/json",
-                                                   "accept": "applica tion/json"})
-            if resp_item.status_code == 200:
-                try:
-                    item_id = json.loads(resp_item.content.decode('utf-8'))['id']
-                except KeyError:
-                    item_id = json.loads(resp_item.content.decode('utf-8'))['uuid']
+
+            description = ""
+            if new_or_existing == "new":
+                for el in dspace_meta["metadata"]:
+                    if el["key"] == "dc.title":
+                        name = el.get("value")
+                    elif "description" in el["key"]:
+                        description = el["value"]
             else:
-                return {"status": 1, "message": "error creating new dspace item"}
+                description = "No description provided"
+
+            if new_or_existing == "new":
+                new_item_url = dspace_url + "/rest/collections/" + str(collection_id) + "/items"
+                if dspace_type == 6:
+                    resp_item = requests.post(new_item_url, json=dspace_meta,
+                                              headers={"Content-Type": "application/json",
+                                                       "accept": "application/json"},
+                                              cookies={"JSESSIONID": login_details})
+                elif dspace_type == 5:
+                    resp_item = requests.post(new_item_url, json=dspace_meta,
+                                              headers={"rest-dspace-token": login_details,
+                                                       "Content-Type": "application/json",
+                                                       "accept": "application/json"})
+                if resp_item.status_code == 200:
+                    try:
+                        item_id = json.loads(resp_item.content.decode('utf-8'))['id']
+                    except KeyError:
+                        item_id = json.loads(resp_item.content.decode('utf-8'))['uuid']
+                else:
+                    return {"status": 1, "message": "error creating new dspace item"}
+            else:
+                item_id = sub["meta"]["identifier"]
+
+
+        # now upload files
+        for s in sub['bundle']:
 
             # for each file in submission bundle
             f = DataFile().get_record(ObjectId(s))
@@ -97,9 +112,7 @@ class DspaceSubmit(object):
             # location is path/filename
             location = f['file_location']
             # get description from dc metadata
-            try:
-                description = f['description']['attributes']['subject_description']['description']
-            except KeyError:
+            if description == "":
                 description = "No Description Provided"
 
             # make bitstream first, n.b. that name and description need to be added as url params, not json data
@@ -111,10 +124,13 @@ class DspaceSubmit(object):
                        "resourceType": "bitstream", "rpDescription": None, "rpName": None, "rpType": "TYPE_INHERITED",
                        "startDate": None, "endDate": None}]
             filename, file_extension = os.path.splitext(name)
+            if "." in file_extension:
+                file_extension = file_extension.replace(".", "")
+            ext = self.get_media_type_from_file_ext(file_extension)
             bitstream = {"name": name,
-                         "description": name,
+                         "description": description,
                          "type": "bitstream",
-                         "format": self.get_media_type_from_file_ext(file_extension),
+                         "format": ext,
                          "bundleName": "ORIGINAL",
                          "policies": policy,
                          }
@@ -178,10 +194,36 @@ class DspaceSubmit(object):
             if type(val) != type(""):
                 val = val[0]
 
-            # key = f.get("dc", "").replace(' type=', '.')
+            #key = f.get("dc", "").replace(' type=', '.')
             key = f.get("dc", "")
-            # if val != "":
-            # if key not in used_keys:
+            if key.startswith("dc."):
+                # remove dc prefix
+                temp = key.split("dc.")[1]
+                key = f.get("prefix", "dc") + "." + temp
+                # remove spaces
+                key = key.replace(" ", ".")
+                key = key.replace(".type=", ".")
+                key = key.lower()
+
+            # deal with special cases
+            if "dc.contributor" in key:
+                key = "dc.contributor"
+            elif "dc.relation.references" in key:
+                key = "dcterms.references"
+            elif "conformsto" in key:
+                key = "dcterms.conformsto"
+            elif "dc.date.availability" in key:
+                key = "dc.date.available"
+            elif "dc.date.issued" in key:
+                key = "dc.date.issued"
+            elif "dcterms.creator" in key:
+                key = "dc.contributor.author"
+            elif "dc.creator.affiliation" in key:
+                key = "dc.contributor"
+            elif "dc.relation.isrequiredby" in key:
+                key = "dcterms.isRequiredBy"
+            elif "dc.relation.isreplacedby" in "key":
+                key = "dcterms.isReplacedBy"
             el = {
                 "key": key,
                 "value": val,
@@ -302,34 +344,4 @@ class DspaceSubmit(object):
         s = Submission().get_record(ObjectId(sub_id))
         f_id = s["bundle"][0]
         items = CgCoreSchemas().extract_repo_fields(str(f_id), "dSpace")
-        '''
-        meta = list()
-        for i in items:
-            if i["dc"] == "dc.title":
-                i.update({"dspacename": i["dc"]})
-                meta.append(i)
-            elif i["dc"] == "dc.creator":
-                meta.append(
-                    {"dc": "dc.creator", "dspacename": "dc.contributor.author", "vals": i["vals"][0]})
-
-            elif i["dc"] == "dc.date type=completion":
-                i.update({"dspacename": "dc.date.accessioned"})
-                meta.append(i)
-            elif i["dc"] == "dc.rights license":
-                i.update({"dspacename": "license"})
-                meta.append(i)
-            elif i["dc"] == "dc.source":
-                i.update({"dspacename": "source"})
-                meta.append(i)
-            elif i["dc"] == "dc.description":
-                i.update({"dspacename": i["dc"]})
-                meta.append(i)
-            elif i["dc"] == "dc.subject":
-                i.update({"dspacename": i["dc"]})
-                meta.append(i)
-            else:
-                meta.append(i)
-            '''
-        for i in items:
-            i['dc'] = i['dc'].replace(" ", ".")
         Submission().update_meta(sub_id, json.dumps(items))

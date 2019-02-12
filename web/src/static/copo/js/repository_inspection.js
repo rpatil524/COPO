@@ -304,7 +304,7 @@ function build_dataverse_modal(resp) {
         .on('click', 'td.summary-details-control', expand_table);
 
     //$('#repo_modal').find('input[value="existing"]').trigger("click")
-
+    $('#repo_modal').data("type", "dataverse")
 }
 
 
@@ -335,6 +335,7 @@ function build_dspace_modal(data) {
         .on('click', 'td.summary-details-control', expand_dspace_table);
 
     $('#repo_modal').find('input[value="existing"]').trigger("click")
+    $('#repo_modal').data("type", "dspace")
 }
 
 /*

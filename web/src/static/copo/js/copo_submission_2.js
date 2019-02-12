@@ -340,6 +340,9 @@ $(document).ready(function () {
                                                     colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to CKAN Package: <span class="badge">' + data.meta.identifier + '</span></div>')
                                                 }
                                             }
+                                            else if (data.meta.hasOwnProperty("repo_type") && data.meta.repo_type == "ckan"){
+                                                colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to New CKAN Package</div>')
+                                            }
                                         }
                                         else {
                                             colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Choose Submission Target</span></div>')
