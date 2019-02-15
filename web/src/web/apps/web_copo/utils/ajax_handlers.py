@@ -110,6 +110,11 @@ def get_upload_information(request):
             # get bundle transfer status
             sub_info_dict["bundle_meta"] = sub.get("bundle_meta", list())
             sub_info_dict["bundle"] = sub.get("bundle", list())
+            sub_info_dict["enable_submit_button"] = "meta" in sub and "fields" in sub["meta"] or sub["repository"] not in [
+                "cg_core",
+                "dataverse",
+                "dspace",
+                "ckan"]
 
             if str(sub.get("complete", False)).lower() == 'false':
                 # could we be dealing with an uploading submission?
@@ -581,7 +586,6 @@ def update_submission_repo_data(request):
         new_or_existing = meta["new_or_existing"]
         if request.POST.get("type") == "dspace":
             if new_or_existing == "new":
-
                 r_type = request.POST["type"]
                 # add meta to separate dict field
                 meta["new_or_existing"] = new_or_existing

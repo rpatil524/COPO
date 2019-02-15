@@ -187,12 +187,16 @@ class DspaceSubmit(object):
                 #  check if lang is array if so take first element
                 if type(lang) != type(""):
                     lang = lang[0]
+                break
         # iterate fields and convert to format required by dspace
         for f in sub["meta"]["fields"]:
             val = f.get("vals", "")
             #  check if vals is array
             if type(val) != type(""):
-                val = val[0]
+                if val != None:
+                    val = val[0]
+                else:
+                    val = ""
 
             key = f.get("dc", "")
 
@@ -209,6 +213,7 @@ class DspaceSubmit(object):
                 key = "dc.contributor"
             elif "dc.relation.references" in key:
                 key = "dcterms.references"
+                val = "http://copo-project.org" + '/copo/resolve:' + str(sub["_id"])
             elif "conformsto" in key:
                 key = "dcterms.conformsto"
             elif "dc.date.availability" in key:
@@ -221,8 +226,10 @@ class DspaceSubmit(object):
                 key = "dc.contributor"
             elif "dc.relation.isrequiredby" in key:
                 key = "dcterms.isRequiredBy"
-            elif "dc.relation.isreplacedby" in "key":
+            elif "dc.relation.isreplacedby" in key:
                 key = "dcterms.isReplacedBy"
+            elif "dc.relation.ispartof" in key:
+                val = "http://copo-project.org" + '/copo/resolve:' + str(sub["_id"])
 
             # add field as entry in list of dicts
             el = {
@@ -309,7 +316,7 @@ class DspaceSubmit(object):
             return "application/pdf"
         elif ext == "ai" or ext == "eps" or ext == "ps":
             return "application/postscript"
-        elif ext == "xls":
+        elif ext == "xls" or ext == "xlsx":
             return "application/vnd.ms-excel"
         elif ext == "ppt":
             return "application/vnd.ms-powerpoint"

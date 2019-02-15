@@ -221,7 +221,7 @@ class CkanSubmit:
         # get file metadata, call converter to strip out dc fields
         s = Submission().get_record(ObjectId(sub_id))
         f_id = s["bundle"][0]
-        items = CgCoreSchemas().extract_repo_fields(str(f_id), "dataverse")
+        items = CgCoreSchemas().extract_repo_fields(str(f_id), "ckan")
         temp_id = "copo:" + str(sub_id)
         # add the submission_id to the dataverse metadata to allow backwards treversal from dataverse
         items.append({"dc": "relation", "copo_id": "relation", "vals": temp_id})

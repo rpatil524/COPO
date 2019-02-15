@@ -181,6 +181,7 @@ class BrokerDA:
         return self.context
 
     def do_sanitise_submissions(self):
+
         records = self.da_object.get_all_records()
 
         for submission in records:
