@@ -234,14 +234,15 @@ class CgCoreSchemas:
         items_list = list()
         stage_ref_list = list()
 
+        # get fields for target repo
         for st in stages:
             for item in st.get("items", list()):
-                new_item = [x for x in cg_schema if x["id"].lower().split(".")[-1] == item.get("id", str()).lower().split(".")[-1]]
+                new_item = [x for x in cg_schema if
+                            x["id"].lower().split(".")[-1] == item.get("id", str()).lower().split(".")[-1]]
                 if new_item:
                     stage_ref_list.append(st["ref"].lower())
                     new_item[0]['id'] = new_item[0]['id'].lower().split(".")[-1]
                     items_list.append(new_item[0])
-
 
         items_df = pd.DataFrame(items_list)
         items_df.index = items_df['id']
@@ -260,6 +261,7 @@ class CgCoreSchemas:
         items_df['vals'] = new_dict_series
 
         items_df = items_df[['ref', 'id', 'vals', 'prefix']]
+        items_df['vals'].fillna('')
 
         items_df.rename(index=str, columns={"ref": "dc", "id": "copo_id"}, inplace=True)
 

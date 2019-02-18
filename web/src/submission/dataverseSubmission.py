@@ -1,20 +1,17 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 19/04/2017'
-import os, uuid, requests, json, datetime, sys
-from datetime import datetime as dt
+
+import os, uuid, requests, json
 from django_tools.middlewares import ThreadLocal
-from django.conf import settings
-from dataverse import Connection, Dataverse, Dataset, DataverseFile
-from dataverse.exceptions import ConnectionError
+from dataverse import Connection, Dataset
 from dal.copo_da import Submission, DataFile
 from web.apps.web_copo.schemas.utils import data_utils
 from dal.copo_da import Profile
-from bson import ObjectId, json_util
-import xml.etree.ElementTree as et
+from bson import ObjectId
 from dataverse.exceptions import OperationFailedError
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import ElementTree, Element, SubElement, Comment, tostring
+from xml.etree.ElementTree import tostring
 from xml.dom import minidom
+import subprocess
 
 
 class DataverseSubmit(object):
@@ -177,10 +174,11 @@ class DataverseSubmit(object):
 
         # if dataset id in submission meta, we are adding to existing dataset, otherwise
         #  we are creating a new dataset
-        if "fields" in s["meta"]:
+        if "fields" in s["meta"]:  # toni's comment - any reason this doesn't simply check for 'alias' in meta?
             # create new
-            return self._create_and_add_to_dataverse(s)
-        elif ('entity_id' in s['meta'] and 'alias' in s['meta']) or ('dataverse_alias' in s['meta'] and 'doi' in s['meta']):
+            return self._create_and_add_to_dataverse(dataverse_alias=s["meta"]["alias"])
+        elif ('entity_id' in s['meta'] and 'alias' in s['meta']) or (
+                'dataverse_alias' in s['meta'] and 'doi' in s['meta']):
             # submit to existing
             return self._add_to_dataverse(s)
 
@@ -215,10 +213,53 @@ class DataverseSubmit(object):
         dv_storageIdentifier = meta['latest']['storageIdentifier']
         return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
 
-    def _create_and_add_to_dataverse(self, sub):
-        connection = self._get_connection()
-        # dv = self._create_dataverse(sub['meta'], connection)
-        dv = connection.get_dataverse(sub["meta"]["alias"])
+    def _create_and_add_to_dataverse(self, dataverse_alias=str()):
+        """
+        creates a Dataset in a Dataverse
+        :param dataverse_alias:
+        :return:
+        """
+        # make API call
+        dataset_json = '/Users/etuka/Desktop/dataset-finch1.json'
+
+        api_call = 'curl -H "X-Dataverse-key: {api_token}" -X POST ' \
+                   '{server_url}/api/dataverses/{dv_alias}/datasets --upload-file {dataset_json}'
+
+        api_call = api_call.format(api_token=self.host['apikey'],
+                                   server_url=self.host['url'],
+                                   dv_alias=dataverse_alias,
+                                   dataset_json=dataset_json)
+
+        # retrieve call result
+        try:
+            receipt = subprocess.check_output(api_call, shell=True)
+        except Exception as e:
+            print('API call error: ' + str(e))
+            return False
+
+        try:
+            receipt = json.loads(receipt.decode('utf-8'))
+        except Exception as e:
+            exception_message = 'Could not retrieve API result. ' + str(receipt)
+            print(exception_message)
+            return False
+
+        if receipt.get("status", str()).lower() in ("ok", "200"):
+            dataset_id = receipt.get("data", dict())
+        else:
+            exception_message = 'The Dataset could not be created. ' + str(receipt)
+            print(exception_message)
+            raise OperationFailedError(exception_message)
+            return False
+
+        # publish dataset
+        publish_status = self.publish_dataset(dataset_id.get('id', str()))
+
+        # add file to dataset
+        pass
+
+        # save dataset info
+        pass
 
         return False
 
@@ -240,6 +281,13 @@ class DataverseSubmit(object):
             with open(file_location, 'rb') as f:
                 contents = f.read()
                 ds.upload_file(file_name, contents, zip_files=False)
+
+    def send_files_curl(self, sub, persistent_id=str()):
+
+        for id in sub['bundle']:
+            file = DataFile().get_record(ObjectId(id))
+            file_location = file['file_location']
+            file_name = file['name']
 
     def _get_connection(self):
         dvurl = self.host['url']
@@ -372,6 +420,21 @@ class DataverseSubmit(object):
         doc = Submission().mark_as_published(sub_id)
 
         return doc
+
+    def publish_dataset(self, dataset_id):
+        url = self.host['url'] + '/api/datasets/' + str(dataset_id) + '/actions/:publish?type=major'
+
+        resp = requests.post(
+            url,
+            data={'type': 'major', 'key': self.host['apikey']},
+            headers=self.headers
+        )
+
+        if resp.status_code not in (200, 201):
+            raise OperationFailedError('Dataset could not be published. ' + resp.content)
+            return False
+
+        return True
 
     def dc_dict_to_dc(self, sub_id):
         # get file metadata, call converter to strip out dc fields

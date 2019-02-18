@@ -119,7 +119,8 @@ def get_figshare_category_options():
 
     drop_downs_pth = RESOLVER['copo_drop_downs']
 
-    df = pd.DataFrame(json_to_pytype(os.path.join(drop_downs_pth, 'figshare_categories.json')).get("properties", list()))
+    df = pd.DataFrame(
+        json_to_pytype(os.path.join(drop_downs_pth, 'figshare_categories.json')).get("properties", list()))
     df["label"] = df["title"]
     df['value'] = df['id']
 
@@ -128,8 +129,10 @@ def get_figshare_category_options():
 
     return result
 
+
 def get_repo_type_options():
     return lookup.DROP_DOWNS['REPO_TYPE_OPTIONS']
+
 
 def get_dataverse_subject_dropdown():
     return lookup.DROP_DOWNS['DATAVERSE_SUBJECTS']
@@ -588,12 +591,19 @@ def get_args_from_parameter(parameter, param_value_dict):
     return args
 
 
+def san_check(val):
+    return val if val is not None else ''
+
+
 class DecoupleFormSubmission:
     def __init__(self, auto_fields, schema):
         """
         :param auto_fields: fields/values list from form submission
         :param schema: the particular schema used for resolving DB fields
         """
+
+        # clear None values
+        auto_fields = {k: san_check(v) for k, v in auto_fields.items() if k}
 
         self.auto_fields = auto_fields
         self.schema = schema
@@ -694,7 +704,8 @@ class DecoupleFormSubmission:
 
                                     key_split = (key.split(f.id + ".")[-1]).split(".")
                                     if len(key_split) == 1:
-                                        primary_data[(key_split[0]).rsplit(self.global_key_split, 1)[0]] = self.auto_fields[key]
+                                        primary_data[(key_split[0]).rsplit(self.global_key_split, 1)[0]] = \
+                                        self.auto_fields[key]
                                     else:
                                         key_list.append(key_split[:-1])
                                         key_split[-1] = key_split[-1].rsplit(self.global_key_split, 1)[0]
@@ -915,7 +926,8 @@ class DecoupleFormSubmission:
 
                                     key_split = (key.split(f_id + ".")[-1]).split(".")
                                     if len(key_split) == 1:
-                                        primary_data[(key_split[0]).rsplit(self.global_key_split, 1)[0]] = self.auto_fields[key]
+                                        primary_data[(key_split[0]).rsplit(self.global_key_split, 1)[0]] = \
+                                        self.auto_fields[key]
                                     else:
                                         key_list.append(key_split[:-1])
                                         key_split[-1] = key_split[-1].rsplit(self.global_key_split, 1)[0]

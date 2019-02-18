@@ -133,7 +133,7 @@ $(document).ready(function () {
             // get repo info
             var meta = undefined
             if (data.hasOwnProperty('meta')) {
-                meta = data['meta']
+                meta = data.meta;
             }
 
             var destination_repo = undefined
