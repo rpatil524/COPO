@@ -137,12 +137,6 @@ $(document).ready(function () {
             var meta = []
             if (data.hasOwnProperty('meta')) {
                 meta = data.meta;
-<<<<<<< HEAD
-=======
-                console.log(meta);
-                console.log("************");
-                meta = []
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
             }
 
             var destination_repo = undefined
@@ -150,7 +144,7 @@ $(document).ready(function () {
                 if (data.destination_repo) {
                     if (typeof(data.destination_repo == 'object')) {
                         if (Object.keys(data.destination_repo).length > 0) {
-                            destination_repo = data.destination_repo
+                            destination_repo = data.destination_repo;
                         }
                     }
                 }
