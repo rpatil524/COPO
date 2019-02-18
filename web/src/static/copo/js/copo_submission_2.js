@@ -83,9 +83,12 @@ $(document).ready(function () {
 
     //******************************Functions Block******************************//
     function do_render_submission_table(d) {
+
         var dtd = d.table_data.dataSet;
         var repos = d.table_data.repos;
         set_empty_component_message(dtd.length); //display empty submission message.
+
+
 
         if (dtd.length == 0) {
             return false;
@@ -131,9 +134,15 @@ $(document).ready(function () {
             }
 
             // get repo info
-            var meta = undefined
+            var meta = []
             if (data.hasOwnProperty('meta')) {
                 meta = data.meta;
+<<<<<<< HEAD
+=======
+                console.log(meta);
+                console.log("************");
+                meta = []
+>>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
             }
 
             var destination_repo = undefined
@@ -340,6 +349,9 @@ $(document).ready(function () {
                                                     colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to CKAN Package: <span class="badge">' + data.meta.identifier + '</span></div>')
                                                 }
                                             }
+                                            else if (data.meta.hasOwnProperty("repo_type") && data.meta.repo_type == "ckan"){
+                                                colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to New CKAN Package</div>')
+                                            }
                                         }
                                         else {
                                             colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Choose Submission Target</span></div>')
@@ -348,9 +360,8 @@ $(document).ready(function () {
 
                                 }
 
-
                                 var colsThirdHTML = $('<div class="col-sm-2 col-md-2 col-lg-2" style="padding-left: 2px; margin-left: -50px;"></div>')
-                                    .append('<div data-repo-selected="' + repo_selected + '" class="pull-right" id="submission_control_' + data.record_id + '"></div>');
+                                    .append('<div data-repo-selected="' + repo_selected + '" class="pull-right " id="submission_control_' + data.record_id + '"></div>');
 
 
                                 // set submission status
@@ -669,7 +680,7 @@ $(document).ready(function () {
                         progressObject
                             .html('')
                             .append('<div><span class=" submission-info-label">Pending submission. Please click \'Submit\' to begin.</span></div>');
-                        actionButton = get_submit_action(submissionRecord.submission_id, $("#submission_control_" + submissionRecord.submission_id), "submit");
+                        actionButton = get_submit_action(submissionRecord.submission_id, $("#submission_control_" + submissionRecord.submission_id), "submit", submissionRecord);
                     }
 
 
@@ -729,8 +740,9 @@ $(document).ready(function () {
                 do_render_submission_table(data);
                 tableLoader.remove();
             },
-            error: function () {
+            error: function (data) {
                 alert("Couldn't retrieve submissions!");
+                console.log(data)
             }
         });
     }
@@ -798,13 +810,17 @@ $(document).ready(function () {
         });
     }
 
-    function get_submit_action(submission_id, element, typeMessage) {
+    function get_submit_action(submission_id, element, typeMessage, sub_data) {
         var buttonLabel = 'Submit';
-        var is_enabled = 'disabled'; //toni's comments - this will force even ENA based submission to be disabled, so overriding
-        is_enabled = '';
-        if ($(element).data('repo-selected')) {
-            is_enabled = 'enabled'
+        var is_enabled
+        if (sub_data.enable_submit_button) {
+            is_enabled = 'enabled'; //toni's comments - this will force even ENA based submission to be disabled, so overriding
         }
+        else{
+            is_enabled = 'disabled'
+        }
+
+
         var buttonClass = "tiny ui basic primary button " + is_enabled;
         if (typeMessage == 'retry') {
             buttonLabel = 'Retry';

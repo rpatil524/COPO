@@ -47,7 +47,7 @@ class DspaceSubmit(object):
         resp = requests.post(login_url + param_string)
         # store session identifier for future requests
         if resp.status_code != 200:
-            #  now try using v5 method
+            # now try using v5 method
             params = {"email": email, "password": password}
             resp = requests.post(login_url, json=params)
             if resp.status_code != 200:
@@ -59,30 +59,42 @@ class DspaceSubmit(object):
         except KeyError:
             login_details = resp.content
             dspace_type = 5
+
         # get item identifier, this is where we will deposit bitstream
         if new_or_existing == "existing":
-            item_id = sub['meta']['identifier']
-        elif new_or_existing == "new":
-            dspace_meta = self._create_dspace_meta(sub)
-            # create item
-            collection_id = sub["meta"]["identifier"]
-            # get name
-        for s in sub['bundle']:
-            for el in dspace_meta["metadata"]:
-                if el["key"] == "dc.title":
-                    name = el.get("value")
+            # if existing we should already have item id
+            try:
+                item_id = sub['meta']['identifier']
+            except KeyError as e:
+                return {"status": 1, "message": "No dSpace Item identifier found, please try selecting item again."}
 
+        elif new_or_existing == "new":
+            # if new we must create a new item in the given collection
+            dspace_meta = self._create_dspace_meta(sub)
+            # sub["meta"]["identifier"] in this case is the collection id
+            collection_id = sub["meta"]["identifier"]
+            # get name and description
+            description = ""
+            for el in dspace_meta["metadata"]:
+                if "description" in el["key"]:
+                    description = el["value"]
+            if description == "":
+                description = "No description provided"
+
+            # create the item
             new_item_url = dspace_url + "/rest/collections/" + str(collection_id) + "/items"
             if dspace_type == 6:
                 resp_item = requests.post(new_item_url, json=dspace_meta,
                                           headers={"Content-Type": "application/json",
-                                                   "accept": "application/json"}, cookies={"JSESSIONID": login_details})
+                                                   "accept": "application/json"},
+                                          cookies={"JSESSIONID": login_details})
             elif dspace_type == 5:
                 resp_item = requests.post(new_item_url, json=dspace_meta,
                                           headers={"rest-dspace-token": login_details,
                                                    "Content-Type": "application/json",
                                                    "accept": "application/json"})
             if resp_item.status_code == 200:
+                # get item id of the item we just created
                 try:
                     item_id = json.loads(resp_item.content.decode('utf-8'))['id']
                 except KeyError:
@@ -90,17 +102,15 @@ class DspaceSubmit(object):
             else:
                 return {"status": 1, "message": "error creating new dspace item"}
 
+        # now upload files
+        for s in sub['bundle']:
             # for each file in submission bundle
             f = DataFile().get_record(ObjectId(s))
             # name is name without path
             name = f['name']
+            description = f['name']
             # location is path/filename
             location = f['file_location']
-            # get description from dc metadata
-            try:
-                description = f['description']['attributes']['subject_description']['description']
-            except KeyError:
-                description = "No Description Provided"
 
             # make bitstream first, n.b. that name and description need to be added as url params, not json data
             bitstream_url = dspace_url + "/rest/items/" + str(
@@ -110,11 +120,17 @@ class DspaceSubmit(object):
             policy = [{"action": "DEFAULT_*", "epersonId": -1, "groupId": 0, "resourceId": 47166,
                        "resourceType": "bitstream", "rpDescription": None, "rpName": None, "rpType": "TYPE_INHERITED",
                        "startDate": None, "endDate": None}]
+
+            # get correct bitstream file extension lookup
             filename, file_extension = os.path.splitext(name)
+            if "." in file_extension:
+                file_extension = file_extension.replace(".", "")
+            ext = self.get_media_type_from_file_ext(file_extension)
+
             bitstream = {"name": name,
-                         "description": name,
+                         "description": description,
                          "type": "bitstream",
-                         "format": file_extension,
+                         "format": ext,
                          "bundleName": "ORIGINAL",
                          "policies": policy,
                          }
@@ -171,17 +187,51 @@ class DspaceSubmit(object):
                 #  check if lang is array if so take first element
                 if type(lang) != type(""):
                     lang = lang[0]
+                break
         # iterate fields and convert to format required by dspace
         for f in sub["meta"]["fields"]:
             val = f.get("vals", "")
             #  check if vals is array
             if type(val) != type(""):
-                val = val[0]
+                if val != None:
+                    val = val[0]
+                else:
+                    val = ""
 
-            # key = f.get("dc", "").replace(' type=', '.')
             key = f.get("dc", "")
-            # if val != "":
-            # if key not in used_keys:
+
+            # remove dc prefix and add correct prefix (some fields require dcterms)
+            temp = key.split("dc.")[1]
+            key = f.get("prefix", "dc") + "." + temp
+            # remove spaces, types and make lowercase
+            key = key.replace(" ", ".")
+            key = key.replace(".type=", ".")
+            key = key.lower()
+
+            # deal with special cases
+            if "dc.contributor" in key:
+                key = "dc.contributor"
+            elif "dc.relation.references" in key:
+                key = "dcterms.references"
+                val = "http://copo-project.org" + '/copo/resolve:' + str(sub["_id"])
+            elif "conformsto" in key:
+                key = "dcterms.conformsto"
+            elif "dc.date.availability" in key:
+                key = "dc.date.available"
+            elif "dc.date.completion" in key:
+                key = "dc.date.issued"
+            elif "dcterms.creator" in key:
+                key = "dc.contributor.author"
+            elif "dc.creator.affiliation" in key:
+                key = "dc.contributor"
+            elif "dc.relation.isrequiredby" in key:
+                key = "dcterms.isRequiredBy"
+            elif "dc.relation.isreplacedby" in key:
+                key = "dcterms.isReplacedBy"
+            elif "dc.relation.ispartof" in key:
+                val = "http://copo-project.org" + '/copo/resolve:' + str(sub["_id"])
+
+            # add field as entry in list of dicts
             el = {
                 "key": key,
                 "value": val,
@@ -192,9 +242,6 @@ class DspaceSubmit(object):
         out["metadata"] = arr
         return out
 
-    def _update_submission(self, sub, data_resp):
-        print(data_resp)
-
     def _update_dspace_submission(self, sub, dspace_url, data_id):
         data_url = dspace_url + "/rest/bitstreams/" + str(data_id)
         resp = requests.get(data_url)
@@ -203,9 +250,6 @@ class DspaceSubmit(object):
             data["uuid"] = data.pop("id")
         data['dspace_instance'] = dspace_url
         Submission().insert_dspace_accession(sub, data)
-
-    def _make_dspace_metadata(self, sub):
-        pass
 
     def get_dspace_communites(self):
         url = self.host['url']
@@ -267,37 +311,39 @@ class DspaceSubmit(object):
         else:
             return json.dumps({"error": self.error_msg})
 
+    def get_media_type_from_file_ext(self, ext):
+        if ext == "pdf":
+            return "application/pdf"
+        elif ext == "ai" or ext == "eps" or ext == "ps":
+            return "application/postscript"
+        elif ext == "xls" or ext == "xlsx":
+            return "application/vnd.ms-excel"
+        elif ext == "ppt":
+            return "application/vnd.ms-powerpoint"
+        elif ext == "gif":
+            return "image/gif"
+        elif ext == "jpg" or ext == "jpeg":
+            return "image/jpeg"
+        elif ext == "png":
+            return "image/png"
+        elif ext == "tif" or ext == "tiff":
+            return "image/tiff"
+        elif ext == "bmp":
+            return "image/x-ms-bmp"
+        elif ext == "html" or ext == "htm":
+            return "text/html"
+        elif ext == "asc" or ext == "txt":
+            return "text/plain"
+        elif ext == "xml":
+            return "text/xml"
+        elif ext == "doc" or ext == "docx":
+            return "application/msword"
+        else:
+            return ""
+
     def dc_dict_to_dc(self, sub_id):
         # get file metadata, call converter to strip out dc fields
         s = Submission().get_record(ObjectId(sub_id))
         f_id = s["bundle"][0]
         items = CgCoreSchemas().extract_repo_fields(str(f_id), "dSpace")
-        '''
-        meta = list()
-        for i in items:
-            if i["dc"] == "dc.title":
-                i.update({"dspacename": i["dc"]})
-                meta.append(i)
-            elif i["dc"] == "dc.creator":
-                meta.append(
-                    {"dc": "dc.creator", "dspacename": "dc.contributor.author", "vals": i["vals"][0]})
-
-            elif i["dc"] == "dc.date type=completion":
-                i.update({"dspacename": "dc.date.accessioned"})
-                meta.append(i)
-            elif i["dc"] == "dc.rights license":
-                i.update({"dspacename": "license"})
-                meta.append(i)
-            elif i["dc"] == "dc.source":
-                i.update({"dspacename": "source"})
-                meta.append(i)
-            elif i["dc"] == "dc.description":
-                i.update({"dspacename": i["dc"]})
-                meta.append(i)
-            elif i["dc"] == "dc.subject":
-                i.update({"dspacename": i["dc"]})
-                meta.append(i)
-            else:
-                meta.append(i)
-            '''
         Submission().update_meta(sub_id, json.dumps(items))

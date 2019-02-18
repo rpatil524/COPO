@@ -110,6 +110,11 @@ def get_upload_information(request):
             # get bundle transfer status
             sub_info_dict["bundle_meta"] = sub.get("bundle_meta", list())
             sub_info_dict["bundle"] = sub.get("bundle", list())
+            sub_info_dict["enable_submit_button"] = "meta" in sub and "fields" in sub["meta"] or sub["repository"] not in [
+                "cg_core",
+                "dataverse",
+                "dspace",
+                "ckan"]
 
             if str(sub.get("complete", False)).lower() == 'false':
                 # could we be dealing with an uploading submission?
@@ -487,10 +492,13 @@ def remove_repo_from_group(request):
         return HttpResponseBadRequest(json.dumps({'resp': 'Server Error - Try again'}))
 
 
-def get_repo_info(request):
+def get_repo_info(request, sub=None):
     # this ajax method is called when user clicks "inspect repo" button on submission view
     try:
-        sub_id = request.GET['sub_id']
+        if not sub:
+            sub_id = request.GET['sub_id']
+        else:
+            sub_id = sub
         s = Submission().get_record(ObjectId(sub_id))
         repo = s['destination_repo']
         # if sub type is cg_core, do conversion from interim to dc
@@ -571,14 +579,13 @@ def update_submission_repo_data(request):
         s = Submission().update_destination_repo(repo_id=custom_repo_id, submission_id=submission_id)
         s['record_id'] = str(submission_id)
         clear_submission_metadata(request)
+        get_repo_info(request, sub=submission_id)
         return HttpResponse(json_util.dumps(s))
     elif task == 'change_meta':
         meta = json.loads(request.POST['meta'])
         new_or_existing = meta["new_or_existing"]
         if request.POST.get("type") == "dspace":
             if new_or_existing == "new":
-                #  need to get form metadata for creating new dspace item
-                form_data = json.loads(request.POST['form_data'])
                 r_type = request.POST["type"]
                 # add meta to separate dict field
                 meta["new_or_existing"] = new_or_existing
@@ -589,6 +596,7 @@ def update_submission_repo_data(request):
             if new_or_existing == "new":
                 m = Submission().get_record(ObjectId(submission_id))["meta"]
                 meta["fields"] = m
+                meta["repo_type"] = request.POST["type"]
 
         # now update submission record
         if type(meta) == type(dict()):
@@ -654,7 +662,7 @@ def get_existing_metadata(request):
     #         .get("title_author_contributor", {}).get("subject", "")
     #     out["type"] = df.get("description", {}).get("attributes", {}) \
     #         .get("optional_fields", {}).get("type", "")
-    #return HttpResponse(json.dumps(out))
+    # return HttpResponse(json.dumps(out))
 
 
 def get_ckan_items(request):
