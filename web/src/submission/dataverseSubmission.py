@@ -176,7 +176,7 @@ class DataverseSubmit(object):
         #  we are creating a new dataset
         if "fields" in s["meta"]:  # toni's comment - any reason this doesn't simply check for 'alias' in meta?
             # create new
-            return self._create_and_add_to_dataverse(dataverse_alias=s["meta"]["alias"])
+            return self._create_and_add_to_dataverse(submission_record=s)
         elif ('entity_id' in s['meta'] and 'alias' in s['meta']) or (
                 'dataverse_alias' in s['meta'] and 'doi' in s['meta']):
             # submit to existing
@@ -213,12 +213,37 @@ class DataverseSubmit(object):
         dv_storageIdentifier = meta['latest']['storageIdentifier']
         return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
 
-    def _create_and_add_to_dataverse(self, dataverse_alias=str()):
+    def convert_dataset_metadata(self, metadata_fields=list()):
+        """
+        given metadata fields, function returns a Dataset-compliant schema
+        :param metadata_fields:
+        :return: converted metadata
+        """
+
+        converted_metadata = dict()
+        return converted_metadata
+
+    def _create_and_add_to_dataverse(self, submission_record=dict()):
         """
         creates a Dataset in a Dataverse
-        :param dataverse_alias:
+        :param submission_record:
         :return:
         """
+
+        submission_meta = submission_record.get("meta", dict())
+
+        # get dataverse alias
+        dataverse_alias = submission_meta.get("alias", str())
+
+        if not dataverse_alias:
+            exception_message = 'Dataverse alias not found! '
+            print(exception_message)
+            raise OperationFailedError(exception_message)
+            return False
+
+        # convert dataset metadata
+        converted_metadata = self.convert_dataset_metadata(metadata_fields=submission_meta.get("fields", list()))
+
         # make API call
         dataset_json = '/Users/etuka/Desktop/dataset-finch1.json'
 

@@ -12,11 +12,6 @@ from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.lookup.resolver import RESOLVER
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 
-# es test
-from dal import cursor_to_list
-from elasticsearch import Elasticsearch
-# end es test
-
 Schemas = get_collection_ref("Schemas")
 Lookups = get_collection_ref("Lookups")
 
@@ -69,16 +64,6 @@ class Command(BaseCommand):
                 Lookups.insert_many(result_df.to_dict('records'))
             except Exception as e:
                 print(e)
-
-        # index too in elastic search
-        # es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
-        # es.indices.delete(index='lookups', ignore=[400, 404])
-        # records = cursor_to_list(Lookups.find({}))
-        # for rec in records:
-        #     rec["id"] = str(rec["_id"])
-        #     rec.pop('_id', None)
-        #     es.index(index='lookups', doc_type='dropdown', body=rec)
-
 
     def agrovoc_datasource(self):
         """

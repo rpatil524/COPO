@@ -181,9 +181,8 @@ def copo_visualize(request):
     context = dict()
 
     # test
-    #from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
-    #CgCoreSchemas().process_schema()
-    #v = CgCoreSchemas().extract_repo_fields(datafile_id="5c0fb70bd127fdc41c80b8e8", repo="dataverse")
+    # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+    # v = CgCoreSchemas().extract_repo_fields(datafile_id="5ba0b949d127fd313b62677c", repo="dataverse")
     # test ends
 
     task = request.POST.get("task", str())
