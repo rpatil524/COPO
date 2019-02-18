@@ -17,6 +17,12 @@ class CgCoreSchemas:
         self.type_field_status_path = os.path.join(self.schemas_utils_paths, 'type_field_STATUS.csv')
         self.map_type_subtype_path = os.path.join(self.schemas_utils_paths, 'mapTypeSubtype.csv')
         self.copo_schema_spec_path = os.path.join(self.schemas_utils_paths, 'copo_schema.csv')
+        self.dataverse_dataset_template = os.path.join(self.schemas_utils_paths, 'dataverse_dataset_template.json')
+
+    def get_dv_dataset_template(self):
+        pass
+
+        # return cg_schema = d_utils.json_to_pytype(self.path_to_json)
 
     def retrieve_schema_specs(self, path_to_spec):
         """
