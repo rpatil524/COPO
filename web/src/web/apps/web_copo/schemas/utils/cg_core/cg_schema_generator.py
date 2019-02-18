@@ -20,9 +20,11 @@ class CgCoreSchemas:
         self.dataverse_dataset_template = os.path.join(self.schemas_utils_paths, 'dataverse_dataset_template.json')
 
     def get_dv_dataset_template(self):
-        pass
-
-        # return cg_schema = d_utils.json_to_pytype(self.path_to_json)
+        try:
+            return d_utils.json_to_pytype(self.dataverse_dataset_template)
+        except Exception as e:
+            print("Couldn't retrieve Dataverse template" + str(e))
+            return False
 
     def retrieve_schema_specs(self, path_to_spec):
         """
@@ -209,6 +211,7 @@ class CgCoreSchemas:
         :param repo:
         :return:
         """
+
         from dal.copo_da import DataFile
         from dal.copo_base_da import DataSchemas
 
@@ -251,7 +254,7 @@ class CgCoreSchemas:
                     items_list.append(new_item[0])
 
         items_df = pd.DataFrame(items_list)
-        items_df.index = items_df['id']
+        items_df.index = items_df['id'].str.lower()
         items_df = items_df[['ref', 'id', 'prefix']]
         items_df = items_df[~items_df['ref'].isna()]
 
@@ -264,10 +267,11 @@ class CgCoreSchemas:
             new_dict.update(d)
 
         new_dict_series = pd.Series(new_dict)
+        new_dict_series.index = new_dict_series.index.str.lower()
         items_df['vals'] = new_dict_series
+        items_df['vals'] = items_df['vals'].fillna('')
 
         items_df = items_df[['ref', 'id', 'vals', 'prefix']]
-        items_df['vals'].fillna('')
 
         items_df.rename(index=str, columns={"ref": "dc", "id": "copo_id"}, inplace=True)
 

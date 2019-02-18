@@ -220,8 +220,30 @@ class DataverseSubmit(object):
         :return: converted metadata
         """
 
-        converted_metadata = dict()
-        return converted_metadata
+        # get template
+        dv_metadata = CgCoreSchemas().get_dv_dataset_template()
+
+        if not dv_metadata:
+            exception_message = 'Error retrieving Dataset template! '
+            print(exception_message)
+            raise OperationFailedError(exception_message)
+            return False
+
+        fields = list()
+        for item in metadata_fields:
+            field = dict(multiple=False, typeClass='primitive', typeName=str(), value=str())
+            value = item.get("vals", str())
+
+            if isinstance(value, str):
+                field['typeName'] = item["copo_id"]
+                field['value'] = item["vals"]
+                fields.append(field)
+            elif isinstance(value, list):
+                pass
+
+        dv_metadata["datasetVersion"]["metadataBlocks"]["citation"]["fields"] = fields
+
+        return dv_metadata
 
     def _create_and_add_to_dataverse(self, submission_record=dict()):
         """
