@@ -6,11 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/submission/ckanSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/ckanSubmission.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/cgcore_mappings/cg_core.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/cgcore_mappings/cg_core.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" afterDir="false" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <ignored path="$PROJECT_DIR$/.idea/httpRequests/" />
@@ -1863,13 +1858,6 @@
       <option name="presentableId" value="Default" />
       <updated>1480591260906</updated>
     </task>
-    <task id="LOCAL-00044" summary="commenting">
-      <created>1532536182418</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1532536182418</updated>
-    </task>
     <task id="LOCAL-00045" summary="making views and autocomplete services for creating new dataverse/dataset">
       <created>1532621225348</created>
       <option name="number" value="00045" />
@@ -2206,7 +2194,14 @@
       <option name="project" value="LOCAL" />
       <updated>1550242859208</updated>
     </task>
-    <option name="localTasksCounter" value="93" />
+    <task id="LOCAL-00093" summary="uploads to ckan now working as expected">
+      <created>1550596438397</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1550596438399</updated>
+    </task>
+    <option name="localTasksCounter" value="94" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -2252,7 +2247,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1920" height="988" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3292683" />
       <window_info anchor="bottom" id="Event Log" order="9" show_stripe_button="false" sideWeight="0.2825465" side_tool="true" weight="0.42276424" />
@@ -2354,7 +2348,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="pushing tests for testing on server" />
     <MESSAGE value="tests for dspace and dataverse now in place" />
     <MESSAGE value="adding selenium test to try and check multiple upload speed" />
     <MESSAGE value="creating of ckan datasets and resources working along with test harness" />
@@ -2379,7 +2372,8 @@
     <MESSAGE value="multiple files uploading to dspace with full metadata" />
     <MESSAGE value="tidying of dspace code" />
     <MESSAGE value="toni's changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="toni's changes" />
+    <MESSAGE value="uploads to ckan now working as expected" />
+    <option name="LAST_COMMIT_MESSAGE" value="uploads to ckan now working as expected" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2398,11 +2392,6 @@
           <url>file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py</url>
           <line>292</line>
           <option name="timeStamp" value="1597" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/web/src/submission/ckanSubmission.py</url>
-          <line>106</line>
-          <option name="timeStamp" value="1713" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -2426,11 +2415,7 @@
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
       <expression>
-        <expression-string>requests.post(fullurl,
-                                         data=data,
-                                         #files=files,
-                                         headers=self.headers
-                                         )</expression-string>
+        <expression-string />
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
@@ -2450,8 +2435,7 @@
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>json.dumps(out
-           )</expression-string>
+        <expression-string />
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
