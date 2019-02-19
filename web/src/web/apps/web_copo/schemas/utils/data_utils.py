@@ -602,7 +602,7 @@ class DecoupleFormSubmission:
         :param schema: the particular schema used for resolving DB fields
         """
 
-        # clear None values
+        # clear None types
         auto_fields = {k: san_check(v) for k, v in auto_fields.items() if k}
 
         self.auto_fields = auto_fields

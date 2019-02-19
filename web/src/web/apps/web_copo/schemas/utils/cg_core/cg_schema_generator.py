@@ -20,9 +20,11 @@ class CgCoreSchemas:
         self.dataverse_dataset_template = os.path.join(self.schemas_utils_paths, 'dataverse_dataset_template.json')
 
     def get_dv_dataset_template(self):
-        pass
-
-        # return cg_schema = d_utils.json_to_pytype(self.path_to_json)
+        try:
+            return d_utils.json_to_pytype(self.dataverse_dataset_template)
+        except Exception as e:
+            print("Couldn't retrieve Dataverse template" + str(e))
+            return False
 
     def retrieve_schema_specs(self, path_to_spec):
         """
@@ -209,6 +211,7 @@ class CgCoreSchemas:
         :param repo:
         :return:
         """
+
         from dal.copo_da import DataFile
         from dal.copo_base_da import DataSchemas
 
@@ -225,7 +228,7 @@ class CgCoreSchemas:
 
         cg_schema = DataSchemas("COPO").get_ui_template_node('cgCore')
 
-        # filter by 'repo'
+        # filter schema items by repo
         cg_schema = [x for x in cg_schema if
                      x.get("target_repo", str()).strip() != str() and
                      repo_type_option.get("abbreviation", str()) in [y.strip() for y in
@@ -237,26 +240,23 @@ class CgCoreSchemas:
         attributes = description.get("attributes", dict())
         stages = description.get("stages", list())
 
-        items_list = list()
-        stage_ref_list = list()
+        schema_df = pd.DataFrame(cg_schema)
+        schema_df.id = schema_df.id.str.lower().str.split(".").str[-1]
+        schema_df.index = schema_df.id
+        schema_df = schema_df[['ref', 'id', 'prefix']]
+        schema_df = schema_df[~schema_df['ref'].isna()]
 
-        # get fields for target repo
-        for st in stages:
-            for item in st.get("items", list()):
-                new_item = [x for x in cg_schema if
-                            x["id"].lower().split(".")[-1] == item.get("id", str()).lower().split(".")[-1]]
-                if new_item:
-                    stage_ref_list.append(st["ref"].lower())
-                    new_item[0]['id'] = new_item[0]['id'].lower().split(".")[-1]
-                    items_list.append(new_item[0])
+        # filter stage items - stage items should conform to specifications of the repo
+        schema_ids = list(schema_df.id)
+        items = {item.get("id", str()).lower().split(".")[-1]: st.get("ref", "").lower() for st in stages for item in
+                 st.get("items", list()) if item.get("id", str()).lower().split(".")[-1] in schema_ids}
 
-        items_df = pd.DataFrame(items_list)
-        items_df.index = items_df['id'].str.lower()
-        items_df = items_df[['ref', 'id', 'prefix']]
-        items_df = items_df[~items_df['ref'].isna()]
+        # this obeys any filtering that may have been enforced by some client agent (e.g. COPO Wizard),
+        # within the context of the repo
+        schema_df = schema_df[schema_df.index.isin(items.keys())]
 
-        # first level filter - relevant stages
-        target_stages = list(set(stage_ref_list))
+        # obtain attributes for filtered stage items
+        target_stages = list(set(items.values()))
         datafile_attributes = [v for k, v in attributes.items() if k in target_stages]
 
         new_dict = dict()
@@ -265,14 +265,14 @@ class CgCoreSchemas:
 
         new_dict_series = pd.Series(new_dict)
         new_dict_series.index = new_dict_series.index.str.lower()
-        items_df['vals'] = new_dict_series
-        items_df['vals'].fillna('')
+        schema_df['vals'] = new_dict_series
+        schema_df['vals'] = schema_df['vals'].fillna('')
 
-        items_df = items_df[['ref', 'id', 'vals', 'prefix']]
+        schema_df = schema_df[['ref', 'id', 'vals', 'prefix']]
 
-        items_df.rename(index=str, columns={"ref": "dc", "id": "copo_id"}, inplace=True)
+        schema_df.rename(index=str, columns={"ref": "dc", "id": "copo_id"}, inplace=True)
 
-        dc_list = items_df.to_dict('records')
+        dc_list = schema_df.to_dict('records')
 
         return dc_list
 
