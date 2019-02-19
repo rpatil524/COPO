@@ -6,17 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-<<<<<<< HEAD
-      <change beforePath="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/management/commands/setup_schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/management/commands/setup_schemas.py" afterDir="false" />
-=======
-      <change beforePath="$PROJECT_DIR$/web/src/dal/broker_da.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/dal/broker_da.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/submission/ckanSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/ckanSubmission.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" afterDir="false" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
       <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/cgcore_mappings/cg_core.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/cgcore_mappings/cg_core.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/copo_schema.csv" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/copo_schema.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" afterDir="false" />
     </list>
@@ -121,321 +113,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-<<<<<<< HEAD
-      <file leaf-file-name="dataverseSubmission.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="dataverseSubmission.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="256">
-              <caret line="255" column="54" lean-forward="true" selection-start-line="255" selection-start-column="54" selection-end-line="255" selection-end-column="54" />
-              <folding>
-                <element signature="e#51#83#0" expanded="true" />
-                <element signature="e#966#1111#0" expanded="true" />
-                <element signature="e#1120#4381#0" expanded="true" />
-                <element signature="e#5424#6675#0" expanded="true" />
-                <element signature="e#2005#2146#0" expanded="true" />
-                <element signature="e#2205#2251#0" expanded="true" />
-                <element signature="e#2299#3116#0" expanded="true" />
-                <element signature="e#7887#8095#0" expanded="true" />
-                <element signature="e#3730#4050#0" expanded="true" />
-                <element signature="e#10097#10263#0" expanded="true" />
-                <element signature="e#4091#4248#0" expanded="true" />
-                <element signature="e#4300#4812#0" expanded="true" />
-                <element signature="e#4867#5265#0" expanded="true" />
-                <element signature="e#5322#5414#0" expanded="true" />
-                <element signature="e#5489#5824#0" expanded="true" />
-                <element signature="e#5872#7016#0" expanded="true" />
-                <element signature="e#7119#7958#0" expanded="true" />
-                <element signature="e#7992#8109#0" expanded="true" />
-                <element signature="e#8160#9284#0" expanded="true" />
-                <element signature="e#15623#16058#0" expanded="true" />
-                <element signature="e#9331#9840#0" expanded="true" />
-                <element signature="e#9867#10057#0" expanded="true" />
-=======
-      <file leaf-file-name="copo_submission_2.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="139">
-              <caret line="143" lean-forward="true" selection-start-line="143" selection-end-line="143" />
-              <folding>
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#i#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
-              </folding>
+            <state relative-caret-position="-319">
+              <caret line="182" column="41" selection-start-line="182" selection-start-column="31" selection-end-line="182" selection-end-column="41" />
             </state>
           </provider>
         </entry>
       </file>
-<<<<<<< HEAD
-      <file leaf-file-name="copo_submission_2.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
+      <file leaf-file-name="ajax_handlers.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="379">
-              <caret line="135" column="33" lean-forward="true" selection-start-line="135" selection-start-column="33" selection-end-line="135" selection-end-column="33" />
+            <state relative-caret-position="331">
+              <caret line="646" selection-start-line="646" selection-end-line="646" />
               <folding>
-                <element signature="e#8275#18161#0" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="e#137#148#0" expanded="true" />
               </folding>
-=======
-      <file leaf-file-name="generic_handlers.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="175">
-              <caret line="862" column="33" lean-forward="true" selection-start-line="862" selection-start-column="33" selection-end-line="862" selection-end-column="33" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
-            </state>
-          </provider>
-        </entry>
-      </file>
-<<<<<<< HEAD
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="110" column="99" lean-forward="true" selection-start-line="110" selection-start-column="99" selection-end-line="110" selection-end-column="99" />
-              <folding>
-                <element signature="e#6658#8970#0" expanded="true" />
-              </folding>
-=======
-      <file leaf-file-name="copo_schema.csv" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/copo_schema.csv">
-          <provider editor-type-id="csv-table-editor">
-            <state showInfoPanel="true" fixedHeaders="false" rowLines="3">
-              <column index="0" width="100" />
-              <column index="1" width="100" />
-              <column index="2" width="100" />
-              <column index="3" width="100" />
-              <column index="4" width="100" />
-              <column index="5" width="100" />
-              <column index="6" width="100" />
-              <column index="7" width="100" />
-              <column index="8" width="100" />
-              <column index="9" width="100" />
-              <column index="10" width="100" />
-              <column index="11" width="100" />
-              <column index="12" width="100" />
-              <column index="13" width="100" />
-              <column index="14" width="100" />
-              <column index="15" width="100" />
-              <column index="16" width="100" />
-              <column index="17" width="100" />
-              <column index="18" width="100" />
-              <column index="19" width="100" />
-              <column index="20" width="100" />
-              <column index="21" width="100" />
-              <column index="22" width="100" />
-              <column index="23" width="100" />
-              <column index="24" width="100" />
-              <column index="25" width="100" />
-              <column index="26" width="100" />
-              <column index="27" width="100" />
-              <column index="28" width="100" />
-              <column index="29" width="100" />
-              <column index="30" width="100" />
-              <column index="31" width="100" />
-              <column index="32" width="100" />
-              <column index="33" width="100" />
-              <column index="34" width="100" />
-              <column index="35" width="100" />
-              <column index="36" width="100" />
-              <column index="37" width="100" />
-              <column index="38" width="100" />
-              <column index="39" width="100" />
-              <column index="40" width="100" />
-              <column index="41" width="100" />
-              <column index="42" width="100" />
-              <column index="43" width="100" />
-              <column index="44" width="100" />
-              <column index="45" width="100" />
-              <column index="46" width="100" />
-              <column index="47" width="100" />
-              <column index="48" width="100" />
-              <column index="49" width="100" />
-              <column index="50" width="100" />
-              <column index="51" width="100" />
-              <column index="52" width="100" />
-              <column index="53" width="100" />
-              <column index="54" width="100" />
-              <column index="55" width="100" />
-              <column index="56" width="100" />
-              <column index="57" width="100" />
-              <column index="58" width="100" />
-              <column index="59" width="100" />
-              <column index="60" width="100" />
-              <column index="61" width="100" />
-              <column index="62" width="100" />
-              <column index="63" width="100" />
-              <column index="64" width="100" />
-              <column index="65" width="100" />
-              <column index="66" width="100" />
-              <column index="67" width="100" />
-              <column index="68" width="100" />
-              <column index="69" width="100" />
-              <column index="70" width="100" />
-              <column index="71" width="100" />
-              <column index="72" width="100" />
-              <column index="73" width="100" />
-              <column index="74" width="100" />
-              <column index="75" width="100" />
-              <column index="76" width="100" />
-              <column index="77" width="100" />
-              <column index="78" width="100" />
-              <column index="79" width="100" />
-              <column index="80" width="100" />
-              <column index="81" width="100" />
-              <column index="82" width="100" />
-              <column index="83" width="100" />
-              <column index="84" width="100" />
-              <column index="85" width="100" />
-              <column index="86" width="100" />
-            </state>
-          </provider>
-          <provider selected="true" editor-type-id="csv-text-editor">
-            <state relative-caret-position="195">
-              <caret line="13" column="169" selection-start-line="13" selection-start-column="169" selection-end-line="13" selection-end-column="169" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
-            </state>
-          </provider>
-        </entry>
-      </file>
-<<<<<<< HEAD
-      <file leaf-file-name="setup_schemas.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/management/commands/setup_schemas.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="17" column="44" lean-forward="true" selection-start-line="17" selection-start-column="44" selection-end-line="17" selection-end-column="44" />
-              <folding>
-                <element signature="e#85#136#0" expanded="true" />
-                <element signature="e#774#954#0" expanded="true" />
-                <element signature="e#999#1312#0" expanded="true" />
-                <element signature="e#1365#2059#0" expanded="true" />
-                <element signature="e#2506#3018#0" expanded="true" />
-                <element signature="e#3068#3813#0" expanded="true" />
-                <element signature="e#3859#4983#0" expanded="true" />
-                <element signature="e#5033#6864#0" expanded="true" />
-              </folding>
-=======
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="64">
-              <caret line="204" column="55" selection-start-line="204" selection-start-column="55" selection-end-line="204" selection-end-column="55" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="broker_da.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/dal/broker_da.py">
-          <provider selected="true" editor-type-id="text-editor">
-<<<<<<< HEAD
-            <state relative-caret-position="1045">
-              <caret line="76" column="43" lean-forward="true" selection-start-line="76" selection-start-column="43" selection-end-line="76" selection-end-column="43" />
-              <folding>
-                <element signature="e#47#57#0" expanded="true" />
-                <element signature="e#726#1731#0" expanded="true" />
-                <element signature="e#1786#1853#0" expanded="true" />
-                <element signature="e#1902#2250#0" expanded="true" />
-                <element signature="e#4492#5064#0" expanded="true" />
-                <element signature="e#5097#5571#0" expanded="true" />
-                <element signature="e#5626#5944#0" expanded="true" />
-                <element signature="e#5976#6451#0" expanded="true" />
-                <element signature="e#6499#6707#0" expanded="true" />
-                <element signature="e#6746#6985#0" expanded="true" />
-                <element signature="e#7030#7153#0" expanded="true" />
-                <element signature="e#7202#8297#0" expanded="true" />
-                <element signature="e#8363#8581#0" expanded="true" />
-                <element signature="e#8636#8703#0" expanded="true" />
-                <element signature="e#8742#10178#0" expanded="true" />
-                <element signature="e#10229#10705#0" expanded="true" />
-                <element signature="e#10742#11892#0" expanded="true" />
-                <element signature="e#11946#12198#0" expanded="true" />
-                <element signature="e#12242#12369#0" expanded="true" />
-                <element signature="e#12412#12476#0" expanded="true" />
-                <element signature="e#12528#13082#0" expanded="true" />
-                <element signature="e#13123#13227#0" expanded="true" />
-                <element signature="e#13271#13405#0" expanded="true" />
-                <element signature="e#13450#13586#0" expanded="true" />
-                <element signature="e#13634#14430#0" expanded="true" />
-                <element signature="e#14470#14717#0" expanded="true" />
-                <element signature="e#14764#15053#0" expanded="true" />
-                <element signature="e#15106#16027#0" expanded="true" />
-                <element signature="e#16070#16257#0" expanded="true" />
-                <element signature="e#16308#16705#0" expanded="true" />
-                <element signature="e#16752#17041#0" expanded="true" />
-                <element signature="e#17086#17178#0" expanded="true" />
-              </folding>
-=======
-            <state relative-caret-position="304">
-              <caret line="232" column="38" selection-start-line="232" selection-start-column="38" selection-end-line="232" selection-end-column="38" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
-            </state>
-          </provider>
-        </entry>
-      </file>
-<<<<<<< HEAD
-      <file leaf-file-name="wizard_helper.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="257">
-              <caret line="390" column="35" lean-forward="true" selection-start-line="390" selection-start-column="35" selection-end-line="390" selection-end-column="35" />
-              <folding>
-                <element signature="e#19013#20970#0" expanded="true" />
-              </folding>
-=======
-      <file leaf-file-name="html_tags.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="259">
-              <caret line="776" selection-start-line="776" selection-end-line="776" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
-            </state>
-          </provider>
-        </entry>
-      </file>
-<<<<<<< HEAD
-      <file leaf-file-name="submissionDelegator.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="389">
-              <caret line="66" column="38" lean-forward="true" selection-start-line="66" selection-start-column="38" selection-end-line="66" selection-end-column="38" />
             </state>
           </provider>
         </entry>
@@ -443,66 +137,62 @@
       <file leaf-file-name="data_utils.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="139">
-              <caret line="604" column="27" lean-forward="true" selection-start-line="604" selection-start-column="27" selection-end-line="604" selection-end-column="27" />
+            <state relative-caret-position="154">
+              <caret line="88" column="33" lean-forward="true" selection-start-line="88" selection-start-column="33" selection-end-line="88" selection-end-column="33" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ckanSubmission.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/web/src/submission/ckanSubmission.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="245">
+              <caret line="100" column="50" lean-forward="true" selection-start-line="100" selection-start-column="50" selection-end-line="100" selection-end-column="50" />
               <folding>
-                <element signature="e#22#31#0" expanded="true" />
-                <element signature="e#573#853#0" expanded="true" />
-                <element signature="e#927#1103#0" expanded="true" />
-                <element signature="e#1160#1253#0" expanded="true" />
-                <element signature="e#1294#1517#0" expanded="true" />
-                <element signature="e#1553#1674#0" expanded="true" />
-                <element signature="e#1714#1718#0" expanded="true" />
-                <element signature="e#1754#1918#0" expanded="true" />
-                <element signature="e#1954#2156#0" expanded="true" />
-                <element signature="e#2199#2387#0" expanded="true" />
-                <element signature="e#2428#2543#0" expanded="true" />
-                <element signature="e#2577#2891#0" expanded="true" />
-                <element signature="e#2935#3620#0" expanded="true" />
-                <element signature="e#3655#3700#0" expanded="true" />
-                <element signature="e#3744#3790#0" expanded="true" />
-                <element signature="e#3833#3883#0" expanded="true" />
-                <element signature="e#3926#3967#0" expanded="true" />
-                <element signature="e#4010#4044#0" expanded="true" />
-                <element signature="e#4085#4613#0" expanded="true" />
-                <element signature="e#4647#5657#0" expanded="true" />
-                <element signature="e#5707#6765#0" expanded="true" />
-                <element signature="e#6810#7872#0" expanded="true" />
-                <element signature="e#7919#8910#0" expanded="true" />
-                <element signature="e#8947#8986#0" expanded="true" />
-                <element signature="e#9024#9064#0" expanded="true" />
-                <element signature="e#9101#9141#0" expanded="true" />
-                <element signature="e#9178#9216#0" expanded="true" />
-                <element signature="e#9254#9294#0" expanded="true" />
-                <element signature="e#9335#9377#0" expanded="true" />
-                <element signature="e#9420#9464#0" expanded="true" />
-                <element signature="e#9507#9551#0" expanded="true" />
-                <element signature="e#9577#9840#0" expanded="true" />
-                <element signature="e#9866#10012#0" expanded="true" />
-                <element signature="e#10043#10190#0" expanded="true" />
-                <element signature="e#10224#10264#0" expanded="true" />
-                <element signature="e#10291#10420#0" expanded="true" />
-                <element signature="e#10455#10558#0" expanded="true" />
-                <element signature="e#10589#10692#0" expanded="true" />
-                <element signature="e#10727#10785#0" expanded="true" />
-                <element signature="e#10827#14016#0" expanded="true" />
-                <element signature="e#14058#14453#0" expanded="true" />
-                <element signature="e#14503#14731#0" expanded="true" />
-                <element signature="e#14787#14950#0" expanded="true" />
-                <element signature="e#15006#16917#0" expanded="true" />
-                <element signature="e#16955#17477#0" expanded="true" />
-                <element signature="e#17515#17902#0" expanded="true" />
-                <element signature="e#17937#18121#0" expanded="true" />
-                <element signature="e#18147#18285#0" expanded="true" />
-                <element signature="e#18350#18738#0" expanded="true" />
-                <element signature="e#18772#18809#0" expanded="true" />
-                <element signature="e#19181#29163#0" expanded="true" />
-                <element signature="e#29219#39434#0" expanded="true" />
-                <element signature="e#39508#40061#0" expanded="true" />
-                <element signature="e#40140#40907#0" expanded="true" />
-                <element signature="e#40964#41080#0" expanded="true" />
-                <element signature="e#41136#41418#0" expanded="true" />
-                <element signature="e#41456#41681#0" expanded="true" />
+                <element signature="e#33#67#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="repository_inspection.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="615">
+              <caret line="41" column="28" selection-start-line="41" selection-start-column="17" selection-end-line="41" selection-end-column="28" />
+              <folding>
+                <element signature="n#style#0;n#div#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#0;n#td#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#0;n#td#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="cg_core.json" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/cgcore_mappings/cg_core.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-139">
+              <caret column="34004" selection-start-column="34004" selection-end-column="34004" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dspaceSubmission.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="289">
+              <caret line="127" column="67" lean-forward="true" selection-start-line="123" selection-start-column="12" selection-end-line="127" selection-end-column="67" />
+              <folding>
+                <element signature="e#33#77#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -511,32 +201,26 @@
       <file leaf-file-name="cg_schema_generator.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="501">
-              <caret line="382" selection-start-line="382" selection-end-line="382" />
-              <folding>
-                <element signature="e#22#31#0" expanded="true" />
-                <element signature="e#301#782#0" expanded="true" />
-                <element signature="e#843#1224#0" expanded="true" />
-                <element signature="e#1271#2374#0" expanded="true" />
-                <element signature="e#2431#3959#0" expanded="true" />
-                <element signature="e#4005#4269#0" expanded="true" />
-                <element signature="e#4325#5085#0" expanded="true" />
-                <element signature="e#5154#6380#0" expanded="true" />
-                <element signature="e#6424#6585#0" expanded="true" />
-                <element signature="e#6629#6794#0" expanded="true" />
-                <element signature="e#6870#9471#0" expanded="true" />
-                <element signature="e#9529#9713#0" expanded="true" />
-                <element signature="e#9771#9957#0" expanded="true" />
-                <element signature="e#9999#10120#0" expanded="true" />
-                <element signature="e#10161#11448#0" expanded="true" />
-              </folding>
-=======
-      <file leaf-file-name="copo_submission.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_submission.json">
+            <state relative-caret-position="381">
+              <caret line="268" column="35" lean-forward="true" selection-start-line="268" selection-start-column="35" selection-end-line="268" selection-end-column="35" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="copo_submission_2.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="27">
-              <caret line="62" column="41" selection-start-line="62" selection-start-column="35" selection-end-line="62" selection-end-column="41" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
+            <state relative-caret-position="502">
+              <caret line="852" column="52" selection-start-line="852" selection-start-column="52" selection-end-line="852" selection-end-column="52" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="submissionDelegator.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="243">
+              <caret line="87" column="53" selection-start-line="87" selection-start-column="53" selection-end-line="87" selection-end-column="53" />
             </state>
           </provider>
         </entry>
@@ -556,45 +240,13 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-<<<<<<< HEAD
-=======
-      <find>lang</find>
-      <find>l</find>
-      <find>learning</find>
       <find>rights</find>
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
       <find>ElementTree</find>
       <find>get_existing_metadata</find>
-      <find>get_repo_info</find>
       <find>dialog</find>
       <find>dataset-label</find>
       <find>update_submission_repo_data</find>
       <find>namesp</find>
-<<<<<<< HEAD
-      <find>submit</find>
-      <find>json</find>
-      <find>REPO</find>
-      <find>curl</find>
-      <find>send_files</find>
-      <find>alias</find>
-      <find>subp</find>
-      <find>jso</find>
-      <find>try</find>
-      <find>_metadata</find>
-      <find>raise</find>
-      <find>settings</find>
-      <find>settings.LOGGER</find>
-      <find>except</find>
-      <find>Loglvl</find>
-      <find>request</find>
-      <find>post</find>
-      <find>self.host</find>
-      <find>fillna</find>
-      <find>replace</find>
-      <find>save</find>
-      <find>publish</find>
-      <find>auto_fields</find>
-=======
       <find>hasF</find>
       <find>dc</find>
       <find>re</find>
@@ -604,7 +256,6 @@
       <find>fa-cloud</find>
       <find>get_upload_information</find>
       <find>submission_control</find>
-      <find>submission_control_</find>
       <find>has_repo_info</find>
       <find>1000</find>
       <find>get_ckan_items</find>
@@ -613,8 +264,12 @@
       <find>repos</find>
       <find>bundle</find>
       <find>parse</find>
+      <find>generate_table_da</find>
       <find>meta</find>
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
+      <find>get_repo_info</find>
+      <find>submission_control_</find>
+      <find>submission_</find>
+      <find>relation</find>
     </findStrings>
     <replaceStrings>
       <replace>context-help-ctrl</replace>
@@ -648,12 +303,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-<<<<<<< HEAD
-        <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_profile.json" />
-        <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_dataverse_repo.json" />
-=======
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
-        <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_submission.json" />
         <option value="$PROJECT_DIR$/web/src/web/settings/logger.py" />
         <option value="$PROJECT_DIR$/web/src/tests/test_dv.py" />
         <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_dspace.json" />
@@ -671,17 +320,14 @@
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json" />
         <option value="$PROJECT_DIR$/web/src/tests/test_ckan_repository.py" />
         <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_ckan_submission.json" />
-<<<<<<< HEAD
-=======
         <option value="$PROJECT_DIR$/web/src/submission/submissionDelegator.py" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
         <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_cgcore.json" />
         <option value="$PROJECT_DIR$/web/src/web/settings/base.py" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py" />
         <option value="$PROJECT_DIR$/web/src/tests/test_dataverse_and_dspace_respositories.py" />
         <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_datafile_cgcore.json" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_submission.json" />
         <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_cgcore_dataverse_submission.json" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py" />
         <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_cgcore_dataverse_submission_new.json" />
         <option value="$PROJECT_DIR$/web/src/tests/test_cgcore.py" />
@@ -693,34 +339,21 @@
         <option value="$USER_HOME$/Desktop/output.json" />
         <option value="$PROJECT_DIR$/web/src/dal/copo_da.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py" />
-<<<<<<< HEAD
-        <option value="$PROJECT_DIR$/web/src/submission/ckanSubmission.py" />
-        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_formats.py" />
-        <option value="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" />
-        <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/management/commands/setup_schemas.py" />
-        <option value="$PROJECT_DIR$/web/src/submission/submissionDelegator.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" />
-        <option value="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" />
-=======
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_formats.py" />
         <option value="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_4.py" />
         <option value="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
-        <option value="$PROJECT_DIR$/web/src/submission/ckanSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/copo_schema.csv" />
         <option value="$PROJECT_DIR$/web/src/dal/broker_da.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" />
-        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
         <option value="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/cgcore_mappings/cg_core.json" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py" />
+        <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" />
+        <option value="$PROJECT_DIR$/web/src/submission/ckanSubmission.py" />
       </list>
     </option>
   </component>
@@ -745,18 +378,10 @@
       <path value="$PROJECT_DIR$/web/src/static/copo/lou-multi-select-e052211/package.json" />
     </packageJsonPaths>
   </component>
-<<<<<<< HEAD
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-1920" />
-    <option name="y" value="-94" />
-    <option name="width" value="1920" />
-    <option name="height" value="1057" />
-=======
   <component name="ProjectFrameBounds">
     <option name="y" value="23" />
     <option name="width" value="1920" />
     <option name="height" value="988" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -867,42 +492,8 @@
               <item name="web" type="462c0819:PsiDirectoryNode" />
               <item name="apps" type="462c0819:PsiDirectoryNode" />
               <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="management" type="462c0819:PsiDirectoryNode" />
-              <item name="commands" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
               <item name="schemas" type="462c0819:PsiDirectoryNode" />
               <item name="copo" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="schemas" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-              <item name="dbmodels" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="schemas" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-              <item name="dbmodels" type="462c0819:PsiDirectoryNode" />
-              <item name="isa" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
@@ -952,20 +543,6 @@
               <item name="apps" type="462c0819:PsiDirectoryNode" />
               <item name="web_copo" type="462c0819:PsiDirectoryNode" />
               <item name="schemas" type="462c0819:PsiDirectoryNode" />
-              <item name="copo" type="462c0819:PsiDirectoryNode" />
-              <item name="uimodels" type="462c0819:PsiDirectoryNode" />
-              <item name="mappings" type="462c0819:PsiDirectoryNode" />
-              <item name="copo_mappings" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COPO" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="schemas" type="462c0819:PsiDirectoryNode" />
               <item name="utils" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -980,23 +557,6 @@
               <item name="utils" type="462c0819:PsiDirectoryNode" />
               <item name="cg_core" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="wizards" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COPO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="apps" type="462c0819:PsiDirectoryNode" />
-              <item name="web_copo" type="462c0819:PsiDirectoryNode" />
-              <item name="wizards" type="462c0819:PsiDirectoryNode" />
-              <item name="datafile" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -1006,7 +566,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
-    <property name="SearchEverywhereHistoryKey" value="views&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/views.py&#10;re&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/repository_inspection.js&#10;ckan&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/ckanSubmission.py&#10;ajax&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;setup&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/management/commands/setup_schemas.py&#10;dspace&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/dspaceSubmission.py&#10;submission&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_submission_2.js&#10;repo&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/repository_inspection.js&#10;scra&#9;FILE&#9;file:///Users/fshaw/Library/Preferences/PyCharm2018.1/scratches/scratch_1.py&#10;023798&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/media/chunked_uploads/35/10_05_58_023798&#10;xml.xml&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/media/chunked_uploads/32/09_29_55_184884/xml.xml&#10;temp&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/components_template.html&#10;sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/submissionDelegator.py&#10;template&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/components_template.html&#10;settings&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/settings&#10;html&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templatetags/html_tags.py&#10;selen&#9;RUN_CONFIGURATION&#9;selenium_stress_test&#10;sele&#9;null&#9;null&#10;test&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/tests/test_ckan_repository.py&#10;urls&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/urls.py&#10;dublin&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/dublincore_mappings&#10;html_t&#9;null&#9;null&#10;man&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/manage.py&#10;url&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/urls.py&#10;mana&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/manage.py&#10;dc_stages&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json&#10;copo_sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_submission_2.js&#10;dataverse&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/dataverseSubmission.py&#10;templates&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates&#10;submission.json&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_submission.json&#10;rep&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/repository_inspection.js&#10;lookup&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/lookup/lookup.py&#10;copo_lookup&#9;null&#9;null&#10;generic&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/generic_handlers.js&#10;generic handlers&#9;null&#9;null&#10;groups&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/management/commands/setup_groups.py" />
+    <property name="SearchEverywhereHistoryKey" value="data&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/dataverseSubmission.py&#10;dspace&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/dspaceSubmission.py&#10;repo&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/repository_inspection.js&#10;subm&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_submission_2.js&#10;ajax&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/utils/ajax_handlers.py&#10;views&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/views.py&#10;re&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/repository_inspection.js&#10;ckan&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/ckanSubmission.py&#10;setup&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/management/commands/setup_schemas.py&#10;submission&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_submission_2.js&#10;scra&#9;FILE&#9;file:///Users/fshaw/Library/Preferences/PyCharm2018.1/scratches/scratch_1.py&#10;023798&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/media/chunked_uploads/35/10_05_58_023798&#10;xml.xml&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/media/chunked_uploads/32/09_29_55_184884/xml.xml&#10;temp&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/components_template.html&#10;sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/submissionDelegator.py&#10;template&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates/copo/components_template.html&#10;settings&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/settings&#10;html&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templatetags/html_tags.py&#10;selen&#9;RUN_CONFIGURATION&#9;selenium_stress_test&#10;sele&#9;null&#9;null&#10;test&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/tests/test_ckan_repository.py&#10;urls&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/urls.py&#10;dublin&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/dublincore_mappings&#10;html_t&#9;null&#9;null&#10;man&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/manage.py&#10;url&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/urls.py&#10;mana&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/manage.py&#10;dc_stages&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json&#10;copo_sub&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/copo_submission_2.js&#10;dataverse&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/submission/dataverseSubmission.py&#10;templates&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/templates&#10;submission.json&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/copo_mappings/copo_submission.json&#10;rep&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/repository_inspection.js&#10;lookup&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/lookup/lookup.py&#10;copo_lookup&#9;null&#9;null&#10;generic&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/static/copo/js/generic_handlers.js&#10;generic handlers&#9;null&#9;null&#10;groups&#9;FILE&#9;file:///Users/fshaw/Dropbox/dev/COPO/web/src/web/apps/web_copo/management/commands/setup_groups.py" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
@@ -1747,6 +1307,118 @@
       </list>
     </option>
   </component>
+  <component name="RestoreUpdateTree" date="Moments ago" ActionInfo="_Update">
+    <UpdatedFiles>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Updated from server" />
+        <option name="myStatusName" value="Changed on server" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="CHANGED_ON_SERVER" />
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Updated" />
+          <option name="myStatusName" value="Changed" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="UPDATED" />
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/cgcore_mappings/cg_core.json</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py</PATH>
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Created" />
+          <option name="myStatusName" value="Created" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="CREATED" />
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/dataverse_dataset_template.json</PATH>
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Deleted" />
+          <option name="myStatusName" value="Deleted" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="true" />
+          <option name="myId" value="REMOVED_FROM_REPOSITORY" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Restored" />
+          <option name="myStatusName" value="Will be restored" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="RESTORED" />
+        </FILE-GROUP>
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Modified" />
+        <option name="myStatusName" value="Modified" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MODIFIED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Skipped" />
+        <option name="myStatusName" value="Skipped" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="SKIPPED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with conflicts" />
+        <option name="myStatusName" value="Will be merged with conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_CONFLICTS" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with tree conflicts" />
+        <option name="myStatusName" value="Merged with tree conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_TREE_CONFLICT" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with property conflicts" />
+        <option name="myStatusName" value="Will be merged with property conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_PROPERTY_CONFLICT" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged" />
+        <option name="myStatusName" value="Will be merged" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Not in repository" />
+        <option name="myStatusName" value="Not in repository" />
+        <option name="mySupportsDeletion" value="true" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="UNKNOWN" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Locally added" />
+        <option name="myStatusName" value="Locally added" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="LOCALLY_ADDED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Locally removed" />
+        <option name="myStatusName" value="Locally removed" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="LOCALLY_REMOVED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Switched" />
+        <option name="myStatusName" value="Switched" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="SWITCHED" />
+      </FILE-GROUP>
+    </UpdatedFiles>
+  </component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -1759,7 +1431,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Django server.setup_schemas">
+  <component name="RunManager" selected="Django server.copo-dev">
     <configuration name="CGCoreTests" type="DjangoTestsConfigurationType" factoryName="Django tests">
       <module name="COPO" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -2191,13 +1863,6 @@
       <option name="presentableId" value="Default" />
       <updated>1480591260906</updated>
     </task>
-    <task id="LOCAL-00043" summary="drilling into datasets and selecting of dataverses working">
-      <created>1532535666178</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1532535666178</updated>
-    </task>
     <task id="LOCAL-00044" summary="commenting">
       <created>1532536182418</created>
       <option name="number" value="00044" />
@@ -2534,7 +2199,14 @@
       <option name="project" value="LOCAL" />
       <updated>1550064810425</updated>
     </task>
-    <option name="localTasksCounter" value="92" />
+    <task id="LOCAL-00092" summary="toni's changes">
+      <created>1550242859208</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1550242859208</updated>
+    </task>
+    <option name="localTasksCounter" value="93" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -2579,11 +2251,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-<<<<<<< HEAD
-    <frame x="-1920" y="-94" width="1920" height="1057" extended-state="6" />
-=======
     <frame x="0" y="23" width="1920" height="988" extended-state="0" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3292683" />
@@ -2593,22 +2261,12 @@
       <window_info anchor="bottom" id="Python Console" order="11" weight="0.32026875" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49767134" weight="0.32586786" />
       <window_info anchor="bottom" id="Terminal" order="12" weight="0.2626832" />
-<<<<<<< HEAD
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.37517053" visible="true" weight="0.16027689" />
-      <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" weight="0.25181347" />
-      <window_info anchor="right" id="Database" order="5" />
-      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49767134" weight="0.2701228" />
-      <window_info anchor="right" id="SciView" order="6" weight="0.3297568" />
-      <window_info id="Structure" order="1" sideWeight="0.6248295" side_tool="true" weight="0.21530758" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.7174535" visible="true" weight="0.25675675" />
-=======
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7445743" visible="true" weight="0.21884984" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.8230384" visible="true" weight="0.21884984" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" weight="0.25181347" />
       <window_info anchor="right" id="Database" order="4" weight="0.32960597" />
-      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49767134" weight="0.27030814" />
+      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49767134" weight="0.268757" />
       <window_info anchor="right" id="SciView" order="5" weight="0.58945686" />
-      <window_info id="Structure" order="1" sideWeight="0.25542572" side_tool="true" visible="true" weight="0.21884984" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
+      <window_info id="Structure" order="1" sideWeight="0.1769616" side_tool="true" visible="true" weight="0.21884984" />
       <window_info id="Favorites" order="2" sideWeight="0.14671163" side_tool="true" weight="0.20127796" />
       <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.7174535" visible="true" weight="0.32922733" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -2696,7 +2354,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="completed test for dataverse submission" />
     <MESSAGE value="pushing tests for testing on server" />
     <MESSAGE value="tests for dspace and dataverse now in place" />
     <MESSAGE value="adding selenium test to try and check multiple upload speed" />
@@ -2721,7 +2378,8 @@
     <MESSAGE value="adding format identifier for dspace subs" />
     <MESSAGE value="multiple files uploading to dspace with full metadata" />
     <MESSAGE value="tidying of dspace code" />
-    <option name="LAST_COMMIT_MESSAGE" value="tidying of dspace code" />
+    <MESSAGE value="toni's changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="toni's changes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2736,17 +2394,15 @@
           <line>10</line>
           <option name="timeStamp" value="1574" />
         </line-breakpoint>
-<<<<<<< HEAD
-        <line-breakpoint suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/../environments/copo_python3.5_django2/src/dataverse/dataverse/dataset.py</url>
-          <line>297</line>
-          <option name="timeStamp" value="1600" />
-=======
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py</url>
-          <line>226</line>
+          <line>292</line>
           <option name="timeStamp" value="1597" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/web/src/submission/ckanSubmission.py</url>
+          <line>106</line>
+          <option name="timeStamp" value="1713" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -2759,11 +2415,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-<<<<<<< HEAD
-      <option name="time" value="1633" />
-=======
-      <option name="time" value="1688" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
+      <option name="time" value="1714" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Python.DjangoServer">
@@ -2774,37 +2426,16 @@
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
       <expression>
-        <expression-string>list(df.columns)</expression-string>
+        <expression-string>requests.post(fullurl,
+                                         data=data,
+                                         #files=files,
+                                         headers=self.headers
+                                         )</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>df.columns</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>context['table_data']</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>task</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>task_dict</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>context</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>out</expression-string>
+        <expression-string>data</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
@@ -2814,7 +2445,33 @@
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>sub</expression-string>
+        <expression-string>item</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>json.dumps(out
+           )</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>json.dumps(out)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>out</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>json.dumps(s[&quot;meta&quot;])</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>json.dump(s[&quot;meta&quot;])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
@@ -2833,19 +2490,6 @@
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
-<<<<<<< HEAD
-        <expression-string>receipt['status']</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>dv.alias</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-=======
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
         <expression-string />
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
@@ -2880,13 +2524,6 @@
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
-<<<<<<< HEAD
-    </expressions>
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/web/src/tests/fixtures/dummy_cgcore_dataverse_submission_existing.json" />
-    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/suite.py">
-=======
       <expression>
         <expression-string />
         <language-id>Python</language-id>
@@ -2905,28 +2542,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/components_template.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="25" column="50" selection-start-line="25" selection-start-column="50" selection-end-line="25" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/requirements/prod.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="11" lean-forward="true" selection-start-column="11" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/requirements/base.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
-          <caret line="79" column="22" lean-forward="true" selection-start-line="79" selection-start-column="22" selection-end-line="79" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/media/chunked_uploads/32/09_29_55_184884/xml.xml" />
     <entry file="file://$PROJECT_DIR$/web/src/media/chunked_uploads/35/10_05_58_023798/xml.xml" />
     <entry file="file://$USER_HOME$/Downloads/dataset-update-metadata-1.xml">
       <provider selected="true" editor-type-id="text-editor">
@@ -2950,7 +2565,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4320">
           <caret line="310" column="20" selection-start-line="310" selection-start-column="20" selection-end-line="310" selection-end-column="20" />
@@ -2971,9 +2585,6 @@
         </state>
       </provider>
     </entry>
-<<<<<<< HEAD
-    <entry file="file://$PROJECT_DIR$/web/src/requirements/base.txt">
-=======
     <entry file="file://$PROJECT_DIR$/web/src/tests/fixtures/dataverse_dccore_example.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
@@ -2982,7 +2593,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py">
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1155">
           <caret line="79" column="61" selection-start-line="79" selection-start-column="61" selection-end-line="79" selection-end-column="61" />
@@ -3010,17 +2620,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/codecs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4620">
-          <caret line="308" selection-start-line="308" selection-end-line="308" />
-        </state>
-      </provider>
-    </entry>
-<<<<<<< HEAD
-    <entry file="file://$PROJECT_DIR$/web/src/submission/ckanSubmission.py" />
-    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/xml/etree/ElementTree.py">
-=======
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
@@ -3029,7 +2628,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/src/dataverse/dataverse/dataverse.py">
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
           <caret line="102" column="8" selection-start-line="102" selection-start-column="8" selection-end-line="102" selection-end-column="8" />
@@ -3043,65 +2641,13 @@
         </state>
       </provider>
     </entry>
-<<<<<<< HEAD
-    <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/src/dataverse/dataverse/dataset.py" />
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
-=======
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/management/commands/setup_schemas.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="48" column="29" selection-start-line="48" selection-start-column="29" selection-end-line="48" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/dal/copo_base_da.py">
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1755">
           <caret line="124" column="57" selection-start-line="124" selection-start-column="57" selection-end-line="124" selection-end-column="57" />
         </state>
       </provider>
     </entry>
-<<<<<<< HEAD
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="6" column="54" lean-forward="true" selection-start-line="6" selection-start-column="54" selection-end-line="6" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/copo_schema2.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="34" selection-start-line="13" selection-start-column="34" selection-end-line="13" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizard_views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="37">
-          <caret line="20" column="36" selection-start-line="20" selection-start-column="36" selection-end-line="20" selection-end-column="36" />
-          <folding>
-            <element signature="e#49#60#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/broker_requests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="15" column="34" selection-start-line="15" selection-start-column="31" selection-end-line="15" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_formats.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="37">
-          <caret line="123" column="40" selection-start-line="123" selection-start-column="40" selection-end-line="123" selection-end-column="40" />
-          <folding>
-            <element signature="e#1672#2985#0" expanded="true" />
-          </folding>
-=======
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_formats.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="525">
@@ -3113,203 +2659,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="975">
           <caret line="66" column="37" selection-start-line="66" selection-start-column="37" selection-end-line="66" selection-end-column="37" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py">
-      <provider selected="true" editor-type-id="text-editor">
-<<<<<<< HEAD
-        <state relative-caret-position="76">
-          <caret line="40" column="27" lean-forward="true" selection-start-line="40" selection-start-column="27" selection-end-line="40" selection-end-column="27" />
-          <folding>
-            <element signature="e#0#38#0" expanded="true" />
-            <element signature="e#1729#1805#0" expanded="true" />
-            <element signature="e#1888#2478#0" expanded="true" />
-            <element signature="e#2521#2767#0" expanded="true" />
-            <element signature="e#2809#3382#0" expanded="true" />
-            <element signature="e#3430#3585#0" expanded="true" />
-            <element signature="e#3635#3695#0" expanded="true" />
-            <element signature="e#3745#4126#0" expanded="true" />
-            <element signature="e#4180#5333#0" expanded="true" />
-            <element signature="e#5383#5629#0" expanded="true" />
-            <element signature="e#5700#6844#0" expanded="true" />
-            <element signature="e#6895#7684#0" expanded="true" />
-            <element signature="e#7722#7934#0" expanded="true" />
-            <element signature="e#7967#8461#0" expanded="true" />
-            <element signature="e#8539#8648#0" expanded="true" />
-            <element signature="e#8730#8835#0" expanded="true" />
-            <element signature="e#8903#9150#0" expanded="true" />
-            <element signature="e#9201#9234#0" expanded="true" />
-            <element signature="e#9287#9721#0" expanded="true" />
-            <element signature="e#9793#10571#0" expanded="true" />
-            <element signature="e#10624#10890#0" expanded="true" />
-            <element signature="e#11015#11785#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/environments/copodevelopment/src/dataverse/dataverse/exceptions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="99">
-          <caret line="33" column="6" selection-start-line="33" selection-start-column="6" selection-end-line="33" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/copo_enums.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="6" selection-start-line="5" selection-start-column="6" selection-end-line="5" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="111">
-          <caret line="15" column="15" selection-start-line="15" selection-start-column="15" selection-end-line="15" selection-end-column="15" />
-          <folding>
-            <element signature="e#995#1142#0" expanded="true" />
-            <element signature="e#1196#2883#0" expanded="true" />
-            <element signature="e#3075#12117#0" expanded="true" />
-            <element signature="e#12203#15180#0" expanded="true" />
-            <element signature="e#15267#16971#0" expanded="true" />
-            <element signature="e#17049#20919#0" expanded="true" />
-            <element signature="e#21226#23086#0" expanded="true" />
-            <element signature="e#23118#24604#0" expanded="true" />
-            <element signature="e#24649#24994#0" expanded="true" />
-            <element signature="e#25044#25795#0" expanded="true" />
-            <element signature="e#25838#26179#0" expanded="true" />
-            <element signature="e#26222#26645#0" expanded="true" />
-            <element signature="e#26691#27252#0" expanded="true" />
-            <element signature="e#27294#27561#0" expanded="true" />
-            <element signature="e#27602#28161#0" expanded="true" />
-            <element signature="e#28201#30726#0" expanded="true" />
-            <element signature="e#30776#33917#0" expanded="true" />
-            <element signature="e#34075#41575#0" expanded="true" />
-            <element signature="e#41618#43197#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="40">
-          <caret line="779" column="27" lean-forward="true" selection-start-line="779" selection-start-column="27" selection-end-line="779" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
-          <caret line="137" column="50" lean-forward="true" selection-start-line="137" selection-start-column="50" selection-end-line="137" selection-end-column="50" />
-          <folding>
-            <element signature="e#49#84#0" expanded="true" />
-            <element signature="e#1949#1977#0" expanded="true" />
-            <element signature="e#2013#2800#0" expanded="true" />
-            <element signature="e#2838#2968#0" expanded="true" />
-            <element signature="e#3056#3119#0" expanded="true" />
-            <element signature="e#3160#3347#0" expanded="true" />
-            <element signature="e#3392#3615#0" expanded="true" />
-            <element signature="e#3662#3706#0" expanded="true" />
-            <element signature="e#3743#4207#0" expanded="true" />
-            <element signature="e#4264#4302#0" expanded="true" />
-            <element signature="e#4338#4634#0" expanded="true" />
-            <element signature="e#6609#6843#0" expanded="true" />
-            <element signature="e#6963#7237#0" expanded="true" />
-            <element signature="e#7479#8166#0" expanded="true" />
-            <element signature="e#8224#8376#0" expanded="true" />
-            <element signature="e#8460#8520#0" expanded="true" />
-            <element signature="e#8603#8661#0" expanded="true" />
-            <element signature="e#8724#8841#0" expanded="true" />
-            <element signature="e#8934#9652#0" expanded="true" />
-            <element signature="e#9707#9922#0" expanded="true" />
-            <element signature="e#9980#10079#0" expanded="true" />
-            <element signature="e#10142#10233#0" expanded="true" />
-            <element signature="e#10312#10362#0" expanded="true" />
-            <element signature="e#10410#10563#0" expanded="true" />
-            <element signature="e#10606#11550#0" expanded="true" />
-            <element signature="e#11629#11679#0" expanded="true" />
-            <element signature="e#11736#11804#0" expanded="true" />
-            <element signature="e#11883#11933#0" expanded="true" />
-            <element signature="e#11990#12058#0" expanded="true" />
-            <element signature="e#12141#12199#0" expanded="true" />
-            <element signature="e#12275#12444#0" expanded="true" />
-            <element signature="e#12511#13048#0" expanded="true" />
-            <element signature="e#13107#13466#0" expanded="true" />
-            <element signature="e#13535#13777#0" expanded="true" />
-            <element signature="e#13836#13929#0" expanded="true" />
-            <element signature="e#13973#14086#0" expanded="true" />
-            <element signature="e#14152#14729#0" expanded="true" />
-            <element signature="e#14794#15243#0" expanded="true" />
-            <element signature="e#15318#15962#0" expanded="true" />
-            <element signature="e#16032#16354#0" expanded="true" />
-            <element signature="e#16406#17163#0" expanded="true" />
-            <element signature="e#17242#17415#0" expanded="true" />
-            <element signature="e#17453#17551#0" expanded="true" />
-            <element signature="e#17589#17705#0" expanded="true" />
-            <element signature="e#17778#18403#0" expanded="true" />
-            <element signature="e#18461#18602#0" expanded="true" />
-            <element signature="e#18664#19193#0" expanded="true" />
-            <element signature="e#19251#19380#0" expanded="true" />
-            <element signature="e#19461#19515#0" expanded="true" />
-            <element signature="e#19568#19678#0" expanded="true" />
-            <element signature="e#19732#19926#0" expanded="true" />
-            <element signature="e#19985#20303#0" expanded="true" />
-            <element signature="e#20370#20463#0" expanded="true" />
-            <element signature="e#20539#21660#0" expanded="true" />
-            <element signature="e#21753#22462#0" expanded="true" />
-            <element signature="e#22539#22585#0" expanded="true" />
-            <element signature="e#22638#22757#0" expanded="true" />
-            <element signature="e#22806#23097#0" expanded="true" />
-            <element signature="e#23153#23803#0" expanded="true" />
-            <element signature="e#23870#24371#0" expanded="true" />
-            <element signature="e#24441#24541#0" expanded="true" />
-            <element signature="e#24606#24710#0" expanded="true" />
-            <element signature="e#24787#24920#0" expanded="true" />
-            <element signature="e#24983#25148#0" expanded="true" />
-            <element signature="e#25213#25316#0" expanded="true" />
-            <element signature="e#25364#25474#0" expanded="true" />
-            <element signature="e#25553#26032#0" expanded="true" />
-            <element signature="e#26080#26179#0" expanded="true" />
-            <element signature="e#26238#26348#0" expanded="true" />
-            <element signature="e#26410#26554#0" expanded="true" />
-            <element signature="e#26617#26945#0" expanded="true" />
-            <element signature="e#27010#27320#0" expanded="true" />
-            <element signature="e#27380#27777#0" expanded="true" />
-            <element signature="e#27839#27953#0" expanded="true" />
-            <element signature="e#28020#28143#0" expanded="true" />
-            <element signature="e#28196#28293#0" expanded="true" />
-            <element signature="e#28349#28480#0" expanded="true" />
-            <element signature="e#28546#28665#0" expanded="true" />
-            <element signature="e#28706#28812#0" expanded="true" />
-            <element signature="e#28854#29054#0" expanded="true" />
-            <element signature="e#29105#29187#0" expanded="true" />
-            <element signature="e#29231#29330#0" expanded="true" />
-            <element signature="e#29419#29654#0" expanded="true" />
-            <element signature="e#29707#29859#0" expanded="true" />
-            <element signature="e#29933#30038#0" expanded="true" />
-            <element signature="e#30071#30190#0" expanded="true" />
-            <element signature="e#30237#30360#0" expanded="true" />
-            <element signature="e#30432#31442#0" expanded="true" />
-            <element signature="e#31496#31564#0" expanded="true" />
-            <element signature="e#31639#32266#0" expanded="true" />
-            <element signature="e#32307#32457#0" expanded="true" />
-            <element signature="e#32511#32668#0" expanded="true" />
-            <element signature="e#32715#32719#0" expanded="true" />
-            <element signature="e#32790#32928#0" expanded="true" />
-            <element signature="e#32961#33081#0" expanded="true" />
-            <element signature="e#33246#33673#0" expanded="true" />
-            <element signature="e#33739#33850#0" expanded="true" />
-            <element signature="e#33918#34085#0" expanded="true" />
-            <element signature="e#34131#34187#0" expanded="true" />
-            <element signature="e#34307#34418#0" expanded="true" />
-            <element signature="e#34477#34671#0" expanded="true" />
-            <element signature="e#34732#35902#0" expanded="true" />
-            <element signature="e#35954#36245#0" expanded="true" />
-            <element signature="e#36314#36532#0" expanded="true" />
-=======
-        <state relative-caret-position="1170">
-          <caret line="267" selection-start-line="267" selection-end-line="267" />
         </state>
       </provider>
     </entry>
@@ -3317,11 +2666,11 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="236">
           <caret line="293" selection-start-line="293" selection-end-line="293" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
+          </folding>
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/cgcore_mappings/cg_core.json">
-      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/web/src/dal/copo_da.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -3329,20 +2678,10 @@
           <caret line="506" selection-start-line="506" selection-end-line="506" />
           <folding>
             <element signature="e#49#84#0" expanded="true" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
           </folding>
         </state>
       </provider>
     </entry>
-<<<<<<< HEAD
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="257">
-          <caret line="390" column="35" lean-forward="true" selection-start-line="390" selection-start-column="35" selection-end-line="390" selection-end-column="35" />
-          <folding>
-            <element signature="e#19013#20970#0" expanded="true" />
-          </folding>
-=======
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_4.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="405">
@@ -3350,294 +2689,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="19" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1035">
-          <caret line="74" selection-start-line="74" selection-end-line="74" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
-      <provider selected="true" editor-type-id="text-editor">
-<<<<<<< HEAD
-        <state relative-caret-position="379">
-          <caret line="135" column="33" lean-forward="true" selection-start-line="135" selection-start-column="33" selection-end-line="135" selection-end-column="33" />
-          <folding>
-            <element signature="e#8275#18161#0" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-=======
-        <state>
-          <caret line="375" column="14" selection-start-line="375" selection-start-column="14" selection-end-line="375" selection-end-column="14" />
-          <folding>
-            <element signature="e#50#96#0" expanded="true" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
-          </folding>
-        </state>
-      </provider>
-    </entry>
-<<<<<<< HEAD
-    <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="705">
-          <caret line="67" selection-start-line="67" selection-end-line="67" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/dal/broker_da.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1045">
-          <caret line="76" column="43" lean-forward="true" selection-start-line="76" selection-start-column="43" selection-end-line="76" selection-end-column="43" />
-          <folding>
-            <element signature="e#47#57#0" expanded="true" />
-            <element signature="e#726#1731#0" expanded="true" />
-            <element signature="e#1786#1853#0" expanded="true" />
-            <element signature="e#1902#2250#0" expanded="true" />
-            <element signature="e#4492#5064#0" expanded="true" />
-            <element signature="e#5097#5571#0" expanded="true" />
-            <element signature="e#5626#5944#0" expanded="true" />
-            <element signature="e#5976#6451#0" expanded="true" />
-            <element signature="e#6499#6707#0" expanded="true" />
-            <element signature="e#6746#6985#0" expanded="true" />
-            <element signature="e#7030#7153#0" expanded="true" />
-            <element signature="e#7202#8297#0" expanded="true" />
-            <element signature="e#8363#8581#0" expanded="true" />
-            <element signature="e#8636#8703#0" expanded="true" />
-            <element signature="e#8742#10178#0" expanded="true" />
-            <element signature="e#10229#10705#0" expanded="true" />
-            <element signature="e#10742#11892#0" expanded="true" />
-            <element signature="e#11946#12198#0" expanded="true" />
-            <element signature="e#12242#12369#0" expanded="true" />
-            <element signature="e#12412#12476#0" expanded="true" />
-            <element signature="e#12528#13082#0" expanded="true" />
-            <element signature="e#13123#13227#0" expanded="true" />
-            <element signature="e#13271#13405#0" expanded="true" />
-            <element signature="e#13450#13586#0" expanded="true" />
-            <element signature="e#13634#14430#0" expanded="true" />
-            <element signature="e#14470#14717#0" expanded="true" />
-            <element signature="e#14764#15053#0" expanded="true" />
-            <element signature="e#15106#16027#0" expanded="true" />
-            <element signature="e#16070#16257#0" expanded="true" />
-            <element signature="e#16308#16705#0" expanded="true" />
-            <element signature="e#16752#17041#0" expanded="true" />
-            <element signature="e#17086#17178#0" expanded="true" />
-=======
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/mapTypeSubtype.csv">
       <provider editor-type-id="csv-table-editor">
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
       </provider>
       <provider selected="true" editor-type-id="csv-text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/ckanSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="362">
-          <caret line="149" column="28" selection-start-line="149" selection-start-column="28" selection-end-line="149" selection-end-column="28" />
-          <folding>
-            <element signature="e#33#66#0" expanded="true" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
-          </folding>
-        </state>
-      </provider>
-    </entry>
-<<<<<<< HEAD
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="501">
-          <caret line="382" selection-start-line="382" selection-end-line="382" />
-          <folding>
-            <element signature="e#22#31#0" expanded="true" />
-            <element signature="e#301#782#0" expanded="true" />
-            <element signature="e#843#1224#0" expanded="true" />
-            <element signature="e#1271#2374#0" expanded="true" />
-            <element signature="e#2431#3959#0" expanded="true" />
-            <element signature="e#4005#4269#0" expanded="true" />
-            <element signature="e#4325#5085#0" expanded="true" />
-            <element signature="e#5154#6380#0" expanded="true" />
-            <element signature="e#6424#6585#0" expanded="true" />
-            <element signature="e#6629#6794#0" expanded="true" />
-            <element signature="e#6870#9471#0" expanded="true" />
-            <element signature="e#9529#9713#0" expanded="true" />
-            <element signature="e#9771#9957#0" expanded="true" />
-            <element signature="e#9999#10120#0" expanded="true" />
-            <element signature="e#10161#11448#0" expanded="true" />
-=======
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="519">
-          <caret line="670" column="29" lean-forward="true" selection-start-line="670" selection-start-column="29" selection-end-line="670" selection-end-column="29" />
-          <folding>
-            <element signature="e#137#148#0" expanded="true" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
-          </folding>
-        </state>
-      </provider>
-    </entry>
-<<<<<<< HEAD
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/management/commands/setup_schemas.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="44" lean-forward="true" selection-start-line="17" selection-start-column="44" selection-end-line="17" selection-end-column="44" />
-          <folding>
-            <element signature="e#85#136#0" expanded="true" />
-            <element signature="e#774#954#0" expanded="true" />
-            <element signature="e#999#1312#0" expanded="true" />
-            <element signature="e#1365#2059#0" expanded="true" />
-            <element signature="e#2506#3018#0" expanded="true" />
-            <element signature="e#3068#3813#0" expanded="true" />
-            <element signature="e#3859#4983#0" expanded="true" />
-            <element signature="e#5033#6864#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="389">
-          <caret line="66" column="38" lean-forward="true" selection-start-line="66" selection-start-column="38" selection-end-line="66" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="139">
-          <caret line="604" column="27" lean-forward="true" selection-start-line="604" selection-start-column="27" selection-end-line="604" selection-end-column="27" />
-          <folding>
-            <element signature="e#22#31#0" expanded="true" />
-            <element signature="e#573#853#0" expanded="true" />
-            <element signature="e#927#1103#0" expanded="true" />
-            <element signature="e#1160#1253#0" expanded="true" />
-            <element signature="e#1294#1517#0" expanded="true" />
-            <element signature="e#1553#1674#0" expanded="true" />
-            <element signature="e#1714#1718#0" expanded="true" />
-            <element signature="e#1754#1918#0" expanded="true" />
-            <element signature="e#1954#2156#0" expanded="true" />
-            <element signature="e#2199#2387#0" expanded="true" />
-            <element signature="e#2428#2543#0" expanded="true" />
-            <element signature="e#2577#2891#0" expanded="true" />
-            <element signature="e#2935#3620#0" expanded="true" />
-            <element signature="e#3655#3700#0" expanded="true" />
-            <element signature="e#3744#3790#0" expanded="true" />
-            <element signature="e#3833#3883#0" expanded="true" />
-            <element signature="e#3926#3967#0" expanded="true" />
-            <element signature="e#4010#4044#0" expanded="true" />
-            <element signature="e#4085#4613#0" expanded="true" />
-            <element signature="e#4647#5657#0" expanded="true" />
-            <element signature="e#5707#6765#0" expanded="true" />
-            <element signature="e#6810#7872#0" expanded="true" />
-            <element signature="e#7919#8910#0" expanded="true" />
-            <element signature="e#8947#8986#0" expanded="true" />
-            <element signature="e#9024#9064#0" expanded="true" />
-            <element signature="e#9101#9141#0" expanded="true" />
-            <element signature="e#9178#9216#0" expanded="true" />
-            <element signature="e#9254#9294#0" expanded="true" />
-            <element signature="e#9335#9377#0" expanded="true" />
-            <element signature="e#9420#9464#0" expanded="true" />
-            <element signature="e#9507#9551#0" expanded="true" />
-            <element signature="e#9577#9840#0" expanded="true" />
-            <element signature="e#9866#10012#0" expanded="true" />
-            <element signature="e#10043#10190#0" expanded="true" />
-            <element signature="e#10224#10264#0" expanded="true" />
-            <element signature="e#10291#10420#0" expanded="true" />
-            <element signature="e#10455#10558#0" expanded="true" />
-            <element signature="e#10589#10692#0" expanded="true" />
-            <element signature="e#10727#10785#0" expanded="true" />
-            <element signature="e#10827#14016#0" expanded="true" />
-            <element signature="e#14058#14453#0" expanded="true" />
-            <element signature="e#14503#14731#0" expanded="true" />
-            <element signature="e#14787#14950#0" expanded="true" />
-            <element signature="e#15006#16917#0" expanded="true" />
-            <element signature="e#16955#17477#0" expanded="true" />
-            <element signature="e#17515#17902#0" expanded="true" />
-            <element signature="e#17937#18121#0" expanded="true" />
-            <element signature="e#18147#18285#0" expanded="true" />
-            <element signature="e#18350#18738#0" expanded="true" />
-            <element signature="e#18772#18809#0" expanded="true" />
-            <element signature="e#19181#29163#0" expanded="true" />
-            <element signature="e#29219#39434#0" expanded="true" />
-            <element signature="e#39508#40061#0" expanded="true" />
-            <element signature="e#40140#40907#0" expanded="true" />
-            <element signature="e#40964#41080#0" expanded="true" />
-            <element signature="e#41136#41418#0" expanded="true" />
-            <element signature="e#41456#41681#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/sword_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="14" column="24" selection-start-line="14" selection-start-column="24" selection-end-line="14" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="110" column="99" lean-forward="true" selection-start-line="110" selection-start-column="99" selection-end-line="110" selection-end-column="99" />
-          <folding>
-            <element signature="e#6658#8970#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="255" column="54" lean-forward="true" selection-start-line="255" selection-start-column="54" selection-end-line="255" selection-end-column="54" />
-          <folding>
-            <element signature="e#51#83#0" expanded="true" />
-            <element signature="e#966#1111#0" expanded="true" />
-            <element signature="e#1120#4381#0" expanded="true" />
-            <element signature="e#5424#6675#0" expanded="true" />
-            <element signature="e#2005#2146#0" expanded="true" />
-            <element signature="e#2205#2251#0" expanded="true" />
-            <element signature="e#2299#3116#0" expanded="true" />
-            <element signature="e#7887#8095#0" expanded="true" />
-            <element signature="e#3730#4050#0" expanded="true" />
-            <element signature="e#10097#10263#0" expanded="true" />
-            <element signature="e#4091#4248#0" expanded="true" />
-            <element signature="e#4300#4812#0" expanded="true" />
-            <element signature="e#4867#5265#0" expanded="true" />
-            <element signature="e#5322#5414#0" expanded="true" />
-            <element signature="e#5489#5824#0" expanded="true" />
-            <element signature="e#5872#7016#0" expanded="true" />
-            <element signature="e#7119#7958#0" expanded="true" />
-            <element signature="e#7992#8109#0" expanded="true" />
-            <element signature="e#8160#9284#0" expanded="true" />
-            <element signature="e#15623#16058#0" expanded="true" />
-            <element signature="e#9331#9840#0" expanded="true" />
-            <element signature="e#9867#10057#0" expanded="true" />
-=======
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="384">
-          <caret line="864" column="16" lean-forward="true" selection-start-line="864" selection-start-column="16" selection-end-line="864" selection-end-column="16" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/site-packages/django/contrib/auth/decorators.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -3801,7 +2857,7 @@
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="64">
-          <caret line="204" column="55" selection-start-line="204" selection-start-column="55" selection-end-line="204" selection-end-column="55" />
+          <caret line="203" column="55" selection-start-line="203" selection-start-column="55" selection-end-line="203" selection-end-column="55" />
         </state>
       </provider>
     </entry>
@@ -3826,43 +2882,137 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="139">
-          <caret line="143" lean-forward="true" selection-start-line="143" selection-end-line="143" />
+        <state relative-caret-position="344">
+          <caret line="850" lean-forward="true" selection-start-line="850" selection-end-line="850" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/site-packages/django/core/management/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="287" selection-start-line="287" selection-end-line="287" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/site-packages/django/core/management/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="469">
+          <caret line="370" selection-start-line="370" selection-end-line="370" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../environments/copo_python3.5_django2/lib/python3.5/codecs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="308" selection-start-line="308" selection-end-line="308" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/manage.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/management/commands/setup_schemas.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/cgcore_mappings/cg_core.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-139">
+          <caret column="34004" selection-start-column="34004" selection-end-column="34004" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="88" column="33" lean-forward="true" selection-start-line="88" selection-start-column="33" selection-end-line="88" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="331">
+          <caret line="646" selection-start-line="646" selection-end-line="646" />
           <folding>
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#1;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#button#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#i#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
->>>>>>> 0c5580ba9b59a95ac842dc3029bfe27b4fcf1d99
+            <element signature="e#137#148#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py">
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="259">
-          <caret line="776" selection-start-line="776" selection-end-line="776" />
+        <state relative-caret-position="615">
+          <caret line="41" column="28" selection-start-line="41" selection-start-column="17" selection-end-line="41" selection-end-column="28" />
+          <folding>
+            <element signature="n#style#0;n#div#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#td#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#td#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="502">
+          <caret line="852" column="52" selection-start-line="852" selection-start-column="52" selection-end-line="852" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="243">
+          <caret line="87" column="53" selection-start-line="87" selection-start-column="53" selection-end-line="87" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="381">
+          <caret line="268" column="35" lean-forward="true" selection-start-line="268" selection-start-column="35" selection-end-line="268" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="127" column="67" lean-forward="true" selection-start-line="123" selection-start-column="12" selection-end-line="127" selection-end-column="67" />
+          <folding>
+            <element signature="e#33#77#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-319">
+          <caret line="182" column="41" selection-start-line="182" selection-start-column="31" selection-end-line="182" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/ckanSubmission.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="245">
+          <caret line="100" column="50" lean-forward="true" selection-start-line="100" selection-start-column="50" selection-end-line="100" selection-end-column="50" />
+          <folding>
+            <element signature="e#33#67#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

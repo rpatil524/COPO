@@ -251,7 +251,7 @@ class CgCoreSchemas:
                     items_list.append(new_item[0])
 
         items_df = pd.DataFrame(items_list)
-        items_df.index = items_df['id']
+        items_df.index = items_df['id'].str.lower()
         items_df = items_df[['ref', 'id', 'prefix']]
         items_df = items_df[~items_df['ref'].isna()]
 
@@ -264,10 +264,11 @@ class CgCoreSchemas:
             new_dict.update(d)
 
         new_dict_series = pd.Series(new_dict)
+        new_dict_series.index = new_dict_series.index.str.lower()
         items_df['vals'] = new_dict_series
+        items_df['vals'].fillna('')
 
         items_df = items_df[['ref', 'id', 'vals', 'prefix']]
-        items_df['vals'].fillna('')
 
         items_df.rename(index=str, columns={"ref": "dc", "id": "copo_id"}, inplace=True)
 

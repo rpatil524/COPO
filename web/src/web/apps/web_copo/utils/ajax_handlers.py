@@ -644,25 +644,7 @@ def get_existing_metadata(request):
 
     out = sub["meta"]
     return HttpResponse(json.dumps(out))
-    # else:
-    #     df_id = sub["bundle"][0]
-    #     df = DataFile().get_record(ObjectId(df_id))
-    #     out = dict()
-    #     out["creator"] = df.get("description", {}).get("attributes", {}) \
-    #         .get("title_author_contributor", {}).get("creator", "")
-    #     out["accessioned"] = str(datetime.now())
-    #     out["created"] = str(datetime.now())
-    #     out["available"] = str(datetime.now())
-    #     out["issued"] = str(datetime.now())
-    #     out["abstract"] = Profile().get_record(ObjectId(sub["profile_id"]))['description']
-    #     out["language"] = "en_US"
-    #     out["rights"] = df.get("description", {}).get("attributes", {}).get("optional_fields", {}).get("license", "")
-    #     out["subject"] = df.get("description", {}).get("attributes", {}).get("subject_description", {}).get("subject", "")
-    #     out["title"] = df.get("description", {}).get("attributes", {}) \
-    #         .get("title_author_contributor", {}).get("subject", "")
-    #     out["type"] = df.get("description", {}).get("attributes", {}) \
-    #         .get("optional_fields", {}).get("type", "")
-    # return HttpResponse(json.dumps(out))
+
 
 
 def get_ckan_items(request):
