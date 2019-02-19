@@ -213,12 +213,14 @@ class DataverseSubmit(object):
         dv_storageIdentifier = meta['latest']['storageIdentifier']
         return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
 
-    def convert_dataset_metadata(self, metadata_fields=list()):
+    def convert_dataset_metadata(self, submission_record=dict()):
         """
-        given metadata fields, function returns a Dataset-compliant schema
-        :param metadata_fields:
-        :return: converted metadata
+        function returns a Dataset-compliant schema
+        :param submission_record:
+        :return:
         """
+
+        metadata_fields = submission_record.get("meta",dict()).get("fields", list())
 
         # get template
         dv_metadata = CgCoreSchemas().get_dv_dataset_template()
@@ -264,7 +266,7 @@ class DataverseSubmit(object):
             return False
 
         # convert dataset metadata
-        converted_metadata = self.convert_dataset_metadata(metadata_fields=submission_meta.get("fields", list()))
+        converted_metadata = self.convert_dataset_metadata(submission_record=submission_record)
 
         # make API call
         dataset_json = '/Users/etuka/Desktop/dataset-finch1.json'
