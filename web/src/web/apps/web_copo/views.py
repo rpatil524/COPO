@@ -104,7 +104,7 @@ def test_dataverse_submit(request):
     # items = CgCoreSchemas().extract_repo_fields(datafile_id="5ba0b949d127fd313b62677c", repo="dataverse")
 
     # from submission.dataverseSubmission import DataverseSubmit
-    # DataverseSubmit().submit(dataFile_ids=["592ee1e668236b82e40b4c56"], sub_id="592ee7f168236b85d16510ef")
+    # DataverseSubmit(submission_id="592ee7f168236b85d16510ef").submit()
     return render(request, 'copo/test_page.html', {})
 
 

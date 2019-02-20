@@ -17,14 +17,6 @@ class CgCoreSchemas:
         self.type_field_status_path = os.path.join(self.schemas_utils_paths, 'type_field_STATUS.csv')
         self.map_type_subtype_path = os.path.join(self.schemas_utils_paths, 'mapTypeSubtype.csv')
         self.copo_schema_spec_path = os.path.join(self.schemas_utils_paths, 'copo_schema.csv')
-        self.dataverse_dataset_template = os.path.join(self.schemas_utils_paths, 'dataverse_dataset_template.json')
-
-    def get_dv_dataset_template(self):
-        try:
-            return d_utils.json_to_pytype(self.dataverse_dataset_template)
-        except Exception as e:
-            print("Couldn't retrieve Dataverse template" + str(e))
-            return False
 
     def retrieve_schema_specs(self, path_to_spec):
         """
@@ -251,8 +243,8 @@ class CgCoreSchemas:
         items = {item.get("id", str()).lower().split(".")[-1]: st.get("ref", "").lower() for st in stages for item in
                  st.get("items", list()) if item.get("id", str()).lower().split(".")[-1] in schema_ids}
 
-        # this obeys any filtering that may have been enforced by some client agent (e.g. COPO Wizard),
-        # within the context of the repo
+        # account for any filtering that may have been enforced by some client agent (e.g. COPO Wizard),
+        # within the context of the target repo
         schema_df = schema_df[schema_df.index.isin(items.keys())]
 
         # obtain attributes for filtered stage items

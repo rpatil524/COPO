@@ -13,15 +13,21 @@ from xml.etree.ElementTree import tostring
 from xml.dom import minidom
 import subprocess
 
+from web.apps.web_copo.lookup.resolver import RESOLVER
+
 
 class DataverseSubmit(object):
-    host = None
-    headers = None
+    def __init__(self, submission_id=str()):
+        self.submission_id = submission_id
+        # self.submission_record = Submission().get_record(ObjectId(self.submission_id))
+        # self.host = Submission().get_dataverse_details(self.submission_id)
+        # self.headers = {'X-Dataverse-key': self.host['apikey']}
 
-    def __init__(self, sub_id=None):
-        if sub_id:
-            self.host = Submission().get_dataverse_details(sub_id)
-            self.headers = {'X-Dataverse-key': self.host['apikey']}
+        # test ####################
+        self.submission_record = self.test_data()['sub_record']
+        self.host = self.test_data()['destination_repo']
+        self.headers = {'X-Dataverse-key': self.host['apikey']}
+        # test ends ################
 
     def test_data(self):
         """
@@ -151,36 +157,22 @@ class DataverseSubmit(object):
 
         return test_data
 
-    def submit(self, sub_id, dataFile_ids):
-
-        profile_id = data_utils.get_current_request().session.get('profile_id')
-        s = Submission().get_record(ObjectId(sub_id))
-
-        # test ####################
-        sub_id = self.test_data()['sub_id']
-        s = self.test_data()['sub_record']
-        # test ends ################
-
-        # this flag tells us if we are dealing with a cg submission
-        isCg = s["is_cg"]
-        # get url for dataverse
-        # self.host = Submission().get_dataverse_details(sub_id)
-
-        # test ####################
-        self.host = self.test_data()['destination_repo']
-        # test ends ################
-
-        self.headers = {'X-Dataverse-key': self.host['apikey']}
+    def submit(self):
+        """
+        function controls the submission of objects to a Dataverse
+        :return:
+        """
 
         # if dataset id in submission meta, we are adding to existing dataset, otherwise
         #  we are creating a new dataset
-        if "fields" in s["meta"]:  # toni's comment - any reason this doesn't simply check for 'alias' in meta?
+        if "fields" in self.submission_record[
+            "meta"]:  # toni's comment - any reason this doesn't simply check for 'alias' in meta?
             # create new
-            return self._create_and_add_to_dataverse(submission_record=s)
-        elif ('entity_id' in s['meta'] and 'alias' in s['meta']) or (
-                'dataverse_alias' in s['meta'] and 'doi' in s['meta']):
+            return self._create_and_add_to_dataverse()
+        elif ('entity_id' in self.submission_record['meta'] and 'alias' in self.submission_record['meta']) or (
+                'dataverse_alias' in self.submission_record['meta'] and 'doi' in self.submission_record['meta']):
             # submit to existing
-            return self._add_to_dataverse(s)
+            return self._add_to_dataverse()
 
     def truncate_url(self, url):
         if url.startswith('https://'):
@@ -192,7 +184,8 @@ class DataverseSubmit(object):
     def clear_submission_metadata(self, sub_id):
         Submission().clear_submission_metadata(sub_id)
 
-    def _add_to_dataverse(self, sub):
+    def _add_to_dataverse(self):
+        sub = self.submission_record
         c = self._get_connection()
         try:
             alias = sub['meta']['dataverse_alias']
@@ -213,48 +206,14 @@ class DataverseSubmit(object):
         dv_storageIdentifier = meta['latest']['storageIdentifier']
         return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
 
-    def convert_dataset_metadata(self, submission_record=dict()):
-        """
-        function returns a Dataset-compliant schema
-        :param submission_record:
-        :return:
-        """
-
-        metadata_fields = submission_record.get("meta",dict()).get("fields", list())
-
-        # get template
-        dv_metadata = CgCoreSchemas().get_dv_dataset_template()
-
-        if not dv_metadata:
-            exception_message = 'Error retrieving Dataset template! '
-            print(exception_message)
-            raise OperationFailedError(exception_message)
-            return False
-
-        fields = list()
-        for item in metadata_fields:
-            field = dict(multiple=False, typeClass='primitive', typeName=str(), value=str())
-            value = item.get("vals", str())
-
-            if isinstance(value, str):
-                field['typeName'] = item["copo_id"]
-                field['value'] = item["vals"]
-                fields.append(field)
-            elif isinstance(value, list):
-                pass
-
-        dv_metadata["datasetVersion"]["metadataBlocks"]["citation"]["fields"] = fields
-
-        return dv_metadata
-
-    def _create_and_add_to_dataverse(self, submission_record=dict()):
+    def _create_and_add_to_dataverse(self):
         """
         creates a Dataset in a Dataverse
         :param submission_record:
         :return:
         """
 
-        submission_meta = submission_record.get("meta", dict())
+        submission_meta = self.submission_record.get("meta", dict())
 
         # get dataverse alias
         dataverse_alias = submission_meta.get("alias", str())
@@ -266,18 +225,16 @@ class DataverseSubmit(object):
             return False
 
         # convert dataset metadata
-        converted_metadata = self.convert_dataset_metadata(submission_record=submission_record)
+        converted_metadata_path = self.convert_dataset_metadata()
 
         # make API call
-        dataset_json = '/Users/etuka/Desktop/dataset-finch1.json'
-
         api_call = 'curl -H "X-Dataverse-key: {api_token}" -X POST ' \
                    '{server_url}/api/dataverses/{dv_alias}/datasets --upload-file {dataset_json}'
 
         api_call = api_call.format(api_token=self.host['apikey'],
                                    server_url=self.host['url'],
                                    dv_alias=dataverse_alias,
-                                   dataset_json=dataset_json)
+                                   dataset_json=converted_metadata_path)
 
         # retrieve call result
         try:
@@ -302,7 +259,7 @@ class DataverseSubmit(object):
             return False
 
         # publish dataset
-        publish_status = self.publish_dataset(dataset_id.get('id', str()))
+        # publish_status = self.publish_dataset(dataset_id.get('id', str()))
 
         # add file to dataset
         pass
@@ -320,6 +277,62 @@ class DataverseSubmit(object):
         meta = ds._metadata
         dv_storageIdentifier = meta['latest']['storageIdentifier']
         return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
+
+    def convert_dataset_metadata(self):
+        """
+        function returns a Dataset-compliant schema given submission metadata
+        :return:
+        """
+
+        schemas_utils_paths = RESOLVER["cg_core_utils"]
+        dataverse_dataset_template = os.path.join(schemas_utils_paths, 'dataverse_dataset_template.json')
+
+        try:
+            dv_metadata = data_utils.json_to_pytype(dataverse_dataset_template)
+        except Exception as e:
+            print("Couldn't retrieve Dataverse template" + str(e))
+            return False
+
+        metadata_fields = self.submission_record.get("meta", dict()).get("fields", list())
+
+        fields = list()
+        for item in metadata_fields:
+            field = dict(multiple=False, typeClass='primitive', typeName=str(), value=str())
+            value = item.get("vals", str())
+
+            if isinstance(value, str):
+                field['typeName'] = item["copo_id"]
+                field['value'] = item["vals"]
+                fields.append(field)
+            elif isinstance(value, list):
+                pass
+
+        dv_metadata["datasetVersion"]["metadataBlocks"]["citation"]["fields"] = fields
+        data_path = self.get_data_path()
+
+        path_to_json = os.path.join(data_path, 'dataset.json')
+
+        try:
+            with open(path_to_json, "w") as ff:
+                ff.write(json.dumps(dv_metadata))
+        except Exception as e:
+            print('Error creating dataset metadata: ' + str(e))
+            return False
+
+        return path_to_json
+
+    def get_data_path(self):
+        dir = os.path.join(os.path.dirname(__file__), "data")
+        data_path = os.path.join(os.path.join(dir, self.submission_id), 'dataverse')
+
+        if not os.path.exists(data_path):
+            try:
+                os.makedirs(data_path)
+            except Exception as e:
+                print('Error creating data path: ' + str(e))
+                return False
+
+        return data_path
 
     def send_files(self, sub, ds):
 

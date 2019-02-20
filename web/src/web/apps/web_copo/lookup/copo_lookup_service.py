@@ -1,7 +1,6 @@
 __author__ = 'etuka'
 
 import os
-import requests
 import pandas as pd
 from bson import ObjectId
 from dal import cursor_to_list
@@ -63,6 +62,7 @@ class COPOLookup:
             select_yes_no=os.path.join(self.drop_downs_pth, 'select_yes_no.json'),
             select_start_end=os.path.join(self.drop_downs_pth, 'select_start_end.json'),
             cgiar_centres=os.path.join(self.drop_downs_pth, 'cgiar_centres.json'),
+            crp_list=os.path.join(self.drop_downs_pth, 'crp_list.json'),
             languagelist=os.path.join(self.drop_downs_pth, 'language_list.json'),
             figshare_category_options=d_utils.get_figshare_category_options(),
             figshare_article_options=d_utils.get_figshare_article_options(),
@@ -95,46 +95,12 @@ class COPOLookup:
                 bn = list()
                 bn.append(self.accession) if isinstance(self.accession, str) else bn.extend(self.accession)
                 filter_by["accession"] = {'$in': bn}
-
             elif self.search_term:
                 filter_by["label"] = {'$regex': self.search_term, "$options": 'i'}
 
             records = cursor_to_list(Lookups.find(filter_by, projection))
 
         return records
-
-    def get_fundingbodies(self):
-        """
-        function performs a lookup on funding bodies'
-        see: https://www.crossref.org/services/funder-registry/; https://github.com/CrossRef/rest-api-doc
-        :return:
-        """
-
-        REQUEST_BASE_URL = 'https://api.crossref.org/funders'
-        BASE_HEADERS = {'Accept': 'application/json'}
-
-        all_list = list()
-
-        if self.accession:
-            bn = list()
-            bn.append(self.accession) if isinstance(self.accession, str) else bn.extend(self.accession)
-
-            for acc in bn:
-                resp = requests.get(acc)
-                json_body = resp.json()
-                label = json_body.get("prefLabel", dict()).get("Label", dict()).get("literalForm", dict()).get(
-                    "content",
-                    "n/a")
-                all_list.append(dict(accession=acc, label=label, description=''))
-        elif self.search_term:
-            resp = requests.get(REQUEST_BASE_URL, params={'query': str(self.search_term)}, headers=BASE_HEADERS)
-            json_body = resp.json()
-
-            resolved_items = json_body['message'].get('items', list())
-            for item in resolved_items:
-                all_list.append(dict(accession=item["uri"], label=item["name"], description=''))
-
-        return all_list
 
     def get_samplesource(self):
         """

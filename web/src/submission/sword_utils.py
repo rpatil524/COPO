@@ -12,7 +12,7 @@ from django.http import HttpResponse
 from submission.dataverseSubmission import DataverseSubmit
 
 def test_module(request):
-    DataverseSubmit.submit()
+    DataverseSubmit().submit()
     return(HttpResponse(d))
 
 

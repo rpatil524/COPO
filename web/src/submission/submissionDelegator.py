@@ -62,10 +62,7 @@ def delegate_submission(request):
 
     ## Submit to Dataverse
     elif repo == 'dataverse':
-        result = dataverseSubmission.DataverseSubmit().submit(
-            sub_id=sub_id,
-            dataFile_ids=sub['bundle']
-        )
+        result = dataverseSubmission.DataverseSubmit(submission_id=sub_id).submit()
         if result == True:
             return HttpResponse(jsonpickle.dumps({'status': 0}))
         else:
