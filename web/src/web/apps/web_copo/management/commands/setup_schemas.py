@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 
 import os
 import glob
+import json
 import pandas as pd
 import xml.etree.ElementTree as ET
 from dal.copo_base_da import DataSchemas
@@ -25,6 +26,8 @@ class Command(BaseCommand):
         # generate ui schemas
         self.generate_ui_schemas()
 
+        self.convert_crp_list()
+
         self.generate_lookup_datasource()
 
         self.stdout.write(self.style.SUCCESS('Successfully generated schemas'))
@@ -42,6 +45,40 @@ class Command(BaseCommand):
 
         # generate new schemas
         data_schema.get_ui_template()
+
+        return True
+
+    def convert_crp_list(self):
+        """
+        converts cgiar crp from csv to json
+        :return:
+        """
+
+        try:
+            df = pd.read_csv(os.path.join(drop_downs_pth, 'crp_list.csv'))
+        except Exception as e:
+            self.stdout.write(self.style.ERROR('Error retrieving schema resource: ' + str(e)))
+            return False
+
+        # ﻿'Platform_no', 'Operating_name', 'Official_name', 'Standard_reference', 'Lead_center', 'Class'
+        df.columns = [x.lower() for x in df.columns]
+        df['label'] = df['official_name']
+        df['value'] = df['operating_name']
+        df['description'] = "<div><strong>Platform number</strong>: " + df['platform_no'].astype(str) + \
+                            "</div><div><strong>Standard reference</strong>: " + df['standard_reference'].astype(str) + \
+                            "</div><div><strong>Operating name</strong>: " + df['operating_name'].astype(str) + \
+                            "</div><div><strong>Lead center</strong>: " + df['lead_center'].astype(str) + \
+                            "</div><strong>Class</strong>: " + df['class'].astype(str)
+
+        df = df[['label', 'value', 'description']]
+        result = df.to_dict('records')
+
+        try:
+            with open(os.path.join(drop_downs_pth, 'crp_list.json'), 'w') as fout:
+                json.dump(result, fout)
+        except Exception as e:
+            self.stdout.write(self.style.ERROR('Error writing crp_list.json: ' + str(e)))
+            return False
 
         return True
 
