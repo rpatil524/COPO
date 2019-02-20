@@ -110,11 +110,13 @@ def get_upload_information(request):
             # get bundle transfer status
             sub_info_dict["bundle_meta"] = sub.get("bundle_meta", list())
             sub_info_dict["bundle"] = sub.get("bundle", list())
-            sub_info_dict["enable_submit_button"] = "meta" in sub and "fields" in sub["meta"] or sub["repository"] not in [
-                "cg_core",
-                "dataverse",
-                "dspace",
-                "ckan"]
+            if sub["repository"] not in ["cg_core", "dataverse", "dspace", "ckan"]:
+                sub_info_dict["enable_submit_button"] = True
+            else:
+                if "meta" in sub and "fields" in sub["meta"] or "identifier" in sub["meta"]:
+                    sub_info_dict["enable_submit_button"] = True
+                else:
+                    sub_info_dict["enable_submit_button"] = False
 
             if str(sub.get("complete", False)).lower() == 'false':
                 # could we be dealing with an uploading submission?
@@ -644,7 +646,6 @@ def get_existing_metadata(request):
 
     out = sub["meta"]
     return HttpResponse(json.dumps(out))
-
 
 
 def get_ckan_items(request):

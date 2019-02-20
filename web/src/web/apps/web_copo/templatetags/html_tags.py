@@ -620,11 +620,17 @@ def generate_submission_accessions_data(submission_record):
             )
 
         elif repository == "dspace":
-            columns = [{"title": "Format"}, {"title": "uuid"}, {"title": "dSpace URL"}, {"title": "Name"},
-                       {"title": "File Size"}]
+            columns = [{"title": "Description"}, {"title": "Format"}, {"title": "Filesize"}, {"title": "Retrieve Link"},
+                       {"title": "Metadata Link"}]
             for a in accessions:
+                link_ref = a["dspace_instance"] + a["link"]
+                link_href = '<a href="' + link_ref + '">' + link_ref + '</a>'
+                link_ref_1 = '<a href="' + link_ref + '/retrieve">' + link_ref + '</a>'
+                link_retrieve = '<a href="' + link_ref_1 + '">' + link_ref_1 + '</a>'
                 data_set.append(
-                    [a["format"], a["uuid"], a["dspace_instance"], a["name"], (hurry.filesize.size(a["sizeBytes"]))]
+                    [a["description"], a["format"], (hurry.filesize.size(a["sizeBytes"])),
+                     link_ref_1,
+                     link_href]
                 )
 
         elif repository == "ckan":

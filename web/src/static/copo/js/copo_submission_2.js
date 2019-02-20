@@ -808,7 +808,7 @@ $(document).ready(function () {
         var buttonLabel = 'Submit';
         var is_enabled
         if (sub_data.enable_submit_button) {
-            is_enabled = 'enabled'; //toni's comments - this will force even ENA based submission to be disabled, so overriding
+            is_enabled = 'enabled';
         }
         else{
             is_enabled = 'disabled'
