@@ -364,7 +364,7 @@ def generate_table_records(profile_id=str(), component=str()):
 
         if component == "submission":
             df["special_repositories"] = df["repository"]
-            df['meta'] = df.meta.astype(str)
+
             columns.append(dict(data="special_repositories", visible=False))
 
         columns.append(dict(data="record_id", visible=False))

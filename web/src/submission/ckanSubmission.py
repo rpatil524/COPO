@@ -74,40 +74,52 @@ class CkanSubmit:
 
         # now we have a dataset id to which to add the datafile
         for f in s["bundle"]:
+
             # data = dict()
             df = DataFile().get_record(ObjectId(f))
             # upload file
-            f = {'file': open(df["file_location"], 'rb')}
 
+            # get correct bitstream file extension lookup
             try:
-                ext = file_name, file_ext = os.path.splitext(df["name"])
-                ext = ext[1].split('.')[1]
+                filename, file_extension = os.path.splitext(df["name"])
+                if "." in file_extension:
+                    file_extension = file_extension.replace(".", "")
+                ext = self.get_media_type_from_file_ext(file_extension)
             except:
                 ext = ""
             now = str(datetime.date.today())
+            print(df["name"])
             data["name"] = df["name"]
             data["created"] = now
-            data["format"] = ext
-            data["upload"] = f
+            data["mimetype"] = ext
+
             fullurl = self.host["url"] + "resource_create"
             data["url"] = str(uuid.uuid4())
-            try:
-                print(self.headers)
-                resp = requests.post(fullurl,
-                                     data=data,
-                                     files=f,
-                                     headers=self.headers
-                                     )
-            except (TypeError, ValueError) as e:
-                print(e)
-                # for some reason this fails the first time
-                resp = requests.post(fullurl,
-                                     data=data,
-                                     files=f,
-                                     headers=self.headers
-                                     )
-            except TypeError as t:
-                print(t)
+
+            with open(df["file_location"], 'rb') as f:
+                files = [
+                    ('upload', (df["name"], f, ext))
+                ]
+                # data["upload"] = files
+                try:
+                    print(self.headers)
+
+                    resp = requests.post(fullurl,
+                                         data=data,
+                                         files=files,
+                                         headers=self.headers
+                                         )
+                    # print(resp.json()['headers'])
+                except (TypeError, ValueError) as e:
+                    print(e)
+                    # for some reason this fails the first time
+                    resp = requests.post(fullurl,
+                                         data=data,
+                                         files=files,
+                                         headers=self.headers
+                                         )
+                except TypeError as t:
+                    print(t)
             if resp.status_code == 200:
                 details = json.loads(resp.content.decode("utf-8"))
                 self._update_and_complete_submission(details, sub_id)
@@ -203,15 +215,26 @@ class CkanSubmit:
 
             elif item["dc"] == "dc.language":
                 pass
+            elif item["dc"] == "dc.relation":
+                # add the submission_id to the dataverse metadata to allow backwards treversal from dataverse
+                temp_id = "http://copo-project.org" + '/copo/resolve:' + str(s["_id"])
+                extras.append({"key": "relation", "value": temp_id})
+            elif item["dc"] == "notes":
+                # pass this as it will lead to a multiple key error
+                pass
             else:
-                extras.append({"key": item["copo_id"], "value": item["vals"]})
+                if type(item["vals"]) == type(""):
+                    extras.append({"key": item["copo_id"], "value": item["vals"]})
+                elif type(item["vals"]) == type([]):
+                    for idx, val in enumerate(item["vals"]):
+                        extras.append({"key": item["dc"] + "_" + str(idx + 1), "value": val})
         out["extras"] = extras
-        # out["extras"] = []
 
         '''
         for key in out:
             # ckan throws a wobbly if there is punctuation in field values, so remove
             if type(out[key]) == type(""):
+                out[key] = out[key].replace(" ", "")
                 out[key] = out[key].translate(str.maketrans("", "", string.punctuation))
                 out[key] = out[key].lower()
         '''
@@ -222,7 +245,35 @@ class CkanSubmit:
         s = Submission().get_record(ObjectId(sub_id))
         f_id = s["bundle"][0]
         items = CgCoreSchemas().extract_repo_fields(str(f_id), "ckan")
-        temp_id = "copo:" + str(sub_id)
-        # add the submission_id to the dataverse metadata to allow backwards treversal from dataverse
-        items.append({"dc": "relation", "copo_id": "relation", "vals": temp_id})
+
         Submission().update_meta(sub_id, json.dumps(items))
+
+    def get_media_type_from_file_ext(self, ext):
+        if ext == "pdf":
+            return "application/pdf"
+        elif ext == "ai" or ext == "eps" or ext == "ps":
+            return "application/postscript"
+        elif ext == "xls" or ext == "xlsx":
+            return "application/vnd.ms-excel"
+        elif ext == "ppt":
+            return "application/vnd.ms-powerpoint"
+        elif ext == "gif":
+            return "image/gif"
+        elif ext == "jpg" or ext == "jpeg":
+            return "image/jpeg"
+        elif ext == "png":
+            return "image/png"
+        elif ext == "tif" or ext == "tiff":
+            return "image/tiff"
+        elif ext == "bmp":
+            return "image/x-ms-bmp"
+        elif ext == "html" or ext == "htm":
+            return "text/html"
+        elif ext == "asc" or ext == "txt":
+            return "text/plain"
+        elif ext == "xml":
+            return "text/xml"
+        elif ext == "doc" or ext == "docx":
+            return "application/msword"
+        else:
+            return ""
