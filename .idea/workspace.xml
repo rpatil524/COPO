@@ -4,9 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" description="if (type == 'dspace') {" line="694" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="" />
     <ignored path=".idea/dataSources.local.xml" />
     <ignored path="$PROJECT_DIR$/.idea/httpRequests/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -138,7 +136,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ckanSubmission.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ckanSubmission.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/submission/ckanSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="245">
@@ -196,16 +194,16 @@
       <file leaf-file-name="cg_schema_generator.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="381">
-              <caret line="268" column="35" lean-forward="true" selection-start-line="268" selection-start-column="35" selection-end-line="268" selection-end-column="35" />
+            <state relative-caret-position="-95">
+              <caret line="24" column="30" lean-forward="true" selection-start-line="24" selection-start-column="30" selection-end-line="24" selection-end-column="30" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="copo_submission_2.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="copo_submission_2.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="502">
+            <state relative-caret-position="190">
               <caret line="852" column="52" selection-start-line="852" selection-start-column="52" selection-end-line="852" selection-end-column="52" />
             </state>
           </provider>
@@ -1316,8 +1314,10 @@
           <option name="mySupportsDeletion" value="false" />
           <option name="myCanBeAbsent" value="false" />
           <option name="myId" value="UPDATED" />
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/cgcore_mappings/cg_core.json</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/web/src/submission/dataverseSubmission.py</PATH>
           <PATH vcs="Git" revision="">$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/web/src/web/apps/web_copo/views.py</PATH>
         </FILE-GROUP>
         <FILE-GROUP>
           <option name="myUpdateName" value="Created" />
@@ -1325,7 +1325,6 @@
           <option name="mySupportsDeletion" value="false" />
           <option name="myCanBeAbsent" value="false" />
           <option name="myId" value="CREATED" />
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/dataverse_dataset_template.json</PATH>
         </FILE-GROUP>
         <FILE-GROUP>
           <option name="myUpdateName" value="Deleted" />
@@ -1858,13 +1857,6 @@
       <option name="presentableId" value="Default" />
       <updated>1480591260906</updated>
     </task>
-    <task id="LOCAL-00045" summary="making views and autocomplete services for creating new dataverse/dataset">
-      <created>1532621225348</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1532621225348</updated>
-    </task>
     <task id="LOCAL-00046" summary="making views and autocomplete services for creating new dataverse/dataset">
       <created>1533049756531</created>
       <option name="number" value="00046" />
@@ -2201,7 +2193,14 @@
       <option name="project" value="LOCAL" />
       <updated>1550596438399</updated>
     </task>
-    <option name="localTasksCounter" value="94" />
+    <task id="LOCAL-00094" summary="uploads to ckan now working as expected">
+      <created>1550596493474</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1550596493475</updated>
+    </task>
+    <option name="localTasksCounter" value="95" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -2390,7 +2389,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py</url>
-          <line>292</line>
+          <line>316</line>
           <option name="timeStamp" value="1597" />
         </line-breakpoint>
       </breakpoints>
@@ -2415,7 +2414,11 @@
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
       <expression>
-        <expression-string />
+        <expression-string>requests.post(fullurl,
+                                         data=data,
+                                         #files=files,
+                                         headers=self.headers
+                                         )</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
@@ -2435,7 +2438,8 @@
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string />
+        <expression-string>json.dumps(out
+           )</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
@@ -2952,24 +2956,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="502">
-          <caret line="852" column="52" selection-start-line="852" selection-start-column="52" selection-end-line="852" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="243">
           <caret line="87" column="53" selection-start-line="87" selection-start-column="53" selection-end-line="87" selection-end-column="53" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="381">
-          <caret line="268" column="35" lean-forward="true" selection-start-line="268" selection-start-column="35" selection-end-line="268" selection-end-column="35" />
         </state>
       </provider>
     </entry>
@@ -2997,6 +2987,20 @@
           <folding>
             <element signature="e#33#67#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-95">
+          <caret line="24" column="30" lean-forward="true" selection-start-line="24" selection-start-column="30" selection-end-line="24" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="852" column="52" selection-start-line="852" selection-start-column="52" selection-end-line="852" selection-end-column="52" />
         </state>
       </provider>
     </entry>
