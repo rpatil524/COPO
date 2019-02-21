@@ -352,7 +352,10 @@ def generate_table_records(profile_id=str(), component=str()):
     projection = [(x["id"].split(".")[-1], 1) for x in schema]
 
     # retrieve and process records
-    records = da_object.get_all_records_columns(projection=dict(projection))
+    if component == "submission":
+        records = da_object.get_all_records_columns(sort_by="date_created", sort_direction=1, projection=dict(projection))
+    else:
+        records = da_object.get_all_records_columns(projection=dict(projection))
 
     if len(records):
         df = pd.DataFrame(records)
