@@ -164,7 +164,7 @@ class DspaceSubmit(object):
                         data_resp = requests.put(data_url, data=file_stream,
                                                  headers={"rest-dspace-token": login_details})
                 if data_resp.status_code == 200:
-                    self._update_dspace_submission(sub, dspace_url, data_id)
+                    self._update_dspace_submission(sub, dspace_url, data_id, item_id)
             else:
                 return (str(resp.status_code) + " ," + resp.reason + " ," + resp.content.decode('utf-8'))
         logout_url = dspace_url + '/rest/logout'
@@ -242,13 +242,16 @@ class DspaceSubmit(object):
         out["metadata"] = arr
         return out
 
-    def _update_dspace_submission(self, sub, dspace_url, data_id):
+    def _update_dspace_submission(self, sub, dspace_url, data_id, item_id):
         data_url = dspace_url + "/rest/bitstreams/" + str(data_id)
+        meta_url = dspace_url + "/rest/items/" + str(item_id) + "?expand=all"
         resp = requests.get(data_url)
         data = json.loads(resp.content.decode('utf-8'))
         if "uuid" not in data:
             data["uuid"] = data.pop("id")
         data['dspace_instance'] = dspace_url
+        data["item_id"] = item_id
+        data["meta_url"] = meta_url
         Submission().insert_dspace_accession(sub, data)
 
     def get_dspace_communites(self):

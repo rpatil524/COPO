@@ -353,7 +353,8 @@ def generate_table_records(profile_id=str(), component=str()):
 
     # retrieve and process records
     if component == "submission":
-        records = da_object.get_all_records_columns(sort_by="date_created", sort_direction=1, projection=dict(projection))
+        records = da_object.get_all_records_columns(sort_by="date_created", sort_direction=1,
+                                                    projection=dict(projection))
     else:
         records = da_object.get_all_records_columns(projection=dict(projection))
 
@@ -627,21 +628,21 @@ def generate_submission_accessions_data(submission_record):
                        {"title": "Metadata Link"}]
             for a in accessions:
                 link_ref = a["dspace_instance"] + a["link"]
-                link_href = '<a href="' + link_ref + '">' + link_ref + '</a>'
-                link_ref_1 = '<a href="' + link_ref + '/retrieve">' + link_ref + '</a>'
-                link_retrieve = '<a href="' + link_ref_1 + '">' + link_ref_1 + '</a>'
+                meta_link = '<a href="' + a["meta_url"] + '">' + a["meta_url"] + '</a>'
+                retrieve_link = '<a href="' + link_ref + '/retrieve">' + link_ref + '</a>'
                 data_set.append(
                     [a["description"], a["format"], (hurry.filesize.size(a["sizeBytes"])),
-                     link_ref_1,
-                     link_href]
+                     retrieve_link,
+                     meta_link]
                 )
 
         elif repository == "ckan":
 
-            columns = [{"title": "Name"}, {"title": "resource id"}, {"title": "package id"}, {"title": "Format"}]
+            columns = [{"title": "Name"}, {"title": "resource id"}, {"title": "Resource Link"}, {"title": "Format"}]
             for a in accessions:
+                retrieve_link = '<a href="' + a["result"]["url"] + '">' + a["result"]["url"] + '</a>'
                 data_set.append(
-                    [a["result"]["name"], a["result"]["id"], a["result"]["package_id"], a["result"]["format"]]
+                    [a["result"]["name"], a["result"]["id"], retrieve_link, a["result"]["format"]]
                 )
 
     return_dict = dict(dataSet=data_set,
