@@ -122,6 +122,7 @@ class CkanSubmit:
                     print(t)
                 if resp.status_code == 200:
                     details = json.loads(resp.content.decode("utf-8"))
+                    details["result"]["repo_url"] = self.host["url"]
                     self._update_and_complete_submission(details, sub_id)
                 elif resp.status_code == 400:
                     # try again checking for https
