@@ -1,0 +1,126 @@
+{
+    "title": "ENA Datafile Description",
+    "description": "Definitions for elements that appear in different stages of a wizard targeted at submissions to the ENA (European Nucleotide Archive) repository. 'ref', id of stage; 'title',  header used for the stage; 'content', the function to call to generate stage html; items, actual form elements on the page; 'is_stage_stub', if the stage entry is a complete stage or a bootstrap; 'is_conditional_stage', displays a stage based on some condition being satisfied; 'is_singular_stage', if all items must have same value for this stage",
+    "properties": [
+        {
+            "ref": "study_type",
+            "title": "Study Information",
+            "is_singular_stage": true,
+            "message": "Enter information about the assembly.",
+            "items": [
+                {
+                    "id": "study",
+                    "help_tip": "Must be an accession or alias of a previously uploaded sequence read",
+                    "label": "Study Alias",
+                    "hidden": "false",
+                    "required": "true",
+                    "type": "string",
+                    "control": "text",
+                    "default_value": ""
+                },
+                {
+                    "id": "sample",
+                    "help_tip": "Must be an accession or an alias for sample created during a previous upload",
+                    "label": "Sample Alias",
+                    "hidden": "false",
+                    "required": "true",
+                    "type": "string",
+                    "control": "text",
+                    "default_value": ""
+                },
+                {
+                    "id": "assemblyname",
+                    "help_tip": "Unique ID for this assembly submission.",
+                    "label": "Unique Assembly Name",
+                    "hidden": "false",
+                    "required": "true",
+                    "type": "string",
+                    "control": "text",
+                    "default_value": ""
+                },
+                {
+                    "id": "assembly_type",
+                    "help_tip": "Choose the type of assembly from the dropdown.",
+                    "label": "Assembly Type",
+                    "hidden": "false",
+                    "required": "true",
+                    "type": "string",
+                    "control": "select",
+                    "default_value": "clone or isolate",
+                    "option_values": [
+                        "clone or isolate",
+                        "primary metagenome",
+                        "binned metagenome",
+                        "Metagenome-Assembled Genome (MAG)",
+                        "Environmetal Single-Cell Amplified Genome (SAG)"
+                    ]
+                },
+                {
+                    "id": "coverage",
+                    "help_tip": "The estimated depth of sequencing coverage.",
+                    "label": "Coverage",
+                    "hidden": "false",
+                    "required": "true",
+                    "type": "string",
+                    "control": "text",
+                    "default_value": ""
+                },
+                {
+                    "id": "program",
+                    "help_tip": "The assembly program.",
+                    "label": "Program",
+                    "hidden": "false",
+                    "required": "true",
+                    "type": "string",
+                    "control": "text",
+                    "default_value": ""
+                },
+                {
+                    "id": "platform",
+                    "help_tip": "The sequencing platform.",
+                    "label": "Platform",
+                    "hidden": "false",
+                    "required": "true",
+                    "type": "string",
+                    "control": "text",
+                    "default_value": ""
+                },
+                {
+                    "id": "mingaplength",
+                    "help_tip": "Minimum length of consecutive Ns to be considered a gap.",
+                    "label": "Minimum Gap Length",
+                    "hidden": "false",
+                    "required": "false",
+                    "type": "string",
+                    "control": "text",
+                    "default_value": ""
+                },
+                {
+                    "id": "moleculetype",
+                    "help_tip": "Molecule Type.",
+                    "label": "Molecule Type",
+                    "hidden": "false",
+                    "required": "false",
+                    "type": "string",
+                    "control": "select",
+                    "default_value": "",
+                    "option_values": [
+                        "genomic DNA",
+                        "genomic RNA",
+                        "viral cRNA"
+                    ]
+                },
+                {
+                    "id": "description",
+                    "help_tip": "Description of the genome assembly.",
+                    "label": "Description",
+                    "hidden": "false",
+                    "required": "false",
+                    "type": "string",
+                    "control": "text",
+                    "default_value": ""
+                }
+            ]
+        }
+    ]
+}

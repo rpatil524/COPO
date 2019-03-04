@@ -240,9 +240,15 @@ class EnaSubmit(object):
 
         # setup paths for conversion directories
         if self.submission['repository'] == 'ena':
+            # this is now deprecated and will never be called
             return self.do_seq_reads_submission(sub_id, remote_path, transfer_token)
         elif self.submission['repository'] == 'ena-ant':
             return self.do_annotation_submission(sub_id, remote_path, transfer_token)
+        elif self.submission['repository'] == 'ena-asm':
+            return self.do_assembly_submission(sub_id, remote_path, transfer_token)
+
+    def do_assembly_submission(sub_id, remote_path, transfer_token):
+        pass
 
     def do_seq_reads_submission(self, sub_id, remote_path, transfer_token):
         # # setup paths for conversion directories
