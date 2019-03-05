@@ -52,7 +52,7 @@ class DspaceSubmit(object):
             resp = requests.post(login_url, json=params)
             if resp.status_code != 200:
                 # there is actually a problem with the login process
-                return {"status": 1, "message": "error logging into dSpace: error" + str(resp.status_code)}
+                return {"status": 401, "message": "error logging into dSpace: error" + str(resp.status_code)}
         try:
             login_details = resp.cookies["JSESSIONID"]
             dspace_type = 6
@@ -66,7 +66,7 @@ class DspaceSubmit(object):
             try:
                 item_id = sub['meta']['identifier']
             except KeyError as e:
-                return {"status": 1, "message": "No dSpace Item identifier found, please try selecting item again."}
+                return {"status": 404, "message": "No dSpace Item identifier found, please try selecting item again."}
 
         elif new_or_existing == "new":
             # if new we must create a new item in the given collection
@@ -100,7 +100,7 @@ class DspaceSubmit(object):
                 except KeyError:
                     item_id = json.loads(resp_item.content.decode('utf-8'))['uuid']
             else:
-                return {"status": 1, "message": "error creating new dspace item"}
+                return {"status": 404, "message": "error creating new dspace item"}
 
         # now upload files
         for s in sub['bundle']:

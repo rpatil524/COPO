@@ -513,7 +513,7 @@ def get_repo_info(request, sub=None):
                 dspace().dc_dict_to_dc(sub_id)
     except Exception as e:
         print(e)
-        return HttpResponse(json.dumps({"status": 1, "message": "error getting dataverse"}))
+        return HttpResponse(json.dumps({"status": 404, "message": "error getting dataverse"}))
     s = Submission().get_record(ObjectId(sub_id))
     out = {'repo_type': repo['type'], 'repo_url': repo['url'], 'meta': s["meta"]}
 
