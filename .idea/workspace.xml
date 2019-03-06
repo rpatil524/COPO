@@ -4,13 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" description="if (type == 'dspace') {" line="694" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="adding schema for ENA assemblies and skeleton submission code">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/submission/enaSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/enaSubmission.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" afterDir="false" />
-    </list>
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="" />
     <ignored path=".idea/dataSources.local.xml" />
     <ignored path="$PROJECT_DIR$/.idea/httpRequests/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -127,8 +121,8 @@
       <file leaf-file-name="dataverseSubmission.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="147">
-              <caret line="195" column="33" selection-start-line="195" selection-start-column="33" selection-end-line="195" selection-end-column="33" />
+            <state relative-caret-position="137">
+              <caret line="159" column="12" selection-start-line="159" selection-start-column="12" selection-end-line="159" selection-end-column="12" />
               <folding>
                 <element signature="e#51#82#0" expanded="true" />
               </folding>
@@ -148,11 +142,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="submissionDelegator.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="submissionDelegator.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="128">
-              <caret line="52" selection-start-line="52" selection-end-line="52" />
+            <state relative-caret-position="481">
+              <caret line="96" column="24" selection-start-line="96" selection-start-column="24" selection-end-line="96" selection-end-column="24" />
             </state>
           </provider>
         </entry>
@@ -166,11 +160,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="enaSubmission.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="enaSubmission.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
-              <caret line="272" column="47" selection-start-line="272" selection-start-column="47" selection-end-line="272" selection-end-column="47" />
+            <state relative-caret-position="379">
+              <caret line="277" column="36" lean-forward="true" selection-start-line="277" selection-start-column="36" selection-end-line="277" selection-end-column="36" />
             </state>
           </provider>
         </entry>
@@ -226,7 +220,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>1</find>
       <find>fa-cloud</find>
       <find>get_upload_information</find>
       <find>submission_control</find>
@@ -256,6 +249,7 @@
       <find>WIZA</find>
       <find>&quot;option_values&quot;</find>
       <find>&quot;status&quot;: 1</find>
+      <find>HttpRe</find>
     </findStrings>
     <replaceStrings>
       <replace>context-help-ctrl</replace>
@@ -303,7 +297,6 @@
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/dc_stages.json" />
         <option value="$PROJECT_DIR$/web/src/tests/test_ckan_repository.py" />
         <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_ckan_submission.json" />
-        <option value="$PROJECT_DIR$/web/src/submission/submissionDelegator.py" />
         <option value="$PROJECT_DIR$/web/src/tests/fixtures/dummy_cgcore.json" />
         <option value="$PROJECT_DIR$/web/src/web/settings/base.py" />
         <option value="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_utils.py" />
@@ -340,6 +333,7 @@
         <option value="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/submission/dspaceSubmission.py" />
         <option value="$PROJECT_DIR$/web/src/submission/enaSubmission.py" />
+        <option value="$PROJECT_DIR$/web/src/submission/submissionDelegator.py" />
       </list>
     </option>
   </component>
@@ -1778,13 +1772,6 @@
       <option name="presentableId" value="Default" />
       <updated>1480591260906</updated>
     </task>
-    <task id="LOCAL-00052" summary="can select existing community / collection / item for file, now need to upload to existing">
-      <created>1537542176778</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1537542176778</updated>
-    </task>
     <task id="LOCAL-00053" summary="bug fixes for adding to space item and logic for directing to dspace submission pathway">
       <created>1537805689072</created>
       <option name="number" value="00053" />
@@ -2121,7 +2108,14 @@
       <option name="project" value="LOCAL" />
       <updated>1551719862116</updated>
     </task>
-    <option name="localTasksCounter" value="101" />
+    <task id="LOCAL-00101" summary="adding manifest file creation, changing http error codes and backend validation for AGP/FASTA file types">
+      <created>1551799279255</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1551799279256</updated>
+    </task>
+    <option name="localTasksCounter" value="102" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -2269,7 +2263,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="bug fixes for ui" />
     <MESSAGE value="adding to existing ckan working" />
     <MESSAGE value="multi file subs working along with frontend error reporting on fail" />
     <MESSAGE value="more fixes to ckan uploads" />
@@ -2294,7 +2287,8 @@
     <MESSAGE value="further refinments to accessions view" />
     <MESSAGE value="refinements to ckan accessions view" />
     <MESSAGE value="adding schema for ENA assemblies and skeleton submission code" />
-    <option name="LAST_COMMIT_MESSAGE" value="adding schema for ENA assemblies and skeleton submission code" />
+    <MESSAGE value="adding manifest file creation, changing http error codes and backend validation for AGP/FASTA file types" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding manifest file creation, changing http error codes and backend validation for AGP/FASTA file types" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2892,16 +2886,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="195" column="33" selection-start-line="195" selection-start-column="33" selection-end-line="195" selection-end-column="33" />
-          <folding>
-            <element signature="e#51#82#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/src/submission/dspaceSubmission.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
@@ -2912,17 +2896,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
+    <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="52" selection-start-line="52" selection-end-line="52" />
+        <state relative-caret-position="379">
+          <caret line="277" column="36" lean-forward="true" selection-start-line="277" selection-start-column="36" selection-end-line="277" selection-end-column="36" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/src/submission/enaSubmission.py">
+    <entry file="file://$PROJECT_DIR$/web/src/submission/dataverseSubmission.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="272" column="47" selection-start-line="272" selection-start-column="47" selection-end-line="272" selection-end-column="47" />
+        <state relative-caret-position="137">
+          <caret line="159" column="12" selection-start-line="159" selection-start-column="12" selection-end-line="159" selection-end-column="12" />
+          <folding>
+            <element signature="e#51#82#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/src/submission/submissionDelegator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="481">
+          <caret line="96" column="24" selection-start-line="96" selection-start-column="24" selection-end-line="96" selection-end-column="24" />
         </state>
       </provider>
     </entry>
