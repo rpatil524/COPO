@@ -4,41 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/web/src/static/copo/js/repository_inspection.js" description="if (type == 'dspace') {" line="694" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_wizard_stages.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/converters/ena/copo_isa_ena.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/dal/broker_da.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/dal/broker_da.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/dal/copo_base_da.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/dal/copo_base_da.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/dal/copo_da.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/dal/copo_da.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/css/copo/profile_pricelist.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/css/copo/profile_pricelist.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/css/copo/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_data.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_form_handlers.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/copo_submission_2.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/static/copo/js/generic_handlers.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/submission/dataverseSubmission.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/copo_lookup_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/copo_lookup_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/drop_downs/crp_list.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/drop_downs/crp_list.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/help_messages/context_help.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/help_messages/context_help.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/help_messages/global_help.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/help_messages/global_help.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/management/commands/setup_schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/management/commands/setup_schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/cgcore_mappings/cg_core.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/copo/uimodels/mappings/cgcore_mappings/cg_core.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/copo_schema.csv" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/copo_schema.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/type_field_STATUS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/type_field_STATUS.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_formats.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/data_formats.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base_simple.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/base_simple.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_data.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templates/copo/copo_data.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/templatetags/html_tags.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/utils/ajax_handlers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_callbacks.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_callbacks.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/datafile/wizard_helper.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/apps/web_copo/wizards/sample/wizard_helper.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/landing/agenda_workshop2.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/landing/agenda_workshop2.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/web/landing/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/web/landing/index.html" afterDir="false" />
-    </list>
+    <list default="true" id="07efea0a-da82-4290-951a-e94da4f257a8" name="Default" comment="" />
     <ignored path=".idea/dataSources.local.xml" />
     <ignored path="$PROJECT_DIR$/.idea/httpRequests/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -162,7 +128,7 @@
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="117">
-              <caret line="98" column="9" lean-forward="true" selection-start-line="98" selection-start-column="9" selection-end-line="98" selection-end-column="9" />
+              <caret line="98" column="9" selection-start-line="98" selection-start-column="9" selection-end-line="98" selection-end-column="9" />
               <folding>
                 <element signature="e#0#38#0" expanded="true" />
                 <element signature="e#1199#1556#0" expanded="true" />
@@ -250,7 +216,7 @@
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="230">
-              <caret line="302" column="24" selection-start-line="302" selection-start-column="8" selection-end-line="302" selection-end-column="24" />
+              <caret line="302" column="100" selection-start-line="302" selection-start-column="100" selection-end-line="302" selection-end-column="100" />
               <folding>
                 <element signature="e#22#31#0" expanded="true" />
                 <element signature="e#302#878#0" expanded="true" />
@@ -279,7 +245,7 @@
         <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/copo_lookup_service.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="211">
-              <caret line="182" column="77" lean-forward="true" selection-start-line="182" selection-start-column="77" selection-end-line="182" selection-end-column="77" />
+              <caret line="182" column="77" selection-start-line="182" selection-start-column="77" selection-end-line="182" selection-end-column="77" />
               <folding>
                 <element signature="e#22#31#0" expanded="true" />
                 <element signature="e#694#1134#0" expanded="true" />
@@ -314,10 +280,6 @@
                 <element signature="e#8482#10014#0" expanded="true" />
                 <element signature="e#10167#12830#0" expanded="true" />
                 <element signature="e#12943#16079#0" expanded="true" />
-                <element signature="e#16196#18854#0" expanded="true" />
-                <element signature="e#18921#19474#0" expanded="true" />
-                <element signature="e#19579#20328#0" expanded="true" />
-                <element signature="e#20447#20971#0" expanded="true" />
                 <element signature="e#21094#25199#0" expanded="true" />
                 <element signature="e#25293#27322#0" expanded="true" />
                 <element signature="e#27375#27659#0" expanded="true" />
@@ -2375,7 +2337,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="828" extended-state="6" />
+    <frame x="-1836" y="-94" width="1440" height="828" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3292683" />
@@ -2386,56 +2348,71 @@
       <window_info anchor="bottom" id="Python Console" order="11" weight="0.32026875" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49767134" weight="0.32586786" />
       <window_info anchor="bottom" id="Terminal" order="12" weight="0.2626832" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.58349705" visible="true" weight="0.22460657" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.58526605" visible="true" weight="0.22460657" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" weight="0.25181347" />
       <window_info anchor="right" id="Database" order="5" weight="0.32960597" />
       <window_info anchor="right" id="SciView" order="6" weight="0.58941346" />
-      <window_info id="Structure" order="1" sideWeight="0.41650295" side_tool="true" visible="true" weight="0.22460657" />
+      <window_info id="Structure" order="1" sideWeight="0.41473398" side_tool="true" visible="true" weight="0.22460657" />
       <window_info id="Favorites" order="2" sideWeight="0.14671163" side_tool="true" weight="0.20127796" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.7174535" weight="0.30559346" />
       <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.7174535" visible="true" weight="0.30559346" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" weight="0.25181347" />
       <window_info anchor="right" id="JSON Viewer" order="7" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.58349705" visible="true" weight="0.22460657" />
+      <window_info anchor="right" id="SciView" order="6" weight="0.58941346" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.3292683" />
+      <window_info anchor="bottom" id="Version Control" order="13" weight="0.32698768" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49767134" weight="0.32586786" />
       <window_info anchor="right" id="Data View" order="8" />
       <window_info anchor="right" id="Mongo Explorer" order="3" />
       <window_info anchor="bottom" id="REST Client" order="14" sideWeight="0.49499285" weight="0.43855694" />
+      <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
+      <window_info id="Structure" order="1" sideWeight="0.41650295" side_tool="true" visible="true" weight="0.22460657" />
+      <window_info anchor="right" x="0" y="0" width="310" height="628" id="Documentation" order="9" side_tool="true" weight="0.32904148" />
+      <window_info anchor="right" id="Database" order="5" weight="0.32960597" />
       <window_info anchor="bottom" id="Messages" order="7" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49767134" weight="0.268757" />
-      <window_info anchor="right" id="Coverage" order="4" side_tool="true" weight="0.32960597" />
-    </layout>
-    <layout-to-restore>
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.8230384" visible="true" weight="0.21884984" />
-      <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" weight="0.25181347" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49767134" weight="0.32586786" />
+      <window_info anchor="bottom" id="Event Log" order="9" show_stripe_button="false" sideWeight="0.2825465" side_tool="true" weight="0.42276424" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.14671163" side_tool="true" weight="0.20127796" />
+      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49767134" weight="0.268757" />
+      <window_info anchor="bottom" id="Terminal" order="12" weight="0.2626832" />
+      <window_info anchor="right" id="Coverage" order="4" side_tool="true" weight="0.32960597" />
+      <window_info anchor="bottom" id="Python Console" order="11" weight="0.32026875" />
+    </layout>
+    <layout-to-restore>
+      <window_info anchor="right" x="0" y="0" width="430" height="785" id="Documentation" order="9" side_tool="true" weight="0.32960597" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" weight="0.25181347" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Data View" order="8" />
       <window_info id="Structure" order="1" sideWeight="0.1769616" side_tool="true" visible="true" weight="0.21884984" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3292683" />
-      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49767134" weight="0.268757" />
+      <window_info anchor="bottom" id="Version Control" order="13" weight="0.32698768" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49767134" weight="0.32586786" />
+      <window_info anchor="bottom" id="Terminal" order="12" weight="0.2626832" />
       <window_info anchor="right" id="JSON Viewer" order="7" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Python Console" order="11" weight="0.32026875" />
       <window_info anchor="bottom" id="REST Client" order="14" sideWeight="0.49499285" weight="0.43855694" />
+      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49767134" weight="0.268757" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.8230384" visible="true" weight="0.21884984" />
       <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.7174535" visible="true" weight="0.32922733" />
-      <window_info anchor="right" x="0" y="0" width="430" height="785" id="Documentation" order="9" side_tool="true" weight="0.32960597" />
-      <window_info anchor="right" id="Database" order="5" weight="0.32960597" />
+      <window_info anchor="bottom" id="Messages" order="7" />
       <window_info anchor="right" id="Mongo Explorer" order="4" />
       <window_info anchor="bottom" id="Event Log" order="9" show_stripe_button="false" sideWeight="0.2825465" side_tool="true" weight="0.42276424" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="13" weight="0.32698768" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="right" id="SciView" order="6" weight="0.58945686" />
-      <window_info anchor="bottom" id="Terminal" order="12" weight="0.2626832" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Messages" order="7" />
+      <window_info anchor="right" id="Database" order="5" weight="0.32960597" />
       <window_info anchor="right" id="Coverage" order="3" side_tool="true" weight="0.32960597" />
-      <window_info anchor="bottom" id="Python Console" order="11" weight="0.32026875" />
+      <window_info id="Favorites" order="2" sideWeight="0.14671163" side_tool="true" weight="0.20127796" />
     </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -2851,29 +2828,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="394">
           <caret line="230" column="49" lean-forward="true" selection-start-line="230" selection-start-column="49" selection-end-line="230" selection-end-column="49" />
-          <folding>
-            <element signature="e#22#31#0" expanded="true" />
-            <element signature="e#309#1584#0" expanded="true" />
-            <element signature="e#1672#2986#0" expanded="true" />
-            <element signature="e#3037#5824#0" expanded="true" />
-            <element signature="e#5882#6338#0" expanded="true" />
-            <element signature="e#6373#6685#0" expanded="true" />
-            <element signature="e#6741#6862#0" expanded="true" />
-            <element signature="e#6904#7042#0" expanded="true" />
-            <element signature="e#7085#7225#0" expanded="true" />
-            <element signature="e#7266#7401#0" expanded="true" />
-            <element signature="e#7455#7715#0" expanded="true" />
-            <element signature="e#7749#7877#0" expanded="true" />
-            <element signature="e#7919#8061#0" expanded="true" />
-            <element signature="e#8101#8264#0" expanded="true" />
-            <element signature="e#8304#8511#0" expanded="true" />
-            <element signature="e#9012#9519#0" expanded="true" />
-            <element signature="e#9561#10038#0" expanded="true" />
-            <element signature="e#10082#10172#0" expanded="true" />
-            <element signature="e#10215#10465#0" expanded="true" />
-            <element signature="e#10633#10662#0" expanded="true" />
-            <element signature="e#10715#11119#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2888,30 +2842,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="142">
           <caret line="106" column="68" selection-start-line="106" selection-start-column="68" selection-end-line="106" selection-end-column="68" />
-          <folding>
-            <element signature="e#48#59#0" expanded="true" />
-            <element signature="e#190#984#0" expanded="true" />
-            <element signature="e#1026#2568#0" expanded="true" />
-            <element signature="e#2622#2849#0" expanded="true" />
-            <element signature="e#2898#2988#0" expanded="true" />
-            <element signature="e#3027#3111#0" expanded="true" />
-            <element signature="e#3162#3230#0" expanded="true" />
-            <element signature="e#3282#3360#0" expanded="true" />
-            <element signature="e#3403#3658#0" expanded="true" />
-            <element signature="e#3703#3871#0" expanded="true" />
-            <element signature="e#3911#4000#0" expanded="true" />
-            <element signature="e#4041#4314#0" expanded="true" />
-            <element signature="e#4362#4432#0" expanded="true" />
-            <element signature="e#4481#4571#0" expanded="true" />
-            <element signature="e#4618#4706#0" expanded="true" />
-            <element signature="e#4760#4831#0" expanded="true" />
-            <element signature="e#4883#4952#0" expanded="true" />
-            <element signature="e#5135#5200#0" expanded="true" />
-            <element signature="e#5242#5325#0" expanded="true" />
-            <element signature="e#5379#5466#0" expanded="true" />
-            <element signature="e#5517#5601#0" expanded="true" />
-            <element signature="e#5644#5720#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -3053,78 +2983,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1740">
           <caret line="1388" column="24" selection-start-line="1388" selection-start-column="24" selection-end-line="1388" selection-end-column="24" />
-          <folding>
-            <element signature="e#467#1511#0" expanded="true" />
-            <element signature="e#865#921#0" expanded="true" />
-            <element signature="e#950#1017#0" expanded="true" />
-            <element signature="e#1120#1505#0" expanded="true" />
-            <element signature="e#2954#3406#0" expanded="true" />
-            <element signature="e#3248#3327#0" expanded="true" />
-            <element signature="e#3356#3396#0" expanded="true" />
-            <element signature="e#3444#4769#0" expanded="true" />
-            <element signature="e#3570#4765#0" expanded="true" />
-            <element signature="e#4164#4757#0" expanded="true" />
-            <element signature="e#4800#7375#0" expanded="true" />
-            <element signature="e#4904#5023#0" expanded="true" />
-            <element signature="e#5185#5263#0" expanded="true" />
-            <element signature="e#5375#5419#0" expanded="true" />
-            <element signature="e#5459#6431#0" expanded="true" />
-            <element signature="e#5578#5710#0" expanded="true" />
-            <element signature="e#6116#6417#0" expanded="true" />
-            <element signature="e#6594#6668#0" expanded="true" />
-            <element signature="e#6895#6973#0" expanded="true" />
-            <element signature="e#7431#8860#0" expanded="true" />
-            <element signature="e#8917#9979#0" expanded="true" />
-            <element signature="e#10014#10886#0" expanded="true" />
-            <element signature="e#10918#11175#0" expanded="true" />
-            <element signature="e#11202#11474#0" expanded="true" />
-            <element signature="e#11512#12036#0" expanded="true" />
-            <element signature="e#11828#12031#0" expanded="true" />
-            <element signature="e#12074#12490#0" expanded="true" />
-            <element signature="e#12528#12807#0" expanded="true" />
-            <element signature="e#12874#13880#0" expanded="true" />
-            <element signature="e#13920#14109#0" expanded="true" />
-            <element signature="e#14159#17177#0" expanded="true" />
-            <element signature="e#17280#17869#0" expanded="true" />
-            <element signature="e#17927#18487#0" expanded="true" />
-            <element signature="e#18538#20524#0" expanded="true" />
-            <element signature="e#20581#21139#0" expanded="true" />
-            <element signature="e#21194#21778#0" expanded="true" />
-            <element signature="e#21831#23087#0" expanded="true" />
-            <element signature="e#23145#23626#0" expanded="true" />
-            <element signature="e#23686#25009#0" expanded="true" />
-            <element signature="e#24389#24871#0" expanded="true" />
-            <element signature="e#25078#27721#0" expanded="true" />
-            <element signature="e#25811#26085#0" expanded="true" />
-            <element signature="e#27780#29730#0" expanded="true" />
-            <element signature="e#29790#30526#0" expanded="true" />
-            <element signature="e#30057#30257#0" expanded="true" />
-            <element signature="e#30584#30895#0" expanded="true" />
-            <element signature="e#30954#34488#0" expanded="true" />
-            <element signature="e#31976#32383#0" expanded="true" />
-            <element signature="e#33951#34085#0" expanded="true" />
-            <element signature="e#34552#36418#0" expanded="true" />
-            <element signature="e#36483#38911#0" expanded="true" />
-            <element signature="e#37300#37707#0" expanded="true" />
-            <element signature="e#38976#41216#0" expanded="true" />
-            <element signature="e#39614#40078#0" expanded="true" />
-            <element signature="e#41280#42929#0" expanded="true" />
-            <element signature="e#42391#42525#0" expanded="true" />
-            <element signature="e#42987#43645#0" expanded="true" />
-            <element signature="e#44543#44699#0" expanded="true" />
-            <element signature="e#45505#45744#0" expanded="true" />
-            <element signature="e#45781#45938#0" expanded="true" />
-            <element signature="e#46001#49326#0" expanded="true" />
-            <element signature="e#47882#48170#0" expanded="true" />
-            <element signature="e#49386#51386#0" expanded="true" />
-            <element signature="e#50104#50253#0" expanded="true" />
-            <element signature="e#51449#53235#0" expanded="true" />
-            <element signature="e#53302#55877#0" expanded="true" />
-            <element signature="e#54849#55304#0" expanded="true" />
-            <element signature="e#55940#57739#0" expanded="true" />
-            <element signature="e#57801#59073#0" expanded="true" />
-            <element signature="e#59139#59167#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -3152,17 +3010,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
           <caret line="106" column="33" selection-start-line="106" selection-start-column="33" selection-end-line="106" selection-end-column="33" />
-          <folding>
-            <element signature="e#85#136#0" expanded="true" />
-            <element signature="e#759#972#0" expanded="true" />
-            <element signature="e#1017#1437#0" expanded="true" />
-            <element signature="e#1479#2887#0" expanded="true" />
-            <element signature="e#2940#3634#0" expanded="true" />
-            <element signature="e#3678#4190#0" expanded="true" />
-            <element signature="e#4240#4985#0" expanded="true" />
-            <element signature="e#5031#6155#0" expanded="true" />
-            <element signature="e#6205#8036#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -3206,10 +3053,6 @@
             <element signature="e#8482#10014#0" expanded="true" />
             <element signature="e#10167#12830#0" expanded="true" />
             <element signature="e#12943#16079#0" expanded="true" />
-            <element signature="e#16196#18854#0" expanded="true" />
-            <element signature="e#18921#19474#0" expanded="true" />
-            <element signature="e#19579#20328#0" expanded="true" />
-            <element signature="e#20447#20971#0" expanded="true" />
             <element signature="e#21094#25199#0" expanded="true" />
             <element signature="e#25293#27322#0" expanded="true" />
             <element signature="e#27375#27659#0" expanded="true" />
@@ -3367,7 +3210,7 @@
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/lookup/copo_lookup_service.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="211">
-          <caret line="182" column="77" lean-forward="true" selection-start-line="182" selection-start-column="77" selection-end-line="182" selection-end-column="77" />
+          <caret line="182" column="77" selection-start-line="182" selection-start-column="77" selection-end-line="182" selection-end-column="77" />
           <folding>
             <element signature="e#22#31#0" expanded="true" />
             <element signature="e#694#1134#0" expanded="true" />
@@ -3385,7 +3228,7 @@
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="117">
-          <caret line="98" column="9" lean-forward="true" selection-start-line="98" selection-start-column="9" selection-end-line="98" selection-end-column="9" />
+          <caret line="98" column="9" selection-start-line="98" selection-start-column="9" selection-end-line="98" selection-end-column="9" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
             <element signature="e#1199#1556#0" expanded="true" />
@@ -3412,7 +3255,7 @@
     <entry file="file://$PROJECT_DIR$/web/src/web/apps/web_copo/schemas/utils/cg_core/cg_schema_generator.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="230">
-          <caret line="302" column="24" selection-start-line="302" selection-start-column="8" selection-end-line="302" selection-end-column="24" />
+          <caret line="302" column="100" selection-start-line="302" selection-start-column="100" selection-end-line="302" selection-end-column="100" />
           <folding>
             <element signature="e#22#31#0" expanded="true" />
             <element signature="e#302#878#0" expanded="true" />
