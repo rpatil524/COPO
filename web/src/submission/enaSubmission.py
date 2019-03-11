@@ -9,26 +9,23 @@ from tools import resolve_env
 from django.conf import settings
 from dal.copo_da import DataFile
 from dal.copo_da import RemoteDataFile, Submission, Profile
-
 from web.apps.web_copo.lookup.copo_enums import *
-
 from hurry.filesize import size, alternative
 import xml.etree.ElementTree as ET
-
 from isatools.convert import json2sra
 from isatools import isajson
-
 import subprocess
 import os
 import pexpect
-
 from datetime import datetime
+from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
+import web.apps.web_copo.schemas.utils.data_utils as d_utils
+
 
 REPOSITORIES = settings.REPOSITORIES
 BASE_DIR = settings.BASE_DIR
 lg = settings.LOGGER
-from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
-import web.apps.web_copo.schemas.utils.data_utils as d_utils
+
 
 
 # please note!!! There's now a separate class to handle submission of raw reads sequence, called: EnaSubmit4Reads
