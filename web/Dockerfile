@@ -2,6 +2,7 @@ FROM python:3.5
 RUN apt-get update && apt-get install -y \
     rsync \
     git \
+	nano \
     libxml2-dev \
     python \
     build-essential \

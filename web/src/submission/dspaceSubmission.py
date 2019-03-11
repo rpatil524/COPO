@@ -188,7 +188,7 @@ class DspaceSubmit(object):
                 #if type(lang) != type(""):
                 #    lang = lang[0]
                 if isinstance(lang, list):
-                    lang = lang[0] if lang else '"'
+                    lang = lang[0] if lang else ""
                 break
         # iterate fields and convert to format required by dspace
         for f in sub["meta"]["fields"]:
