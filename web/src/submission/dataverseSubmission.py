@@ -222,7 +222,6 @@ class DataverseSubmit(object):
             exception_message = 'Dataverse alias not found! '
             print(exception_message)
             raise OperationFailedError(exception_message)
-            return False
 
         # convert dataset metadata
         converted_metadata_path = self.convert_dataset_metadata()
@@ -240,15 +239,16 @@ class DataverseSubmit(object):
         try:
             receipt = subprocess.check_output(api_call, shell=True)
         except Exception as e:
-            print('API call error: ' + str(e))
-            return False
+            exception_message = 'API call error: ' + str(e)
+            print(exception_message)
+            raise OperationFailedError(exception_message)
 
         try:
             receipt = json.loads(receipt.decode('utf-8'))
         except Exception as e:
             exception_message = 'Could not retrieve API result. ' + str(receipt)
             print(exception_message)
-            return False
+            raise OperationFailedError(exception_message)
 
         if receipt.get("status", str()).lower() in ("ok", "200"):
             dataset_id = receipt.get("data", dict())
@@ -256,7 +256,6 @@ class DataverseSubmit(object):
             exception_message = 'The Dataset could not be created. ' + str(receipt)
             print(exception_message)
             raise OperationFailedError(exception_message)
-            return False
 
         # publish dataset
         # publish_status = self.publish_dataset(dataset_id.get('id', str()))
@@ -290,8 +289,9 @@ class DataverseSubmit(object):
         try:
             dv_metadata = data_utils.json_to_pytype(dataverse_dataset_template)
         except Exception as e:
-            print("Couldn't retrieve Dataverse template" + str(e))
-            return False
+            exception_message = "Couldn't retrieve Dataverse template. " + str(e)
+            print(exception_message)
+            raise OperationFailedError(exception_message)
 
         metadata_fields = self.submission_record.get("meta", dict()).get("fields", list())
 
@@ -316,8 +316,9 @@ class DataverseSubmit(object):
             with open(path_to_json, "w") as ff:
                 ff.write(json.dumps(dv_metadata))
         except Exception as e:
-            print('Error creating dataset metadata: ' + str(e))
-            return False
+            exception_message = "Error creating dataset metadata. " + str(e)
+            print(exception_message)
+            raise OperationFailedError(exception_message)
 
         return path_to_json
 

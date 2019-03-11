@@ -136,23 +136,6 @@ $(document).ready(function () {
         do_wizard_show_me($(this));
     });
 
-    //description-bundle-explained
-    $(document).on("click", ".description-bundle-explained", function (event) {
-        event.preventDefault();
-        var item = $(this);
-        item.webuiPopover('destroy');
-
-        item.webuiPopover({
-            content: '<div class="webpop-content-div limit-text">A description bundle is a collection of datafiles with similar attributes, which can potentially be described together. <hr/><span style="color: #35637e;">Click on a bundle to access bundle tasks, including reloading the description.</span></div>',
-            trigger: 'sticky',
-            width: 300,
-            arrow: true,
-            placement: 'right',
-            dismissible: true,
-            closeable: true
-        });
-    });
-
     //handle event for adding datafiles to a description bundle
     $('#bundle_add_act').on('click', function (event) {
         event.preventDefault();
@@ -169,7 +152,7 @@ $(document).ready(function () {
 
         var $dialogContent = $('<div/>');
         var table_div = $('<div/>').append(tbl);
-        var filter_message = $('<div style="margin-bottom: 20px;"><div style="font-weight: bold; margin-bottom: 5px;">Note: Only unbundled datafiles are listed.</div><div style="color: orangered;">This action will reset the wizard to the first stage to account for the change! </div></div>');
+        var filter_message = $('<div style="margin-bottom: 20px;"><div style="font-weight: bold; margin-bottom: 5px;">Note: Only unbundled datafiles are listed.</div><div style="color: orangered;">This action will take the wizard back to the first stage to account for the change! </div></div>');
         var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader"></div>'));
 
         var dialog = new BootstrapDialog({

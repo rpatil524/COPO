@@ -34,6 +34,8 @@ $(document).ready(function () {
 
     select2_mouse_event();
 
+    select2_data_view_event();
+
 });
 
 function setup_autocomplete() {
@@ -53,43 +55,91 @@ function setup_autocomplete() {
     auto_complete();
 }
 
-function select2_mouse_event() {
-    $(document).on({
-            mouseover: function () {
-                var item = $(this);
-                var dataItem = item.find(".copo-select2-info");
+function select2_data_view_event() {
+    $(document).on("click", ".copo-embedded", function () {
+        var item = $(this);
+        lookupsURL = $("#ajax_search_copo_local").val();
+        var localolsURL = lookupsURL.replace("999", item.data("source"));
+        var accession = item.data("accession");
 
-                if (dataItem.data("server")) {//resolve item description from the server
+        item.find(".fa").addClass("fa-spin");
+        item.addClass("text-primary");
+        item.webuiPopover('destroy');
 
-                    WebuiPopovers.updateContent(item.closest(".copo-form-group"), '<div class="webpop-content-div"><span class="fa fa-spinner fa-pulse fa-2x"></span></div>');
+        $.ajax({
+            url: localolsURL,
+            type: "GET",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                "accession": accession
+            },
+            success: function (data) {
+                if (data.hasOwnProperty('result') && data.result.length > 0) {
+                    var desc = data.result[0].description;
+                    WebuiPopovers.updateContent(item, '<div class="webpop-content-div limit-text">' + desc + '</div>');
 
-                    $.ajax({
-                        url: dataItem.data("url"),
-                        type: "GET",
-                        headers: {
-                            'X-CSRFToken': csrftoken
-                        },
-                        data: {
-                            "accession": dataItem.data("id")
-                        },
-                        success: function (data) {
-                            if (data.hasOwnProperty('result') && data.result.length > 0) {
-                                var desc = data.result[0].description;
-                                WebuiPopovers.updateContent(item.closest(".copo-form-group"), '<div class="webpop-content-div limit-text">' + desc + '</div>');
-                            }
-                        },
-                        error: function () {
-                            console.log("Couldn't retrieve item's details!");
-                        }
+                    item.webuiPopover({
+                        content: '<div class="webpop-content-div limit-text">' + desc + '</div>',
+                        trigger: 'sticky',
+                        width: 300,
+                        arrow: true,
+                        placement: 'right',
+                        dismissible: true,
+                        closeable: true
                     });
 
-                } else if (dataItem.data("descr")) {//display item description
-                    WebuiPopovers.updateContent(item.closest(".copo-form-group"), '<div class="webpop-content-div limit-text">' + dataItem.data("descr") + '</div>');
+                    item.removeClass("text-primary");
+                    item.find(".fa").removeClass("fa-spin");
                 }
+            },
+            error: function () {
+                item.removeClass("text-primary");
+                item.find(".fa").removeClass("fa-spin");
+                item.webuiPopover('destroy');
+                alert("Couldn't retrieve item's details!");
             }
-        },
-        '.select2-results__option.select2-results__option--highlighted'
-    );
+        });
+    });
+}
+
+function select2_mouse_event() {
+    $(document).on("mouseover", ".select2-results__option.select2-results__option--highlighted", function () {
+        var item = $(this);
+        var dataItem = item.find(".copo-select2-info");
+        var parentElem = item.closest(".copo-form-group");
+
+        if (parentElem.length) {
+            if (dataItem.data("server")) {//resolve item description from the server
+
+                WebuiPopovers.updateContent(parentElem, '<div class="webpop-content-div"><span class="fa fa-spinner fa-pulse fa-2x"></span></div>');
+
+                $.ajax({
+                    url: dataItem.data("url"),
+                    type: "GET",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    data: {
+                        "accession": dataItem.data("id")
+                    },
+                    success: function (data) {
+                        if (data.hasOwnProperty('result') && data.result.length > 0) {
+                            var desc = data.result[0].description;
+                            WebuiPopovers.updateContent(parentElem, '<div class="webpop-content-div limit-text">' + desc + '</div>');
+                        }
+                    },
+                    error: function () {
+                        console.log("Couldn't retrieve item's details!");
+                    }
+                });
+
+            } else if (dataItem.data("descr")) {//display item description
+                WebuiPopovers.updateContent(parentElem, '<div class="webpop-content-div limit-text">' + dataItem.data("descr") + '</div>');
+            }
+        }
+    });
 }
 
 function ontology_value_change() {
@@ -861,7 +911,7 @@ function refresh_select2box() {
             elem.select2({
                 tags: true,
                 data: JSON.parse(elem.attr("data-currentValue")),
-                dropdownParent: $(this).closest(".copo-form-group")
+                // dropdownParent: $(this).closest(".copo-form-group")
             });
         }
 
@@ -877,7 +927,7 @@ function refresh_multiselect2box() {
             elem.select2({
                 data: JSON.parse(elem.attr("data-optionsList")),
                 maximumSelectionLength: elem.attr("data-maximumSelectionLength"),
-                dropdownParent: $(this).closest(".copo-form-group")
+                // dropdownParent: $(this).closest(".copo-form-group")
             });
 
             elem.val(JSON.parse(elem.attr("data-currentValue")));
@@ -948,7 +998,8 @@ function refresh_copo_lookup2() {
                     data: function (params) {
                         return {
                             q: params.term, // search term
-                            'profile_id': profile_id
+                            'profile_id': profile_id,
+                            'referenced_field': elem.attr("data-ref")
                         };
                     },
                     processResults: function (data) {

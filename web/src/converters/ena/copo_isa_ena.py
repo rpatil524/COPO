@@ -624,7 +624,7 @@ class Assay:
         materials = list()
 
         if datafile_samples:
-            datafile_samples = datafile_samples.split(",")
+            datafile_samples = datafile_samples.split(",") if isinstance(datafile_samples, str) else datafile_samples
             copo_samples = self.copo_isa_records["sample"]
             df = pd.DataFrame(copo_samples)
             df = df[df['_id'].isin([ObjectId(element) for element in datafile_samples])]
@@ -842,11 +842,15 @@ class ISAHelpers:
                                                                  submission_token)
 
         # sample... contingent on datafiles
-        attach_samples = [
-            x.get("description", dict()).get("attributes", dict()).get('attach_samples', dict()).get('study_samples',
-                                                                                                     str()) for x in
-            copo_records["datafile"]]
-        attach_samples = list(set(attach_samples))  # get unique samples
+        attach_samples = list()
+        for x in copo_records["datafile"]:
+            samp = x.get("description", dict()).get("attributes", dict()).get('attach_samples', dict()).get('study_samples', list())
+            if isinstance(samp, str):
+                attach_samples.extend(samp.split(","))
+            elif isinstance(samp, list):
+                attach_samples.extend(samp)
+
+        attach_samples = set(attach_samples)  # get unique samples
         object_list = [ObjectId(sample_id) for sample_id in attach_samples]
 
         copo_records["sample"] = list()

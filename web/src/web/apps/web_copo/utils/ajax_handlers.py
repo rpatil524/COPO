@@ -73,17 +73,20 @@ def search_copo_components(request, data_source):
     search_term = request.GET.get("q", str())
     accession = request.GET.get("accession", str())
     profile_id = request.GET.get("profile_id", str())
+    referenced_field = request.GET.get("referenced_field", str())
 
     if request.method == 'POST':
         search_term = request.POST.get("q", str())
         accession = request.POST.get("accession", str())
         profile_id = request.POST.get("profile_id", str())
+        referenced_field = request.POST.get("referenced_field", str())
 
     data = COPOLookup(
         search_term=search_term,
         accession=accession,
         data_source=data_source,
-        profile_id=profile_id
+        profile_id=profile_id,
+        referenced_field=referenced_field
     ).broker_component_search()
 
     return HttpResponse(jsonpickle.encode(data), content_type='application/json')

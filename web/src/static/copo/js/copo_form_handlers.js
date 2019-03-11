@@ -1050,6 +1050,7 @@ var dispatchFormControl = {
                 "data-validate": true,
                 "data-placeholder": placeholder,
                 "data-url": localolsURL,
+                "data-ref": formElem.ref || '',
                 "data-maximumSelectionLength": maximumSelectionLength,
                 "data-currentValue": JSON.stringify(currentValue)
             });
@@ -1064,8 +1065,8 @@ var dispatchFormControl = {
         var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
 
         //create new item button
-        var newItemCreate = formElem.create_new_item || '';
-        var optionComponent = formElem.option_component || '';
+        var newItemCreate = formElem.create_new_item || false;
+        var optionComponent = formElem.option_component || false;
 
         if (newItemCreate.toString() == "true" && optionComponent != '') {
             var addBtn = $('<button/>',
@@ -1970,29 +1971,30 @@ function create_attachable_component(formElem) {
                         success: function (data) {
                             //set returned record
 
-                            if (formElem.control == "copo-lookup2" && data.option_values.length) {
-                                var currentValue = data.option_values.map(function (item) {
-                                    if (typeof item === "string") {
-                                        var newItem = item;
-                                        item = {};
-                                        item.value = newItem;
-                                        item.label = newItem;
+                            if (formElem.control == "copo-lookup2") {
+                                if (data.option_values.length) {
+                                    var currentValue = data.option_values.map(function (item) {
+                                        if (typeof item === "string") {
+                                            var newItem = item;
+                                            item = {};
+                                            item.value = newItem;
+                                            item.label = newItem;
+                                        }
+                                        return {
+                                            id: item.accession || item.value,
+                                            text: item.label,
+                                            selected: true
+                                        };
+                                    });
+
+                                    var newOption = new Option(currentValue[0].text, currentValue[0].id, true, true);
+
+                                    if (formElem.data_maxItems && formElem.data_maxItems.toString() == "1") {
+                                        selectizeObjects[formElem.id].val(null).trigger('change');
                                     }
-                                    return {
-                                        id: item.accession || item.value,
-                                        text: item.label,
-                                        selected: true
-                                    };
-                                });
 
-                                var newOption = new Option(currentValue[0].text, currentValue[0].id, true, true);
-
-                                if (formElem.data_maxItems && formElem.data_maxItems.toString() == "1") {
-                                    selectizeObjects[formElem.id].val(null).trigger('change');
+                                    selectizeObjects[formElem.id].append(newOption).trigger('change');
                                 }
-
-                                selectizeObjects[formElem.id].append(newOption).trigger('change');
-
                             } else if (selectizeObjects.hasOwnProperty(formElem.id)) {
                                 var selectizeControl = selectizeObjects[formElem.id];
 
@@ -2060,6 +2062,8 @@ function create_attachable_component(formElem) {
     dialog.open();
 
     var csrftoken = $.cookie('csrftoken');
+    var referenced_field = formElem.ref || '';
+    var referenced_type = formElem.cg_type_name || ''; //mostly apply to cgcore types - to determine field constraint
 
     $.ajax({
         url: copoFormsURL,
@@ -2067,16 +2071,24 @@ function create_attachable_component(formElem) {
         headers: {'X-CSRFToken': csrftoken},
         data: {
             'task': 'form_and_component_records',
-            'component': formElem.option_component
+            'component': formElem.option_component,
+            'referenced_field': referenced_field,
+            'referenced_type': referenced_type
         },
         success: function (data) {
             //generate controls and attach to form object
             var formSchema = data.form.form_schema;
             formCtrl.append(generate_form_controls(formSchema, data.form.form_value));
 
+            //refresh controls
+            refresh_tool_tips();
+
             //attach clone control
             if (data.component_records.length) {
                 cloneCol.append(build_clone_control(data.component_records, formElem.label));
+
+                //refresh controls
+                refresh_tool_tips();
 
                 //listen to clone control value change
                 cloneCol.find(".copo-clone-control").on("change", function (event) {
@@ -2091,13 +2103,15 @@ function create_attachable_component(formElem) {
                         type: "POST",
                         headers: {'X-CSRFToken': csrftoken},
                         data: {
-                            'task': "component_record",
+                            'task': "component_form_record",
                             'component': formElem.option_component,
+                            'referenced_field': referenced_field,
+                            'referenced_type': referenced_type,
                             'target_id': $(this).val()
                         },
                         success: function (clone_data) {
                             formLoader2.remove();
-                            formCtrl.append(generate_form_controls(formSchema, clone_data.component_record));
+                            formCtrl.append(generate_form_controls(clone_data.component_schema, clone_data.component_record));
 
                             //refresh form validator
                             refresh_validator(formCtrl);

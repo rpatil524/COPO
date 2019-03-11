@@ -19,9 +19,14 @@
         "content": "<ol><li>Select the datafiles to be described under the <strong>Inspect</strong> pane</li><li>Click the <strong>Describe</strong> button</li><li>The description wizard will be launched with the target files available for description</li></ol>",
         "context": ["datafile","describe"]
       },
+       {
+        "title": "What is a description bundle?",
+        "content": "A description bundle is a collection of datafiles with similar attributes, which can potentially be described together.",
+        "context": ["datafile","describe"]
+      },
       {
         "title": "How do I exit a description?",
-        "content": "You can select to exit a description at any stage <ol><li>Click on the <strong>Exit Description</strong> button at the bottom of the wizard pane</li><li> You will be prompted to confirm the requested action</li><li> All previously entered description metadata will be saved for the future</li></ol>",
+        "content": "You can select to exit a description at any stage <ol><li>Click on the <strong>Exit Wizard</strong> button at the bottom of the wizard pane</li><li> You will be prompted to confirm the requested action</li><li> All previously entered description metadata will be saved for the future</li></ol>",
         "context": ["datafile","describe"]
       },
       {

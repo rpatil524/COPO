@@ -1682,7 +1682,7 @@ div.shown span.side-help-trigger:before {
     margin-bottom: 10px;
 }
 
-.no-15-left-margin{
+.no-15-left-margin {
     margin-left: 0 !important
 }
 
@@ -1769,7 +1769,6 @@ div.shown span.side-help-trigger:before {
         transform: rotate(360deg);
     }
 }
-
 
 #cover-spin::after {
     content: '';

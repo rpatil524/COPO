@@ -12,6 +12,7 @@ from dal.copo_base_da import DataSchemas
 from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.lookup.resolver import RESOLVER
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
+from web.apps.web_copo.schemas.utils.data_formats import DataFormats
 
 Schemas = get_collection_ref("Schemas")
 Lookups = get_collection_ref("Lookups")
@@ -40,11 +41,12 @@ class Command(BaseCommand):
         # instantiate data schema
         data_schema = DataSchemas("COPO")
 
-        # delete existing schemas
-        data_schema.delete_ui_template()
+        # generate core schemas
+        temp_dict = DataFormats("COPO").generate_ui_template()
 
-        # generate new schemas
-        data_schema.get_ui_template()
+        # store schemas in DB
+        if temp_dict["status"] == "success" and temp_dict["data"]:
+            data_schema.add_ui_template(temp_dict["data"])
 
         return True
 
@@ -64,11 +66,11 @@ class Command(BaseCommand):
         df.columns = [x.lower() for x in df.columns]
         df['label'] = df['official_name']
         df['value'] = df['operating_name']
-        df['description'] = "<div><strong>Platform number</strong>: " + df['platform_no'].astype(str) + \
-                            "</div><div><strong>Standard reference</strong>: " + df['standard_reference'].astype(str) + \
-                            "</div><div><strong>Operating name</strong>: " + df['operating_name'].astype(str) + \
-                            "</div><div><strong>Lead center</strong>: " + df['lead_center'].astype(str) + \
-                            "</div><strong>Class</strong>: " + df['class'].astype(str)
+        df['description'] = "<div>Platform number: " + df['platform_no'].astype(str) + \
+                            "</div><div>Standard reference: " + df['standard_reference'].astype(str) + \
+                            "</div><div>Operating name: " + df['operating_name'].astype(str) + \
+                            "</div><div>Lead center: " + df['lead_center'].astype(str) + \
+                            "</div>Class: " + df['class'].astype(str)
 
         df = df[['label', 'value', 'description']]
         result = df.to_dict('records')

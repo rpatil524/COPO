@@ -5,25 +5,20 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from jsonpickle import encode
 from submission.submissionDelegator import delegate_submission
-from dal.orcid_da import Orcid
 from api.handlers.general import *
 from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, CopoGroup, Repository
 from dal.OAuthTokens import OAuthToken
 from dal.broker_da import BrokerDA, BrokerVisuals
 from dal import cursor_to_list
 from .lookup.lookup import HTML_TAGS
-from exceptions_and_logging.logger import Logtype, Loglvl
-from exceptions_and_logging.CopoRuntimeError import CopoRuntimeError
 from django.conf import settings
 from allauth.account.forms import LoginForm
 from allauth.socialaccount.models import SocialAccount
 from bson import json_util as j
 from web.apps.web_copo.lookup.lookup import REPO_NAME_LOOKUP
 import requests
-import datetime
 from rauth import OAuth2Service
 from web.apps.web_copo.utils import EnaImports as eimp
-from submission.enaSubmission import EnaSubmit
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.decorators import user_is_staff
 import web.apps.web_copo.templatetags.html_tags as htags
@@ -101,7 +96,11 @@ def authenticate_figshare(request):
 
 def test_dataverse_submit(request):
     # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
-    # items = CgCoreSchemas().extract_repo_fields(datafile_id="5ba0b949d127fd313b62677c", repo="dataverse")
+    # items = CgCoreSchemas().extract_repo_fields(datafile_id="5ba0b949d127fd313b62677c", repo="ckan")
+    # CgCoreSchemas().process_schema()
+    # CgCoreSchemas().get_type_constraints(type_name="KOS")
+    # from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
+    # option_values = COPOLookup(accession=["5c77c2c9d127fd80d6f645e8"], data_source="cg_dependency_lookup").broker_component_search()['result']
 
     # from submission.dataverseSubmission import DataverseSubmit
     # DataverseSubmit(submission_id="592ee7f168236b85d16510ef").submit()
@@ -210,7 +209,7 @@ def copo_visualize(request):
     if task in task_dict:
         context = task_dict[task]()
 
-    out = jsonpickle.encode(context)
+    out = jsonpickle.encode(context, unpicklable=False)
     return HttpResponse(out, content_type='application/json')
 
 
@@ -228,6 +227,8 @@ def copo_forms(request):
     broker_da = BrokerDA(context=context,
                          profile_id=profile_id,
                          component=request.POST.get("component", str()),
+                         referenced_field=request.POST.get("referenced_field", str()),
+                         referenced_type=request.POST.get("referenced_type", str()),
                          target_id=request.POST.get("target_id", str()),
                          target_ids=json.loads(request.POST.get("target_ids", "[]")),
                          datafile_ids=json.loads(request.POST.get("datafile_ids", "[]")),
@@ -250,14 +251,14 @@ def copo_forms(request):
                      initiate_submission=broker_da.do_initiate_submission,
                      user_email=broker_da.do_user_email,
                      component_record=broker_da.do_component_record,
+                     component_form_record=broker_da.component_form_record,
                      sanitise_submissions=broker_da.do_sanitise_submissions
                      )
 
     if task in task_dict:
         context = task_dict[task]()
 
-    out = jsonpickle.encode(context)
-
+    out = jsonpickle.encode(context, unpicklable=False)
     return HttpResponse(out, content_type='application/json')
 
 

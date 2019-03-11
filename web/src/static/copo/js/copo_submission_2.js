@@ -89,7 +89,6 @@ $(document).ready(function () {
         set_empty_component_message(dtd.length); //display empty submission message.
 
 
-
         if (dtd.length == 0) {
             return false;
         }
@@ -328,7 +327,7 @@ $(document).ready(function () {
 
                                         if (data.accessions == undefined) {
                                             ;
-                                        } else if (!jQuery.isEmptyObject(data.meta) && data.meta != ""){
+                                        } else if (!jQuery.isEmptyObject(data.meta) && data.meta != "") {
                                             if ($(data.meta)[0].hasOwnProperty('identifier') || $(data.meta)[0].hasOwnProperty('alias')) {
                                                 if (data.destination_repo['type'] == 'dspace') {
                                                     colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' - ' + data.meta.dspace_item_name + '</span></div>')
@@ -343,7 +342,7 @@ $(document).ready(function () {
                                                     colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to CKAN Package: <span class="badge">' + data.meta.identifier + '</span></div>')
                                                 }
                                             }
-                                            else if (data.meta.hasOwnProperty("repo_type") && data.meta.repo_type == "ckan"){
+                                            else if (data.meta.hasOwnProperty("repo_type") && data.meta.repo_type == "ckan") {
                                                 colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to New CKAN Package</div>')
                                             }
                                         }
@@ -807,10 +806,11 @@ $(document).ready(function () {
     function get_submit_action(submission_id, element, typeMessage, sub_data) {
         var buttonLabel = 'Submit';
         var is_enabled
-        if (sub_data.enable_submit_button) {
+
+        if (sub_data && sub_data.enable_submit_button) {
             is_enabled = 'enabled'; //toni's comments - this will force even ENA based submission to be disabled, so overriding
         }
-        else{
+        else {
             is_enabled = 'disabled'
         }
 
@@ -917,7 +917,6 @@ $(document).ready(function () {
                             'component': component
                         },
                         success: function (data) {
-                            console.log(data)
                             BootstrapDialog.show({
                                 title: "Submission Accessions",
                                 message: $('<div></div>').append('<table id="submission_accession_table_' + targetID + '" class="ui celled stripe table hover copo-noborders-table" cellspacing="0" width="100%"></table>'),
@@ -936,14 +935,18 @@ $(document).ready(function () {
                                     var dataSet = data.submission_accessions.dataSet;
                                     var columns = data.submission_accessions.columns;
 
+                                    var rowGroup = null;
+                                    var groupAcessionRepos = ["ena"];
+                                    if (data.submission_accessions.hasOwnProperty('repository') && groupAcessionRepos.indexOf(data.submission_accessions.repository) > -1) {
+                                        rowGroup = {dataSrc: 3};
+                                    }
+
 
                                     var accessionTable = $('#' + tableID).DataTable({
                                         data: dataSet,
                                         columns: columns,
                                         order: [[3, 'asc']],
-                                        rowGroup: {
-                                            dataSrc: 3
-                                        },
+                                        rowGroup: rowGroup,
                                         columnDefs: [
                                             {
                                                 "width": "10%",

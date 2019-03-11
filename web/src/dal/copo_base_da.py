@@ -1,5 +1,3 @@
-
-
 __author__ = 'felixshaw'
 
 import bson.objectid as o
@@ -7,7 +5,6 @@ from web.apps.web_copo.schemas.utils import data_utils
 from django.urls import reverse
 
 from web.apps.web_copo.vocab.status_vocab import STATUS_CODES
-from web.apps.web_copo.schemas.utils.data_formats import DataFormats
 from dal.mongo_util import get_collection_ref
 from dal.base_resource import Resource
 
@@ -116,43 +113,19 @@ class DataSchemas:
         Schemas.remove({"schemaName": self.schema, "schemaType": "UI"})
 
     def get_ui_template(self):
-        doc = Schemas.find_one({"schemaName": self.schema, "schemaType": "UI"})
-
-        if doc:
+        try:
+            doc = Schemas.find_one({"schemaName": self.schema, "schemaType": "UI"})
             doc = doc["data"]
-        else:
-            # try generating the template
-            temp_dict = DataFormats(self.schema).generate_ui_template()
+        except Exception as e:
+            exception_message = "Couldn't retrieve component schema. " + str(e)
+            print(exception_message)
+            raise
 
-            # store a copy in the DB
-            if temp_dict["status"] == "success" and temp_dict["data"]:
-                self.add_ui_template(temp_dict["data"])
-                doc = temp_dict["data"]
-            else:
-                # todo: we could do with some error reporting here!
-                doc = None
         return doc
 
     def get_ui_template_node(self, identifier):
-        projection = {'data.copo.' + identifier: 1}
-        filter_by = dict(schemaName=self.schema, schemaType="UI")
+        doc = self.get_ui_template()
+        doc = {k.lower(): v for k, v in doc.items() if k.lower() == 'copo'}
+        doc = {k.lower(): v for k, v in doc.get("copo", dict()).items() if k.lower() == identifier.lower()}
 
-        doc = Schemas.find_one(filter_by, projection)
-
-        template = list()
-
-        if doc:
-            template = doc.get('data', dict()).get('copo', dict()).get(identifier, dict()).get('fields', list())
-        else:
-            # try generating the template
-            temp_dict = DataFormats(self.schema).generate_ui_template()
-
-            # store a copy in the DB
-            if temp_dict["status"] == "success" and temp_dict["data"]:
-                self.add_ui_template(temp_dict["data"])
-                doc = temp_dict["data"]
-
-                if doc:
-                    template = doc.get('copo', dict()).get(identifier, dict()).get('fields', list())
-
-        return template
+        return doc.get(identifier.lower(), dict()).get("fields", list())

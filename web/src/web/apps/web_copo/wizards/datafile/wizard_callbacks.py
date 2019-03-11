@@ -203,7 +203,7 @@ class WizardCallbacks:
             cg_type = cg_subtype
 
         if not cg_type:
-            # no type specified, we can't really do anything but signal abort
+            # no type specified, we can't really do anything - signal abort
             return dict()
 
         # re-validate dependency if necessary
@@ -214,44 +214,101 @@ class WizardCallbacks:
         if not cg_type_old == cg_type:
             cleared_stages = self.__wzh.remove_stage_dependency(next_stage_index)
 
-            # get new dynamic stages based on user current choice
+            # get new dynamic stages based on the cgcore type/subtype selected
             new_stages = list()
+            cgcore_object = CgCoreSchemas()
 
             # get fields schema
-            schema_df = CgCoreSchemas().get_type_constraints(cg_type)
+            schema_df = cgcore_object.get_type_constraints(cg_type)
 
-            # get dependencies
-            # todo: revisit this once there is more clarification from the CG Core folks
-            # dependencies = schema_df[~schema_df['dependency'].isin([''])]['dependency'].unique()
-            #
-            # # filter out dependants - these are fields that are to be displayed via their parent field
-            # schema_df = schema_df[schema_df['dependency'].isin([''])]
-            # schema_df["show_create_button"] = False
-            #
-            # composite_field_df = schema_df[schema_df['ref'].isin(dependencies)]
-            # schema_df.loc[composite_field_df.index, "show_create_button"] = True
-            # schema_df.loc[composite_field_df.index, "control"] = "copo-select"
+            # get constraint ranking
+            constraint_to_rank = cgcore_object.get_constraint_ranking()
 
-            # get stage id groups
+            # set type ranking - used to sort and select parent's type ranking for dependencies
+            type_ranking = dict(array=1, string=2)
+
+            # build dependency map
+            dependency_series = schema_df.dependency.copy()
+            dependencies = list(dependency_series.fillna('').unique())
+            dependencies = [x for x in dependencies if x]
+
+            schema_df["create_new_item"] = np.nan
+            schema_df['option_component'] = np.nan
+
+            for dp in dependencies:
+                children_df = schema_df[schema_df.dependency == dp]
+
+                # get reference child index - used to build parent properties
+                parent_indx = children_df.index[0]
+
+                # set parent field constraint - derived from children constraints with the highest ranking
+                schema_df.loc[parent_indx, 'field_constraint'] = sorted(set(children_df.field_constraint),
+                                                                        key=lambda x: constraint_to_rank.get(x, 100))[0]
+
+                # set parent type using children's - if at least one child
+                # is an array that should be passed onto the parent using the data_maxItems property
+
+                value_type = sorted(set(children_df.type), key=lambda x: type_ranking.get(x, 100))[0]
+
+                schema_df.loc[parent_indx, 'data_maxItems'] = 1 if value_type == "string" else -1
+                schema_df.loc[parent_indx, 'type'] = "string"
+                schema_df.loc[parent_indx, 'create_new_item'] = True
+                schema_df.loc[parent_indx, 'option_component'] = "cgcore"
+                schema_df.loc[parent_indx, 'control'] = "copo-lookup2"
+                schema_df.loc[parent_indx, 'data_source'] = "cg_dependency_lookup"
+                schema_df.loc[parent_indx, 'ref'] = dp
+                schema_df.loc[parent_indx, 'dependency'] = np.nan
+
+            # filter out dependent items - build dependency map
+            schema_df['dependency'] = schema_df['dependency'].fillna('')
+            schema_df = schema_df[schema_df['dependency'].isin([''])]
+
+            # get stage id
             stage_ids = list(schema_df.stage_id.unique())
 
-            stage_ids = pd.Series(stage_ids)
-            stage_ids = stage_ids.astype(int).sort_values()
-            stage_ids = stage_ids[stage_ids >= 0]
-            stage_ids = stage_ids.astype(str)
+            stage_ids = pd.Series(stage_ids).astype(int).sort_values()
+            stage_ids = stage_ids[stage_ids >= 0].astype(str)
+
+            columns = list(schema_df.columns)
+            for col in columns:
+                schema_df[col].fillna('n/a', inplace=True)
+
+            wizard_stage_maps = cgcore_object.get_wizard_stages_df()
+            wizard_stage_maps_list = list(wizard_stage_maps['stage_id'])
 
             for s_id in stage_ids:
-                title = "Stage - " + s_id
+
+                # filter out items without valid stage reference
+                if str(s_id) not in wizard_stage_maps_list:
+                    continue
+
+                stage_df = wizard_stage_maps[wizard_stage_maps.stage_id == str(s_id)]
+
+                # couldn't find corresponding stage information
+                if not len(stage_df):
+                    continue
+
+                stage_df = stage_df.to_dict('records')[0]
+
+                title = stage_df["stage_label"]
 
                 ref = "cg_stage_" + s_id
                 # todo: get message for stage, and an appropriate title
-                message = "Dynamically generated stage - still needs appropriate message!"
+                message = stage_df["stage_message"]
+
+                items = schema_df[schema_df.stage_id == s_id].sort_values(
+                    by=['field_constraint_rank']).to_dict('records')
+
+                # delete non-relevant attributes
+                for item in items:
+                    for k in columns:
+                        if item[k] == 'n/a':
+                            del item[k]
 
                 stage_dict = dict(title=title,
                                   ref=ref,
                                   message=message,
-                                  items=schema_df[schema_df.stage_id == s_id].sort_values(
-                                      by=['field_constraint_rank']).to_dict('records')
+                                  items=items
                                   )
 
                 new_stages.append(stage_dict)

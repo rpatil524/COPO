@@ -9,7 +9,7 @@ from api.doi_metadata import DOI2Metadata
 import web.apps.web_copo.templatetags.html_tags as htags
 from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from dal.copo_da import Profile, Publication, Source, Person, Sample, Submission, DataFile, DAComponent, Annotation, \
-    Description
+    Description, CGCore
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.metadata_rater import MetadataRater
 from web.apps.web_copo.schemas.utils import data_utils
@@ -38,10 +38,11 @@ class BrokerDA:
             profile=Profile,
             datafile=DataFile,
             submission=Submission,
-            annotation=Annotation
+            annotation=Annotation,
+            cgcore=CGCore
         )
 
-        if da_dict.get(self.component):
+        if self.component in da_dict:
             self.da_object = da_dict[self.component](self.profile_id)
 
     def set_extra_params(self, extra_param):
@@ -134,8 +135,12 @@ class BrokerDA:
         component_dict = self.param_dict.get("component_dict", dict())
         message_dict = self.param_dict.get("message_dict", dict())
 
+        kwargs = dict()
+        kwargs["referenced_field"] = self.param_dict.get("referenced_field", str())
+        kwargs["referenced_type"] = self.param_dict.get("referenced_type", str())
+
         self.context["form"] = htags.generate_copo_form(self.component, target_id, component_dict, message_dict,
-                                                        self.profile_id)
+                                                        self.profile_id, **kwargs)
         self.context["form"]["visualize"] = self.param_dict.get("visualize")
         return self.context
 
@@ -143,8 +148,12 @@ class BrokerDA:
         # generates form, and in addition returns records of the form component, this could, for instance, be
         # used for cloning of a record
 
+        kwargs = dict()
+        kwargs["referenced_field"] = self.param_dict.get("referenced_field", str())
+        kwargs["referenced_type"] = self.param_dict.get("referenced_type", str())
+
         self.context = self.do_form()
-        self.context["component_records"] = htags.generate_component_records(self.component, self.profile_id)
+        self.context["component_records"] = htags.generate_component_records(self.component, self.profile_id, **kwargs)
 
         return self.context
 
@@ -178,6 +187,22 @@ class BrokerDA:
     def do_component_record(self):
         self.context["component_record"] = self.da_object.get_record(self.param_dict.get("target_id"))
 
+        return self.context
+
+    def component_form_record(self):
+        target_id = self.param_dict.get("target_id")
+        component_dict = self.param_dict.get("component_dict", dict())
+        message_dict = self.param_dict.get("message_dict", dict())
+
+        kwargs = dict()
+        kwargs["referenced_field"] = self.param_dict.get("referenced_field", str())
+        kwargs["referenced_type"] = self.param_dict.get("referenced_type", str())
+
+        form_value = htags.generate_copo_form(self.component, target_id, component_dict, message_dict,
+                                                        self.profile_id, **kwargs)
+
+        self.context["component_record"] = form_value["form_value"]
+        self.context["component_schema"] = form_value["form_schema"]
         return self.context
 
     def do_sanitise_submissions(self):
@@ -403,9 +428,6 @@ class BrokerVisuals:
     def do_get_component_info(self):
         target_id = self.param_dict.get("target_id", str())
         da_object = DAComponent(target_id, self.component)
-        print(target_id)
-
-        print(self.component)
         self.context["component_info"] = "welcome to " + str(da_object.get_component_count())
 
         return self.context

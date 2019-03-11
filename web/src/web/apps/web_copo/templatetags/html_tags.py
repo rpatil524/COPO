@@ -14,7 +14,8 @@ import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from dal.copo_base_da import DataSchemas
-from dal.copo_da import ProfileInfo, Profile, DAComponent, Repository
+from dal.copo_da import ProfileInfo, Repository, Profile, Publication, Source, Person, Sample, Submission, DataFile, \
+    DAComponent, Annotation, CGCore
 from allauth.socialaccount import providers
 from django_tools.middlewares import ThreadLocal
 import hurry
@@ -29,6 +30,17 @@ table_id_dict = dict(publication="publication_table",
                      annotation="annotation_table",
                      profile="profile_table"
                      )
+da_dict = dict(
+    publication=Publication,
+    person=Person,
+    sample=Sample,
+    source=Source,
+    profile=Profile,
+    datafile=DataFile,
+    submission=Submission,
+    annotation=Annotation,
+    cgcore=CGCore
+)
 
 
 @register.simple_tag
@@ -85,7 +97,7 @@ def get_control_options(f):
 
     option_values = list()
 
-    if f.get("control", str()) in ["copo-lookup", "copo-lookup2"]:
+    if f.get("control", "text") in ["copo-lookup", "copo-lookup2"]:
         return COPOLookup(accession=f.get('data', str()),
                           data_source=f.get('data_source', str())).broker_component_search()['result']
 
@@ -112,12 +124,16 @@ def get_control_options(f):
 
 
 @register.filter("generate_copo_form")
-def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), message_dict=dict(), profile_id=str()):
+def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), message_dict=dict(), profile_id=str(),
+                       **kwargs):
     # message_dict templates are defined in the lookup dictionary: "MESSAGES_LKUPS"
 
     label_dict = get_labels()
 
     da_object = DAComponent(component=component, profile_id=profile_id)
+
+    if component in da_dict:
+        da_object = da_dict[component](profile_id)
 
     form_value = component_dict
 
@@ -125,15 +141,17 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
     if target_id:
         form_value = da_object.get_record(target_id)
 
+    form_value["_id"] = str(target_id)
+
     form_schema = list()
 
     # get schema fields
-    for f in da_object.get_schema().get("schema_dict"):
+    for f in da_object.get_component_schema(**kwargs):
         if f.get("show_in_form", True):
 
             # if required, resolve data source for select-type controls,
             # i.e., if a callback is defined on the 'option_values' field
-            if "option_values" in f:
+            if "option_values" in f or f.get("control", "text") in ["copo-lookup", "copo-lookup2"]:
                 f['data'] = form_value.get(f["id"].split(".")[-1], str())
                 f["option_values"] = get_control_options(f)
 
@@ -194,17 +212,21 @@ def filter_sample_type(form_value, elem):
 
 
 @register.filter("generate_component_record")
-def generate_component_records(component=str(), profile_id=str(), label_key=str()):
+def generate_component_records(component=str(), profile_id=str(), label_key=str(), **kwargs):
     da_object = DAComponent(component=component, profile_id=profile_id)
+
+    if component in da_dict:
+        da_object = da_dict[component](profile_id)
+
     component_records = list()
-    schema = da_object.get_schema().get("schema_dict")
+    schema = da_object.get_component_schema(**kwargs)
 
     # if label_key is not provided, we will assume the first element in the schema to be the label_key
 
     if not label_key:
         label_key = schema[0]["id"].split(".")[-1]
 
-    for record in da_object.get_all_records():
+    for record in da_object.get_all_records(**kwargs):
         option = dict(value=str(record["_id"]), label=record[label_key])
         component_records.append(option)
 
@@ -647,6 +669,9 @@ def generate_submission_accessions_data(submission_record):
 def generate_attributes(component, target_id):
     da_object = DAComponent(component=component)
 
+    if component in da_dict:
+        da_object = da_dict[component]()
+
     # get and filter schema elements based on displayable columns
     schema = [x for x in da_object.get_schema().get("schema_dict") if x.get("show_as_attribute", False)]
 
@@ -1000,7 +1025,10 @@ def resolve_copo_lookup2_data(data, elem):
     option_values = get_control_options(elem)
 
     if option_values:
-        resolved_value = [x['label'] for x in option_values]
+        resolved_value = [x[
+                              'label'] + "<span class='copo-embedded' style='margin-left: 5px;' data-source='{data_source}' data-accession='{data_accession}' >" \
+                                         "<i title='click for related information' style='cursor: pointer;' class='fa fa-info-circle'></i></span>".format(
+            data_source=elem['data_source'], data_accession=x['accession']) for x in option_values]
 
     return resolved_value
 

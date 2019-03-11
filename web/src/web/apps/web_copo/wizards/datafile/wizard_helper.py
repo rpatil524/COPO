@@ -269,7 +269,7 @@ class WizardHelper:
             for st in stage.get("items", list()):
                 if st.get("control", "text") == "copo-lookup":
                     continue
-                if st.get("option_values", False) == False:
+                if st.get("option_values", False) is False:
                     st.pop('option_values', None)
                     continue
 
@@ -323,7 +323,7 @@ class WizardHelper:
         """
 
         for item in stage.get("items", list()):
-            if item.get("control", str()) in ["copo-lookup", "copo-lookup2"]:
+            if item.get("control", "text") in ["copo-lookup", "copo-lookup2"]:
                 item['data'] = stage['data'].get(item["id"].split(".")[-1], str())
                 item["option_values"] = htags.get_control_options(item)
 
@@ -495,6 +495,7 @@ class WizardHelper:
                     print(stage["ref"])
                     print('Stage resolution error. Next stage index: ' + str(next_stage_index) + " " + str(e))
                     stage = dict()
+                    raise
 
             # we expect a stage that cannot be directly rendered to return a False, thus prompting
             # progression to the next
@@ -1195,6 +1196,11 @@ class WizardHelper:
             result_dict["control_schema"]["type"] = "string"  # constraints control to be rendered as an non-array
             result_dict["schema_data"] = record_attributes[key[0]][key[1]][int(key[2])]
 
+        # resolve option values for special controls
+        if result_dict["control_schema"].get("control", "text") in ["copo-lookup", "copo-lookup2"]:
+            result_dict["control_schema"]['data'] = result_dict["schema_data"]
+            result_dict["control_schema"]["option_values"] = htags.get_control_options(result_dict["control_schema"])
+
         return result_dict
 
     def save_cell_data(self, cell_reference, record_id, auto_fields):
@@ -1770,8 +1776,14 @@ class WizardHelper:
         df = pd.read_csv(pairing_info)
 
         # remove spaces that could have come with the file name
-        df["File1"] = df.File1.str.strip()
-        df["File2"] = df.File2.str.strip()
+        try:
+            df["File1"] = df.File1.str.strip()
+            df["File2"] = df.File2.str.strip()
+        except Exception as e:
+            exception_message = "Error forming pairs. " + str(e)
+            validation_result["status"] = "error"
+            validation_result["message"] = exception_message
+            return validation_result
 
         # get all the file names involved
         revised_file_names = list(df.File1) + list(df.File2)
@@ -1784,7 +1796,7 @@ class WizardHelper:
         if not stored_file_names == revised_file_names:
             validation_result["status"] = "error"
             validation_result[
-                "message"] = "Pairing mismatch! This could be caused by repeating file names or introducing extraneous file names not in the exported list."
+                "message"] = "Pairing error! Possible cause might be repeated file names, or the introduction of file names not in the exported list."
 
             return validation_result
 

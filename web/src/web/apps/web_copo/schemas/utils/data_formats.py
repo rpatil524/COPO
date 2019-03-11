@@ -56,6 +56,7 @@ class DataFormats:
 
         if new_list:
             self.generated_controls = new_list
+
             # set some default fields
             self.set_type()
             self.set_control_meta()
@@ -228,7 +229,8 @@ class DataFormats:
 
     def set_option_values(self):
         for elem_dict in self.generated_controls:
-            if elem_dict.get("control", str()).lower() in ['copo-lookup', 'copo-multi-select',
+            if elem_dict.get("control", str()).lower() in ['copo-lookup', 'copo-multi-select', 'copo-select2',
+                                                           'copo-lookup2',
                                                            'copo-button-list', 'copo-single-select',
                                                            'copo-multi-select2'] and "option_values" not in elem_dict:
                 elem_dict["option_values"] = list()

@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from bson import ObjectId
 from dal import cursor_to_list
-from dal.copo_da import Sample, Source
+from dal.copo_da import Sample, Source, CGCore
 from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.lookup.resolver import RESOLVER
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
@@ -26,6 +26,7 @@ class COPOLookup:
         self.accession = self.param_dict.get("accession", dict())
         self.data_source = self.param_dict.get("data_source", str())
         self.profile_id = self.param_dict.get("profile_id", str())
+        self.referenced_field = self.param_dict.get("referenced_field", str())
         self.drop_downs_pth = RESOLVER['copo_drop_downs']
 
     def broker_component_search(self):
@@ -34,6 +35,7 @@ class COPOLookup:
             'countrieslist': self.get_lookup_type,
             'mediatypelabels': self.get_lookup_type,
             'fundingbodies': self.get_lookup_type,
+            'cg_dependency_lookup': self.cg_dependency_lookup,
             'isa_samples_lookup': self.get_isasamples,
             'sample_source_lookup': self.get_samplesource,
             'all_samples_lookup': self.get_allsamples
@@ -47,8 +49,9 @@ class COPOLookup:
                 result = dispatcher[self.data_source]()
                 message = 'success'
             except Exception as e:
-                message = 'error'
-                print(e)
+                exception_message = "Error brokering component search. " + str(e)
+                print(exception_message)
+                raise
 
         return dict(result=result, message=message)
 
@@ -115,7 +118,7 @@ class COPOLookup:
             if isinstance(self.accession, str):
                 self.accession = self.accession.split(",")
 
-            object_ids = [ObjectId(x) for x in self.accession]
+            object_ids = [ObjectId(x) for x in self.accession if x.strip()]
             records = cursor_to_list(Source().get_collection_handle().find({"_id": {"$in": object_ids}}))
 
             if records:
@@ -153,6 +156,70 @@ class COPOLookup:
 
         return result
 
+    def cg_dependency_lookup(self):
+        """
+        lookup for cgcore dependent components
+        :return:
+        """
+        import web.apps.web_copo.templatetags.html_tags as htags
+
+        result = list()
+        df = pd.DataFrame()
+        schema = CGCore().get_component_schema()
+
+        if self.accession:
+            if isinstance(self.accession, str):
+                self.accession = self.accession.split(",")
+
+            object_ids = [ObjectId(x) for x in self.accession if x.strip()]
+            records = cursor_to_list(CGCore().get_collection_handle().find({"_id": {"$in": object_ids}}))
+            result = list()
+
+            if records:
+                for record in records:
+                    referenced_field = record.get("dependency_id", str())
+                    schema = [x for x in schema if 'dependency' in x and x['dependency'] == referenced_field]
+
+                    label = record.get(schema[0]["id"].split(".")[-1], str())
+                    resolved = htags.resolve_display_data(schema, record)
+                    description = self.format_description(resolved)
+
+                    item_dict = dict(accession=str(record["_id"]),
+                                     label=label,
+                                     description=description)
+                    item_dict['server-side'] = True  # ...to request callback to server for resolving item description
+
+                    result.append(item_dict)
+        elif self.search_term:
+            referenced_field = self.referenced_field
+            schema = [x for x in schema if 'dependency' in x and x['dependency'] == referenced_field]
+
+            filter_name = schema[0]["id"].split(".")[-1]
+            projection = {filter_name: 1}
+            filter_by = dict()
+            filter_by[filter_name] = {'$regex': self.search_term, "$options": 'i'}
+
+            sort_by = filter_name
+            sort_direction = -1
+
+            records = CGCore(profile_id=self.profile_id).get_all_records_columns(filter_by=filter_by,
+                                                                                 projection=projection,
+                                                                                 sort_by=sort_by,
+                                                                                 sort_direction=sort_direction)
+
+            if records:
+                df = pd.DataFrame(records)
+                df['accession'] = df._id.astype(str)
+                df['label'] = df[filter_name]
+                df['description'] = ''
+                df['server-side'] = True  # ...to request callback to server for resolving item description
+
+        if not df.empty:
+            df = df[['accession', 'label', 'description', 'server-side']]
+            result = df.to_dict('records')
+
+        return result
+
     def get_isasamples(self):
         """
         lookup for ISA-based (COPO standard) samples
@@ -167,7 +234,7 @@ class COPOLookup:
             if isinstance(self.accession, str):
                 self.accession = self.accession.split(",")
 
-            object_ids = [ObjectId(x) for x in self.accession]
+            object_ids = [ObjectId(x) for x in self.accession if x.strip()]
             records = cursor_to_list(Sample().get_collection_handle().find({"_id": {"$in": object_ids}}))
 
             if records:
@@ -219,7 +286,7 @@ class COPOLookup:
             if isinstance(self.accession, str):
                 self.accession = self.accession.split(",")
 
-            object_ids = [ObjectId(x) for x in self.accession]
+            object_ids = [ObjectId(x) for x in self.accession if x.strip()]
             records = cursor_to_list(Sample().get_collection_handle().find({"_id": {"$in": object_ids}}))
 
             if records:

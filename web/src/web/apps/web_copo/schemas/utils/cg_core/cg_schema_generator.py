@@ -4,6 +4,9 @@ import os
 import json
 import numpy as np
 import pandas as pd
+from bson import ObjectId
+from dal import cursor_to_list
+
 import web.apps.web_copo.lookup.lookup as lkup
 from web.apps.web_copo.lookup.resolver import RESOLVER
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
@@ -17,6 +20,7 @@ class CgCoreSchemas:
         self.type_field_status_path = os.path.join(self.schemas_utils_paths, 'type_field_STATUS.csv')
         self.map_type_subtype_path = os.path.join(self.schemas_utils_paths, 'mapTypeSubtype.csv')
         self.copo_schema_spec_path = os.path.join(self.schemas_utils_paths, 'copo_schema.csv')
+        self.cg_wizard_stages = os.path.join(self.schemas_utils_paths, 'cg_wizard_stages.csv')
 
     def retrieve_schema_specs(self, path_to_spec):
         """
@@ -36,6 +40,21 @@ class CgCoreSchemas:
 
         return df
 
+    def get_wizard_stages_df(self):
+        """
+        function returns a dataframe of wizard stages
+        :return:
+        """
+        path_to_spec = self.cg_wizard_stages
+        df = pd.read_csv(path_to_spec)
+
+        df['stage_label'] = df['stage_label'].fillna("Description")
+        df['stage_id'] = df['stage_id'].fillna("000")
+        df.stage_id = df.stage_id.astype(str)
+        df['stage_message'] = df['stage_message'].fillna("CG Core stage")
+
+        return df
+
     def get_type_field_matrix(self):
         """
         function returns cg core fields and corresponding constraints as a dataframe
@@ -48,8 +67,7 @@ class CgCoreSchemas:
         df['match_type_subtype_x'] = df['in cgc2 typelist'].astype(str) + df['in cgc2 subtypelist'].astype(str)
         df = df[(df['match_type_subtype_x'] == '01') | (df['match_type_subtype_x'] == '10')]
 
-        # # substitute value
-        # todo: example dc.creator affiliation depends on dc.creator use this infer dependency
+        # substitute value
         # df = df.replace('required if applicable', 'required')
         df = df.replace('required if applicable', 'required-if-applicable')
 
@@ -69,7 +87,21 @@ class CgCoreSchemas:
 
     def get_type_constraints(self, type_name):
         """
-        given a type (or a subtype) function returns relevant schemas and constraints
+        given a type (or a subtype) function returns relevant schemas with associated constraints
+        :param type_name:
+        :return:
+        """
+
+        from dal.copo_base_da import DataSchemas
+        schema_fields = DataSchemas("COPO").get_ui_template_node('cgCore')
+
+        df = self.resolve_field_constraint(schema=schema_fields, type_name=type_name)
+        return df
+
+    def resolve_field_constraint(self, schema=list(), type_name=str()):
+        """
+        given type_name, function sets field constraint for schema items - also filters out non-applicable fields
+        :param schema:
         :param type_name:
         :return:
         """
@@ -80,10 +112,7 @@ class CgCoreSchemas:
         df_type_series = df_type_series[df_type_series != 'not applicable']
         df_type_series.index = df_type_series.index.str.lower()
 
-        from dal.copo_base_da import DataSchemas
-        schema_fields = DataSchemas("COPO").get_ui_template_node('cgCore')
-
-        schemas_df = pd.DataFrame(schema_fields)
+        schemas_df = pd.DataFrame(schema)
         schemas_df.index = schemas_df.ref.str.lower()
         schemas_df = schemas_df[schemas_df.index.isin(df_type_series.index)]
 
@@ -95,17 +124,12 @@ class CgCoreSchemas:
             {'required': True, 'recommended': False, 'optional': False, 'required-if-applicable': False})
 
         # rank fields by constraints
-        constraint_to_rank = {
-            'required': 1,
-            'required-if-applicable': 2,
-            'recommended': 3,
-            'optional': 4
-        }
+        constraint_to_rank = self.get_constraint_ranking()
 
-        lowercased = schemas_df['field_constraint'].str.lower()
-        schemas_df['field_constraint_rank'] = lowercased.map(constraint_to_rank)
+        lowered = schemas_df['field_constraint'].str.lower()
+        schemas_df['field_constraint_rank'] = lowered.map(constraint_to_rank)
 
-        schemas_df['option_values'] = schemas_df['option_values'].fillna(False)
+        schemas_df['cg_type_name'] = type_name  # needed for resolving dependency constraints
 
         return schemas_df
 
@@ -121,6 +145,14 @@ class CgCoreSchemas:
         df = df[['type collection character', 'type', 'subtype', 'remark']]
 
         return df
+
+    def get_constraint_ranking(self):
+        return {
+            'required': 1,
+            'required-if-applicable': 2,
+            'recommended': 3,
+            'optional': 4
+        }
 
     def get_required_types(self, type_class):
         """
@@ -204,7 +236,9 @@ class CgCoreSchemas:
         :return:
         """
 
-        from dal.copo_da import DataFile
+        # todo: modify this to account for dependent fields!
+
+        from dal.copo_da import DataFile, CGCore
         from dal.copo_base_da import DataSchemas
 
         if not repo:  # no repository to filter by
@@ -238,12 +272,15 @@ class CgCoreSchemas:
         schema_df = schema_df[['ref', 'id', 'prefix']]
         schema_df = schema_df[~schema_df['ref'].isna()]
 
+        # get stage items without any constraints
+        all_items = [item for st in stages for item in st.get("items", list())]
+
         # filter stage items - stage items should conform to specifications of the repo
         schema_ids = list(schema_df.id)
         items = {item.get("id", str()).lower().split(".")[-1]: st.get("ref", "").lower() for st in stages for item in
                  st.get("items", list()) if item.get("id", str()).lower().split(".")[-1] in schema_ids}
 
-        # account for any filtering that may have been enforced by some client agent (e.g. COPO Wizard),
+        # ...also, account for any filtering performed by client agents (e.g., dependencies in COPO Wizard),
         # within the context of the target repo
         schema_df = schema_df[schema_df.index.isin(items.keys())]
 
@@ -261,6 +298,37 @@ class CgCoreSchemas:
         schema_df['vals'] = schema_df['vals'].fillna('')
 
         schema_df = schema_df[['ref', 'id', 'vals', 'prefix']]
+
+        # get composite attributes
+        composite_attrib = [x for x in all_items if x["id"] in list(schema_df.id) and x.get("create_new_item", False)]
+
+        # expand composite attributes
+        for cattrib in composite_attrib:
+            comp_series = schema_df.loc[cattrib["id"]]
+            schema_df = schema_df[~schema_df.id.isin([cattrib["id"]])]
+            children_schemas = [x for x in cg_schema if x.get("dependency", str()).lower() == comp_series.ref.lower()]
+
+            accessions = comp_series.vals
+            if isinstance(accessions, str):
+                accessions = accessions.split(",")
+
+            object_ids = [ObjectId(x) for x in accessions if x.strip()]
+
+            records = list()
+            if len(object_ids):
+                records = cursor_to_list(CGCore().get_collection_handle().find({"_id": {"$in": object_ids}}))
+
+            attr_list = list()
+            for child in children_schemas:
+                child_dict = dict(ref=child["ref"], id=child["id"].split(".")[-1], prefix=child["prefix"], vals=[])
+                attr_list.append(child_dict)
+                for rec in records:
+                    child_dict["vals"].append(rec.get(child_dict["id"], str()))
+
+            if attr_list:
+                attr_df = pd.DataFrame(attr_list)
+                attr_df.index = attr_df.id
+                schema_df = pd.concat([schema_df, attr_df])
 
         schema_df.rename(index=str, columns={"ref": "dc", "id": "copo_id"}, inplace=True)
 
@@ -336,7 +404,7 @@ class CgCoreSchemas:
 
         specs_df = self.get_schema_spec()
 
-        # compose copo schema fragment from cg-core spec
+        # compose copo schema from cg-core spec
         df = specs_df.T.copy()
         df["ref"] = list(df.index)
 

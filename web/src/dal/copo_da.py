@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 import pandas as pd
 import pymongo.errors as pymongo_errors
+from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 
 PubCollection = 'PublicationCollection'
 PersonCollection = 'PersonCollection'
@@ -28,6 +29,7 @@ ProfileCollection = 'Profiles'
 AnnotationReference = 'AnnotationCollection'
 GroupCollection = 'GroupCollection'
 RepositoryCollection = 'RepositoryCollection'
+CGCoreCollection = 'CGCoreCollection'
 
 handle_dict = dict(publication=get_collection_ref(PubCollection),
                    person=get_collection_ref(PersonCollection),
@@ -38,7 +40,8 @@ handle_dict = dict(publication=get_collection_ref(PubCollection),
                    datafile=get_collection_ref(DataFileCollection),
                    annotation=get_collection_ref(AnnotationReference),
                    group=get_collection_ref(GroupCollection),
-                   repository=get_collection_ref(RepositoryCollection)
+                   repository=get_collection_ref(RepositoryCollection),
+                   cgcore=get_collection_ref(CGCoreCollection)
                    )
 
 
@@ -126,13 +129,16 @@ class DAComponent:
                     schema=x.fields
                     )
 
+    def get_component_schema(self, **kwargs):
+        return DataSchemas("COPO").get_ui_template_node(self.component)
+
     def save_record(self, auto_fields=dict(), **kwargs):
         fields = dict()
+        schema = kwargs.get("schema", list()) or self.get_component_schema()
 
         # set auto fields
         if auto_fields:
-            fields = DecoupleFormSubmission(auto_fields,
-                                            self.get_schema().get("schema_dict")).get_schema_fields_updated_dict()
+            fields = DecoupleFormSubmission(auto_fields, schema).get_schema_fields_updated_dict()
 
         # should have target_id for updates and return empty string for inserts
         target_id = kwargs.pop("target_id", str())
@@ -152,19 +158,19 @@ class DAComponent:
             system_fields[k] = v
 
         # add system fields to 'fields' and set default values - insert mode only
-        for f in self.get_schema().get("schema"):
-            f_id = f.id.split(".")[-1]
+        for f in schema:
+            f_id = f["id"].split(".")[-1]
 
             if f_id in system_fields:
                 fields[f_id] = system_fields.get(f_id)
 
             if not target_id and f_id not in fields:
-                fields[f_id] = data_utils.default_jsontype(f.type)
+                fields[f_id] = data_utils.default_jsontype(f["type"])
 
         # if True, then the database action (to save/update) is never performed, but validated 'fields' are returned
         validate_only = kwargs.pop("validate_only", False)
 
-        if validate_only == True:
+        if validate_only is True:
             return fields
         else:
             if target_id:
@@ -180,7 +186,7 @@ class DAComponent:
 
             return rec
 
-    def get_all_records(self, sort_by='_id', sort_direction=-1):
+    def get_all_records(self, sort_by='_id', sort_direction=-1, **kwargs):
         doc = dict(deleted=data_utils.get_not_deleted_flag())
         if self.profile_id:
             doc["profile_id"] = self.profile_id
@@ -324,6 +330,71 @@ class Person(DAComponent):
         return
 
 
+class CGCore(DAComponent):
+    def __init__(self, profile_id=None):
+        super(CGCore, self).__init__(profile_id, "cgcore")
+
+    def get_component_schema(self, **kwargs):
+        schema_fields = super(CGCore, self).get_component_schema()
+
+        referenced_field = kwargs.get("referenced_field", str())
+        referenced_type = kwargs.get("referenced_type", str())
+
+        if referenced_field:  # resolve dependencies
+            schema_fields = [x for x in schema_fields if 'dependency' in x and x['dependency'] == referenced_field]
+
+        if referenced_type:  # set field constraints
+            schema_df = CgCoreSchemas().resolve_field_constraint(schema=schema_fields, type_name=referenced_type)
+            columns = list(schema_df.columns)
+
+            for col in columns:
+                schema_df[col].fillna('n/a', inplace=True)
+
+            schema_fields = schema_df.sort_values(by=['field_constraint_rank']).to_dict('records')
+
+            # delete non-relevant attributes
+            for item in schema_fields:
+                for k in columns:
+                    if item[k] == 'n/a':
+                        del item[k]
+
+        for item in schema_fields:
+            # set array types to string - child array types are accounted for by the parent
+            item["type"] = "string"
+
+        return schema_fields
+
+    def get_all_records(self, sort_by='_id', sort_direction=-1, **kwargs):
+        doc = dict(deleted=data_utils.get_not_deleted_flag())
+        if self.profile_id:
+            doc["profile_id"] = self.profile_id
+
+        referenced_field = kwargs.get("referenced_field", str())
+
+        if referenced_field:
+            doc["dependency_id"] = referenced_field
+
+        return cursor_to_list(self.get_collection_handle().find(doc).sort([[sort_by, sort_direction]]))
+
+    def save_record(self, auto_fields=dict(), **kwargs):
+        all_keys = [x.lower() for x in auto_fields.keys() if x]
+        schema_fields = self.get_component_schema()
+        schema_fields = [x for x in schema_fields if x["id"].lower() in all_keys]
+
+        schema_fields.append(dict(id="dependency_id", type="string", control="text"))
+        schema_fields.append(dict(id="date_modified", type="string", control="text"))
+        schema_fields.append(dict(id="deleted", type="string", control="text"))
+        schema_fields.append(dict(id="date_created", type="string", control="text"))
+        schema_fields.append(dict(id="profile_id", type="string", control="text"))
+
+        if schema_fields:
+            kwargs["dependency_id"] = schema_fields[0].get("dependency", str())
+
+        kwargs["schema"] = schema_fields
+
+        return super(CGCore, self).save_record(auto_fields, **kwargs)
+
+
 class Source(DAComponent):
     def __init__(self, profile_id=None):
         super(Source, self).__init__(profile_id, "source")
@@ -359,7 +430,7 @@ class Submission(DAComponent):
                     repository=repo,
                     status=False,
                     complete='false',
-                    is_cg=str(repo=="cg_core"),
+                    is_cg=str(repo == "cg_core"),
                     user_id=data_utils.get_current_user().id,
                     date_created=date.today()
             ).items():

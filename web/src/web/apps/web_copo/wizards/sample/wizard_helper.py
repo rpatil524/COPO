@@ -78,7 +78,7 @@ class WizardHelper:
             for st in stage.get("items", list()):
                 if st["control"] == "copo-lookup":
                     continue
-                if st.get("option_values", False) == False:
+                if st.get("option_values", False) is False:
                     st.pop('option_values', None)
                     continue
 
@@ -94,7 +94,7 @@ class WizardHelper:
         """
 
         for item in stage.get("items", list()):
-            if item.get("control", str()) in ["copo-lookup", "copo-lookup2"]:
+            if item.get("control", "text") in ["copo-lookup", "copo-lookup2"]:
                 item['data'] = stage['data'].get(item["id"].split(".")[-1], str())
                 item["option_values"] = htags.get_control_options(item)
 
@@ -925,6 +925,12 @@ class WizardHelper:
         elif parent_schema["type"] == "array":
             result_dict["control_schema"]["type"] = "string"  # constraints control to be rendered as an non-array
             result_dict["schema_data"] = record[key[0]][int(key[1])]
+
+        # resolve option values for special controls
+        if result_dict["control_schema"].get("control", "text") in ["copo-lookup", "copo-lookup2"]:
+            result_dict["control_schema"]['data'] = result_dict["schema_data"]
+            result_dict["control_schema"]["option_values"] = htags.get_control_options(
+                result_dict["control_schema"])
 
         return result_dict
 
