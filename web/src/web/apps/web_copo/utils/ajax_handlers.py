@@ -113,11 +113,13 @@ def get_upload_information(request):
             # get bundle transfer status
             sub_info_dict["bundle_meta"] = sub.get("bundle_meta", list())
             sub_info_dict["bundle"] = sub.get("bundle", list())
-            sub_info_dict["enable_submit_button"] = "meta" in sub and "fields" in sub["meta"] or sub["repository"] not in [
-                "cg_core",
-                "dataverse",
-                "dspace",
-                "ckan"]
+            if sub["repository"] not in ["cg_core", "dataverse", "dspace", "ckan"]:
+                sub_info_dict["enable_submit_button"] = True
+            else:
+                if "meta" in sub and "fields" in sub["meta"] or "identifier" in sub["meta"]:
+                    sub_info_dict["enable_submit_button"] = True
+                else:
+                    sub_info_dict["enable_submit_button"] = False
 
             if str(sub.get("complete", False)).lower() == 'false':
                 # could we be dealing with an uploading submission?
@@ -514,7 +516,7 @@ def get_repo_info(request, sub=None):
                 dspace().dc_dict_to_dc(sub_id)
     except Exception as e:
         print(e)
-        return HttpResponse(json.dumps({"status": 1, "message": "error getting dataverse"}))
+        return HttpResponse(json.dumps({"status": 404, "message": "error getting dataverse"}))
     s = Submission().get_record(ObjectId(sub_id))
     out = {'repo_type': repo['type'], 'repo_url': repo['url'], 'meta': s["meta"]}
 
@@ -647,7 +649,6 @@ def get_existing_metadata(request):
 
     out = sub["meta"]
     return HttpResponse(json.dumps(out))
-
 
 
 def get_ckan_items(request):

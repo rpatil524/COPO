@@ -374,7 +374,11 @@ def generate_table_records(profile_id=str(), component=str()):
     projection = [(x["id"].split(".")[-1], 1) for x in schema]
 
     # retrieve and process records
-    records = da_object.get_all_records_columns(projection=dict(projection))
+    if component == "submission":
+        records = da_object.get_all_records_columns(sort_by="date_created", sort_direction=1,
+                                                    projection=dict(projection))
+    else:
+        records = da_object.get_all_records_columns(projection=dict(projection))
 
     if len(records):
         df = pd.DataFrame(records)
@@ -642,19 +646,26 @@ def generate_submission_accessions_data(submission_record):
             )
 
         elif repository == "dspace":
-            columns = [{"title": "Format"}, {"title": "uuid"}, {"title": "dSpace URL"}, {"title": "Name"},
-                       {"title": "File Size"}]
+            columns = [{"title": "Description"}, {"title": "Format"}, {"title": "Filesize"}, {"title": "Retrieve Link"},
+                       {"title": "Metadata Link"}]
             for a in accessions:
+                link_ref = a["dspace_instance"] + a["link"]
+                meta_link = '<a target="_blank" href="' + a["meta_url"] + '">' + a["meta_url"] + '</a>'
+                retrieve_link = '<a href="' + link_ref + '/retrieve">' + link_ref + '</a>'
                 data_set.append(
-                    [a["format"], a["uuid"], a["dspace_instance"], a["name"], (hurry.filesize.size(a["sizeBytes"]))]
+                    [a["description"], a["format"], (hurry.filesize.size(a["sizeBytes"])),
+                     retrieve_link,
+                     meta_link]
                 )
 
         elif repository == "ckan":
-
-            columns = [{"title": "Name"}, {"title": "resource id"}, {"title": "package id"}, {"title": "Format"}]
+            columns = [{"title": "Name"}, {"title": "Metadata Link"}, {"title": "Resource Link"}, {"title": "Format"}]
             for a in accessions:
+                retrieve_link = '<a href="' + a["result"]["url"] + '">' + a["result"]["url"] + '</a>'
+                meta_link = '<a target="_blank" href="' + a["result"]["repo_url"] + 'package_show?id=' + a['result'][
+                    'package_id'] + '">' + 'Show Metadata' + '</a>'
                 data_set.append(
-                    [a["result"]["name"], a["result"]["id"], a["result"]["package_id"], a["result"]["format"]]
+                    [a["result"]["name"], meta_link, retrieve_link, a["result"]["format"]]
                 )
 
     return_dict = dict(dataSet=data_set,

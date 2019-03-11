@@ -240,9 +240,45 @@ class EnaSubmit(object):
 
         # setup paths for conversion directories
         if self.submission['repository'] == 'ena':
+            # this is now deprecated and will never be called
             return self.do_seq_reads_submission(sub_id, remote_path, transfer_token)
         elif self.submission['repository'] == 'ena-ant':
             return self.do_annotation_submission(sub_id, remote_path, transfer_token)
+        elif self.submission['repository'] == 'ena-asm':
+            return self.do_assembly_submission(sub_id, remote_path, transfer_token)
+
+    def do_assembly_submission(self, sub_id, remote_path, transfer_token):
+        # make dir for manifest file
+        conv_dir = os.path.join(self._dir, sub_id)
+        if not os.path.exists(conv_dir):
+            os.makedirs(conv_dir)
+        # file for metadata
+        sub = Submission().get_record(sub_id)
+        datafile = DataFile().get_record(sub["bundle"][0])
+        metadata = datafile["description"]["attributes"]["study_type"]
+        # make manifest
+        with open(os.path.join(conv_dir, "manifest.manifest"), 'w+') as manifest:
+            for key in metadata.keys():
+                line = key.upper() + "\t" + metadata[key] + "\n"
+                manifest.write(line)
+            agp_flag = False
+            fasta_flag = False
+            for f in sub["bundle"]:
+                file = DataFile().get_record(ObjectId(f))
+                if file["name"].endswith("fasta"):
+                    fasta = "FASTA\t" + file["file_location"] + "\n"
+                    fasta_flag = True
+                    manifest.write(fasta)
+                if file["name"].endswith('agp'):
+                    agp = "AGP\t" + file["file_location"] + "\n"
+                    agp_flag = True
+                    manifest.write(agp)
+        if agp_flag and fasta_flag:
+
+            #  proceed to submission
+            pass
+        else:
+            return {"status": 428, "message": "You must supply an AGP file and a FASTA file"}
 
     def do_seq_reads_submission(self, sub_id, remote_path, transfer_token):
         # # setup paths for conversion directories

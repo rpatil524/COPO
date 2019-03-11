@@ -120,33 +120,34 @@ class CkanSubmit:
                                          )
                 except TypeError as t:
                     print(t)
-            if resp.status_code == 200:
-                details = json.loads(resp.content.decode("utf-8"))
-                self._update_and_complete_submission(details, sub_id)
-            elif resp.status_code == 400:
-                # try again checking for https
-                instance = re.findall("https", fullurl)
-                if len(instance) == 0:
-                    fullurl = fullurl.replace("http", "https")
-                resp = requests.post(fullurl,
-                                     data=data,
-                                     files=f,
-                                     headers=self.headers
-                                     )
-                if resp.status_code != 200:
-                    msg = json.loads(resp.content.decode("utf-8"))["error"]["message"]
-                    return {"status": resp.status_code, "message": msg}
-                details = json.loads(resp.content.decode("utf-8"))
-                self._update_and_complete_submission(details, sub_id)
-            elif resp.status_code == 409:
-                fullurl = self.host["url"] + "package_show"
-                resp = requests.post(fullurl, data={"id": dataset_id})
-                #  now iterate through resources to get matching name
-                resources = json.dumps(resp.content.decode("utf-8"))["result"]["resources"]
-                fullurl = self.host["url"] + "resource_update"
-                # Submission().mark_submission_complete(ObjectId(sub_id))
-            else:
-                return json.dumps({"status": resp.status_code, "message": resp.reason + " - " + resp.text})
+                if resp.status_code == 200:
+                    details = json.loads(resp.content.decode("utf-8"))
+                    details["result"]["repo_url"] = self.host["url"]
+                    self._update_and_complete_submission(details, sub_id)
+                elif resp.status_code == 400:
+                    # try again checking for https
+                    instance = re.findall("https", fullurl)
+                    if len(instance) == 0:
+                        fullurl = fullurl.replace("http", "https")
+                    resp = requests.post(fullurl,
+                                         data=data,
+                                         files=f,
+                                         headers=self.headers
+                                         )
+                    if resp.status_code != 200:
+                        msg = json.loads(resp.content.decode("utf-8"))["error"]["message"]
+                        return {"status": resp.status_code, "message": msg}
+                    details = json.loads(resp.content.decode("utf-8"))
+                    self._update_and_complete_submission(details, sub_id)
+                elif resp.status_code == 409:
+                    fullurl = self.host["url"] + "package_show"
+                    resp = requests.post(fullurl, data={"id": dataset_id})
+                    #  now iterate through resources to get matching name
+                    resources = json.dumps(resp.content.decode("utf-8"))["result"]["resources"]
+                    fullurl = self.host["url"] + "resource_update"
+                    # Submission().mark_submission_complete(ObjectId(sub_id))
+                else:
+                    return json.dumps({"status": resp.status_code, "message": resp.reason + " - " + resp.text})
 
         Submission().mark_submission_complete(ObjectId(sub_id))
         return True

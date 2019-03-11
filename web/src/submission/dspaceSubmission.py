@@ -52,7 +52,7 @@ class DspaceSubmit(object):
             resp = requests.post(login_url, json=params)
             if resp.status_code != 200:
                 # there is actually a problem with the login process
-                return {"status": 1, "message": "error logging into dSpace: error" + str(resp.status_code)}
+                return {"status": 401, "message": "error logging into dSpace: error" + str(resp.status_code)}
         try:
             login_details = resp.cookies["JSESSIONID"]
             dspace_type = 6
@@ -66,7 +66,7 @@ class DspaceSubmit(object):
             try:
                 item_id = sub['meta']['identifier']
             except KeyError as e:
-                return {"status": 1, "message": "No dSpace Item identifier found, please try selecting item again."}
+                return {"status": 404, "message": "No dSpace Item identifier found, please try selecting item again."}
 
         elif new_or_existing == "new":
             # if new we must create a new item in the given collection
@@ -100,7 +100,7 @@ class DspaceSubmit(object):
                 except KeyError:
                     item_id = json.loads(resp_item.content.decode('utf-8'))['uuid']
             else:
-                return {"status": 1, "message": "error creating new dspace item"}
+                return {"status": 404, "message": "error creating new dspace item"}
 
         # now upload files
         for s in sub['bundle']:
@@ -164,7 +164,7 @@ class DspaceSubmit(object):
                         data_resp = requests.put(data_url, data=file_stream,
                                                  headers={"rest-dspace-token": login_details})
                 if data_resp.status_code == 200:
-                    self._update_dspace_submission(sub, dspace_url, data_id)
+                    self._update_dspace_submission(sub, dspace_url, data_id, item_id)
             else:
                 return (str(resp.status_code) + " ," + resp.reason + " ," + resp.content.decode('utf-8'))
         logout_url = dspace_url + '/rest/logout'
@@ -242,13 +242,16 @@ class DspaceSubmit(object):
         out["metadata"] = arr
         return out
 
-    def _update_dspace_submission(self, sub, dspace_url, data_id):
+    def _update_dspace_submission(self, sub, dspace_url, data_id, item_id):
         data_url = dspace_url + "/rest/bitstreams/" + str(data_id)
+        meta_url = dspace_url + "/rest/items/" + str(item_id) + "?expand=all"
         resp = requests.get(data_url)
         data = json.loads(resp.content.decode('utf-8'))
         if "uuid" not in data:
             data["uuid"] = data.pop("id")
         data['dspace_instance'] = dspace_url
+        data["item_id"] = item_id
+        data["meta_url"] = meta_url
         Submission().insert_dspace_accession(sub, data)
 
     def get_dspace_communites(self):

@@ -193,7 +193,7 @@ class DataverseSubmit(object):
             alias = sub['meta']['alias']
         dv = c.get_dataverse(alias)
         if dv == None:
-            return {"status": 1, "message": "error getting dataverse"}
+            return {"status": 404, "message": "error getting dataverse"}
         doi = self.truncate_url(sub['meta']['doi'])
         ds = dv.get_dataset_by_doi(doi)
         if ds == None:

@@ -321,6 +321,9 @@ def get_datafiles_json(target_id=None):
 def get_study_type_options():
     return lookup.DROP_DOWNS['STUDY_TYPES']
 
+def get_assembly_type_option():
+    return lookup.DROP_DOWNS['ASSEMBLY_TYPES']
+
 
 def get_sample_type_options():
     return lookup.DROP_DOWNS['SAMPLE_TYPES']
