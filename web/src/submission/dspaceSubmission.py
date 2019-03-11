@@ -185,18 +185,15 @@ class DspaceSubmit(object):
             if f["dc"] == "dc.language":
                 lang = f.get("vals", "")
                 #  check if lang is array if so take first element
-                if type(lang) != type(""):
-                    lang = lang[0]
+                if isinstance(lang, list):
+                    lang = lang[0] if lang else ""
                 break
         # iterate fields and convert to format required by dspace
         for f in sub["meta"]["fields"]:
             val = f.get("vals", "")
             #  check if vals is array
-            if type(val) != type(""):
-                if val != None:
-                    val = val[0]
-                else:
-                    val = ""
+            if isinstance(val, list):
+                val = val[0] if val else ""
 
             key = f.get("dc", "")
 
