@@ -1,65 +1,128 @@
-web:
-  container_name: copo-web
-  restart: always
-  build: ./web/
-  expose:
-    - "8000"
-  links:
-    - mongo:mongo
-    - postgres:postgres
-    - redis:redis
-  volumes:
-    - ./web/src:/copo
-    - ./media:/copo/media  
-  env_file: .env
-  environment:
-    DEBUG: 'false'
-  command: bash -c "python manage.py makemigrations rest && python manage.py makemigrations chunked_upload && python manage.py makemigrations && python manage.py migrate && python /copo/social.py && /usr/local/bin/gunicorn web.wsgi:application -w 4 -t 1000 -b :8000"
+version: '3.7'
 
-nginx:
-  container_name: copo-nginx
-  restart: always
-  build: ./nginx/
-  ports:
-    - "80:80"
-  volumes:
-    - ./web/src/static:/www/static
-  volumes_from:
-    - web
-  links:
-    - web:web
+services:
 
-mongo:
-  container_name: copo-mongo
-  restart: always
-  image: mongo:latest
-  ports:
-    - "27017:27017"
-  env_file: .env
-  command: mongod
-  volumes:
-    - ./mongo/mongo-entrypoint/:/docker-entrypoint-initdb.d/
-  #   - ./mongo/mongodata:/data/db
+  copo-web:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/copo
+    depends_on:
+      - copo-postgres
+      - copo-mongo
+      - copo-redis
+    secrets:
+      - copo_web_secret_key
+      - copo_postgres_user_password
+      - copo_mongo_user_password
+      - copo_google_secret_key
+      - copo_figshare_client_id_key
+      - copo_facebook_secret_key
+      - copo_twitter_secret_key
+      - copo_orcid_secret_key
+      - copo_figshare_client_secret_key
+      - copo_figshare_consumer_secret_key
+      - copo_webin_user
+      - copo_webin_user_password
+    tty: true
+    environment:
+      ENVIRONMENT_TYPE: prod
+      SECRET_KEY_FILE: /run/secrets/copo_web_secret_key
+      MEDIA_PATH: media/
+      DEBUG: 'false'
+      REDIS_HOST: copo-redis
+      REDIS_PORT: 6379
+      ASPERA_PLUGIN_DIRECTORY: aspera_linux_plugin
+      WEBIN_USER_FILE: /run/secrets/copo_webin_user
+      WEBIN_USER_PASSWORD_FILE: /run/secrets/copo_webin_user_password
+      ENA_SERVICE: https://www-test.ebi.ac.uk
+      MONGO_USER: copo_user
+      MONGO_USER_PASSWORD_FILE: /run/secrets/copo_mongo_user_password
+      MONGO_DB: copo_mongo
+      MONGO_HOST: copo-mongo
+      MONGO_PORT: 27017
+      MONGO_MAX_POOL_SIZE: 100
+      POSTGRES_DB: copo
+      POSTGRES_USER: copo_user
+      POSTGRES_PORT: 5432
+      POSTGRES_SERVICE: copo-postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/copo_postgres_user_password
+      ORCID_SECRET_FILE: /run/secrets/copo_orcid_secret_key
+      FIGSHARE_CONSUMER_SECRET_FILE: /run/secrets/copo_figshare_consumer_secret_key
+      FIGSHARE_CLIENT_ID_FILE: /run/secrets/copo_figshare_client_id_key
+      FIGSHARE_CLIENT_SECRET_FILE: /run/secrets/copo_figshare_client_secret_key
+      GOOGLE_SECRET_FILE: /run/secrets/copo_google_secret_key
+      TWITTER_SECRET_FILE: /run/secrets/copo_twitter_secret_key
+      FACEBOOK_SECRET_FILE: /run/secrets/copo_facebook_secret_key
 
-redis:
-  container_name: copo-redis
-  restart: always
-  image: redis:latest
-  ports:
-    - "6379:6379"
-  volumes:
-    - redisdata:/data
+  copo-redis:
+    image: redis:latest
+    restart: always
+    volumes:
+      - redisdata:/data
 
-postgres:
-  container_name: copo-pg
-  restart: always
-  image: library/postgres
-  ports:
-    - "5432:5432"
-  env_file: .env
-  # volumes:
-  #   - ./postgres/postgresdata:/var/lib/postgresql/data
+  copo-postgres:
+    image: postgres:9.6
+    restart: always
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    secrets:
+      - copo_postgres_user_password
+    environment:
+      POSTGRES_DB: copo
+      POSTGRES_USER: copo_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/copo_postgres_user_password
+
+  copo-mongo:
+    build: ./services/mongo/
+    restart: always
+    user: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    secrets:
+      - copo_mongo_initdb_root_password
+      - copo_mongo_user_password
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: copo_admin
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/copo_mongo_initdb_root_password
+      MONGO_USER: copo_user
+      MONGO_USER_PASSWORD_FILE: /run/secrets/copo_mongo_user_password
+      MONGO_DB: copo_mongo
+
+volumes:
+  redisdata:
+  mongo-data:
+  postgres-data:
 
 
-
-
+secrets:
+  copo_mongo_initdb_root_password:
+    file: ${COPO_KEYS}copo_mongo_initdb_root_password
+  copo_mongo_user_password:
+    file: ${COPO_KEYS}copo_mongo_user_password
+  copo_postgres_user_password:
+    file: ${COPO_KEYS}copo_postgres_user_password
+  copo_web_secret_key:
+    file: ${COPO_KEYS}copo_web_secret_key
+  copo_orcid_secret_key:
+    file: ${COPO_KEYS}copo_orcid_secret_key
+  copo_figshare_consumer_secret_key:
+    file: ${COPO_KEYS}copo_figshare_consumer_secret_key
+  copo_figshare_client_id_key:
+    file: ${COPO_KEYS}copo_figshare_client_id_key
+  copo_figshare_client_secret_key:
+    file: ${COPO_KEYS}copo_figshare_client_secret_key
+  copo_google_secret_key:
+    file: ${COPO_KEYS}copo_google_secret_key
+  copo_twitter_secret_key:
+    file: ${COPO_KEYS}copo_twitter_secret_key
+  copo_facebook_secret_key:
+    file: ${COPO_KEYS}copo_facebook_secret_key
+  copo_webin_user:
+    file: ${COPO_KEYS}copo_webin_user
+  copo_webin_user_password:
+    file: ${COPO_KEYS}copo_webin_user_password
