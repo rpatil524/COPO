@@ -1,5 +1,7 @@
 **/.idea/
 
+.idea/*
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -82,6 +84,7 @@ celerybeat-schedule
 
 # dotenv
 .env
+copo_keys/*
 
 # virtualenv
 .venv/
@@ -104,10 +107,13 @@ ENV/
 # add ignore for chunked_uploads
 web/src/media
 web/src/media/chunked_uploads
+media/chunked_uploads
 media/*
 web/src/submission/data/*
+submission/data/*
 
 web/src/static/CACHE/css/**
+static/CACHE/
 mongo/mongodata
 *.DS_Store
 .DS_Store
@@ -121,7 +127,10 @@ workspace.xml
 .gitignore.swp
 web/src/static/CACHE/
 web/src/submission/data/.gitignore
+submission/data/.gitignore
 web/src/tools/reposit/aspera/AsperaConnect.app/Contents/Resources/aspera_mac_plugin/
+tools/reposit/aspera/AsperaConnect.app/Contents/Resources/aspera_mac_plugin/
 
 # logs
 web/src/exceptions_and_logging/logs
+exceptions_and_logging/logs
