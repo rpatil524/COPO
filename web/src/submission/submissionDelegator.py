@@ -2,10 +2,10 @@ __author__ = 'felix.shaw@tgac.ac.uk - 27/05/2016'
 
 from django.http import HttpResponse, JsonResponse
 from dal.copo_da import Submission
-import dal.figshare_da as fda
 from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission
 from django.urls import reverse
 import jsonpickle, json
+
 
 
 def delegate_submission(request):
