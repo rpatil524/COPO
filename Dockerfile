@@ -1,4 +1,5 @@
 FROM python:3.6
+ENV PYTHONUNBUFFERED 0
 
 RUN apt-get update && apt-get install -y \
     rsync \
@@ -18,14 +19,11 @@ RUN apt-get update && apt-get install -y \
 
 RUN gem install sass
 
-ENV PYTHONUNBUFFERED 0
-
-RUN mkdir /copo
-
-COPY . /copo/
-RUN pip3 install -r /copo/requirements/dev.txt
+COPY ./requirements/ /tmp/requirements/
+RUN pip3 install -r /tmp/requirements/dev.txt
 
 WORKDIR /copo
+COPY . /copo/
 
 EXPOSE 8000
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

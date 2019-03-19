@@ -310,7 +310,7 @@ class Person(DAComponent):
             'copo.person.roles.annotationValue': 'SRA Inform On Status',
             'copo.person.lastName': user.last_name,
             'copo.person.firstName': user.first_name,
-            'copo.person.roles.annotationValue_1': 'SRA Inform On Error',
+            'copo.person.roles.annotationValue___0___1': 'SRA Inform On Error',
             'copo.person.email': user.email
         }
 
