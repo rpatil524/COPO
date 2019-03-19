@@ -3,6 +3,7 @@ version: '3.7'
 services:
 
   copo-web:
+    container_name: copo_copo-web
     build: .
     restart: always
     ports:
@@ -58,12 +59,14 @@ services:
       FACEBOOK_SECRET_FILE: /run/secrets/copo_facebook_secret_key
 
   copo-redis:
+    container_name: copo_copo-redis
     image: redis:latest
     restart: always
     volumes:
       - redisdata:/data
 
   copo-postgres:
+    container_name: copo_copo-postgres
     image: postgres:9.6
     restart: always
     volumes:
@@ -76,6 +79,7 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/copo_postgres_user_password
 
   copo-mongo:
+    container_name: copo_copo-mongo
     build: ./services/mongo/
     restart: always
     user: mongodb
