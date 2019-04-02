@@ -19,6 +19,7 @@ from dal.copo_da import ProfileInfo, Repository, Profile, Publication, Source, P
 from allauth.socialaccount import providers
 from django_tools.middlewares import ThreadLocal
 import hurry
+from submission.ckanSubmission import CkanSubmit
 
 register = template.Library()
 
@@ -661,7 +662,8 @@ def generate_submission_accessions_data(submission_record):
         elif repository == "ckan":
             columns = [{"title": "Name"}, {"title": "Metadata Link"}, {"title": "Resource Link"}, {"title": "Format"}]
             for a in accessions:
-                retrieve_link = '<a href="' + a["result"]["url"] + '">' + a["result"]["url"] + '</a>'
+                retrieve_link = '<a href="' + a["result"]["url"] + '">' + \
+                                a["result"]["url"] + '</a>'
                 meta_link = '<a target="_blank" href="' + a["result"]["repo_url"] + 'package_show?id=' + a['result'][
                     'package_id'] + '">' + 'Show Metadata' + '</a>'
                 data_set.append(

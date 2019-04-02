@@ -6,6 +6,7 @@ from dal.copo_da import DataFile
 import datetime
 from bson import ObjectId
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+from urllib.parse import urljoin
 
 
 class CkanSubmit:
@@ -138,6 +139,7 @@ class CkanSubmit:
                         msg = json.loads(resp.content.decode("utf-8"))["error"]["message"]
                         return {"status": resp.status_code, "message": msg}
                     details = json.loads(resp.content.decode("utf-8"))
+                    details["result"]["repo_url"] = self.host["url"]
                     self._update_and_complete_submission(details, sub_id)
                 elif resp.status_code == 409:
                     fullurl = self.host["url"] + "package_show"
@@ -278,3 +280,8 @@ class CkanSubmit:
             return "application/msword"
         else:
             return ""
+
+    def get_submitted_package_details(self, package_id):
+        fullurl = urljoin(self.host["url"], "package_show?id=" + package_id)
+        resp = requests.get(fullurl)
+        return resp.content.decode('utf-8')

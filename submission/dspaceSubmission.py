@@ -100,7 +100,7 @@ class DspaceSubmit(object):
                 except KeyError:
                     item_id = json.loads(resp_item.content.decode('utf-8'))['uuid']
             else:
-                return {"status": 404, "message": "error creating new dspace item"}
+                return {"status": resp_item.status_code, "message": resp_item.reason}
 
         # now upload files
         for s in sub['bundle']:
@@ -166,7 +166,7 @@ class DspaceSubmit(object):
                 if data_resp.status_code == 200:
                     self._update_dspace_submission(sub, dspace_url, data_id, item_id)
             else:
-                return (str(resp.status_code) + " ," + resp.reason + " ," + resp.content.decode('utf-8'))
+                return {"status": resp.status_code, "message": resp.reason}
         logout_url = dspace_url + '/rest/logout'
         if dspace_type == 6:
             requests.post(logout_url, cookies={"JSESSIONID": login_details})
