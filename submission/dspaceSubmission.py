@@ -6,7 +6,8 @@ from web.apps.web_copo.schemas.utils import data_utils
 from bson import ObjectId
 from urllib.request import quote
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
-
+from web.apps.web_copo.schemas.utils.data_utils import get_base_url
+from urllib.parse import urljoin
 
 class DspaceSubmit(object):
     host = None
@@ -217,7 +218,9 @@ class DspaceSubmit(object):
                 key = "dc.contributor"
             elif "dc.relation.references" in key:
                 key = "dcterms.references"
-                val = "http://copo-project.org" + '/copo/resolve:' + str(sub["_id"])
+                url = get_base_url()
+                val = urljoin(url, 'copo/resolve/' + str(sub["_id"]))
+
             elif "conformsto" in key:
                 key = "dcterms.conformsto"
             elif "dc.date.availability" in key:
@@ -233,7 +236,8 @@ class DspaceSubmit(object):
             elif "dc.relation.isreplacedby" in key:
                 key = "dcterms.isReplacedBy"
             elif "dc.relation.ispartof" in key:
-                val = "http://copo-project.org" + '/copo/resolve:' + str(sub["_id"])
+                url = get_base_url()
+                val = urljoin(url, 'copo/resolve/' + str(sub["_id"]))
 
             # add field as entry in list of dicts
             el = {

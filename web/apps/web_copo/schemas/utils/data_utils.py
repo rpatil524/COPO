@@ -15,6 +15,7 @@ import web.apps.web_copo.lookup.lookup as lookup
 from web.apps.web_copo.lookup.resolver import RESOLVER
 from django.conf import settings
 from django.contrib.auth.models import User
+from urllib.parse import urljoin
 
 
 def pretty_print(data, path=None):
@@ -381,6 +382,12 @@ def get_current_user():
 
 def get_current_request():
     return ThreadLocal.get_current_request()
+
+def get_base_url():
+    r = ThreadLocal.get_current_request()
+    scheme = r.scheme
+    domain = r.get_host()
+    return scheme + "://" + domain
 
 
 def get_datetime():

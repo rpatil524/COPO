@@ -22,6 +22,7 @@ from web.apps.web_copo.utils import EnaImports as eimp
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.decorators import user_is_staff
 import web.apps.web_copo.templatetags.html_tags as htags
+from dal.copo_da import DataFile
 
 LOGGER = settings.LOGGER
 
@@ -169,6 +170,20 @@ def copo_data(request, profile_id):
 def copo_docs(request):
     context = dict()
     return render(request, 'copo/copo_docs.html', {'context': context})
+
+def resolve_submission_id(request, submission_id):
+    sub = Submission().get_record(submission_id)
+    # get all file metadata
+    output = dict()
+    files = list()
+    for f in sub["bundle"]:
+        file = DataFile().get_record(f)
+        files.append(file["description"]["attributes"])
+    output["files"] = files
+    output["accessions"] = sub["accessions"]
+    output["metadata"] = {}
+    output["metadata"]["dc"] = sub["meta"]["fields"]
+    return HttpResponse(j.dumps(output))
 
 
 @login_required

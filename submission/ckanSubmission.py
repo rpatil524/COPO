@@ -7,7 +7,8 @@ import datetime
 from bson import ObjectId
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 from urllib.parse import urljoin
-
+from web.apps.web_copo.schemas.utils.data_utils import get_base_url
+from urllib.parse import urljoin
 
 class CkanSubmit:
     host = None
@@ -179,7 +180,9 @@ class CkanSubmit:
         out["private"] = False
         out["author_email"] = "felix.shaw@tgac.ac.uk"
         out["maintainer_email"] = "felix.shaw@tgac.ac.uk"
-        out["url"] = "http://copo-project.org" + '/copo/resolve:' + str(s["_id"])
+
+        url = get_base_url()
+        out["url"] = urljoin(url, 'copo/resolve/' + str(s["_id"]))
 
         extras = list()
 
@@ -220,7 +223,8 @@ class CkanSubmit:
                 pass
             elif item["dc"] == "dc.relation":
                 # add the submission_id to the dataverse metadata to allow backwards treversal from dataverse
-                temp_id = "http://copo-project.org" + '/copo/resolve:' + str(s["_id"])
+                url = get_base_url()
+                temp_id = urljoin(url, 'copo/resolve/' + str(s["_id"]))
                 extras.append({"key": "relation", "value": temp_id})
             elif item["dc"] == "notes":
                 # pass this as it will lead to a multiple key error

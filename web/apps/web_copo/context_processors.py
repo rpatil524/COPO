@@ -3,9 +3,10 @@ from dal import Profile_Status_Info
 from dal.figshare_da import Figshare
 import ast
 import requests
+from urllib.parse import urljoin
+
 
 def get_status(request):
-
     # call method to obtain number of profiles which have outstanding issues
     issues = Profile_Status_Info().get_profiles_status()
     if issues['num_issues'] == 0:
@@ -15,4 +16,5 @@ def get_status(request):
 
 
 def add_partial_submissions_to_context(request):
-    return {'partial_submissions':'ommitted'}
+    return {'partial_submissions': 'ommitted'}
+
