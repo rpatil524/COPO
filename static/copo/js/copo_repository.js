@@ -10,7 +10,8 @@ $(document).ready(function () {
         $(".saving_status").hide();
     });
     $(".saving_status").hide();
-    $(document).on("click", ".delete_cell_user", delete_user_row);
+    $(document).on("click", ".delete_repo", delete_repo);
+
 
     $('#repos_table').on('click', '.clickable-row', function (event) {
         $(this).addClass('active').siblings().removeClass('active');
@@ -51,7 +52,7 @@ $(document).ready(function () {
             }).done(function (item) {
                 $('#add_repo_modal').modal('toggle')
                 var tr = document.createElement("tr");
-                tr.innerHTML = "<td>" + item.name + "</td><td>" + item.type + "</td><td>" + item.url + "</td><td class='delete_cell'>" +
+                tr.innerHTML = "<td>" + item.name + "</td><td>" + item.type + "</td><td>" + item.url + "</td><td class='delete_repo'>" +
                     "<i class='fa fa-minus-square delete-user-button minus-color'></i>" +
                     "</td>";
                 $(tr).data("repo_name", item.repo_name);
@@ -71,8 +72,7 @@ $(document).ready(function () {
         enable_authentication_boxes()
         if (type == 'dspace') {
             disable_apikey_box()
-        }
-        else {
+        } else {
             disable_username_password_boxes()
         }
     })
@@ -84,6 +84,62 @@ $(document).ready(function () {
 
     function disable_apikey_box() {
         $('#apikey').attr('disabled', 'disabled')
+    }
+
+    function delete_repo(e) {
+        e.stopPropagation()
+        var row = $(e.currentTarget).closest("tr")
+        $(document).data("repo_row_for_deletion", row)
+        var id = row.data("id")
+        var code = BootstrapDialog.show({
+            type: BootstrapDialog.TYPE_DANGER,
+            title: $('<span>Delete Repository</span>'),
+            message: function () {
+                return "Are you sure you want to delete this Repo entry?";
+            },
+            draggable: true,
+            closable: true,
+            animate: true,
+            onhide: function () {
+            },
+            buttons: [{
+                label: 'Cancel',
+                action: function (dialogRef) {
+                    dialogRef.close();
+                }
+            },
+                {
+                    icon: 'glyphicon glyphicon-trash',
+                    label: 'Delete',
+                    cssClass: 'btn-danger',
+                    action: function (dialogRef) {
+                        data_dict = {'target_id': id}
+                        csrftoken = $.cookie('csrftoken');
+                        $.ajax({
+                            url: '/copo/delete_repo_entry',
+                            type: "GET",
+                            dataType: "json",
+                            contentType: 'application/json',
+                            headers: {
+                                'X-CSRFToken': csrftoken
+                            },
+                            data: data_dict,
+                            success: function (d) {
+                                // delete row from table
+                                $(row).remove()
+                            },
+                            error: function () {
+                                alert("Couldn't delete repo!");
+
+                            }
+                        });
+
+                        dialogRef.close();
+
+                    }
+                }
+            ]
+        });
     }
 
     function enable_authentication_boxes() {
@@ -182,11 +238,10 @@ function get_repos_data() {
 
             var tr = document.createElement("tr");
             if (u_type == "managers") {
-                tr.innerHTML = "<td>" + item.name + "</td><td>" + item.type + "</td><td>" + item.url + "</td><td class='delete_cell'>" +
-                    "<i class='fa fa-minus-square delete-user-button minus-color'></i>" +
+                tr.innerHTML = "<td>" + item.name + "</td><td>" + item.type + "</td><td>" + item.url + "</td><td class='delete_repo'>" +
+                    "<i class='fa fa-minus-square delete-repo-button minus-color'></i>" +
                     "</td>";
-            }
-            else if (u_type == "submitters") {
+            } else if (u_type == "submitters") {
                 tr.innerHTML = "<td>" + item.name + "</td><td>" + item.type + "</td><td>" + item.url + "</td>";
             }
 

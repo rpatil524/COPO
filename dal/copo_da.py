@@ -15,6 +15,9 @@ from django.conf import settings
 import pandas as pd
 import pymongo.errors as pymongo_errors
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+from web.apps.web_copo.models import UserDetails
+from django.db.models import Q
+
 
 PubCollection = 'PublicationCollection'
 PersonCollection = 'PersonCollection'
@@ -893,6 +896,19 @@ class Repository(DAComponent):
     def pull_user(self, repo_id, user_id):
         doc = self.Repository.update({'_id': ObjectId(repo_id)},
                                      {'$pull': {'users': {'uid': user_id}}})
+        return doc
+
+    def delete(self, repo_id):
+        # have to delete repo id from UserDetails model as well as remove mongo record
+        uds = UserDetails.objects.filter(repo_manager__contains=[repo_id])
+        for ud in uds:
+            ud.repo_manager.remove(repo_id)
+            ud.save()
+        uds = UserDetails.objects.filter(repo_submitter__contains=[repo_id])
+        for ud in uds:
+            ud.repo_submitter.remove(repo_id)
+            ud.save()
+        doc = self.Repository.remove({"_id": ObjectId(repo_id)})
         return doc
 
 

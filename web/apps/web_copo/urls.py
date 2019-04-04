@@ -88,4 +88,6 @@ urlpatterns = [path('', views.index, name='index'),
 
                path('get_ckan_items/', ajax_handlers.get_ckan_items,
                     name="get_ckan_items"),
+               path('delete_repo_entry/', ajax_handlers.delete_repo_entry,
+                    name="delete_repo_entry"),
                ]
