@@ -70,7 +70,7 @@ class CkanSubmit:
                 }
                 fullurl = self.host["url"] + "resource_create"
             else:
-                return json.dumps({"status": 500, "message": resp.reason + " - " + resp.text})
+                return json.dumps({"status": resp.status_code, "message": resp.reason + " - " + resp.text})
         else:
             data = {"package_id": s["meta"]["identifier"]}
 
@@ -245,6 +245,7 @@ class CkanSubmit:
                 out[key] = out[key].translate(str.maketrans("", "", string.punctuation))
                 out[key] = out[key].lower()
         '''
+
         return out
 
     def dc_dict_to_dc(self, sub_id):

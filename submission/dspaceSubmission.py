@@ -215,7 +215,7 @@ class DspaceSubmit(object):
 
             # deal with special cases
             if "dc.contributor" in key:
-                key = "dc.contributor"
+                key = "dcterms.contributor"
             elif "dc.relation.references" in key:
                 key = "dcterms.references"
                 url = get_base_url()

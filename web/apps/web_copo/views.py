@@ -96,8 +96,8 @@ def authenticate_figshare(request):
 
 
 def test_dataverse_submit(request):
-    # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
-    # items = CgCoreSchemas().extract_repo_fields(datafile_id="5ba0b949d127fd313b62677c", repo="ckan")
+    from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+    items = CgCoreSchemas().extract_repo_fields(datafile_id="5ca21ac09c7372001075f824", repo="dspace")
     # CgCoreSchemas().process_schema()
     # CgCoreSchemas().get_type_constraints(type_name="KOS")
     # from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
