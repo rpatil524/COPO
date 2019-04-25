@@ -5,7 +5,7 @@
     {
       "ref": "description_bundle_name",
       "title": "Bundle Name",
-      "message": "Please assign a label to your description. Assigning a label to a description makes for easy referencing in the future.",
+      "message": "Please assign a label to your description. A well-defined label can aid in easily accessing this description in the future.",
       "is_metadata": false,
       "callback": "get_unique_bundle_names",
       "items": [

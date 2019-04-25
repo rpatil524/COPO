@@ -1,4 +1,5 @@
 __author__ = 'etuka'
+import os
 import re
 import json
 import numpy as np
@@ -26,8 +27,7 @@ class WizardHelper:
         self.wiz_message = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["wizards_messages"])["properties"]
 
         self.key_split = "___0___"
-        self.object_key = settings.SAMPLE_OBJECT_PREFIX + self.description_token
-        self.store_name = settings.SAMPLE_OBJECT_STORE
+        self.object_key = "sample_" + self.description_token
 
     def initiate_description(self):
         """
@@ -173,8 +173,9 @@ class WizardHelper:
             # stage data has changed, refresh wizard
             next_stage_dict['refresh_wizard'] = True
 
-            # remove store object, if any, associated with this description
-            Description().remove_store_object(store_name=self.store_name, object_key=self.object_key)
+            # remove any stored object associated with this description
+            if os.path.exists(self.get_object_file_path()):
+                os.remove(self.get_object_file_path())
 
             # update meta
             meta["generated_columns"] = list()
@@ -431,13 +432,17 @@ class WizardHelper:
         """
 
         # if there's stored object, use that rather than generating dataset from scratch
-        stored_data_set = list()
+        object_path = self.get_object_path()
+        if not os.path.exists(object_path):
+            os.makedirs(object_path)
+
         try:
-            with pd.HDFStore(self.store_name) as store:
+            with pd.HDFStore(self.get_object_file_path()) as store:
                 if self.object_key in store:
                     stored_data_set = store[self.object_key].to_dict('records')
         except Exception as e:
-            print('HDF5 Access Error: ' + str(e))
+            print('Data Access Error: ' + str(e))
+            stored_data_set = list()
 
         description = Description().GET(self.description_token)
         stored_columns = description["meta"].get("generated_columns", list())
@@ -577,11 +582,12 @@ class WizardHelper:
         data_set = samples_df.to_dict('records')
 
         # save generated dataset
+        samples_df.index = samples_df.DT_RowId
         try:
-            with pd.HDFStore(self.store_name) as store:
-                store[self.object_key] = pd.DataFrame(data_set)
+            with pd.HDFStore(self.get_object_file_path()) as store:
+                store[self.object_key] = samples_df
         except Exception as e:
-            lg.log('HDF5 Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+            lg.log('Data Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
 
         # save generated columns
         meta = description.get("meta", dict())
@@ -982,7 +988,7 @@ class WizardHelper:
             validation_parameters["data"] = resolved_data[key[0]]
             result["value"] = htags.get_resolver(resolved_data[key[0]], control_schema)
 
-        # ...this to get lists to render properly
+        # ...this, to get lists to render properly
         if isinstance(result["value"], list):
             result["value"] = " ".join(result["value"])
 
@@ -1003,15 +1009,16 @@ class WizardHelper:
                 {"_id": _id},
                 {'$set': record})
 
-        # refresh stored dataset with new display value
+        # update dataset with new value
         try:
-            with pd.HDFStore(self.store_name) as store:
+            with pd.HDFStore(self.get_object_file_path()) as store:
                 gd_df = store[self.object_key]
-                gd_df.loc[gd_df.loc[gd_df['DT_RowId'].isin(["row_" + record_id])].index, cell_reference] = result[
-                    "value"]
+                gd_df.loc["row_" + record_id, cell_reference] = result["value"]
                 store[self.object_key] = gd_df
         except Exception as e:
-            lg.log('HDF5 Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+            print('Data Access Error: ' + str(e))
+            lg.log('Data Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+            raise
 
         return result
 
@@ -1093,23 +1100,24 @@ class WizardHelper:
                 {"_id": {"$in": object_ids}},
                 {'$set': {key[0]: resolved_data}})
 
-        # refresh stored dataset with new display value
+        # update dataset with new value
         try:
-            with pd.HDFStore(self.store_name) as store:
+            with pd.HDFStore(self.get_object_file_path()) as store:
                 gd_df = store[self.object_key]
-                gd_df.loc[gd_df.loc[gd_df['DT_RowId'].isin(target_rows)].index, cell_reference] = result["value"]
+                gd_df.loc[target_rows, cell_reference] = result["value"]
                 store[self.object_key] = gd_df
-
                 if len(target_rows) > refresh_threshold:
                     result["data_set"] = gd_df.to_dict('records')
         except Exception as e:
-            lg.log('HDF5 Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+            print('Data Access Error: ' + str(e))
+            lg.log('Data Access Error: ' + str(e), level=Loglvl.ERROR, type=Logtype.FILE)
+            raise
 
         return result
 
     def finalise_description(self):
         """
-        function makes described sample accessible in the main stream of sample records
+        function updates described samples to make them visible
         :return:
         """
         result = dict(status='success', value='')
@@ -1123,6 +1131,9 @@ class WizardHelper:
 
         Description().delete_description([self.description_token])
 
+        # delete store object
+        Description().remove_store_object(object_path=self.get_object_path())
+
         return result
 
     def discard_description(self):
@@ -1134,7 +1145,7 @@ class WizardHelper:
         result = dict(status='success')
 
         # delete store object
-        Description().remove_store_object(store_name=self.store_name, object_key=self.object_key)
+        Description().remove_store_object(object_path=self.get_object_path())
 
         # remove entries associated with this token
         Sample().get_collection_handle().delete_many(
@@ -1166,7 +1177,7 @@ class WizardHelper:
 
         for r in records:
             ll = description_df[description_df._id == r['_id']]
-            last_rendered_stage = r['meta'].get('last_rendered_stage', str())
+            last_rendered_stage = r.get('meta', dict()).get('last_rendered_stage', str())
             stages = r['stages']
             lrs = [x['title'] for x in stages if x['ref'] == last_rendered_stage]
             lrs = lrs[0] if lrs else 'N/A'
@@ -1181,3 +1192,19 @@ class WizardHelper:
             refined_records.append(val)
 
         return refined_records
+
+    def get_object_path(self):
+        """
+        function returns directory to description data
+        :return:
+        """
+        object_path = os.path.join(settings.MEDIA_ROOT, 'description_data', self.description_token)
+        return object_path
+
+    def get_object_file_path(self):
+        """
+        function returns file path to description data
+        :return:
+        """
+        file_path = os.path.join(self.get_object_path(), 'generated.h5')
+        return file_path

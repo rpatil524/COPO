@@ -48,8 +48,7 @@ $(document).ready(function () {
 
         if (component == 'annotation') {
             initiate_annotation_call();
-        }
-        else {
+        } else {
             initiate_form_call(component);
         }
     });
@@ -138,8 +137,7 @@ function initiate_annotation_call() {
             if (e.type == 'PDF Document') {
                 $(document).data('annotator_type', 'txt')
                 load_txt_data(e);
-            }
-            else if (e.type == 'Spreadsheet') {
+            } else if (e.type == 'Spreadsheet') {
                 $(document).data('annotator_type', 'ss')
                 load_ss_data(e);
             }
@@ -283,8 +281,7 @@ function build_form_body(data) {
 
         try {
             formCtrl.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err);
             formCtrl.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + formElem.label + '): Cannot resolve form control!</div>');
         }
@@ -323,8 +320,7 @@ function generate_form_controls(formSchema, formValue) {
 
         try {
             layoutDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](FormElem, elemValue));
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err);
             layoutDiv.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + FormElem.label + '): Cannot resolve form control!</div>');
         }
@@ -762,8 +758,7 @@ var dispatchFormControl = {
                 }
                 if (vl == "required") {
                     $('<option disabled selected value>' + lbl + '</option>').appendTo(selectCtrl)
-                }
-                else {
+                } else {
                     $('<option value="' + vl + '">' + lbl + '</option>').appendTo(selectCtrl);
                 }
             }
@@ -996,14 +991,14 @@ var dispatchFormControl = {
         return returnDiv;
     },
     do_copo_lookup2_ctrl: function (formElem, elemValue) {
-        formElem["type"] = "string"; //this, for the purposes of the UI, should be assigned a string temporarily, since multi_search takes care of the multiple values
+        formElem["type"] = "string"; //this, for the purposes of the UI, since multi_search takes care of the multiple values
 
         var ctrlsDiv = $('<div/>',
             {
                 class: "ctrlDIV"
             });
 
-        var placeholder = "Lookup " + formElem.label + "...";
+        var placeholder = "Search " + formElem.label + "...";
         if (formElem.hasOwnProperty("placeholder")) {
             placeholder = formElem.placeholder;
         }
@@ -1062,13 +1057,17 @@ var dispatchFormControl = {
         ctrlsDiv.append(ctrl);
         ctrlsDiv.append(vM.errorHelpDiv);
 
-        var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
-
         //create new item button
         var newItemCreate = formElem.create_new_item || false;
         var optionComponent = formElem.option_component || false;
 
-        if (newItemCreate.toString() == "true" && optionComponent != '') {
+        var addbtnDivRow = '';
+
+        if (newItemCreate.toString().toLowerCase() == "true" && optionComponent != '') {
+            var lookupMessage = "<hr/><div class='text-info' style='margin-top: 5px; font-weight: bold;'>Enter 1 or more characters to search for existing values, or use the create button to create and assign a value.</div>";
+            formElem["help_tip"] = formElem["help_tip"] || '';
+            formElem["help_tip"] = formElem["help_tip"] + lookupMessage;
+
             var addBtn = $('<button/>',
                 {
                     style: "border-radius:0;",
@@ -1088,11 +1087,15 @@ var dispatchFormControl = {
                     class: "col-sm-12 col-md-12 col-lg-12"
                 }).append(addBtn);
 
-            var addbtnDivRow = $('<div/>',
+            addbtnDivRow = $('<div/>',
                 {
                     class: "row btn-row",
                 }).append(addbtnDiv);
+        }
 
+        var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+
+        if (addbtnDivRow != '') {
             returnDiv.append(addbtnDivRow);
         }
 

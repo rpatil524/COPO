@@ -5,6 +5,18 @@
 {% load html_tags %}
 
 {% block stylesheet_block %}
+    <link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
+    <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
+    <link rel="stylesheet" href="{% static 'copo/jQuery-File-Upload-master/css/jquery.fileupload.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/jQuery-File-Upload-master/css/jquery.fileupload-ui.css' %}">
+    <!-- CSS adjustments for browsers with JavaScript disabled -->
+    <noscript>
+        <link rel="stylesheet" href="{% static 'copo/jQuery-File-Upload-master/css/jquery.fileupload-noscript.css' %}">
+    </noscript>
+    <noscript>
+        <link rel="stylesheet"
+              href="{% static 'copo/jQuery-File-Upload-master/css/jquery.fileupload-ui-noscript.css' %}">
+    </noscript>
     <link rel="stylesheet" href="{% static 'copo/css/copo/copo_wizard.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/copo/sample.css' %}">
 {% endblock %}
@@ -36,8 +48,22 @@
 {% block content %}
 
     <!--test ends -->
-
     <!--test ends -->
+
+    <!-- file upload control template -->
+    <div id="file_upload_template1" style="display: none;">
+        <div style="display: inline-block;">
+            <form enctype="multipart/form-data" id="file_upload_form" name="file_upload_form" method="POST"
+                  action="/rest/sample_wiz/">
+                {% csrf_token %}
+                <span class="tiny ui basic teal button fileinput-button"
+                      style="background-image: none; border-color:transparent;">
+                    <span>Upload CSV...</span>
+                    <input type="file" id="description_file" name="description_file"/>
+                </span>
+            </form>
+        </div>
+    </div>
 
     <!-- sample wizard section -->
     <div id="wizard_toggle" class="collapse" style="margin-bottom: 20px;">
@@ -228,5 +254,6 @@
     <script src="{% static 'copo/js/generic_handlers.js' %}"></script>
     <script src="{% static 'copo/js/generic_handlers_ext2.js' %}"></script>
     <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
-    <script src="{% static 'copo/js/copo_sample_2.js' %}"></script>
+    <script src="{% static 'copo/js/copo_sample.js' %}"></script>
+
 {% endblock %}

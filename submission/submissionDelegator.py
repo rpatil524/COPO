@@ -2,10 +2,9 @@ __author__ = 'felix.shaw@tgac.ac.uk - 27/05/2016'
 
 from django.http import HttpResponse, JsonResponse
 from dal.copo_da import Submission
-from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission
+from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission, enareads
 from django.urls import reverse
 import jsonpickle, json
-
 
 
 def delegate_submission(request):
@@ -44,8 +43,9 @@ def delegate_submission(request):
 
     # Submit to ENA Sequence reads - splits the submission task to micro-tasks to overcome the timeout issues observed
     elif repo == 'ena':
-        ena_status = request.POST.get("ena_status", "commenced")
-        result = enaSubmission.EnaSubmit4Reads(submission_id=sub_id, status=ena_status).submit()
+        # ena_status = request.POST.get("ena_status", "commenced")
+        # result = enaSubmission.EnaSubmit4Reads(submission_id=sub_id, status=ena_status).submit()
+        result = enareads.EnaReads(submission_id=sub_id).submit()
         return HttpResponse(jsonpickle.dumps({'status': result}))
 
     # Submit to ENA
@@ -54,7 +54,7 @@ def delegate_submission(request):
             sub_id=sub_id,
             dataFile_ids=sub['bundle'],
         )
-        if result == True:
+        if result is True:
             return HttpResponse(jsonpickle.dumps({'status': 1}))
         else:
             error = result
@@ -90,8 +90,6 @@ def delegate_submission(request):
             return HttpResponse(jsonpickle.dumps({'status': 0}))
         else:
             error = json.loads(result)
-
-
 
     # return error
     return HttpResponse(error["message"], status=error["status"])

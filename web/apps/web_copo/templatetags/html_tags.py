@@ -141,8 +141,6 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
     if target_id:
         form_value = da_object.get_record(target_id)
 
-    form_value["_id"] = str(target_id)
-
     form_schema = list()
 
     # get schema fields
@@ -167,6 +165,11 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
                 continue
 
             form_schema.append(f)
+
+    if form_value:
+        form_value["_id"] = str(target_id)
+    else:
+        form_value = str()
 
     return dict(component_name=component,
                 form_label=label_dict.get(component, dict()).get("label", str()),
@@ -227,7 +230,7 @@ def generate_component_records(component=str(), profile_id=str(), label_key=str(
         label_key = schema[0]["id"].split(".")[-1]
 
     for record in da_object.get_all_records(**kwargs):
-        option = dict(value=str(record["_id"]), label=record[label_key])
+        option = dict(value=str(record["_id"]), label=record.get(label_key, "N/A"))
         component_records.append(option)
 
     return component_records

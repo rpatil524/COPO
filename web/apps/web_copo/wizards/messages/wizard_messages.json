@@ -55,7 +55,7 @@
       "text_class": "text-default"
     },
     "inherit_metadata_103_message": {
-      "text": "Some of the selected datafiles are ahead of items in the current description bundle, in terms of description metadata, and can be inherited from. <br/><br/>Do you want the current description bundle to inherit the following metadata? <br/><div style='color:red; margin-top:20px;'>Please note that this action might alter the wizard state, due to the upgrade in description metadata.</div>",
+      "text": "Some of the selected datafiles are ahead of items in the current description bundle, in terms of description metadata, and can be inherited from. <br/><br/>Do you want the current description bundle to inherit the following metadata? <br/><div class='text-danger' style='margin-top:20px;'>Please note that this action might alter the wizard state, due to the upgrade in description metadata.</div>",
       "text_class": "text-default"
     },
     "incompatible_metadata_message": {
@@ -162,11 +162,15 @@
       "text_class": "text-info"
     },
     "bundling_violation_alert_message": {
-      "text": "Bundle datafiles have incompatible metadata for the following <strong>constrained</strong> stage items: {}. <br/><br/><span style='color:red'>Please note that, as this is a constrained stage, any metadata supplied will be shared by all the datafiles in the description bundle. This may impact previously ascribed metadata for some of the datafiles should you choose to continue.</span>",
+      "text": "Bundle datafiles have incompatible metadata for the following <strong>constrained</strong> stage items: {}. <br/><br/><span class='text-danger'>Please note that, as this is a constrained stage, any metadata supplied will be shared by all the datafiles in the description bundle. This may impact previously ascribed metadata for some of the datafiles should you choose to continue.</span>",
       "text_class": "text-danger"
     },
     "constrained_stage_alert_message": {
-      "text": "<hr/><strong><span style='color:red'>Constrained stage!</span></strong> <br/>Metadata supplied in this stage will apply to all the datafiles in the description bundle.<br/><br/><strong>Attribute values in a constrained stage can potentially alter the description metadata template, and hence the sequence of steps presented by the wizard.</strong>",
+      "text": "<hr/><strong><span class='text-danger'>Constrained stage!</span></strong> <br/>Metadata supplied in this stage will apply to all the datafiles in the description bundle.<br/><br/><strong>Attribute values in a constrained stage can potentially alter the description metadata template, and hence the sequence of steps presented by the wizard.</strong>",
+      "text_class": "text-danger"
+    },
+    "update_stage_alert_message": {
+      "text": "<hr/><strong><span class='text-info'>Entry update!</span></strong> <br/>Metadata supplied in this stage can be updated for individual files in the bundle at the final stage of the wizard.</strong>",
       "text_class": "text-danger"
     },
     "invalid_token_message": {
@@ -174,15 +178,15 @@
       "text_class": "text-warning"
     },
     "pooled_data_message": {
-      "text": "<hr/><strong><span style='color:red'>Stage data!</span></strong> <br/>Stage data was resolved by aggregating metadata from datafiles in the bundle. You can update this to reflect current description needs.",
+      "text": "<hr/><strong><span class='text-danger'>Stage data!</span></strong> <br/>Stage data was resolved by aggregating metadata from datafiles in the bundle. You can update this to reflect current description needs.",
       "text_class": "text-warning"
     },
      "new_bundling_alert": {
-      "text": "<strong><span style='color:red'>Bundling conflict!</span></strong><br/>Some of the target datafiles are already part of an existing bundle. To create a new bundle you must first 'unbundle' the affected datafiles. <br/><strong>Please note that unbundling datafiles can invalidate previously recorded metadata.</strong><br/><br/>To reload a bundle, click on the target bundle under the description bundles section.",
+      "text": "<strong><span class='text-danger'>Bundling conflict!</span></strong><br/>Some of the target datafiles are already part of an existing bundle. To create a new bundle you must first 'unbundle' the affected datafiles. <br/><strong>Please note that unbundling datafiles can invalidate previously recorded metadata.</strong><br/><br/>To reload a bundle, click on the target bundle under the description bundles section.",
       "text_class": "text-warning"
     },
      "cg_multiple_types_alert": {
-      "text": "<hr/><strong><span style='color:red'>Multiple items type!</span></strong><br/>Please ensure that the right type is assigned to individual items in the bundle.",
+      "text": "<hr/><strong><span class='text-danger'>Multiple items type!</span></strong><br/>Please ensure that the right type is assigned to individual items in the bundle.",
       "text_class": "text-warning"
     }
   }

@@ -236,8 +236,6 @@ class CgCoreSchemas:
         :return:
         """
 
-        # todo: modify this to account for dependent fields!
-
         from dal.copo_da import DataFile, CGCore
         from dal.copo_base_da import DataSchemas
 

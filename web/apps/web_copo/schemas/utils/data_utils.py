@@ -3,18 +3,23 @@ __author__ = 'etuka'
 import os
 import json
 import copy
-import requests
 import pandas as pd
-from datetime import datetime
 from bson.json_util import dumps
 from collections import namedtuple
 import xml.etree.ElementTree as ET
 from django_tools.middlewares import ThreadLocal
-# from web.apps.web_copo.utils.ajax_handlers import get_continuation_studies
 import web.apps.web_copo.lookup.lookup as lookup
 from web.apps.web_copo.lookup.resolver import RESOLVER
 from django.conf import settings
 from django.contrib.auth.models import User
+from datetime import datetime, tzinfo, timedelta
+
+
+class simple_utc(tzinfo):
+    def tzname(self,**kwargs):
+        return "UTC"
+    def utcoffset(self, dt):
+        return timedelta(0)
 
 
 def pretty_print(data, path=None):

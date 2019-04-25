@@ -3,6 +3,7 @@ __date__ = '21 Nov 2016'
 
 import json
 import web.apps.web_copo.wizards.sample.wizard_helper as wizh
+import web.apps.web_copo.wizards.sample.ingest_data as tcsv
 
 
 class BrokerRequests:
@@ -37,7 +38,8 @@ class BrokerRequests:
             discard_description=self.do_discard_description,
             batch_update=self.do_batch_update,
             pending_description=self.do_pending_description,
-            delete_pending_description=self.do_delete_pending_description
+            delete_pending_description=self.do_delete_pending_description,
+            description_csv=self.do_description_csv,
         )
 
         return request_dict
@@ -93,12 +95,14 @@ class BrokerRequests:
 
     def do_save_cell_data(self):
         cell_reference = self.param_dict.get("cell_reference", str())
-        self.context['cell_update'] = self.wizard_helper.save_cell_data(cell_reference, self.target_id, self.auto_fields)
+        self.context['cell_update'] = self.wizard_helper.save_cell_data(cell_reference, self.target_id,
+                                                                        self.auto_fields)
 
     def do_batch_update(self):
         cell_reference = self.param_dict.get("cell_reference", str())
         target_rows = self.param_dict.get("target_rows", list())
-        self.context['batch_update'] = self.wizard_helper.batch_update_cells(cell_reference, self.target_id, target_rows)
+        self.context['batch_update'] = self.wizard_helper.batch_update_cells(cell_reference, self.target_id,
+                                                                             target_rows)
 
     def do_finalise_description(self):
         self.context['finalise_result'] = self.wizard_helper.finalise_description()
@@ -111,3 +115,7 @@ class BrokerRequests:
 
     def do_delete_pending_description(self):
         self.context['status'] = self.wizard_helper.discard_description()
+
+    def do_description_csv(self):
+        translate_csv = tcsv.IngestData(description_token=self.description_token, profile_id=self.profile_id)
+        self.context['result'] = translate_csv.manage_process(csv_file=self.param_dict.get("description_file", str()))

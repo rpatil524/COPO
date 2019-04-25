@@ -1,5 +1,7 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 
+import os
+import copy
 from datetime import datetime, date
 from bson import ObjectId, json_util
 from chunked_upload.models import ChunkedUpload
@@ -335,6 +337,11 @@ class CGCore(DAComponent):
         super(CGCore, self).__init__(profile_id, "cgcore")
 
     def get_component_schema(self, **kwargs):
+        """
+        function returns sub schema for a composite attribute
+        :param kwargs:
+        :return:
+        """
         schema_fields = super(CGCore, self).get_component_schema()
 
         referenced_field = kwargs.get("referenced_field", str())
@@ -342,6 +349,23 @@ class CGCore(DAComponent):
 
         if referenced_field:  # resolve dependencies
             schema_fields = [x for x in schema_fields if 'dependency' in x and x['dependency'] == referenced_field]
+
+            # add an attribute to capture the referenced field - mark this as hidden for UI purposes
+            dependent_record_label = 'dependency_id'
+            new_attribute = copy.deepcopy(schema_fields[-1])
+            new_attribute["id"] = new_attribute["id"].split(".")
+            new_attribute["id"][-1] = dependent_record_label
+            new_attribute["id"] = ".".join(new_attribute["id"])
+            new_attribute["control"] = 'text'
+            new_attribute["hidden"] = 'true'
+            new_attribute["required"] = True
+            new_attribute["help_tip"] = ''
+            new_attribute["label"] = ''
+            new_attribute["default_value"] = referenced_field
+            new_attribute["show_in_form"] = True
+            new_attribute["show_in_table"] = False
+            new_attribute["versions"] = [dependent_record_label]
+            schema_fields = [new_attribute] + schema_fields
 
         if referenced_type:  # set field constraints
             schema_df = CgCoreSchemas().resolve_field_constraint(schema=schema_fields, type_name=referenced_type)
@@ -361,6 +385,25 @@ class CGCore(DAComponent):
         for item in schema_fields:
             # set array types to string - child array types are accounted for by the parent
             item["type"] = "string"
+
+        if schema_fields:
+            # add a mandatory label field - for lookups and uniquely identifying a sub-record
+            dependent_record_label = 'copo_name'
+            new_attribute = copy.deepcopy(schema_fields[-1])
+            new_attribute["id"] = new_attribute["id"].split(".")
+            new_attribute["id"][-1] = dependent_record_label
+            new_attribute["id"] = ".".join(new_attribute["id"])
+            new_attribute["control"] = 'text'
+            new_attribute["hidden"] = 'false'
+            new_attribute["field_constraint"] = 'required'
+            new_attribute["required"] = True
+            new_attribute["help_tip"] = 'Please provide a unique label for this dependent record.'
+            new_attribute["label"] = 'Label'
+            new_attribute["show_in_form"] = True
+            new_attribute["show_in_table"] = True
+            new_attribute["versions"] = [dependent_record_label]
+            new_attribute["field_constraint_rank"] = 1
+            schema_fields = [new_attribute] + schema_fields
 
         return schema_fields
 
@@ -387,9 +430,9 @@ class CGCore(DAComponent):
         schema_fields.append(dict(id="date_created", type="string", control="text"))
         schema_fields.append(dict(id="profile_id", type="string", control="text"))
 
-        if schema_fields:
-            kwargs["dependency_id"] = schema_fields[0].get("dependency", str())
-
+        # get dependency id
+        dependency_id = [v for k, v in auto_fields.items() if k.split(".")[-1] == "dependency_id"]
+        kwargs["dependency_id"] = dependency_id[0] if dependency_id else ''
         kwargs["schema"] = schema_fields
 
         return super(CGCore, self).save_record(auto_fields, **kwargs)
@@ -991,6 +1034,9 @@ class Description:
             pass
         return doc
 
+    def get_description_handle(self):
+        return self.DescriptionCollection
+
     def create_description(self, stages=list(), attributes=dict(), profile_id=str(), component=str(), meta=dict(),
                            name=str()):
         self.component = component
@@ -1059,15 +1105,13 @@ class Description:
             # remove records associated with the description_tokens from the collection
             SampleCollection = get_collection_ref('SampleCollection')
 
-            store_name = settings.SAMPLE_OBJECT_STORE
-
             for id in object_ids:
                 SampleCollection.delete_many(
                     {"description_token": str(id), "deleted": data_utils.get_deleted_flag()})
 
                 # delete store object
-                object_key = settings.SAMPLE_OBJECT_PREFIX + str(id)
-                self.remove_store_object(store_name=store_name, object_key=object_key)
+                object_path = os.path.join(settings.MEDIA_ROOT, 'description_data', str(id))
+                self.remove_store_object(object_path=object_path)
 
         return True
 
@@ -1078,10 +1122,7 @@ class Description:
 
         return description_df
 
-    def remove_store_object(self, store_name, object_key):
-        try:
-            with pd.HDFStore(store_name) as store:
-                if object_key in store:
-                    del store[object_key]
-        except Exception as e:
-            print('HDF5 Access Error: ' + str(e))
+    def remove_store_object(self, object_path=str()):
+        if os.path.exists(object_path):
+            import shutil
+            shutil.rmtree(object_path)

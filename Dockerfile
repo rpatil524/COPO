@@ -2,6 +2,7 @@ FROM python:3.6
 ENV PYTHONUNBUFFERED 0
 
 RUN apt-get update && apt-get install -y \
+    default-jre \
     rsync \
     git \
 	nano \
@@ -24,6 +25,10 @@ RUN pip3 install -r /tmp/requirements/dev.txt
 
 WORKDIR /copo
 COPY . /copo/
+
+# add aspera client to path
+COPY ./tools/reposit/.aspera/ /root/.aspera/
+ENV PATH /root/.aspera/cli/bin:$PATH
 
 EXPOSE 8000
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

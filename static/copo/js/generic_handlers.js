@@ -2359,6 +2359,26 @@ function do_global_help(component) {
     });
 }
 
+function get_timestamp() {
+    var date = new Date();
+
+    var monthNames = [
+        "Jan", "Feb", "Mar",
+        "Apr", "May", "Jun", "Jul",
+        "Aug", "Sep", "Oct",
+        "Nov", "Dec"
+    ];
+
+    var day = date.getDate();
+    var monthIndex = date.getMonth();
+    var year = date.getFullYear();
+    var hour = date.getHours();
+    var minute = date.getMinutes();
+    var second = date.getSeconds();
+
+    return day + '_' + monthNames[monthIndex] + '_' + year + "_" + hour + "_" + minute + "_" + second;
+}
+
 function do_context_help_event() {
     //handles collapsing of help topics
 

@@ -513,7 +513,7 @@ $(document).ready(function () {
 
             //end of wizard intercept
             if (wizardElement.find('.steps li.active:first').attr('data-name') == 'review') {
-                finalise_description(datafileDescriptionToken);
+                finalise_description(datafileDescriptionToken, true);
                 return false;
             }
 
@@ -624,28 +624,97 @@ $(document).ready(function () {
         });
     } //end add_step()
 
-    function finalise_description(description_token) {
-        $("#cover-spin").css("display", "block");
+    function finalise_description(description_token, show_exit_wizard) {
+        var message = $('<div/>', {class: "webpop-content-div"});
+        message.append("Do you want to proceed with the submission of this bundle?");
+        var downloadTimer = null;
 
-        $.ajax({
-            url: wizardURL,
-            type: "POST",
-            headers: {
-                'X-CSRFToken': csrftoken
+        var modal_buttons = [
+            {
+                id: 'btn-submission-go',
+                label: 'Submit',
+                cssClass: 'tiny ui basic teal button',
+                action: function (dialogRef) {
+                    var $button = this;
+                    $button.disable();
+
+                    $("#cover-spin").css("display", "block");
+                    $.ajax({
+                        url: wizardURL,
+                        type: "POST",
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
+                        data: {
+                            'request_action': 'initiate_submission',
+                            'description_token': description_token,
+                            'profile_id': $('#profile_id').val()
+                        },
+                        success: function (data) {
+                            if (data.result.existing || false) {
+                                $("#cover-spin").css("display", "none");
+                                message.html("<div class='text-info'>This bundle is already in the submission stream. You will now be redirected to the submission page. </div>");
+                                message.append('<div style="margin-top: 5px;">Click the Cancel button below to remain on this page.</div>');
+                                message.append('<div style="margin-top: 10px;"><progress value="0" max="10" id="progressBarSubmit"></progress></div>');
+                                var timeleft = 10;
+                                downloadTimer = setInterval(function () {
+                                    document.getElementById("progressBarSubmit").value = 10 - timeleft;
+                                    timeleft -= 1;
+                                    if (timeleft <= 0) {
+                                        clearInterval(downloadTimer);
+                                        window.location.replace($("#submission_url").val());
+                                    }
+                                }, 1000);
+                            } else {
+                                dialogRef.close();
+                                window.location.replace($("#submission_url").val());
+                            }
+
+                            return false;
+                        },
+                        error: function () {
+                            $("#cover-spin").css("display", "none");
+                            alert("Couldn't initiate submission!");
+                        }
+                    });
+                }
             },
-            data: {
-                'request_action': 'initiate_submission',
-                'description_token': description_token,
-                'profile_id': $('#profile_id').val()
-            },
-            success: function (data) {
-                window.location.replace($("#submission_url").val());
-                return false;
-            },
-            error: function () {
-                $("#cover-spin").css("display", "none");
-                alert("Couldn't initiate submission!");
+            {
+                label: 'Cancel',
+                cssClass: 'tiny ui basic button',
+                action: function (dialogRef) {
+                    dialogRef.close();
+                    if (downloadTimer) {
+                        clearInterval(downloadTimer);
+                    }
+                }
             }
+        ];
+
+        if (show_exit_wizard) {
+            modal_buttons.splice(1, 0, {
+                label: 'Exit wizard',
+                cssClass: 'tiny ui basic secondary button',
+                action: function (dialogRef) {
+                    dialogRef.close();
+                    if (downloadTimer) {
+                        clearInterval(downloadTimer);
+                    }
+
+                    window.location.reload();
+                }
+            });
+        }
+
+        var dialog = new BootstrapDialog.show({
+            title: "Confirm bundle submission",
+            message: message,
+            cssClass: 'copo-modal2',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_INFO,
+            // size: BootstrapDialog.SIZE_NORMAL,
+            buttons: modal_buttons
         });
 
         return false;
@@ -912,8 +981,7 @@ $(document).ready(function () {
 
             try {
                 formDiv.append(dispatchFormControl[controlsMapping[control.toLowerCase()]](formElem, elemValue));
-            }
-            catch (err) {
+            } catch (err) {
                 formDiv.append('<div class="form-group copo-form-group"><span class="text-danger">Form Control Error</span> (' + formElem.label + '): Cannot resolve form control!</div>');
             }
 
@@ -941,8 +1009,7 @@ $(document).ready(function () {
             $('#sample_copo').attr('disabled', 'disabled');
             $('#study_ena').removeAttr('disabled');
             $('#sample_ena').removeAttr('disabled');
-        }
-        else {
+        } else {
 
             $('#study_ena').attr('disabled', 'disabled');
             $('#sample_ena').attr('disabled', 'disabled');
@@ -1602,8 +1669,8 @@ $(document).ready(function () {
                     },
                     'selectNone',
                     {
-                        extend: 'excel',
-                        text: 'Export',
+                        extend: 'csv',
+                        text: 'Export CSV',
                         title: null,
                         filename: "copo_datafiles_" + String(datafileDescriptionToken)
                     }
@@ -1749,8 +1816,7 @@ $(document).ready(function () {
             $(node).find(".cell-edit-panel").find(":input").each(function () {
                 try {
                     form_values[this.id] = $(this).val().trim();
-                }
-                catch (err) {
+                } catch (err) {
                     form_values[this.id] = $(this).val();
                 }
             });
@@ -2397,6 +2463,10 @@ $(document).ready(function () {
         var shownRows = table.rows({page: 'current'}).nodes().toArray();
         var target_rows = table.rows({page: 'current'}).ids().toArray();
 
+        if (!target_rows.length) {
+            return false;
+        }
+
         $.ajax({
             url: wizardURL,
             type: "POST",
@@ -2428,7 +2498,7 @@ $(document).ready(function () {
                 }
             },
             error: function () {
-                alert("Couldn't retrieve bundling information!");
+                console.log("Couldn't retrieve bundling information!");
             }
         });
     } //end of function
@@ -2614,7 +2684,7 @@ $(document).ready(function () {
             do_view_description(bundle_id);
         } else if (task == "submit-in-bundle") {
             //todo: validate bundle first, then call finalise_description to initiate submission
-            finalise_description(bundle_id);
+            finalise_description(bundle_id, false);
         }
     }
 
@@ -2648,18 +2718,22 @@ $(document).ready(function () {
 
         var bundle_name = parentElem.find(".bundle-name-i").text();
         bundle_name = String(bundle_name).replace(/^\s+|\s+$/g, '');
+
         var bundle_html = parentElem.find(".bundle-name-i").html();
         parentElem.find(".bundle-name-i").text("Deleting...");
         parentElem.prop('disabled', true);
 
+        var message = $('<div/>', {class: "webpop-content-div"});
+        message.append("Are you sure you want to delete the bundle: <strong>" + bundle_name + "</strong>? <div style='margin-top: 20px; color: #ff0000;'>This action might impact referenced objects if you choose to continue.</div>");
+
         BootstrapDialog.show({
             title: "Delete bundle",
-            message: "Are you sure you want to delete the bundle: <strong>" + bundle_name + "</strong>? <div style='margin-top: 20px; color: #ff0000;'>This action might impact referenced components if you choose to continue.</div>",
-            // cssClass: 'copo-modal2',
+            message: message,
+            cssClass: 'copo-modal2',
             closable: false,
             animate: true,
             type: BootstrapDialog.TYPE_DANGER,
-            size: BootstrapDialog.SIZE_NORMAL,
+            // size: BootstrapDialog.SIZE_NORMAL,
             buttons: [
                 {
                     label: 'Cancel',
@@ -2668,13 +2742,16 @@ $(document).ready(function () {
                         parentElem.prop('disabled', false);
                         parentElem.find(".bundle-name-i").html(bundle_html);
                         dialogRef.close();
-                        return false;
                     }
                 },
                 {
-                    label: '<i style="padding-right: 5px;" class="fa fa-trash-o" aria-hidden="true"></i> Remove',
+                    id: "btn-remove-bundle",
+                    label: '<i style="padding-right: 5px;" class="fa fa-trash-o" aria-hidden="true"></i> Delete',
                     cssClass: 'tiny ui basic red button',
                     action: function (dialogRef) {
+                        var $button = this; // 'this' here is a jQuery object that wrapping the <button> DOM element.
+                        $button.disable();
+
                         $.ajax({
                             url: wizardURL,
                             type: "POST",
@@ -2686,15 +2763,24 @@ $(document).ready(function () {
                                 'description_token': bundle_id
                             },
                             success: function (data) {
-                                load_description_bundles();
-                                refresh_inDescription_flag();
+                                if (data.result.hasOwnProperty("status") && data.result.status == "success") {
+                                    load_description_bundles();
+                                    refresh_inDescription_flag();
+                                    dialogRef.close();
+
+                                } else if (data.result.hasOwnProperty("status") && data.result.status == "error") {
+                                    message.html("<div class='text-danger'>Couldn't complete action: " + data.result.message + "</div>");
+                                    parentElem.prop('disabled', false);
+                                    parentElem.find(".bundle-name-i").html(bundle_html);
+                                }
+
                             },
                             error: function () {
                                 alert("Couldn't delete bundle!");
+                                dialogRef.close();
                             }
                         });
 
-                        dialogRef.close();
                         return false;
                     }
                 }

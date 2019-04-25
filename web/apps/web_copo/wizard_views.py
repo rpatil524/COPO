@@ -36,6 +36,10 @@ def data_wiz(request):
 def sample_wiz(request):
     context = dict()
     request_action = request.POST.get("request_action", str())
+    description_file = str()
+
+    if request.method == 'POST' and request.FILES:
+        description_file = request.FILES.get("csv", str())
 
     context = samp.BrokerRequests(context=context,
                                   target_id=request.POST.get("target_id", str()),
@@ -49,6 +53,7 @@ def sample_wiz(request):
                                   column_reference=request.POST.get("column_reference", str()),
                                   bundle_name=request.POST.get("bundle_name", str()),
                                   sample_names=request.POST.get("sample_names", str()),
+                                  description_file=description_file,
                                   ).post_context(request_action)
 
     out = jsonpickle.encode(context)

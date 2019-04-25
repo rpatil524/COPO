@@ -5,11 +5,13 @@ import numpy as np
 import pandas as pd
 from io import StringIO
 from bson import ObjectId
+from datetime import datetime
 from dal import cursor_to_list
 from django.conf import settings
+from collections import namedtuple
 from pandas.io.json import json_normalize
 
-from dal.copo_da import DataFile, Description, Submission
+from dal.copo_da import DataFile, Description, Submission, DAComponent
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.templatetags.html_tags as htags
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
@@ -329,6 +331,60 @@ class WizardHelper:
 
         return True
 
+    def resolve_defaults(self, stage):
+        """
+        function sets default values for items that needs resolving to other sources
+        :param stages:
+        :return:
+        """
+
+        Reference = namedtuple('Reference', ['repo', 'stage_ref', 'item_id'])
+
+        # dictionary key take the format - repo, stage ref, and item id mapped to some resolver (e.g., function)
+        register_repo_stage_item = {
+            Reference("ena", "project_details", "project_name"): self.get_bundle_name,
+            Reference("ena", "project_details", "project_title"): self.get_profile_title,
+            Reference("ena", "project_details", "project_description"): self.get_profile_description,
+            Reference("ena", "project_details", "project_release_date"): self.get_current_date
+        }
+
+        if not self.description_token:
+            return False
+
+        description = Description().GET(self.description_token)
+
+        if not description:
+            return False
+
+        attributes = description.get("attributes", dict())
+        target_repository = attributes.get("target_repository", dict()).get("deposition_context", str())
+
+        if not target_repository:
+            return False
+
+        repo_reference = [x for x in register_repo_stage_item.keys() if x.repo == target_repository]
+
+        if not repo_reference:
+            return False
+
+        stage_ref = [x for x in repo_reference if x.stage_ref == stage.get("ref", str())]
+
+        if not stage_ref:
+            return False
+
+        item_reference = [x for x in stage_ref if x.item_id in [item["id"] for item in stage.get("items", list())]]
+
+        if not item_reference:
+            return False
+
+        for ref in stage_ref:
+            item = [item for item in stage.get("items", list()) if item["id"] == ref.item_id]
+
+            if item:
+                item[0]["default_value"] = register_repo_stage_item[ref]()
+
+        return True
+
     def remove_stage_dependency(self, indx):
         """
         function removes resolved stages preceding 'indx'
@@ -439,8 +495,8 @@ class WizardHelper:
         if next_stage_dict['stage']['ref'] in attributes and "data" not in next_stage_dict['stage']:
             next_stage_dict['stage']['data'] = attributes[next_stage_dict['stage']['ref']]
 
-        # save reference to rendered stage
         if next_stage_dict['stage']['ref']:
+            # save reference to rendered stage
             meta["last_rendered_stage"] = next_stage_dict['stage']['ref']
 
             if not next_stage_dict['stage']['ref'] in meta["rendered_stages"]:
@@ -455,16 +511,23 @@ class WizardHelper:
 
         Description().edit_description(self.description_token, dict(meta=meta))
 
-        if next_stage_dict["stage"].get("apply_to_all", False):  # report constraint in stage
+        # user feedback: constrained stage
+        if next_stage_dict["stage"].get("apply_to_all", False):
             next_stage_dict["stage"]["message"] = next_stage_dict["stage"]["message"] + \
                                                   self.wiz_message["constrained_stage_alert_message"]["text"]
+        elif next_stage_dict["stage"].get("is_metadata", True):
+            next_stage_dict["stage"]["message"] = next_stage_dict["stage"]["message"] + \
+                                                  self.wiz_message["update_stage_alert_message"]["text"]
 
         # get name of description and pass on
-        next_stage_dict["description_label"] = Description().GET(self.description_token).get("name", str())
+        next_stage_dict["description_label"] = self.get_bundle_name()
 
         # check and resolve value for lookup fields
         if "data" in next_stage_dict['stage']:
             self.verify_lookup_items(next_stage_dict['stage'])
+
+        # check and resolve default values
+        self.resolve_defaults(next_stage_dict['stage'])
 
         return next_stage_dict
 
@@ -500,7 +563,7 @@ class WizardHelper:
             # we expect a stage that cannot be directly rendered to return a False, thus prompting
             # progression to the next
             # stage in the sequence of stages (see below). Such non-renderable stages
-            # may just be processes or stubs meant for resolving other dynamic stages
+            # may just be processes or stubs meant for resolving dynamic stages
             if isinstance(stage, dict):
                 break
 
@@ -1542,21 +1605,39 @@ class WizardHelper:
         :return:
         """
 
-        trgts_df = pd.DataFrame(target_rows, columns=['id'])
-        trgts_df['idsplit'] = trgts_df['id'].apply(lambda x: ObjectId(x.split("row_")[-1]))
+        target_rows = [ObjectId(x.split("row_")[-1]) for x in target_rows]
 
+        if not target_rows:
+            return list()
+
+        # get records with description id
         records = cursor_to_list(DataFile().get_collection_handle().find({"$and": [
-            {"_id": {"$in": list(trgts_df.idsplit)}},
-            {'description_token': {"$exists": True, "$ne": ""}}]}))
+            {"_id": {"$in": target_rows}},
+            {'description_token': {"$exists": True, "$ne": ""}}]},
+            {'description_token': 1, '_id': 1}))
 
-        all_targets_series = list()
-
+        # validate description id
+        valid_tokens = list()
         if len(records):
-            all_targets_df = pd.DataFrame(records)
-            all_targets_df['record'] = all_targets_df['_id'].apply(lambda x: 'row_' + str(x))
-            all_targets_series = list(all_targets_df['record'])
+            object_ids = {ObjectId(x["description_token"]) for x in records}
+            valid_tokens = cursor_to_list(
+                Description().get_description_handle().find(
+                    {"_id": {"$in": list(object_ids)}, "profile_id": self.profile_id}, {'_id': 1}))
 
-        return all_targets_series
+        valid_tokens = [str(x["_id"]) for x in valid_tokens]
+        targets_with_token = list()
+
+        # filter by targets with valid token
+        for rec in records:
+            if rec["description_token"] in valid_tokens:
+                targets_with_token.append('row_' + str(rec["_id"]))
+
+        # if len(records):
+        #     all_targets_df = pd.DataFrame(records)
+        #     all_targets_df['record'] = all_targets_df['_id'].apply(lambda x: 'row_' + str(x))
+        #     targets_with_token = list(all_targets_df['record'])
+
+        return targets_with_token
 
     def delete_description_record(self):
         """
@@ -1565,6 +1646,16 @@ class WizardHelper:
         """
 
         result = dict(status='success')
+
+        # check for dependency before delete
+        records = cursor_to_list(
+            Submission().get_collection_handle().find(
+                {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
+                {'_id': 1}))
+
+        if len(records):
+            result = dict(status='error', message="Existing dependency with a submission record!")
+            return result
 
         update_dict = dict(description_token=str())
 
@@ -1601,6 +1692,16 @@ class WizardHelper:
         :return:
         """
 
+        # create a new submission record only if none exist for this description
+
+        records = cursor_to_list(
+            Submission().get_collection_handle().find(
+                {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
+                {'_id': 1}))
+
+        if len(records):
+            return dict(submission_id=str(records[0]["_id"]), existing=True)
+
         records = cursor_to_list(
             DataFile().get_collection_handle().find(
                 {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
@@ -1623,7 +1724,7 @@ class WizardHelper:
 
         submission_id = str(Submission(profile_id=self.profile_id).save_record(dict(), **kwarg).get("_id", str()))
 
-        return submission_id
+        return dict(submission_id=submission_id, existing=False)
 
     def pair_datafiles(self, auto_fields):
         """
@@ -1824,3 +1925,48 @@ class WizardHelper:
         validation_result["data"] = df.to_dict('records')
 
         return validation_result
+
+    def get_profile_title(self):
+        """
+        function returns the title of the parent profile for this description
+        :return:
+        """
+
+        title = str()
+        record = DAComponent(component="profile").get_record(self.profile_id)
+
+        if record:
+            title = record.get("title", str())
+
+        return title
+
+    def get_profile_description(self):
+        """
+        function returns description of the parent profile
+        :return:
+        """
+
+        description = str()
+        record = DAComponent(component="profile").get_record(self.profile_id)
+
+        if record:
+            description = record.get("description", str())
+
+        return description
+
+    @staticmethod
+    def get_current_date():
+        """
+        function returns current date
+        :return:
+        """
+
+        return datetime.today().strftime('%d/%m/%Y')
+
+    def get_bundle_name(self):
+        """
+        function returns the bundle name
+        :return:
+        """
+
+        return Description().GET(self.description_token).get("name", str())

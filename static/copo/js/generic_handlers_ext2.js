@@ -333,7 +333,7 @@ function do_render_server_side_table(componentMeta) {
         var tdList = this.className.split(" ");
 
         for (var i = 0; i < tdList.length; ++i) {
-            if($.inArray(tdList[i], classList) > -1) {
+            if ($.inArray(tdList[i], classList) > -1) {
                 foundClass = true;
                 break;
             }
@@ -537,8 +537,8 @@ function do_render_component_table(data, componentMeta) {
                 },
                 'selectNone',
                 {
-                    extend: 'excel',
-                    text: 'Export',
+                    extend: 'csv',
+                    text: 'Export CSV',
                     title: null
                 }
             ],

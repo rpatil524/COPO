@@ -95,8 +95,8 @@ def authenticate_figshare(request):
 
 
 def test_dataverse_submit(request):
-    # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
-    # items = CgCoreSchemas().extract_repo_fields(datafile_id="5ba0b949d127fd313b62677c", repo="ckan")
+    from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+    items = CgCoreSchemas().extract_repo_fields(datafile_id="5c8d7936e99f8100100e8c51", repo="ckan")
     # CgCoreSchemas().process_schema()
     # CgCoreSchemas().get_type_constraints(type_name="KOS")
     # from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
@@ -104,6 +104,10 @@ def test_dataverse_submit(request):
 
     # from submission.dataverseSubmission import DataverseSubmit
     # DataverseSubmit(submission_id="592ee7f168236b85d16510ef").submit()
+    from submission import enareads
+
+    # enareads.EnaReads(submission_id="5c9a05fda4ce3118dc271727").create_submission_location()
+
     return render(request, 'copo/test_page.html', {})
 
 
@@ -277,7 +281,7 @@ def copo_submissions(request, profile_id):
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
 
-    return render(request, 'copo/copo_submission_2.html', {'profile_id': profile_id, 'profile': profile})
+    return render(request, 'copo/copo_submission.html', {'profile_id': profile_id, 'profile': profile})
 
 
 @login_required

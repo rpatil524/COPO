@@ -23,6 +23,54 @@
       ]
     },
     {
+      "ref": "project_details",
+      "apply_to_all": true,
+      "title": "Study Details",
+      "message": "Please add some details to better describe this study.",
+      "items": [
+        {
+          "id": "project_name",
+          "type": "string",
+          "help_tip": "Enter a short name for the study. Default value set from bundle information.",
+          "label": "Name",
+          "hidden": "false",
+          "required": "false",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "project_title",
+          "type": "string",
+          "help_tip": "Enter a short descriptive title for the study. Default value set from profile information.",
+          "label": "Title",
+          "hidden": "false",
+          "required": "true",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "project_description",
+          "type": "string",
+          "help_tip": "Enter a long description of the scope of the study. Default value set from profile information.",
+          "label": "Description",
+          "hidden": "false",
+          "required": "true",
+          "control": "textarea",
+          "default_value": ""
+        },
+        {
+          "id": "project_release_date",
+          "type": "string",
+          "help_tip": "Please specify the public release date of this study. This can be at most two years in the future. <div class='text-danger'>Specifying a date in the past will entail immediate public release of the study upon submission.</span>",
+          "label": "Release date",
+          "hidden": "false",
+          "required": "false",
+          "control": "date-picker",
+          "default_value": ""
+        }
+      ]
+    },
+    {
       "ref": "attach_samples",
       "title": "Sample",
       "message": "Select and associate a sample to files in the bundle. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",

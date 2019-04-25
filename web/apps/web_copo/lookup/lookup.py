@@ -21,6 +21,9 @@ DB_TEMPLATES = {
 # SRA_SETTINGS PATHS
 SRA_SETTINGS = os.path.join(RESOLVER['schemas_generic'], 'sra_settings.json')
 SRA_COMMENTS = os.path.join(RESOLVER['schemas_generic'], 'sra_comments.json')
+SRA_SUBMISSION_TEMPLATE = os.path.join(RESOLVER['schemas_generic'], 'submission.xml')
+SRA_PROJECT_TEMPLATE = os.path.join(RESOLVER['schemas_generic'], 'project.xml')
+SRA_SAMPLE_TEMPLATE = os.path.join(RESOLVER['schemas_generic'], 'sample.xml')
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
 # API_RETURN_TEMPLATES dictionary provides paths to api return templates

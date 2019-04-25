@@ -1713,13 +1713,13 @@ div.shown span.side-help-trigger:before {
 
 .required-label {
     font-size: 11px;
-    color: red;
+    color: #dc3545;
     margin-left: 5px;
 }
 
 .recommended-label {
     font-size: 11px;
-    color: green;
+    color: #17a2b8;
     margin-left: 5px;
 }
 
