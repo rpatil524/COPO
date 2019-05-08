@@ -270,7 +270,7 @@ class CgCoreSchemas:
         schema_df = schema_df[['ref', 'id', 'prefix']]
         schema_df = schema_df[~schema_df['ref'].isna()]
 
-        # get stage items without any constraints
+        # get all stage items
         all_items = [item for st in stages for item in st.get("items", list())]
 
         # filter stage items - stage items should conform to specifications of the repo

@@ -1786,3 +1786,10 @@ div.shown span.side-help-trigger:before {
 }
 
 /*end cover spin*/
+
+/*select2 styling*/
+.select2-search__field {
+    width: 100% !important;
+}
+
+/*end select2 styling*/

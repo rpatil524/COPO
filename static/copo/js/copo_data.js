@@ -1162,6 +1162,10 @@ $(document).ready(function () {
                                 //display wizard
                                 $("#wizard_toggle").collapse("toggle");
 
+                                $('html, body').animate({
+                                    scrollTop: $('#wizard_toggle').offset().top - 50
+                                }, 'slow');
+
                                 //hide the review stage -- to be redisplayed when all the dynamic stages are displayed
                                 wizardElement.find('.steps li:last-child').hide();
 

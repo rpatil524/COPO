@@ -115,7 +115,8 @@ class Command(BaseCommand):
 
         data_df['accession'] = data_df['uri'].apply(lambda x: x.get('value', str()))
         data_df['label'] = data_df['label'].apply(lambda x: x.get('value', str()))
-        data_df['description'] = ' '
+        data_df['description'] = '<table style="width:100%"><tr><td>Label</td><td>' + data_df[
+            'label'] + '</td></tr><tr><td>Accession</td><td>' + data_df['accession'] + '</td></table>'
         data_df['tags'] = [''] * len(data_df)
 
         return data_df
@@ -129,7 +130,7 @@ class Command(BaseCommand):
         data = d_utils.json_to_pytype(os.path.join(drop_downs_pth, 'countries.json'))["bindings"]
         data_df = pd.DataFrame(data)
 
-        data_df['accession'] = data_df['iso_3166-2']
+        data_df['accession'] = data_df['name']
         data_df['label'] = data_df['name']
 
         data_df['description'] = '<table style="width:100%"><tr><td>Code</td><td>' + data_df[

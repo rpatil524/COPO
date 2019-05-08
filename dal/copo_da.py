@@ -397,6 +397,7 @@ class CGCore(DAComponent):
             new_attribute["hidden"] = 'false'
             new_attribute["field_constraint"] = 'required'
             new_attribute["required"] = True
+            new_attribute["unique"] = True
             new_attribute["help_tip"] = 'Please provide a unique label for this dependent record.'
             new_attribute["label"] = 'Label'
             new_attribute["show_in_form"] = True

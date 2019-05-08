@@ -166,11 +166,11 @@
       "text_class": "text-danger"
     },
     "constrained_stage_alert_message": {
-      "text": "<hr/><strong><span class='text-danger'>Constrained stage!</span></strong> <br/>Metadata supplied in this stage will apply to all the datafiles in the description bundle.<br/><br/><strong>Attribute values in a constrained stage can potentially alter the description metadata template, and hence the sequence of steps presented by the wizard.</strong>",
+      "text": "<hr/><strong><span class='text-danger'>Important - Entry update!</span></strong> <br/>Metadata supplied in this stage cannot be updated for individual datafiles in the description bundle.",
       "text_class": "text-danger"
     },
     "update_stage_alert_message": {
-      "text": "<hr/><strong><span class='text-info'>Entry update!</span></strong> <br/>Metadata supplied in this stage can be updated for individual files in the bundle at the final stage of the wizard.</strong>",
+      "text": "<hr/><strong><span class='text-info'>Important - Entry update!</span></strong> <br/>Metadata supplied in this stage can be updated for individual files in the description bundle at the final stage of the wizard.</strong>",
       "text_class": "text-danger"
     },
     "invalid_token_message": {

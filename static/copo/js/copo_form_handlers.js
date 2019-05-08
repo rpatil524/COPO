@@ -2110,6 +2110,7 @@ function create_attachable_component(formElem) {
                             'component': formElem.option_component,
                             'referenced_field': referenced_field,
                             'referenced_type': referenced_type,
+                            'action_type': 'cloning',
                             'target_id': $(this).val()
                         },
                         success: function (clone_data) {

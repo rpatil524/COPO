@@ -37,7 +37,6 @@ def index(request):
     else:
         context['partial_submission_redirect_url'] = None
 
-
     return render(request, 'copo/index.html', context)
 
 
@@ -48,9 +47,9 @@ def login(request):
     return render(request, 'copo/auth/login.html', context)
 
 
-
 def test(request):
     return render(request, 'copo/test_page.html', {})
+
 
 '''
 def test(request):
@@ -69,6 +68,7 @@ def test(request):
     Submission().save_record(dict(), **s)
     return HttpResponse(accessions)
 '''
+
 
 def test_submission(request):
     delegate_submission(request)
@@ -95,16 +95,24 @@ def authenticate_figshare(request):
 
 
 def test_dataverse_submit(request):
-    from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
-    items = CgCoreSchemas().extract_repo_fields(datafile_id="5c8d7936e99f8100100e8c51", repo="ckan")
+    # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+    # t = CgCoreSchemas.get_repo_mapping(repo="dataverse")
+    # items = CgCoreSchemas().extract_repo_fields(datafile_id="5c8d7934e99f8100100e8c4e", repo="dataverse")
+    # from submission.helpers.dataverse_helper import SubmissionHelper
     # CgCoreSchemas().process_schema()
     # CgCoreSchemas().get_type_constraints(type_name="KOS")
     # from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
     # option_values = COPOLookup(accession=["5c77c2c9d127fd80d6f645e8"], data_source="cg_dependency_lookup").broker_component_search()['result']
 
-    # from submission.dataverseSubmission import DataverseSubmit
-    # DataverseSubmit(submission_id="592ee7f168236b85d16510ef").submit()
-    from submission import enareads
+    from submission.dataverseSubmission import DataverseSubmit
+    DataverseSubmit(submission_id="5cd2e489ca53bf0a523df3db").submit()
+    t = 1
+    # from submission import enareads
+
+    # metadata_file_path = SubmissionHelper(
+    #     submission_id="5cc6b98961f2ab000ff79100",
+    #     file_path="/opt/project/submission/data/5cc6b98961f2ab000ff79100/dataverse")\
+    #     .do_conversion()
 
     # enareads.EnaReads(submission_id="5c9a05fda4ce3118dc271727").create_submission_location()
 
@@ -240,6 +248,7 @@ def copo_forms(request):
                          visualize=request.POST.get("visualize", str()),
                          id_handle=request.POST.get("id_handle", str()),
                          user_id=request.user.id,
+                         action_type=request.POST.get("action_type", str()),
                          id_type=request.POST.get("id_type", str()),
                          data_source=request.POST.get("data_source", str()),
                          user_email=request.POST.get("user_email", str())

@@ -158,7 +158,7 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
             # generate unique items based on the component records
             if "unique" in f and not f.get("unique_items", list()):
                 f["unique_items"] = generate_unique_items(component=component, profile_id=profile_id,
-                                                          elem_id=f["id"].split(".")[-1], record_id=target_id)
+                                                          elem_id=f["id"].split(".")[-1], record_id=target_id, **kwargs)
 
             # filter based on sample type
             if component == "sample" and not filter_sample_type(form_value, f):
@@ -237,13 +237,17 @@ def generate_component_records(component=str(), profile_id=str(), label_key=str(
 
 
 @register.filter("generate_unique_items")
-def generate_unique_items(component=str(), profile_id=str(), elem_id=str(), record_id=str()):
+def generate_unique_items(component=str(), profile_id=str(), elem_id=str(), record_id=str(), **kwargs):
     da_object = DAComponent(component=component, profile_id=profile_id)
+    action_type = kwargs.get("action_type", str())
     component_records = list()
 
-    for record in da_object.get_all_records():
-        if elem_id in record and not str(record["_id"]) == record_id:
-            component_records.append(record[elem_id])
+    all_records = da_object.get_all_records()
+
+    if action_type == "cloning":
+        component_records = [x[elem_id] for x in all_records if elem_id in x]
+    else:
+        component_records = [x[elem_id] for x in all_records if elem_id in x and not str(x["_id"]) == record_id]
 
     return component_records
 

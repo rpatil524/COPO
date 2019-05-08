@@ -681,15 +681,15 @@ $(document).ready(function () {
         refresh_tool_tips();
 
         //now trigger polling if not already started
-        // if (!intervalIsSet) {
-        //     intervalIsSet = true;
-        //
-        //     //set polling into motion
-        //     setInterval(function () {
-        //         //get submissions information
-        //         get_submission_information();
-        //     }, 1000);
-        // }
+        if (!intervalIsSet) {
+            intervalIsSet = true;
+
+            //set polling into motion
+            setInterval(function () {
+                //get submissions information
+                get_submission_information();
+            }, 1000);
+        }
     }
 
     function sanitise_submissions() {

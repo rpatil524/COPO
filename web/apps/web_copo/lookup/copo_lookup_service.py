@@ -82,7 +82,7 @@ class COPOLookup:
 
         data = pths_map.get(self.data_source, str())
 
-        if isinstance(data, str):  # it's only a path, resolve to get actual data
+        if isinstance(data, str) and data:  # it's only a path, resolve to get actual data
             data = d_utils.json_to_pytype(data)
 
         return data
@@ -165,7 +165,7 @@ class COPOLookup:
 
         result = list()
         df = pd.DataFrame()
-        schema = CGCore().get_component_schema()
+        dependent_record_label = 'copo_name'
 
         if self.accession:
             if isinstance(self.accession, str):
@@ -178,9 +178,16 @@ class COPOLookup:
             if records:
                 for record in records:
                     referenced_field = record.get("dependency_id", str())
-                    schema = [x for x in schema if 'dependency' in x and x['dependency'] == referenced_field]
+                    kwargs = dict()
+                    kwargs["referenced_field"] = referenced_field
+                    schema = CGCore().get_component_schema(**kwargs)
 
-                    label = record.get(schema[0]["id"].split(".")[-1], str())
+                    label = record.get(dependent_record_label, str())
+
+                    # modify schema before generating description
+                    schema = [x for x in schema if
+                              'dependency' in x and x['dependency'] == referenced_field and x.get("show_in_table",
+                                                                                                  True)]
                     resolved = htags.resolve_display_data(schema, record)
                     description = self.format_description(resolved)
 
@@ -192,11 +199,9 @@ class COPOLookup:
                     result.append(item_dict)
         elif self.search_term:
             referenced_field = self.referenced_field
-            schema = [x for x in schema if 'dependency' in x and x['dependency'] == referenced_field]
-
-            filter_name = schema[0]["id"].split(".")[-1]
+            filter_name = dependent_record_label
             projection = {filter_name: 1}
-            filter_by = dict()
+            filter_by = dict(dependency_id=referenced_field)
             filter_by[filter_name] = {'$regex': self.search_term, "$options": 'i'}
 
             sort_by = filter_name

@@ -1,7 +1,7 @@
 __author__ = 'etuka'
 __date__ = '13 May 2016'
 
-import ast
+import json
 from bson import ObjectId
 from django.contrib.auth.models import User
 import web.apps.web_copo.lookup.lookup as lkup
@@ -25,7 +25,7 @@ class BrokerDA:
         self.auto_fields = self.param_dict.get("auto_fields", dict())
 
         if self.auto_fields and isinstance(self.auto_fields, str):
-            self.auto_fields = ast.literal_eval(self.auto_fields)
+            self.auto_fields = json.loads(self.auto_fields)
 
         self.broker_visuals = BrokerVisuals(**kwargs)
         self.da_object = DAComponent(self.profile_id, self.component)
@@ -197,6 +197,7 @@ class BrokerDA:
         kwargs = dict()
         kwargs["referenced_field"] = self.param_dict.get("referenced_field", str())
         kwargs["referenced_type"] = self.param_dict.get("referenced_type", str())
+        kwargs["action_type"] = self.param_dict.get("action_type", str())
 
         form_value = htags.generate_copo_form(self.component, target_id, component_dict, message_dict,
                                                         self.profile_id, **kwargs)

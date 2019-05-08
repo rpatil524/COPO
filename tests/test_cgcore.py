@@ -54,7 +54,7 @@ class CGCoreTests(TestCase):
 
     def test_cg_core_to_dataverse_conversion(self):
         # the method below will extract dc fields and add them to the meta field of the supplied sub id
-        DataverseSubmit(submission_id=self.s_dv).dc_dict_to_dc()
+        DataverseSubmit().dc_dict_to_dc(self.s_dv)
         s = Submission().get_record(self.s_dv)
         self.assertGreater(len(s["meta"]), 0)
         self.assertTrue("dsTitle" in s["meta"])
