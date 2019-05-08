@@ -245,7 +245,7 @@ class CkanSubmit:
                 out[key] = out[key].translate(str.maketrans("", "", string.punctuation))
                 out[key] = out[key].lower()
         '''
-
+        #return {"name":"test", "title":"test title", "private":False}
         return out
 
     def dc_dict_to_dc(self, sub_id):
