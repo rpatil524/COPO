@@ -619,6 +619,12 @@ def publish_dataverse(request):
     return HttpResponse(resp)
 
 
+def delete_repo_entry(request):
+    repo_id = request.GET["target_id"]
+    deleted = Repository().delete(repo_id)
+    return HttpResponse(json.dumps({"deleted": deleted}))
+
+
 def get_dspace_communities(request):
     sub_id = request.GET['submission_id']
     resp = dspace(sub_id).get_dspace_communites()

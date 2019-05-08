@@ -6,7 +6,8 @@ from web.apps.web_copo.schemas.utils import data_utils
 from bson import ObjectId
 from urllib.request import quote
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
-
+from web.apps.web_copo.schemas.utils.data_utils import get_base_url
+from urllib.parse import urljoin
 
 class DspaceSubmit(object):
     host = None
@@ -100,7 +101,7 @@ class DspaceSubmit(object):
                 except KeyError:
                     item_id = json.loads(resp_item.content.decode('utf-8'))['uuid']
             else:
-                return {"status": 404, "message": "error creating new dspace item"}
+                return {"status": resp_item.status_code, "message": resp_item.reason}
 
         # now upload files
         for s in sub['bundle']:
@@ -166,7 +167,7 @@ class DspaceSubmit(object):
                 if data_resp.status_code == 200:
                     self._update_dspace_submission(sub, dspace_url, data_id, item_id)
             else:
-                return (str(resp.status_code) + " ," + resp.reason + " ," + resp.content.decode('utf-8'))
+                return {"status": resp.status_code, "message": resp.reason}
         logout_url = dspace_url + '/rest/logout'
         if dspace_type == 6:
             requests.post(logout_url, cookies={"JSESSIONID": login_details})
@@ -214,10 +215,12 @@ class DspaceSubmit(object):
 
             # deal with special cases
             if "dc.contributor" in key:
-                key = "dc.contributor"
+                key = "dcterms.contributor"
             elif "dc.relation.references" in key:
                 key = "dcterms.references"
-                val = "http://copo-project.org" + '/copo/resolve:' + str(sub["_id"])
+                url = get_base_url()
+                val = urljoin(url, 'copo/resolve/' + str(sub["_id"]))
+
             elif "conformsto" in key:
                 key = "dcterms.conformsto"
             elif "dc.date.availability" in key:
@@ -233,7 +236,8 @@ class DspaceSubmit(object):
             elif "dc.relation.isreplacedby" in key:
                 key = "dcterms.isReplacedBy"
             elif "dc.relation.ispartof" in key:
-                val = "http://copo-project.org" + '/copo/resolve:' + str(sub["_id"])
+                url = get_base_url()
+                val = urljoin(url, 'copo/resolve/' + str(sub["_id"]))
 
             # add field as entry in list of dicts
             el = {

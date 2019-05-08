@@ -6,7 +6,9 @@ from dal.copo_da import DataFile
 import datetime
 from bson import ObjectId
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
-
+from urllib.parse import urljoin
+from web.apps.web_copo.schemas.utils.data_utils import get_base_url
+from urllib.parse import urljoin
 
 class CkanSubmit:
     host = None
@@ -68,7 +70,7 @@ class CkanSubmit:
                 }
                 fullurl = self.host["url"] + "resource_create"
             else:
-                return json.dumps({"status": 500, "message": resp.reason + " - " + resp.text})
+                return json.dumps({"status": resp.status_code, "message": resp.reason + " - " + resp.text})
         else:
             data = {"package_id": s["meta"]["identifier"]}
 
@@ -138,6 +140,7 @@ class CkanSubmit:
                         msg = json.loads(resp.content.decode("utf-8"))["error"]["message"]
                         return {"status": resp.status_code, "message": msg}
                     details = json.loads(resp.content.decode("utf-8"))
+                    details["result"]["repo_url"] = self.host["url"]
                     self._update_and_complete_submission(details, sub_id)
                 elif resp.status_code == 409:
                     fullurl = self.host["url"] + "package_show"
@@ -177,7 +180,9 @@ class CkanSubmit:
         out["private"] = False
         out["author_email"] = "felix.shaw@tgac.ac.uk"
         out["maintainer_email"] = "felix.shaw@tgac.ac.uk"
-        out["url"] = "http://copo-project.org" + '/copo/resolve:' + str(s["_id"])
+
+        url = get_base_url()
+        out["url"] = urljoin(url, 'copo/resolve/' + str(s["_id"]))
 
         extras = list()
 
@@ -218,7 +223,8 @@ class CkanSubmit:
                 pass
             elif item["dc"] == "dc.relation":
                 # add the submission_id to the dataverse metadata to allow backwards treversal from dataverse
-                temp_id = "http://copo-project.org" + '/copo/resolve:' + str(s["_id"])
+                url = get_base_url()
+                temp_id = urljoin(url, 'copo/resolve/' + str(s["_id"]))
                 extras.append({"key": "relation", "value": temp_id})
             elif item["dc"] == "notes":
                 # pass this as it will lead to a multiple key error
@@ -239,6 +245,7 @@ class CkanSubmit:
                 out[key] = out[key].translate(str.maketrans("", "", string.punctuation))
                 out[key] = out[key].lower()
         '''
+        #return {"name":"test", "title":"test title", "private":False}
         return out
 
     def dc_dict_to_dc(self, sub_id):
@@ -278,3 +285,8 @@ class CkanSubmit:
             return "application/msword"
         else:
             return ""
+
+    def get_submitted_package_details(self, package_id):
+        fullurl = urljoin(self.host["url"], "package_show?id=" + package_id)
+        resp = requests.get(fullurl)
+        return resp.content.decode('utf-8')

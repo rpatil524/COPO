@@ -4,6 +4,7 @@ import os
 import json
 import copy
 import pandas as pd
+from urllib.parse import urljoin
 from bson.json_util import dumps
 from collections import namedtuple
 import xml.etree.ElementTree as ET
@@ -20,6 +21,7 @@ class simple_utc(tzinfo):
         return "UTC"
     def utcoffset(self, dt):
         return timedelta(0)
+
 
 
 def pretty_print(data, path=None):
@@ -386,6 +388,12 @@ def get_current_user():
 
 def get_current_request():
     return ThreadLocal.get_current_request()
+
+def get_base_url():
+    r = ThreadLocal.get_current_request()
+    scheme = r.scheme
+    domain = r.get_host()
+    return scheme + "://" + domain
 
 
 def get_datetime():

@@ -129,6 +129,7 @@ TEMPLATES = [
                 "web.apps.web_copo.context_processors.get_status",
                 "web.apps.web_copo.context_processors.add_partial_submissions_to_context",
 
+
                 'django.contrib.auth.context_processors.auth',
             ],
             'debug': True,
@@ -184,4 +185,3 @@ UNIT_TESTING = False
 TEST_USER_NAME = 'jonny'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400
-

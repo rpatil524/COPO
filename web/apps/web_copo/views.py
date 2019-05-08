@@ -22,6 +22,7 @@ from web.apps.web_copo.utils import EnaImports as eimp
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.decorators import user_is_staff
 import web.apps.web_copo.templatetags.html_tags as htags
+from dal.copo_da import DataFile
 
 LOGGER = settings.LOGGER
 
@@ -104,9 +105,9 @@ def test_dataverse_submit(request):
     # from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
     # option_values = COPOLookup(accession=["5c77c2c9d127fd80d6f645e8"], data_source="cg_dependency_lookup").broker_component_search()['result']
 
-    from submission.dataverseSubmission import DataverseSubmit
-    DataverseSubmit(submission_id="5cd2e489ca53bf0a523df3db").submit()
-    t = 1
+    # from submission.dataverseSubmission import DataverseSubmit
+    # DataverseSubmit(submission_id="5cd2e489ca53bf0a523df3db").submit()
+    # t = 1
     # from submission import enareads
 
     # metadata_file_path = SubmissionHelper(
@@ -181,6 +182,20 @@ def copo_data(request, profile_id):
 def copo_docs(request):
     context = dict()
     return render(request, 'copo/copo_docs.html', {'context': context})
+
+def resolve_submission_id(request, submission_id):
+    sub = Submission().get_record(submission_id)
+    # get all file metadata
+    output = dict()
+    files = list()
+    for f in sub["bundle"]:
+        file = DataFile().get_record(f)
+        files.append(file["description"]["attributes"])
+    output["files"] = files
+    output["accessions"] = sub["accessions"]
+    output["metadata"] = {}
+    output["metadata"]["dc"] = sub["meta"]["fields"]
+    return HttpResponse(j.dumps(output))
 
 
 @login_required

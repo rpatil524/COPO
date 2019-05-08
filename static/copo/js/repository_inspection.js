@@ -205,13 +205,14 @@ function build_ckan_modal(resp) {
                 "<td>" + el + "</td>"
             trow = trow + colCheck
         })
+        $('#repo_modal').find('#ckan-table').DataTable()
     }
     else {
         trow = "<tr><td colspan='5'>No Data to Show</td></tr>"
     }
     $(t).find('tbody').append(trow)
     $('#repo_modal').find('#table-div-dataverse').append(t)
-    $('#repo_modal').find('#ckan-table').DataTable()
+
     $('#repo_modal').find('input[value="existing"]').trigger("click")
     $('#repo_modal').data("type", "ckan")
 }
