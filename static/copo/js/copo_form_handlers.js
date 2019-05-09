@@ -1062,11 +1062,10 @@ var dispatchFormControl = {
         var optionComponent = formElem.option_component || false;
 
         var addbtnDivRow = '';
+        var lookupMessage = "Enter 1 or more characters to search for a value.";
 
         if (newItemCreate.toString().toLowerCase() == "true" && optionComponent != '') {
-            var lookupMessage = "<hr/><div class='text-info' style='margin-top: 5px; font-weight: bold;'>Enter 1 or more characters to search for existing values, or use the create button to create and assign a value.</div>";
-            formElem["help_tip"] = formElem["help_tip"] || '';
-            formElem["help_tip"] = formElem["help_tip"] + lookupMessage;
+            lookupMessage += " You can also use the create button to create and assign a new value."
 
             var addBtn = $('<button/>',
                 {
@@ -1092,6 +1091,11 @@ var dispatchFormControl = {
                     class: "row btn-row",
                 }).append(addbtnDiv);
         }
+
+        lookupMessage = "<hr/><div class='text-info' style='margin-top: 5px; font-weight: bold;'>"+lookupMessage+"</div>";
+
+        formElem["help_tip"] = formElem["help_tip"] || '';
+        formElem["help_tip"] = formElem["help_tip"] + lookupMessage;
 
         var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
 

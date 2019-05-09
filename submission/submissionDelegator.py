@@ -63,10 +63,18 @@ def delegate_submission(request):
     ## Submit to Dataverse
     elif repo == 'dataverse':
         result = dataverseSubmission.DataverseSubmit(submission_id=sub_id).submit()
-        if result == True:
+        if result is True:
             return HttpResponse(jsonpickle.dumps({'status': 0}))
         else:
-            error = result
+            message = str()
+            status = 500
+            if isinstance(result, str):
+                message = result
+            elif isinstance(result, dict):
+                message = result.get("message", str())
+                status = result.get("status", 500)
+            message = "\n " + message
+            return HttpResponse(message, status=status)
 
     ## Submit to dspace
     elif repo == 'dspace':

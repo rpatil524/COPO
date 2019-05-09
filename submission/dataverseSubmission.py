@@ -108,6 +108,7 @@ class DataverseSubmit(object):
         # proceed with the creation of a dataset iff no accessions are recorded
         dataset_persistent_id = self.submission_record.get("accessions", dict()).get("dataset_doi", str())
 
+        # there's existing submission associated with this submission
         if dataset_persistent_id:
             return self.post_dataset_creation(persistent_id=dataset_persistent_id)
 
@@ -118,7 +119,8 @@ class DataverseSubmit(object):
         if not dataverse_alias:
             exception_message = 'Dataverse alias not found! '
             self.report_error(exception_message)
-            raise OperationFailedError(exception_message)
+            return exception_message
+            # raise OperationFailedError(exception_message)
 
         # convert to Dataset metadata
         metadata_file_path = self.do_conversion()
@@ -138,21 +140,23 @@ class DataverseSubmit(object):
         except Exception as e:
             exception_message = 'API call error: ' + str(e)
             self.report_error(exception_message)
-            raise OperationFailedError(exception_message)
+            return exception_message
+            # raise OperationFailedError(exception_message)
 
         try:
             receipt = json.loads(receipt.decode('utf-8'))
         except Exception as e:
             exception_message = 'Could not retrieve API result. ' + str(receipt)
-            self.report_error(exception_message)
-            raise OperationFailedError(exception_message)
+            return exception_message
+            # raise OperationFailedError(exception_message)
 
         if receipt.get("status", str()).lower() in ("ok", "200"):
             receipt = receipt.get("data", dict())
         else:
             exception_message = 'The Dataset could not be created. ' + str(receipt)
             self.report_error(exception_message)
-            raise OperationFailedError(exception_message)
+            return exception_message
+            # raise OperationFailedError(exception_message)
 
         dataset_persistent_id = receipt.get("persistentId", str())
         dataset_id = receipt.get("id", str())
@@ -622,10 +626,15 @@ class DataverseSubmit(object):
 
     def report_error(self, error_message):
         print(error_message)
-        lg.log('Submission ID: ' + self.submission_id + " " + error_message, level=Loglvl.ERROR,
-               type=Logtype.FILE)
 
-        return True
+        try:
+            lg.log('Submission ID: ' + self.submission_id + " " + error_message, level=Loglvl.ERROR,
+                   type=Logtype.FILE)
+        except Exception as e:
+            pass
+
+        return False
+
 
 
 def prettify(elem):
