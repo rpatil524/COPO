@@ -66,13 +66,13 @@ def delegate_submission(request):
         if result is True:
             return HttpResponse(jsonpickle.dumps({'status': 0}))
         else:
-            message = str()
-            status = 500
             if isinstance(result, str):
                 message = result
+                status = 404
             elif isinstance(result, dict):
                 message = result.get("message", str())
-                status = result.get("status", 500)
+                status = result.get("status", 404)
+
             message = "\n " + message
             return HttpResponse(message, status=status)
 
