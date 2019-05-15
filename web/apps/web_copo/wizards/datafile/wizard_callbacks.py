@@ -39,10 +39,7 @@ class WizardCallbacks:
 
             item = item[0] if item else dict()
 
-            if count_bundle_items <= 1:
-                item['option_values'] = CgCoreSchemas().get_singular_types()
-            else:
-                item['option_values'] = CgCoreSchemas().get_multiple_types()
+            item['option_values'] = CgCoreSchemas().get_cg_types()
 
             save_dict = dict(attributes=attributes, stages=stages)
             Description().edit_description(self.__wzh.description_token, save_dict)
@@ -72,10 +69,7 @@ class WizardCallbacks:
 
             type = attributes.get("cg_type", dict()).get("type", str())
 
-            if count_bundle_items <= 1:
-                item['option_values'] = CgCoreSchemas().get_singular_subtypes(type)
-            else:
-                item['option_values'] = CgCoreSchemas().get_multiple_subtypes(type)
+            item['option_values'] = CgCoreSchemas().get_cg_subtypes(type)
 
             save_dict = dict(attributes=attributes, stages=stages)
             Description().edit_description(self.__wzh.description_token, save_dict)

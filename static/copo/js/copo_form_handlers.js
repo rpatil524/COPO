@@ -492,6 +492,15 @@ function set_validation_markers(formElem, ctrl) {
     var validationMarkers = {};
     var errorHelpDiv = "";
 
+    // if (ctrl.hasClass("onto-select")) {
+    //     ctrl = $(ctrl[0]);
+    //     // $(ctrl[0]).attr("required", true);
+    //     // $(ctrl[0]).attr("data-error", formElem.label + " required!");
+    //     // console.log(ctrl[0]);
+    //     // console.log(formElem.required)
+    // }
+
+
     //required marker
     if (formElem.hasOwnProperty("required") && (formElem.required.toString().toLowerCase() == "true")) {
         ctrl.attr("required", true);
@@ -558,6 +567,24 @@ function set_validation_markers(formElem, ctrl) {
 
         errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
     }
+
+    //validate_ontology marker
+    if (formElem.hasOwnProperty("validate_ontology") && (formElem.validate_ontology.toString().toLowerCase() == "true")) {
+        ctrl.attr("data-ontology", "ontology");
+        ctrl.attr('data-ontology-error', "Please enter a valid ontology.");
+
+        errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
+    }
+
+    //ontologyrequired marker
+    // if (formElem.hasOwnProperty("control") && (formElem.control.toString().toLowerCase() == "ontology term") &&
+    //     formElem.hasOwnProperty("required") && (formElem.required.toString().toLowerCase() == "true")) {
+    //     ctrl.attr("data-otr", "otr");
+    //     ctrl.attr('data-otr-error', "Please enter a value for the " + formElem.label);
+    //
+    //     errorHelpDiv = $('<div></div>').attr({class: "help-block with-errors"});
+    // }
+
 
     validationMarkers['errorHelpDiv'] = errorHelpDiv;
     validationMarkers['ctrl'] = ctrl;
@@ -970,10 +997,13 @@ var dispatchFormControl = {
             }
         });
 
-        ctrlsDiv.append(ontologyCtrlObject);
+        var validationCandidate = ontologyCtrlObject.find(".onto-select")[0];
 
-        var vM = set_validation_markers(formElem, ontologyCtrlObject.find(".onto-select"));
-        ontologyCtrlObject.append(vM.errorHelpDiv);
+        //set validation markers
+        var vM = set_validation_markers(formElem, $(validationCandidate));
+
+        ctrlsDiv.append(ontologyCtrlObject);
+        ctrlsDiv.append(vM.errorHelpDiv);
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
@@ -1092,7 +1122,7 @@ var dispatchFormControl = {
                 }).append(addbtnDiv);
         }
 
-        lookupMessage = "<hr/><div class='text-info' style='margin-top: 5px; font-weight: bold;'>"+lookupMessage+"</div>";
+        lookupMessage = "<hr/><div class='text-info' style='margin-top: 5px; font-weight: bold;'>" + lookupMessage + "</div>";
 
         formElem["help_tip"] = formElem["help_tip"] || '';
         formElem["help_tip"] = formElem["help_tip"] + lookupMessage;
@@ -2661,6 +2691,45 @@ function custom_validate(formObject) {
                 var newValue = $el.val().trim();
 
                 var oKFlag = re.test(newValue);
+
+                if (!oKFlag) {
+                    return "Not valid!";
+                }
+            },
+            otr: function ($el) {//validates for ontology fields required
+                var validationSource = $el;
+
+                var oKFlag = true;
+
+
+                validationSource.closest(".ontology-parent").find(".ontology-field-hidden").each(function () {
+                    var dataKey = $(this).attr("data-key");
+
+                    if ((dataKey == 'annotationValue' && !$(this).val().trim())) {
+                        oKFlag = false;
+                    }
+
+                });
+
+                oKFlag = false;
+
+
+                if (!oKFlag) {
+                    return "Not valid!";
+                }
+            },
+            ontology: function ($el) {//validates for ontology fields requiring accessions
+                var validationSource = $el;
+                var oKFlag = true;
+
+                validationSource.closest(".ontology-parent").find(".ontology-field-hidden").each(function () {
+                    var dataKey = $(this).attr("data-key");
+
+                    if ((dataKey == 'termSource' && !$(this).val().trim()) || (dataKey == 'termAccession' && !$(this).val().trim())) {
+                        oKFlag = false;
+                    }
+
+                });
 
                 if (!oKFlag) {
                     return "Not valid!";

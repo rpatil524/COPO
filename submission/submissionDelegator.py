@@ -43,10 +43,22 @@ def delegate_submission(request):
 
     # Submit to ENA Sequence reads - splits the submission task to micro-tasks to overcome the timeout issues observed
     elif repo == 'ena':
-        # ena_status = request.POST.get("ena_status", "commenced")
-        # result = enaSubmission.EnaSubmit4Reads(submission_id=sub_id, status=ena_status).submit()
         result = enareads.EnaReads(submission_id=sub_id).submit()
-        return HttpResponse(jsonpickle.dumps({'status': result}))
+
+        if result is True:
+            return HttpResponse(jsonpickle.dumps({'status': 0}))
+        else:
+            if isinstance(result, str):
+                message = result
+                status = 404
+            elif isinstance(result, dict):
+                message = result.get("message", str())
+                status = result.get("status", 404)
+
+            message = "\n " + message
+
+            return HttpResponse(message, status=status)
+
 
     # Submit to ENA
     elif 'ena' in repo:
