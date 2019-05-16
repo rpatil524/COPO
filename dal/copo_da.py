@@ -309,15 +309,6 @@ class Person(DAComponent):
         creates an (SRA) person record and attach to profile
         Returns:
         """
-        user = data_utils.get_current_user()
-
-        auto_fields = {
-            'copo.person.roles.annotationValue': 'SRA Inform On Status',
-            'copo.person.lastName': user.last_name,
-            'copo.person.firstName': user.first_name,
-            'copo.person.roles.annotationValue___0___1': 'SRA Inform On Error',
-            'copo.person.email': user.email
-        }
 
         people = self.get_all_records()
         sra_roles = list()
@@ -329,9 +320,21 @@ class Person(DAComponent):
         has_sra_roles = all(x in sra_roles for x in ['SRA Inform On Status', 'SRA Inform On Error'])
 
         if not has_sra_roles:
-            kwargs = dict()
-            self.save_record(auto_fields, **kwargs)
+            try:
+                user = data_utils.get_current_user()
 
+                auto_fields = {
+                    'copo.person.roles.annotationValue': 'SRA Inform On Status',
+                    'copo.person.lastName': user.last_name,
+                    'copo.person.firstName': user.first_name,
+                    'copo.person.roles.annotationValue___0___1': 'SRA Inform On Error',
+                    'copo.person.email': user.email
+                }
+            except Exception as e:
+                pass
+            else:
+                kwargs = dict()
+                self.save_record(auto_fields, **kwargs)
         return
 
 
@@ -347,11 +350,17 @@ class CGCore(DAComponent):
         """
         schema_fields = super(CGCore, self).get_component_schema()
 
+        if not schema_fields:
+            return list()
+
         referenced_field = kwargs.get("referenced_field", str())
         referenced_type = kwargs.get("referenced_type", str())
 
         if referenced_field:  # resolve dependencies
             schema_fields = [x for x in schema_fields if 'dependency' in x and x['dependency'] == referenced_field]
+
+            if not schema_fields:
+                return list()
 
             # add an attribute to capture the referenced field - mark this as hidden for UI purposes
             dependent_record_label = 'dependency_id'
