@@ -126,7 +126,7 @@
       ]
     },
     "apply_to_all_message": {
-      "text": "Please be aware that any metadata supplied in this stage will apply to all items in the description bundle. Click <b>Next</b>, when done, to proceed.",
+      "text": "Please be aware that any metadata supplied in this stage will apply to all items in the bundle. Click <b>Next</b>, when done, to proceed.",
       "text_class": "text-info"
     },
     "description_bundle_select_message": {
@@ -162,7 +162,7 @@
       "text_class": "text-info"
     },
     "bundling_violation_alert_message": {
-      "text": "Bundle datafiles have incompatible metadata for the following <strong>constrained</strong> stage items: {}. <br/><br/><span class='text-danger'>Please note that, as this is a constrained stage, any metadata supplied will be shared by all the datafiles in the description bundle. This may impact previously ascribed metadata for some of the datafiles should you choose to continue.</span>",
+      "text": "Bundle datafiles have incompatible metadata for the following <strong>constrained</strong> stage items: {}. <br/><br/><span class='text-danger'>Metadata supplied at this stage will be shared by all the datafiles in the description bundle. The user will be unable to update entries supplied here for individual files.</span>",
       "text_class": "text-danger"
     },
     "constrained_stage_alert_message": {
@@ -170,7 +170,7 @@
       "text_class": "text-danger"
     },
     "update_stage_alert_message": {
-      "text": "<hr/><strong><span class='text-info'>Important - Entry update!</span></strong> <br/>Metadata supplied in this stage can be updated for individual files in the description bundle at the final stage of the wizard.</strong>",
+      "text": "<hr/><strong><span class='text-info'>Important - Entry update!</span></strong> <br/>Metadata supplied in this will initially be copied across to all files in the bundle. The user can, at the final stage of the wizard, update entries for individual files in the bundle.</strong>",
       "text_class": "text-danger"
     },
     "invalid_token_message": {

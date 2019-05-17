@@ -3,26 +3,6 @@
   "description": "Definitions for elements that appear in different stages of a wizard targeted at submissions to the ENA (European Nucleotide Archive) repository. 'ref', id of stage; 'title',  header used for the stage; items, actual form elements on the page; 'apply_to_all', if all items must have same value for this stage;",
   "properties": [
     {
-      "ref": "study_type",
-      "title": "Study Type",
-      "apply_to_all": true,
-      "message": "Select the study type under which the datafiles were created. The study type presents a controlled vocabulary for expressing the overall purpose of the study.",
-      "items": [
-        {
-          "id": "study_type",
-          "help_tip": "Select Study Type from the list",
-          "label": "Study Type",
-          "hidden": "false",
-          "required": "true",
-          "type": "string",
-          "control": "copo-single-select",
-          "default_value": "",
-          "data_source": "study_type_options",
-          "option_values": []
-        }
-      ]
-    },
-    {
       "ref": "project_details",
       "apply_to_all": true,
       "title": "Study Details",
@@ -61,7 +41,7 @@
         {
           "id": "project_release_date",
           "type": "string",
-          "help_tip": "Please specify the public release date of this study. This can be at most two years in the future. <div class='text-danger'>Specifying a date in the past will entail immediate public release of the study upon submission.</span>",
+          "help_tip": "Please specify the public release date of this study. This can be at most two years in the future. <div class='text-danger'>Specifying a date in the past, entails an immediate release of the study on submission.</span>",
           "label": "Release date",
           "hidden": "false",
           "required": "false",
@@ -90,8 +70,119 @@
       ]
     },
     {
-      "ref": "protocol_refs",
-      "callback": "get_ena_sequence_stages"
+      "ref": "library_preparation",
+      "title": "Library Preparation",
+      "message": "Specify the origin of the material that may have been sequenced, and any treatments that the material might have undergone that affect the sequencing result.",
+      "items": [
+        {
+          "help_tip": "Specify whether to expect single, paired, or other configuration of reads",
+          "required": "true",
+          "default_value": "",
+          "control_meta": {},
+          "control": "copo-single-select",
+          "versions": [
+            "library_layout"
+          ],
+          "deprecated": false,
+          "hidden": "false",
+          "id": "library_layout",
+          "label": "Library layout",
+          "show_in_form": true,
+          "type": "string",
+          "show_in_table": true,
+          "option_values": [
+            "SINGLE",
+            "PAIRED"
+          ]
+        },
+        {
+          "help_tip": "Select the sequencing technique intended for this library",
+          "required": "false",
+          "default_value": "",
+          "control_meta": {},
+          "control": "copo-single-select",
+          "versions": [
+            "library_strategy"
+          ],
+          "deprecated": false,
+          "hidden": "false",
+          "id": "library_strategy",
+          "label": "Library strategy",
+          "show_in_form": true,
+          "type": "string",
+          "show_in_table": true,
+          "option_values": [],
+          "data_source": "library_strategy"
+        },
+        {
+          "help_tip": "Select the sequencing technique intended for this library",
+          "required": "false",
+          "default_value": "",
+          "control_meta": {},
+          "control": "copo-single-select",
+          "versions": [
+            "library_source"
+          ],
+          "deprecated": false,
+          "hidden": "false",
+          "id": "library_source",
+          "label": "Library source",
+          "show_in_form": true,
+          "type": "string",
+          "show_in_table": true,
+          "option_values": [],
+          "data_source": "library_source"
+        },
+        {
+          "help_tip": "Select the method that was used to select for or against, enrich, or screen the material being sequenced",
+          "required": "false",
+          "default_value": "",
+          "control_meta": {},
+          "control": "copo-single-select",
+          "versions": [
+            "library_selection"
+          ],
+          "deprecated": false,
+          "hidden": "false",
+          "id": "library_selection",
+          "label": "Library selection",
+          "show_in_form": true,
+          "type": "string",
+          "show_in_table": true,
+          "option_values": [],
+          "data_source": "library_selection"
+        },
+        {
+          "id": "library_description",
+          "type": "string",
+          "help_tip": "Enter an optional library description.",
+          "label": "Description",
+          "hidden": "false",
+          "required": "false",
+          "control": "textarea",
+          "default_value": ""
+        }
+      ]
+    },
+    {
+      "ref": "nucleic_acid_sequencing",
+      "title": "Nucleic Acid Sequencing",
+      "message": "Specify the sequencing technique used.",
+      "items": [
+        {
+          "id": "sequencing_instrument",
+          "show_in_form": true,
+          "type": "string",
+          "show_in_table": true,
+          "help_tip": "Specify the sequencing instrument model and make.",
+          "label": "Sequencing Instrument",
+          "hidden": "false",
+          "required": "true",
+          "control": "copo-single-select",
+          "data_source": "sequencing_instrument",
+          "option_values": []
+        }
+      ]
     }
   ]
 }

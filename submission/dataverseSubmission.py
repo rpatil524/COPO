@@ -73,30 +73,127 @@ class DataverseSubmit(object):
             url = url[7:]
         return url
 
+    @staticmethod
+    def get_format_doi(doi):
+        """
+        function formats passed doi for api calls to dataverse
+        :param doi:
+        :return:
+        """
+        doi_prefixes = ["https://doi.org/", "http://doi.org/", "https://", "http://", "doi.org/"]
+
+        for dp in doi_prefixes:
+            if dp in doi:
+                doi = "doi:" + doi.split("https://doi.org/")[-1]
+
+        return doi
+
     def clear_submission_metadata(self):
         Submission().clear_submission_metadata(self.submission_id)
 
-    def _add_to_dataverse(self):
-        sub = self.submission_record
-        c = self._get_connection()
-        try:
-            alias = sub['meta']['dataverse_alias']
-        except KeyError:
-            alias = sub['meta']['alias']
-        dv = c.get_dataverse(alias)
-        if dv == None:
-            return {"status": 404, "message": "error getting dataverse"}
-        doi = self.truncate_url(sub['meta']['doi'])
-        ds = dv.get_dataset_by_doi(doi)
-        if ds == None:
-            ds = dv.get_dataset_by_string_in_entry(str.encode(sub['meta']['identifier']))
-            if ds == None:
-                ds = dv.get_dataset_by_string_in_entry(str(sub['meta']['doi']).encode())
+    def get_dataverse_details(self, dataverse_alias):
+        """
+        function retrieves dataverse details given its alias
+        :param dataverse_alias:
+        :return:
+        """
 
-        self.send_files(sub, ds)
-        meta = ds._metadata
-        dv_storageIdentifier = meta['latest']['storageIdentifier']
-        return self._update_submission_record(sub, ds, dv, dv_storageIdentifier)
+        response_data = dict()
+
+        try:
+            url = self.host + "/api/dataverses/" + dataverse_alias
+            response = requests.get(url)
+            if str(response.status_code).lower() in ("ok", "200"):
+                response_data = response.json().get("data", dict())
+        except Exception as e:
+            exception_message = "Error retrieving dataverse details " + url + " : " + str(e)
+            self.report_error(exception_message)
+
+        return response_data
+
+    def get_dataset_details(self, doi):
+        """
+        function retrieves dataset details given its doi
+        :param doi:
+        :return:
+        """
+
+        response_data = dict()
+
+        # retrieve dataset details given its doi
+        headers = {'X-Dataverse-key': self.api_token}
+
+        # get formatted doi
+        doi = self.get_format_doi(doi)
+
+        params = (
+            ('persistentId', doi),
+        )
+
+        try:
+            url = self.host + "/api/datasets/:persistentId/"
+            response = requests.get(url, headers=headers, params=params)
+            if str(response.status_code).lower() in ("ok", "200"):
+                response_data = response.json().get("data", dict())
+        except Exception as e:
+            exception_message = "Error retrieving dataset details " + url + " : " + str(e)
+            self.report_error(exception_message)
+
+        return response_data
+
+    def _add_to_dataverse(self):
+        """
+        function adds datafiles to a dataset
+        :return:
+        """
+        sub = self.submission_record
+
+        # check for dataverse alias
+
+        alias = sub.get("meta", dict()).get("dataverse_alias", str()) or sub.get("meta", dict()).get("alias", str())
+
+        if not alias:
+            return {"status": 404, "message": "\n Error getting dataverse"}
+
+        # check for dataset doi
+        doi = sub.get("meta", dict()).get("doi", str())
+
+        if not doi:
+            return {"status": 404, "message": "\n Error getting dataset"}
+
+        # add file to dataset
+        result = self.send_files_curl(persistent_id=doi)
+
+        if result is True:
+            # store accessions and clear submission
+            dv_response_data = self.get_dataverse_details(alias)
+            ds_response_data = self.get_dataset_details(doi)
+
+            dataset_title = [x["value"] for x in
+                             ds_response_data.get("latestVersion", dict()).get("metadataBlocks", dict()).get("citation",
+                                                                                                             dict()).get(
+                                 "fields", dict()) if x.get("typeName", str()) == "title"]
+
+            acc = dict()
+            acc['dataset_id'] = ds_response_data.get("id", str())
+            acc['dataset_doi'] = doi
+            acc['dataverse_alias'] = alias
+            acc['dataverse_title'] = dv_response_data.get("name", "N/A")
+            acc['dataset_title'] = "N/A"
+
+            if dataset_title:
+                if isinstance(dataset_title, list):
+                    acc['dataset_title'] = dataset_title[0]
+                elif isinstance(dataset_title, str):
+                    acc['dataset_title'] = dataset_title
+
+            sub['accessions'] = acc
+            sub['target_id'] = sub.pop('_id', self.submission_id)
+            Submission().save_record(dict(), **sub)
+
+            self.clear_submission_metadata()
+
+        return result
 
     def _create_and_add_to_dataverse(self):
         """
@@ -108,9 +205,9 @@ class DataverseSubmit(object):
         # proceed with the creation of a dataset iff no accessions are recorded
         dataset_persistent_id = self.submission_record.get("accessions", dict()).get("dataset_doi", str())
 
+        # there's existing submission associated with this submission
         if dataset_persistent_id:
             return self.post_dataset_creation(persistent_id=dataset_persistent_id)
-
 
         # get dataverse alias
         dataverse_alias = self.submission_record.get("meta", dict()).get("alias", str())
@@ -118,7 +215,8 @@ class DataverseSubmit(object):
         if not dataverse_alias:
             exception_message = 'Dataverse alias not found! '
             self.report_error(exception_message)
-            raise OperationFailedError(exception_message)
+            return exception_message
+            # raise OperationFailedError(exception_message)
 
         # convert to Dataset metadata
         metadata_file_path = self.do_conversion()
@@ -135,24 +233,20 @@ class DataverseSubmit(object):
         # retrieve call result
         try:
             receipt = subprocess.check_output(api_call, shell=True)
+            receipt = json.loads(receipt.decode('utf-8'))
         except Exception as e:
             exception_message = 'API call error: ' + str(e)
             self.report_error(exception_message)
-            raise OperationFailedError(exception_message)
-
-        try:
-            receipt = json.loads(receipt.decode('utf-8'))
-        except Exception as e:
-            exception_message = 'Could not retrieve API result. ' + str(receipt)
-            self.report_error(exception_message)
-            raise OperationFailedError(exception_message)
-
-        if receipt.get("status", str()).lower() in ("ok", "200"):
-            receipt = receipt.get("data", dict())
+            return exception_message
+            # raise OperationFailedError(exception_message)
         else:
-            exception_message = 'The Dataset could not be created. ' + str(receipt)
-            self.report_error(exception_message)
-            raise OperationFailedError(exception_message)
+            if receipt.get("status", str()).lower() in ("ok", "200"):
+                receipt = receipt.get("data", dict())
+            else:
+                exception_message = 'The Dataset could not be created. ' + str(receipt)
+                self.report_error(exception_message)
+                return exception_message
+                # raise OperationFailedError(exception_message)
 
         dataset_persistent_id = receipt.get("persistentId", str())
         dataset_id = receipt.get("id", str())
@@ -163,33 +257,27 @@ class DataverseSubmit(object):
         acc['dataset_id'] = dataset_id
         acc['dataset_doi'] = dataset_persistent_id
         acc['dataverse_alias'] = dataverse_alias
-        acc['dataverse_title'] = str()
-        acc['dataset_title'] = str()
+        acc['dataset_title'] = "N/A"
 
         # retrieve dataverse details given its alias
-        response = requests.get(self.host + "/api/dataverses/" + dataverse_alias)
-        if str(response.status_code).lower() in ("ok", "200"):
-            response_data = response.json().get("data", dict())
-            acc['dataverse_title'] = response_data.get("name", str())
+        dv_response_data = self.get_dataverse_details(dataverse_alias)
+        acc['dataverse_title'] = dv_response_data.get("name", "N/A")
 
         # retrieve dataset details given its doi
-        headers = {'X-Dataverse-key': self.api_token}
+        ds_response_data = self.get_dataset_details(dataset_persistent_id)
+        dataset_title = [x["value"] for x in
+                         ds_response_data.get("latestVersion", dict()).get("metadataBlocks", dict()).get("citation",
+                                                                                                         dict()).get(
+                             "fields", dict()) if x.get("typeName", str()) == "title"]
 
-        params = (
-            ('persistentId', dataset_persistent_id),
-        )
+        if dataset_title:
+            if isinstance(dataset_title, list):
+                acc['dataset_title'] = dataset_title[0]
+            elif isinstance(dataset_title, str):
+                acc['dataset_title'] = dataset_title
 
-        response = requests.get(self.host + "/api/datasets/:persistentId/", headers=headers, params=params)
-        if str(response.status_code).lower() in ("ok", "200"):
-            response_data = response.json().get("data", dict())
-            dataset_title = [x["value"] for x in
-                             response_data.get("latestVersion", dict()).get("metadataBlocks", dict()).get("citation",
-                                                                                                          dict()).get(
-                                 "fields", dict()) if x.get("typeName", str()) == "title"]
-            acc['dataset_title'] = dataset_title[0] if dataset_title else ''
-
+        # update submission record with accessions
         sub['accessions'] = acc
-
         sub['target_id'] = sub.pop('_id', self.submission_id)
         Submission().save_record(dict(), **sub)
 
@@ -205,7 +293,7 @@ class DataverseSubmit(object):
         # add file to dataset
         result = self.send_files_curl(persistent_id=persistent_id)
 
-        if result:
+        if result is True:
             self.clear_submission_metadata()
 
         return result
@@ -230,6 +318,9 @@ class DataverseSubmit(object):
         # get submission record
         sub = self.submission_record
 
+        # get formatted doi
+        persistent_id = self.get_format_doi(persistent_id)
+
         datafiles = sub.get("bundle_meta", list())
 
         # get all pending files
@@ -245,27 +336,37 @@ class DataverseSubmit(object):
             return True
 
         # compose api call
-        api_call = 'curl -H "X-Dataverse-key:{api_token}" -X POST -F \'file=@{data_file}\' -F \'jsonData={{"description":"Datafile","categories":["Data"], "restrict":"true"}}\' "{server_url}/api/datasets/:persistentId/add?persistentId={persistent_id}"'
+        api_call = 'curl -H "X-Dataverse-key:{api_token}" -X ' \
+                   'POST -F \'file=@{data_file}\' -F \'jsonData={{"description":"Datafile","categories":["Data"], ' \
+                   '"restrict":"true"}}\' "{server_url}/api/datasets/:persistentId/add?persistentId={persistent_id}"'
         api_call = api_call.format(api_token=self.api_token,
                                    server_url=self.host,
                                    persistent_id=persistent_id,
                                    data_file='mock-datafile')
 
+        upload_error = ""
         for df in pending_files:
             upload_string = api_call.replace("mock-datafile", df.get("file_path", str()))
             try:
                 receipt = subprocess.check_output(upload_string, shell=True)
+                receipt = json.loads(receipt.decode('utf-8'))
             except Exception as e:
                 exception_message = "Error uploading file " + df.get("file_path", str()) + " : " + str(e)
                 self.report_error(exception_message)
+                upload_error = upload_error + "\n" + exception_message
             else:
-                df["upload_status"] = True
+                if receipt.get("status", str()).lower() in ("ok", "200"):
+                    df["upload_status"] = True
+                else:
+                    exception_message = "Error uploading file " + df.get("file_path", str()) + " : " + str(receipt)
+                    self.report_error(exception_message)
+                    upload_error = upload_error + "\n" + exception_message
 
         # if all files uploaded, mark submission as complete
         pending_files = [x for x in pending_files if x.get("upload_status", False) is False]
 
         if pending_files:
-            return False
+            return {"status": 404, "message": upload_error}
 
         sub['complete'] = True
         sub['completed_on'] = datetime.now()
@@ -622,10 +723,14 @@ class DataverseSubmit(object):
 
     def report_error(self, error_message):
         print(error_message)
-        lg.log('Submission ID: ' + self.submission_id + " " + error_message, level=Loglvl.ERROR,
-               type=Logtype.FILE)
 
-        return True
+        try:
+            lg.log('Submission ID: ' + self.submission_id + " " + error_message, level=Loglvl.ERROR,
+                   type=Logtype.FILE)
+        except Exception as e:
+            pass
+
+        return False
 
 
 def prettify(elem):

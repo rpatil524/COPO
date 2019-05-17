@@ -28,7 +28,7 @@ def data_wiz(request):
                                          )
 
     context = broker_request.post_context(request_action)
-    out = jsonpickle.encode(context)
+    out = jsonpickle.encode(context, unpicklable=False)
 
     return HttpResponse(out, content_type='application/json')
 
@@ -56,7 +56,7 @@ def sample_wiz(request):
                                   description_file=description_file,
                                   ).post_context(request_action)
 
-    out = jsonpickle.encode(context)
+    out = jsonpickle.encode(context, unpicklable=False)
 
     return HttpResponse(out, content_type='application/json')
 

@@ -28,7 +28,7 @@
     },
     {
       "help_tip": "A taxonomic information associated to the Source Biological material (e.g., species, genus, strain).",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -44,6 +44,7 @@
       "id": "copo.source.organism",
       "type": "string",
       "show_in_table": true,
+      "validate_ontology": true,
       "ontology_names": [
         "ncbitaxon"
       ]

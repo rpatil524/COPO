@@ -1,0 +1,97 @@
+{
+  "title": "ENA Datafile Description",
+  "description": "Definitions for elements that appear in different stages of a wizard targeted at submissions to the ENA (European Nucleotide Archive) repository. 'ref', id of stage; 'title',  header used for the stage; items, actual form elements on the page; 'apply_to_all', if all items must have same value for this stage;",
+  "properties": [
+    {
+      "ref": "study_type",
+      "title": "Study Type",
+      "apply_to_all": true,
+      "message": "Select the study type under which the datafiles were created. The study type presents a controlled vocabulary for expressing the overall purpose of the study.",
+      "items": [
+        {
+          "id": "study_type",
+          "help_tip": "Select Study Type from the list",
+          "label": "Study Type",
+          "hidden": "false",
+          "required": "true",
+          "type": "string",
+          "control": "copo-single-select",
+          "default_value": "",
+          "data_source": "study_type_options",
+          "option_values": []
+        }
+      ]
+    },
+    {
+      "ref": "project_details",
+      "apply_to_all": true,
+      "title": "Study Details",
+      "message": "Please add some details to better describe this study.",
+      "items": [
+        {
+          "id": "project_name",
+          "type": "string",
+          "help_tip": "Enter a short name for the study. Default value set from bundle information.",
+          "label": "Name",
+          "hidden": "false",
+          "required": "false",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "project_title",
+          "type": "string",
+          "help_tip": "Enter a short descriptive title for the study. Default value set from profile information.",
+          "label": "Title",
+          "hidden": "false",
+          "required": "true",
+          "control": "text",
+          "default_value": ""
+        },
+        {
+          "id": "project_description",
+          "type": "string",
+          "help_tip": "Enter a long description of the scope of the study. Default value set from profile information.",
+          "label": "Description",
+          "hidden": "false",
+          "required": "true",
+          "control": "textarea",
+          "default_value": ""
+        },
+        {
+          "id": "project_release_date",
+          "type": "string",
+          "help_tip": "Please specify the public release date of this study. This can be at most two years in the future. <div class='text-danger'>Specifying a date in the past will entail immediate public release of the study upon submission.</span>",
+          "label": "Release date",
+          "hidden": "false",
+          "required": "false",
+          "control": "date-picker",
+          "default_value": ""
+        }
+      ]
+    },
+    {
+      "ref": "attach_samples",
+      "title": "Sample",
+      "message": "Select and associate a sample to files in the bundle. A Sample defines an isolate of sequenceable material upon which sequencing experiments has been based.",
+      "items": [
+        {
+          "id": "study_samples",
+          "type": "string",
+          "help_tip": "Specify the sample you used in your study",
+          "label": "Sample",
+          "hidden": "false",
+          "required": "true",
+          "control": "copo-lookup2",
+          "data_maxItems": 1,
+          "data_source": "isa_samples_lookup",
+          "option_values": []
+        }
+      ]
+    },
+    {
+      "ref": "protocol_refs",
+      "callback": "get_ena_sequence_stages"
+    }
+  ]
+}

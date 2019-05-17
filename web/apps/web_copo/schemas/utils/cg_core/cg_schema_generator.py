@@ -18,7 +18,7 @@ class CgCoreSchemas:
         self.schemas_utils_paths = RESOLVER["cg_core_utils"]
         self.path_to_json = os.path.join(self.resource_path, 'cg_core.json')
         self.type_field_status_path = os.path.join(self.schemas_utils_paths, 'type_field_STATUS.csv')
-        self.map_type_subtype_path = os.path.join(self.schemas_utils_paths, 'mapTypeSubtype.csv')
+        self.map_type_subtype_path = os.path.join(self.schemas_utils_paths, 'cg_types.csv')
         self.copo_schema_spec_path = os.path.join(self.schemas_utils_paths, 'copo_schema.csv')
         self.cg_wizard_stages = os.path.join(self.schemas_utils_paths, 'cg_wizard_stages.csv')
 
@@ -63,9 +63,9 @@ class CgCoreSchemas:
 
         df = self.retrieve_schema_specs(self.type_field_status_path)
 
-        # filter valid types and subtypes
-        df['match_type_subtype_x'] = df['in cgc2 typelist'].astype(str) + df['in cgc2 subtypelist'].astype(str)
-        df = df[(df['match_type_subtype_x'] == '01') | (df['match_type_subtype_x'] == '10')]
+        # filter valid types and subtypes - no longer relevant
+        # df['match_type_subtype_x'] = df['in cgc2 typelist'].astype(str) + df['in cgc2 subtypelist'].astype(str)
+        # df = df[(df['match_type_subtype_x'] == '01') | (df['match_type_subtype_x'] == '10')]
 
         # substitute value
         # df = df.replace('required if applicable', 'required')
@@ -133,19 +133,6 @@ class CgCoreSchemas:
 
         return schemas_df
 
-    def get_type_subtype_map(self):
-        """
-        function returns type-subtype mapping
-        :return:
-        """
-
-        path_to_spec = self.map_type_subtype_path
-        df = pd.read_csv(path_to_spec)
-
-        df = df[['type collection character', 'type', 'subtype', 'remark']]
-
-        return df
-
     def get_constraint_ranking(self):
         return {
             'required': 1,
@@ -154,15 +141,18 @@ class CgCoreSchemas:
             'optional': 4
         }
 
-    def get_required_types(self, type_class):
+    def get_cg_subtypes(self, type_name):
         """
-        function returns items matching required type_class
-        :param type_class:
+        function returns relevant subtypes for a type
+        :param type_name:
         :return:
         """
 
-        type_map_df = self.get_type_subtype_map()
-        df = type_map_df[type_map_df['type collection character'] == type_class]
+        df = pd.read_csv(self.map_type_subtype_path)
+        df = df[['Type', 'Subtype']]
+        df = df[df.Type.str.strip().str.lower() == type_name.lower()]
+        df = df[['Subtype']]
+        df.columns = ['type']
 
         all_types_index = self.get_type_field_matrix().index
 
@@ -177,56 +167,30 @@ class CgCoreSchemas:
 
         return qualified_types
 
-    def get_required_subtype(self, type_class, type_name):
+    def get_cg_types(self):
         """
-        function returns items matching required type_class and type
-        :param type_class:
-        :param type_name:
+        function returns all types
         :return:
         """
 
-        qualified_types = list()
-
-        type_map_df = self.get_type_subtype_map()
-
-        df = type_map_df[type_map_df['type collection character'] == type_class]
-
-        # filter by type
-        df = df[df['type'].str.strip().str.lower() == type_name.strip().lower()]
+        df = pd.read_csv(self.map_type_subtype_path)
+        df = df[['Information product type', 'Cgcore_field']]
+        df = df[df.Cgcore_field.str.strip().str.lower() == "dc.type"]
+        df = df[['Information product type']]
+        df.columns = ['type']
 
         all_types_index = self.get_type_field_matrix().index
 
+        df_series = pd.Series(list(df['type'].str.strip().str.lower().dropna().unique()))
         all_types_series = pd.Series(all_types_index.str.strip().str.lower())
-        subtypes = list(df['subtype'].str.strip().str.lower().dropna().unique())
 
-        if subtypes:
-            df_series = pd.Series(subtypes)
-            qualified_types = list(df_series[df_series.isin(all_types_series)])
-        else:
-            remarks = list(df['remark'].str.strip().str.lower().dropna().unique())
-            if remarks and remarks[0] == 'can contain any type or subtype':
-                qualified_types = list(all_types_series)
+        qualified_types = list(df_series[df_series.isin(all_types_series)])
 
         all_types_series = pd.Series(all_types_index)
+
         qualified_types = list(all_types_series[all_types_series.str.strip().str.lower().isin(qualified_types)])
 
         return qualified_types
-
-    def get_singular_types(self):
-        """
-        function returns relevant types for single item description
-        :return:
-        """
-
-        return self.get_required_types('as singular types')
-
-    def get_multiple_types(self):
-        """
-        function returns relevant types for multiple item description
-        :return:
-        """
-
-        return self.get_required_types('multiple item types')
 
     def extract_repo_fields(self, datafile_id=str(), repo=str()):
         """
@@ -334,23 +298,6 @@ class CgCoreSchemas:
 
         return dc_list
 
-    def get_singular_subtypes(self, type_name):
-        """
-        function returns relevant subtypes for type
-        :param type_name:
-        :return:
-        """
-
-        return self.get_required_subtype('as singular types', type_name)
-
-    def get_multiple_subtypes(self, type_name):
-        """
-        function returns relevant subtypes for type
-        :param type_name:
-        :return:
-        """
-
-        return self.get_required_subtype('multiple item types', type_name)
 
     def controls_mapping(self):
         """
