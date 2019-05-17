@@ -9,6 +9,8 @@ from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSc
 from urllib.parse import urljoin
 from web.apps.web_copo.schemas.utils.data_utils import get_base_url
 from urllib.parse import urljoin
+import unicodedata
+
 
 class CkanSubmit:
     host = None
@@ -172,18 +174,19 @@ class CkanSubmit:
 
     def _create_ckan_metadata(self, s):
         # get file
-
         out = dict()
-        out["name"] = str(uuid.uuid4())
+        out["name"] = str(uuid.uuid4()).encode('ascii', 'replace')
+
         out["state"] = "active"
         out["tags"] = []
         out["private"] = False
+
         out["author_email"] = "felix.shaw@tgac.ac.uk"
         out["maintainer_email"] = "felix.shaw@tgac.ac.uk"
 
         url = get_base_url()
         out["url"] = urljoin(url, 'copo/resolve/' + str(s["_id"]))
-
+        out["url"] = "hjkhkjhaj"
         extras = list()
 
         for item in s["meta"]["fields"]:
@@ -225,7 +228,7 @@ class CkanSubmit:
                 # add the submission_id to the dataverse metadata to allow backwards treversal from dataverse
                 url = get_base_url()
                 temp_id = urljoin(url, 'copo/resolve/' + str(s["_id"]))
-                extras.append({"key": "relation", "value": temp_id})
+                #extras.append({"key": "relation", "value": temp_id})
             elif item["dc"] == "notes":
                 # pass this as it will lead to a multiple key error
                 pass

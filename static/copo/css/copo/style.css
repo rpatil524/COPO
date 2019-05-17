@@ -1791,5 +1791,8 @@ div.shown span.side-help-trigger:before {
 .select2-search__field {
     width: 100% !important;
 }
-
+.wtHolder{
+    width: 100%;
+    overflow: scroll;
+}
 /*end select2 styling*/
