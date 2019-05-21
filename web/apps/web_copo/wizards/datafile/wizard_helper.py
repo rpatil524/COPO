@@ -1019,6 +1019,10 @@ class WizardHelper:
                 {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
                 {'name': 1, 'description.attributes': 1}))
 
+        # 
+        if not records:
+            return dict(columns=columns, rows=[])
+
         datafiles_df = pd.DataFrame(records)
         datafiles_df["DT_RowId"] = datafiles_df._id.astype(str)
         datafiles_df.DT_RowId = 'row_' + datafiles_df.DT_RowId

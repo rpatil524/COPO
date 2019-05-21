@@ -228,7 +228,7 @@ def generate_component_records(component=str(), profile_id=str(), label_key=str(
     # if label_key is not provided, we will assume the first element in the schema to be the label_key
 
     if not label_key:
-        label_key = schema[0]["id"].split(".")[-1]
+        label_key = schema[0]["id"].split(".")[-1] if schema else ''
 
     for record in da_object.get_all_records(**kwargs):
         option = dict(value=str(record["_id"]), label=record.get(label_key, "N/A"))

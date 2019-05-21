@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+#*********************************************************************************
+# before running this restore scripts run the following on the postgres db host: *
+# dropdb copo -U copo_user                                                       *
+# createdb copo -U copo_user                                                     *
+# Also, supply restore paths for both mongo and postgres                         *
+#*********************************************************************************
+
 
 # usage: file_env VAR [DEFAULT]
 #    ie: file_env 'XYZ_DB_PASSWORD' 'example'
@@ -34,16 +41,9 @@ file_env 'POSTGRES_PORT'
 file_env 'POSTGRES_SERVICE'
 file_env 'POSTGRES_PASSWORD'
 
-export TIMESTAMP=$(date +'%Y%m%d%H%M%S')
+echo "Restoring mongo \"$MONGO_DB\"..."
+# run mongo restore
+mongorestore --db ${MONGO_DB} -u copo_admin -p ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin -h ${MONGO_HOST}:${MONGO_PORT} --drop /backup/mongo/20190521030000/copo_mongo
 
-echo "Backing up mongo \"$MONGO_DB\"..."
-# remove old mongo backup
-find /backup/mongo/ -mtime +7  -exec rm -rf {} \;
-# run mongo backup
-mongodump --out /backup/mongo/${TIMESTAMP} --db ${MONGO_DB} -u copo_admin -p ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin -h ${MONGO_HOST}:${MONGO_PORT}
-
-echo "Backing up postgres \"$POSTGRES_DB\"..."
-# remove old postgres backup
-find /backup/postgres/ -mtime +7  -exec rm -rf {} \;
-# run postgres backup
-PGPASSWORD=${POSTGRES_PASSWORD} pg_dump -h ${POSTGRES_SERVICE} -p ${POSTGRES_PORT} -U ${POSTGRES_USER} ${POSTGRES_DB}  > /backup/postgres/${TIMESTAMP}.sql
+echo "Restoring postgres \"$POSTGRES_DB\"..."
+PGPASSWORD=${POSTGRES_PASSWORD} psql -h ${POSTGRES_SERVICE} -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_DB} < backup/postgres/20190521220228.sql
