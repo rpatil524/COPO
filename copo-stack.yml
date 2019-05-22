@@ -1,0 +1,275 @@
+version: '3.7'
+
+services:
+
+  # web service
+  copo-web:
+    image: copo/copo-web:demo 
+    volumes:
+      - web-data:/copo/media
+      - static-data:/copo/static
+      - logs-data:/copo/exceptions_and_logging/logs
+      - submission-data:/copo/submission/data
+    networks:
+      - copo-frontend-network
+      - copo-backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.web-service == true
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 6G
+        reservations:
+          cpus: '0.5'
+          memory: 5G
+    tty: true
+    secrets: &secrt
+      - copo_web_secret_key
+      - copo_postgres_user_password
+      - copo_mongo_user_password
+      - copo_mongo_initdb_root_password
+      - copo_google_secret_key
+      - copo_figshare_client_id_key
+      - copo_facebook_secret_key
+      - copo_twitter_secret_key
+      - copo_orcid_secret_key
+      - copo_figshare_client_secret_key
+      - copo_figshare_consumer_secret_key
+      - copo_webin_user
+      - copo_webin_user_password
+      - copo-project.crt
+      - copo-project.key
+    environment: &env
+      ENVIRONMENT_TYPE: prod
+      SECRET_KEY_FILE: /run/secrets/copo_web_secret_key
+      MEDIA_PATH: media/
+      DEBUG: 'false'
+      REDIS_HOST: copo-redis
+      REDIS_PORT: 6379
+      ASPERA_PLUGIN_DIRECTORY: aspera_linux_plugin
+      WEBIN_USER_FILE: /run/secrets/copo_webin_user
+      WEBIN_USER_PASSWORD_FILE: /run/secrets/copo_webin_user_password
+      ENA_SERVICE: https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/
+      MONGO_USER: copo_user
+      MONGO_USER_PASSWORD_FILE: /run/secrets/copo_mongo_user_password
+      MONGO_DB: copo_mongo
+      MONGO_HOST: copo-mongo
+      MONGO_PORT: 27017
+      MONGO_INITDB_ROOT_USERNAME: copo_admin
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/copo_mongo_initdb_root_password
+      MONGO_MAX_POOL_SIZE: 100
+      POSTGRES_DB: copo
+      POSTGRES_USER: copo_user
+      POSTGRES_PORT: 5432
+      POSTGRES_SERVICE: copo-postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/copo_postgres_user_password
+      ORCID_SECRET_FILE: /run/secrets/copo_orcid_secret_key
+      FIGSHARE_CONSUMER_SECRET_FILE: /run/secrets/copo_figshare_consumer_secret_key
+      FIGSHARE_CLIENT_ID_FILE: /run/secrets/copo_figshare_client_id_key
+      FIGSHARE_CLIENT_SECRET_FILE: /run/secrets/copo_figshare_client_secret_key
+      GOOGLE_SECRET_FILE: /run/secrets/copo_google_secret_key
+      TWITTER_SECRET_FILE: /run/secrets/copo_twitter_secret_key
+      FACEBOOK_SECRET_FILE: /run/secrets/copo_facebook_secret_key
+
+  # mongo service
+  copo-mongo:
+    image: copo/copo-mongo
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.mongo-service == true
+      resources:
+        limits:
+          cpus: '0.40'
+          memory: 5G
+        reservations:
+          cpus: '0.40'
+          memory: 5G
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    networks:
+     - copo-backend-network
+    user: mongodb
+    volumes:
+      - mongo-data:/data/db
+    environment: *env
+    secrets: *secrt
+
+  # postgres service
+  copo-postgres:
+    image: postgres:9.6
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.postgres-service == true
+      resources:
+        limits:
+          cpus: '0.40'
+          memory: 4G
+        reservations:
+          cpus: '0.40'
+          memory: 4G
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    networks:
+     - copo-backend-network
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment: *env
+    secrets: *secrt
+
+  # backup service
+  copo-backup:
+    image: copo/copo-backup
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+          - node.labels.backup-service == true
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 5G
+        reservations:
+          cpus: '0.30'
+          memory: 5G
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    networks:
+     - copo-backend-network
+    volumes:
+      - mongo-backup:/backup/mongo
+      - postgres-backup:/backup/postgres
+    environment: *env
+    secrets: *secrt
+    
+  # redis service
+  copo-redis:
+    image: library/redis
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.web-service == true
+      resources:
+        limits:
+          cpus: '0.20'
+          memory: 512M
+        reservations:
+          cpus: '0.20'
+          memory: 512M
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    networks:
+     - copo-frontend-network
+
+  # nginx service
+  copo-nginx:
+    image: copo/copo-nginx
+    volumes:
+      - static-data:/www/static
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.web-service == true
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 4G
+        reservations:
+          cpus: '0.30'
+          memory: 4G
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    networks:
+      - copo-frontend-network
+    ports:
+      - "80:80"
+      - "443:443"
+    environment: *env
+    secrets: *secrt
+
+# networks
+networks:
+  copo-frontend-network:
+  copo-backend-network:
+
+# volumes
+volumes:
+  mongo-data:
+    external: true
+  postgres-data:
+    external: true
+  logs-data:
+    external: true
+  mongo-backup:
+    external: true
+  postgres-backup:
+    external: true
+  static-data:
+    external: true
+  submission-data:
+    external: true
+  web-data:
+    external: true
+
+# secrets
+secrets:
+  copo_mongo_initdb_root_password:
+    external: true
+  copo_mongo_user_password:
+    external: true
+  copo_postgres_user_password:
+    external: true
+  copo_web_secret_key:
+    external: true
+  copo_orcid_secret_key:
+    external: true
+  copo_figshare_consumer_secret_key:
+    external: true
+  copo_figshare_client_id_key:
+    external: true
+  copo_figshare_client_secret_key:
+    external: true
+  copo_google_secret_key:
+    external: true
+  copo_twitter_secret_key:
+    external: true
+  copo_facebook_secret_key:
+    external: true
+  copo_webin_user:
+    external: true
+  copo_webin_user_password:
+    external: true
+  copo-project.crt:
+    external: true
+  copo-project.key:
+    external: true
+
+  

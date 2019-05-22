@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 
 #*********************************************************************************
-# before running this restore scripts run the following on the postgres db host: *
-# dropdb copo -U copo_user                                                       *
-# createdb copo -U copo_user                                                     *
-# Also, supply restore paths for both mongo and postgres                         *
+# Supply restore paths for both mongo and postgres                               *
 #*********************************************************************************
 
 
@@ -42,8 +39,23 @@ file_env 'POSTGRES_SERVICE'
 file_env 'POSTGRES_PASSWORD'
 
 echo "Restoring mongo \"$MONGO_DB\"..."
-# run mongo restore
-mongorestore --db ${MONGO_DB} -u copo_admin -p ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin -h ${MONGO_HOST}:${MONGO_PORT} --drop /backup/mongo/20190521030000/copo_mongo
+
+# get most recent backup
+cd /backup/mongo/ || exit
+mongobkup=$(ls -t | head -n1)
+
+# do backup
+mongorestore --db ${MONGO_DB} -u copo_admin -p ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin -h ${MONGO_HOST}:${MONGO_PORT} --drop /backup/mongo/"$mongobkup"/copo_mongo
 
 echo "Restoring postgres \"$POSTGRES_DB\"..."
-PGPASSWORD=${POSTGRES_PASSWORD} psql -h ${POSTGRES_SERVICE} -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_DB} < backup/postgres/20190521220228.sql
+
+# get most recent backup
+cd /backup/postgres/ || exit
+pgbkup=$(ls -t | head -n1)
+
+# drop and re-create db
+PGPASSWORD=${POSTGRES_PASSWORD} dropdb -h ${POSTGRES_SERVICE} -p ${POSTGRES_PORT} -U ${POSTGRES_USER} ${POSTGRES_DB}
+PGPASSWORD=${POSTGRES_PASSWORD} createdb -h ${POSTGRES_SERVICE} -p ${POSTGRES_PORT} -U ${POSTGRES_USER} ${POSTGRES_DB}
+
+# do backup
+PGPASSWORD=${POSTGRES_PASSWORD} psql -h ${POSTGRES_SERVICE} -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_DB} < /backup/postgres/"$pgbkup"
