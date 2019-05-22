@@ -1103,9 +1103,23 @@ $(document).ready(function () {
             unbundle_datafiles(records);
         } else if (task == "discard") {
             do_undescribe_confirmation(records);
+        } else if (task == "annotate"){
+            do_begin_annotate(records);
         }
 
     } //end of func
+
+
+    function do_begin_annotate(records){
+        if(records.length != 1){
+            alert("You cannot annotate multiple spreadsheets at one.")
+            return false
+        }
+        else{
+            var file_id = records[0].split("_")
+            window.location.href = "/copo/annotate_meta/" + file_id[file_id.length -1] + "/view";
+        }
+    }
 
     function initiate_datafile_description(parameters) {
         $('[data-toggle="tooltip"]').tooltip('destroy');

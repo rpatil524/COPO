@@ -23,6 +23,7 @@ from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.decorators import user_is_staff
 import web.apps.web_copo.templatetags.html_tags as htags
 from dal.copo_da import DataFile
+import pandas
 
 LOGGER = settings.LOGGER
 
@@ -169,6 +170,12 @@ def copo_samples(request, profile_id):
     return render(request, 'copo/copo_sample.html', {'profile_id': profile_id, 'profile': profile})
 
 
+@login_required()
+def annotate_meta(request, file_id):
+
+    return render(request, 'copo/copo_annotate_spreadsheet.html', {'file_id': file_id})
+
+
 @login_required
 def copo_data(request, profile_id):
     request.session['datafile_url'] = request.path
@@ -182,6 +189,7 @@ def copo_data(request, profile_id):
 def copo_docs(request):
     context = dict()
     return render(request, 'copo/copo_docs.html', {'context': context})
+
 
 def resolve_submission_id(request, submission_id):
     sub = Submission().get_record(submission_id)

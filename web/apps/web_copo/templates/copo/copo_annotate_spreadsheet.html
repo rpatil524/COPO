@@ -1,0 +1,62 @@
+{% extends 'copo/base_2col.html' %}
+
+{% load staticfiles %}
+{% load web_tags %}
+{% load html_tags %}
+
+
+
+{% block content %}
+
+    <input type="hidden" id="file_id" val="{{ file_id }}"/>
+
+    <div id="ss_data"></div>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% block stylesheet_block %}
+    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
+
+    <link rel="stylesheet" href="{% static 'copo/handsontable7.0.3/handsontable.full.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/datafile.css' %}" xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_annotations.css' %}" xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_ontology_styles.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+{% endblock %}
+
+
+{% block js_block %}
+    <script type="text/javascript" src="{% static 'copo/js/copo_annotate_spreadsheet.js' %}"></script>
+    <script>
+
+
+        $(document).ready(function () {
+            $('.global-page-title').append('<span class="ajax_loading_div pull-right"><img style="display: inline" src="{% static 'copo/img/preload.gif' %}" class="ajax_loading_img"/> Saving ...</span>')
+        })
+
+    </script>
+
+
+    <!--<script type="text/javascript" src="{% static 'copo/js/generic_handlers.js' %}"></script>-->
+    <!--<script type="text/javascript" src="{% static 'copo/js/generic_handlers_ext2.js' %}"></script>-->
+    <!--<script type="text/javascript" src="{% static 'copo/js/copo_form_handlers.js' %}"></script>-->
+    <!--<script type="text/javascript" src="{% static 'copo/js/setup_annotator.js' %}"></script>-->
+    <script type="text/javascript" src="{% static 'copo/js/copo_annotations.js' %}"></script>
+    <script type="text/javascript" src="{% static 'copo/handsontable7.0.3/handsontable.full.js' %}"></script>
+    <script type="text/javascript" src="{% static 'copo/js/copo_ontology_functions.js' %}"></script>
+
+
+{% endblock %}
