@@ -9,8 +9,16 @@
 {% block content %}
 
     <input type="hidden" id="file_id" val="{{ file_id }}"/>
+    <ul class="nav nav-tabs" id="ss_sheets">
 
-    <div id="ss_data"></div>
+    </ul>
+
+    <div class="tab-content" id="ss_data">
+
+
+    </div>
+
+
 
 {% endblock %}
 
@@ -54,7 +62,7 @@
     <!--<script type="text/javascript" src="{% static 'copo/js/generic_handlers_ext2.js' %}"></script>-->
     <!--<script type="text/javascript" src="{% static 'copo/js/copo_form_handlers.js' %}"></script>-->
     <!--<script type="text/javascript" src="{% static 'copo/js/setup_annotator.js' %}"></script>-->
-    <script type="text/javascript" src="{% static 'copo/js/copo_annotations.js' %}"></script>
+    <!--<script type="text/javascript" src="{% static 'copo/js/copo_annotations.js' %}"></script>-->
     <script type="text/javascript" src="{% static 'copo/handsontable7.0.3/handsontable.full.js' %}"></script>
     <script type="text/javascript" src="{% static 'copo/js/copo_ontology_functions.js' %}"></script>
 
