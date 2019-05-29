@@ -265,14 +265,6 @@ def generate_table_columns(component=str()):
     detail_dict = dict(className='summary-details-control detail-hover-message', orderable=False, data=None,
                        title='', defaultContent='', width="5%")
 
-    if component == "datafile":
-        special_dict = dict(className='describe-status', orderable=False, data=None,
-                            title='', width="1%",
-                            defaultContent='<span title="Click for description info" data-desc="" style="cursor: '
-                                           'pointer;" class="metadata-rating uncertain">'
-                                           '<i class="fa fa-square" aria-hidden="true"></i></span>')
-        columns.insert(0, special_dict)
-
     columns.insert(0, detail_dict)
 
     # get indexed fields - only fields that are indexed can be ordered when using server-side processing
@@ -312,6 +304,10 @@ def generate_server_side_table_records(profile_id=str(), component=str(), reques
     records_total = da_object.get_collection_handle().count(
         {'profile_id': profile_id, 'deleted': data_utils.get_not_deleted_flag()})
 
+    records_total = da_object.get_collection_handle().count({"$and": [
+        {"profile_id": profile_id, 'deleted': data_utils.get_not_deleted_flag()},
+        {"description_token": {"$nin": ["5cd98d19c66a38035a6c2a17", "5cd98b98c66a38035a6c2a14"]}}]})
+
     # get and filter schema elements based on displayable columns
     schema = [x for x in da_object.get_schema().get("schema_dict") if x.get("show_in_table", True)]
 
@@ -330,9 +326,11 @@ def generate_server_side_table_records(profile_id=str(), component=str(), reques
     search_term = request.get('search[value]', '').strip()
 
     # retrieve and process records
+    filter_by = dict()
+    filter_by["description_token"] = {'$nin': ["5cd98d19c66a38035a6c2a17", "5cd98b98c66a38035a6c2a14"]}
     records = da_object.get_all_records_columns_server(sort_by=sort_by, sort_direction=sort_direction,
                                                        search_term=search_term, projection=dict(projection),
-                                                       limit=n_size, skip=start)
+                                                       limit=n_size, skip=start, filter_by=filter_by)
 
     records_filtered = records_total
 
@@ -427,10 +425,13 @@ def generate_table_records(profile_id=str(), component=str()):
 
         data_set = df.to_dict('records')
 
-    correct_repos = list()
+    return_dict = dict(dataSet=data_set,
+                       columns=columns
+                       )
+
     # do check for custom repos here
     if component == "submission":
-
+        correct_repos = list()
         user = ThreadLocal.get_current_user()
         repo_ids = user.userdetails.repo_submitter
         all_repos = Repository().get_by_ids(repo_ids)
@@ -443,10 +444,7 @@ def generate_table_records(profile_id=str(), component=str()):
         for repo in correct_repos:
             repo["_id"] = str(repo["_id"])
 
-    return_dict = dict(dataSet=data_set,
-                       columns=columns,
-                       repos=correct_repos
-                       )
+        return_dict["repos"] = correct_repos
 
     return return_dict
 

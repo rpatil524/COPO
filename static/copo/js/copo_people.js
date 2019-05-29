@@ -18,7 +18,7 @@ $(document).ready(function () {
     //instantiate/refresh tooltips
     refresh_tool_tips();
 
-    //trigger refresh of profiles list
+    //trigger refresh of table data
     $('body').on('refreshtable', function (event) {
         do_render_component_table(globalDataBuffer, componentMeta);
     });

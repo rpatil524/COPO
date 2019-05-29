@@ -610,24 +610,32 @@ class WizardHelper:
 
     def get_description_bundle(self):
         """
-        function returns description bundles
+        function returns datafiles in a description bundle
         :return:
         """
 
         data_set = list()
 
-        records = cursor_to_list(
-            DataFile().get_collection_handle().find(
-                {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
-                {'name': 1}))
+        # get and filter schema elements based on displayable columns
+        schema = [x for x in DataFile().get_schema().get("schema_dict") if x.get("show_in_table", True)]
 
-        if len(records):
+        # build db column projection
+        projection = [(x["id"].split(".")[-1], 1) for x in schema]
+        filter_by = dict(description_token=self.description_token)
+
+        records = DataFile().get_all_records_columns(projection=dict(projection), filter_by=filter_by)
+
+        if records:
             df = pd.DataFrame(records)
-            df['_id'] = df._id.astype(str)
-            df["DT_RowId"] = df._id
-            df["chk_box"] = ''
+            df['record_id'] = df._id.astype(str)
+            df["DT_RowId"] = df.record_id
             df.DT_RowId = 'row_' + df.DT_RowId
             df = df.drop('_id', axis='columns')
+
+            for x in schema:
+                x["id"] = x["id"].split(".")[-1]
+                df[x["id"]] = df[x["id"]].apply(htags.resolve_control_output_apply, args=(x,)).astype(str)
+
             data_set = df.to_dict('records')
 
         return data_set
@@ -1533,7 +1541,7 @@ class WizardHelper:
 
     def get_description_records(self):
         """
-        function returns description records
+        function returns description bundles
         :return:
         """
 
@@ -1571,12 +1579,12 @@ class WizardHelper:
         name = description['name']
         created_on = htags.resolve_datetime_data(description['created_on'], dict())
 
-        attributes = description['attributes']
-        meta = description["meta"]
+        attributes = description.get('attributes', dict())
+        meta = description.get("meta", dict())
 
         # get rendered stages
-        rendered_stages_ref = meta["rendered_stages"]
-        rendered_stages = [x for x in description["stages"] if
+        rendered_stages_ref = meta.get("rendered_stages", list())
+        rendered_stages = [x for x in description.get("stages", list()) if
                            x['ref'] in rendered_stages_ref and x.get("is_metadata", True)]
 
         datafile_attributes = dict()
@@ -1591,13 +1599,15 @@ class WizardHelper:
                     datafile_attributes[item["id"]] = atrib_val
                     datafile_items.append(item)
 
-        resolved_element = htags.resolve_display_data(datafile_items, datafile_attributes)
-        target_repository = resolved_element['data_set']['target_repository___0___deposition_context']
-
         data_set = list()
+        target_repository = str()
 
-        for indx, col in enumerate(resolved_element['columns']):
-            data_set.append([indx, col['title'], resolved_element['data_set'][col['data']]])
+        if datafile_items:
+            resolved_element = htags.resolve_display_data(datafile_items, datafile_attributes)
+            target_repository = resolved_element['data_set']['target_repository___0___deposition_context']
+
+            for indx, col in enumerate(resolved_element['columns']):
+                data_set.append([indx, col['title'], resolved_element['data_set'][col['data']]])
 
         return dict(data_set=data_set, name=name, number_of_datafiles=number_of_datafiles, created_on=created_on,
                     target_repository=target_repository)

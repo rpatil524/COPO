@@ -236,6 +236,21 @@ class BrokerDA:
 
         return self.context
 
+    def create_description_bundle(self):
+        """
+        function creates a new description bundle
+        :return:
+        """
+
+        import uuid
+        name = "bundle-"+str(uuid.uuid1())
+
+        self.context["result"] = str(
+            Description().create_description(profile_id=self.profile_id, component=self.component, name=name)['_id'])
+
+        return self.context
+
+
 
 class BrokerVisuals:
     def __init__(self, **kwargs):

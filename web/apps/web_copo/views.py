@@ -183,6 +183,7 @@ def copo_docs(request):
     context = dict()
     return render(request, 'copo/copo_docs.html', {'context': context})
 
+
 def resolve_submission_id(request, submission_id):
     sub = Submission().get_record(submission_id)
     # get all file metadata
@@ -280,7 +281,8 @@ def copo_forms(request):
                      user_email=broker_da.do_user_email,
                      component_record=broker_da.do_component_record,
                      component_form_record=broker_da.component_form_record,
-                     sanitise_submissions=broker_da.do_sanitise_submissions
+                     sanitise_submissions=broker_da.do_sanitise_submissions,
+                     create_description_bundle=broker_da.create_description_bundle,
                      )
 
     if task in task_dict:

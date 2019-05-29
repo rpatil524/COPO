@@ -320,7 +320,7 @@ function do_render_server_side_table(componentMeta) {
         .each(function (value) {
             $(this)
                 .removeClass("btn btn-default")
-                .addClass('tiny ui basic button');
+                .addClass('tiny ui button');
         });
 
     place_task_buttons(componentMeta); //this will place custom buttons on the table for executing tasks on records
@@ -401,7 +401,7 @@ function do_render_server_side_table(componentMeta) {
         .on('click', 'td.summary-details-control', function (event) {
             event.preventDefault();
 
-            var event = jQuery.Event("posttablerefresh"); //individual compnents can trap and handle this event as they so wish
+            var event = jQuery.Event("posttablerefresh"); //individual components can trap and handle this event as they so wish
             $('body').trigger(event);
 
             var tr = $(this).closest('tr');

@@ -1958,9 +1958,10 @@ function get_profile_components() {
             colorClass: "data_color",
             color: "black",
             buttons: ["quick-tour-template"],
-            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help", "copo-sidebar-upload"],
+            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
             tableID: 'datafile_table',
-            recordActions: ["describe_record_multi", "unbundle_record_multi", "undescribe_record_multi"],
+            // recordActions: ["describe_record_multi", "unbundle_record_multi", "undescribe_record_multi"],
+            recordActions: [],
             visibleColumns: 3
         },
         {

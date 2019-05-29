@@ -1793,3 +1793,9 @@ div.shown span.side-help-trigger:before {
 }
 
 /*end select2 styling*/
+
+/*bundle styles*/
+
+.bundle-task {
+    font-size: 13px !important;
+}

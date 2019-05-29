@@ -336,6 +336,7 @@ function get_hash(id, tform) {
         html = '<h5><span class="hash_span label label-success">' + data.output_hash + '</span></h5>';
         $d.children('ul').append(html);
         $("input[value='" + id + "']").parent().next().children('.hash-image').hide();
+        $("input[value='" + data.file_id + "']").closest(".file_info").remove();
 
         do_render_component_table(data, get_component_meta("datafile"));
 

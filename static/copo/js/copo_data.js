@@ -41,17 +41,15 @@ $(document).ready(function () {
         }
     }
 
-    //load description bundles
-    load_description_bundles();
-
 
     //get component metadata
     var componentMeta = get_component_meta(component);
     componentMeta.table_columns = JSON.parse($("#table_columns").val());
+
     do_render_server_side_table(componentMeta);
 
-    //load records
-    //load_records(componentMeta);
+    //load description bundle
+    load_description_bundles();
 
 
     // handle/attach events to table buttons
@@ -66,7 +64,7 @@ $(document).ready(function () {
 
     //refresh metadata rating after table redraw
     $('body').on('posttablerefresh', function (event) {
-        refresh_inDescription_flag();
+        // //load description bundles
     });
 
     //details button hover
@@ -87,7 +85,7 @@ $(document).ready(function () {
     });
 
     //bundle list menu items tasks
-    $(document).on('click', '.dropdown-menu a', function (event) {
+    $(document).on('click', '.bundle-task', function (event) {
         event.preventDefault();
         dispatch_bundle_events($(this));
     });
@@ -106,10 +104,10 @@ $(document).ready(function () {
         show_bundle_details($(this), $(this).closest(".bundle-action-btn").attr("data-record"));
     });
 
-    //description bundle view
-    $(document).on("click", ".bundle-view", function (event) {
+    //create bundle
+    $(document).on("click", ".create-bundle-btn", function (event) {
         event.preventDefault();
-        do_view_description($(this).attr("data-target"));
+        create_description_bundle();
     });
 
     //description table data
@@ -272,7 +270,6 @@ $(document).ready(function () {
                                         elem.prop('disabled', false);
                                     }
                                     refresh_wizard(); //refresh wizard to account for the change
-                                    refresh_inDescription_flag();
                                     dialogRef.close();
                                 },
                                 error: function () {
@@ -612,10 +609,6 @@ $(document).ready(function () {
                 if (wizard_components.hasOwnProperty('description_label') && wizard_components.description_label.trim() != '') {
                     $("#datafile_description_panel_title").html(" - " + wizard_components.description_label);
                 }
-
-                //refresh description bundles display
-                load_description_bundles();
-                refresh_inDescription_flag();
 
             },
             error: function () {
@@ -2206,8 +2199,36 @@ $(document).ready(function () {
         });
     }
 
+    function create_description_bundle() {
+        $.ajax({
+            url: copoFormsURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'task': 'create_description_bundle',
+                'component': component,
+                'profile_id': $('#profile_id').val()
+            },
+            success: function (data) {
+                load_description_bundles();
+            },
+            error: function () {
+                alert("Couldn't create description bundle!");
+            }
+        });
+    }
+
     function load_description_bundles() {
+        $("#bundle-list-message").hide();
+        $("#new-bundle-message").hide();
+
+        var loader = $('<div class="copo-i-loader" style="margin-left: 40%;"></div>');
+        $("#cover-spin-bundle").html(loader);
+
         WebuiPopovers.hideAll();
+        var table = $('#' + componentMeta.tableID).DataTable();
 
         $.ajax({
             url: wizardURL,
@@ -2221,35 +2242,57 @@ $(document).ready(function () {
             },
             success: function (data) {
                 if (data.records.length > 0) {
+                    $("#bundle-list-message").show();
+
                     $(".desc-bundle-display-div").show();
-                    $(".desc-bundle-display-div").find(".desc-bundle-display-div-2").html('');
+                    // $(".desc-bundle-display-div").find(".desc-bundle-display-div-2").html('');
+
+                    var displayedBundle = [];
+                    $(".description-bundle-panel").each(function () {
+                        displayedBundle.push($(this).attr("id"));
+                    });
 
                     var dtd = data.records;
                     for (var i = 0; i < dtd.length; ++i) {
                         var Ddata = dtd[i];
 
-                        var actionBTN = $(".record-action-templates").find(".description_bundle_button").clone();
-                        actionBTN.removeClass("description_bundle_button");
-                        actionBTN.addClass("description-bundles-list");
-                        actionBTN.find(".bundle-name-i").append(Ddata.name);
-                        actionBTN.attr("data-record", Ddata.id);
-                        $(".desc-bundle-display-div").find(".desc-bundle-display-div-2").append(actionBTN);
+                        if(displayedBundle.indexOf(Ddata.id) > -1) {
+                            continue;
+                        }
+
+                        var panel = $(".record-action-templates").find(".dbundle-div").clone();
+                        panel.removeClass("dbundle-div");
+                        panel.addClass("description-bundle-panel");
+                        panel.attr("id", Ddata.id);
+                        panel.find(".pname").append("<span class=''>" + Ddata.name + "</span>");
+
+                        $(".desc-bundle-display-div").find(".desc-bundle-display-div-2").prepend(panel);
+
                     }
-                } else {
-                    $(".desc-bundle-display-div").find(".desc-bundle-display-div-2").html('');
-                    $(".desc-bundle-display-div").hide();
+                }
+
+                try {
+                    loader.remove();
+                } catch (err) {
                 }
             },
             error: function () {
+                try {
+                    loader.remove();
+                } catch (err) {
+                }
                 console.log("Couldn't complete request for description bundles");
             }
         });
     } //end of function
 
-    function view_bundle_metadata(description_token) {
-        //show description bundle
+    function view_bundle_metadata(description_token, viewPort) {
 
-        var tableID = 'bundle_metadata_view_tbl';
+        var loader = $('<div class="copo-i-loader" style="margin-left: 40%;"></div>');
+        viewPort.html(loader);
+
+
+        var tableID = 'bundle_metadata_view_tbl' + description_token;
         var tbl = $('<table/>',
             {
                 id: tableID,
@@ -2263,104 +2306,66 @@ $(document).ready(function () {
             "style": "margin-bottom: 20px;"
         });
         var table_div = $('<div/>').append(tbl);
-        var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader"></div>'));
 
-        var dialog = new BootstrapDialog({
-            type: BootstrapDialog.TYPE_PRIMARY,
-            size: BootstrapDialog.SIZE_NORMAL,
-            title: function () {
-                return $('<span>Bundle summary</span>');
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
             },
-            closable: false,
-            animate: true,
-            draggable: false,
-            onhide: function (dialogRef) {
-                //nothing to do for now
+            data: {
+                'request_action': 'get_description_bundle_details',
+                'description_token': description_token
             },
-            onshown: function (dialogRef) {
-                $.ajax({
-                    url: wizardURL,
-                    type: "POST",
-                    headers: {
-                        'X-CSRFToken': csrftoken
-                    },
-                    data: {
-                        'request_action': 'get_description_bundle_details',
-                        'description_token': description_token
-                    },
-                    success: function (data) {
-                        spinner_div.remove();
+            success: function (data) {
+                loader.remove();
 
-                        meta_div.append("<div class='webpop-content-div'><strong>Name:</strong> " + data.result.name + "</div>");
-                        meta_div.append("<div class='webpop-content-div'><strong>Files in bundle:</strong> " + data.result.number_of_datafiles + "</div>");
-                        meta_div.append("<div class='webpop-content-div'><strong>Metadata Template:</strong> " + data.result.target_repository + "</div>");
-                        meta_div.append("<div class='webpop-content-div'><strong>Modified:</strong> " + data.result.created_on + "</div>");
+                viewPort.append(meta_div).append(table_div);
 
-                        var dtd = data.result.data_set;
-                        var cols = [
-                            {title: "s/n", visible: false},
-                            {title: "Label"},
-                            {title: "Value"}
-                        ];
+                meta_div.append("<div class='webpop-content-div'><strong>Bundle Name:</strong> " + data.result.name + "</div>");
+                meta_div.append("<div class='webpop-content-div'><strong>No. of datafiles:</strong> " + data.result.number_of_datafiles + "</div>");
+                meta_div.append("<div class='webpop-content-div'><strong>Metadata Template:</strong> " + data.result.target_repository + "</div>");
+                meta_div.append("<div class='webpop-content-div'><strong>Last Modified:</strong> " + data.result.created_on + "</div>");
 
-                        var table = null;
+                var dtd = data.result.data_set;
+                var cols = [
+                    {title: "s/n", visible: false},
+                    {title: "Label"},
+                    {title: "Value"}
+                ];
 
-                        table = $('#' + tableID).DataTable({
-                            data: dtd,
-                            searchHighlight: true,
-                            "lengthChange": false,
-                            order: [
-                                [0, "asc"]
-                            ],
-                            scrollY: "300px",
-                            scrollX: true,
-                            scrollCollapse: true,
-                            paging: false,
-                            language: {
-                                // "info": " _START_ to _END_ of _TOTAL_ entries",
-                                // "search": " "
-                            },
-                            // select: {
-                            //     style: 'multi',
-                            //     selector: 'td:first-child'
-                            // },
-                            columns: cols,
-                            dom: 'lfit<"row">rp'
-                        });
+                var table = null;
 
-                        // $('#' + tableID + '_wrapper')
-                        //     .find(".dataTables_filter")
-                        //     .find("input")
-                        //     .removeClass("input-sm")
-                        //     .attr("placeholder", "Search bundle");
-
-                    },
-                    error: function () {
-                        alert("Couldn't display description bundle!");
-                        dialogRef.close();
-                    }
+                table = $('#' + tableID).DataTable({
+                    data: dtd,
+                    searchHighlight: true,
+                    "lengthChange": false,
+                    order: [
+                        [0, "asc"]
+                    ],
+                    scrollY: "300px",
+                    scrollX: true,
+                    scrollCollapse: true,
+                    paging: false,
+                    columns: cols,
+                    dom: 'lfit<"row">rp'
                 });
             },
-            buttons: [{
-                label: 'OK',
-                cssClass: 'tiny ui basic primary button',
-                action: function (dialogRef) {
-                    dialogRef.close();
-                }
-            }]
+            error: function () {
+                alert("Couldn't display description bundle!");
+                dialogRef.close();
+            }
         });
 
-
-        $dialogContent.append(meta_div).append(table_div).append(spinner_div);
-        dialog.realize();
-        dialog.setMessage($dialogContent);
-        dialog.open();
     } // end of function
 
-    function do_view_description(description_token) {
-        //show description bundle
+    function show_bundle_datafiles(description_token, viewPort) {
+        //show files in description bundle
 
-        var tableID = 'description_view_tbl';
+        var loader = $('<div class="copo-i-loader" style="margin-left: 40%;"></div>');
+        viewPort.html(loader);
+
+        var tableID = 'description_view_tbl' + description_token;
         var tbl = $('<table/>',
             {
                 id: tableID,
@@ -2369,94 +2374,145 @@ $(document).ready(function () {
                 width: "100%"
             });
 
-        var $dialogContent = $('<div/>');
         var table_div = $('<div/>').append(tbl);
-        var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader"></div>'));
 
-        var dialog = new BootstrapDialog({
-            type: BootstrapDialog.TYPE_PRIMARY,
-            size: BootstrapDialog.SIZE_NORMAL,
-            title: function () {
-                return $('<span>Bundle items</span>');
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
             },
-            closable: false,
-            animate: true,
-            draggable: false,
-            onhide: function (dialogRef) {
-                //nothing to do for now
+            data: {
+                'request_action': 'get_description_bundle',
+                'description_token': description_token
             },
-            onshown: function (dialogRef) {
-                $.ajax({
-                    url: wizardURL,
-                    type: "POST",
-                    headers: {
-                        'X-CSRFToken': csrftoken
+            success: function (data) {
+                loader.remove();
+
+                viewPort.append(table_div);
+
+                var dtd = data.result;
+                var cols = componentMeta.table_columns;
+
+                var table = null;
+
+                table = $('#' + tableID).DataTable({
+                    data: dtd,
+                    searchHighlight: true,
+                    "lengthChange": false,
+                    order: [
+                        [1, "asc"]
+                    ],
+                    scrollY: "300px",
+                    scrollX: true,
+                    scrollCollapse: true,
+                    paging: false,
+                    buttons: [
+                        'selectAll',
+                        'selectNone',
+                    ],
+                    language: {
+                        "info": " _START_ to _END_ of _TOTAL_ datafiles",
+                        "search": " ",
+                        buttons: {
+                            selectAll: "Select all",
+                            selectNone: "clear selection"
+                        }
                     },
-                    data: {
-                        'request_action': 'get_description_bundle',
-                        'description_token': description_token
+                    select: {
+                        style: 'multi',
+                        //selector: 'td:first-child'
                     },
-                    success: function (data) {
-                        spinner_div.remove();
-
-                        var dtd = data.result;
-                        var cols = [
-                            {title: "", className: 'select-checkbox', data: "chk_box", orderable: false},
-                            {title: "Datafiles", data: "name"}
-                        ];
-
-                        var table = null;
-
-                        table = $('#' + tableID).DataTable({
-                            data: dtd,
-                            searchHighlight: true,
-                            "lengthChange": false,
-                            order: [
-                                [1, "asc"]
-                            ],
-                            scrollY: "300px",
-                            scrollX: true,
-                            scrollCollapse: true,
-                            paging: false,
-                            language: {
-                                "info": " _START_ to _END_ of _TOTAL_ datafiles",
-                                "search": " "
-                            },
-                            select: {
-                                style: 'multi',
-                                selector: 'td:first-child'
-                            },
-                            columns: cols,
-                            dom: 'lfit<"row">rp'
-                        });
-
-                        $('#' + tableID + '_wrapper')
-                            .find(".dataTables_filter")
-                            .find("input")
-                            .removeClass("input-sm")
-                            .attr("placeholder", "Search bundle");
-
-                    },
-                    error: function () {
-                        alert("Couldn't display description bundle!");
-                        dialogRef.close();
-                    }
+                    columns: cols,
+                    dom: 'Blfit<"row">rp'
                 });
+
+                table
+                    .buttons()
+                    .nodes()
+                    .each(function (value) {
+                        $(this)
+                            .removeClass("btn btn-default")
+                            .addClass('tiny ui basic button');
+                    });
+
+                $('#' + tableID + '_wrapper')
+                    .find(".dataTables_filter")
+                    .find("input")
+                    .removeClass("input-sm")
+                    .attr("placeholder", "Search bundle");
+
+                //handle event for table details
+                $('#' + tableID + ' tbody')
+                    .off('click', 'td.summary-details-control')
+                    .on('click', 'td.summary-details-control', function (event) {
+                        event.preventDefault();
+
+                        var tr = $(this).closest('tr');
+                        var row = table.row(tr);
+                        tr.addClass('showing');
+
+                        if (row.child.isShown()) {
+                            // This row is already open - close it
+                            row.child('');
+                            row.child.hide();
+                            tr.removeClass('showing');
+                            tr.removeClass('shown');
+                        } else {
+                            $.ajax({
+                                url: copoVisualsURL,
+                                type: "POST",
+                                headers: {
+                                    'X-CSRFToken': csrftoken
+                                },
+                                data: {
+                                    'task': "attributes_display",
+                                    'component': componentMeta.component,
+                                    'target_id': row.data().record_id
+                                },
+                                success: function (data) {
+                                    if (data.component_attributes.columns) {
+                                        // expand row
+
+                                        var contentHtml = $('<table/>', {
+                                            // cellpadding: "5",
+                                            cellspacing: "0",
+                                            border: "0",
+                                            // style: "padding-left:50px;"
+                                        });
+
+                                        for (var i = 0; i < data.component_attributes.columns.length; ++i) {
+                                            var colVal = data.component_attributes.columns[i];
+
+                                            var colTR = $('<tr/>');
+                                            contentHtml.append(colTR);
+
+                                            colTR
+                                                .append($('<td/>').append(colVal.title))
+                                                .append($('<td/>').append(data.component_attributes.data_set[colVal.data]));
+
+                                        }
+
+                                        row.child($('<div></div>').append(contentHtml).html()).show();
+                                        tr.removeClass('showing');
+                                        tr.addClass('shown');
+                                    }
+                                },
+                                error: function () {
+                                    alert("Couldn't retrieve " + component + " attributes!");
+                                    return '';
+                                }
+                            });
+                        }
+                    });
+
             },
-            buttons: [{
-                label: 'OK',
-                cssClass: 'tiny ui basic primary button',
-                action: function (dialogRef) {
-                    dialogRef.close();
-                }
-            }]
+            error: function () {
+                alert("Couldn't display description bundle!");
+                dialogRef.close();
+            }
         });
 
-
-        $dialogContent.append(table_div).append(spinner_div);
-        dialog.realize();
-        dialog.setMessage($dialogContent);
-        dialog.open();
     } // end of function
 
 
@@ -2652,8 +2708,6 @@ $(document).ready(function () {
                                     'description_targets': JSON.stringify(records)
                                 },
                                 success: function (data) {
-                                    load_description_bundles();
-                                    refresh_inDescription_flag();
                                     table.rows().deselect(); //deselect all rows
                                     server_side_select[component] = [];
                                 },
@@ -2675,20 +2729,26 @@ $(document).ready(function () {
     }
 
     function dispatch_bundle_events(elem) {
-        var bundle_id = elem.closest(".description-bundles-list").attr("data-record")
-        var task = elem.attr("class");
+        var bundle_id = elem.closest(".description-bundle-panel").attr("id");
+        var viewPort = elem.closest(".description-bundle-panel").find(".pbody");
+
+        elem.closest(".description-bundle-panel").find(".bundle-task").removeClass("active");
+        elem.addClass("active");
+        var task = elem.data("task");
+        viewPort.html('');
+
 
         if (task == "delete-bundle") {
-            delete_description_record(bundle_id, elem);
+            //delete_description_record(bundle_id, elem);
         } else if (task == "reload-bundle") {
-            initiate_datafile_description({'description_token': bundle_id});
-        } else if (task == "metadata-bundle") {
-            view_bundle_metadata(bundle_id);
-        } else if (task == "files-in-bundle") {
-            do_view_description(bundle_id);
+            //initiate_datafile_description({'description_token': bundle_id});
+        } else if (task == "metadata") {
+            view_bundle_metadata(bundle_id, viewPort);
+        } else if (task == "datafiles") {
+            show_bundle_datafiles(bundle_id, viewPort);
         } else if (task == "submit-in-bundle") {
             //todo: validate bundle first, then call finalise_description to initiate submission
-            finalise_description(bundle_id, false);
+            //finalise_description(bundle_id, false);
         }
     }
 
@@ -2768,8 +2828,6 @@ $(document).ready(function () {
                             },
                             success: function (data) {
                                 if (data.result.hasOwnProperty("status") && data.result.status == "success") {
-                                    load_description_bundles();
-                                    refresh_inDescription_flag();
                                     dialogRef.close();
 
                                 } else if (data.result.hasOwnProperty("status") && data.result.status == "error") {

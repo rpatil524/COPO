@@ -226,6 +226,29 @@
                    "(3) 'all' - always true, and none dependent of row selections e.g., add button",
     -->
     <div class="record-action-templates">
+        <div class="dbundle-div" style="margin-bottom: 20px;">
+            <div class="ui two top attached buttons">
+                <div class="five ui buttons">
+                    <button data-task="datafiles" class="ui button bundle-task">Datafiles</button>
+                    <button data-task="describe" class="ui button bundle-task">Describe</button>
+                    <button data-task="metadata" class="ui button bundle-task">Metadata</button>
+                    <button data-task="submit" class="ui button bundle-task">Submit</button>
+                    <button data-task="delete" class="ui button bundle-task">Delete</button>
+                </div>
+            </div>
+            <div class="ui one bottom attached buttons">
+                <div class="ui primary button pname" style="font-size: 14px; background: rgba(221, 225, 231, 0.3); color: #264d73; border: 1px solid rgb(209, 209, 209);"></div>
+            </div>
+            <div class="ui attached segment pbody" style="font-size: inherit;">
+                <p></p>
+            </div>
+            <div class="ui two bottom attached buttons">
+                <div class="ui button pstatus">Status</div>
+            </div>
+            <hr/>
+        </div>
+
+
         <div class="add_record_all tiny ui basic dtables-dbuttons  blue button copo-dt"
              data-toggle="tooltip"
              data-container="body"
@@ -548,34 +571,34 @@
                     <div class="col-sm-12 col-md-12 col-lg-12">
                         <div class="panel panel-dtables">
                             <div class="panel-body collapse in" id="copo_data_upload_tab">
-                                <div style="display: inline-block; text-indent: 0.5em; margin-top: 15px;">
-                                    <form enctype="multipart/form-data" id="upload_0" method="POST"
-                                          action="/rest/receive_data_file_chunked/"
-                                          style="margin-right:40px">
-                                        {% csrf_token %}
-                                        <span data-copo-tour-id="copo_data_upload_file_button"
-                                              id="upload_files_button"
-                                              class="tiny ui basic teal button fileinput-button"
-                                              style="background-image: none; border-color:transparent;">
-                                                <span>Select files...</span>
-                                                <input type="file" name="file"
-                                                       onchange="get_chunk_size(event)" multiple/>
-                                                <input type="hidden" name="upload_id" value=""/>
-                                                <input type="hidden" name="panel_ordering"
-                                                       value="0"/>
-                                                <input type="hidden" name="exp_id" value=""/>
-                                        </span>
-                                    </form>
-                                    <div class="CyVerse Files"><br/><br/>
-                                        <a id="cyverse_files_link" href="{% url 'copo:agave_oauth' %}">Click to View
-                                            Files in CyVerse</a>
-                                        <!--<a target="_blank" href="https://agave.iplantc.org/oauth2/authorize?response_type=code&client_id=KOm9gFBPVwq6sfCMgumZRJG5j8wa&redirect_uri=http://127.0.0.1:8000/copo/agave_oauth" class="get_files">Click to View Files in CyVerse</a>-->
-                                    </div>
-
-                                    <div id="file_tree" style="visibility:hidden"></div>
-
-                                    <div class="file_status_label" style="margin-top: 8px;"></div>
-                                </div>
+                                {#                                <div style="display: inline-block; text-indent: 0.5em; margin-top: 15px;">#}
+                                {#                                    <form enctype="multipart/form-data" id="upload_0" method="POST"#}
+                                {#                                          action="/rest/receive_data_file_chunked/"#}
+                                {#                                          style="margin-right:40px">#}
+                                {#                                        {% csrf_token %}#}
+                                {#                                        <span data-copo-tour-id="copo_data_upload_file_button"#}
+                                {#                                              id="upload_files_button"#}
+                                {#                                              class="tiny ui basic teal button fileinput-button"#}
+                                {#                                              style="background-image: none; border-color:transparent;">#}
+                                {#                                                <span>Select files...</span>#}
+                                {#                                                <input type="file" name="file"#}
+                                {#                                                       onchange="get_chunk_size(event)" multiple/>#}
+                                {#                                                <input type="hidden" name="upload_id" value=""/>#}
+                                {#                                                <input type="hidden" name="panel_ordering"#}
+                                {#                                                       value="0"/>#}
+                                {#                                                <input type="hidden" name="exp_id" value=""/>#}
+                                {#                                        </span>#}
+                                {#                                    </form>#}
+                                {#                                    <div class="CyVerse Files"><br/><br/>#}
+                                {#                                        <a id="cyverse_files_link" href="{% url 'copo:agave_oauth' %}">Click to View#}
+                                {#                                            Files in CyVerse</a>#}
+                                {#                                        <!--<a target="_blank" href="https://agave.iplantc.org/oauth2/authorize?response_type=code&client_id=KOm9gFBPVwq6sfCMgumZRJG5j8wa&redirect_uri=http://127.0.0.1:8000/copo/agave_oauth" class="get_files">Click to View Files in CyVerse</a>-->#}
+                                {#                                    </div>#}
+                                {##}
+                                {#                                    <div id="file_tree" style="visibility:hidden"></div>#}
+                                {##}
+                                {#                                    <div class="file_status_label" style="margin-top: 8px;"></div>#}
+                                {#                                </div>#}
                             </div>
                         </div>
                     </div>
