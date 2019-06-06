@@ -1,4 +1,4 @@
-{% extends 'copo/base_2col.html' %}
+{% extends 'copo/base_1col.html' %}
 
 {% load staticfiles %}
 {% load web_tags %}
@@ -8,20 +8,52 @@
 
 {% block content %}
 
-    <input type="hidden" id="file_id" val="{{ file_id }}"/>
-    <ul class="nav nav-tabs" id="ss_sheets">
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <input type="hidden" id="file_id" val="{{ file_id }}"/>
+            <ul class="nav nav-tabs" id="ss_sheets">
+                <!-- sheet tabs are appended here in JS -->
+            </ul>
+            <div class="tab-content" id="ss_data"  >
+                <!-- sheet data are appended here in JS -->
+            </div>
+            <hr/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4 col-md-4 col-lg-4" style="border:1px solid black; min-height: 300px">
+            <!-- search controls go here -->
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12" style="border:1px solid black; min-height: 150px">
+                    <form>
+                        <div class="form-group">
+                            <label for="search_term">Search Term</label>
+                            <input type="text" class="form-control" id="search_term_text_box"
+                                   aria-describedby="term_help" placeholder="Search">
+                            <small id="term_help" class="form-text text-muted">Start typing to find matching ontology terms
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12" style="border:1px solid black; min-height: 300px"></div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-4 col-lg-4" style="border:1px solid black;background-color: #f9f9f9; ">
+            <label for="search_results">Search Results <small class="text-muted">Drag Term to Column</small></label>
+            <!-- search results go here -->
+            <div id="search_results" style="overflow-y: scroll">
 
-    </ul>
-
-    <div class="tab-content" id="ss_data">
-
-
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-4 col-lg-4" id="filters" style="border:1px solid black;">
+            <!-- element filters go here -->
+        </div>
     </div>
 
 
-
 {% endblock %}
-
 
 
 
@@ -51,9 +83,9 @@
     <script>
 
 
-        $(document).ready(function () {
-            $('.global-page-title').append('<span class="ajax_loading_div pull-right"><img style="display: inline" src="{% static 'copo/img/preload.gif' %}" class="ajax_loading_img"/> Saving ...</span>')
-        })
+        //$(document).ready(function () {
+        //    $('.global-page-title').append('<span class="ajax_loading_div pull-right"><img style="display: inline" src="{% static 'copo/img/preload.gif' %}" class="ajax_loading_img"/> Saving ...</span>')
+        //})
 
     </script>
 

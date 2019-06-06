@@ -15,10 +15,10 @@ def refresh_display(request):
     x1 = pandas.ExcelFile(path)
     sheet_names = x1.sheet_names
     for name in sheet_names:
-        d = pandas.read_excel(path, name)
+        d = pandas.read_excel(path, name).fillna(0)
         out = list()
         out.append(d.columns.tolist())
-        out.extend(d.values.tolist())
+        out.extend(d.values[0:5].tolist())
 
         data.append(out)
     return HttpResponse(json.dumps({"data": data, "names": sheet_names}))

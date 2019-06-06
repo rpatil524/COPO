@@ -1,0 +1,32 @@
+#ss_sheets{
+    margin-bottom: 10px;
+    overflow-x: auto;
+}
+#ss_data{
+    min-height:160px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#search_results{
+    height:451px;
+    padding: 5px;
+
+}
+#filters{
+    min-height:451px;
+}
+
+.annotation_term{
+    min-height: 50px;
+    margin-top: 10px;
+    padding: 5px;
+    width: 90%;
+    z-index: 9999;
+}
+.highlight{
+    margin-bottom: 20px
+}
+.annotation_term .ontology_name{
+
+}

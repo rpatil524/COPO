@@ -8,10 +8,10 @@ $(document).ready(function () {
 
     $(document).on('click', '#ontology_dropdown_filter li', handle_ontology_filter_click)
 
-    $.ajaxStart(function(){
+    $(document).ajaxStart(function(){
         $('#annotation_loader').css('visibility', 'visible')
     })
-    $.ajaxStop(function(){
+    $(document).ajaxStop(function(){
         $('#annotation_loader').css('visibility', 'hidden')
     })
 
