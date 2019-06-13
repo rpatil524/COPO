@@ -20,7 +20,6 @@ from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSc
 from web.apps.web_copo.models import UserDetails
 from django.db.models import Q
 
-
 PubCollection = 'PublicationCollection'
 PersonCollection = 'PersonCollection'
 DataCollection = 'DataCollection'
@@ -87,7 +86,11 @@ class DAComponent:
         self.profile_id = profile_id
         self.component = component
 
-    def get_record(self, oid):
+    def get_record(self, oid) -> object:
+        """
+
+        :rtype: object
+        """
         doc = None
         if self.get_collection_handle():
             doc = self.get_collection_handle().find_one({"_id": ObjectId(oid)})
@@ -744,6 +747,22 @@ class DataFile(DAComponent):
             # now update datafile record
             self.get_collection_handle().update({'_id': ObjectId(target_id)},
                                                 {'$set': {'description.stages': df['description']['stages']}})
+
+    def update_file_level_metadata(self, file_id, data):
+        self.get_collection_handle().update({"_id": ObjectId(file_id)}, {"$push": {"file_level_annotation": data}})
+        return self.get_file_level_metadata_for_sheet(file_id, data["sheet_name"])
+
+    def get_file_level_metadata_for_sheet(self, file_id, sheetname):
+        docs = self.get_collection_handle().find({"_id": ObjectId(file_id)},
+                                                 {"file_level_annotation": {"$elemMatch": {"sheet_name": sheetname}}}, )
+        docs = self.get_collection_handle().aggregate(
+            [
+                {"$match": {"_id": ObjectId(file_id)}},
+                {"$unwind": "$file_level_annotation"},
+                {"$project": {"file_level_annotation": 1, "_id": 0}},
+                {"$sort": {"file_level_annotation.column_idx": 1}}
+            ])
+        return cursor_to_list(docs)
 
 
 class Profile(DAComponent):

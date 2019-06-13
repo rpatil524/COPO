@@ -22,11 +22,20 @@
     margin-top: 10px;
     padding: 5px;
     width: 90%;
-    z-index: 9999;
+
 }
 .highlight{
     margin-bottom: 20px
 }
 .annotation_term .ontology_name{
+
+}
+
+.dropHover{
+    color:red;
+}
+
+.selectedColumn{
+    background-color: #d0e3eb !important;
 
 }

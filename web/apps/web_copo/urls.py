@@ -93,4 +93,8 @@ urlpatterns = [path('', views.index, name='index'),
                     name="delete_repo_entry"),
                path('refresh_annotation_display/', annotation_handlers.refresh_display,
                     name="refresh_annotation_display"),
+               path('send_file_annotation/', annotation_handlers.send_file_annotation,
+                    name="send_file_annotation"),
+               path('refresh_annotations/', annotation_handlers.refresh_annotations,
+                    name="refresh_annotations"),
                ]
