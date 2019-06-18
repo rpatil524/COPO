@@ -16,6 +16,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 import pandas as pd
 import pymongo.errors as pymongo_errors
+import pymongo
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 from web.apps.web_copo.models import UserDetails
 from django.db.models import Q
@@ -246,6 +247,28 @@ class Annotation(DAComponent):
     def __init__(self, profile_id=None):
         super(Annotation, self).__init__(profile_id, "annotation")
 
+    def add_or_increment_term(self, data):
+        # check if annotation is already present
+        a = self.get_collection_handle().find_one({"uid": data["uid"], "iri": data["iri"], "sheet_name": data["sheet_name"], "label": data["label"]})
+        if a:
+            # increment
+            return self.get_collection_handle().update({"_id": a["_id"]}, {"$inc":{"count": 1}})
+        else:
+            data["count"] = 1
+            return self.get_collection_handle().insert(data)
+
+
+
+    def get_terms_for_user_alphabetical(self, uid):
+        a = self.get_collection_handle().find({"uid": uid}).sort("label", pymongo.ASCENDING)
+        return cursor_to_list(a)
+
+    def get_terms_for_user_ranked(self, data):
+        pass
+
+    def get_terms_for_user_by_dataset(self, data):
+        pass
+    '''
     def get_annotations_for_page(self, document_id):
         doc = self.get_collection_handle().find_one(
             {"_id": ObjectId(document_id)},
@@ -295,6 +318,7 @@ class Annotation(DAComponent):
     def get_annotation_by_name(self, doc_name, uid):
         return self.get_collection_handle().find_one({'document_name': {'$regex': "^" + doc_name}})
 
+    '''
 
 class Person(DAComponent):
     def __init__(self, profile_id=None):
@@ -763,6 +787,12 @@ class DataFile(DAComponent):
                 {"$sort": {"file_level_annotation.column_idx": 1}}
             ])
         return cursor_to_list(docs)
+
+    def delete_annotation(self, col_idx, sheet_name, file_id):
+        docs = self.get_collection_handle().update({"_id": ObjectId(file_id)},
+                                                   {"$pull": {"file_level_annotation": {"sheet_name": sheet_name,
+                                                                                        "column_idx": str(col_idx)}}})
+        return docs
 
 
 class Profile(DAComponent):

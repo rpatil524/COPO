@@ -13,7 +13,6 @@ $(document).ready(function () {
     $("#search_term_text_box").val("")
 
 
-
 })
 
 $(document).ajaxStart(function () {
@@ -29,14 +28,24 @@ function stopDrag(ev) {
 }
 
 function dropHandler(ev, ui) {
+    var data = new Object();
     var iri = $(ui.draggable.context).data("iri")
+    data.label = $(ui.draggable.context).data("label")
+    data.id = $(ui.draggable.context).data("id")
+    data.obo_id = $(ui.draggable.context).data("obo_id")
+    data.ontology_name = $(ui.draggable.context).data("ontology_name")
+    data.ontology_prefix = $(ui.draggable.context).data("ontology_prefix")
+    data.short_form = $(ui.draggable.context).data("short_form")
+    data.type = $(ui.draggable.context).data("type")
+    data.description = $(ui.draggable.context).data("description")
+
     // call backend to save term
     var col = $(ev.target).index();
     var name = $(ev.target).closest("div[name^='table']").attr("name")
     var hot = $(document).data(name)
     name = name.split("table_")[1]
     var col_header = hot.getDataAtCell(0, col)
-    var data = new Object();
+
     data.col_idx = col;
     data.sheet_name = name;
     data.col_header = col_header;
@@ -52,12 +61,13 @@ function dropHandler(ev, ui) {
         },
     }).done(function (d) {
         d = JSON.parse(d)
-        console.log(d)
+        refresh_display()
     }).error(function (d) {
         console.error("error: " + d)
     })
 }
 
+// this handler is called to indicate when a user has moused over a column
 function overHandler(ev, ui) {
 
     var pt = ui.offset
@@ -86,6 +96,7 @@ function delay(fn, ms) {
 }
 
 var lastValue = '';
+// this is the handler which is called 1 second after the user stops typing in the search box
 $(document).on("input propertychange", "#search_term_text_box", delay(function (e) {
     var val = $(e.currentTarget).val()
     $.ajax({
@@ -95,38 +106,10 @@ $(document).on("input propertychange", "#search_term_text_box", delay(function (
         var d = JSON.parse(data)
         $("#search_results").empty()
         d.response.docs.forEach(function (entry, idx) {
-
             if (idx == 0) {
-                console.log(entry)
             }
-            //console.log(d.highlighting[entry["id"]])
-            var v = d.highlighting[entry["id"]]["label_autosuggest"][0]
-            var result = $("<div/>", {
-                class: "annotation_term panel panel-default",
-                "data-iri": entry.iri
-            }).draggable({
-                helper: "clone",
-                containment: 'window',
-                opacity: 0.6,
-                start: startDrag,
-                stop: stopDrag
-            })
-            $(result).append($("<span/>", {
-                html: v,
-                class: "highlight"
-            }))
-            $(result).append($("<span/>", {
-                html: entry["ontology_prefix"],
-                class: "pull-right"
-            }))
-            if (entry.hasOwnProperty("description")) {
-                t = entry["description"][0]
-            } else {
-                t = "Description Unavailable"
-            }
-            $(result).append($("<div/>", {html: t}))
-            $("#search_results").append(result)
-
+            var p = build_result_panel(d, idx, entry)
+            $("#search_results").append(p)
         })
 
 
@@ -134,6 +117,53 @@ $(document).on("input propertychange", "#search_term_text_box", delay(function (
 
 
 }))
+
+function build_result_panel(d, idx, entry) {
+
+    var v
+    var desc
+    if (d.hasOwnProperty("highlighting")) {
+        v = d.highlighting[entry["id"]]["label_autosuggest"][0]
+        desc = entry["description"][0]
+    } else {
+        v = entry.label
+        desc = entry.description
+    }
+    var result = $("<div/>", {
+        class: "annotation_term panel panel-default",
+        "data-iri": entry.iri,
+        "data-label": entry.label,
+        "data-id": entry.id,
+        "data-obo_id": entry.obo_id,
+        "data-ontology_name": entry.ontology_name,
+        "data-ontology_prefix": entry.ontology_prefix,
+        "data-short_form": entry.short_form,
+        "data-type": entry.type,
+        "data-is_search_result": true
+    }).draggable({
+        helper: "clone",
+        containment: 'window',
+        opacity: 0.6,
+        start: startDrag,
+        stop: stopDrag
+    })
+    $(result).append($("<span/>", {
+        html: v,
+        class: "highlight"
+    }))
+    $(result).append($("<span/>", {
+        html: entry["ontology_prefix"],
+        class: "pull-right"
+    }))
+    if (entry.hasOwnProperty("description")) {
+        t = desc
+    } else {
+        t = "Description Unavailable"
+    }
+    $(result).data("description", t)
+    $(result).append($("<div/>", {html: t}))
+    return result
+}
 
 function refresh_display() {
     var file_id = $("#file_id").val()
@@ -176,7 +206,6 @@ function refresh_display() {
                 autoColumnSize: {useHeaders: true},
                 beforeOnCellMouseOver: function (evt, coords, td) {
                     evt.preventDefault()
-                    //console.log($(td).html())
                 }
             });
             hot.render()
@@ -198,22 +227,101 @@ function refresh_annotations() {
     var file_id = $("#file_id").val()
     $.ajax({
         url: "/copo/refresh_annotations/",
-        data: {"file_id": file_id,"sheet_name": sheet_name},
+        data: {"file_id": file_id, "sheet_name": sheet_name},
         type: "GET"
-    }).done(function(data){
+    }).done(function (data) {
         data = JSON.parse(data)
-        for(var d in data.annotations){
-            var result = $("<div/>", {
-                class: "panel panel-default",
-                "data-iri": data.annotations[d].file_level_annotation.iri,
-                text: data.annotations[d].file_level_annotation.iri
-            })
+        $("#existing_annotations").empty()
+        for (var d in data.annotations) {
+            var result = make_annotation_panel(data.annotations, d)
+
             $("#existing_annotations").append(result)
+            var sheet_name = $("div[name^='table']:visible").attr("name")
+            var hot = $(document).data(sheet_name)
+            for (var i = 0; i < hot.countRows(); i++) {
+                var cell = hot.getCell(i, data.annotations[d].file_level_annotation.column_idx)
+                $(cell).addClass("annotatedColumn");
+            }
         }
+    })
+    $.ajax({
+        url: "/copo/refresh_annotations_for_user/",
+        data: {"file_id": file_id, "sheet_name": sheet_name},
+        type: "GET",
+        dataType: "json"
+    }).done(function (d) {
+
+        $("#your_annotations").empty()
+        $(d.annotations_alpha).each(function (entry, idx) {
+            var result = build_result_panel(d, entry, idx)
+            $('#your_annotations').append(result)
+
+        })
     })
 
 }
 
+function make_annotation_panel(data, d) {
+    var obj
+    var do_delete = false
+    if (data[d].hasOwnProperty("file_level_annotation")) {
+        obj = data[d].file_level_annotation
+        do_delete = true
+    } else {
+        obj = data[d]
+    }
+    var result = $("<div/>", {
+        class: "panel panel-default annotation_term",
+        "data-iri": obj.iri,
+        "data-col_idx": obj.column_idx,
+        "data-is_search_result": false,
+    })
+    var content = $("<div></div>")
+    if (do_delete) {
+        $(content).append('<button type="button" ' +
+            'data-col_idx="' + obj.column_idx + '" ' +
+            'data-sheet_name="' + obj.sheet_name + '"' +
+            'class="btn pull-right btn-danger btn-sm delete_annotation" style="padding:5px" aria-label="Left Align"><span style="margin: 0" class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>')
+    }
+    $(content).append("<u style='" + "font-size: larger" + "'>" + obj.label + "</u><br/>")
+    $(content).append("<strong>" + obj.ontology_name + "</strong><br>")
+    $(content).append(obj.description)
+    $(result).append(content)
+    return result
+}
+
+$(document).on("mouseover", ".annotation_term", function (data) {
+    if ($(data.currentTarget).data("is_search_result") == false) {
+        var sheet_name = $("div[name^='table']:visible").attr("name")
+        var hot = $(document).data(sheet_name)
+        var col = $(data.currentTarget).data("col_idx")
+        $(".selectedAnnotation").removeClass("selectedAnnotation")
+        $(data.currentTarget).addClass("selectedAnnotation")
+        $(".selectedColumn").removeClass("selectedColumn")
+        for (var i = 0; i < hot.countRows(); i++) {
+            var cell = hot.getCell(i, col)
+            $(cell).addClass("selectedColumn");
+        }
+    }
+})
+$(document).on("mouseout", ".annotation_term", function (data) {
+    $(".selectedAnnotation").removeClass("selectedAnnotation")
+    $(".selectedColumn").removeClass("selectedColumn")
+})
+$(document).on("click", ".delete_annotation", function (ev) {
+    var col_idx = $(ev.currentTarget).data("col_idx")
+    var sheet_name = $(ev.currentTarget).data("sheet_name")
+    var file_id = $("#file_id").val()
+    $.ajax({
+        url: "/copo/delete_annotation",
+        type: "GET",
+        data: {"col_idx": col_idx, "sheet_name": sheet_name, "file_id": file_id}
+    }).done(function (data) {
+        refresh_display()
+    }).error(function (data) {
+        console.error(data)
+    })
+})
 
 function make_dropabble() {
     $("#ss_data tr td").droppable({

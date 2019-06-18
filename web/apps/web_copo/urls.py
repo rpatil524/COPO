@@ -97,4 +97,8 @@ urlpatterns = [path('', views.index, name='index'),
                     name="send_file_annotation"),
                path('refresh_annotations/', annotation_handlers.refresh_annotations,
                     name="refresh_annotations"),
+               path('delete_annotation/', annotation_handlers.delete_annotation,
+                    name="delete_annotation"),
+               path('refresh_annotations_for_user/', annotation_handlers.refresh_annotations_for_user,
+                    name="refresh_annotations_for_user"),
                ]

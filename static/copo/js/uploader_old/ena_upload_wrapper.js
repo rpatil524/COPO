@@ -6,6 +6,7 @@ var chunk_size = 0;
 var chunk_threshold = 100000000;
 
 function get_chunk_size(event) {
+    alert("hello")
     upload_size = event.currentTarget.files[0].size;
     if (upload_size < chunk_threshold) {
         chunk_size = 0;
@@ -18,7 +19,8 @@ function get_chunk_size(event) {
         );
     }
     else {
-        chunk_size >= chunk_threshold;
+        //chunk_size >= chunk_threshold;
+        chunk_size = 10000000
         $(event.currentTarget).parent().parent().fileupload(
             'option',
             {

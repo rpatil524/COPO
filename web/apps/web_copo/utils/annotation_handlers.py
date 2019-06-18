@@ -1,7 +1,8 @@
-from dal.copo_da import DataFile
+from dal.copo_da import DataFile, Annotation
 import pandas
 from django.http import HttpResponse
 import json
+from bson import json_util
 
 # how many rows of each sheet should be shown to the user
 truncate_after = 5
@@ -20,14 +21,22 @@ def refresh_display(request):
         out.append(d.columns.tolist())
         out.extend(d.values[0:5].tolist())
         data.append(out)
-    return HttpResponse(json.dumps({"data": data, "names": sheet_names}))
+    return HttpResponse(json_util.dumps({"data": data, "names": sheet_names}))
 
 
 def refresh_annotations(request):
     file_id = request.GET["file_id"]
     sheet_name = request.GET["sheet_name"]
     annotations = DataFile().get_file_level_metadata_for_sheet(file_id, sheet_name)
-    return HttpResponse(json.dumps({"annotations": annotations}))
+    return HttpResponse(json_util.dumps({"annotations": annotations}))
+
+
+def refresh_annotations_for_user(request):
+    file_id = request.GET["file_id"]
+    sheet_name = request.GET["sheet_name"]
+    uid = request.user.id
+    annotations_alpha = Annotation().get_terms_for_user_alphabetical(uid)
+    return HttpResponse(json_util.dumps({"annotations_alpha": annotations_alpha}))
 
 
 def send_file_annotation(request):
@@ -35,8 +44,29 @@ def send_file_annotation(request):
     sheet_name = request.POST["sheet_name"]
     col_header = request.POST["col_header"]
     iri = request.POST["iri"]
+    label = request.POST["label"]
+    id = request.POST["id"]
+    obo_id = request.POST["obo_id"]
+    ontology_name = request.POST["ontology_name"]
+    ontology_prexfix = request.POST["ontology_prefix"]
+    short_form = request.POST["short_form"]
+    type = request.POST["type"]
     file_id = request.POST["file_id"]
-    print(col_idx + " " + sheet_name + " " + col_header + " " + iri + " " + file_id)
-    data = {"column_idx": col_idx, "column_header": col_header, "sheet_name": sheet_name, "iri": iri}
-    annotations = DataFile().update_file_level_metadata(file_id, data)
-    return HttpResponse(json.dumps({"d": "Hello World"}))
+    description = request.POST["description"]
+    data = {"column_idx": col_idx, "column_header": col_header, "sheet_name": sheet_name, "iri": iri,
+            "obo_id": obo_id, "label": label, "id": id, "ontology_name": ontology_name,
+            "ontology_prefix": ontology_prexfix,
+            "short_form": short_form, "type": type, "description": description, "uid": request.user.id}
+    if Annotation().add_or_increment_term(data):
+        annotations = DataFile().update_file_level_metadata(file_id, data)
+    else:
+        annotations = {"status": 500, "message": "Could not add annotation"}
+    return HttpResponse(json_util.dumps({"annotation": annotations}))
+
+
+def delete_annotation(request):
+    col_idx = request.GET["col_idx"]
+    sheet_name = request.GET["sheet_name"]
+    file_id = request.GET["file_id"]
+    doc = DataFile().delete_annotation(col_idx=col_idx, sheet_name=sheet_name, file_id=file_id)
+    return HttpResponse("Hello World")
