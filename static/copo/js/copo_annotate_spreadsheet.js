@@ -12,6 +12,7 @@ $(document).ready(function () {
     })
     $("#search_term_text_box").val("")
 
+    $(document).on("click", "#filters a", do_my_annotations)
 
 })
 
@@ -122,7 +123,8 @@ function build_result_panel(d, idx, entry) {
 
     var v
     var desc
-    if (d.hasOwnProperty("highlighting")) {
+    var used = d.hasOwnProperty("highlighting") == false
+    if (!used) {
         v = d.highlighting[entry["id"]]["label_autosuggest"][0]
         desc = entry["description"][0]
     } else {
@@ -152,9 +154,15 @@ function build_result_panel(d, idx, entry) {
         class: "highlight"
     }))
     $(result).append($("<span/>", {
-        html: entry["ontology_prefix"],
-        class: "pull-right"
+        html: " - <strong>" + entry["ontology_prefix"] + "</strong>",
+        class: ""
     }))
+    if(used){
+        $(result.append($("<span/>", {
+            html: "used: " + entry["count"],
+            class: "pull-right"
+        })))
+    }
     if (entry.hasOwnProperty("description")) {
         t = desc
     } else {
@@ -244,21 +252,38 @@ function refresh_annotations() {
             }
         }
     })
-    $.ajax({
+   do_my_annotations()
+
+}
+
+function do_my_annotations(event){
+    var filter = ""
+    if (event == undefined){
+        filter = "all"
+
+    }
+    else{
+        $(".label-primary").removeClass("label-primary")
+        $(event.currentTarget).addClass("label-primary")
+        filter = $(event.currentTarget).data("filter")
+    }
+
+    var file_id = $("#file_id").val()
+    var sheet_name = $("div[name^='table']:visible").attr("name").split("table_")[1]
+     $.ajax({
         url: "/copo/refresh_annotations_for_user/",
-        data: {"file_id": file_id, "sheet_name": sheet_name},
+        data: {"file_id": file_id, "sheet_name": sheet_name, "filter": filter},
         type: "GET",
         dataType: "json"
     }).done(function (d) {
 
         $("#your_annotations").empty()
-        $(d.annotations_alpha).each(function (entry, idx) {
+        $(d.annotations).each(function (entry, idx) {
             var result = build_result_panel(d, entry, idx)
             $('#your_annotations').append(result)
 
         })
     })
-
 }
 
 function make_annotation_panel(data, d) {
@@ -312,10 +337,11 @@ $(document).on("click", ".delete_annotation", function (ev) {
     var col_idx = $(ev.currentTarget).data("col_idx")
     var sheet_name = $(ev.currentTarget).data("sheet_name")
     var file_id = $("#file_id").val()
+    var label = $(ev.currentTarget).closest(".annotation_term").data("iri")
     $.ajax({
         url: "/copo/delete_annotation",
         type: "GET",
-        data: {"col_idx": col_idx, "sheet_name": sheet_name, "file_id": file_id}
+        data: {"col_idx": col_idx, "sheet_name": sheet_name, "file_id": file_id, "iri": label}
     }).done(function (data) {
         refresh_display()
     }).error(function (data) {

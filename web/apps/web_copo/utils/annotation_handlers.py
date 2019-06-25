@@ -34,9 +34,15 @@ def refresh_annotations(request):
 def refresh_annotations_for_user(request):
     file_id = request.GET["file_id"]
     sheet_name = request.GET["sheet_name"]
+    filter = request.GET["filter"]
     uid = request.user.id
-    annotations_alpha = Annotation().get_terms_for_user_alphabetical(uid)
-    return HttpResponse(json_util.dumps({"annotations_alpha": annotations_alpha}))
+    if filter == "all":
+        annotations = Annotation().get_terms_for_user_alphabetical(uid)
+    elif filter == "by_count":
+        annotations = Annotation().get_terms_for_user_ranked(uid)
+    elif filter == "by_dataset":
+        annotations = Annotation().get_terms_for_user_by_dataset(uid)
+    return HttpResponse(json_util.dumps({"annotations": annotations}))
 
 
 def send_file_annotation(request):
@@ -56,7 +62,7 @@ def send_file_annotation(request):
     data = {"column_idx": col_idx, "column_header": col_header, "sheet_name": sheet_name, "iri": iri,
             "obo_id": obo_id, "label": label, "id": id, "ontology_name": ontology_name,
             "ontology_prefix": ontology_prexfix,
-            "short_form": short_form, "type": type, "description": description, "uid": request.user.id}
+            "short_form": short_form, "type": type, "description": description, "uid": request.user.id, "file_id": file_id}
     if Annotation().add_or_increment_term(data):
         annotations = DataFile().update_file_level_metadata(file_id, data)
     else:
@@ -68,5 +74,10 @@ def delete_annotation(request):
     col_idx = request.GET["col_idx"]
     sheet_name = request.GET["sheet_name"]
     file_id = request.GET["file_id"]
+    iri = request.GET["iri"]
+    uid = request.user.id
+
+
+    doc = Annotation().decrement_or_delete_annotation(uid, iri)
     doc = DataFile().delete_annotation(col_idx=col_idx, sheet_name=sheet_name, file_id=file_id)
     return HttpResponse("Hello World")

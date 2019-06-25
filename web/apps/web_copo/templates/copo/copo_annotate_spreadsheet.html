@@ -11,6 +11,7 @@
     <div class="row">
         <div class="col-sm-12 col-md-12 col-lg-12">
             <input type="hidden" id="file_id" value="{{ file_id }}"/>
+            <p class="h4">{{ file_name }}</p>
             <ul class="nav nav-tabs" id="ss_sheets">
                 <!-- sheet tabs are appended here in JS -->
             </ul>
@@ -21,10 +22,10 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-4 col-md-4 col-lg-4" style="border:1px solid black; min-height: 300px">
+        <div class="col-sm-4 col-md-4 col-lg-4" style="min-height: 300px; border-right:1px dashed #286090;">
             <!-- search controls go here -->
             <div class="row">
-                <div class="col-sm-12 col-md-12 col-lg-12" style="border:1px solid black; min-height: 150px">
+                <div class="col-sm-12 col-md-12 col-lg-12" style="min-height: 150px">
                     <form>
                         <div class="form-group">
                             <p class="lead">Search Term</p>
@@ -48,18 +49,24 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-4 col-md-4 col-lg-4" style="border:1px solid black;background-color: #f9f9f9; ">
+        <div class="col-sm-4 col-md-4 col-lg-4" style="background-color: #f9f9f9; ">
 
-            <div class="col-sm-12 col-md-12 col-lg-12" style="border:1px solid black; min-height: 650px">
+            <div class="col-sm-12 col-md-12 col-lg-12" style="min-height: 650px">
                 <p class="lead">Annotations</p>
                 <div id="existing_annotations"></div>
             </div>
 
 
         </div>
-        <div class="col-sm-4 col-md-4 col-lg-4" id="filters" style="border:1px solid black; min-height: 650px">
+        <span class="col-sm-4 col-md-4 col-lg-4" id="filters" style=" border-left:1px dashed #286090; min-height: 650px">
             <!-- element filters go here -->
             <p class="lead">Your Annotations</p>
+            <span id="filters">
+                <a href="#" data-filter="all" class="label label-default label-primary">All Terms</a>
+                <a href="#" data-filter="by_count" class="label label-default">By Times Used</a>
+                <a href="#" data-filter="by_dataset" class="label label-default">By Dataset</a>
+            </span>
+            <hr/>
             <div id="your_annotations"></div>
         </div>
     </div>

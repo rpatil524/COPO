@@ -249,76 +249,41 @@ class Annotation(DAComponent):
 
     def add_or_increment_term(self, data):
         # check if annotation is already present
-        a = self.get_collection_handle().find_one({"uid": data["uid"], "iri": data["iri"], "sheet_name": data["sheet_name"], "label": data["label"]})
+        a = self.get_collection_handle().find_one({"uid": data["uid"], "iri": data["iri"], "label": data["label"]})
         if a:
             # increment
-            return self.get_collection_handle().update({"_id": a["_id"]}, {"$inc":{"count": 1}})
+            return self.get_collection_handle().update({"_id": a["_id"]}, {"$inc": {"count": 1}})
         else:
             data["count"] = 1
             return self.get_collection_handle().insert(data)
 
-
+    def decrement_or_delete_annotation(self, uid, iri):
+        a = self.get_collection_handle().find_one({"uid": uid, "iri": iri})
+        if a:
+            if a["count"] > 1:
+                # decrement
+                return self.get_collection_handle().update({"_id": a["_id"]}, {"$inc": {"count": -1}})
+            else:
+                return self.get_collection_handle().delete_one({"_id": a["_id"]})
+        else:
+            return False
 
     def get_terms_for_user_alphabetical(self, uid):
         a = self.get_collection_handle().find({"uid": uid}).sort("label", pymongo.ASCENDING)
         return cursor_to_list(a)
 
-    def get_terms_for_user_ranked(self, data):
-        pass
+    def get_terms_for_user_ranked(self, uid):
+        a = self.get_collection_handle().find({"uid": uid}).sort("count", pymongo.DESCENDING)
+        return cursor_to_list(a)
 
-    def get_terms_for_user_by_dataset(self, data):
-        pass
-    '''
-    def get_annotations_for_page(self, document_id):
-        doc = self.get_collection_handle().find_one(
-            {"_id": ObjectId(document_id)},
-        )
-        return doc
-
-    def update_annotation(self, document_id, annotation_id, fields, delete=False):
-        # first remove element
-        self.get_collection_handle().update(
-            {
-                'annotation._id': ObjectId(annotation_id)
-            },
-            {
-                '$pull':
-                    {'annotation':
-                         {'_id': ObjectId(annotation_id)}
-                     }
-            }
-        )
-        if delete == False:
-            # now add new element
-            fields['_id'] = annotation_id
-            self.get_collection_handle().update(
-                {
-                    '_id': ObjectId(document_id)
-                },
-                {
-                    '$push': {'annotation': fields}
-                }
-            )
-            return fields
-        return ''
-
-    def add_to_annotation(self, id, fields):
-        fields['_id'] = ObjectId()
-        self.get_collection_handle().update(
-            {'_id': ObjectId(id)},
-            {'$push':
-                 {'annotation': fields}
-             }
-        )
-        return fields
-
-    def annotation_exists(self, doc_name, uid):
-        return self.get_collection_handle().find({'document_name': {'$regex': "^" + doc_name}}).count() > 0
-
-    def get_annotation_by_name(self, doc_name, uid):
-        return self.get_collection_handle().find_one({'document_name': {'$regex': "^" + doc_name}})
-
-    '''
+    def get_terms_for_user_by_dataset(self, uid):
+        docs = self.get_collection_handle().aggregate(
+            [
+                {"$match": {"uid": uid}},
+                {"$group": {"_id": "$file_id", "annotations": {"$push": "$$ROOT"}}}
+            ])
+        data = cursor_to_list(docs)
+        return data
 
 class Person(DAComponent):
     def __init__(self, profile_id=None):
@@ -777,8 +742,7 @@ class DataFile(DAComponent):
         return self.get_file_level_metadata_for_sheet(file_id, data["sheet_name"])
 
     def get_file_level_metadata_for_sheet(self, file_id, sheetname):
-        docs = self.get_collection_handle().find({"_id": ObjectId(file_id)},
-                                                 {"file_level_annotation": {"$elemMatch": {"sheet_name": sheetname}}}, )
+
         docs = self.get_collection_handle().aggregate(
             [
                 {"$match": {"_id": ObjectId(file_id)}},
