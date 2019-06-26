@@ -52,6 +52,7 @@ function dropHandler(ev, ui) {
     data.col_header = col_header;
     data.iri = iri;
     data.file_id = $("#file_id").val()
+    data.file_name = $("#file_name").val()
     csrftoken = $.cookie('csrftoken');
     $.ajax({
         url: "/copo/send_file_annotation/",
@@ -157,7 +158,7 @@ function build_result_panel(d, idx, entry) {
         html: " - <strong>" + entry["ontology_prefix"] + "</strong>",
         class: ""
     }))
-    if(used){
+    if (used) {
         $(result.append($("<span/>", {
             html: "used: " + entry["count"],
             class: "pull-right"
@@ -252,38 +253,64 @@ function refresh_annotations() {
             }
         }
     })
-   do_my_annotations()
+    do_my_annotations()
 
 }
 
-function do_my_annotations(event){
-    var filter = ""
-    if (event == undefined){
-        filter = "all"
+var annotation_fiter = ""
 
-    }
-    else{
+function do_my_annotations(event) {
+
+    if (event == undefined) {
+        annotation_fiter = "all"
+
+    } else {
         $(".label-primary").removeClass("label-primary")
         $(event.currentTarget).addClass("label-primary")
-        filter = $(event.currentTarget).data("filter")
+        annotation_fiter = $(event.currentTarget).data("filter")
     }
 
     var file_id = $("#file_id").val()
     var sheet_name = $("div[name^='table']:visible").attr("name").split("table_")[1]
-     $.ajax({
+    $.ajax({
         url: "/copo/refresh_annotations_for_user/",
-        data: {"file_id": file_id, "sheet_name": sheet_name, "filter": filter},
+        data: {"file_id": file_id, "sheet_name": sheet_name, "filter": annotation_fiter},
         type: "GET",
         dataType: "json"
     }).done(function (d) {
 
         $("#your_annotations").empty()
-        $(d.annotations).each(function (entry, idx) {
-            var result = build_result_panel(d, entry, idx)
-            $('#your_annotations').append(result)
+        if (annotation_fiter != "by_dataset") {
+            $(d.annotations).each(function (idx, entry) {
+                var result = build_result_panel(d=d, idx=idx, entry=entry)
+                $('#your_annotations').append(result)
+            })
+        }
+        else {
+            var accordion = $('<div class="panel-group" id="by_dataset_accordion" role="tablist" aria-multiselectable="true"></div>')
+            $(d.annotations).each(function (idx, entry) {
+                var p1 = $('<div class="panel panel-default">')
+                var p_heading = $('<div class="panel-heading" role="tab" id="accordion_heading_' + idx + '">')
+                $(p_heading).append('<h4 class="panel-title">')
+                $(p_heading).append('<a role="button" class="collapsed" data-toggle="collapse" data-parent="#by_dataset_accordion" href="#collapse_' + idx + '" aria-expanded="true"' +
+                    'aria-controls="collapse_' + idx + '">' + entry.annotations[0].file_name + '</a>')
+                $(p1).append(p_heading)
 
-        })
+                var accordion_panel = $('<div id="collapse_' + idx + '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="accordion_heading_' + idx + '"><div class="panel-body">')
+
+                for (data in entry.annotations) {
+                    s = entry.annotations[data]
+                    var panel = build_result_panel(0, 0, s)
+                    $(accordion_panel).append(panel)
+                }
+                $(p1).append(accordion_panel)
+                $(accordion).append(p1)
+            })
+            $("#your_annotations").append(accordion)
+        }
+
     })
+
 }
 
 function make_annotation_panel(data, d) {

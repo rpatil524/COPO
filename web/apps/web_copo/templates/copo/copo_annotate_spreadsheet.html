@@ -11,6 +11,7 @@
     <div class="row">
         <div class="col-sm-12 col-md-12 col-lg-12">
             <input type="hidden" id="file_id" value="{{ file_id }}"/>
+            <input type="hidden" id="file_name" value="{{ file_name }}"/>
             <p class="h4">{{ file_name }}</p>
             <ul class="nav nav-tabs" id="ss_sheets">
                 <!-- sheet tabs are appended here in JS -->
@@ -21,8 +22,8 @@
             <hr/>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-4 col-md-4 col-lg-4" style="min-height: 300px; border-right:1px dashed #286090;">
+    <span class="row">
+    <div class="col-sm-4 col-md-4 col-lg-4" style="min-height: 300px; border-right:1px dashed #286090;">
             <!-- search controls go here -->
             <div class="row">
                 <div class="col-sm-12 col-md-12 col-lg-12" style="min-height: 150px">
@@ -49,7 +50,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-4 col-md-4 col-lg-4" style="background-color: #f9f9f9; ">
+    <div class="col-sm-4 col-md-4 col-lg-4" style="background-color: #f9f9f9; ">
 
             <div class="col-sm-12 col-md-12 col-lg-12" style="min-height: 650px">
                 <p class="lead">Annotations</p>
@@ -58,7 +59,7 @@
 
 
         </div>
-        <span class="col-sm-4 col-md-4 col-lg-4" id="filters" style=" border-left:1px dashed #286090; min-height: 650px">
+    <span class="col-sm-4 col-md-4 col-lg-4" id="filters" style=" border-left:1px dashed #286090; min-height: 650px">
             <!-- element filters go here -->
             <p class="lead">Your Annotations</p>
             <span id="filters">
@@ -66,9 +67,10 @@
                 <a href="#" data-filter="by_count" class="label label-default">By Times Used</a>
                 <a href="#" data-filter="by_dataset" class="label label-default">By Dataset</a>
             </span>
+
             <hr/>
             <div id="your_annotations"></div>
-        </div>
+        </span>
     </div>
 
 

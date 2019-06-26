@@ -58,11 +58,13 @@ def send_file_annotation(request):
     short_form = request.POST["short_form"]
     type = request.POST["type"]
     file_id = request.POST["file_id"]
+    file_name = request.POST["file_name"]
     description = request.POST["description"]
     data = {"column_idx": col_idx, "column_header": col_header, "sheet_name": sheet_name, "iri": iri,
             "obo_id": obo_id, "label": label, "id": id, "ontology_name": ontology_name,
             "ontology_prefix": ontology_prexfix,
-            "short_form": short_form, "type": type, "description": description, "uid": request.user.id, "file_id": file_id}
+            "short_form": short_form, "type": type, "description": description, "uid": request.user.id,
+            "file_id": file_id, "file_name": file_name}
     if Annotation().add_or_increment_term(data):
         annotations = DataFile().update_file_level_metadata(file_id, data)
     else:
@@ -76,7 +78,6 @@ def delete_annotation(request):
     file_id = request.GET["file_id"]
     iri = request.GET["iri"]
     uid = request.user.id
-
 
     doc = Annotation().decrement_or_delete_annotation(uid, iri)
     doc = DataFile().delete_annotation(col_idx=col_idx, sheet_name=sheet_name, file_id=file_id)
