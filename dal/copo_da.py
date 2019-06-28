@@ -747,6 +747,7 @@ class DataFile(DAComponent):
             [
                 {"$match": {"_id": ObjectId(file_id)}},
                 {"$unwind": "$file_level_annotation"},
+                {"$match": {"file_level_annotation.sheet_name": sheetname}},
                 {"$project": {"file_level_annotation": 1, "_id": 0}},
                 {"$sort": {"file_level_annotation.column_idx": 1}}
             ])

@@ -52,7 +52,7 @@ def send_file_annotation(request):
     iri = request.POST["iri"]
     label = request.POST["label"]
     id = request.POST["id"]
-    obo_id = request.POST["obo_id"]
+    obo_id = request.POST.get("obo_id", "")
     ontology_name = request.POST["ontology_name"]
     ontology_prexfix = request.POST["ontology_prefix"]
     short_form = request.POST["short_form"]

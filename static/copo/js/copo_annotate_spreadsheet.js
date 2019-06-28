@@ -4,6 +4,7 @@ $(document).ready(function () {
     refresh_display()
     //refresh_annotations()
     $(document).on("shown.bs.tab", ".hot_tab", function () {
+        $(document).data("selected_nav_tab", this)
         var id = this.innerText
         var hot = $(document).data("table_" + id)
         hot.render()
@@ -64,6 +65,8 @@ function dropHandler(ev, ui) {
     }).done(function (d) {
         d = JSON.parse(d)
         refresh_display()
+        var t = $(document).data("selected_nav_tab")
+        $(t).tab("show")
     }).error(function (d) {
         console.error("error: " + d)
     })
@@ -133,7 +136,7 @@ function build_result_panel(d, idx, entry) {
         desc = entry.description
     }
     var result = $("<div/>", {
-        class: "annotation_term panel panel-default",
+        class: "annotation_term panel panel-default align-middle",
         "data-iri": entry.iri,
         "data-label": entry.label,
         "data-id": entry.id,
@@ -226,8 +229,6 @@ function refresh_display() {
     }).error(function (data) {
         console.error(data)
     })
-
-
 }
 
 function refresh_annotations() {
@@ -291,18 +292,21 @@ function do_my_annotations(event) {
             $(d.annotations).each(function (idx, entry) {
                 var p1 = $('<div class="panel panel-default">')
                 var p_heading = $('<div class="panel-heading" role="tab" id="accordion_heading_' + idx + '">')
-                $(p_heading).append('<h4 class="panel-title">')
-                $(p_heading).append('<a role="button" class="collapsed" data-toggle="collapse" data-parent="#by_dataset_accordion" href="#collapse_' + idx + '" aria-expanded="true"' +
+
+                var h4 = $('<h4 class="panel-title"></h4>')
+                $(h4).append('<a role="button" data-toggle="collapse" data-parent="#by_dataset_accordion" href="#collapse_' + idx + '" aria-expanded="true"' +
                     'aria-controls="collapse_' + idx + '">' + entry.annotations[0].file_name + '</a>')
+                $(p_heading).append(h4)
                 $(p1).append(p_heading)
 
-                var accordion_panel = $('<div id="collapse_' + idx + '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="accordion_heading_' + idx + '"><div class="panel-body">')
-
+                var accordion_panel = $('<div id="collapse_' + idx + '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="accordion_heading_' + idx + '">')
+                var panel_body  = $('<div class="panel-body"></div>')
                 for (data in entry.annotations) {
                     s = entry.annotations[data]
                     var panel = build_result_panel(0, 0, s)
-                    $(accordion_panel).append(panel)
+                    $(panel_body).append(panel)
                 }
+                $(accordion_panel).append(panel_body)
                 $(p1).append(accordion_panel)
                 $(accordion).append(p1)
             })
