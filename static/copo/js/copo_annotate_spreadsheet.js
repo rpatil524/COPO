@@ -4,12 +4,15 @@ $(document).ready(function () {
     refresh_display()
     //refresh_annotations()
     $(document).on("shown.bs.tab", ".hot_tab", function () {
-        $(document).data("selected_nav_tab", this)
+
         var id = this.innerText
         var hot = $(document).data("table_" + id)
         hot.render()
         make_dropabble()
         refresh_annotations()
+    })
+    $(document).on("click", ".hot_tab", function(){
+        $(document).data("selected_nav_tab", $(this))
     })
     $("#search_term_text_box").val("")
 
@@ -20,6 +23,8 @@ $(document).ready(function () {
 $(document).ajaxStart(function () {
 
 })
+
+
 
 function startDrag(ev) {
 
@@ -65,8 +70,7 @@ function dropHandler(ev, ui) {
     }).done(function (d) {
         d = JSON.parse(d)
         refresh_display()
-        var t = $(document).data("selected_nav_tab")
-        $(t).tab("show")
+
     }).error(function (d) {
         console.error("error: " + d)
     })
@@ -201,7 +205,7 @@ function refresh_display() {
 
             $('#ss_sheets').append(li)
 
-            var h = $('<div name=' + id + ' class="tab-pane fade ' + active + '" id="' + id + '"></div>')
+            var h = $('<div name=' + id + ' role="tabpanel" class="tab-pane fade ' + active + '" id="' + id + '"></div>')
 
             $("#ss_data").append(h)
 
@@ -224,6 +228,7 @@ function refresh_display() {
             $(document).data(id, hot)
             make_dropabble()
             refresh_annotations()
+            console.log("refresh display")
         })
 
     }).error(function (data) {
@@ -254,6 +259,7 @@ function refresh_annotations() {
             }
         }
     })
+    console.log("refresh annotations")
     do_my_annotations()
 
 }
@@ -314,7 +320,9 @@ function do_my_annotations(event) {
         }
 
     })
-
+    //console.log($($(document).data("selected_nav_tab")).find("a").attr("href"))
+    //$($(document).data("selected_nav_tab")).find("a").tab("show")
+    console.log("my annotations")
 }
 
 function make_annotation_panel(data, d) {
