@@ -4,6 +4,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from jsonpickle import encode
+
 from submission.submissionDelegator import delegate_submission
 from api.handlers.general import *
 from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, CopoGroup, Repository
@@ -96,6 +97,8 @@ def authenticate_figshare(request):
 
 
 def test_dataverse_submit(request):
+    from submission import enareadSubmission
+    result = enareadSubmission.EnaReads(submission_id="5d1f635b373b6d6e2d04c52b").submit()
     # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
     # t = CgCoreSchemas.get_repo_mapping(repo="dataverse")
     # items = CgCoreSchemas().extract_repo_fields(datafile_id="5c8d7934e99f8100100e8c4e", repo="dataverse")
@@ -267,7 +270,8 @@ def copo_forms(request):
                          action_type=request.POST.get("action_type", str()),
                          id_type=request.POST.get("id_type", str()),
                          data_source=request.POST.get("data_source", str()),
-                         user_email=request.POST.get("user_email", str())
+                         user_email=request.POST.get("user_email", str()),
+                         bundle_name=request.POST.get("bundle_name", str()),
                          )
 
     task_dict = dict(resources=broker_da.do_form_control_schemas,
@@ -282,7 +286,7 @@ def copo_forms(request):
                      component_record=broker_da.do_component_record,
                      component_form_record=broker_da.component_form_record,
                      sanitise_submissions=broker_da.do_sanitise_submissions,
-                     create_description_bundle=broker_da.create_description_bundle,
+                     create_rename_description_bundle=broker_da.create_rename_description_bundle,
                      )
 
     if task in task_dict:

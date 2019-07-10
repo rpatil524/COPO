@@ -477,8 +477,8 @@ class WizardCallbacks:
         # get records in bundle
         records = cursor_to_list(DataFile().get_collection_handle().find({"$and": [
             {"description_token": self.__wzh.description_token, 'deleted': d_utils.get_not_deleted_flag()},
-            {'description.attributes.library_construction': {"$exists": True}}]},
-            {'description.attributes.library_construction': 1, 'name': 1}))
+            {'description.attributes': {"$exists": True}}]},
+            {'description.attributes': 1, 'name': 1}))
 
         if not records:
             # no items to pair, clear any previous pairing information
@@ -486,15 +486,19 @@ class WizardCallbacks:
 
             return False
 
+        for rec in records:
+            datafile_attributes = [v for k, v in rec['description'].get('attributes', dict()).items()]
+
+            new_dict = dict()
+            for d in datafile_attributes:
+                new_dict.update(d)
+
+            rec['attributes'] = new_dict
+            rec['pairing'] = rec['attributes'].get('library_layout', '').upper()
+
         df = pd.DataFrame(records)
         df._id = df['_id'].astype(str)
         df.index = df._id
-
-        df['pairing'] = df['description'].apply(
-            lambda x: x.get('attributes', dict()).get('library_construction', dict()).get('library_layout', np.nan))
-
-        df = df.dropna()
-        df['pairing'] = df.pairing.str.upper()
 
         df = df[df['pairing'] == 'PAIRED']
 

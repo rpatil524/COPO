@@ -11,7 +11,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}COPO - Collaborative Open Plant Omics{% endblock %}</title>
 
-
     <!-- Semantic UI -->
     <link rel="stylesheet" href="{% static 'copo/semantic_ui/semantic.css' %}">
     <link rel="stylesheet" href="{% static 'copo/semantic_ui/components/icon.css' %}">
@@ -202,7 +201,7 @@
                                 'user_email': emaddres
                             },
                             success: function (data) {
-                                $(".takeatour").trigger("click");
+                                //$(".takeatour").trigger("click");
                             },
                             error: function () {
                                 alert("Couldn't add email!");

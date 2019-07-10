@@ -61,350 +61,108 @@
 
     <!--test ends -->
 
-
-    <script>
-
-        var dataSet2 = [];
-
-        var dataSet = [
-            ["Tiger Nixon", "System Architect", "Edinburgh", "5421", "2011/04/25", "$320,800"],
-            ["Garrett Winters", "Accountant", "Tokyo", "8422", "2011/07/25", "$170,750"],
-            ["Ashton Cox", "Junior Technical Author", "San Francisco", "1562", "2009/01/12", "$86,000"],
-            ["Cedric Kelly", "Senior Javascript Developer", "Edinburgh", "6224", "2012/03/29", "$433,060"],
-            ["Airi Satou", "Accountant", "Tokyo", "5407", "2008/11/28", "$162,700"],
-            ["Brielle Williamson", "Integration Specialist", "New York", "4804", "2012/12/02", "$372,000"],
-            ["Herrod Chandler", "Sales Assistant", "San Francisco", "9608", "2012/08/06", "$137,500"],
-            ["Rhona Davidson", "Integration Specialist", "Tokyo", "6200", "2010/10/14", "$327,900"],
-            ["Colleen Hurst", "Javascript Developer", "San Francisco", "2360", "2009/09/15", "$205,500"],
-            ["Sonya Frost", "Software Engineer", "Edinburgh", "1667", "2008/12/13", "$103,600"],
-            ["Jena Gaines", "Office Manager", "London", "3814", "2008/12/19", "$90,560"],
-            ["Quinn Flynn", "Support Lead", "Edinburgh", "9497", "2013/03/03", "$342,000"],
-            ["Charde Marshall", "Regional Director", "San Francisco", "6741", "2008/10/16", "$470,600"],
-            ["Haley Kennedy", "Senior Marketing Designer", "London", "3597", "2012/12/18", "$313,500"],
-            ["Tatyana Fitzpatrick", "Regional Director", "London", "1965", "2010/03/17", "$385,750"],
-            ["Michael Silva", "Marketing Designer", "London", "1581", "2012/11/27", "$198,500"],
-            ["Paul Byrd", "Chief Financial Officer (CFO)", "New York", "3059", "2010/06/09", "$725,000"],
-            ["Gloria Little", "Systems Administrator", "New York", "1721", "2009/04/10", "$237,500"],
-            ["Bradley Greer", "Software Engineer", "London", "2558", "2012/10/13", "$132,000"],
-            ["Dai Rios", "Personnel Lead", "Edinburgh", "2290", "2012/09/26", "$217,500"],
-            ["Jenette Caldwell", "Development Lead", "New York", "1937", "2011/09/03", "$345,000"],
-            ["Yuri Berry", "Chief Marketing Officer (CMO)", "New York", "6154", "2009/06/25", "$675,000"],
-            ["Caesar Vance", "Pre-Sales Support", "New York", "8330", "2011/12/12", "$106,450"],
-            ["Doris Wilder", "Sales Assistant", "Sidney", "3023", "2010/09/20", "$85,600"],
-            ["Angelica Ramos", "Chief Executive Officer (CEO)", "London", "5797", "2009/10/09", "$1,200,000"],
-            ["Gavin Joyce", "Developer", "Edinburgh", "8822", "2010/12/22", "$92,575"],
-            ["Jennifer Chang", "Regional Director", "Singapore", "9239", "2010/11/14", "$357,650"],
-            ["Brenden Wagner", "Software Engineer", "San Francisco", "1314", "2011/06/07", "$206,850"],
-            ["Fiona Green", "Chief Operating Officer (COO)", "San Francisco", "2947", "2010/03/11", "$850,000"],
-            ["Shou Itou", "Regional Marketing", "Tokyo", "8899", "2011/08/14", "$163,000"],
-            ["Michelle House", "Integration Specialist", "Sidney", "2769", "2011/06/02", "$95,400"],
-            ["Suki Burks", "Developer", "London", "6832", "2009/10/22", "$114,500"],
-            ["Prescott Bartlett", "Technical Author", "London", "3606", "2011/05/07", "$145,000"],
-            ["Gavin Cortez", "Team Leader", "San Francisco", "2860", "2008/10/26", "$235,500"],
-            ["Martena Mccray", "Post-Sales support", "Edinburgh", "8240", "2011/03/09", "$324,050"],
-            ["Unity Butler", "Marketing Designer", "San Francisco", "5384", "2009/12/09", "$85,675"]
-        ];
-
-        $(document).ready(function () {
-            var table = $('#example2').DataTable({
-                data: dataSet,
-                columns: [
-                    {title: "Name"},
-                    {title: "Position"},
-                    {title: "Office"},
-                    {title: "Extn."},
-                    {title: "Start date"},
-                    {title: "Salary"}
-                ],
-                dom: 'Bfrtip',
-                select: true,
-                createdRow: function (row, data, index) {
-                    $(row).attr("id", "row" + index);
-                    $(row).addClass("draggable_tr");
-                },
-                select: {
-                    style: 'multi'
-                },
-                buttons: [
-                    {
-                        text: 'Select all',
-                        action: function () {
-                            table.rows().select();
-                            $('.childgrid tr.selected').addClass('selectedRow');
-                        }
-                    },
-                    {
-                        text: 'Select none',
-                        action: function () {
-                            table.rows().deselect();
-                            $('.childgrid tr.selected').removeClass('selectedRow');
-                        }
-                    }
-                ]
-            });
-        });
-
-        $(document).ready(function () {
-            $('#example3').DataTable({
-                data: dataSet2,
-                columns: [
-                    {title: "Name"},
-                    {title: "Position"},
-                    {title: "Office"},
-                    {title: "Extn."},
-                    {title: "Start date"},
-                    {title: "Salary"}
-                ],
-                select: {
-                    style: 'multi'
-                },
-            });
-        });
-
-
-        $(document).ready(function () {
-            var daa = [["Tiger Nixon", "System Architect", "Edinburgh", "5421", "2011/04/25", "$320,800"],
-                ["Garrett Winters", "Accountant", "Tokyo", "8422", "2011/07/25", "$170,750"],
-                ["Ashton Cox", "Junior Technical Author", "San Francisco", "1562", "2009/01/12", "$86,000"],
-                ["Cedric Kelly", "Senior Javascript Developer", "Edinburgh", "6224", "2012/03/29", "$433,060"]];
-
-            $(".bitacoratable .childgrid .draggable_tr").draggable({
-                helper: function () {
-                    var selected = $('.childgrid tr.selectedRow');
-                    if (selected.length === 0) {
-                        selected = $(this).addClass('selectedRow');
-                    }
-                    var container = $('<div/>').attr('id', 'draggingContainer');
-                    container.css({"z-index": 9000});
-                    container.append(selected.clone().removeClass("selectedRow selected"));
-                    return container;
-                }
-            });
-
-            $(".bitacoratable .childgrid").droppable({
-                drop: function (event, ui) {
-                    $(this).append(ui.helper.children());
-                    $('.selectedRow').remove();
-                    //console.log($(this).attr('id'));
-                    var pElem = $(this);
-
-                    pElem.find('.draggable_tr').each(function () {
-                        console.log($(this).attr("id"));
-                    });
-
-                    var table = null;
-                    var tableID = "example3";
-
-                    if ($.fn.dataTable.isDataTable('#' + tableID)) {
-                        //if table instance already exists, then do refresh
-                        table = $('#' + tableID).DataTable();
-                    }
-
-                    if (table) {
-                        //clear old, set new data
-                        table.rows().deselect();
-                        table
-                            .clear()
-                            .draw();
-                        table
-                            .rows
-                            .add(dataSet);
-                        table
-                            .columns
-                            .adjust()
-                            .draw();
-                        table
-                            .search('')
-                            .columns()
-                            .search('')
-                            .draw();
-                    }
-
-                }
-            });
-
-            $(document).on("click", ".childgrid .draggable_tr", function () {
-                $(this).toggleClass("selectedRow");
-            });
-
-
-        });
-
-
-    </script>
-
-    <style>
-
-        .childgrid tr {
-            cursor: pointer;
-        }
-
-        .selectedRow {
-            color: #4f5359;
-        }
-
-        .selectedRow, .selectedRow:active, .childgrid tr:active {
-            background-color: #7893bc;
-            cursor: move;
-        }
-    </style>
-
-
-    {#    <div class="row">#}
-    {#        <div class="col-sm-6 col-md-6 col-lg-6 bitacoratable">#}
-    {#            <table id="example2" class="display childgrid" width="100%"></table>#}
-    {#        </div>#}
-    {#        <div class="col-sm-6 col-md-6 col-lg-6 bitacoratable" style="background: #4f5359; padding: 2em;">#}
-    {#            <table id="example3" class="display childgrid" width="100%"></table>#}
-    {#        </div>#}
-    {#    </div>#}
-
     <!--test ends -->
 
 
     <!-- datafile wizard section -->
+
     <div id="wizard_toggle" class="collapse" style="margin-bottom: 20px;">
-        <div class="panel panel-primary">
-            <div class="panel-heading">Datafile Description <span id="datafile_description_panel_title"></span></div>
-            <div class="panel-body">
-                <div class="fuelux" style="margin-bottom: 5px;">
-                    <div class="row action-rw">
-                        <!-- save for later description button -->
-                        <div id="reload_act" class=" tiny ui basic secondary button"
-                             data-toggle="tooltip"
-                             title="Save description for later"
-                             tabindex="0">
-                            <span style="padding-left: 3px;">Exit wizard</span>
-                        </div>
 
-                        <!-- show description bundle button -->
-                        <div id="bundle_act" class=" tiny ui basic blue button"
-                             data-toggle="tooltip"
-                             title="View description bundle"
-                             tabindex="0">
-                            <span style="padding-left: 3px;">View bundle</span>
-                        </div>
-
-                        <!-- add to bundle button -->
-                        <div id="bundle_add_act" class=" tiny ui basic teal button"
-                             data-toggle="tooltip"
-                             title="Add datafiles to bundle"
-                             tabindex="0">
-                            <span style="padding-left: 3px;">Add to bundle</span>
-                        </div>
-
-                        <!-- Help tip -->
-                        <div class="pull-right">
-                            <label style="font-weight: normal; margin-right: 5px;"> Help tips </label>
-                            <input id="wizard-help-checkbox" type="checkbox" name="wizard-help-checkbox" checked>
-                        </div>
-
+        <div class="ui attached blue message">
+            <div class="header">
+                Datafiles description
+            </div>
+            <p>
+            <div class="webpop-content-div" style="color: #35637e;">
+                <span>Adding metadata for </span><span id="datafile_description_panel_title"></span>
+            </div>
+            </p>
+        </div>
+        <div class="ui attached fluid segment" style="font-size: inherit;">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <div class="pull-right" style="margin-bottom: 15px;">
+                    <!-- exit description button -->
+                    <div id="exit_wizard" class="big ui grey button"
+                         tabindex="0">
+                        <span style="padding-left: 3px;">Exit description</span>
                     </div>
-                    <div class="wizard" data-initialize="wizard" id="dataFileWizard">
-                        <div class="steps-container">
-                            <ul class="steps">
-                                <li data-step="1" data-name="intro" class="active">
-                                    <span class="badge">1</span>Intro
-                                    <span class="chevron"></span>
-                                </li>
-                                <li data-step="2" data-name="review">
-                                    <span class="badge">2</span>Review
-                                    <span class="chevron"></span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="actions">
-                            <div class="large ui buttons">
-                                <button id="wiz_prev_btn" class="ui button btn-prev">Prev</button>
-                                <div class="or"></div>
-                                <button id="wiz_next_btn" class="ui primary button btn-next" data-last="Finish!">Next
-                                </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="fuelux" style="margin-bottom: 5px;">
+                        <div class="wizard" data-initialize="wizard" id="dataFileWizard">
+                            <div class="steps-container">
+                                <ul class="steps">
+                                    <li data-step="1" data-name="review">
+                                        <span class="badge">1</span>End
+                                        <span class="chevron"></span>
+                                    </li>
+                                </ul>
                             </div>
-                        </div>
-                        <div class="step-content"
-                             style="margin-bottom: 45px; border: 0.1em solid rgba(229, 239, 255, 1.0); border-radius: 4px;">
-                            <div class="step-pane active datafile-pane" data-step="1">
-
-                                <form id="wizard_form_1" class="wizard-dynamic-form">
-                                    <input id="current_stage"
-                                           name="current_stage"
-                                           value="intro" type="hidden">
-                                </form>
-
-                                <!-- description wizard getting started section -->
-                                <div class="webpop-content-div">
-                                    <div class="row">
-                                        <div class="col-sm-8">
-                                            <h4>Getting started...</h4>
-                                            The following tips are provided to help you navigate the wizard:
-                                            <div style="margin-top: 10px;"></div>
-                                            <ol>
-                                                <li>
-                                                    Use the <strong><a class="wiz-showme" data-target="wiz_next_btn"
-                                                                       data-label="Next stage" href="#"
-                                                                       title="show me">Next</a></strong> button to
-                                                    proceed
-                                                    to
-                                                    the next
-                                                    stage of the wizard,
-                                                    and the <strong><a class="wiz-showme" data-target="wiz_prev_btn"
-                                                                       data-label="Previous stage" href="#"
-                                                                       title="show me">Prev</a></strong> button to
-                                                    return to
-                                                    a
-                                                    previous
-                                                    stage
-                                                </li>
-                                                <li>
-                                                    Use the <a class="wiz-showme" data-target="wizard-help-checkbox"
-                                                               data-label="Help tips" href="#"
-                                                               title="show me"><strong>help tips</strong></a> button to
-                                                    toggle
-                                                    display of help
-                                                    tips
-                                                </li>
-                                                <li>
-                                                    The <a class="wiz-showme" data-target="copo-documentation"
-                                                           data-label="Documentation" href="#"
-                                                           title="show me"><strong>documentation</strong></a> page
-                                                    offers a
-                                                    more
-                                                    detailed guide
-                                                    to datafile description
-                                                </li>
-                                            </ol>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="panel panel-info">
-                                                <div class="panel-heading"
-                                                     style="background-image: none; padding-top: 5px; padding-bottom: 5px;">
-                                                    <i style="font-size: 20px;" class="fa fa-info-circle text-info"></i>
-                                                </div>
-                                                <div class="panel-body">
-                                                    <div class="webpop-content-div text-info">
-                                                        All datafiles in the bundle will initially share the same
-                                                        metadata
-                                                        supplied through the wizard stages. <strong>Entries for
-                                                        individual datafiles
-                                                        can be updated at the final stage of the wizard.</strong>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <div class="actions">
+                                <div class="large ui buttons">
+                                    <button class="ui button btn-prev">Prev</button>
+                                    <div class="or"></div>
+                                    <button class="ui primary button btn-next" data-last="Finish">Next
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="step-content"
+                                 style="margin-bottom: 45px; border: 0.1em solid rgba(229, 239, 255, 1.0); border-radius: 4px;">
+                                <div class="step-pane" data-step="1">
+                                    <h4>Wrap up!</h4>
+                                    <p>
+                                    <div class="webpop-content-div">You have reached the final stage of the wizard.<br/>
+                                        If you are satisfied with the entries you have made, click
+                                        <strong>Finish</strong>
+                                        button to finalise your description and terminate the wizard.<br/> You can still
+                                        use
+                                        the <strong>Prev</strong> button to go back and make changes.
                                     </div>
+                                    </p>
                                 </div>
                             </div>
-                            <div class="step-pane" data-step="2">
-                                <h4>Wrap up!</h4>
-                                <p>
-                                <div class="webpop-content-div">You have reached the final stage of the wizard.<br/>
-                                    If you are satisfied with the entries you have made, click the
-                                    <strong>Finish!</strong>
-                                    button to finalise your description and terminate the wizard.<br/> You can still use
-                                    the <strong>Prev</strong> button to go back and make changes.
-                                </div>
-                                </p>
-                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui bottom attached blue message">
+            Datafiles description
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12" style="margin-bottom: 10px;">
+            <button data-toggle="collapse" data-target="#datafiles_workflow" class="btn btn-link">View Datafiles
+                Workflow
+            </button>
+
+            <div id="datafiles_workflow" class="collapse">
+                <div class="ui ordered steps">
+                    <div class=" step">
+                        <div class="content">
+                            <div class="title">Upload datafiles</div>
+                            <div class="description">Start by uploading one or more datafiles</div>
+                        </div>
+                    </div>
+                    <div class=" step">
+                        <div class="content">
+                            <div class="title">Create a bundle</div>
+                            <div class="description">A bundle groups one or more datafiles</div>
+                        </div>
+                    </div>
+                    <div class=" step">
+                        <div class="content">
+                            <div class="title">Add datafiles to bundle</div>
+                            <div class="description">You can drag and drop datafiles to a bundle</div>
+                        </div>
+                    </div>
+                    <div class=" step">
+                        <div class="content">
+                            <div class="title">Add metadata</div>
+                            <div class="description">Describe & submit files in the bundle</div>
                         </div>
                     </div>
                 </div>
@@ -413,102 +171,110 @@
     </div>
 
     <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-12">
-            <img style="margin-bottom: 40px; height: 90px;" src="{% static "copo/img/df-workflow.png" %}"/>
-        </div>
-    </div>
-
-    <!-- upload file section -->
-    <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-12">
-            <div style="display: inline-block; text-indent: 0.5em; margin-top: 15px;">
-                <form enctype="multipart/form-data" id="upload_0" method="POST"
-                      action="/rest/receive_data_file_chunked/"
-                      style="margin-right:40px">
-                    {% csrf_token %}
-                    <span data-copo-tour-id="copo_data_upload_file_button"
-                          id="upload_files_button"
-                          class="tiny ui basic primary huge button fileinput-button"
-                          style="background-image: none; border-color:transparent;">
-                                                <span>Upload datafiles...</span>
-                                                <input type="file" name="file"
-                                                       onchange="get_chunk_size(event)" multiple/>
-                                                <input type="hidden" name="upload_id" value=""/>
-                                                <input type="hidden" name="panel_ordering"
-                                                       value="0"/>
-                                                <input type="hidden" name="exp_id" value=""/>
-                                        </span>
-                </form>
-                <div class="CyVerse Files"><br/>
-                    <a id="cyverse_files_link" href="{% url 'copo:agave_oauth' %}">Click to View
-                        Files in CyVerse</a>
-                    <!--<a target="_blank" href="https://agave.iplantc.org/oauth2/authorize?response_type=code&client_id=KOm9gFBPVwq6sfCMgumZRJG5j8wa&redirect_uri=http://127.0.0.1:8000/copo/agave_oauth" class="get_files">Click to View Files in CyVerse</a>-->
-                </div>
-
-                <div id="file_tree" style="visibility:hidden"></div>
-
-                <div class="file_status_label" style="margin-top: 8px;"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-6 col-md-6 col-lg-6">
+        <div class="col-sm-6 col-md-6 col-lg-6" id="datafile_col_table_div">
             <!-- datafile table section -->
-            <div class="panel panel-default" style="border: none;">
-                <div class="panel-heading" style="background-image: none; border: none;">
+
+            <div class="ui attached message">
+                <div class="header">
                     Datafiles
                 </div>
-                <div class="panel-body">
-                    <div class="webpop-content-div" id="datafile-list-message"><span style="color: #35637e;">Below are your datafiles. To describe, drag and drop to a bundle and select describe. </span>
-                    </div>
-                    <div class="webpop-content-div" id="upload-datafile-message">
-                        <strong>No datafile!</strong> There are no datafiles yet in this profile. Use the upload button
-                        to add datafiles.
-                    </div>
+                <p>
+                <div class="webpop-content-div" id="datafile-list-message"><span style="color: #35637e;">Use the upload button to add datafiles. </span>
+                </div>
+                </p>
+            </div>
+            <div class="ui attached fluid segment draggable-parent" style="font-size: inherit;">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="pull-right">
+                            <div style="display: inline-block; text-indent: 0.5em;">
+                                <form enctype="multipart/form-data" id="upload_0" method="POST"
+                                      action="/rest/receive_data_file_chunked/"
+                                      style="margin-right:40px">
+                                    {% csrf_token %}
+                                    <span data-copo-tour-id="copo_data_upload_file_button"
+                                          id="upload_files_button"
+                                          class="big ui primary button fileinput-button"
+                                          style="background-image: none; border-color:transparent;">
+                                                                                <span>Upload datafiles...</span>
+                                                                                <input id="main_file_upload" type="file"
+                                                                                       name="file"
+                                                                                       onchange="get_chunk_size(event)"
+                                                                                       multiple/>
+                                                                                <input type="hidden" name="upload_id"
+                                                                                       value=""/>
+                                                                                <input type="hidden"
+                                                                                       name="panel_ordering"
+                                                                                       value="0"/>
+                                                                                <input type="hidden" name="exp_id"
+                                                                                       value=""/>
+                                                                        </span>
+                                </form>
 
-                    <!-- datafile table -->
-                    <div style="margin-top: 30px;" id="component_table_loader"
-                         class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"
-                         data-copo-tour-id="datafile_table"></div> <!-- div used by the quick tour agent -->
+                                <div id="file_tree" style="visibility:hidden"></div>
+
+                                <div class="file_status_label" style="margin-top: 8px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- datafile table -->
+                <div id="component_table_loader"
+                     class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"
+                     data-copo-tour-id="datafile_table"></div> <!-- div used by the quick tour agent -->
+                <div style="display: block; margin-top: 25px;">
                     <table id="datafile_table"
-                           class="ui celled table hover copo-noborders-table"
+                           class="ui celled table hover draggable-table copo-noborders-table"
                            cellspacing="0" width="100%">
                     </table>
-
                 </div>
-            </div>
 
+            </div>
+            <div class="ui bottom attached message">
+                Datafiles
+            </div>
         </div>
         <div class="col-sm-6 col-md-6 col-lg-6">
             <!-- description bundle section -->
 
-            <div class="panel panel-default" style="border: none;">
-                <div class="panel-heading" style="background-image: none; border: none;">
+            <div class="ui attached message">
+                <div class="header">
                     Description bundles
                 </div>
-                <div class="panel-body">
-                    <div id="cover-spin-bundle"></div>
-                    <div class="webpop-content-div" id="bundle-list-message" style="display: none;"><span
-                            style="color: #35637e;">Below are your description bundles. Drag and drop datafiles to a bundle, and use the describe button to commence description. </span>
-                    </div>
-                    <div class="webpop-content-div" id="new-bundle-message" style="display: none;">
-                        <strong>No bundle!</strong> There are no bundles yet in this profile. Use the create button to
-                        add one.
-                    </div>
-                    <hr/>
-                    <div class="create-bundle-btn tiny ui primary basic button"
-                         title="Create bundle"
-                         tabindex="0">
-                        <i class="fa fa-layer-group"></i>
-                        <span style="padding-left: 3px;">Create a bundle</span>
-                    </div>
-                    <hr/>
-
-                    <div class="desc-bundle-display-div" style="display: block;">
-                        <div class="desc-bundle-display-div-2"></div>
+                <p>
+                <div class="webpop-content-div" id="bundle-list-message" style="display: none;"><span
+                        style="color: #35637e;">Drag and drop datafiles to a bundle, then click <strong>Add Metadata</strong> to describe them. </span>
+                </div>
+                <div class="webpop-content-div" id="new-bundle-message" style="display: none;">
+                        <span style="color: #35637e;">Use the create
+                        button to create a bundle.</span>
+                </div>
+                </p>
+            </div>
+            <div class="ui attached fluid segment" style="font-size: inherit;">
+                <div class="row">
+                    <div class="col-sm-8 col-md-8 col-lg-8"></div>
+                    <div class="col-sm-4 col-md-4 col-lg-4">
+                        <div class="pull-right">
+                            <div class="create-bundle-btn big ui primary button"
+                                 title="Create bundle"
+                                 tabindex="0">
+                                <i class="fa fa-layer-group"></i>
+                                <span style="padding-left: 3px;">Create a bundle...</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <div id="cover-spin-bundle"></div>
+
+                <div class="desc-bundle-display-div" style="display: block; margin-top: 25px;">
+                    <div class="desc-bundle-display-div-2"></div>
+                </div>
+            </div>
+            <div class="ui bottom attached message">
+                Description bundles
             </div>
         </div>
     </div>
@@ -528,6 +294,7 @@
     <script src="{% static 'copo/js/generic_handlers_ext2.js' %}"></script>
     <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
     <script src="{% static 'copo/js/copo_data.js' %}"></script>
+    <script src="{% static 'copo/js/copo_data_bundle.js' %}"></script>
     <script src="{% static 'copo/js/jquery.form.js' %}"></script>
     <script src="{% static 'copo/js/bootstrapValidator.js' %}"></script>
     <script src="{% static 'copo/jQuery-File-Upload-master/js/vendor/jquery.ui.widget.js' %}"></script>

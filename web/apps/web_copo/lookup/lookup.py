@@ -422,7 +422,7 @@ DROP_DOWNS = {
         {
             'value': 'cg_core',
             'label': 'CG Core',
-            'description': 'CG compliant data object description template - this is a placeholder text'
+            'description': 'Template for describing CG-compliant data objects'
         },
         {
             'value': 'ena',

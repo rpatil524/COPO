@@ -143,7 +143,7 @@ $(document).ready(function () {
                         dialog = trigger_csv_upload();
                         dialog.realize();
                         dialog.open();
-                        $(dialog.getModalBody()).find(".feedbackrow").find(".feedbackcol").html("<div>Processing <strong>"+file.name+"</strong></div><div style='margin-top: 5px;'>Please wait...</div>");
+                        $(dialog.getModalBody()).find(".feedbackrow").find(".feedbackcol").html("<div>Processing <strong>" + file.name + "</strong></div><div style='margin-top: 5px;'>Please wait...</div>");
                     },
                     success: function (data) {
                         var result = data.result;
@@ -155,7 +155,7 @@ $(document).ready(function () {
                                 .html('Refresh table');
                         } else if (result.hasOwnProperty("status") && result.status == "error") {
                             dialog.setType(BootstrapDialog.TYPE_DANGER);
-                            $(dialog.getModalBody()).find(".feedbackrow").find(".feedbackcol").html("<span class='text-danger'>"+ result.message + "</span>");
+                            $(dialog.getModalBody()).find(".feedbackrow").find(".feedbackcol").html("<span class='text-danger'>" + result.message + "</span>");
                             $($(dialog.getModalFooter()).find("#btn-cancel-process")[0])
                                 .addClass('red')
                                 .html('Abort');
@@ -767,23 +767,25 @@ $(document).ready(function () {
         });
 
         var left = $('<div/>', {
-            class: "col-sm-8"
+            class: "col-sm-9"
         });
 
         var right = $('<div/>', {
-            class: "col-sm-4"
+            class: "col-sm-3"
         });
 
         var message = $('<div/>', {class: "webpop-content-div"});
         message.append(stage_message);
 
-        var panel = get_panel('info');
-        panel.find('.panel-body').append(message);
-        panel.find('.panel-heading')
-            .append('<i style="font-size: 20px;" class="fa fa-info-circle text-info"></i>')
-            .css({"padding-top": "5px", "padding-bottom": "5px"});
-        panel.find(".panel-footer").remove();
-        right.append(panel);
+        var feedback = get_feedback_pane();
+        feedback.find(".close").remove();
+        feedback
+            .removeClass("success");
+
+        feedback.find(".header").html("");
+        feedback.find("p").append(message);
+
+        right.append(feedback);
 
         row
             .append(left)
@@ -821,6 +823,26 @@ $(document).ready(function () {
         formCtrl.append(stage_content);
 
         formDiv.append(formCtrl);
+
+        var navrow = $('<div/>', {
+            class: "row",
+            style: "margin-top:20px;"
+        });
+
+        var navcol = $('<div/>', {
+            class: "col-sm-12"
+        });
+
+        var navbuttons = '<div class="large ui buttons">\n' +
+            '  <button class="ui button wiz-btn-prev">Prev</button>\n' +
+            '  <div class="or"></div>\n' +
+            '  <button class="ui primary button wiz-btn-next">Next</button>\n' +
+            '</div>';
+
+        navcol.append(navbuttons);
+        navrow.append(navcol);
+        left.append('<hr/>');
+        left.append(navrow);
 
         return row;
     }
@@ -1866,7 +1888,6 @@ $(document).ready(function () {
                         message.append("<span>Last visited stage: </span>");
                         message.append(rec.last_rendered_stage);
                         message.append("<div style='margin-top: 5px;'></div>");
-                        message.append("<span style='color: #c93c00'>" + rec.grace_period + " before automatic deletion</span>");
                         message.append("<div style='margin-top: 5px;'></div>");
 
                         var deletedesc = '<a class="delete-description-i pull-right" href="#" role="button" ' +

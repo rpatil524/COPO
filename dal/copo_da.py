@@ -1110,37 +1110,6 @@ class Description:
 
         return is_valid
 
-    def purge_descriptions(self, component=str()):
-        """
-        remove 'obsolete' tokens - where date created is more than 'no_of_days' days
-        :return:
-        """
-
-        if not component == "sample":  # samples gets purge, but not other components e.g., datafiles
-            return True
-
-        no_of_days = settings.DESCRIPTION_GRACE_PERIOD
-
-        description_df = self.get_elapsed_time_dataframe()
-
-        if len(description_df):
-            object_ids = description_df[description_df.diff_days > no_of_days]['_id'].tolist()
-
-            self.DescriptionCollection.remove({"_id": {"$in": object_ids}})
-
-            # remove records associated with the description_tokens from the collection
-            SampleCollection = get_collection_ref('SampleCollection')
-
-            for id in object_ids:
-                SampleCollection.delete_many(
-                    {"description_token": str(id), "deleted": data_utils.get_deleted_flag()})
-
-                # delete store object
-                object_path = os.path.join(settings.MEDIA_ROOT, 'description_data', str(id))
-                self.remove_store_object(object_path=object_path)
-
-        return True
-
     def get_elapsed_time_dataframe(self):
         pipeline = [{"$project": {"_id": 1, "diff_days": {
             "$divide": [{"$subtract": [data_utils.get_datetime(), "$created_on"]}, 1000 * 60 * 60 * 24]}}}]

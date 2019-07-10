@@ -224,169 +224,186 @@ function deselect_records(tableID) {
 function do_render_server_side_table(componentMeta) {
     var tableID = componentMeta.tableID;
     var component = componentMeta.component;
-    server_side_select[component] = [];
 
-    var table = $('#' + tableID).DataTable({
-        "paging": true,
-        "processing": true,
-        "serverSide": true,
-        "searchDelay": 850,
-        "columns": componentMeta.table_columns,
-        ajax: {
-            url: copoVisualsURL,
-            type: "POST",
-            headers: {
-                'X-CSRFToken': csrftoken
-            },
-            data: {
-                'task': 'server_side_table_data',
-                'component': component
-            },
-            dataFilter: function (data) {
-                var json = jQuery.parseJSON(data);
-                json.recordsTotal = json.records_total;
-                json.recordsFiltered = json.records_filtered;
-                json.data = json.data_set;
+    var table = null;
 
-                return JSON.stringify(json); // return JSON string
-            }
-        },
-        "rowCallback": function (row, data) {
-            if ($.inArray(data.DT_RowId, server_side_select[component]) !== -1) {
-                $(row).addClass('selected');
-            }
-        },
-        fnDrawCallback: function () {
-            refresh_tool_tips();
-            var event = jQuery.Event("posttablerefresh"); //individual compnents can trap and handle this event as they so wish
-            $('body').trigger(event);
 
-            if (server_side_select[component].length > 0) {
-                var message = server_side_select[component].length + " records selected";
-                if (server_side_select[component].length == 1) {
-                    message = server_side_select[component].length + " record selected";
+    if ($.fn.dataTable.isDataTable('#' + tableID)) {
+        // get table instance
+        table = $('#' + tableID).DataTable();
+    }
+
+    if (table) {
+        //if table instance already exists, refresh
+        table.draw();
+    } else {
+        server_side_select[component] = [];
+
+        table = $('#' + tableID).DataTable({
+            "paging": true,
+            "processing": true,
+            "serverSide": true,
+            "searchDelay": 850,
+            "columns": componentMeta.table_columns,
+            ajax: {
+                url: copoVisualsURL,
+                type: "POST",
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                data: {
+                    'task': 'server_side_table_data',
+                    'component': component
+                },
+                dataFilter: function (data) {
+                    var json = jQuery.parseJSON(data);
+                    json.recordsTotal = json.records_total;
+                    json.recordsFiltered = json.records_filtered;
+                    json.data = json.data_set;
+
+                    return JSON.stringify(json); // return JSON string
                 }
-                $('#' + tableID + '_info').append("<span class='select-item select-item-1'>" + message + "</span>");
-            }
-        },
-        buttons: [
-            {
-                text: 'Select visible records',
-                action: function (e, dt, node, config) {
-                    //remove custom select info
-                    $('#' + tableID + '_info').find(".select-item-1").remove();
+            },
+            "rowCallback": function (row, data) {
+                if ($.inArray(data.DT_RowId, server_side_select[component]) !== -1) {
+                    $(row).addClass('selected');
+                }
+            },
+            createdRow: function (row, data, index) {
+                $(row).addClass("draggable_tr");
+            },
+            fnDrawCallback: function () {
+                refresh_tool_tips();
+                var event = jQuery.Event("posttablerefresh"); //individual compnents can trap and handle this event as they so wish
+                $('body').trigger(event);
 
-                    dt.rows().select();
-                    var selectedRows = table.rows('.selected').ids().toArray();
+                if (server_side_select[component].length > 0) {
+                    var message = server_side_select[component].length + " records selected";
+                    if (server_side_select[component].length == 1) {
+                        message = server_side_select[component].length + " record selected";
+                    }
+                    $('#' + tableID + '_info').append("<span class='select-item select-item-1'>" + message + "</span>");
+                }
+            },
+            buttons: [
+                {
+                    text: 'Select visible records',
+                    action: function (e, dt, node, config) {
+                        //remove custom select info
+                        $('#' + tableID + '_info').find(".select-item-1").remove();
 
-                    for (var i = 0; i < selectedRows.length; ++i) {
-                        var index = $.inArray(selectedRows[i], server_side_select[component]);
+                        dt.rows().select();
+                        var selectedRows = table.rows('.selected').ids().toArray();
 
-                        if (index === -1) {
-                            server_side_select[component].push(selectedRows[i]);
+                        for (var i = 0; i < selectedRows.length; ++i) {
+                            var index = $.inArray(selectedRows[i], server_side_select[component]);
+
+                            if (index === -1) {
+                                server_side_select[component].push(selectedRows[i]);
+                            }
                         }
+
+                        $('#' + tableID + '_info')
+                            .find(".select-row-message")
+                            .html(server_side_select[component].length + " records selected");
+                    }
+                },
+                {
+                    text: 'Clear selection',
+                    action: function (e, dt, node, config) {
+                        dt.rows().deselect();
+                        server_side_select[component] = [];
+                        $('#' + tableID + '_info').find(".select-item-1").remove();
+                    }
+                }
+            ],
+            language: {
+                select: {
+                    rows: {
+                        _: "<span class='select-row-message'>%d records selected</span>",
+                        0: "",
+                        1: "%d record selected"
+                    }
+                },
+                "processing": "<div class='copo-i-loader'></div>"
+            },
+            dom: 'Bfr<"row"><"row info-rw" i>tlp'
+        });
+
+        table
+            .buttons()
+            .nodes()
+            .each(function (value) {
+                $(this)
+                    .removeClass("btn btn-default")
+                    .addClass('tiny ui button');
+            });
+
+        place_task_buttons(componentMeta); //this will place custom buttons on the table for executing tasks on records
+        do_table_buttons_events_server_side(component);
+
+        table.on('click', 'tr >td', function () {
+            var classList = ["describe-status", "summary-details-control", "detail-hover-message"]; //don't select on these
+            var foundClass = false;
+
+            var tdList = this.className.split(" ");
+
+            for (var i = 0; i < tdList.length; ++i) {
+                if ($.inArray(tdList[i], classList) > -1) {
+                    foundClass = true;
+                    break;
+                }
+            }
+
+            if (foundClass) {
+                return false;
+            }
+
+            var elem = $(this).closest("tr");
+
+            var id = elem.attr("id");
+            var index = $.inArray(id, server_side_select[component]);
+
+            if (index === -1) {
+                server_side_select[component].push(id);
+            } else {
+                server_side_select[component].splice(index, 1);
+            }
+
+            elem.toggleClass('selected');
+
+            //selected message
+            $('#' + tableID + '_info').find(".select-item-1").remove();
+            var message = ''
+
+            if ($('#' + tableID + '_info').find(".select-row-message").length) {
+                if (server_side_select[component].length > 0) {
+                    message = server_side_select[component].length + " records selected";
+                    if (server_side_select[component].length == 1) {
+                        message = server_side_select[component].length + " record selected";
                     }
 
                     $('#' + tableID + '_info')
                         .find(".select-row-message")
-                        .html(server_side_select[component].length + " records selected");
+                        .html(message);
+                } else {
+                    $('#' + tableID + '_info')
+                        .find(".select-row-message")
+                        .html("");
                 }
-            },
-            {
-                text: 'Clear selection',
-                action: function (e, dt, node, config) {
-                    dt.rows().deselect();
-                    server_side_select[component] = [];
-                    $('#' + tableID + '_info').find(".select-item-1").remove();
-                }
-            }
-        ],
-        language: {
-            select: {
-                rows: {
-                    _: "<span class='select-row-message'>%d records selected</span>",
-                    0: "",
-                    1: "%d record selected"
-                }
-            },
-            "processing": "<div class='copo-i-loader'></div>"
-        },
-        dom: 'Bfr<"row"><"row info-rw" i>tlp'
-    });
-
-    table
-        .buttons()
-        .nodes()
-        .each(function (value) {
-            $(this)
-                .removeClass("btn btn-default")
-                .addClass('tiny ui button');
-        });
-
-    place_task_buttons(componentMeta); //this will place custom buttons on the table for executing tasks on records
-    do_table_buttons_events_server_side(component);
-
-    table.on('click', 'tr >td', function () {
-        var classList = ["describe-status", "summary-details-control", "detail-hover-message"]; //don't select on these
-        var foundClass = false;
-
-        var tdList = this.className.split(" ");
-
-        for (var i = 0; i < tdList.length; ++i) {
-            if ($.inArray(tdList[i], classList) > -1) {
-                foundClass = true;
-                break;
-            }
-        }
-
-        if (foundClass) {
-            return false;
-        }
-
-        var elem = $(this).closest("tr");
-
-        var id = elem.attr("id");
-        var index = $.inArray(id, server_side_select[component]);
-
-        if (index === -1) {
-            server_side_select[component].push(id);
-        } else {
-            server_side_select[component].splice(index, 1);
-        }
-
-        elem.toggleClass('selected');
-
-        //selected message
-        $('#' + tableID + '_info').find(".select-item-1").remove();
-        var message = ''
-
-        if ($('#' + tableID + '_info').find(".select-row-message").length) {
-            if (server_side_select[component].length > 0) {
-                message = server_side_select[component].length + " records selected";
-                if (server_side_select[component].length == 1) {
-                    message = server_side_select[component].length + " record selected";
-                }
-
-                $('#' + tableID + '_info')
-                    .find(".select-row-message")
-                    .html(message);
             } else {
-                $('#' + tableID + '_info')
-                    .find(".select-row-message")
-                    .html("");
-            }
-        } else {
-            if (server_side_select[component].length > 0) {
-                message = server_side_select[component].length + " records selected";
-                if (server_side_select[component].length == 1) {
-                    message = server_side_select[component].length + " record selected";
+                if (server_side_select[component].length > 0) {
+                    message = server_side_select[component].length + " records selected";
+                    if (server_side_select[component].length == 1) {
+                        message = server_side_select[component].length + " record selected";
+                    }
+                    $('#' + tableID + '_info').append("<span class='select-item select-item-1'>" + message + "</span>");
                 }
-                $('#' + tableID + '_info').append("<span class='select-item select-item-1'>" + message + "</span>");
             }
 
-        }
+        });
+    }
 
-    });
 
     $('#' + tableID + '_wrapper')
         .find(".dataTables_filter")

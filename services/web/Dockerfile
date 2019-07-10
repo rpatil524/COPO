@@ -1,5 +1,6 @@
 FROM python:3.6
-ENV PYTHONUNBUFFERED 0
+
+ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && apt-get install -y \
     default-jre \
@@ -23,7 +24,7 @@ RUN pip install --upgrade pip
 
 COPY ./requirements/ /tmp/requirements/
 
-RUN pip3 install -r /tmp/requirements/dev.txt
+RUN pip install -r /tmp/requirements/dev.txt
 
 RUN mkdir /copo
 RUN mkdir /code

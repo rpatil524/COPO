@@ -3,28 +3,9 @@
   "description": "Definitions for elements that appear in different stages of a wizard for submission to different repositories. 'ref', id of stage; 'title', header used for the stage; 'content', the function to call to generate stage html; items, actual form elements on the page; 'apply_to_all', if all items must have same value for this stage; 'is_metadata' if this stage should be considered as datafile metadata",
   "properties": [
     {
-      "ref": "description_bundle_name",
-      "title": "Bundle Name",
-      "message": "Please assign a label to your description. A well-defined label can aid in easily accessing this description in the future.",
-      "is_metadata": false,
-      "callback": "get_unique_bundle_names",
-      "items": [
-        {
-          "id": "description_bundle_name",
-          "help_tip": "Supply a name for your description bundle",
-          "label": "Bundle name",
-          "hidden": "false",
-          "required": "true",
-          "control": "text",
-          "unique": true,
-          "unique_items": []
-        }
-      ]
-    },
-    {
       "ref": "target_repository",
       "title": "Repository",
-      "message": "Select the target repository for which this description is intended. The target repository choice helps inform the wizard on an appropriate metadata template for your description.",
+      "message": "Select the target repository for which this description is intended. The choice of a target repository helps inform the wizard on an appropriate metadata template for your description.",
       "apply_to_all": true,
       "items": [
         {
@@ -46,10 +27,11 @@
     },
     {
       "ref": "datafiles_editing",
-      "title": "Datafile Attributes",
+      "title": "Review Datafile Metadata",
+      "is_metadata": false,
       "callback": "perform_datafile_generation",
       "renderer": "perform_datafile_generation",
-      "message": "In this stage each attribute value that describes a datafile is represented in a column, allowing specific attribute values for individual datafiles to be easily accessed and modified. You can also batch-update attribute values for groups of datafiles. <ul><li>To update attribute value for a single datafile: <ol><li>Click to focus on a cell (note: this action is different from row selection)</li><li>Double-click or press 'Enter' on a focused cell to make it editable</li><li>Make your changes and double-click or press 'Enter' again to save your changes</li></ol><li>To batch-update corresponding attribute values for a group of datafiles:<ol><li>Click to focus on a target cell, the value of which will be used to update corresponding cells of selected records</li><li>Select one or more rows that will form the update batch</li><li>Click the 'Update selected records' button</li></ol></li><li>Click <strong>Next</strong>, when done editing, to proceed to the final stage</li></ul>",
+      "message": "<ul><li>To update metadata for a datafile: <ol><li>Double-click or press 'Enter' on a target cell</li><li>Enter a new value, and double-click or press 'Enter' to save</li></ol><li>To update metadata for a batch of datafiles:<ol><li>Click to select a reference cell (N.B. the value of this cell is to be copied to target datafiles)</li><li>Select one or more records to form a batch</li><li>Click the 'Update selected records' button</li></ol></li></ul>",
       "items": [
       ]
     },
@@ -59,7 +41,7 @@
       "is_metadata": false,
       "callback": "perform_datafile_pairing",
       "renderer": "perform_datafile_pairing",
-      "message": "Pair up datafiles in the description bundle for which the library layout has been set to 'PAIRED'..</span>",
+      "message": "Please pair up datafiles in the description bundle. Pairing is expected of files for which the library layout has been set to 'PAIRED'.</span>",
       "items": [
       ]
     }

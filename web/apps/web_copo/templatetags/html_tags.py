@@ -14,7 +14,8 @@ import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from dal.copo_base_da import DataSchemas
-from dal.copo_da import ProfileInfo, Repository, Profile, Publication, Source, Person, Sample, Submission, DataFile, \
+from dal.copo_da import ProfileInfo, Repository, Description, Profile, Publication, Source, Person, Sample, Submission, \
+    DataFile, \
     DAComponent, Annotation, CGCore
 from allauth.socialaccount import providers
 from django_tools.middlewares import ThreadLocal
@@ -304,9 +305,25 @@ def generate_server_side_table_records(profile_id=str(), component=str(), reques
     records_total = da_object.get_collection_handle().count(
         {'profile_id': profile_id, 'deleted': data_utils.get_not_deleted_flag()})
 
-    records_total = da_object.get_collection_handle().count({"$and": [
-        {"profile_id": profile_id, 'deleted': data_utils.get_not_deleted_flag()},
-        {"description_token": {"$nin": ["5cd98d19c66a38035a6c2a17", "5cd98b98c66a38035a6c2a14"]}}]})
+    # retrieve and process records
+    filter_by = dict()
+
+    if component == "datafile":
+        # get all active bundles in the profile
+        existing_bundles = Description().get_all_records_columns(projection=dict(_id=1),
+                                                                 filter_by=dict(profile_id=profile_id,
+                                                                                component=component))
+        existing_bundles = [str(x["_id"]) for x in existing_bundles]
+        records_total = da_object.get_collection_handle().count({"$and": [
+            {"profile_id": profile_id, 'deleted': data_utils.get_not_deleted_flag()},
+            {"$or": [
+                {"description_token": {"$in": [None, False, ""]}},
+                {"description_token": {"$nin": existing_bundles}}]}
+        ]})
+
+        filter_by = {"$or": [
+                {"description_token": {"$in": [None, False, ""]}},
+                {"description_token": {"$nin": existing_bundles}}]}
 
     # get and filter schema elements based on displayable columns
     schema = [x for x in da_object.get_schema().get("schema_dict") if x.get("show_in_table", True)]
@@ -325,9 +342,6 @@ def generate_server_side_table_records(profile_id=str(), component=str(), reques
     # search
     search_term = request.get('search[value]', '').strip()
 
-    # retrieve and process records
-    filter_by = dict()
-    filter_by["description_token"] = {'$nin': ["5cd98d19c66a38035a6c2a17", "5cd98b98c66a38035a6c2a14"]}
     records = da_object.get_all_records_columns_server(sort_by=sort_by, sort_direction=sort_direction,
                                                        search_term=search_term, projection=dict(projection),
                                                        limit=n_size, skip=start, filter_by=filter_by)

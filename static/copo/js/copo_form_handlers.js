@@ -162,7 +162,7 @@ function json2HtmlForm(data) {
 
     var dialog = new BootstrapDialog({
         type: BootstrapDialog.TYPE_PRIMARY,
-        size: BootstrapDialog.SIZE_NORMAL,
+        size: BootstrapDialog.SIZE_WIDE,
         title: function () {
             return $('<span>' + get_form_title(data) + '</span>');
         },
@@ -423,7 +423,7 @@ function set_up_form_help_div(data) {
             class: "col-sm-5 col-md-5 col-lg-5"
         }).append(get_help_ctrl());
 
-    return ctrlDiv.append(cloneCol).append(helpCtrl);
+    return ctrlDiv.append(cloneCol);
 }
 
 function set_up_form_body_div(data) {
@@ -491,14 +491,6 @@ function set_validation_markers(formElem, ctrl) {
 
     var validationMarkers = {};
     var errorHelpDiv = "";
-
-    // if (ctrl.hasClass("onto-select")) {
-    //     ctrl = $(ctrl[0]);
-    //     // $(ctrl[0]).attr("required", true);
-    //     // $(ctrl[0]).attr("data-error", formElem.label + " required!");
-    //     // console.log(ctrl[0]);
-    //     // console.log(formElem.required)
-    // }
 
 
     //required marker
@@ -637,7 +629,8 @@ var dispatchFormControl = {
         ctrlsDiv.append(txt);
         ctrlsDiv.append(vM.errorHelpDiv);
 
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        var output = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        return add_message_segment(output);
     },
     do_text_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
@@ -709,7 +702,8 @@ var dispatchFormControl = {
         ctrlsDiv.append(metaDiv);
         ctrlsDiv.append(vM.errorHelpDiv);
 
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        var output = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        return add_message_segment(output);
     },
     do_small_text_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
@@ -731,7 +725,7 @@ var dispatchFormControl = {
         ctrlsDiv.append(txt);
         ctrlsDiv.append(vM.errorHelpDiv);
 
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        return add_message_segment(get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue));
     },
     do_textarea_ctrl: function (formElem, elemValue) {
 
@@ -755,7 +749,8 @@ var dispatchFormControl = {
         ctrlsDiv.append(txt);
         ctrlsDiv.append(vM.errorHelpDiv);
 
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        var output = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        return add_message_segment(output);
     },
     do_select_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
@@ -824,16 +819,16 @@ var dispatchFormControl = {
             });
 
         for (var i = 0; i < durationSchema.length; ++i) {
-            var mg = "margin-left:5px;";
+            var mg = "";
             if (i == 0) {
                 mg = '';
             }
             var fv = formElem.id + "." + durationSchema[i].id.split(".").slice(-1)[0];
 
 
-            var sp = $('<span/>',
+            var sp = $('<div/>',
                 {
-                    style: "display: inline-block; " + mg
+                    // style: "display: inline-block; " + mg
                 });
 
             var durationCtrlObject = get_basic_input(sp, durationSchema[i]);
@@ -860,7 +855,9 @@ var dispatchFormControl = {
             ctrlsDiv.append(durationCtrlObject);
         }
 
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        var output = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+
+        return add_message_segment(output);
     },
     do_copo_characteristics_ctrl_2: function (formElem, elemValue) {
         var workingSchema = copoSchemas[formElem.control.toLowerCase()];
@@ -924,7 +921,7 @@ var dispatchFormControl = {
             }
         }
 
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        return add_message_segment(get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue));
     },
     do_copo_comment_ctrl: function (formElem, elemValue) {
         var commentSchema = copoSchemas[formElem.control.toLowerCase()];
@@ -1005,7 +1002,7 @@ var dispatchFormControl = {
         ctrlsDiv.append(ontologyCtrlObject);
         ctrlsDiv.append(vM.errorHelpDiv);
 
-        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        return add_message_segment(get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue));
     },
     do_copo_lookup_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
@@ -1091,49 +1088,46 @@ var dispatchFormControl = {
         var newItemCreate = formElem.create_new_item || false;
         var optionComponent = formElem.option_component || false;
 
-        var addbtnDivRow = '';
-        var lookupMessage = "Enter 1 or more characters to search for a value.";
-
-        if (newItemCreate.toString().toLowerCase() == "true" && optionComponent != '') {
-            lookupMessage += " You can also use the create button to create and assign a new value."
-
-            var addBtn = $('<button/>',
-                {
-                    style: "border-radius:0;",
-                    class: "btn btn-xs btn-primary",
-                    type: "button",
-                    "data-component": formElem.option_component,
-                    "data-element-id": formElem.id,
-                    html: '<i class="fa fa-plus-circle"></i> Create new ' + formElem.label,
-                    click: function (event) {
-                        event.preventDefault();
-                        create_attachable_component(formElem);
-                    },
-                });
-
-            var addbtnDiv = $('<div/>',
-                {
-                    class: "col-sm-12 col-md-12 col-lg-12"
-                }).append(addBtn);
-
-            addbtnDivRow = $('<div/>',
-                {
-                    class: "row btn-row",
-                }).append(addbtnDiv);
-        }
-
-        lookupMessage = "<hr/><div class='text-info' style='margin-top: 5px; font-weight: bold;'>" + lookupMessage + "</div>";
-
+        var lookupMessage = "<div class='copo-text-primary' style='margin-top: 10px;'>Enter one or more characters to search for a term.</div>";
         formElem["help_tip"] = formElem["help_tip"] || '';
         formElem["help_tip"] = formElem["help_tip"] + lookupMessage;
 
         var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+        var firstElement = returnDiv;
 
-        if (addbtnDivRow != '') {
-            returnDiv.append(addbtnDivRow);
+        if (newItemCreate.toString().toLowerCase() == "true" && optionComponent != '') {
+
+            firstElement = $('<div/>', {
+                class: "row control-row"
+            });
+
+            var left = $('<div/>', {
+                class: "col-sm-9"
+            });
+
+            var right = $('<div/>', {
+                class: "col-sm-3",
+                style: "padding-top: 28px; padding-left: 5px;"
+            });
+
+            firstElement
+                .append(left)
+                .append(right);
+
+            var addBtn = get_add_button("Create and add a new " + formElem.label);
+
+            left.append(returnDiv);
+            right.append(addBtn);
+
+            addBtn
+                .attr({"data-component": formElem.option_component, "data-element-id": formElem.id})
+                .click(function (event) {
+                    event.preventDefault();
+                    create_attachable_component(formElem);
+                });
         }
 
-        return returnDiv
+        return add_message_segment(firstElement);
     },
     do_copo_multi_select_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
@@ -1265,7 +1259,7 @@ var dispatchFormControl = {
 
         var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
 
-        return returnDiv
+        return add_message_segment(returnDiv);
     },
     do_copo_single_select_ctrl: function (formElem, elemValue) {
         formElem["type"] = "string"; //this, for the purposes of the UI, should be assigned a string temporarily, since multi_search takes care of the multiple values
@@ -1335,7 +1329,7 @@ var dispatchFormControl = {
 
         var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
 
-        return returnDiv
+        return add_message_segment(returnDiv);
     },
     do_copo_multi_search_ctrl: function (formElem, elemValue) {
         formElem["type"] = "string"; //this, for the purposes of the UI, should be assigned a string temporarily, since multi_search takes care of the multiple values
@@ -1404,7 +1398,7 @@ var dispatchFormControl = {
 
         var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
 
-        return returnDiv
+        return add_message_segment(returnDiv);
     },
     do_copo_select2_ctrl: function (formElem, elemValue) {
         formElem["type"] = "string"; //this, for the purposes of the UI, should be assigned a string temporarily, since multi_search takes care of the multiple values
@@ -1463,7 +1457,7 @@ var dispatchFormControl = {
 
         var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
 
-        return returnDiv
+        return add_message_segment(returnDiv);
     },
     do_hidden_ctrl: function (formElem, elemValue) {
 
@@ -1579,9 +1573,12 @@ var dispatchFormControl = {
 
         ctrlsDiv.append(form_label_ctrl(formElem)).append(radioGroup).append(hiddenCtrl).append(hiddenCtrlPreviousValue);
 
-        return form_div_ctrl()
+        var output = form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
+
+        return add_message_segment(output);
+
     },
     do_copo_resolver_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>');
@@ -1647,10 +1644,12 @@ var dispatchFormControl = {
 
         ctrlsDiv.append(feedBackElem);
 
-        return form_div_ctrl()
+        var output = form_div_ctrl()
             .append(form_label_ctrl(formElem))
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
+
+        return add_message_segment(output);
 
     },
     do_copo_input_group_ctrl: function (formElem, elemValue) {
@@ -1715,10 +1714,12 @@ var dispatchFormControl = {
         var vM = set_validation_markers(formElem, textDataInput);
         ctrlsDiv.append(vM.errorHelpDiv);
 
-        return form_div_ctrl()
+        var output = form_div_ctrl()
             .append(form_label_ctrl(formElem))
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
+
+        return add_message_segment(output);
 
     },
     do_copo_button_list_ctrl_old: function (formElem, elemValue) {
@@ -1787,10 +1788,11 @@ var dispatchFormControl = {
 
         }
 
-        return form_div_ctrl()
+        var output = form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
-            .append(ctrlsDiv)
+            .append(ctrlsDiv);
 
+        return add_message_segment(output);
     },
     do_copo_item_slider_ctrl: function (formElem, elemValue) {
 
@@ -1856,9 +1858,11 @@ var dispatchFormControl = {
         ctrlsDiv.append(countCtrlOutputDiv);
         ctrlsDiv.append(hiddenCtrl);
 
-        return form_div_ctrl()
+        var output = form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
+
+        return add_message_segment(output);
     },
     do_copo_item_count_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
@@ -1905,9 +1909,11 @@ var dispatchFormControl = {
         var vM = set_validation_markers(formElem, counter_ctrl);
         ctrlsDiv.append(vM.errorHelpDiv);
 
-        return form_div_ctrl()
+        var output = form_div_ctrl()
             .append(form_help_ctrl(formElem.help_tip))
             .append(ctrlsDiv);
+
+        return add_message_segment(output);
     },
     do_dataverse_author: function do_dataverse_author(formElem) {
         alert('abc')
@@ -1952,7 +1958,7 @@ function create_attachable_component(formElem) {
             class: "col-sm-5 col-md-5 col-lg-5"
         }).append(helpCtrl);
 
-    helpDivRow.append(cloneCol).append(helpCtrlCol);
+    helpDivRow.append(cloneCol);
 
     var dialog = new BootstrapDialog({
         type: BootstrapDialog.TYPE_PRIMARY,
@@ -2217,6 +2223,20 @@ function form_label_ctrl(formElem) {
                 for: target,
                 class: "control-label"
             });
+
+        var helpTip = formElem["help_tip"] || '';
+        if (helpTip) {
+            var item = $('<i class="ui icon question circle" style="margin-left: 5px;"></i>');
+            item.webuiPopover('destroy');
+            item.webuiPopover({
+                content: '<div class="webpop-content-div">' + helpTip + '</div>',
+                arrow: true,
+                width: 200,
+                trigger: 'hover',
+            });
+
+            lblCtrl.append(item);
+        }
     }
     return lblCtrl
 }
@@ -2262,33 +2282,49 @@ function get_element_clone(ctrlsDiv, counter) {
         }
     });
 
-    var cloneDiv = $('<div/>',
-        {
-            style: 'margin-top:30px;'
-        });
+
+    var row = $('<div/>', {
+        class: "row control-row"
+    });
+
+    var left = $('<div/>', {
+        class: "col-sm-9"
+    });
+
+    var right = $('<div/>', {
+        class: "col-sm-3",
+        style: "padding-left: 5px;"
+    });
+
+    row
+        .append(left)
+        .append(right);
+
+    var delBtn = get_del_button();
+
+    delBtn.click(function (event) {
+        event.preventDefault();
+        row.remove();
+    });
+
+    var addBtn = get_add_button();
+
+    addBtn.click(function (event) {
+        event.preventDefault();
+        ++counter;
+
+        get_element_clone(ctrlsDiv, counter).insertAfter(row);
+
+        //refresh controls
+        refresh_tool_tips();
+    });
 
 
-    var delDiv = $('<div/>',
-        {
-            style: 'padding:5px;'
-        });
+    left.append(ctrlClone);
+    right.append(addBtn);
+    right.append(delBtn);
 
-    var delBtn = $('<button/>',
-        {
-            style: "border-radius:0;",
-            type: "button",
-            class: "btn btn-xs btn-danger pull-right",
-            html: '<i class="fa fa-trash-o"></i> Delete',
-            click: function (event) {
-                event.preventDefault();
-                cloneDiv.remove();
-            }
-        });
-
-    delDiv.append(delBtn);
-    cloneDiv.append(ctrlClone).append(delDiv);
-
-    return cloneDiv
+    return row
 }
 
 function resolve_ctrl_values(ctrlsDiv, counter, formElem, elemValue) {
@@ -2453,7 +2489,7 @@ function get_ontology_span_2(ontologySpan, formElem) {
             class: "form-control input-copo onto-select",
             "data-url": localolsURL,
             "data-element": formElem.id,
-            "data-validate": true
+            "data-validate": true,
         });
 
     ontologySpan.append(selectCtrl);
@@ -2463,6 +2499,7 @@ function get_ontology_span_2(ontologySpan, formElem) {
             style: "margin-top:5px;  padding:3px; background-image:none; border-color:transparent; word-wrap: break-word;",
             class: "onto-label ontol-span webpop-content-div alert alert-default",
             title: "Ontology field",
+            "data-toggle": "tooltip",
             html: '<span class="ontology-label"><i class="fa fa-align-justify free-text" style="padding-right: 5px; display: none;"></i><img class="non-free-text" src="/static/copo/img/ontology2.png" style="cursor:pointer;"></span><span class="onto-label-span"></span><span class="onto-label-more collapse"></span>'
         });
 
@@ -2577,23 +2614,75 @@ function get_multi_search_span(formElem, ctrlsDiv) {
     return ctrlsDiv;
 }
 
+function add_message_segment(outputCtrl) {
+    var row = $('<div/>', {
+        class: "row rendered-control"
+    });
+
+    var left = $('<div/>', {
+        class: "col-sm-12 control-segment"
+    });
+
+    left.append(outputCtrl);
+
+    var right = $('<div/>', {
+        class: "col-sm-4 message-segment"
+    });
+
+    row
+        .append(left)
+    // .append(right);
+
+    return row;
+}
+
 function get_form_ctrl(ctrlsDiv, formElem, elemValue) {
     //control clone parameters...
-    var addbtnDiv = '';
     var counter = 0;
 
     //resolve control values
     var ctrlObjects = resolve_ctrl_values(ctrlsDiv.clone(), counter, formElem, elemValue);
 
+    var firstElement = ctrlObjects.ctrlsWithValuesDiv;
     if (formElem.type == "array") {
-        addbtnDiv = do_array_ctrls(ctrlsDiv.clone(), ctrlObjects.counter, formElem);
+        firstElement = $('<div/>', {
+            class: "row control-row"
+        });
+
+        var left = $('<div/>', {
+            class: "col-sm-9"
+        });
+
+        var right = $('<div/>', {
+            class: "col-sm-3",
+            style: "padding-left: 5px;"
+        });
+
+        firstElement
+            .append(left)
+            .append(right);
+
+        var addBtn = get_add_button();
+
+        left.append(ctrlObjects.ctrlsWithValuesDiv);
+        right.append(addBtn);
+
+        addBtn.click(function (event) {
+            event.preventDefault();
+            ++counter;
+
+            get_element_clone(ctrlsDiv, counter).insertAfter(firstElement);
+
+            //refresh controls
+            refresh_validator($(this).closest("form"));
+            refresh_tool_tips();
+        });
     }
 
     return form_div_ctrl()
         .append(form_label_ctrl(formElem))
-        .append(ctrlObjects.ctrlsWithValuesDiv)
+        .append(firstElement)
         .append(ctrlObjects.ctrlsWithValuesDivArray)
-        .append(addbtnDiv)
         .append(form_help_ctrl(formElem.help_tip));
 }
 
@@ -2849,3 +2938,21 @@ function save_form(formJSON) {
         }
     });
 } //end of function
+
+function get_del_button(theTitle) {
+    var title = theTitle || "Remove";
+    var delBtn = $('<button data-toggle="tooltip" title="' + title + '"  class="ui blue icon button">\n' +
+        '  <i class="minus icon"></i>\n' +
+        '</button>');
+
+    return delBtn;
+}
+
+function get_add_button(theTitle) {
+    var title = theTitle || "Add";
+    var addBtn = $('<button data-toggle="tooltip" title="' + title + '" class="ui blue icon button">\n' +
+        '  <i class="plus icon"></i>\n' +
+        '</button>');
+
+    return addBtn;
+}

@@ -82,7 +82,7 @@ services:
   # postgres service
   copo-postgres:
     <<: *shared-settings
-    image: postgres:9.6
+    image: library/postgres
     volumes:
       - postgres-data:/var/lib/postgresql/data
     deploy:

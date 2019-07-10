@@ -85,6 +85,10 @@ div[class*=" col-"] {
 / / border: 1 px solid black;
 }
 
+.control-row {
+    margin-bottom: 5px;
+}
+
 #sidebar > ul > li {
     cursor: pointer
 }
@@ -1796,6 +1800,56 @@ div.shown span.side-help-trigger:before {
 
 /*bundle styles*/
 
-.bundle-task {
-    font-size: 13px !important;
+.bundle-task.ui.button {
+    font-size: 12px;
 }
+
+.sub-bundle-task.ui.button {
+    line-height: 1.6;
+}
+
+
+
+/*draggable*/
+.draggable_tr {
+    cursor: pointer;
+}
+
+.draggingContainer {
+    background: rgba(50, 102, 154, 0.2);
+    cursor: move;
+    color: #003366;
+    padding: 5px;
+}
+
+.description-bundle-panel.dropActive {
+    border: 5px solid #e68a00;
+}
+
+.description-bundle-panel.dropHover {
+    border: 5px solid #00cc00;
+}
+
+/*ui steps*/
+.ui.steps .step.active .title {
+    color: #293f54;
+}
+
+.ui.steps .step .title {
+    font-size: 1.4285714em;
+}
+
+.ui.steps .step .description {
+    font-size: 1.12857143em;
+}
+
+/*ui text colors*/
+.copo-text-danger {
+    color: #990000;
+}
+
+.copo-text-primary {
+    color: #003366;
+}
+
+/*copo form controls*/

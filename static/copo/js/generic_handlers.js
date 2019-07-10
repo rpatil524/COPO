@@ -22,7 +22,7 @@ $(document).ready(function () {
     do_context_help_event();
 
     //input fields help tips event
-    set_inputs_help();
+    //set_inputs_help();
 
     //add event for ontology field change
     ontology_value_change();
@@ -35,6 +35,8 @@ $(document).ready(function () {
     select2_mouse_event();
 
     select2_data_view_event();
+
+    setup_dismissable_message();
 
 });
 
@@ -53,6 +55,21 @@ function setup_autocomplete() {
         }
     })
     auto_complete();
+}
+
+function setup_dismissable_message() {
+    $(document).on("click", ".message .close", function () {
+        $(this).closest(".message").remove();
+    });
+}
+
+function get_feedback_pane() {
+    return $('<div class="ui success message" style="margin-bottom: 10px;">\n' +
+        '                        <i class="close icon"></i>\n' +
+        '                        <div class="header"></div>\n' +
+        '                        <p></p>\n' +
+        '                        <div class="m-body"></div>\n' +
+        '                    </div>');
 }
 
 function select2_data_view_event() {
@@ -105,41 +122,43 @@ function select2_data_view_event() {
 }
 
 function select2_mouse_event() {
-    $(document).on("mouseover", ".select2-results__option.select2-results__option--highlighted", function () {
+    $(document).on("mouseover", ".server-desc", function () {
         var item = $(this);
-        var dataItem = item.find(".copo-select2-info");
-        var parentElem = item.closest(".copo-form-group");
 
-        if (parentElem.length) {
-            if (dataItem.data("server")) {//resolve item description from the server
+        var parentElem = item.closest(".parentSpan");
+        var url = parentElem.attr("data-url");
+        var accession = parentElem.attr("data-id");
 
-                WebuiPopovers.updateContent(parentElem, '<div class="webpop-content-div"><span class="fa fa-spinner fa-pulse fa-2x"></span></div>');
-
-                $.ajax({
-                    url: dataItem.data("url"),
-                    type: "GET",
-                    headers: {
-                        'X-CSRFToken': csrftoken
-                    },
-                    data: {
-                        "accession": dataItem.data("id")
-                    },
-                    success: function (data) {
-                        if (data.hasOwnProperty('result') && data.result.length > 0) {
-                            var desc = data.result[0].description;
-                            WebuiPopovers.updateContent(parentElem, '<div class="webpop-content-div limit-text">' + desc + '</div>');
-                        }
-                    },
-                    error: function () {
-                        console.log("Couldn't retrieve item's details!");
-                    }
-                });
-
-            } else if (dataItem.data("descr")) {//display item description
-                WebuiPopovers.updateContent(parentElem, '<div class="webpop-content-div limit-text">' + dataItem.data("descr") + '</div>');
-            }
+        if (!(url && accession)) {
+            return false;
         }
+
+        WebuiPopovers.updateContent(item, '<div class="webpop-content-div"><span class="fa fa-spinner fa-pulse fa-2x"></span></div>');
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                "accession": accession
+            },
+            success: function (data) {
+                if (data.hasOwnProperty('result') && data.result.length > 0) {
+                    var desc = data.result[0].description;
+                    WebuiPopovers.updateContent(item, '<div class="webpop-content-div limit-text">' + desc + '</div>');
+
+                }
+            },
+            error: function () {
+                console.log("Couldn't retrieve item's details!");
+            }
+        });
+
+
     });
+
 }
 
 function ontology_value_change() {
@@ -956,10 +975,19 @@ function refresh_singleselectbox() {
                     }
 
                     var descr = state.description || '';
+                    var $state = $('<span>' + state.text + '</span>');
 
-                    var $state = $(
-                        '<span class="copo-select2-info" data-descr="' + descr + '">' + state.text + '</span>'
-                    );
+                    if (descr) {
+                        var item = $('<i class="ui secondary icon question circle" style="margin-left: 15px;"></i>');
+                        item.webuiPopover('destroy');
+                        item.webuiPopover({
+                            content: '<div class="webpop-content-div">' + descr + '</div>',
+                            arrow: true,
+                            width: 200,
+                            trigger: 'hover',
+                        });
+                        $state.append(item);
+                    }
 
                     return $state;
                 }
@@ -1026,7 +1054,22 @@ function refresh_copo_lookup2() {
                     return markup;
                 }, // for our custom formatter to work
                 templateResult: function (state) {
-                    return '<span data-id="' + state.id + '" data-server="' + state.serverSide + '" data-url="' + state.url + '" class="copo-select2-info select2-minfo">' + state.text + '</span>';
+                    var $state = $('<span  data-id="' + state.id + '" data-server="' + state.serverSide + '" data-url="' + state.url + '" class="parentSpan">' + state.text + '</span>');
+
+                    var item = $('<i class="ui secondary icon question server-desc circle" style="margin-left: 15px;"></i>');
+
+                    item.webuiPopover('destroy');
+                    item.webuiPopover({
+                        content: '<div class="webpop-content-div"></div>',
+                        arrow: true,
+                        width: 200,
+                        trigger: 'hover',
+                    });
+
+                    $state.append(item);
+                    return $state;
+
+                    //return '<span data-id="' + state.id + '" data-server="' + state.serverSide + '" data-url="' + state.url + '" class="copo-select2-info select2-minfo">' + state.text + '</span>';
                 }
             });
 
@@ -2012,7 +2055,7 @@ function get_profile_components() {
             iconClass: "fa fa-pencil",
             semanticIcon: "write",
             countsKey: "num_annotation",
-            buttons: ["quick-tour-template", "new-component-template"],
+            buttons: ["quick-tour-template"],
             sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help", "copo-sidebar-annotate"],
             colorClass: "annotations_color",
             color: "violet",
@@ -2345,11 +2388,11 @@ function do_global_help(component) {
             //set quick tour message and trigger display event
             try {
                 do_context_help(data.context_help);
-                quickTourFlag = data.quick_tour_flag;
-
-                if (quickTourFlag && data.user_has_email) {
-                    $(".takeatour").trigger("click");
-                }
+                // quickTourFlag = data.quick_tour_flag;
+                //
+                // if (quickTourFlag && data.user_has_email) {
+                //     //$(".takeatour").trigger("click");
+                // }
 
             } catch (err) {
             }
@@ -2414,25 +2457,35 @@ function set_inputs_help() {
             title.find(".constraint-label").remove();
             title = title.html();
         }
+
         var content = elem.find(".form-input-help").html();
 
-        elem.webuiPopover('destroy');
+        if (elem.closest(".rendered-control").length) {
+            elem.closest(".rendered-control").find(".message-segment")
+                .html('')
+                .append($('<div style="margin-top: 15px;" class="webpop-content-div message-segment-help ui ignored info message">' + content + '</div>'));
+        } else {
+            elem.webuiPopover('destroy');
 
-        elem.webuiPopover({
-            title: title,
-            content: '<div class="webpop-content-div">' + content + '</div>',
-            trigger: 'sticky',
-            width: 300,
-            arrow: true,
-            closeable: true,
-            animation: 'fade',
-            placement: 'right',
-        });
-
+            elem.webuiPopover({
+                title: title,
+                content: '<div class="webpop-content-div">' + content + '</div>',
+                trigger: 'sticky',
+                width: 300,
+                arrow: true,
+                closeable: true,
+                animation: 'fade',
+                placement: 'right',
+            });
+        }
     });
 
     $(document).on("blur", ".copo-form-group", function (event) {
-        $(this).webuiPopover('destroy');
+        if ($(this).closest(".rendered-control").length) {
+            $(this).closest(".rendered-control").find(".message-segment-help").remove();
+        } else {
+            $(this).webuiPopover('destroy');
+        }
     });
 }
 

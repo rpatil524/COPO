@@ -200,7 +200,7 @@ class BrokerDA:
         kwargs["action_type"] = self.param_dict.get("action_type", str())
 
         form_value = htags.generate_copo_form(self.component, target_id, component_dict, message_dict,
-                                                        self.profile_id, **kwargs)
+                                              self.profile_id, **kwargs)
 
         self.context["component_record"] = form_value["form_value"]
         self.context["component_schema"] = form_value["form_schema"]
@@ -236,20 +236,45 @@ class BrokerDA:
 
         return self.context
 
-    def create_description_bundle(self):
+    def create_rename_description_bundle(self):
         """
-        function creates a new description bundle
+        function creates a new description bundle or renames an existing one
         :return:
         """
 
-        import uuid
-        name = "bundle-"+str(uuid.uuid1())
+        target_id = self.param_dict.get("target_id", str())
+        bundle_name = self.param_dict.get("bundle_name", str())
 
-        self.context["result"] = str(
-            Description().create_description(profile_id=self.profile_id, component=self.component, name=name)['_id'])
+        result = dict(status="success", message="")
 
+        if Description().get_description_handle().find(
+                {"name": {'$regex': "^" + bundle_name + "$",
+                          "$options": 'i'}}).count() >= 1:
+            result["status"] = "error"
+            result["message"] = "Bundle name must be unique"
+        elif target_id:
+            # updating existing bundle
+            Description().edit_description(target_id, {"name": bundle_name})
+
+            try:
+                Description().edit_description(target_id, {"name": bundle_name})
+            except Exception as e:
+                print("Couldn't update bundle: " + bundle_name + " " + str(e))
+                result["status"] = "error"
+                result["message"] = "Couldn't update bundle"
+        else:
+            # new bundle being created
+            try:
+                bundle = Description().create_description(profile_id=self.profile_id, component=self.component,
+                                                          name=bundle_name)
+                result["data"] = dict(id=str(bundle["_id"]), name=bundle["name"])
+            except Exception as e:
+                print("Couldn't create bundle: " + bundle_name + " " + str(e))
+                result["status"] = "error"
+                result["message"] = "Couldn't create bundle"
+
+        self.context["result"] = result
         return self.context
-
 
 
 class BrokerVisuals:
@@ -343,7 +368,7 @@ class BrokerVisuals:
 
         if data_source:
             option_values = COPOLookup(accession=[target_id],
-                                                       data_source=data_source).broker_component_search()['result']
+                                       data_source=data_source).broker_component_search()['result']
 
         self.context["option_values"] = option_values
         self.context["created_record_id"] = target_id

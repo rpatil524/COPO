@@ -194,7 +194,7 @@ elif [ $1 == "run" ]
 then
   set_envs
   printf "Starting COPO...\n"
-  mongod --fork
+	  mongod --fork -- logpath "~/mongolog/"
   if [ "$opsys" == "Darwin" ]
   then
     brew services start postgres
@@ -273,7 +273,7 @@ then
       # install python3
       $pac_man install -y python3
       # install MongoDB
-      $pac_man install -y mongodb
+      $pac_man install mongodb
       echo making data/db/
       sudo mkdir -p /data/db
       brew services start mongodb
@@ -309,13 +309,13 @@ then
       virtualenv -p python3 $COPO_VM_NAME
       source $local_dir/$COPO_VM_NAME/bin/activate
       pip3 install --upgrade setuptools
-      pip3 install -r $local_dir/web/src/requirements/base.txt
-      /$local_dir/web/src/manage.py makemigrations
-      /$local_dir/web/src/manage.py makemigrations chunked_upload
-      /$local_dir/web/src/manage.py makemigrations allauth
-      /$local_dir/web/src/manage.py migrate
-      /$local_dir/web/src/manage.py setup_groups
-      /$local_dir/web/src/manage.py setup_schemas
+      pip3 install -r $local_dir/requirements/base.txt
+      $local_dir/manage.py makemigrations
+      $local_dir/manage.py makemigrations chunked_upload
+      $local_dir/manage.py makemigrations allauth
+      $local_dir/manage.py migrate
+      $local_dir/manage.py setup_groups
+      $local_dir/manage.py setup_schemas
 
       # add social account records
       psql $POSTGRES_DB $POSTGRES_USER -c "DELETE FROM socialaccount_socialapp_sites"
@@ -327,8 +327,8 @@ then
       div
       sudo gem install sass
       printf "Finished Installing....type 'setup run' to run the COPO development server."
-    elif [[ $opsys == "Ubuntu" ]]
-    then
+    #elif [[ $opsys == "Ubuntu" ]]
+    #then
       $pac_man --allow-unauthenticated install -y python3
       # import public key used by apt-get
       $pac_man install -y apt-transport-https
@@ -360,6 +360,7 @@ then
       # installation is interupted for some reason.
       echo -e "local\t\tcopo\t\tall\t\ttrust\n$(cat /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf)" > /etc/postgresql/$(ls /etc/postgresql)/main/pg_hba.conf
       service postgresql restart
+	  
 
 
       printf "Attempting to add required users to PostgreSQL. If this fails, try adding a .pgpass file to your home directory
@@ -388,12 +389,12 @@ then
       source $COPO_VM_NAME/bin/activate
       pip3 install --upgrade setuptools
       pip3 install -r /$local_dir/web/src/requirements/base.txt
-      /$local_dir/web/src/manage.py makemigrations
-      /$local_dir/web/src/manage.py makemigrations chunked_upload
-      /$local_dir/web/src/manage.py makemigrations allauth
-      /$local_dir/web/src/manage.py migrate
-      /$local_dir/web/src/manage.py setup_groups
-      /$local_dir/web/src/manage.py setup_schemas
+      $local_dir/manage.py makemigrations
+      $local_dir/manage.py makemigrations chunked_upload
+      $local_dir/manage.py makemigrations allauth
+      $local_dir/manage.py migrate
+      $local_dir/manage.py setup_groups
+      $local_dir/manage.py setup_schemas
 
       # add social account records
       psql $POSTGRES_DB $POSTGRES_USER -c "DELETE FROM socialaccount_socialapp_sites"

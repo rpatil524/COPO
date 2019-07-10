@@ -33,17 +33,18 @@ class BrokerRequests:
                             save_cell_data=self.do_save_cell_data,
                             batch_update=self.do_batch_update,
                             un_describe=self.do_un_describe,
+                            remove_bundle_metadata=self.do_remove_bundle_metadata,
                             get_description_records=self.do_description_records,
                             match_to_description=self.do_match_to_description,
                             unbundle_datafiles=self.do_unbundle_datafiles,
-                            delete_description_record=self.do_delete_description_record,
+                            delete_description_bundle=self.do_delete_description_bundle,
                             get_unbundled_datafiles=self.do_get_unbundled_datafiles,
                             get_description_bundle_details=self.do_get_description_bundle_details,
                             initiate_submission=self.do_initiate_submission,
                             add_to_bundle=self.do_add_to_bundle,
                             validate_datafile_pairing=self.do_validate_datafile_pairing,
                             get_unpaired_datafiles=self.do_get_unpaired_datafiles,
-                            pair_datafiles=self.do_pair_datafiles
+                            pair_datafiles=self.do_pair_datafiles,
                             )
 
         return request_dict
@@ -60,7 +61,7 @@ class BrokerRequests:
         return self.context
 
     def do_initiate_description(self):
-        self.context['result'] = self.wizard_helper.initiate_description(self.description_targets)
+        self.context['result'] = self.wizard_helper.initiate_description()
 
     def do_next_stage(self):
         self.context['next_stage'] = self.wizard_helper.resolve_next_stage(self.auto_fields)
@@ -83,6 +84,9 @@ class BrokerRequests:
     def do_un_describe(self):
         self.context['result'] = self.wizard_helper.discard_description(self.description_targets)
 
+    def do_remove_bundle_metadata(self):
+        self.context['result'] = self.wizard_helper.remove_bundle_metadata()
+
     def do_batch_update(self):
         cell_reference = self.param_dict.get("cell_reference", str())
         self.context['batch_update'] = self.wizard_helper.batch_update_cells(cell_reference, self.target_id,
@@ -97,8 +101,8 @@ class BrokerRequests:
     def do_unbundle_datafiles(self):
         self.context['result'] = self.wizard_helper.unbundle_datafiles(self.description_targets)
 
-    def do_delete_description_record(self):
-        self.context['result'] = self.wizard_helper.delete_description_record()
+    def do_delete_description_bundle(self):
+        self.context['result'] = self.wizard_helper.delete_description_bundle()
 
     def do_get_unbundled_datafiles(self):
         self.context['result'] = self.wizard_helper.get_unbundled_datafiles()

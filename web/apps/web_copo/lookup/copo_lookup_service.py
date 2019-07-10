@@ -107,6 +107,10 @@ class COPOLookup:
 
             records = cursor_to_list(Lookups.find(filter_by, projection))
 
+            if not records and self.search_term:
+                del filter_by["label"]
+                records = cursor_to_list(Lookups.find(filter_by, projection))
+
         return records
 
     def get_samplesource(self):
@@ -144,6 +148,14 @@ class COPOLookup:
                                                                                  projection=projection,
                                                                                  sort_by=sort_by,
                                                                                  sort_direction=sort_direction)
+
+            if not records:
+                # try getting all records
+                del filter_by["name"]
+                records = Source(profile_id=self.profile_id).get_all_records_columns(filter_by=filter_by,
+                                                                                     projection=projection,
+                                                                                     sort_by=sort_by,
+                                                                                     sort_direction=sort_direction)
 
             if records:
                 df = pd.DataFrame(records)
@@ -216,6 +228,13 @@ class COPOLookup:
                                                                                  sort_by=sort_by,
                                                                                  sort_direction=sort_direction)
 
+            if not records:
+                # try getting all records
+                del filter_by[filter_name]
+                records = CGCore(profile_id=self.profile_id).get_all_records_columns(filter_by=filter_by,
+                                                                                     projection=projection,
+                                                                                     sort_by=sort_by,
+                                                                                     sort_direction=sort_direction)
             if records:
                 df = pd.DataFrame(records)
                 df['accession'] = df._id.astype(str)
@@ -266,6 +285,13 @@ class COPOLookup:
                                                                                  projection=projection,
                                                                                  sort_by=sort_by,
                                                                                  sort_direction=sort_direction)
+            if not records:
+                # try getting all records
+                del filter_by['name']
+                records = Sample(profile_id=self.profile_id).get_all_records_columns(filter_by=filter_by,
+                                                                                     projection=projection,
+                                                                                     sort_by=sort_by,
+                                                                                     sort_direction=sort_direction)
             if records:
                 df = pd.DataFrame(records)
                 df['accession'] = df._id.astype(str)
@@ -317,6 +343,14 @@ class COPOLookup:
                                                                                  projection=projection,
                                                                                  sort_by=sort_by,
                                                                                  sort_direction=sort_direction)
+            if not records:
+                # try getting all records
+                del filter_by['name']
+                records = Sample(profile_id=self.profile_id).get_all_records_columns(filter_by=filter_by,
+                                                                                     projection=projection,
+                                                                                     sort_by=sort_by,
+                                                                                     sort_direction=sort_direction)
+
             if records:
                 df = pd.DataFrame(records)
                 df['accession'] = df._id.astype(str)

@@ -18,7 +18,7 @@ function get_chunk_size(event) {
         );
     }
     else {
-        chunk_size >= chunk_threshold;
+        chunk_size = chunk_threshold;
         $(event.currentTarget).parent().parent().fileupload(
             'option',
             {
@@ -278,7 +278,7 @@ $(document).ready(function () {
             }
         }).done(function (data) {
             //refresh datafiles table
-            do_render_component_table(data, get_component_meta("datafile"));
+            do_render_server_side_table(get_component_meta("datafile"));
 
             //check if the file needs compression; send request to server to gzip
             if (data.do_compress) {
@@ -303,7 +303,7 @@ $(document).ready(function () {
                         get_hash(file_id, tform)
 
                         //update table data
-                        do_render_component_table(data, get_component_meta("datafile"));
+                        do_render_server_side_table(get_component_meta("datafile"));
 
                     },
                     error: function (data) {
@@ -317,8 +317,7 @@ $(document).ready(function () {
         })
     }
 
-})
-;
+});
 
 function get_hash(id, tform) {
     $("input[value='" + id + "']").parent().next().children('.hash-image').show();
@@ -338,7 +337,7 @@ function get_hash(id, tform) {
         $("input[value='" + id + "']").parent().next().children('.hash-image').hide();
         $("input[value='" + data.file_id + "']").closest(".file_info").remove();
 
-        do_render_component_table(data, get_component_meta("datafile"));
+        do_render_server_side_table(get_component_meta("datafile"));
 
     });
 

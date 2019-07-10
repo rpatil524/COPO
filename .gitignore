@@ -122,6 +122,8 @@ workspace.xml
 # add ignore for migrations
 0001_initial.py
 
+copo_env
+
 
 
 .gitignore.swp

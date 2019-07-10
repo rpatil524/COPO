@@ -41,68 +41,34 @@ class WizardHelper:
 
         return p_id
 
-    def initiate_description(self, description_targets):
+    def initiate_description(self):
         """
-        using the description targets as basis, function attempts to initiate a new description...
-        :param description_targets: datafiles to be described
+        function initiates a new description
         :return:
         """
 
         initiate_result = dict(status="success", message="")
-        initiate_result['wiz_message'] = self.wiz_message
 
-        if self.description_token:  # this is a call to reload an existing description
+        try:
             description = Description().GET(self.description_token)
+        except Exception as e:
+            initiate_result['status'] = "error"
+            initiate_result['message'] = self.wiz_message["bundle_record_not_found"]["text"]
 
-            if not description:  # validate token
-                # description record doesn't exist; flag error
-                initiate_result['status'] = "error"
-                initiate_result['message'] = self.wiz_message["invalid_token_message"]["text"]
-                initiate_result.pop('wiz_message', None)
-            else:
-                # reset timestamp, which will also reset the 'grace period' for the description
-                Description().edit_description(self.description_token, dict(created_on=d_utils.get_datetime()))
-                initiate_result['description_token'] = self.description_token
+            return initiate_result
 
-                # get name of description and pass on
-                initiate_result["description_label"] = description.get("name", str())
-
-        else:  # this is a call to instantiate a new description; create record, and issue token
-            # validate description targets for bundling - based on existing bundle membership
-            trgts_df = pd.DataFrame(description_targets, columns=['id'])
-            trgts_df['idsplit'] = trgts_df['id'].apply(lambda x: ObjectId(x.split("row_")[-1]))
-
-            records_count = DataFile().get_collection_handle().find({"$and": [
-                {"_id": {"$in": list(trgts_df.idsplit)}},
-                {'description_token': {"$exists": True, "$ne": ""}},
-                {'deleted': d_utils.get_not_deleted_flag()}]}).count()
-
-            if records_count > 0:
-                initiate_result['status'] = "error"
-                initiate_result['message'] = self.wiz_message["new_bundling_alert"]["text"]
-                initiate_result.pop('wiz_message', None)
-
-                return initiate_result
-
+        stages = description.get("stages", list())
+        if not stages:
             # get initial stages - other stages will be dynamically determined along the line
-            wizard_stages = WizardSchemas().get_wizard_template("start")
+            stages = WizardSchemas().get_wizard_template("start")
 
             # resolve type and data source for generated stages
-            self.sanitise_stages(wizard_stages)
+            self.sanitise_stages(stages)
 
-            meta = dict(rendered_stages=list())
+        save_dict = dict(stages=stages, created_on=d_utils.get_datetime())
+        Description().edit_description(self.description_token, save_dict)
 
-            initiate_result['description_token'] = str(
-                Description().create_description(stages=wizard_stages, attributes=dict(),
-                                                 profile_id=self.profile_id,
-                                                 component=self.component, meta=meta)['_id'])
-
-            # save description token against bundle items
-            update_dict = dict(description_token=initiate_result['description_token'])
-
-            DataFile().get_collection_handle().update_many(
-                {"_id": {"$in": list(trgts_df.idsplit)}},
-                {'$set': update_dict})
+        initiate_result["next_stage"] = self.resolve_next_stage({"current_stage": "intro"})
 
         return initiate_result
 
@@ -111,17 +77,6 @@ class WizardHelper:
         trgts_df['idsplit'] = trgts_df['id'].apply(lambda x: ObjectId(x.split("row_")[-1]))
 
         initiate_result = dict(status="success", message="")
-
-        records_count = DataFile().get_collection_handle().find({"$and": [
-            {"_id": {"$in": list(trgts_df.idsplit)}},
-            {'description_token': {"$exists": True, "$ne": ""}},
-            {'deleted': d_utils.get_not_deleted_flag()}]}).count()
-
-        if records_count > 0:
-            initiate_result['status'] = "error"
-            initiate_result['message'] = self.wiz_message["new_bundling_alert"]["text"]
-
-            return initiate_result
 
         # save description token against bundle items
         update_dict = dict(description_token=self.description_token)
@@ -217,6 +172,11 @@ class WizardHelper:
         if len(records) == 1:
             next_stage_dict['stage']['data'] = records[0].get("description", dict()).get("attributes", dict()).get(
                 current_stage, dict())
+
+            if next_stage_dict['stage']['data']:
+                # message to alert the user to how we arrived at data
+                next_stage_dict["stage"]["message"] = next_stage_dict["stage"]["message"] + \
+                                                      self.wiz_message["pooled_data_message"]["text"]
 
             return True
 
@@ -431,6 +391,7 @@ class WizardHelper:
         stages = description["stages"]
         attributes = description["attributes"]
         meta = description.get("meta", dict())
+        bundle_name = description.get("name", str())
 
         # get next stage index
         next_stage_index = [indx for indx, stage in enumerate(stages) if stage['ref'] == current_stage]
@@ -442,18 +403,18 @@ class WizardHelper:
         next_stage_index = next_stage_index[0] + 1 if len(next_stage_index) else 0
 
         # save in-coming stage data, check for changes, re-validate wizard, serve next stage
-        current_stage_dict = stages[next_stage_index - 1]
-        previous_data = attributes.get(current_stage, dict())
-        current_data = DecoupleFormSubmission(auto_fields, current_stage_dict['items']).get_schema_fields_updated_dict()
+        previous_data = None
+        current_data = None
+
+        if next_stage_index > 0:
+            current_stage_dict = stages[next_stage_index - 1]
+            previous_data = attributes.get(current_stage, dict())
+            current_data = DecoupleFormSubmission(auto_fields, current_stage_dict['items']).get_schema_fields_updated_dict()
 
         # save stage data
         if current_data and not (current_data == previous_data):
             attributes[current_stage] = current_data
             save_dict = dict(attributes=attributes)
-
-            # bundle name saved differently
-            if current_stage == "description_bundle_name":
-                save_dict["name"] = current_data["description_bundle_name"]
 
             Description().edit_description(self.description_token, save_dict)
 
@@ -464,16 +425,6 @@ class WizardHelper:
             if current_stage in meta["rendered_stages"]:
                 srch_indx = meta["rendered_stages"].index(current_stage)
                 meta["rendered_stages"] = meta["rendered_stages"][:srch_indx + 1]
-
-            # generate discrete attributes
-            # if current_stage_dict.get("is_metadata", True):
-            #     self.generate_discrete_stage_attribute(current_stage)
-
-            # remove store object, if any, associated with this description
-            # Description().remove_store_object(store_name=self.store_name, object_key=self.object_key)
-
-            # update meta
-            # meta["generated_columns"] = list()
 
         # get next stage
         next_stage_dict['stage'] = self.serve_stage(next_stage_index)
@@ -499,8 +450,11 @@ class WizardHelper:
             # save reference to rendered stage
             meta["last_rendered_stage"] = next_stage_dict['stage']['ref']
 
-            if not next_stage_dict['stage']['ref'] in meta["rendered_stages"]:
-                meta["rendered_stages"].append(next_stage_dict['stage']['ref'])
+            rendered_stages = meta.get("rendered_stages", list())
+
+            if not next_stage_dict['stage']['ref'] in rendered_stages:
+                rendered_stages.append(next_stage_dict['stage']['ref'])
+                meta["rendered_stages"] = rendered_stages
 
                 # validate description bundle against this stage
                 self.validate_description_targets(next_stage_dict)
@@ -520,7 +474,7 @@ class WizardHelper:
                                                   self.wiz_message["update_stage_alert_message"]["text"]
 
         # get name of description and pass on
-        next_stage_dict["description_label"] = self.get_bundle_name()
+        next_stage_dict["description_label"] = bundle_name
 
         # check and resolve value for lookup fields
         if "data" in next_stage_dict['stage']:
@@ -556,7 +510,7 @@ class WizardHelper:
                     stage = getattr(wizard_callbacks, stage["callback"])(next_stage_index)
                 except Exception as e:
                     print(stage["ref"])
-                    print('Stage resolution error. Next stage index: ' + str(next_stage_index) + " " + str(e))
+                    print('Stage resolution error. Next stage index: ' + str(next_stage_index) + ' ' + str(e))
                     stage = dict()
                     raise
 
@@ -586,23 +540,33 @@ class WizardHelper:
 
     def get_unbundled_datafiles(self):
         """
-        function returns datafiles that are not bundled
+        function returns datafiles that are not part of any bundle
         :return:
         """
+
+        # get all active bundles in the profile
+        existing_bundles = Description().get_all_records_columns(projection=dict(_id=1),
+                                                                 filter_by=dict(profile_id=self.profile_id,
+                                                                                component=self.component))
+        existing_bundles = [str(x["_id"]) for x in existing_bundles]
 
         data_set = list()
 
         records = cursor_to_list(DataFile().get_collection_handle().find({"$and": [
             {"profile_id": self.profile_id, 'deleted': d_utils.get_not_deleted_flag()},
-            {"description_token": {"$in": [None, False, ""]}}]},
-            {'name': 1}))
+            {"$or": [
+                {"description_token": {"$in": [None, False, ""]}},
+                {"description_token": {"$nin": existing_bundles}}]}]},
+            {'name': 1, 'description_token': 1}))
 
         if len(records):
             df = pd.DataFrame(records)
+            df['description_token'] = df['description_token'].fillna('')
             df['_id'] = df._id.astype(str)
             df["DT_RowId"] = df._id
             df["chk_box"] = ''
             df.DT_RowId = 'row_' + df.DT_RowId
+
             df = df.drop('_id', axis='columns')
             data_set = df.to_dict('records')
 
@@ -639,283 +603,6 @@ class WizardHelper:
             data_set = df.to_dict('records')
 
         return data_set
-
-    def generate_discrete_stage_attribute(self, current_stage):
-        """
-        function generates discrete attribute for stage whose stage_ref is provided
-        :param current_stage:
-        :return:
-        """
-
-        description = Description().GET(self.description_token)
-
-        stage = [x for x in description["stages"] if x['ref'] == current_stage]
-        stage = stage[0] if stage else {}
-        attributes = description["attributes"].get(current_stage, dict())
-
-        # object type controls and their corresponding schemas
-        object_controls = d_utils.get_object_array_schema()
-
-        # data and columns lists
-        data = list()
-
-        columns = [dict(title=' ', name='s_n', data="s_n", className='select-checkbox'),
-                   dict(title='Name', name='name', data="name")]
-
-        # aggregate items and data from all rendered stages
-        datafile_items = list()
-        datafile_attributes = dict()  # will be used for generating tabular data
-
-        apply_to_all = stage.get("apply_to_all", False)
-
-        for item in stage.get("items", list()):
-            if str(item.get("hidden", False)).lower() == "false":
-                atrib_val = attributes.get(item["id"], str())
-                item["id"] = stage["ref"] + self.key_split + item["id"]
-                item["apply_to_all"] = apply_to_all
-                datafile_attributes[item["id"]] = atrib_val
-                datafile_items.append(item)
-
-        schema_df = pd.DataFrame(datafile_items)
-
-        for index, row in schema_df.iterrows():
-            resolved_data = htags.resolve_control_output(datafile_attributes, dict(row.dropna()))
-            label = row["label"]
-
-            # 'apply_to_all' columns are flagged as non-editable in table view
-            column_class = 'locked-column' if row.get("apply_to_all") else ''
-
-            if row['control'] in object_controls.keys():
-                # get object-type-control schema
-                control_df = pd.DataFrame(object_controls[row['control']])
-                control_df['id2'] = control_df['id'].apply(lambda x: x.split(".")[-1])
-
-                if resolved_data:
-                    object_array_keys = [list(x.keys())[0] for x in resolved_data[0]]
-                    object_array_df = pd.DataFrame([dict(pair for d in k for pair in d.items()) for k in resolved_data])
-
-                    for o_indx, o_row in object_array_df.iterrows():
-                        # add primary header/value - first element in object_array_keys taken as header, second value
-                        # e.g., category, value in material_attribute_value schema
-                        # a slightly different implementation will be needed for an object-type-control
-                        # that require a different display structure
-
-                        class_name = self.key_split.join((row.id, str(o_indx), object_array_keys[1]))
-                        columns.append(dict(title=label + " [{0}]".format(o_row[object_array_keys[0]]), data=class_name,
-                                            className=column_class))
-                        data.append({class_name: o_row[object_array_keys[1]]})
-
-                        # add other headers/values e.g., unit in material_attribute_value schema
-                        for subitem in object_array_keys[2:]:
-                            class_name = self.key_split.join((row.id, str(o_indx), subitem))
-                            columns.append(dict(
-                                title=control_df[control_df.id2.str.lower() == subitem.lower()].iloc[0].label,
-                                data=class_name, className=column_class))
-                            data.append({class_name: o_row[subitem]})
-            elif row["type"] == "array":
-                for tt_indx, tt_val in enumerate(resolved_data):
-                    shown_keys = (row["id"], str(tt_indx))
-                    class_name = self.key_split.join(shown_keys)
-                    columns.append(
-                        dict(title=label + " [{0}]".format(str(tt_indx + 1)), data=class_name,
-                             className=column_class))
-
-                    if isinstance(tt_val, list):
-                        tt_val = ', '.join(tt_val)
-
-                    data.append({class_name: tt_val})
-            else:
-                shown_keys = row["id"]
-                class_name = shown_keys
-                columns.append(dict(title=label, data=class_name, className=column_class))
-                val = resolved_data
-
-                if isinstance(val, list):
-                    val = ', '.join(val)
-
-                data.append({class_name: val})
-
-        # get records in bundle
-        records = cursor_to_list(
-            DataFile().get_collection_handle().find(
-                {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
-                {'name': 1, 'description.attributes.' + current_stage: 1}))
-
-        datafiles_df = pd.DataFrame(records)
-        datafiles_df["DT_RowId"] = datafiles_df._id.astype(str)
-        datafiles_df.DT_RowId = 'row_' + datafiles_df.DT_RowId
-
-        datafiles_df.index = datafiles_df._id
-
-        # build display dataset
-        data_record = dict(pair for d in data for pair in d.items())
-        for k, v in data_record.items():
-            datafiles_df[k] = v
-
-        datafiles_df.insert(loc=0, column='s_n', value=[''] * len(records))
-
-        # any record lacking stage data?
-        item_series = datafiles_df['description'].apply(
-            lambda x: x.get('attributes', dict()).get(current_stage, np.nan))
-
-        # split records to those with/out data for current_stage
-        no_description_list = list(item_series[item_series.isna()].index)
-        has_description_series = item_series[~item_series.index.isin(no_description_list)].copy()
-
-        # process datafiles info...
-        # get rendered stages
-        meta = description["meta"]
-        rendered_stages_ref = meta["rendered_stages"]
-        rendered_stages = [x for x in description["stages"] if
-                           x['ref'] in rendered_stages_ref and x.get("is_metadata", True)]
-
-        df_attributes = dict()  # will be copied to records with no previous description data
-
-        for st in rendered_stages:
-            df_attributes[st["ref"]] = description["attributes"].get(st["ref"], dict())
-
-        # copy across wizard's data to records without description or single record case
-        if len(no_description_list) or len(has_description_series) == 1:
-            update_dict = dict(description=dict(stages=rendered_stages, attributes=df_attributes))
-            no_description_list = no_description_list + list(has_description_series.index)
-            DataFile().get_collection_handle().update_many(
-                {"_id": {"$in": no_description_list}},
-                {'$set': update_dict})
-
-        if len(has_description_series) > 1:
-            if apply_to_all:
-                # check for data consistency if apply_to_all stage, where all records in bundle must have same data
-                item_series = has_description_series[has_description_series.astype(str) != str(attributes)]
-
-                if len(item_series):
-                    trgt_list = list(item_series.index)
-
-                    DataFile().get_collection_handle().update_many(
-                        {"_id": {"$in": trgt_list}},
-                        {'$set': {"description.attributes." + current_stage: attributes}})
-
-                # update stage list
-                DataFile().get_collection_handle().update_many(
-                    {"_id": {"$in": list(has_description_series.index)}},
-                    {'$set': {"description.stages": rendered_stages}})
-
-            else:
-                for index, row in schema_df.iterrows():
-                    st_key_split = row.id.split(self.key_split)  # will give [0]: stage ref; [1]: control id
-
-                    # any record lacking current item?
-                    item_series = has_description_series.apply(lambda x: x.get(st_key_split[1], np.nan))
-
-                    trgt_list = list(item_series[item_series.isna()].index)
-
-                    if len(trgt_list):
-                        # update our running series by excluding trgt_list; save data for records in trgt_list
-                        item_series = item_series[~item_series.index.isin(trgt_list)]
-
-                        DataFile().get_collection_handle().update_many(
-                            {"_id": {"$in": list(trgt_list)}},
-                            {'$set': {"description.attributes." + st_key_split[0] + "." + st_key_split[1]: attributes[
-                                st_key_split[1]]}})
-
-                    if not len(item_series):
-                        continue
-
-                    # get records having data different from the wizard's
-                    item_series = item_series[item_series.astype(str) != str(attributes[st_key_split[1]])]
-
-                    if not len(item_series):
-                        continue
-
-                    # records have data different from the wizard's need to resolve this to the attributes dataframe
-                    retained_row_id = row.id
-                    row.id = st_key_split[1]  # update row id momentarily for data resolution
-
-                    item_series_resolved = has_description_series[
-                        has_description_series.index.isin(item_series.index)].apply(htags.resolve_control_output,
-                                                                                    args=(row,))
-
-                    row.id = retained_row_id
-
-                    if row.control in object_controls.keys() or row.type == "array":
-                        # resolve wizard's data, using it to align data for the records
-                        retained_row_id = row.id
-                        row.id = st_key_split[1]  # update row id momentarily for data resolution
-                        df_resolved_data = htags.resolve_control_output(attributes, row)
-
-                        row.id = retained_row_id
-
-                        if not df_resolved_data:
-                            continue
-
-                        # align records - i.e., same number of items in records' data as in wizard's
-                        # we assume here that items having the same length with the wizard's points to a consistent
-                        # set of features (e.g., host, height in sample characteristics)
-
-                        item_series_resolved_less = item_series_resolved[
-                            item_series_resolved.apply(lambda x: len(x)) < len(df_resolved_data)]
-
-                        # align entries, update db, drop column and update resolved dataframe
-                        if len(item_series_resolved_less):
-                            # augment _less items
-                            item_series_resolved_less = item_series_resolved_less.apply(
-                                lambda x: x + df_resolved_data[len(x):])
-
-                            # ...also align actual data and save to db
-                            bulk = DataFile().get_collection_handle().initialize_unordered_bulk_op()
-                            for ser_indx in list(item_series_resolved_less.index):
-                                ser_val = item_series[ser_indx] + attributes[st_key_split[1]][
-                                                                  len(item_series[ser_indx]):]
-                                bulk.find({'_id': ser_indx}).update({'$set': {
-                                    "description.attributes." + st_key_split[0] + "." + st_key_split[
-                                        1]: ser_val}})
-                            bulk.execute()
-
-                            # merge back to item_series_resolved
-                            item_series_resolved = item_series_resolved.loc[
-                                item_series_resolved_less.index] = item_series_resolved_less
-
-                        # update ui-bound dataframe for object controls
-                        if row.control in object_controls.keys():
-                            object_array_keys = [list(x.keys())[0] for x in df_resolved_data[0]]
-
-                            for ii in range(0, len(df_resolved_data)):
-                                class_name = self.key_split.join((row.id, str(ii), object_array_keys[1]))
-                                item_series_resolved_ui = item_series_resolved.apply(
-                                    lambda x: x[ii][1][object_array_keys[1]])
-
-                                datafiles_df.loc[
-                                    list(item_series_resolved_ui.index), class_name] = item_series_resolved_ui
-
-                                for subitem in object_array_keys[2:]:
-                                    class_name = self.key_split.join((row.id, str(ii), subitem))
-                                    sub_index = object_array_keys.index(subitem)
-
-                                    item_series_resolved_ui = item_series_resolved.apply(
-                                        lambda x: x[ii][sub_index][subitem])
-
-                                    datafiles_df.loc[
-                                        list(item_series_resolved_ui.index), class_name] = item_series_resolved_ui
-                        else:
-                            #  update ui-bound dataset for arrays
-                            for tt_indx in range(len(df_resolved_data)):
-                                class_name = self.key_split.join((row.id, str(tt_indx)))
-                                item_series_resolved_ui = item_series_resolved.apply(
-                                    lambda x: ', '.join(x[tt_indx]) if isinstance(x[tt_indx], list) else x[tt_indx])
-
-                                datafiles_df.loc[
-                                    list(item_series_resolved_ui.index), class_name] = item_series_resolved_ui
-                    else:
-                        class_name = row.id
-                        item_series_resolved_ui = item_series_resolved.apply(
-                            lambda x: ', '.join(x) if isinstance(x, list) else x)
-                        datafiles_df.loc[
-                            list(item_series_resolved_ui.index), class_name] = item_series_resolved_ui
-
-        # generate dataset for UI
-        datafiles_df = datafiles_df.drop(['_id', 'description'], axis='columns')
-        data_set = datafiles_df.to_dict('records')
-
-        return dict(columns=columns, rows=data_set)
 
     def generate_discrete_attributes(self):
         """
@@ -1482,6 +1169,32 @@ class WizardHelper:
             {"_id": {"$in": object_list}}, {"$set": {"description": dict()}}
         )
 
+    def remove_bundle_metadata(self):
+        """
+        function removes bundle's metadata
+        :return:
+        """
+
+        result = dict(status="success", message="")
+
+        fields = dict(
+            stages=list(),
+            attributes=dict(),
+            meta=dict(),
+            created_on=d_utils.get_datetime(),
+        )
+
+        try:
+            Description().edit_description(self.description_token, fields)
+        except Exception as e:
+            result['status'] = "error"
+            exception_message = "Error removing bundle's metadata " + " : " + str(e)
+            result['message'] = exception_message
+
+            return result
+
+        return result
+
     def do_validation(self, validation_parameters):
         """
         validates supplied entry
@@ -1547,7 +1260,7 @@ class WizardHelper:
 
         data_set = list()
 
-        projection = dict(name=1)
+        projection = dict(name=1, created_on=1)
         filter_by = dict(profile_id=self.profile_id, component=self.component)
 
         if self.description_token:
@@ -1560,6 +1273,7 @@ class WizardHelper:
             df = pd.DataFrame(records)
             df['id'] = df._id.astype(str)
             df['name'] = df['name'].replace('', 'N/A')
+            df['created_on'] = df['created_on'].apply(lambda x: htags.resolve_datetime_data(x, dict()))
 
             data_set = df.to_dict('records')
 
@@ -1653,9 +1367,9 @@ class WizardHelper:
 
         return targets_with_token
 
-    def delete_description_record(self):
+    def delete_description_bundle(self):
         """
-        function removes description record - datafiles are once more 'free agents'
+        function removes description bundle - thus unbundling assocoated datafiles
         :return:
         """
 

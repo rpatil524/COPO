@@ -46,6 +46,10 @@
       "text": "You have opted to exit the current description. Your entries will be saved, and you can carry on describing the datafiles at a later time. <br/><br/>Are you sure you want to exit the description?",
       "text_class": "text-default"
     },
+    "bundle_record_not_found": {
+      "text": "Couldn't find information about the target bundle.",
+      "text_class": "text-default"
+    },
     "confirm_bundling_action": {
       "text": "The selected datafiles will be described as a 'bundle', and may potentially be submitted together to the same repository. <br/><br/>Do you want to go ahead with the description?",
       "text_class": "text-default"
@@ -166,11 +170,11 @@
       "text_class": "text-danger"
     },
     "constrained_stage_alert_message": {
-      "text": "<hr/><strong><span class='text-danger'>Important - Entry update!</span></strong> <br/>Metadata supplied in this stage cannot be updated for individual datafiles in the description bundle.",
+      "text": "<hr/><strong><span class='copo-text-danger'>Please note!</span></strong> <br/>Metadata entered in this stage cannot be modified for individual datafiles in the description bundle.",
       "text_class": "text-danger"
     },
     "update_stage_alert_message": {
-      "text": "<hr/><strong><span class='text-info'>Important - Entry update!</span></strong> <br/>Metadata supplied in this will initially be copied across to all files in the bundle. The user can, at the final stage of the wizard, update entries for individual files in the bundle.</strong>",
+      "text": "<hr/><strong><span class='copo-text-danger'>Please note!</span></strong> <br/>Metadata entered in this stage can later be modified for individual files in the bundle.</strong>",
       "text_class": "text-danger"
     },
     "invalid_token_message": {
@@ -178,15 +182,15 @@
       "text_class": "text-warning"
     },
     "pooled_data_message": {
-      "text": "<hr/><strong><span class='text-danger'>Stage data!</span></strong> <br/>Stage data was resolved by aggregating metadata from datafiles in the bundle. You can update this to reflect current description needs.",
+      "text": "<hr/><strong><span class='copo-text-danger'>Stage data!</span></strong> <br/>Stage data was resolved by aggregating metadata from datafiles in the bundle. You can update this to reflect current description requirements.",
       "text_class": "text-warning"
     },
      "new_bundling_alert": {
-      "text": "<strong><span class='text-danger'>Bundling conflict!</span></strong><br/>Some of the target datafiles are already part of an existing bundle. To create a new bundle you must first 'unbundle' the affected datafiles. <br/><strong>Please note that unbundling datafiles can invalidate previously recorded metadata.</strong><br/><br/>To reload a bundle, click on the target bundle under the description bundles section.",
+      "text": "<strong><span class='copo-text-danger'>Bundling conflict!</span></strong><br/>Some of the target datafiles are already part of an existing bundle. To create a new bundle you must first 'unbundle' the affected datafiles. <br/><strong>Please note that unbundling datafiles can invalidate previously recorded metadata.</strong><br/><br/>To reload a bundle, click on the target bundle under the description bundles section.",
       "text_class": "text-warning"
     },
      "cg_multiple_types_alert": {
-      "text": "<hr/><strong><span class='text-danger'>Multiple items type!</span></strong><br/>Please ensure that the right type is assigned to individual items in the bundle.",
+      "text": "<hr/><strong><span class='copo-text-danger'>Multiple items type!</span></strong><br/>Please ensure that the right type is assigned to individual items in the bundle.",
       "text_class": "text-warning"
     }
   }

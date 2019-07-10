@@ -990,7 +990,9 @@ class DecoupleFormSubmission:
                             secondary_data_list.sort()
 
                             for sdl in secondary_data_list:
-                                value_list.append(self.auto_fields[sdl])
+                                tmp_val = self.auto_fields.get(sdl, str()).strip()
+                                if tmp_val:
+                                    value_list.append(tmp_val)
 
                         auto_dict[f_id.split(".")[-1]] = value_list
             else:

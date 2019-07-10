@@ -1161,9 +1161,6 @@ class WizardHelper:
         :return:
         """
 
-        # first, remove obsolete description records
-        Description().purge_descriptions(component="sample")
-
         projection = dict(created_on=1, attributes=1, meta=1, stages=1)
         filter_by = dict(profile_id=self.profile_id, component='sample')
         records = Description().get_all_records_columns(sort_by='created_on', projection=projection,
@@ -1171,8 +1168,6 @@ class WizardHelper:
 
         # step toward computing grace period before automatic removal of description
         description_df = Description().get_elapsed_time_dataframe()
-        no_of_days = settings.DESCRIPTION_GRACE_PERIOD
-
         refined_records = list()
 
         for r in records:
@@ -1185,7 +1180,6 @@ class WizardHelper:
                 created_on=htags.resolve_datetime_data(r['created_on'], dict()),
                 _id=str(r['_id']),
                 number_of_samples=r['attributes'].get("number_of_samples", dict()).get("number_of_samples", 'N/A'),
-                grace_period=str(int(float(no_of_days) - float(ll.diff_days))) + ' days',
                 last_rendered_stage=lrs
             )
 

@@ -158,16 +158,6 @@ def hash_upload(request):
              auto_fields=auto_fields
              ).do_save_edit()
 
-    # do visualise
-    table_data = BrokerVisuals(
-        profile_id=profile_id,
-        context=output_dict,
-        component=component,
-        record_object=record_object
-    ).do_row_data().get("table_data", dict())
-
-    output_dict['table_data'] = table_data
-
     out = jsonpickle.encode(output_dict)
     print('hash complete ' + file_id)
     return HttpResponse(out, content_type='json')
@@ -243,16 +233,6 @@ def inspect_file(request):
                   visualize="last_record"
                   ).do_save_edit().get("record_object", dict())
 
-    # do visualise
-    table_data = BrokerVisuals(
-        profile_id=profile_id,
-        context=output_dict,
-        component=component,
-        record_object=df
-    ).do_row_data().get("table_data", dict())
-
-    output_dict['table_data'] = table_data
-
     out = jsonpickle.encode(output_dict)
     return HttpResponse(out, content_type='json')
 
@@ -314,16 +294,6 @@ def zip_file(request):
              component=component,
              auto_fields=auto_fields
              ).do_save_edit()
-
-    # do visualise
-    table_data = BrokerVisuals(
-        profile_id=profile_id,
-        context=out,
-        component=component,
-        record_object=record_object
-    ).do_row_data().get("table_data", dict())
-
-    out['table_data'] = table_data
 
     out = jsonpickle.encode(out)
     return HttpResponse(out, content_type='json')

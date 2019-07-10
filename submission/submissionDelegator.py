@@ -2,7 +2,7 @@ __author__ = 'felix.shaw@tgac.ac.uk - 27/05/2016'
 
 from django.http import HttpResponse, JsonResponse
 from dal.copo_da import Submission
-from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission, enareads
+from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission, enareadSubmission
 from django.urls import reverse
 import jsonpickle, json
 
@@ -43,7 +43,7 @@ def delegate_submission(request):
 
     # Submit to ENA Sequence reads - splits the submission task to micro-tasks to overcome the timeout issues observed
     elif repo == 'ena':
-        result = enareads.EnaReads(submission_id=sub_id).submit()
+        result = enareadSubmission.EnaReads(submission_id=sub_id).submit()
 
         if result is True:
             return HttpResponse(jsonpickle.dumps({'status': 0}))
