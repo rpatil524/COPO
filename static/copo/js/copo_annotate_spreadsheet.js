@@ -182,6 +182,7 @@ function build_result_panel(d, idx, entry) {
 }
 
 function refresh_display() {
+
     var file_id = $("#file_id").val()
     $.ajax({
         url: "/copo/refresh_annotation_display/",
