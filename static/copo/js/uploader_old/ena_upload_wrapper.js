@@ -19,6 +19,7 @@ function get_chunk_size(event) {
     }
     else {
         chunk_size = chunk_threshold;
+        //chunk_size = 10000000
         $(event.currentTarget).parent().parent().fileupload(
             'option',
             {

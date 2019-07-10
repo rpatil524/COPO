@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 from . import views
-from web.apps.web_copo.utils import ajax_handlers
+from web.apps.web_copo.utils import ajax_handlers, annotation_handlers
 
 app_name = 'web_copo'
 urlpatterns = [path('', views.index, name='index'),
@@ -30,6 +30,7 @@ urlpatterns = [path('', views.index, name='index'),
                        name='copo_annotation'),
                re_path(r'^copo_repository/(?P<profile_id>[a-z0-9]+)/view', views.copo_repository,
                        name='copo_repository'),
+               re_path(r'^annotate_meta/(?P<file_id>[a-z0-9]+)/view', views.annotate_meta, name='annotate_meta'),
                re_path(r'^resolve/(?P<submission_id>[a-z0-9]+)', views.resolve_submission_id,
                        name="resolve_submission_id"),
                path('get_source_count/', ajax_handlers.get_source_count,
@@ -90,4 +91,14 @@ urlpatterns = [path('', views.index, name='index'),
                     name="get_ckan_items"),
                path('delete_repo_entry/', ajax_handlers.delete_repo_entry,
                     name="delete_repo_entry"),
+               path('refresh_annotation_display/', annotation_handlers.refresh_display,
+                    name="refresh_annotation_display"),
+               path('send_file_annotation/', annotation_handlers.send_file_annotation,
+                    name="send_file_annotation"),
+               path('refresh_annotations/', annotation_handlers.refresh_annotations,
+                    name="refresh_annotations"),
+               path('delete_annotation/', annotation_handlers.delete_annotation,
+                    name="delete_annotation"),
+               path('refresh_annotations_for_user/', annotation_handlers.refresh_annotations_for_user,
+                    name="refresh_annotations_for_user"),
                ]

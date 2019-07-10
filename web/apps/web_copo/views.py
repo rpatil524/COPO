@@ -16,6 +16,7 @@ from django.conf import settings
 from allauth.account.forms import LoginForm
 from allauth.socialaccount.models import SocialAccount
 from bson import json_util as j
+from bson import ObjectId
 from web.apps.web_copo.lookup.lookup import REPO_NAME_LOOKUP
 import requests
 from rauth import OAuth2Service
@@ -24,6 +25,7 @@ from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.decorators import user_is_staff
 import web.apps.web_copo.templatetags.html_tags as htags
 from dal.copo_da import DataFile
+import pandas
 
 LOGGER = settings.LOGGER
 
@@ -170,6 +172,12 @@ def copo_samples(request, profile_id):
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
     return render(request, 'copo/copo_sample.html', {'profile_id': profile_id, 'profile': profile})
+
+
+@login_required()
+def annotate_meta(request, file_id):
+    name = DataFile().get_record(ObjectId(file_id))["name"]
+    return render(request, 'copo/copo_annotate_spreadsheet.html', {'file_id': file_id, 'file_name': name})
 
 
 @login_required

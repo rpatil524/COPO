@@ -7,13 +7,25 @@ server {
     ssl_certificate       /run/secrets/copo-project.crt;
     ssl_certificate_key   /run/secrets/copo-project.key;
     client_max_body_size 1000M;
-    keepalive_timeout 730;
-    proxy_connect_timeout 925s;
-    proxy_read_timeout 1500s;
+    # N.B. these lines commented out during ddos testing.....could cause unforseen issues
+    # keepalive_timeout 730;
+    # proxy_connect_timeout 925s;
+    # proxy_read_timeout 1500s;
+    # N.B. Finish
+
+    # N.B. this block to protect against ddos and slowloris attacks
+    client_body_timeout 10s;
+    client_header_timeout 10s;
+    limit_req_zone $binary_remote_addr zone=one:10m rate=15r/s;
+    limit_conn_zone $binary_remote_addr zone=addr:10m;
+    # N.B. Finish
+
 
     location /static {
         autoindex off;
         alias /www/static/;
+        limit_req zone=one;
+        limit_conn addr 10;
     }
 
     location /copo {
@@ -21,42 +33,56 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        limit_req zone=one;
+        limit_conn addr 10;
     }
     location /docs {
         proxy_pass http://copo-web:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        limit_req zone=one;
+        limit_conn addr 10;
     }
     location /accounts {
         proxy_pass http://copo-web:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        limit_req zone=one;
+        limit_conn addr 10;
     }
     location /rest {
         proxy_pass http://copo-web:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        limit_req zone=one;
+        limit_conn addr 10;
     }
     location /api {
         proxy_pass http://copo-web:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        limit_req zone=one;
+        limit_conn addr 10;
     }
     location /admin {
         proxy_pass http://copo-web:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        limit_req zone=one;
+        limit_conn addr 10;
     }
     location / {
         proxy_pass http://copo-web:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        limit_req zone=one;
+        limit_conn addr 10;
     }
 
 }

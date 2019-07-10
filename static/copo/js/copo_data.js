@@ -895,6 +895,18 @@ $(document).ready(function () {
 
     } //end of func
 
+
+    function do_begin_annotate(records){
+        if(records.length != 1){
+            alert("You cannot annotate multiple spreadsheets at one.")
+            return false
+        }
+        else{
+            var file_id = records[0].split("_")
+            window.location.href = "/copo/annotate_meta/" + file_id[file_id.length -1] + "/view";
+        }
+    }
+
     function initiate_datafile_description(parameters) {
         var description_token = '';
 

@@ -1,0 +1,123 @@
+{% extends 'copo/base_1col.html' %}
+
+{% load staticfiles %}
+{% load web_tags %}
+{% load html_tags %}
+
+
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <input type="hidden" id="file_id" value="{{ file_id }}"/>
+            <input type="hidden" id="file_name" value="{{ file_name }}"/>
+            <p class="h4">{{ file_name }}</p>
+            <ul class="nav nav-tabs" id="ss_sheets">
+                <!-- sheet tabs are appended here in JS -->
+            </ul>
+            <div class="tab-content" id="ss_data">
+                <!-- sheet data are appended here in JS -->
+            </div>
+            <hr/>
+        </div>
+    </div>
+    <span class="row">
+    <div class="col-sm-4 col-md-4 col-lg-4" style="min-height: 300px; border-right:1px dashed #286090;">
+            <!-- search controls go here -->
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12" style="min-height: 150px">
+                    <form>
+                        <div class="form-group">
+                            <p class="lead">Search Term</p>
+                            <input type="text" class="form-control" id="search_term_text_box"
+                                   aria-describedby="term_help" placeholder="Search">
+                            <small id="term_help" class="form-text text-muted">Start typing to find matching ontology
+                                terms
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+
+                <p class="lead">Search Results
+                    <small class="text-muted">Drag Term to Column</small>
+                </p>
+                <!-- search results go here -->
+                <div id="search_results" style="overflow-y: scroll">
+
+                </div>
+            </div>
+        </div>
+    <div class="col-sm-4 col-md-4 col-lg-4" style="background-color: #f9f9f9; ">
+
+            <div class="col-sm-12 col-md-12 col-lg-12" style="min-height: 650px">
+                <p class="lead">Annotations</p>
+                <div id="existing_annotations"></div>
+            </div>
+
+
+        </div>
+    <span class="col-sm-4 col-md-4 col-lg-4" id="filters" style=" border-left:1px dashed #286090; min-height: 650px">
+            <!-- element filters go here -->
+            <p class="lead">Your Annotations</p>
+            <span id="filters">
+                <a href="#" data-filter="all" class="label label-default label-primary">All Terms</a>
+                <a href="#" data-filter="by_count" class="label label-default">By Times Used</a>
+                <a href="#" data-filter="by_dataset" class="label label-default">By Dataset</a>
+            </span>
+
+            <hr/>
+            <div id="your_annotations"></div>
+        </span>
+    </div>
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+{% block stylesheet_block %}
+    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
+
+    <link rel="stylesheet" href="{% static 'copo/handsontable7.0.3/handsontable.full.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/datafile.css' %}" xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_annotations.css' %}" xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_ontology_styles.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+{% endblock %}
+
+
+{% block js_block %}
+    <script type="text/javascript" src="{% static 'copo/js/copo_annotate_spreadsheet.js' %}"></script>
+    <script>
+
+
+        //$(document).ready(function () {
+        //    $('.global-page-title').append('<span class="ajax_loading_div pull-right"><img style="display: inline" src="{% static 'copo/img/preload.gif' %}" class="ajax_loading_img"/> Saving ...</span>')
+        //})
+
+    </script>
+
+
+    <!--<script type="text/javascript" src="{% static 'copo/js/generic_handlers.js' %}"></script>-->
+    <!--<script type="text/javascript" src="{% static 'copo/js/generic_handlers_ext2.js' %}"></script>-->
+    <!--<script type="text/javascript" src="{% static 'copo/js/copo_form_handlers.js' %}"></script>-->
+    <!--<script type="text/javascript" src="{% static 'copo/js/setup_annotator.js' %}"></script>-->
+    <!--<script type="text/javascript" src="{% static 'copo/js/copo_annotations.js' %}"></script>-->
+    <script type="text/javascript" src="{% static 'copo/handsontable7.0.3/handsontable.full.js' %}"></script>
+    <script type="text/javascript" src="{% static 'copo/js/copo_ontology_functions.js' %}"></script>
+
+
+{% endblock %}
