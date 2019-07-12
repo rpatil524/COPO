@@ -69,6 +69,6 @@ function handle_ontology_filter_click(e) {
     else {
         var autocomplete_url = '/copo/ajax_search_ontology/' + $(li).data('id')
     }
-    $('#an-column').attr('data-autocomplete', autocomplete_url)
+    $(document).data('autocomplete', autocomplete_url)
 
 }

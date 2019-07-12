@@ -4,6 +4,7 @@ $(document).ready(function () {
     refresh_display()
     //refresh_annotations()
     $(document).on("shown.bs.tab", ".hot_tab", function () {
+        $(document).data("nav_tab", $(this).find("a").attr("href"))
         var id = this.innerText
         var hot = $(document).data("table_" + id)
         hot.render()
@@ -101,12 +102,21 @@ var lastValue = '';
 // this is the handler which is called 1 second after the user stops typing in the search box
 $(document).on("input propertychange", "#search_term_text_box", delay(function (e) {
     var val = $(e.currentTarget).val()
+    var url = $(document).data("autocomplete")
+    if(!url){
+        url = "/copo/ajax_search_ontology/999"
+    }
     $.ajax({
-        url: "/copo/ajax_search_ontology/999",
+        url: url,
         data: {"q": val}
     }).done(function (data) {
         var d = JSON.parse(data)
         $("#search_results").empty()
+        if(!d.response.numFound > 0){
+            p = build_result_panel(undefined)
+            $("#search_results").append(p)
+            return false
+        }
         d.response.docs.forEach(function (entry, idx) {
             if (idx == 0) {
             }
@@ -121,13 +131,26 @@ $(document).on("input propertychange", "#search_term_text_box", delay(function (
 }))
 
 function build_result_panel(d, idx, entry) {
-
+    if(d == undefined){
+        var result = $("<div/>", {
+            class: "annotation_term panel panel-default",
+            html: "Nothing Found"
+        })
+        return result
+    }
     var v
     var desc
     var used = d.hasOwnProperty("highlighting") == false
     if (!used) {
-        v = d.highlighting[entry["id"]]["label_autosuggest"][0]
-        desc = entry["description"][0]
+        if(d.highlighting[entry["id"]]["label_autosuggest"]) {
+            v = d.highlighting[entry["id"]]["label_autosuggest"][0]
+        }
+        if(entry["description"]) {
+            desc = entry["description"][0]
+        }
+        else{
+            desc = "Description Unavailable"
+        }
     } else {
         v = entry.label
         desc = entry.description
@@ -252,6 +275,8 @@ function refresh_annotations() {
                 $(cell).addClass("annotatedColumn");
             }
         }
+        var a = $(document).data("nav_tab")
+        $("a[href=" + a + "]").tab("show")
     })
     do_my_annotations()
 
