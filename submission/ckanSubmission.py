@@ -63,6 +63,7 @@ class CkanSubmit:
                     fullurl = self.host["url"] + "resource_create"
             elif resp.status_code == 409:
                 # there is a conflict so update rather than create
+                print(resp.reason)
                 fullurl = self.host["url"] + "package_show"
                 resp = requests.post(fullurl, json={"name_or_id": data["name"]})
                 data = json.loads(resp.content.decode("utf-8"))
@@ -176,7 +177,7 @@ class CkanSubmit:
         # get file
         out = dict()
         out["name"] = str(uuid.uuid4()).encode('ascii', 'replace')
-
+        #out["name"] = "jfklsdjfklsdjfksldjfk"
         out["state"] = "active"
         out["tags"] = []
         out["private"] = False
@@ -186,12 +187,13 @@ class CkanSubmit:
 
         url = get_base_url()
         out["url"] = urljoin(url, 'copo/resolve/' + str(s["_id"]))
-        out["url"] = "hjkhkjhaj"
+
         extras = list()
 
         for item in s["meta"]["fields"]:
             if item["dc"] == "dc.type":
-                out["type"] = item["vals"]
+                out["type"] = "dataset"
+                print("setting type to 'dataset' due to ckan nomenclature")
             elif item["dc"] == "dc.title":
                 out["title"] = item["vals"][0]
 
@@ -219,6 +221,7 @@ class CkanSubmit:
                 for idx, pub in enumerate(item["vals"]):
                     if idx == 0:
                         out["publisher"] = pub
+
                     else:
                         extras.append({"key": "additional_publisher_" + str(idx + 1), "value": pub})
 
@@ -228,7 +231,7 @@ class CkanSubmit:
                 # add the submission_id to the dataverse metadata to allow backwards treversal from dataverse
                 url = get_base_url()
                 temp_id = urljoin(url, 'copo/resolve/' + str(s["_id"]))
-                #extras.append({"key": "relation", "value": temp_id})
+                extras.append({"key": "relation", "value": temp_id})
             elif item["dc"] == "notes":
                 # pass this as it will lead to a multiple key error
                 pass
@@ -237,18 +240,12 @@ class CkanSubmit:
                     extras.append({"key": item["copo_id"], "value": item["vals"]})
                 elif type(item["vals"]) == type([]):
                     for idx, val in enumerate(item["vals"]):
-                        extras.append({"key": item["dc"] + "_" + str(idx + 1), "value": val})
+                        if type(val) == type(""):
+                            extras.append({"key": item["dc"] + "_" + str(idx + 1), "value": val})
+                        else:
+                            extras.append({"key": item["dc"] + "_" + str(idx + 1), "value": val[idx]})
         out["extras"] = extras
 
-        '''
-        for key in out:
-            # ckan throws a wobbly if there is punctuation in field values, so remove
-            if type(out[key]) == type(""):
-                out[key] = out[key].replace(" ", "")
-                out[key] = out[key].translate(str.maketrans("", "", string.punctuation))
-                out[key] = out[key].lower()
-        '''
-        #return {"name":"test", "title":"test title", "private":False}
         return out
 
     def dc_dict_to_dc(self, sub_id):

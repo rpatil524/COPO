@@ -58,7 +58,11 @@
 
 
 
-    <input type="text" id="input_text" onchange="alert('here we go')"/>
+    {% for record in records %}
+
+        {{ record }}
+
+    {% endfor %}
 
 
 

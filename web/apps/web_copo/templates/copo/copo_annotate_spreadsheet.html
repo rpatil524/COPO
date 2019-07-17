@@ -27,14 +27,39 @@
             <!-- search controls go here -->
             <div class="row">
                 <div class="col-sm-12 col-md-12 col-lg-12" style="min-height: 150px">
-                    <form>
-                        <div class="form-group">
-                            <p class="lead">Search Term</p>
-                            <input type="text" class="form-control" id="search_term_text_box"
-                                   aria-describedby="term_help" placeholder="Search">
-                            <small id="term_help" class="form-text text-muted">Start typing to find matching ontology
+                    <p class="lead">Search Term</p>
+                    <small id="term_help" class="form-text text-muted">Start typing to find matching ontology
                                 terms
                             </small>
+                            <input type="text" class="form-control" id="search_term_text_box"
+                                   aria-describedby="term_help" placeholder="Search">
+                    <form>
+                        <div class="form-group">
+
+                            <div class="dropdown ontology_dropdown pull-right">
+                                        <div class="medium ui basic button dropdown-toggle"
+                                             id="ontology_filter_button"
+                                             data-toggle="dropdown"
+                                             aria-haspopup="true" aria-expanded="true">
+                                            <span class="ontology_label">All Ontologies</span>
+                                            <span class="caret"></span>
+                                        </div>
+
+                                        <ul class="dropdown-menu" id="ontology_dropdown_filter"
+                                            aria-labelledby="dropdownMenu1">
+                                            <a>
+                                                <li class="ontology_dd_item" data-name="All Ontologies" data-id="">
+                                <span class="h5">
+                                    <span class="ontology_dd_name">All Ontologies</span>
+                                    <br/>
+                                    <small class="ontology_dd_description">Search all ontologies for terms.</small>
+                                </span>
+                                                </li>
+                                            </a>
+                                        </ul>
+                            </div>
+
+
                         </div>
                     </form>
                 </div>
