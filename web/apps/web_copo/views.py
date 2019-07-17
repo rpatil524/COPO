@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from jsonpickle import encode
 from submission.submissionDelegator import delegate_submission
 from api.handlers.general import *
-from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, CopoGroup, Repository
+from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, CopoGroup, Repository, AnnotationReference
 from dal.OAuthTokens import OAuthToken
 from dal.broker_da import BrokerDA, BrokerVisuals
 from dal import cursor_to_list
@@ -51,7 +51,8 @@ def login(request):
 
 
 def test(request):
-    return render(request, 'copo/test_page.html', {})
+    records = Annotation().get_all_records("5c90f5c518af69000da2097f")
+    return render(request, 'copo/test_page.html', {"records": records})
 
 
 '''
