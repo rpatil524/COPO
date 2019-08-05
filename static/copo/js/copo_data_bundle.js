@@ -16,8 +16,8 @@ $(document).ready(function () {
     load_description_bundles();
 
 
-    //bundle list menu items tasks
-    $(document).on('click', '.bundle-task', function (event) {
+    //bundle tasks
+    $(document).on('click', '.bundlemenu', function (event) {
         event.preventDefault();
         dispatch_bundle_events($(this));
     });
@@ -97,6 +97,90 @@ $(document).ready(function () {
         });
     }
 
+    function clone_bundle(bundle_id) {
+        var bundleName = '';
+        var displayTitle = "Create New Bundle [clone]";
+
+        var dialog = new BootstrapDialog({
+            type: BootstrapDialog.TYPE_PRIMARY,
+            cssClass: 'copo-modal2',
+            title: displayTitle,
+            closable: false,
+            animate: true,
+            draggable: true,
+            onshown: function (dialogRef) {
+                form_body_div.find("#bundle_name_input").focus();
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    cssClass: 'tiny ui basic button',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                    }
+                },
+                {
+                    label: '<i class="copo-components-icons glyphicon glyphicon-save"></i> Save',
+                    cssClass: 'tiny ui basic primary button',
+                    action: function (dialogRef) {
+                        var new_bundle_name = form_body_div.find("#bundle_name_input").val().replace(/^\s+|\s+$/g, '');
+
+                        if (!new_bundle_name) {
+                            form_message_div.html('<span class="text-danger">Please enter a bundle name</span>');
+                            form_body_div.find("#bundle_name_input").focus();
+                        } else {
+                            $.ajax({
+                                url: copoFormsURL,
+                                type: "POST",
+                                headers: {
+                                    'X-CSRFToken': csrftoken
+                                },
+                                data: {
+                                    'task': "clone_description_bundle",
+                                    'bundle_name': new_bundle_name,
+                                    'component': component,
+                                    'target_id': bundle_id,
+                                    'profile_id': $('#profile_id').val()
+                                },
+                                success: function (data) {
+                                    if (data.result.status == "error") {
+                                        form_message_div.html('<span class="text-danger">' + data.result.message + '</span>');
+                                    } else {
+                                        load_description_bundles();
+                                        dialogRef.close();
+                                    }
+                                },
+                                error: function () {
+                                    form_message_div.html('<span class="text-danger">Couldn\'t create description bundle due to a system error!</span>');
+                                }
+                            });
+                        }
+                    }
+                }
+            ]
+        });
+
+        var $dialogContent = $('<div/>');
+
+        var form_body_div = $('<div class="ui form" style="font-size: inherit;">\n' +
+            '  <div class="inline field">\n' +
+            '    <label>Bundle name</label>\n' +
+            '    <input id="bundle_name_input" type="text" value="' + bundleName + '">\n' +
+            '  </div>\n' +
+            '</div>');
+
+        var form_message_div = $('<div/>', {
+            class: "webpop-content-div",
+            style: "margin-bottom: 20px;",
+            html: "Please provide a name for your bundle",
+        });
+
+        $dialogContent.append(form_message_div).append(form_body_div);
+        dialog.realize();
+        dialog.setMessage($dialogContent);
+        dialog.open();
+    }
+
 
     function create_edit_description_bundle(bundle_id) {
         var bundleName = '';
@@ -106,7 +190,7 @@ $(document).ready(function () {
         if (bundle_id) {
             parentElem = $('.description-bundle-panel[data-id="' + bundle_id + '"]');
             bundleName = parentElem.attr("data-bundlename");
-            displayTitle = "Edit Bundle Name";
+            displayTitle = "Edit Bundle";
         } else {
             bundle_id = ''; //control what we are dealing with here
         }
@@ -235,29 +319,59 @@ $(document).ready(function () {
                             continue;
                         }
 
-                        var panel = get_bundle_template();
+                        var panel = $(".description-bundle-template").clone().find(".description-bundle-panel");
                         panel.attr("data-id", Ddata.id);
                         panel.attr("data-bundlename", Ddata.name);
-                        var bundleName = $('<span class="bundlename">' + Ddata.name + '</span>');
-                        var bundleNameEdit = $('<i class="edit green icon" data-toggle="tooltip" title="Edit bundle name" style="margin-left: 5px; cursor: pointer"></i>');
-                        panel.find(".bundle-name")
-                            .append(bundleName)
-                            .append(bundleNameEdit);
 
-                        panel.find(".sub-header").html('<div class="webpop-content-div"><span style="color: #35637e;">Last Modified: ' + Ddata.created_on + '</span></div>');
+                        panel.find(".bundlename").html(Ddata.name);
+                        panel.find(".bundle-modified-date").html("Last modified: " + Ddata.created_on);
+
+                        //set bundle status
+                        var bundleStatus = panel.find(".bundle-status");
+                        // var bundleStatusBottom = panel.find(".bundle-status-bottom");
+                        var submission_status = Ddata.submission_status.toString().toLowerCase();
+
+                        var bundle_description = '';
+                        var exclusion_list = [];
+
+                        if (submission_status == 'submitted') {
+                            bundleStatus.addClass("certificate green");
+                            bundle_description = 'Bundle has been submitted. Select view accessions for accessions and DOIs.';
+                            bundleStatus.prop('title', 'This bundle has been submitted. Select view accessions for accessions and DOIs.');
+                            exclusion_list = ["view_issues", "add_metadata", "edit_bundle", "delete_bundle", "submit_bundle"];
+
+                        } else if (submission_status == 'pending') {
+                            bundleStatus.addClass("circle orange");
+                            bundle_description = 'Bundle is pending submission or submission is currently being processed.'
+                            bundleStatus.prop('title', 'This bundle is pending submission. Use the submit option to continue with the submission.');
+                            exclusion_list = ["edit_bundle", "delete_bundle", "submit_bundle"];
+                        } else if (submission_status == 'error') {
+                            bundleStatus.addClass("circle red");
+                            bundle_description = 'There are issues with this bundle. Use the view issues option for more information.'
+                            bundleStatus.prop('title', 'There are issues with this bundle. Use the view issues option for more information.');
+                        } else {
+                            // bundleStatus.addClass("circle");
+                            bundle_description = 'Please add/edit metadata for this bundle.'
+                            // bundleStatus.prop('title', 'Bundle is yet to be described or has incomplete metadata. Use the add metadata button to describe it.');
+                            exclusion_list = ["add_metadata", "edit_bundle", "delete_bundle", "submit_bundle"];
+                        }
+
+                        //disable non-applicable bundle actions
+                        panel.find(".bundlemenu").each(function (indx, menuitem) {
+                            if (exclusion_list.indexOf($(menuitem).attr("data-task")) > -1) {
+                                $(menuitem).addClass("disabled");
+                            }
+                        });
+
+                        //set description
+                        var bundleDescription = panel.find(".bundle-description");
+                        bundleDescription
+                            .html("")
+                            .append("<div class='webpop-content-div'>" + bundle_description + "</div>");
 
                         $(".desc-bundle-display-div").find(".desc-bundle-display-div-2").prepend(panel);
 
-
-                        //bundle name edit
-                        bundleNameEdit
-                            .click(function (event) {
-                                event.preventDefault();
-                                var bundle_id = $(this).closest(".description-bundle-panel").attr("data-id");
-                                create_edit_description_bundle(bundle_id);
-                            });
-
-                        //make droppable
+                        //make draggable
                         panel.droppable({
                             activeClass: "dropActive",
                             hoverClass: "dropHover",
@@ -269,6 +383,10 @@ $(document).ready(function () {
                                 pElem.find('.selected').each(function () {
                                     target_rows.push($(this).attr("id"));
                                 });
+
+                                if (target_rows.length <= 0) {
+                                    return false;
+                                }
 
                                 //remove draggable rows from panel
                                 pElem.find(".draggable_tr").remove();
@@ -289,7 +407,6 @@ $(document).ready(function () {
                                     success: function (data) {
                                         $('#' + componentMeta.tableID).DataTable().rows().deselect();
                                         server_side_select[component] = [];
-                                        $('.description-bundle-panel[data-id="' + bundle_id + '"]').find(".bundle-task").removeClass("active");
                                         show_bundle_datafiles(bundle_id);
 
                                         //check where this parcel came from
@@ -313,6 +430,7 @@ $(document).ready(function () {
                                 });
                             }
                         });
+
 
                     }
 
@@ -373,11 +491,10 @@ $(document).ready(function () {
             },
             success: function (data) {
                 loader.remove();
-
                 viewPort.append(meta_div).append(table_div);
 
                 // meta_div.append("<div class='webpop-content-div'><strong>Bundle Name:</strong> " + data.result.name + "</div>");
-                meta_div.append("<div class='webpop-content-div'><strong>No. of datafiles:</strong> " + data.result.number_of_datafiles + "</div>");
+                meta_div.append("<div class='webpop-content-div'><strong>Total datafiles:</strong> " + data.result.number_of_datafiles + "</div>");
                 meta_div.append("<div class='webpop-content-div'><strong>Metadata Template:</strong> " + data.result.target_repository + "</div>");
                 meta_div.append("<div class='webpop-content-div'><strong>Last Modified:</strong> " + data.result.created_on + "</div>");
 
@@ -439,26 +556,42 @@ $(document).ready(function () {
                 $('#' + tableID + '_wrapper').css({"margin-top": "10px"});
                 $('#' + tableID + '_wrapper').find(".info-rw").css({"margin-top": "10px"});
 
+                var actionMenu = $('<div/>',
+                    {
+                        class: "ui compact menu",
+                    });
 
-                var actionButtons = $('<div class="two ui buttons"></div>');
-                parentElem.find(".view-actions")
-                    .html('')
-                    .append(actionButtons);
+                customButtons.append(actionMenu);
 
-                var addMetadataButton = get_sub_action_button("Add metadata to bundle", "Add metadata");
-                var removeMetadataButton = get_sub_action_button("Remove bundle's metadata", "Remove metadata");
+                var actionDropdownItem = $('<div/>',
+                    {
+                        class: "ui simple dropdown item",
+                        style: "font-size: 12px;",
+                        html: "Actions"
+                    });
 
-                actionButtons
-                    .append(addMetadataButton)
-                    .append(removeMetadataButton);
+                actionMenu.append(actionDropdownItem);
+                actionDropdownItem.append('<i class="dropdown icon"></i>');
 
+                var actionDropdownMenu = $('<div/>',
+                    {
+                        class: "menu",
+                    });
 
-                addMetadataButton.click(function (event) {
+                actionDropdownItem.append(actionDropdownMenu);
+
+                //Add metadata
+                var actionAddMetadata = $('<div data-html="Add metadata to bundle" data-position="right center" class="item copo-tooltip">Add metadata</div>');
+                actionDropdownMenu.append(actionAddMetadata);
+                actionAddMetadata.click(function (event) {
                     event.preventDefault();
                     add_metadata_bundle(description_token);
                 });
 
-                removeMetadataButton.click(function (event) {
+                //Remove metadata
+                var actionRemoveMetadata = $('<div data-html="Remove bundle metadata. Datafiles in bundle retain their respective metadata" data-position="right center" class="item copo-tooltip">Remove metadata</div>');
+                actionDropdownMenu.append(actionRemoveMetadata);
+                actionRemoveMetadata.click(function (event) {
                     event.preventDefault();
                     remove_bundle_metadata(description_token);
                 });
@@ -494,7 +627,7 @@ $(document).ready(function () {
         var tbl = $('<table/>',
             {
                 id: tableID,
-                "class": "table",
+                "class": "ui celled table hover copo-noborders-table",
                 cellspacing: "0",
                 width: "100%"
             });
@@ -531,6 +664,8 @@ $(document).ready(function () {
                     buttons: [
                         'selectAll',
                         'selectNone',
+                        'copy',
+                        'csv',
                     ],
                     language: {
                         "info": " _START_ to _END_ of _TOTAL_ datafiles",
@@ -542,9 +677,12 @@ $(document).ready(function () {
                     },
                     select: {
                         style: 'multi',
-                        //selector: 'td:first-child'
+                        selector: 'td:not(.annotate-datafile, .summary-details-control, .detail-hover-message)'
                     },
                     columns: cols,
+                    "columnDefs": [
+                        {"width": "50%", "targets": 2}
+                    ],
                     createdRow: function (row, data, index) {
                         $(row).addClass("draggable_tr");
                     },
@@ -603,7 +741,7 @@ $(document).ready(function () {
                     {
                         class: "ui simple dropdown item",
                         style: "font-size: 12px;",
-                        html: "Perform datafiles tasks"
+                        html: "Actions"
                     });
 
                 actionMenu.append(actionDropdownItem);
@@ -617,38 +755,16 @@ $(document).ready(function () {
                 actionDropdownItem.append(actionDropdownMenu);
 
                 //add datafiles
-                var actionAddDatafiles = $('<div class="item">Add datafiles</div>');
-                actionAddDatafiles.webuiPopover('destroy');
-                actionAddDatafiles.webuiPopover({
-                    content: '<div class="webpop-content-div">Add datafiles to bundle</div>',
-                    arrow: true,
-                    width: 200,
-                    placement: 'right',
-                    closeable: true,
-                    trigger: 'hover',
-                });
-
+                var actionAddDatafiles = $('<div data-html="Add datafiles to bundle" data-position="right center" class="item copo-tooltip">Add datafiles</div>');
                 actionDropdownMenu.append(actionAddDatafiles);
-
                 actionAddDatafiles.click(function (event) {
                     event.preventDefault();
                     add_to_bundle(description_token);
                 });
 
                 //remove datafiles
-                var actionRemoveDatafiles = $('<div class="item">Remove datafiles</div>');
-                actionRemoveDatafiles.webuiPopover('destroy');
-                actionRemoveDatafiles.webuiPopover({
-                    content: '<div class="webpop-content-div">Remove selected datafiles from bundle</div>',
-                    arrow: true,
-                    width: 200,
-                    placement: 'right',
-                    closeable: true,
-                    trigger: 'hover',
-                });
-
+                var actionRemoveDatafiles = $('<div data-html="Remove selected datafiles from bundle" data-position="right center" class="item copo-tooltip">Drop datafiles</div>');
                 actionDropdownMenu.append(actionRemoveDatafiles);
-
                 actionRemoveDatafiles.click(function (event) {
                     event.preventDefault();
                     var target_rows = table.rows('.selected').ids().toArray();
@@ -695,19 +811,8 @@ $(document).ready(function () {
 
 
                 //clear datafiles metadata
-                var actionClearMetadata = $('<div class="item">Clear metadata</div>');
-                actionClearMetadata.webuiPopover('destroy');
-                actionClearMetadata.webuiPopover({
-                    content: '<div class="webpop-content-div">Clear metadata for selected datafiles</div>',
-                    arrow: true,
-                    width: 200,
-                    placement: 'right',
-                    closeable: true,
-                    trigger: 'hover',
-                });
-
+                var actionClearMetadata = $('<div data-html="Clear metadata for selected datafiles" data-position="right center" class="item copo-tooltip">Clear metadata</div>');
                 actionDropdownMenu.append(actionClearMetadata);
-
                 actionClearMetadata.click(function (event) {
                     event.preventDefault();
 
@@ -756,12 +861,24 @@ $(document).ready(function () {
 
                 refresh_tool_tips();
 
-
                 $('#' + tableID + '_wrapper')
                     .find(".dataTables_filter")
                     .find("input")
                     .removeClass("input-sm")
                     .attr("placeholder", "Search files in bundle");
+
+                //handle event for datafile annotation
+                $('#' + tableID + ' tbody')
+                    .off('click', 'td.annotate-datafile')
+                    .on('click', 'td.annotate-datafile', function (event) {
+                        event.preventDefault();
+
+                        var tr = $(this).closest('tr');
+                        var record_id = tr.attr("id");
+                        record_id = record_id.split("row_").slice(-1)[0];
+                        var loc = $("#file_annotate_url").val().replace("999", record_id);
+                        window.location.href = loc;
+                    });
 
                 //handle event for table details
                 $('#' + tableID + ' tbody')
@@ -841,7 +958,6 @@ $(document).ready(function () {
         var bundle_id = elem.closest(".description-bundle-panel").attr("data-id");
         var viewPort = elem.closest(".description-bundle-panel").find(".pbody");
 
-        elem.closest(".description-bundle-panel").find(".bundle-task").removeClass("active");
         elem.addClass("active");
         var task = elem.data("task");
 
@@ -849,23 +965,123 @@ $(document).ready(function () {
         elem.closest(".description-bundle-panel").find(".view-actions").html('');
 
 
-        if (task == "describe") {
-            elem.closest(".description-bundle-panel").find(".bundle-task").removeClass("active");
+        if (task == "add_metadata") {
             viewPort.html('');
             add_metadata_bundle(bundle_id);
-        } else if (task == "delete") {
+        } else if (task == "edit_bundle") {
+            create_edit_description_bundle(bundle_id);
+        } else if (task == "add_datafiles") {
+            add_to_bundle(bundle_id);
+        } else if (task == "delete_bundle") {
             delete_description_bundle(bundle_id);
-        } else if (task == "metadata") {
+        } else if (task == "view_metadata") {
             view_bundle_metadata(bundle_id);
-        } else if (task == "datafiles") {
+        } else if (task == "clone_bundle") {
+            clone_bundle(bundle_id);
+        } else if (task == "view_datafiles") {
             show_bundle_datafiles(bundle_id);
-        } else if (task == "submit") {
-            //todo: validate bundle first, then call finalise_description to initiate submission
-            do_submit_description(bundle_id);
+        } else if (task == "view_issues") {
+            show_bundle_issues(bundle_id);
+        } else if (task == "view_accessions") {
+            view_accessions(bundle_id);
         }
     }
 
-    function do_submit_description(bundle_id) {
+    function view_accessions(bundle_id) {
+        var parentElem = $('.description-bundle-panel[data-id="' + bundle_id + '"]');
+        var viewPort = parentElem.find(".pbody");
+
+        var loader = $('<div class="copo-i-loader" style="margin-left: 40%;"></div>');
+        viewPort.html(loader);
+
+        var tableID = 'bundle_accessions_view_tbl' + bundle_id;
+        var tbl = $('<table/>',
+            {
+                id: tableID,
+                "class": "ui celled table hover copo-noborders-table",
+                cellspacing: "0",
+                width: "100%"
+            });
+
+        var meta_div = $('<div/>', {
+            "style": "margin-bottom: 20px;"
+        });
+        var table_div = $('<div/>').append(tbl);
+
+
+        $.ajax({
+            url: wizardURL,
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'request_action': 'get_bundle_accessions',
+                'description_token': bundle_id
+            },
+            success: function (data) {
+                loader.remove();
+                viewPort.append(meta_div).append(table_div);
+
+                if (!data.result.hasOwnProperty("dataSet")) {
+                    viewPort.html('<div>\n' +
+                        '  <p>No accessions found!</p>\n' +
+                        '</div>');
+
+                    return false;
+                }
+
+                var dataSet = data.result.dataSet;
+                var columns = data.result.columns;
+
+                var rowGroup = null;
+                var groupAcessionRepos = ["ena"];
+
+                if (data.result.hasOwnProperty('repository') && groupAcessionRepos.indexOf(data.result.repository) > -1) {
+                    rowGroup = {dataSrc: 3};
+                }
+
+                var table = $('#' + tableID).DataTable({
+                    data: dataSet,
+                    columns: columns,
+                    order: [[3, 'asc']],
+                    scrollY: "300px",
+                    scrollX: true,
+                    scrollCollapse: true,
+                    rowGroup: rowGroup,
+                    columnDefs: [
+                        {
+                            "width": "10%",
+                            "targets": [1]
+                        }
+                    ],
+                    buttons: [
+                        'copy', 'csv',
+                        {
+                            extend: 'excel',
+                            text: 'Spreadsheet',
+                            title: null
+                        }
+                    ],
+                    dom: 'Bfr<"row"><"row info-rw" i>tlp',
+                });
+
+                table
+                    .buttons()
+                    .nodes()
+                    .each(function (value) {
+                        $(this)
+                            .removeClass("btn btn-default")
+                            .addClass('tiny ui button');
+                    });
+            },
+            error: function () {
+                alert("Couldn't retrieve accessions!");
+            }
+        });
+    }
+
+    function show_bundle_issues(bundle_id) {
         var parentElem = $('.description-bundle-panel[data-id="' + bundle_id + '"]');
         var viewPort = parentElem.find(".pbody");
 
@@ -879,61 +1095,40 @@ $(document).ready(function () {
                 'X-CSRFToken': csrftoken
             },
             data: {
-                'request_action': 'initiate_submission',
-                'description_token': bundle_id,
-                'profile_id': $('#profile_id').val()
+                'request_action': 'get_bundle_issues',
+                'description_token': bundle_id
             },
             success: function (data) {
                 loader.remove();
-                var feedback = get_feedback_pane();
-                feedback
-                    .removeClass("success")
-                    .addClass("warning");
+                var issues = data.result;
 
-                if (data.result.existing || false) {
-                    feedback.find(".header").html("Warning");
-                    var message = $('<div>This bundle is already in the submission stream. Do you want to be taken to the submission page?</div>');
-                    var buttonYes = $('<button class="ui primary button" style="margin-left: 5px;">Yes</button>');
-
-                    message.append(buttonYes);
-
-                    feedback.find(".m-body")
-                        .append(message);
-
-                    parentElem.find(".feedback-entry-pane")
-                        .html('')
-                        .append(feedback);
-
-
+                if (issues.length == 0) {
+                    viewPort.html('<div>\n' +
+                        '  <p>No issues found!</p>\n' +
+                        '</div>');
                 } else {
-                    //start description
-                }
+                    viewPort.html('<div class="submission-issues text-danger">\n' +
+                        '  <p>The following issues were found.</p>\n' +
+                        '</div>');
 
-                return false;
+                    var issuesList = $('<ul/>', {
+                        class: "ui list",
+                    });
+
+                    for (var i = 0; i < issues.length; ++i) {
+                        issuesList.append('<li class="text-danger">' + issues[i] + '</li>');
+                    }
+
+                    viewPort.find(".submission-issues").append(issuesList);
+                }
             },
             error: function () {
-                loader.remove();
-
-                var feedback = get_feedback_pane();
-                feedback
-                    .removeClass("success")
-                    .addClass("negative");
-
-                feedback.find(".header").html("Error");
-                feedback.find("p").append("An error occurred while initiating submission! One possible cause might be a network failure.");
-                parentElem.find(".feedback-entry-pane")
-                    .html('')
-                    .append(feedback);
+                alert("Couldn't retrieve issues!");
             }
         });
-
-
     }
 
     function add_metadata_bundle(bundle_id) {
-        var parentElem = $('.description-bundle-panel[data-id="' + bundle_id + '"]');
-        parentElem.find(".feedback-entry-pane").html('');
-
         var event = jQuery.Event("addmetadata");
         event.bundleID = bundle_id;
         $('body').trigger(event);
@@ -1102,87 +1297,6 @@ $(document).ready(function () {
                 }
             ]
         });
-    }
-
-    function get_bundle_template() {
-        var dbundleDiv = $('<div/>',
-            {
-                "class": "description-bundle-panel",
-                style: "margin-bottom: 50px; padding: 20px;",
-            });
-
-        var headerDiv = $('<div/>',
-            {
-                "class": "ui attached message bundle-header",
-            })
-            .append($('<div/>',
-                {
-                    "class": "header bundle-name",
-                })
-            )
-            .append($('<p/>', {
-                class: 'sub-header'
-            }));
-
-        dbundleDiv.append(headerDiv);
-
-        var attachedButtonDiv = $('<div/>',
-            {
-                "class": "ui top attached buttons",
-            });
-
-        dbundleDiv.append(attachedButtonDiv);
-
-        var buttonDiv = $('<div/>',
-            {
-                "class": "five ui buttons",
-            });
-
-        buttonDiv
-            .append(get_bundle_task_button("View Datafiles", "datafiles"))
-            .append(get_bundle_task_button("Add Metadata", "describe"))
-            .append(get_bundle_task_button("View Metadata", "metadata"))
-            .append(get_bundle_task_button("Submit Bundle", "submit"))
-            .append(get_bundle_task_button("Delete Bundle", "delete"))
-
-
-        var attachedSegmentDiv = $('<div/>',
-            {
-                "class": "ui attached fluid segment",
-                style: "font-size: inherit;"
-            });
-        dbundleDiv.append(attachedSegmentDiv);
-
-        attachedSegmentDiv.append(buttonDiv);
-
-        var contentSegmentDiv = $('<div/>',
-            {
-                "class": "row",
-                style: "margin-top: 20px;",
-            }).append($('<div/>',
-            {
-                "class": "col-sm-12 col-md-12 col-lg-12 pbody",
-            }));
-
-        attachedSegmentDiv.append(contentSegmentDiv);
-
-        var attachedMessageDiv = $('<div/>',
-            {
-                "class": "ui bottom attached message bundle-status",
-            });
-
-        dbundleDiv.append(attachedMessageDiv);
-
-
-        return dbundleDiv;
-    }
-
-    function get_bundle_task_button(label, task) {
-        return $('<button style="border-right: 1px solid #575655;" data-task="' + task + '" class="ui basic button bundle-task">' + label + '</button>');
-    }
-
-    function get_sub_action_button(title, label) {
-        return $('<button data-toggle="tooltip" title="' + title + '" class="ui grey button sub-bundle-task">' + label + '</button>');
     }
 
     function add_to_bundle(description_token) {

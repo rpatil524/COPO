@@ -99,8 +99,8 @@ def authenticate_figshare(request):
 
 
 def test_dataverse_submit(request):
-    from submission import enareadSubmission
-    result = enareadSubmission.EnaReads(submission_id="5d1f635b373b6d6e2d04c52b").submit()
+    # from submission import enareadSubmission
+    # result = enareadSubmission.EnaReads(submission_id="5d3cbc00373b6dd8c6fda223").submit()
     # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
     # t = CgCoreSchemas.get_repo_mapping(repo="dataverse")
     # items = CgCoreSchemas().extract_repo_fields(datafile_id="5c8d7934e99f8100100e8c4e", repo="dataverse")
@@ -295,6 +295,7 @@ def copo_forms(request):
                      component_form_record=broker_da.component_form_record,
                      sanitise_submissions=broker_da.do_sanitise_submissions,
                      create_rename_description_bundle=broker_da.create_rename_description_bundle,
+                     clone_description_bundle=broker_da.do_clone_description_bundle,
                      )
 
     if task in task_dict:

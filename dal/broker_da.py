@@ -236,6 +236,45 @@ class BrokerDA:
 
         return self.context
 
+    def do_clone_description_bundle(self):
+        """
+        function creates a new description by cloning an existing (specified) bundle
+        :return:
+        """
+
+        target_id = self.param_dict.get("target_id", str())
+        bundle_name = self.param_dict.get("bundle_name", str())
+
+        result = dict(status="success", message="")
+
+        if Description().get_description_handle().find(
+                {"name": {'$regex': "^" + bundle_name + "$",
+                          "$options": 'i'}}).count() >= 1:
+            result["status"] = "error"
+            result["message"] = "Bundle name must be unique"
+
+            self.context["result"] = result
+            return self.context
+
+        # retrieve clone target
+        description = Description().GET(target_id)
+
+        # new bundle being created
+        try:
+            bundle = Description().create_description(profile_id=self.profile_id, component=self.component,
+                                                      name=bundle_name, stages=description.get('stages', list()),
+                                                      attributes=description.get('attributes', dict()),
+                                                      meta=description.get('meta', dict()))
+
+            result["data"] = dict(id=str(bundle["_id"]), name=bundle["name"])
+        except Exception as e:
+            message = "Couldn't create bundle: " + bundle_name + " " + str(e)
+            result["status"] = "error"
+            result["message"] = message
+
+        self.context["result"] = result
+        return self.context
+
     def create_rename_description_bundle(self):
         """
         function creates a new description bundle or renames an existing one
@@ -259,9 +298,9 @@ class BrokerDA:
             try:
                 Description().edit_description(target_id, {"name": bundle_name})
             except Exception as e:
-                print("Couldn't update bundle: " + bundle_name + " " + str(e))
+                message = "Couldn't update bundle: " + bundle_name + " " + str(e)
                 result["status"] = "error"
-                result["message"] = "Couldn't update bundle"
+                result["message"] = message
         else:
             # new bundle being created
             try:
@@ -269,9 +308,9 @@ class BrokerDA:
                                                           name=bundle_name)
                 result["data"] = dict(id=str(bundle["_id"]), name=bundle["name"])
             except Exception as e:
-                print("Couldn't create bundle: " + bundle_name + " " + str(e))
+                message = "Couldn't create bundle: " + bundle_name + " " + str(e)
                 result["status"] = "error"
-                result["message"] = "Couldn't create bundle"
+                result["message"] = message
 
         self.context["result"] = result
         return self.context

@@ -1,4 +1,4 @@
-# resolves from imports to absolute paths
+# enables quick access to resource directories
 
 import os
 from django.conf import settings
@@ -6,6 +6,7 @@ from django.conf import settings
 web_copo = os.path.join(settings.BASE_DIR, 'web', 'apps', 'web_copo')
 
 RESOLVER = dict()
+RESOLVER['ena_cli'] = os.path.join(settings.BASE_DIR, 'tools', 'reposit', 'ena_cli')
 RESOLVER['schemas_copo'] = os.path.join(web_copo, 'schemas', 'copo', 'dbmodels')
 RESOLVER['copo_drop_downs'] = os.path.join(web_copo, 'lookup', 'drop_downs')
 RESOLVER['isa_json_db_models'] = os.path.join(web_copo, 'schemas', 'copo', 'dbmodels', 'isa', 'json')

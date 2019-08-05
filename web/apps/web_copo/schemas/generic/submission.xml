@@ -5,10 +5,7 @@
     <CONTACTS></CONTACTS>
     <ACTIONS>
         <ACTION>
-            <ADD schema="project" source="project.xml"/>
-        </ACTION>
-        <ACTION>
-            <ADD schema="sample" source="sample.xml"/>
+            <ADD/>
         </ACTION>
     </ACTIONS>
 </SUBMISSION>

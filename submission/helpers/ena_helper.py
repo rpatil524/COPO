@@ -1,12 +1,18 @@
 __author__ = 'etuka'
 __date__ = '02 April 2019'
 
+import os
+import pandas as pd
 from bson import ObjectId
 from datetime import datetime
 from dal import cursor_to_list
+from django.conf import settings
 from collections import defaultdict
-from dal.copo_da import Submission, Person, Description, DataFile, Sample, DAComponent
 import web.apps.web_copo.schemas.utils.data_utils as data_utils
+from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
+from dal.copo_da import Submission, Person, Description, DataFile, Sample, DAComponent
+
+lg = settings.LOGGER
 
 
 class SubmissionHelper:
@@ -17,18 +23,26 @@ class SubmissionHelper:
         self.description = dict()
         self.__converter_errors = list()
 
-        if self.submission_record:
-            self.profile_id = self.submission_record.get("profile_id", str())
-            self.description_token = self.submission_record.get("description_token", str())
+        self.profile_id = self.submission_record.get("profile_id", str())
+        self.description_token = self.submission_record.get("description_token", str())
 
-        if self.description_token:
-            self.description = Description().GET(self.description_token)
+        self.description = Description().GET(self.description_token)
 
     def get_converter_errors(self):
         return self.__converter_errors
 
     def flush_converter_errors(self):
         self.__converter_errors = list()
+
+    def get_pairing_info(self):
+        """
+        function returns information about datafiles pairing
+        :return:
+        """
+
+        datafiles_pairing = self.description.get("attributes", dict()).get("datafiles_pairing", list())
+
+        return datafiles_pairing
 
     def get_sra_contacts(self):
         """
@@ -93,41 +107,77 @@ class SubmissionHelper:
 
         return study_attributes
 
-    def get_study_samples(self):
+    def get_sra_samples(self, submission_location=str()):
         """
         function retrieves study samples and presents them in a format for building an sra sample set
+        :param submission_location:
         :return:
         """
 
         sra_samples = list()
 
-        # retrieves samples, which are attached to datafiles
-        datafiles_id = self.submission_record.get("bundle", list())
+        # get datafiles
+        datafiles = cursor_to_list(
+            DataFile().get_collection_handle().find(
+                {"description_token": self.description_token, 'deleted': data_utils.get_not_deleted_flag()},
+                {'_id': 1, 'file_location': 1, "description.attributes": 1, "name": 1}))
 
-        if not datafiles_id:
+        if not len(datafiles):
             self.__converter_errors.append("No datafiles found in submission!")
             return sra_samples
 
-        datafiles_id_object_list = [ObjectId(element) for element in datafiles_id]
-        datafiles = cursor_to_list(
-            DataFile().get_collection_handle().find({"_id": {"$in": datafiles_id_object_list}},
-                                                    {"description.attributes": 1})
-        )
+        df = pd.DataFrame(datafiles)
+        df['file_id'] = df._id.astype(str)
+        df['file_path'] = df['file_location'].fillna('')
+        df['upload_status'] = False
+
+        df = df[['file_id', 'file_path', 'upload_status']]
+        bundle = list(df.file_id)
+        bundle_meta = df.to_dict('records')
+
+        submission_record = Submission().get_record(self.submission_id)
+        submission_record['bundle'] = bundle
+        submission_record['bundle_meta'] = bundle_meta
+        submission_record['target_id'] = str(submission_record.pop('_id'))
+
+        Submission().save_record(dict(), **submission_record)
 
         samples_id = list()
+        df_attributes = []  # holds datafiles attributes
+
         for datafile in datafiles:
-            sample_id = datafile.get("description", dict()).get("attributes", dict()).get('attach_samples', dict()).get(
-                'study_samples', list())
-            if sample_id and isinstance(sample_id, str):
-                samples_id.extend(sample_id.split(","))
-            elif sample_id and isinstance(sample_id, list):
-                samples_id.extend(sample_id)
+            datafile_attributes = [v for k, v in datafile.get("description", dict()).get("attributes", dict()).items()]
+            new_dict = dict()
+            for d in datafile_attributes:
+                new_dict.update(d)
+
+            new_dict['datafile_id'] = str(datafile['_id'])
+            new_dict['datafile_name'] = datafile.get('name', str())
+            new_dict['datafile_location'] = datafile.get('file_location', str())
+
+            df_attributes.append(new_dict)
+
+        # process datafiles attributes
+        df_attributes_df = pd.DataFrame(df_attributes)
+        df_columns = df_attributes_df.columns
+
+        # replace null values
+        for k in df_columns:
+            df_attributes_df[k].fillna('', inplace=True)
+
+        if 'study_samples' in df_columns:
+            df_attributes_df['study_samples'] = df_attributes_df['study_samples'].apply(
+                lambda x: x[0] if isinstance(x, list) else x.split(",")[-1])
+            samples_id = list(df_attributes_df['study_samples'].unique())
+            samples_id = [x for x in samples_id if x]
 
         if not samples_id:
             self.__converter_errors.append("No samples associated with datafiles!")
             return sra_samples
 
-        samples_id = set(samples_id)  # get unique samples
+        file_path = os.path.join(submission_location, "datafiles.csv")
+        df_attributes_df.to_csv(path_or_buf=file_path, index=False)
+
         samples_id_object_list = [ObjectId(sample_id) for sample_id in samples_id]
         samples_record = cursor_to_list(Sample().get_collection_handle().find({"_id": {"$in": samples_id_object_list}}))
 
@@ -151,6 +201,7 @@ class SubmissionHelper:
 
         for sample in samples_record:
             sra_sample = dict()
+            sra_sample['sample_id'] = str(sample['_id'])
             sra_sample['name'] = sample['name']
             sra_sample['attributes'] = self.get_attributes(sample.get("characteristics", list()))
             sra_sample['attributes'] = sra_sample['attributes'] + self.get_attributes(
@@ -242,3 +293,111 @@ class SubmissionHelper:
                 resolved_attributes.append(attribute)
 
         return resolved_attributes
+
+    def logging_error(self, message):
+        """
+        function provides a consistent way of logging error during submission
+        :param message:
+        :return:
+        """
+        try:
+            lg.log('[Submission: ' + self.submission_id + '] ' + message, level=Loglvl.ERROR, type=Logtype.FILE)
+        except Exception as e:
+            pass
+
+        return False
+
+    def logging_info(self, message):
+        """
+        function provides a consistent way of logging submission status/information
+        :param message:
+        :return:
+        """
+        lg.log('[Submission: ' + self.submission_id + '] ' + message, level=Loglvl.INFO, type=Logtype.FILE)
+
+    def get_study_accessions(self):
+        """
+        function returns study accessions
+        :param accessions:
+        :return:
+        """
+
+        records = cursor_to_list(
+            Submission().get_collection_handle().find({"_id": ObjectId(self.submission_id)}, {"accessions.project": 1}))
+
+        if not records:
+            return list()
+
+        accessions = records[0].get('accessions', dict()).get('project', list())
+
+        return accessions
+
+    def get_sample_accessions(self):
+        """
+        function returns sample accessions
+        :return:
+        """
+
+        records = cursor_to_list(
+            Submission().get_collection_handle().find({"_id": ObjectId(self.submission_id)}, {"accessions.sample": 1}))
+
+        if not records:
+            return list()
+
+        accessions = records[0].get('accessions', dict()).get('sample', list())
+
+        return accessions
+
+    def get_run_accessions(self):
+        """
+        function returns datafiles (runs) accessions
+        :return:
+        """
+
+        records = cursor_to_list(
+            Submission().get_collection_handle().find({"_id": ObjectId(self.submission_id)}, {"accessions.run": 1}))
+
+        if not records:
+            return list()
+
+        accessions = records[0].get('accessions', dict()).get('run', list())
+
+        return accessions
+
+    def add_submission_error(self, message):
+        """
+        function stores submission error in the db
+        :param message:
+        :return:
+        """
+
+        if message:
+            submission_record = Submission().get_record(self.submission_id)
+            transcript = submission_record.get("transcript", dict())
+            error = transcript.get("error", list())
+            error.append(message)
+            transcript['error'] = error
+
+            submission_record['transcript'] = transcript
+            submission_record['target_id'] = str(submission_record.pop('_id'))
+
+            Submission().save_record(dict(), **submission_record)
+
+        return True
+
+    def clear_submission_error(self):
+        """
+        function clears submission error from the db
+        :return:
+        """
+
+        submission_record = Submission().get_record(self.submission_id)
+        transcript = submission_record.get("transcript", dict())
+        transcript.pop('error', '')
+
+        submission_record['transcript'] = transcript
+        submission_record['target_id'] = str(submission_record.pop('_id'))
+
+        Submission().save_record(dict(), **submission_record)
+
+        return True

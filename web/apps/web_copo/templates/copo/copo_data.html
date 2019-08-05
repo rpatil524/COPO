@@ -46,6 +46,7 @@
         <input type="hidden" id="table_columns" value="{{ table_columns }}"/>
         <input type="hidden" value="{% url 'copo:copo_submissions' profile_id=profile_id %}" name="submission_url"
                id="submission_url"/>
+        <input type="hidden" value="{% url 'copo:annotate_meta' file_id=999 %}" name="file_annotate_url" id="file_annotate_url"/>
         <input type="hidden" value="{{ cyverse_files }}" name="cyverse_file_data"
                id="cyverse_file_data"/>
         <input type="hidden" id="selected_datafile" value="{{ selected_file }}"/>
@@ -60,7 +61,6 @@
 {% block content %}
 
     <!--test ends -->
-
     <!--test ends -->
 
 
@@ -68,21 +68,17 @@
 
     <div id="wizard_toggle" class="collapse" style="margin-bottom: 20px;">
 
-        <div class="ui attached blue message">
+        <div class="ui attached black message">
             <div class="header">
-                Datafiles description
+                Adding Metadata [<span
+                    id="datafile_description_panel_title"></span>]
             </div>
-            <p>
-            <div class="webpop-content-div" style="color: #35637e;">
-                <span>Adding metadata for </span><span id="datafile_description_panel_title"></span>
-            </div>
-            </p>
         </div>
         <div class="ui attached fluid segment" style="font-size: inherit;">
             <div class="col-sm-12 col-md-12 col-lg-12">
                 <div class="pull-right" style="margin-bottom: 15px;">
                     <!-- exit description button -->
-                    <div id="exit_wizard" class="big ui grey button"
+                    <div id="exit_wizard" class="big ui secondary inverted button"
                          tabindex="0">
                         <span style="padding-left: 3px;">Exit description</span>
                     </div>
@@ -128,9 +124,9 @@
                 </div>
             </div>
         </div>
-        <div class="ui bottom attached blue message">
-            Datafiles description
-        </div>
+        {#        <div class="ui bottom attached message">#}
+        {#            Datafiles description#}
+        {#        </div>#}
     </div>
 
     <div class="row">
@@ -179,7 +175,7 @@
                     Datafiles
                 </div>
                 <p>
-                <div class="webpop-content-div" id="datafile-list-message"><span style="color: #35637e;">Use the upload button to add datafiles. </span>
+                <div class="webpop-content-div" id="datafile-list-message"><span style="color: #35637e;">Use the upload button to add datafiles.<br/>To add to a bundle, highlight one or more files, drag and drop to the target bundle. </span>
                 </div>
                 </p>
             </div>
@@ -221,7 +217,6 @@
 
                 <!-- datafile table -->
                 <div id="component_table_loader"
-                     class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"
                      data-copo-tour-id="datafile_table"></div> <!-- div used by the quick tour agent -->
                 <div style="display: block; margin-top: 25px;">
                     <table id="datafile_table"
@@ -231,11 +226,11 @@
                 </div>
 
             </div>
-            <div class="ui bottom attached message">
-                Datafiles
-            </div>
+            {#            <div class="ui bottom attached message">#}
+            {#                Datafiles#}
+            {#            </div>#}
         </div>
-        <div class="col-sm-6 col-md-6 col-lg-6">
+        <div class="col-sm-6 col-md-6 col-lg-6" style="max-height: 900px; overflow-y: scroll;">
             <!-- description bundle section -->
 
             <div class="ui attached message">
@@ -244,7 +239,7 @@
                 </div>
                 <p>
                 <div class="webpop-content-div" id="bundle-list-message" style="display: none;"><span
-                        style="color: #35637e;">Drag and drop datafiles to a bundle, then click <strong>Add Metadata</strong> to describe them. </span>
+                        style="color: #35637e;">Drag and drop datafiles to a bundle, then click <strong>Add Metadata</strong> to describe the bundle. </span>
                 </div>
                 <div class="webpop-content-div" id="new-bundle-message" style="display: none;">
                         <span style="color: #35637e;">Use the create
@@ -254,11 +249,26 @@
             </div>
             <div class="ui attached fluid segment" style="font-size: inherit;">
                 <div class="row">
-                    <div class="col-sm-8 col-md-8 col-lg-8"></div>
+                    <div class="col-sm-8 col-md-8 col-lg-8">
+                        <div>
+                            <div>Bundle status codes:</div>
+                            <div title="Bundle has been submitted. Use the view submission option for accessions and DOIs."
+                                 class="ui green large label copo-tooltip">
+                                Submitted
+                            </div>
+                            <div title="Bundle is pending submission. Use the resume submission option to go ahead with the submission."
+                                 class="ui orange large label copo-tooltip">
+                                Pending
+                            </div>
+                            <div title="Bundle is in an invalid state due to error. Please resolved the reported issues to continue."
+                                 class="ui red large label copo-tooltip">
+                                Issues
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-sm-4 col-md-4 col-lg-4">
                         <div class="pull-right">
                             <div class="create-bundle-btn big ui primary button"
-                                 title="Create bundle"
                                  tabindex="0">
                                 <i class="fa fa-layer-group"></i>
                                 <span style="padding-left: 3px;">Create a bundle...</span>
@@ -270,12 +280,13 @@
                 <div id="cover-spin-bundle"></div>
 
                 <div class="desc-bundle-display-div" style="display: block; margin-top: 25px;">
-                    <div class="desc-bundle-display-div-2"></div>
+                    <div class="desc-bundle-display-div-2">
+                    </div>
                 </div>
             </div>
-            <div class="ui bottom attached message">
-                Description bundles
-            </div>
+            {#            <div class="ui bottom attached message">#}
+            {#                Description bundles#}
+            {#            </div>#}
         </div>
     </div>
 

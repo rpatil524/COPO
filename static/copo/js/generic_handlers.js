@@ -825,6 +825,12 @@ function do_render_table(data) {
 function refresh_tool_tips() {
     $("[data-toggle='tooltip']").tooltip();
     $("[data-toggle='popover']").popover();
+    $('.ui.dropdown')
+        .dropdown()
+    ;
+    $('.copo-tooltip')
+        .popup()
+    ;
 
 
     apply_color();
@@ -978,7 +984,7 @@ function refresh_singleselectbox() {
                     var $state = $('<span>' + state.text + '</span>');
 
                     if (descr) {
-                        var item = $('<i class="ui secondary icon question circle" style="margin-left: 15px;"></i>');
+                        var item = $('<i class="ui grey icon info circle" style="margin-left: 15px;"></i>');
                         item.webuiPopover('destroy');
                         item.webuiPopover({
                             content: '<div class="webpop-content-div">' + descr + '</div>',
@@ -1056,7 +1062,7 @@ function refresh_copo_lookup2() {
                 templateResult: function (state) {
                     var $state = $('<span  data-id="' + state.id + '" data-server="' + state.serverSide + '" data-url="' + state.url + '" class="parentSpan">' + state.text + '</span>');
 
-                    var item = $('<i class="ui secondary icon question server-desc circle" style="margin-left: 15px;"></i>');
+                    var item = $('<i class="ui grey icon info server-desc circle" style="margin-left: 15px;"></i>');
 
                     item.webuiPopover('destroy');
                     item.webuiPopover({

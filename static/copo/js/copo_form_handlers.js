@@ -2226,15 +2226,7 @@ function form_label_ctrl(formElem) {
 
         var helpTip = formElem["help_tip"] || '';
         if (helpTip) {
-            var item = $('<i class="ui icon question circle" style="margin-left: 5px;"></i>');
-            item.webuiPopover('destroy');
-            item.webuiPopover({
-                content: '<div class="webpop-content-div">' + helpTip + '</div>',
-                arrow: true,
-                width: 200,
-                trigger: 'hover',
-            });
-
+            var item = $('<i data-html="'+helpTip+'" class="ui grey icon info circle copo-tooltip" style="margin-left: 5px;"></i>');
             lblCtrl.append(item);
         }
     }
@@ -2497,9 +2489,8 @@ function get_ontology_span_2(ontologySpan, formElem) {
     var label = $('<div/>',
         {
             style: "margin-top:5px;  padding:3px; background-image:none; border-color:transparent; word-wrap: break-word;",
-            class: "onto-label ontol-span webpop-content-div alert alert-default",
+            class: "onto-label ontol-span webpop-content-div alert alert-default copo-tooltip",
             title: "Ontology field",
-            "data-toggle": "tooltip",
             html: '<span class="ontology-label"><i class="fa fa-align-justify free-text" style="padding-right: 5px; display: none;"></i><img class="non-free-text" src="/static/copo/img/ontology2.png" style="cursor:pointer;"></span><span class="onto-label-span"></span><span class="onto-label-more collapse"></span>'
         });
 
@@ -2674,7 +2665,6 @@ function get_form_ctrl(ctrlsDiv, formElem, elemValue) {
             get_element_clone(ctrlsDiv, counter).insertAfter(firstElement);
 
             //refresh controls
-            refresh_validator($(this).closest("form"));
             refresh_tool_tips();
         });
     }
@@ -2941,7 +2931,7 @@ function save_form(formJSON) {
 
 function get_del_button(theTitle) {
     var title = theTitle || "Remove";
-    var delBtn = $('<button data-toggle="tooltip" title="' + title + '"  class="ui blue icon button">\n' +
+    var delBtn = $('<button title="' + title + '"  class="ui blue icon button copo-tooltip">\n' +
         '  <i class="minus icon"></i>\n' +
         '</button>');
 
@@ -2950,7 +2940,7 @@ function get_del_button(theTitle) {
 
 function get_add_button(theTitle) {
     var title = theTitle || "Add";
-    var addBtn = $('<button data-toggle="tooltip" title="' + title + '" class="ui blue icon button">\n' +
+    var addBtn = $('<button title="' + title + '" class="ui blue icon button copo-tooltip">\n' +
         '  <i class="plus icon"></i>\n' +
         '</button>');
 

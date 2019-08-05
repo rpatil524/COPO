@@ -25,6 +25,9 @@ SRA_SUBMISSION_TEMPLATE = os.path.join(RESOLVER['schemas_generic'], 'submission.
 SRA_PROJECT_TEMPLATE = os.path.join(RESOLVER['schemas_generic'], 'project.xml')
 SRA_SAMPLE_TEMPLATE = os.path.join(RESOLVER['schemas_generic'], 'sample.xml')
 
+# ENA CLI PATH
+ENA_CLI = os.path.join(RESOLVER['ena_cli'], 'webin-cli-1.8.7.jar')
+
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
 # API_RETURN_TEMPLATES dictionary provides paths to api return templates
 API_RETURN_TEMPLATES = {
