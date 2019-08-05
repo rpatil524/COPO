@@ -58,6 +58,7 @@
 
 #annotations_for_cell{
     margin-bottom: 20px !important;
+    min-height: 20px;
 }
 
 .annotation_for_cell{
