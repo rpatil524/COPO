@@ -2,7 +2,6 @@ import os
 
 from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
 from exceptions_and_logging.logger import Logger
-import exceptions_and_logging.logs
 
 from .base import BASE_DIR
 log_path = os.path.join(BASE_DIR, 'exceptions_and_logging', 'logs')

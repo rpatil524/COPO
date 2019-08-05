@@ -4,14 +4,14 @@ $(document).ready(function () {
     refresh_display()
     //refresh_annotations()
     $(document).on("shown.bs.tab", ".hot_tab", function () {
-
+        $(document).data("nav_tab", $(this).find("a").attr("href"))
         var id = this.innerText
         var hot = $(document).data("table_" + id)
         hot.render()
         make_dropabble()
         refresh_annotations()
     })
-    $(document).on("click", ".hot_tab", function(){
+    $(document).on("click", ".hot_tab", function () {
         $(document).data("selected_nav_tab", $(this))
     })
     $("#search_term_text_box").val("")
@@ -23,7 +23,6 @@ $(document).ready(function () {
 $(document).ajaxStart(function () {
 
 })
-
 
 
 function startDrag(ev) {
@@ -108,12 +107,21 @@ var lastValue = '';
 // this is the handler which is called 1 second after the user stops typing in the search box
 $(document).on("input propertychange", "#search_term_text_box", delay(function (e) {
     var val = $(e.currentTarget).val()
+    var url = $(document).data("autocomplete")
+    if (!url) {
+        url = "/copo/ajax_search_ontology/999"
+    }
     $.ajax({
-        url: "/copo/ajax_search_ontology/999",
+        url: url,
         data: {"q": val}
     }).done(function (data) {
         var d = JSON.parse(data)
         $("#search_results").empty()
+        if (!d.response.numFound > 0) {
+            p = build_result_panel(undefined)
+            $("#search_results").append(p)
+            return false
+        }
         d.response.docs.forEach(function (entry, idx) {
             if (idx == 0) {
             }
@@ -128,13 +136,25 @@ $(document).on("input propertychange", "#search_term_text_box", delay(function (
 }))
 
 function build_result_panel(d, idx, entry) {
-
+    if (d == undefined) {
+        var result = $("<div/>", {
+            class: "annotation_term panel panel-default",
+            html: "Nothing Found"
+        })
+        return result
+    }
     var v
     var desc
     var used = d.hasOwnProperty("highlighting") == false
     if (!used) {
-        v = d.highlighting[entry["id"]]["label_autosuggest"][0]
-        desc = entry["description"][0]
+        if (d.highlighting[entry["id"]]["label_autosuggest"]) {
+            v = d.highlighting[entry["id"]]["label_autosuggest"][0]
+        }
+        if (entry["description"]) {
+            desc = entry["description"][0]
+        } else {
+            desc = "Description Unavailable"
+        }
     } else {
         v = entry.label
         desc = entry.description
@@ -223,7 +243,9 @@ function refresh_display() {
                 autoColumnSize: {useHeaders: true},
                 beforeOnCellMouseOver: function (evt, coords, td) {
                     evt.preventDefault()
-                }
+                },
+                afterOnCellMouseOver: do_cell_mouse_over,
+                afterOnCellMouseOut: do_cell_mouse_out
             });
             hot.render()
             $(document).data(id, hot)
@@ -235,6 +257,33 @@ function refresh_display() {
     }).error(function (data) {
         console.error(data)
     })
+}
+
+function do_cell_mouse_over(evt, coords, td) {
+    var last = $(document).data("mouse_over_cell")
+    if(last == undefined){
+        var pan = $('<span class="panel panel-default annotation_for_cell">' + $(evt.target).data("label") + '</span>')
+        $("#annotations_for_cell").append(pan).fadeIn()
+    }
+    else if (coords.col != last.col) {
+        // change contents
+        //$("#annotations_for_cell").fadeOut()
+        $("#annotations_for_cell").empty()
+
+        var pan = $('<span class="panel panel-default annotation_for_cell" >' + $(evt.target).data("label") + '</span>')
+        $("#annotations_for_cell").append(pan)
+        //$("#annotations_for_cell").show()
+    }
+
+
+    $(document).data("mouse_over_cell", coords)
+}
+
+function do_cell_mouse_out(evt, coords, td){
+    var last = $(document).data("mouse_over_cell")
+    if (coords[0] != last[0]) {
+        $("#annotations_for_cell").fadeOut()
+    }
 }
 
 function refresh_annotations() {
@@ -257,8 +306,12 @@ function refresh_annotations() {
             for (var i = 0; i < hot.countRows(); i++) {
                 var cell = hot.getCell(i, data.annotations[d].file_level_annotation.column_idx)
                 $(cell).addClass("annotatedColumn");
+                $(cell).data("label", data.annotations[d].file_level_annotation.label)
+                $(cell).data("ontology", data.annotations[d].file_level_annotation.ontology_prefix)
             }
         }
+        var a = $(document).data("nav_tab")
+        $("a[href=" + a + "]").tab("show")
     })
     console.log("refresh annotations")
     do_my_annotations()
@@ -290,11 +343,10 @@ function do_my_annotations(event) {
         $("#your_annotations").empty()
         if (annotation_fiter != "by_dataset") {
             $(d.annotations).each(function (idx, entry) {
-                var result = build_result_panel(d=d, idx=idx, entry=entry)
+                var result = build_result_panel(d = d, idx = idx, entry = entry)
                 $('#your_annotations').append(result)
             })
-        }
-        else {
+        } else {
             var accordion = $('<div class="panel-group" id="by_dataset_accordion" role="tablist" aria-multiselectable="true"></div>')
             $(d.annotations).each(function (idx, entry) {
                 var p1 = $('<div class="panel panel-default">')
@@ -307,7 +359,7 @@ function do_my_annotations(event) {
                 $(p1).append(p_heading)
 
                 var accordion_panel = $('<div id="collapse_' + idx + '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="accordion_heading_' + idx + '">')
-                var panel_body  = $('<div class="panel-body"></div>')
+                var panel_body = $('<div class="panel-body"></div>')
                 for (data in entry.annotations) {
                     s = entry.annotations[data]
                     var panel = build_result_panel(0, 0, s)

@@ -615,71 +615,7 @@
                 <div class="row">
                     <div class="col-sm-12 col-md-12 col-lg-12">
                         <div class="panel panel-dtables">
-                            <div class="panel-body collapse in" id="copo_annotation_panel">
-                                <div id="annotation_panel">
-                                    Type in the box below to see possible ontological descriptors for the column
-                                    selected.
-                                    <h3 class="h3">Selected Column:&nbsp <span class="label label-primary"
-                                                                               id="selected_column_name">None Selected</span>
-                                    </h3>
 
-
-                                    <label for="ontology_filter_button">Choose Ontology</label>
-                                    <div class="dropdown ontology_dropdown">
-                                        <div class="medium ui basic button dropdown-toggle"
-                                             id="ontology_filter_button"
-                                             data-toggle="dropdown"
-                                             aria-haspopup="true" aria-expanded="true">
-                                            <span class="ontology_label">All Ontologies</span>
-                                            <span class="caret"></span>
-                                        </div>
-
-                                        <ul class="dropdown-menu" id="ontology_dropdown_filter"
-                                            aria-labelledby="dropdownMenu1">
-                                            <a>
-                                                <li class="ontology_dd_item" data-name="All Ontologies" data-id="">
-                                <span class="h5">
-                                    <span class="ontology_dd_name">All Ontologies</span>
-                                    <br/>
-                                    <small class="ontology_dd_description">Search all ontologies for terms.</small>
-                                </span>
-                                                </li>
-                                            </a>
-                                        </ul>
-                                        <span style="margin-left:30px"
-                                              class="btn btn-sm btn-success" id="export_ss_annotation">Save</span>
-                                        <img src="/static/copo/img/preload.gif" style="visibility: hidden"
-                                             id="annotation_loader" height="18px">
-                                    </div>
-
-                                    <input type="text" class="form-control ontology-field form-control-file"
-                                           id="an-column"
-                                           aria-describedby="fileHelp"
-                                           data-autocomplete="/copo/ajax_search_ontology/999/"/>
-                                </div>
-
-
-                                <div id="annotation_list">
-
-                                    <hr/>
-                                    Current Annotations
-                                    <table id="annotations_table">
-                                        <thead>
-                                        <tr>
-                                            <th>Column</th>
-                                            <th>Annotation</th>
-                                            <th>Ontology</th>
-                                            <th>Reference</th>
-                                            <th></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-
-                                        </tbody>
-                                    </table>
-
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
