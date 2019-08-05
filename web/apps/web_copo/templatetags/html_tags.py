@@ -281,6 +281,15 @@ def generate_table_columns(component=str()):
             orderable = True
         columns.append(dict(data=x["id"], title=x["label"], orderable=orderable))
 
+    # add column for annotation control
+    if component == "datafile":
+        special_dict = dict(className='annotate-datafile', orderable=False, data=None,
+                            title='', width="1%",
+                            defaultContent='<span title="Annotate datafile" style="cursor: '
+                                           'pointer;" class="copo-tooltip">'
+                                           '<i class="ui icon violet write" aria-hidden="true"></i></span>')
+        columns.append(special_dict)
+
     return columns
 
 
@@ -322,8 +331,8 @@ def generate_server_side_table_records(profile_id=str(), component=str(), reques
         ]})
 
         filter_by = {"$or": [
-                {"description_token": {"$in": [None, False, ""]}},
-                {"description_token": {"$nin": existing_bundles}}]}
+            {"description_token": {"$in": [None, False, ""]}},
+            {"description_token": {"$nin": existing_bundles}}]}
 
     # get and filter schema elements based on displayable columns
     schema = [x for x in da_object.get_schema().get("schema_dict") if x.get("show_in_table", True)]
@@ -416,14 +425,6 @@ def generate_table_records(profile_id=str(), component=str()):
         columns.append(dict(data="record_id", visible=False))
         detail_dict = dict(className='summary-details-control detail-hover-message', orderable=False, data=None,
                            title='', defaultContent='', width="5%")
-
-        if component == "datafile":
-            special_dict = dict(className='describe-status', orderable=False, data=None,
-                                title='', width="1%",
-                                defaultContent='<span title="Click for description info" data-desc="" style="cursor: '
-                                               'pointer;" class="metadata-rating uncertain">'
-                                               '<i class="fa fa-square" aria-hidden="true"></i></span>')
-            columns.insert(0, special_dict)
 
         columns.insert(0, detail_dict)
 
@@ -625,7 +626,6 @@ def generate_submission_accessions_data(submission_record):
                             data_set.append([v["sample_accession"], v["sample_alias"], v["biosample_accession"], key])
                         else:
                             data_set.append([v["accession"], v["alias"], str(), key])
-
 
         elif repository == "ena-ant":
             # -----------COLLATE ACCESSIONS FOR ENA ANNOTATIONS----------

@@ -1620,13 +1620,22 @@ div.shown span.side-help-trigger:before {
     }
 }
 
-/*semantic ui button styling override*/
+/*semantic ui override*/
 .ui.tiny.buttons .button,
 .ui.tiny.buttons .or,
 .ui.tiny.button {
     font-size: 11px;
 !important;
 }
+
+.ui.dropdown .menu > .item {
+    font-size: 12px;
+}
+
+.ui.popup {
+    font-size: 12px;
+}
+
 
 .dataTables_wrapper .dataTables_paginate .paginate_button {
     padding: 15px !important;
@@ -1795,22 +1804,15 @@ div.shown span.side-help-trigger:before {
 .select2-search__field {
     width: 100% !important;
 }
-.wtHolder{
+
+.wtHolder {
     width: 100%;
     overflow: scroll;
 }
+
 /*end select2 styling*/
 
 /*bundle styles*/
-
-.bundle-task.ui.button {
-    font-size: 12px;
-}
-
-.sub-bundle-task.ui.button {
-    line-height: 1.6;
-}
-
 
 
 /*draggable*/

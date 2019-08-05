@@ -73,6 +73,14 @@ class WizardHelper:
         return initiate_result
 
     def add_to_bundle(self, description_targets):
+        """
+        function adds datafiles to bundle
+        :param description_targets:
+        :return:
+        """
+
+        description_targets = [x for x in description_targets if x]
+
         trgts_df = pd.DataFrame(description_targets, columns=['id'])
         trgts_df['idsplit'] = trgts_df['id'].apply(lambda x: ObjectId(x.split("row_")[-1]))
 
@@ -409,7 +417,8 @@ class WizardHelper:
         if next_stage_index > 0:
             current_stage_dict = stages[next_stage_index - 1]
             previous_data = attributes.get(current_stage, dict())
-            current_data = DecoupleFormSubmission(auto_fields, current_stage_dict['items']).get_schema_fields_updated_dict()
+            current_data = DecoupleFormSubmission(auto_fields,
+                                                  current_stage_dict['items']).get_schema_fields_updated_dict()
 
         # save stage data
         if current_data and not (current_data == previous_data):
@@ -734,10 +743,14 @@ class WizardHelper:
         no_description_list = list(datafiles_df[datafiles_df.description == {}]['_id'])
         has_description_df = datafiles_df[datafiles_df.description != {}]
 
-        # copy across wizard's data to records without description or single record case
-        if len(no_description_list) or len(has_description_df) == 1:
-            update_dict = dict(description=dict(stages=rendered_stages_copy, attributes=df_attributes))
-            no_description_list = no_description_list + list(has_description_df['_id'])
+        # copy across wizard's data to records without description or single record
+        update_dict = dict(description=dict(stages=rendered_stages_copy, attributes=df_attributes))
+        if len(has_description_df) == 1:
+            DataFile().get_collection_handle().update_many(
+                {"_id": {"$in": list(has_description_df['_id'])}},
+                {'$set': update_dict})
+
+        if len(no_description_list):
             DataFile().get_collection_handle().update_many(
                 {"_id": {"$in": no_description_list}},
                 {'$set': update_dict})
@@ -1275,23 +1288,106 @@ class WizardHelper:
             df['name'] = df['name'].replace('', 'N/A')
             df['created_on'] = df['created_on'].apply(lambda x: htags.resolve_datetime_data(x, dict()))
 
+            # get related submission record
+            submission_records = cursor_to_list(
+                Submission().get_collection_handle().find(
+                    {"description_token": {"$in": list(df['id'])}, 'deleted': d_utils.get_not_deleted_flag()},
+                    {'_id': 1, 'complete': 1, 'description_token': 1, 'transcript': 1}))
+
+            submission_map = dict()
+
+            for sub in submission_records:
+                submission_map[sub['description_token']] = sub.get('complete', False)
+
+                # check for errors
+                if str(submission_map[sub['description_token']]).lower() == 'true':
+                    submission_map[sub['description_token']] = 'submitted'
+                elif len(sub.get('transcript', dict()).get('error', list())):
+                    submission_map[sub['description_token']] = 'error'
+                else:
+                    submission_map[sub['description_token']] = 'pending'
+
+            df['submission_status'] = df['id'].apply(lambda x: submission_map.get(x, 'not_submitted'))
+
             data_set = df.to_dict('records')
 
         return data_set
 
-    def get_description_record_details(self):
+    def get_bundle_issues(self, description_token=str()):
+        """
+        function returns errors for incomplete submissions
+        :param description_token:
+        :return:
+        """
+
+        if not description_token:
+            description_token = self.description_token
+
+        submission_records = cursor_to_list(
+            Submission().get_collection_handle().find(
+                {"description_token": {"$in": [description_token]}, 'deleted': d_utils.get_not_deleted_flag()},
+                {'_id': 1, 'complete': 1, 'description_token': 1, 'transcript': 1}))
+
+        if not submission_records:
+            return list()
+
+        sub = submission_records[0]
+
+        if str(sub.get('complete', False)).lower() == 'true':  # report no issues for completed submission
+            return list()
+
+        issues = sub.get('transcript', dict()).get('error', list())
+
+        return issues
+
+    def get_bundle_accessions(self, description_token=str()):
+        """
+        function returns submission accessions for a bundle
+        :param description_token:
+        :return:
+        """
+
+        if not description_token:
+            description_token = self.description_token
+
+        submission_records = cursor_to_list(
+            Submission().get_collection_handle().find(
+                {"description_token": {"$in": [description_token]}, 'deleted': d_utils.get_not_deleted_flag()},
+                {'_id': 1, 'complete': 1, 'description_token': 1, 'accessions': 1, 'repository': 1}))
+
+        if not submission_records:
+            return list()
+
+        sub = submission_records[0]
+
+        if str(sub.get('complete', False)).lower() == 'false':  # submission is inconclusive
+            return list()
+
+        accessions = sub.get("accessions", dict())
+
+        if not accessions:
+            return list()
+
+        accessions = htags.generate_submission_accessions_data(sub)
+
+        return accessions
+
+    def get_description_record_details(self, description_token=str()):
         """
         function returns description detail
         :return:
         """
 
-        description = Description().GET(self.description_token)
+        if not description_token:
+            description_token = self.description_token
+
+        description = Description().GET(description_token)
 
         number_of_datafiles = DataFile().get_collection_handle().count(
-            {'description_token': str(description['_id']), 'deleted': d_utils.get_not_deleted_flag()})
+            {'description_token': description_token, 'deleted': d_utils.get_not_deleted_flag()})
 
-        name = description['name']
-        created_on = htags.resolve_datetime_data(description['created_on'], dict())
+        name = description.get('name', 'undefined')
+        created_on = htags.resolve_datetime_data(description.get('created_on', ''), dict())
 
         attributes = description.get('attributes', dict())
         meta = description.get("meta", dict())
@@ -1318,10 +1414,11 @@ class WizardHelper:
 
         if datafile_items:
             resolved_element = htags.resolve_display_data(datafile_items, datafile_attributes)
-            target_repository = resolved_element['data_set']['target_repository___0___deposition_context']
+            target_repository = resolved_element.get('data_set', dict()).get(
+                'target_repository___0___deposition_context', str())
 
-            for indx, col in enumerate(resolved_element['columns']):
-                data_set.append([indx, col['title'], resolved_element['data_set'][col['data']]])
+            for indx, col in enumerate(resolved_element.get('columns', list())):
+                data_set.append([indx, col['title'], resolved_element.get('data_set', dict()).get(col['data'], str())])
 
         return dict(data_set=data_set, name=name, number_of_datafiles=number_of_datafiles, created_on=created_on,
                     target_repository=target_repository)
@@ -1422,13 +1519,13 @@ class WizardHelper:
 
         # create a new submission record only if none exist for this description
 
-        records = cursor_to_list(
+        submission_records = cursor_to_list(
             Submission().get_collection_handle().find(
                 {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
                 {'_id': 1}))
 
-        if len(records):
-            return dict(submission_id=str(records[0]["_id"]), existing=True)
+        if len(submission_records):  # submission record exist
+            return dict(submission_id=str(submission_records[0]["_id"]), existing=True)
 
         records = cursor_to_list(
             DataFile().get_collection_handle().find(
@@ -1438,19 +1535,21 @@ class WizardHelper:
         description = Description().GET(self.description_token)
         target_repository = description["attributes"].get("target_repository", dict()).get("deposition_context", str())
 
+        submission_id = str()
+
         if len(records):
             df = pd.DataFrame(records)
             df['file_id'] = df._id.astype(str)
             df['file_path'] = df['file_location'].fillna('')
             df['upload_status'] = False
 
-        df = df[['file_id', 'file_path', 'upload_status']]
-        bundle = list(df.file_id)
-        bundle_meta = df.to_dict('records')
-        kwarg = dict(bundle=bundle, bundle_meta=bundle_meta, repository=target_repository,
-                     description_token=self.description_token)
+            df = df[['file_id', 'file_path', 'upload_status']]
+            bundle = list(df.file_id)
+            bundle_meta = df.to_dict('records')
+            kwarg = dict(bundle=bundle, bundle_meta=bundle_meta, repository=target_repository,
+                         description_token=self.description_token)
 
-        submission_id = str(Submission(profile_id=self.profile_id).save_record(dict(), **kwarg).get("_id", str()))
+            submission_id = str(Submission(profile_id=self.profile_id).save_record(dict(), **kwarg).get("_id", str()))
 
         return dict(submission_id=submission_id, existing=False)
 

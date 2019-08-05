@@ -207,11 +207,6 @@ function display_copo_alert(alertType, alertMessage, displayDuration) {
         alertElement.find(".alert-message").html(alertMessage);
 
         infoPanelElement.prepend(alertElement);
-
-        // setTimeout(function () {
-        //     alertElement.removeClass("alert-" + alertType);
-        //     alertElement.find(".alert-message").css("color", "#ededed");
-        // }, displayDuration);
     }
 
 }
@@ -343,7 +338,7 @@ function do_render_server_side_table(componentMeta) {
         do_table_buttons_events_server_side(component);
 
         table.on('click', 'tr >td', function () {
-            var classList = ["describe-status", "summary-details-control", "detail-hover-message"]; //don't select on these
+            var classList = ["annotate-datafile", "summary-details-control", "detail-hover-message"]; //don't select on columns with these classes
             var foundClass = false;
 
             var tdList = this.className.split(" ");
@@ -479,17 +474,17 @@ function do_render_server_side_table(componentMeta) {
             }
         });
 
+    //hnadle event for annotation of of datafile
     $('#' + tableID + ' tbody')
-        .off('click', 'td.describe-status')
-        .on('click', 'td.describe-status', function (event) {
+        .off('click', 'td.annotate-datafile')
+        .on('click', 'td.annotate-datafile', function (event) {
             event.preventDefault();
 
             var tr = $(this).closest('tr');
-
-            var event = jQuery.Event("showrecordbundleinfo"); //individual compnents can trap and handle this event as they so wish
-            event.rowId = tr.attr("id");
-            event.tableID = tableID;
-            $('body').trigger(event);
+            var record_id = tr.attr("id");
+            record_id = record_id.split("row_").slice(-1)[0];
+            var loc = $("#file_annotate_url").val().replace("999", record_id);
+            window.location.href = loc;
         });
 
 } //end of func

@@ -45,6 +45,8 @@ class BrokerRequests:
                             validate_datafile_pairing=self.do_validate_datafile_pairing,
                             get_unpaired_datafiles=self.do_get_unpaired_datafiles,
                             pair_datafiles=self.do_pair_datafiles,
+                            get_bundle_issues=self.do_get_bundle_issues,
+                            get_bundle_accessions=self.do_get_bundle_accessions,
                             )
 
         return request_dict
@@ -124,3 +126,9 @@ class BrokerRequests:
 
     def do_pair_datafiles(self):
         self.context['result'] = self.wizard_helper.pair_datafiles(self.auto_fields)
+
+    def do_get_bundle_issues(self):
+        self.context['result'] = self.wizard_helper.get_bundle_issues()
+
+    def do_get_bundle_accessions(self):
+        self.context['result'] = self.wizard_helper.get_bundle_accessions()

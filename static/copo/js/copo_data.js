@@ -5,7 +5,6 @@ var key_split = "___0___";
 $(document).ready(function () {
     //****************************** Event Handlers Block *************************//
 
-
     //page global variables
     var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
     var component = "datafile";
@@ -439,8 +438,31 @@ $(document).ready(function () {
                                     }
                                 }, 1000);
                             } else {
-                                dialogRef.close();
-                                window.location.replace($("#submission_url").val());
+                                var submission_id = data.result.submission_id || '';
+
+                                if (submission_id) {
+                                    dialogRef.close();
+                                    window.location.replace($("#submission_url").val());
+                                } else {
+                                    BootstrapDialog.show({
+                                        title: 'Submission Error!',
+                                        message: "Couldn't create submission record. Please make sure there are described datafiles in the bundle.",
+                                        cssClass: 'copo-modal3',
+                                        closable: false,
+                                        animate: true,
+                                        type: BootstrapDialog.TYPE_DANGER,
+                                        buttons: [
+                                            {
+                                                label: '<i class="copo-components-icons fa fa-times"></i> OK',
+                                                cssClass: 'tiny ui basic red button',
+                                                action: function (dialogRef) {
+                                                    dialogRef.close();
+                                                }
+                                            }
+                                        ]
+                                    });
+                                }
+
                             }
 
                             return false;
@@ -594,7 +616,7 @@ $(document).ready(function () {
             dispatchStageRenderer[stage.renderer](stage);
 
             set_up_validator($("#wizard_form_" + numSteps));
-            toggle_disable_next();
+            // toggle_disable_next();
         }
 
         //check for bundle violation
@@ -896,14 +918,13 @@ $(document).ready(function () {
     } //end of func
 
 
-    function do_begin_annotate(records){
-        if(records.length != 1){
+    function do_begin_annotate(records) {
+        if (records.length != 1) {
             alert("You cannot annotate multiple spreadsheets at one.")
             return false
-        }
-        else{
+        } else {
             var file_id = records[0].split("_")
-            window.location.href = "/copo/annotate_meta/" + file_id[file_id.length -1] + "/view";
+            window.location.href = "/copo/annotate_meta/" + file_id[file_id.length - 1] + "/view";
         }
     }
 
@@ -1087,12 +1108,9 @@ $(document).ready(function () {
     }
 
     function set_bundle_status() {
-        $('.description-bundle-panel').find(".bundle-header, .bundle-status").removeClass("blue");
-
         if (datafileDescriptionToken) {
             var parentElem = $('.description-bundle-panel[data-id="' + datafileDescriptionToken + '"]');
             parentElem.prependTo(parentElem.parent());
-            parentElem.find(".bundle-header, .bundle-status").addClass("blue");
         }
     }
 
@@ -1330,6 +1348,7 @@ $(document).ready(function () {
         refresh_tool_tips();
 
         messageDiv.show();
+        toggle_disable_next();
     }
 
     function generate_datafile_edit_table(stage) {
@@ -1405,10 +1424,8 @@ $(document).ready(function () {
                 dtRows = data.table_data.rows;
 
                 render_datafile_attributes_table(tableID);
-
                 btnNext.removeClass("loading");
                 btnNext.prop('disabled', false);
-
             }
         });
 
@@ -1921,7 +1938,7 @@ $(document).ready(function () {
     }
 
     function cell_loader_icon() {
-        var loaderObject = $('<div>', {
+        var loaderObject = $('<div/>', {
             style: 'text-align: center; margin-top: 3px;',
             id: "cell-loader",
             html: "<span class='fa fa-spinner fa-pulse fa-2x'></span>"
