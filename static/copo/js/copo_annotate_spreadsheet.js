@@ -2,7 +2,7 @@ $(document).ready(function () {
     // attach array to document which will be used to hold spreadsheet data
     $(document).data('ss_data', new Array())
     refresh_display()
-    //refresh_annotations()
+    refresh_annotations()
     $(document).on("shown.bs.tab", ".hot_tab", function () {
         $(document).data("nav_tab", $(this).find("a").attr("href"))
         var id = this.innerText
@@ -250,7 +250,7 @@ function refresh_display() {
             hot.render()
             $(document).data(id, hot)
             make_dropabble()
-            refresh_annotations()
+            //refresh_annotations()
         })
 
     }).error(function (data) {
@@ -261,23 +261,29 @@ function refresh_display() {
 function do_cell_mouse_over(evt, coords, td) {
     var last = $(document).data("mouse_over_cell")
     if (last == undefined) {
-        var pan = $('<span class="panel panel-default annotation_for_cell">' + $(evt.target).data("label") + '</span>')
-        $("#annotations_for_cell").append(pan).fadeIn()
+        //var pan = $('<span class="panel panel-default annotation_for_cell">' + $(evt.target).data("label") + '</span>')
+        //$("#annotations_for_cell").append(pan).fadeIn()
     } else if (coords.col != last.col) {
         // change contents
+        console.log("here")
+        console.log($(evt.target).data())
         //$("#annotations_for_cell").fadeOut()
         $("#annotations_for_cell").empty()
-        if ($(evt.target).data("label") == undefined) {
+        if ($(evt.target).data("annotations") == undefined) {
 
-        }
-        else {
-            console.log($(evt.target).data())
-            var pan = $('<span class="panel panel-default annotation_for_cell" >' + $(evt.target).data("label") + '</span>')
-            $("#annotations_for_cell").append(pan)
-        }
-        }
+        } else {
 
+            var annotations = $(evt.target).data("annotations")
+            console.log(annotations)
+            /*
+            $(labels).each(function (idx, label) {
+                var pan = $('<span class="panel panel-default annotation_for_cell" >' + label + '</span>')
+                $("#annotations_for_cell").append(pan)
+            })
 
+             */
+        }
+    }
     $(document).data("mouse_over_cell", coords)
 }
 
@@ -290,7 +296,13 @@ function do_cell_mouse_out(evt, coords, td) {
 
 function refresh_annotations() {
     // refresh current annotations
-    var sheet_name = $("div[name^='table']:visible").attr("name").split("table_")[1]
+    var sheet_name
+    try {
+        sheet_name = $("div[name^='table']:visible").attr("name").split("table_")[1]
+    } catch {
+        // we are loading the first time
+        sheet_name = $($("#ss_sheets li")[0]).find("a").text()
+    }
     var file_id = $("#file_id").val()
     $.ajax({
         url: "/copo/refresh_annotations/",
@@ -299,19 +311,47 @@ function refresh_annotations() {
     }).done(function (data) {
         data = JSON.parse(data)
         $("#existing_annotations").empty()
+        var annotations_arr = new Array()
+        for (var d in data.annotations) {
+            var result = make_annotation_panel(data.annotations, d)
+            $("#existing_annotations").append(result)
+            var an = new Object()
+            an.col_idx = data.annotations[d].file_level_annotation.column_idx
+            an.label = data.annotations[d].file_level_annotation.label
+            an.ontology = data.annotations[d].file_level_annotation.ontology_prefix
+            annotations_arr.push(an)
+        }
+        for (var an in annotations_arr) {
+
+
+            var sheet_name = $("div[name^='table']:visible").attr("name")
+            var hot = $(document).data(sheet_name)
+            var annotation = annotations_arr[an]
+            for (var i = 0; i < hot.countRows(); i++) {
+
+                var cell = hot.getCell(i, annotation.col_idx)
+                $(cell).addClass("annotatedColumn");
+                if ($(cell).data("annotations") == undefined) {
+                    a = new Array()
+                    a.push(annotation)
+                    $(cell).data("annotations", a)
+                } else {
+                    $(cell).data("annotations").push(annotation)
+                }
+
+            }
+        }
+        /*
         for (var d in data.annotations) {
             var result = make_annotation_panel(data.annotations, d)
 
             $("#existing_annotations").append(result)
-            var sheet_name = $("div[name^='table']:visible").attr("name")
-            var hot = $(document).data(sheet_name)
-            for (var i = 0; i < hot.countRows(); i++) {
-                var cell = hot.getCell(i, data.annotations[d].file_level_annotation.column_idx)
-                $(cell).addClass("annotatedColumn");
-                $(cell).data("label", data.annotations[d].file_level_annotation.label)
-                $(cell).data("ontology", data.annotations[d].file_level_annotation.ontology_prefix)
-            }
+
+            var annotations = new Array()
+
         }
+
+         */
         var a = $(document).data("nav_tab")
         $("a[href=" + a + "]").tab("show")
     })
@@ -333,7 +373,11 @@ function do_my_annotations(event) {
     }
 
     var file_id = $("#file_id").val()
-    var sheet_name = $("div[name^='table']:visible").attr("name").split("table_")[1]
+    try {
+        var sheet_name = $("div[name^='table']:visible").attr("name").split("table_")[1]
+    } catch {
+        sheet_name = $($("#ss_sheets li")[0]).find("a").text()
+    }
     $.ajax({
         url: "/copo/refresh_annotations_for_user/",
         data: {"file_id": file_id, "sheet_name": sheet_name, "filter": annotation_fiter},
