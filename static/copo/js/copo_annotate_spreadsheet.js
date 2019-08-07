@@ -1,42 +1,16 @@
-var sheets = {};
-
 $(document).ready(function () {
     // attach array to document which will be used to hold spreadsheet data
     $(document).data('ss_data', new Array())
-
     refresh_display()
-
-    setTimeout(
-        function () {
-            refresh_annotations()
-            //$($("#ss_sheets li")[0]).find("a").trigger("click")
-
-            //make_dropabble();
-
-            // if (!sheets.hasOwnProperty("table_" + id)) {
-            //
-            //     sheets["table_" + id] = 1;
-            // }
-
-        }, 500);
-
-
+    //refresh_annotations()
     $(document).on("shown.bs.tab", ".hot_tab", function () {
         $(document).data("nav_tab", $(this).find("a").attr("href"))
         var id = this.innerText
         var hot = $(document).data("table_" + id)
         hot.render()
-
-        make_dropabble();
-
-        /*if (!sheets.hasOwnProperty("table_" + id)) {
-            make_dropabble();
-            sheets["table_" + id] = 1;
-        }*/
-
+        make_dropabble()
         refresh_annotations()
     })
-
     $(document).on("click", ".hot_tab", function () {
         $(document).data("selected_nav_tab", $(this))
     })
@@ -45,18 +19,6 @@ $(document).ready(function () {
     $(document).on("click", "#filters a", do_my_annotations)
 
 })
-
-function make_dropabble() {
-
-    $("#ss_data tr td").off().droppable({
-        activeClass: "dropActive",
-        tolerance: "pointer",
-        greedy: true,
-        drop: dropHandler,
-        over: overHandler
-
-    })
-}
 
 $(document).ajaxStart(function () {
 
@@ -72,7 +34,6 @@ function stopDrag(ev) {
 }
 
 function dropHandler(ev, ui) {
-
     var data = new Object();
     var iri = $(ui.draggable.context).data("iri")
     data.label = $(ui.draggable.context).data("label")
@@ -289,9 +250,10 @@ function refresh_display() {
             hot.render()
             $(document).data(id, hot)
             make_dropabble()
-
+            refresh_annotations()
+            console.log("refresh display")
         })
-refresh_annotations()
+
     }).error(function (data) {
         console.error(data)
     })
@@ -299,34 +261,25 @@ refresh_annotations()
 
 function do_cell_mouse_over(evt, coords, td) {
     var last = $(document).data("mouse_over_cell")
-    if (last == undefined) {
-        //var pan = $('<span class="panel panel-default annotation_for_cell">' + $(evt.target).data("label") + '</span>')
-        //$("#annotations_for_cell").append(pan).fadeIn()
-    } else if (coords.col != last.col) {
+    if(last == undefined){
+        var pan = $('<span class="panel panel-default annotation_for_cell">' + $(evt.target).data("label") + '</span>')
+        $("#annotations_for_cell").append(pan).fadeIn()
+    }
+    else if (coords.col != last.col) {
         // change contents
-        console.log("here")
-        console.log($(evt.target).data())
         //$("#annotations_for_cell").fadeOut()
         $("#annotations_for_cell").empty()
-        if ($(evt.target).data("annotations") == undefined) {
 
-        } else {
-
-            var annotations = $(evt.target).data("annotations")
-            console.log(annotations)
-            /*
-            $(labels).each(function (idx, label) {
-                var pan = $('<span class="panel panel-default annotation_for_cell" >' + label + '</span>')
-                $("#annotations_for_cell").append(pan)
-            })
-
-             */
-        }
+        var pan = $('<span class="panel panel-default annotation_for_cell" >' + $(evt.target).data("label") + '</span>')
+        $("#annotations_for_cell").append(pan)
+        //$("#annotations_for_cell").show()
     }
+
+
     $(document).data("mouse_over_cell", coords)
 }
 
-function do_cell_mouse_out(evt, coords, td) {
+function do_cell_mouse_out(evt, coords, td){
     var last = $(document).data("mouse_over_cell")
     if (coords[0] != last[0]) {
         $("#annotations_for_cell").fadeOut()
@@ -335,14 +288,7 @@ function do_cell_mouse_out(evt, coords, td) {
 
 function refresh_annotations() {
     // refresh current annotations
-
-    var sheet_name
-    try {
-        sheet_name = $("div[name^='table']:visible").attr("name").split("table_")[1]
-    } catch {
-        // we are loading the first time
-        sheet_name = $($("#ss_sheets li")[0]).find("a").text()
-    }
+    var sheet_name = $("div[name^='table']:visible").attr("name").split("table_")[1]
     var file_id = $("#file_id").val()
     $.ajax({
         url: "/copo/refresh_annotations/",
@@ -351,58 +297,23 @@ function refresh_annotations() {
     }).done(function (data) {
         data = JSON.parse(data)
         $("#existing_annotations").empty()
-        var annotations_arr = new Array()
         for (var d in data.annotations) {
             var result = make_annotation_panel(data.annotations, d)
+
             $("#existing_annotations").append(result)
-            var an = new Object()
-            an.col_idx = data.annotations[d].file_level_annotation.column_idx
-            an.label = data.annotations[d].file_level_annotation.label
-            an.ontology = data.annotations[d].file_level_annotation.ontology_prefix
-            annotations_arr.push(an)
-        }
-        var sheet_name = $("div[name^='table']:visible").attr("name")
-        var hot = $(document).data(sheet_name)
-        //var cells = hot.getCells(0, 0, hot.countRows() - 1, hot.countCols() - 1)
-        for (var y = 0; y < hot.countCols(); y++) {
-            for (var x = 0; x < hot.countRows(); x++) {
-                var cell = hot.getCell(x, y)
-                $(cell).removeData()
-            }
-
-        }
-        for (var an in annotations_arr) {
-
-
-            var annotation = annotations_arr[an]
+            var sheet_name = $("div[name^='table']:visible").attr("name")
+            var hot = $(document).data(sheet_name)
             for (var i = 0; i < hot.countRows(); i++) {
-
-                var cell = hot.getCell(i, annotation.col_idx)
+                var cell = hot.getCell(i, data.annotations[d].file_level_annotation.column_idx)
                 $(cell).addClass("annotatedColumn");
-                if ($(cell).data("annotations") == undefined) {
-                    a = new Array()
-                    a.push(annotation)
-                    $(cell).data("annotations", a)
-                } else {
-                    $(cell).data("annotations").push(annotation)
-                }
-
+                $(cell).data("label", data.annotations[d].file_level_annotation.label)
+                $(cell).data("ontology", data.annotations[d].file_level_annotation.ontology_prefix)
             }
         }
-        /*
-        for (var d in data.annotations) {
-            var result = make_annotation_panel(data.annotations, d)
-
-            $("#existing_annotations").append(result)
-
-            var annotations = new Array()
-
-        }
-
-         */
         var a = $(document).data("nav_tab")
         $("a[href=" + a + "]").tab("show")
     })
+    console.log("refresh annotations")
     do_my_annotations()
 
 }
@@ -421,11 +332,7 @@ function do_my_annotations(event) {
     }
 
     var file_id = $("#file_id").val()
-    try {
-        var sheet_name = $("div[name^='table']:visible").attr("name").split("table_")[1]
-    } catch {
-        sheet_name = $($("#ss_sheets li")[0]).find("a").text()
-    }
+    var sheet_name = $("div[name^='table']:visible").attr("name").split("table_")[1]
     $.ajax({
         url: "/copo/refresh_annotations_for_user/",
         data: {"file_id": file_id, "sheet_name": sheet_name, "filter": annotation_fiter},
@@ -468,6 +375,7 @@ function do_my_annotations(event) {
     })
     //console.log($($(document).data("selected_nav_tab")).find("a").attr("href"))
     //$($(document).data("selected_nav_tab")).find("a").tab("show")
+    console.log("my annotations")
 }
 
 function make_annotation_panel(data, d) {
@@ -533,5 +441,12 @@ $(document).on("click", ".delete_annotation", function (ev) {
     })
 })
 
+function make_dropabble() {
+    $("#ss_data tr td").droppable({
+        activeClass: "dropActive",
+        tolerance: "pointer",
+        drop: dropHandler,
+        over: overHandler
 
-
+    })
+}
