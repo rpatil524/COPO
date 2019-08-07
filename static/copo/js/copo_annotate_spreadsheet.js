@@ -1,16 +1,42 @@
+var sheets = {};
+
 $(document).ready(function () {
     // attach array to document which will be used to hold spreadsheet data
     $(document).data('ss_data', new Array())
+
     refresh_display()
-    refresh_annotations()
+
+    setTimeout(
+        function () {
+            refresh_annotations()
+            //$($("#ss_sheets li")[0]).find("a").trigger("click")
+
+            //make_dropabble();
+
+            // if (!sheets.hasOwnProperty("table_" + id)) {
+            //
+            //     sheets["table_" + id] = 1;
+            // }
+
+        }, 500);
+
+
     $(document).on("shown.bs.tab", ".hot_tab", function () {
         $(document).data("nav_tab", $(this).find("a").attr("href"))
         var id = this.innerText
         var hot = $(document).data("table_" + id)
         hot.render()
-        make_dropabble()
+
+        make_dropabble();
+
+        /*if (!sheets.hasOwnProperty("table_" + id)) {
+            make_dropabble();
+            sheets["table_" + id] = 1;
+        }*/
+
         refresh_annotations()
     })
+
     $(document).on("click", ".hot_tab", function () {
         $(document).data("selected_nav_tab", $(this))
     })
@@ -19,6 +45,18 @@ $(document).ready(function () {
     $(document).on("click", "#filters a", do_my_annotations)
 
 })
+
+function make_dropabble() {
+
+    $("#ss_data tr td").off().droppable({
+        activeClass: "dropActive",
+        tolerance: "pointer",
+        greedy: true,
+        drop: dropHandler,
+        over: overHandler
+
+    })
+}
 
 $(document).ajaxStart(function () {
 
@@ -34,6 +72,7 @@ function stopDrag(ev) {
 }
 
 function dropHandler(ev, ui) {
+
     var data = new Object();
     var iri = $(ui.draggable.context).data("iri")
     data.label = $(ui.draggable.context).data("label")
@@ -250,9 +289,9 @@ function refresh_display() {
             hot.render()
             $(document).data(id, hot)
             make_dropabble()
-            //refresh_annotations()
-        })
 
+        })
+refresh_annotations()
     }).error(function (data) {
         console.error(data)
     })
@@ -296,6 +335,7 @@ function do_cell_mouse_out(evt, coords, td) {
 
 function refresh_annotations() {
     // refresh current annotations
+
     var sheet_name
     try {
         sheet_name = $("div[name^='table']:visible").attr("name").split("table_")[1]
@@ -321,11 +361,19 @@ function refresh_annotations() {
             an.ontology = data.annotations[d].file_level_annotation.ontology_prefix
             annotations_arr.push(an)
         }
+        var sheet_name = $("div[name^='table']:visible").attr("name")
+        var hot = $(document).data(sheet_name)
+        //var cells = hot.getCells(0, 0, hot.countRows() - 1, hot.countCols() - 1)
+        for (var y = 0; y < hot.countCols(); y++) {
+            for (var x = 0; x < hot.countRows(); x++) {
+                var cell = hot.getCell(x, y)
+                $(cell).removeData()
+            }
+
+        }
         for (var an in annotations_arr) {
 
 
-            var sheet_name = $("div[name^='table']:visible").attr("name")
-            var hot = $(document).data(sheet_name)
             var annotation = annotations_arr[an]
             for (var i = 0; i < hot.countRows(); i++) {
 
@@ -485,12 +533,5 @@ $(document).on("click", ".delete_annotation", function (ev) {
     })
 })
 
-function make_dropabble() {
-    $("#ss_data tr td").droppable({
-        activeClass: "dropActive",
-        tolerance: "pointer",
-        drop: dropHandler,
-        over: overHandler
 
-    })
-}
+
