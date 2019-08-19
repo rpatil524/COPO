@@ -1,6 +1,7 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 01/12/2015'
 # this python file is for small utility functions which will be called from Javascript
 import json
+import time
 import jsonpickle
 from datetime import datetime
 from bson import json_util, ObjectId
@@ -14,7 +15,7 @@ from dal.copo_da import Profile
 import web.apps.web_copo.lookup.lookup as ol
 from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from django.conf import settings
-from dal.copo_da import ProfileInfo, RemoteDataFile, Submission, DataFile, Sample, Source, CopoGroup, Annotation, \
+from dal.copo_da import ProfileInfo, Submission, DataFile, Sample, Source, CopoGroup, Annotation, \
     Repository, Person
 from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
@@ -104,89 +105,99 @@ def get_upload_information(request):
     sub_info_list = list()
 
     for id in ids:
-        # get submission collection and check status
-        sub = Submission().get_record(id)
+        # get submission record and check submission status
+        try:
+            sub = Submission().get_record(id)
+        except:
+            sub = dict()
 
-        sub_info_dict = dict(submission_id=id, submission_status=False)
+        if not sub:
+            continue
 
-        if sub:
-            # get bundle transfer status
-            sub_info_dict["bundle_meta"] = sub.get("bundle_meta", list())
-            sub_info_dict["bundle"] = sub.get("bundle", list())
-            if sub["repository"] not in ["cg_core", "dataverse", "dspace", "ckan"]:
-                sub_info_dict["enable_submit_button"] = True
+        sub_info_dict = dict()
+        sub_info_dict["submission_id"] = id
+        sub_info_dict["enable_submit_button"] = True
+
+        repo = sub.get("repository", str()).lower()
+
+        if repo in ["cg_core", "dataverse", "dspace", "ckan"]:
+            if "meta" in sub and "fields" in sub["meta"] or "identifier" in sub["meta"]:
+                pass
             else:
-                if "meta" in sub and "fields" in sub["meta"] or "identifier" in sub["meta"]:
-                    sub_info_dict["enable_submit_button"] = True
+                sub_info_dict["enable_submit_button"] = False
+
+        if str(sub.get("complete", False)).lower() == 'true':
+            # submission has finished
+            sub_info_dict["submission_status"] = True
+            sub_info_dict["completed_on"] = sub.get('completed_on', str()).strftime('%d %b, %Y, %H:%M') if sub.get(
+                'completed_on', str()) else 'unavailable'
+            try:
+                sub_info_dict["article_id"] = sub['article_id']
+            except:
+                sub_info_dict["article_id"] = "unavailable"
+
+            # get study embargo info
+            if repo == "ena":
+                # get study accession
+                prj = sub.get('accessions', dict()).get('project', [{}])
+                status = prj[0].get("status", "Unknown")
+                release_date = prj[0].get("release_date", str())
+                if status.upper() == "PRIVATE":
+                    sub_info_dict["release_status"] = "PRIVATE"
+
+                    sub_info_dict["release_date"] = release_date
+                    if len(release_date) >= 10:  # e.g. '2019-08-30'
+                        try:
+                            datetime_object = datetime.strptime(release_date[:10], '%Y-%m-%d')
+                            sub_info_dict["release_date"] = time.strftime('%a, %d %b %Y %H:%M',
+                                                                          datetime_object.timetuple())
+                        except:
+                            pass
+
+                    sub_info_dict["release_message"] = "<div>All objects in this " \
+                                                       "submission are set to " \
+                                                       "private (confidential) status.</div>" \
+                                                       "<div style='margin-top:10px;'>The release date is set for " \
+                                                       "" + sub_info_dict["release_date"] + \
+                                                       ".</div><div style='margin-top:10px;'>" \
+                                                       "Click to lift the embargo on this study.</div>"
+                elif status.upper() == "PUBLIC":
+                    sub_info_dict["release_status"] = "PUBLIC"
+                    sub_info_dict["study_view_url"] = "https://www.ebi.ac.uk/ena/data/view/" + prj[0].get("accession",
+                                                                                                          str())
+                    sub_info_dict["release_message"] = "<div>All objects in " \
+                                                       "this submission are set to public status.</div> " \
+                                                       "<div style='margin-top:10px;'>Click to view this study " \
+                                                       "on the ENA browser (opens is a new browser tab)." \
+                                                       "</div><div class='text-primary' style='margin-top:10px;'>" \
+                                                       "Please note that it can take " \
+                                                       "up to 24 hours, from the " \
+                                                       "time of submission, for a study to be publicly " \
+                                                       "available on the ENA browser.</div>"
                 else:
-                    sub_info_dict["enable_submit_button"] = False
+                    sub_info_dict["release_status"] = "Unknown"
+                    sub_info_dict["release_message"] = "<div>The embargo status of " \
+                                                       "this study is unknown.</div>" \
+                                                       "<div>For more details, please contact your administrator. " \
+                                                       "Alternatively, you can try searching for the study on the " \
+                                                       "ENA browser to verify its status.</div>"
+        else:
+            # any status to report for running submissions?
+            status = sub.get("transcript", dict()).get('status', dict())
+            if status:
+                # status types are either 'info' or 'error'
+                status = dict(type=status.get('type', str()), message=status.get('message', str()))
+                sub_info_dict["submission_report"] = status
 
-            if str(sub.get("complete", False)).lower() == 'false':
-                # could we be dealing with an uploading submission?
-                rem = RemoteDataFile().get_by_sub_id(id)
+            # report on submitted datafiles - ENA for now...
+            if repo == "ena":
+                run_accessions = sub.get('accessions', dict()).get('run', list())
+                submitted_files = [x for y in run_accessions for x in y.get('datafiles', list())]
 
-                # summary of files uploaded
-                sub_info_dict["uploaded_summary"] = str()
-                if sub_info_dict["bundle_meta"]:
-                    uploaded_files = [x["file_id"] for x in sub_info_dict['bundle_meta'] if x["upload_status"]]
-                    sub_info_dict["uploaded_summary"] = str(len(uploaded_files)) + "/" + str(len(
-                        sub_info_dict["bundle"])) + " datafiles uploaded"
+                if submitted_files:
+                    sub_info_dict["submitted_files"] = submitted_files
 
-                sub_info_dict["restart_submission"] = False  # flag for stalled submission needing a restart
-
-                if rem:
-                    sub_info_dict["active_submission"] = True
-                    sub_info_dict["pct_completed"] = rem['pct_completed']
-
-                    # summary of uploaded size and rate
-                    sub_info_dict["upload_sizerate_summary"] = str()
-                    if rem['bytes_transferred'] and rem['file_size_bytes'] and rem['transfer_rate']:
-                        sub_info_dict["upload_sizerate_summary"] = str(rem['bytes_transferred']) + "/" + str(
-                            rem['file_size_bytes']) + " uploaded @ " + str(rem['transfer_rate'])
-
-                    # get current file being transferred
-                    datafile_id = rem.get("datafile_id", str())
-                    if datafile_id:
-                        sub_info_dict["datafile"] = DataFile().get_record(datafile_id).get("name", str())
-
-                    # is the transfer still active or has it stalled?
-                    # to answer this question, calculate the delta between current time and last recorded activity
-                    current_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-                    fmt = "%d-%m-%Y %H:%M:%S"
-                    tdelta = datetime.strptime(current_time, fmt) - datetime.strptime(rem['current_time'], fmt)
-                    time_threshold = 15  # acceptable threshold, after perceived inactivity,
-                    # for the submission to be classified as valid
-                    if tdelta.seconds / 60 > time_threshold:  # i.e. elapsed time = 'time_threshold' minutes
-                        sub_info_dict["active_submission"] = False
-                        sub_info_dict["submission_error"] = "Possible timeout in submission."
-
-                    # check for error
-                    if rem.get("error", str()):
-                        sub_info_dict["active_submission"] = False
-                        sub_info_dict["submission_error"] = rem["error"]
-
-                    # has the actual upload of files concluded?
-                    sub_info_dict["transfer_status"] = rem['transfer_status']
-                else:
-                    # submission was never started, or something happened along the line but we can't tell
-                    sub_info_dict["active_submission"] = False
-            else:
-                # submission has finished
-                sub_info_dict["submission_status"] = True
-                try:
-                    sub_info_dict["accessions"] = sub['accessions']
-                except:
-                    sub_info_dict["accessions"] = "unavailable"
-                try:
-                    sub_info_dict["completed_on"] = sub['completed_on'].strftime('%d %b, %Y, %H:%M')
-                except:
-                    sub_info_dict["completed_on"] = "unavailable"
-                try:
-                    sub_info_dict["article_id"] = sub['article_id']
-                except:
-                    sub_info_dict["article_id"] = "unavailable"
-
-            sub_info_list.append(sub_info_dict)
+        sub_info_list.append(sub_info_dict)
 
     context["submission_information"] = sub_info_list
     out = jsonpickle.encode(context)

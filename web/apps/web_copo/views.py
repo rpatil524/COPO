@@ -25,7 +25,6 @@ from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.decorators import user_is_staff
 import web.apps.web_copo.templatetags.html_tags as htags
 from dal.copo_da import DataFile
-import pandas
 
 LOGGER = settings.LOGGER
 
@@ -100,29 +99,6 @@ def authenticate_figshare(request):
 
 
 def test_dataverse_submit(request):
-    # from submission import enareadSubmission
-    # result = enareadSubmission.EnaReads(submission_id="5d3cbc00373b6dd8c6fda223").submit()
-    # from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
-    # t = CgCoreSchemas.get_repo_mapping(repo="dataverse")
-    # items = CgCoreSchemas().extract_repo_fields(datafile_id="5c8d7934e99f8100100e8c4e", repo="dataverse")
-    # from submission.helpers.dataverse_helper import SubmissionHelper
-    # CgCoreSchemas().process_schema()
-    # CgCoreSchemas().get_type_constraints(type_name="KOS")
-    # from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
-    # option_values = COPOLookup(accession=["5c77c2c9d127fd80d6f645e8"], data_source="cg_dependency_lookup").broker_component_search()['result']
-
-    # from submission.dataverseSubmission import DataverseSubmit
-    # DataverseSubmit(submission_id="5cd2e489ca53bf0a523df3db").submit()
-    # t = 1
-    # from submission import enareads
-
-    # metadata_file_path = SubmissionHelper(
-    #     submission_id="5cc6b98961f2ab000ff79100",
-    #     file_path="/opt/project/submission/data/5cc6b98961f2ab000ff79100/dataverse")\
-    #     .do_conversion()
-
-    # enareads.EnaReads(submission_id="5c9a05fda4ce3118dc271727").create_submission_location()
-
     return render(request, 'copo/test_page.html', {})
 
 

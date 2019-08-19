@@ -1,8 +1,9 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 27/05/2016'
 
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from dal.copo_da import Submission
-from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission, enareadSubmission
+from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission, \
+    enareadSubmission
 from django.urls import reverse
 import jsonpickle, json
 
@@ -41,24 +42,19 @@ def delegate_submission(request):
             # forward to control view
             return HttpResponse(jsonpickle.dumps({'status': 1, 'url': reverse('copo:authenticate_figshare')}))
 
-    # Submit to ENA Sequence reads - splits the submission task to micro-tasks to overcome the timeout issues observed
+    # Submit to ENA Sequence reads
     elif repo == 'ena':
-        result = enareadSubmission.EnaReads(submission_id=sub_id).submit()
+        sub_task = request.POST.get("sub_task", str())
 
-        if result is True:
+        if sub_task == "release_study":
+            result = enareadSubmission.EnaReads(submission_id=sub_id).release_study()
+        else:
+            result = enareadSubmission.EnaReads(submission_id=sub_id).submit()
+
+        if result.get("status", True) is True:
             return HttpResponse(jsonpickle.dumps({'status': 0}))
         else:
-            if isinstance(result, str):
-                message = result
-                status = 404
-            elif isinstance(result, dict):
-                message = result.get("message", str())
-                status = result.get("status", 404)
-
-            message = "\n " + message
-
-            return HttpResponse(message, status=status)
-
+            return HttpResponse(jsonpickle.dumps({'status': 1, 'message': result.get("message", str())}))
 
     # Submit to ENA
     elif 'ena' in repo:

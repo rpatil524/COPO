@@ -20,7 +20,6 @@ from dal.copo_da import ProfileInfo, Repository, Description, Profile, Publicati
 from allauth.socialaccount import providers
 from django_tools.middlewares import ThreadLocal
 import hurry
-from submission.ckanSubmission import CkanSubmit
 
 register = template.Library()
 
@@ -411,6 +410,7 @@ def generate_table_records(profile_id=str(), component=str()):
 
     if len(records):
         df = pd.DataFrame(records)
+        df['s_n'] = df.index
 
         df['record_id'] = df._id.astype(str)
         df["DT_RowId"] = df.record_id

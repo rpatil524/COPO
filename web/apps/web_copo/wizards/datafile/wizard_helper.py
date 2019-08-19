@@ -602,6 +602,7 @@ class WizardHelper:
             df = pd.DataFrame(records)
             df['record_id'] = df._id.astype(str)
             df["DT_RowId"] = df.record_id
+            df["chk_box"] = ''
             df.DT_RowId = 'row_' + df.DT_RowId
             df = df.drop('_id', axis='columns')
 
@@ -1284,7 +1285,10 @@ class WizardHelper:
 
         if records:
             df = pd.DataFrame(records)
+            df['s_n'] = df.index
             df['id'] = df._id.astype(str)
+            df["DT_RowId"] = df._id.astype(str)
+            df.DT_RowId = 'row_' + df.DT_RowId
             df['name'] = df['name'].replace('', 'N/A')
             df['created_on'] = df['created_on'].apply(lambda x: htags.resolve_datetime_data(x, dict()))
 
@@ -1299,10 +1303,10 @@ class WizardHelper:
             for sub in submission_records:
                 submission_map[sub['description_token']] = sub.get('complete', False)
 
-                # check for errors
+                # todo:  check for errors - need to resolve this
                 if str(submission_map[sub['description_token']]).lower() == 'true':
                     submission_map[sub['description_token']] = 'submitted'
-                elif len(sub.get('transcript', dict()).get('error', list())):
+                elif sub.get('transcript', dict()).get('status', dict()).get("type", str()) == "error":
                     submission_map[sub['description_token']] = 'error'
                 else:
                     submission_map[sub['description_token']] = 'pending'
@@ -1336,7 +1340,7 @@ class WizardHelper:
         if str(sub.get('complete', False)).lower() == 'true':  # report no issues for completed submission
             return list()
 
-        issues = sub.get('transcript', dict()).get('error', list())
+        issues = sub.get('transcript', dict()).get('status', dict()).get("message", list())
 
         return issues
 
@@ -1359,9 +1363,6 @@ class WizardHelper:
             return list()
 
         sub = submission_records[0]
-
-        if str(sub.get('complete', False)).lower() == 'false':  # submission is inconclusive
-            return list()
 
         accessions = sub.get("accessions", dict())
 

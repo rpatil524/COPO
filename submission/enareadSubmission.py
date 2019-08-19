@@ -9,13 +9,13 @@ import pexpect
 import subprocess
 import pandas as pd
 from lxml import etree
-from datetime import datetime
 from tools import resolve_env
 from dal.copo_da import Submission
+from datetime import datetime, date
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from submission.helpers.ena_helper import SubmissionHelper
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
-from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_PROJECT_TEMPLATE, SRA_SAMPLE_TEMPLATE, ENA_CLI
+from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_PROJECT_TEMPLATE, SRA_SAMPLE_TEMPLATE, SRA_SUBMISSION_MODIFY_TEMPLATE, ENA_CLI
 
 """
 class handles read data submissions to the ENA - see: https://ena-docs.readthedocs.io/en/latest/cli_06.html
@@ -25,7 +25,7 @@ class handles read data submissions to the ENA - see: https://ena-docs.readthedo
 class EnaReads:
     def __init__(self, submission_id=str()):
         self.submission_id = submission_id
-        self.project_alias = self.submission_id + 'abaca'
+        self.project_alias = self.submission_id
         self.ena_service = resolve_env.get_env('ENA_SERVICE')
         self.pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
         self.user_token = resolve_env.get_env('WEBIN_USER').split("@")[0]
@@ -33,10 +33,11 @@ class EnaReads:
         self.submission_helper = None
         self.submission_location = None
         self.sra_settings = None
+        self.datafiles_dir = None
 
     def submit(self):
         """
-        function ochestrates the submission process
+        function acts as a controller for the submission process
         :return:
         """
 
@@ -51,10 +52,11 @@ class EnaReads:
         self.submission_helper.logging_info('Initiating submission...')
 
         # clear any existing submission error
-        self.submission_helper.clear_submission_error()
+        self.submission_helper.clear_submission_status()
 
         # submission location
         self.submission_location = self.create_submission_location()
+        self.datafiles_dir = os.path.join(self.submission_location, "files")
 
         # retrieve sra settings
         self.sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -117,13 +119,6 @@ class EnaReads:
         :return:
         """
 
-        result = dict(status=True, value='')
-        submission_xml = [x for x in glob.glob(os.path.join(self.submission_location, "submission.xml"))]
-
-        if submission_xml:
-            result['value'] = submission_xml[0]
-            return result
-
         # create submission xml
         self.submission_helper.logging_info("Creating submission xml...")
 
@@ -180,7 +175,9 @@ class EnaReads:
         """
 
         # create project xml
-        self.submission_helper.logging_info("Registering project...")
+        log_message = "Registering project..."
+        self.submission_helper.logging_info(log_message)
+        self.submission_helper.add_submission_info(log_message)
 
         parser = etree.XMLParser(remove_blank_text=True)
         root = etree.parse(SRA_PROJECT_TEMPLATE, parser).getroot()
@@ -256,24 +253,30 @@ class EnaReads:
             return result
 
         # save project accession
+        self.write_xml_file(root, "project_receipt.xml")
         self.submission_helper.logging_info("Saving project accessions to the database")
         project_accessions = list()
         for accession in root.findall('PROJECT'):
             project_accessions.append(
                 dict(
-                    accession=accession.get('accession', default='undefined'),
-                    alias=accession.get('alias', default='undefined')
+                    accession=accession.get('accession', default=str()),
+                    alias=accession.get('alias', default=str()),
+                    status=accession.get('status', default=str()),
+                    release_date=accession.get('holdUntilDate', default=str())
                 )
             )
 
         submission_record = Submission().get_record(self.submission_id)
         accessions = submission_record.get("accessions", dict())
         accessions['project'] = project_accessions
-
         submission_record['accessions'] = accessions
-        submission_record['target_id'] = str(submission_record.pop('_id'))
 
+        submission_record['target_id'] = str(submission_record.pop('_id'))
         Submission().save_record(dict(), **submission_record)
+
+        # update submission status
+        status_message = "Project successfully registered, and accessions saved."
+        self.submission_helper.add_submission_info(status_message)
 
         return dict(status=True, value='')
 
@@ -286,7 +289,9 @@ class EnaReads:
         result = dict(status=True, value='')
 
         # create sample xml
-        self.submission_helper.logging_info("Registering samples...")
+        log_message = "Registering samples..."
+        self.submission_helper.logging_info(log_message)
+        self.submission_helper.add_submission_info(log_message)
 
         # reset error object
         self.submission_helper.flush_converter_errors()
@@ -341,7 +346,10 @@ class EnaReads:
                     etree.SubElement(sample_attribute_node, 'UNITS').text = atr.get("unit", str())
 
         if not sra_samples:  # no samples to submit
-            self.submission_helper.logging_info("No new samples to register!")
+            log_message = "No new samples to register!"
+            self.submission_helper.logging_info(log_message)
+            self.submission_helper.add_submission_info(log_message)
+
             return dict(status=True, value='')
 
         sra_df = pd.DataFrame(sra_samples)
@@ -396,17 +404,18 @@ class EnaReads:
             return result
 
         # save sample accession
+        self.write_xml_file(root, "samples_receipt.xml")
         self.submission_helper.logging_info("Saving samples accessions to the database")
         sample_accessions = list()
         for accession in root.findall('SAMPLE'):
             biosample = accession.find('EXT_ID')
-            sample_alias = accession.get('alias', default='undefined')
+            sample_alias = accession.get('alias', default=str())
             sample_id = sra_df.loc[sample_alias]['sample_id']
             sample_accessions.append(
                 dict(
-                    sample_accession=accession.get('accession', default='undefined'),
+                    sample_accession=accession.get('accession', default=str()),
                     sample_alias=sample_alias,
-                    biosample_accession=biosample.get('accession', default='undefined'),
+                    biosample_accession=biosample.get('accession', default=str()),
                     sample_id=sample_id
                 )
             )
@@ -416,11 +425,14 @@ class EnaReads:
         previous = accessions.get('sample', list())
         previous.extend(sample_accessions)
         accessions['sample'] = previous
-
         submission_record['accessions'] = accessions
-        submission_record['target_id'] = str(submission_record.pop('_id'))
 
+        submission_record['target_id'] = str(submission_record.pop('_id'))
         Submission().save_record(dict(), **submission_record)
+
+        # update submission status
+        status_message = "Samples successfully registered, and accessions saved."
+        self.submission_helper.add_submission_info(status_message)
 
         return dict(status=True, value='')
 
@@ -430,7 +442,9 @@ class EnaReads:
         :return:
         """
 
-        self.submission_helper.logging_info("Preparing datafiles for submission...")
+        log_message = "Preparing datafiles for submission..."
+        self.submission_helper.logging_info(log_message)
+        self.submission_helper.add_submission_info(log_message)
 
         result = dict(status=True, value='')
         xml_parser = etree.XMLParser(remove_blank_text=True)
@@ -445,6 +459,8 @@ class EnaReads:
             return result
 
         if not len(datafiles_df):
+            # no further datafiles to submit, finalise submission
+            self.finalise_submission()
             return dict(status=True, value='')
 
         # set default for nans
@@ -453,31 +469,21 @@ class EnaReads:
             datafiles_df[k].fillna('', inplace=True)
 
         # create location for submission files -  ena-cli only accepts a single file path
-        files_dir = os.path.join(self.submission_location, "files")
-        manifest_location = os.path.join(self.submission_location, "manifest.txt")
-
         try:
-            if not os.path.exists(files_dir):
-                os.makedirs(files_dir)
+            if not os.path.exists(self.datafiles_dir):
+                os.makedirs(self.datafiles_dir)
         except Exception as e:
-            message = 'Error creating file location ' + files_dir + ": " + str(e)
+            message = 'Error creating file location ' + self.datafiles_dir + ": " + str(e)
             self.submission_helper.logging_error(message)
             result = dict(status=False, value='', message=message)
             return result
 
         # compose the cli command to use
-        test_service = ''
-        if 'wwwdev' in self.ena_service:  # using ena's test service
-            test_service = ' -test '
-            self.submission_helper.logging_info("This is a test submission")
-
-        cli_cmd = 'java -Xmx2048m -jar ' + ENA_CLI + ' -context reads -userName ' + self.user_token + \
-                  ' -password ' + self.pass_word + ' -manifest ' + manifest_location + test_service + ' -submit -centerName ' + \
-                  self.sra_settings["sra_center"] + ' -inputDir ' + files_dir + ' -ascp '
-
+        manifest_location = os.path.join(self.submission_location, "manifest.txt")
+        cli_cmd = self.get_cli_command(manifest_location=manifest_location)
         self.submission_helper.logging_info("CURL command is: " + cli_cmd)
 
-        # get run accessions - we will use this to retrieve already submitted datafiles
+        # get run accessions - these provide info on already submitted datafiles
         run_accessions = self.submission_helper.get_run_accessions()
 
         submitted_files = [x for y in run_accessions for x in y.get('datafiles', list())]
@@ -486,6 +492,8 @@ class EnaReads:
         datafiles_df = datafiles_df[~datafiles_df.datafile_id.isin(submitted_files)]
 
         if not len(datafiles_df):
+            # no further datafiles to submit, finalise submission
+            self.finalise_submission()
             return dict(status=True, value='')
 
         # get pairing info
@@ -504,7 +512,7 @@ class EnaReads:
             datafiles_pairs = datafiles_pairs[
                 (datafiles_pairs['_id'].isin(datafile_ids)) & (datafiles_pairs['_id2'].isin(datafile_ids))]
 
-        # datafiles will be submitted following the rule:
+        # datafiles will be submitted on the following guideline:
         # if a datafile is marked as paired, but no pairing information is found (in datafiles_pairs),
         # the datafile will be submitted as a single file
 
@@ -536,7 +544,7 @@ class EnaReads:
             result = dict(status=False, value='', message=message)
             return result
 
-        # store error file submission error
+        # store file submission error
         submission_errors = list()
 
         for indx in range(len(datafiles_pairs)):
@@ -554,7 +562,7 @@ class EnaReads:
             if not files_pair:
                 continue
 
-            # create metadata list
+            # collate submission metadata
             reads_metadata = list()
 
             # set study accession
@@ -565,16 +573,15 @@ class EnaReads:
                            x['sample_id'] == files_pair[0]['study_samples']]
 
             if not s_accession:
-                accession_error = 'Sample accession not found for datafiles:'
-                for file_meta in files_pair:
-                    accession_error = accession_error + "\n" + file_meta.datafile_name
+                accession_error = 'Sample accession not found for datafiles: ' + str(
+                    [file_meta['datafile_name'] for file_meta in files_pair])
                 self.submission_helper.logging_error(accession_error)
-                submission_errors.extend(copy_errors)
+                submission_errors.append(accession_error)
                 continue
 
             reads_metadata.append(['SAMPLE', s_accession[0]])
 
-            # set name
+            # set submission name
             submission_name = self.project_alias + "_reads_" + files_pair[0].datafile_id
             reads_metadata.append(['NAME', submission_name])
 
@@ -598,17 +605,21 @@ class EnaReads:
             if 'library_description' in datafile_columns:
                 reads_metadata.append(['DESCRIPTION', files_pair[0].library_description])
 
-            # set fastq
+            # set file name - The following file name fields are supported in the manifest file:
+            #
+            #     BAM: Single BAM file
+            #     CRAM: Single CRAM file
+            #     FASTQ: Single fastq file
             reads_metadata.append(['FASTQ', ntpath.basename(files_pair[0].datafile_location)])
             if len(files_pair) > 1:
                 reads_metadata.append(['FASTQ', ntpath.basename(files_pair[1].datafile_location)])
 
+            # generate manifest file
             manifest = pd.DataFrame(reads_metadata)
-
             manifest.to_csv(manifest_location, sep='\t', header=False, index=False)
 
             # copy target datafile(s) to submission location
-            existing_files = [ntpath.basename(name) for name in glob.glob(os.path.join(files_dir, "*.*"))]
+            existing_files = [ntpath.basename(name) for name in glob.glob(os.path.join(self.datafiles_dir, "*.*"))]
             copy_errors = list()
             submission_file_names = list()
             submitted_files_id = list()
@@ -617,10 +628,9 @@ class EnaReads:
                 submitted_files_id.append(file_meta.datafile_id)
                 if ntpath.basename(file_meta.datafile_location) not in existing_files:
                     try:
-                        shutil.copy(file_meta.datafile_location, files_dir)
+                        shutil.copy(file_meta.datafile_location, self.datafiles_dir)
                     except Exception as e:
-                        message = "Omitted submission of datafile [" + file_meta.datafile_name + "] due to error: " + str(
-                            e)
+                        message = "Error copying datafile " + file_meta.datafile_name + " " + str(e)
                         copy_errors.append(message)
 
             if len(copy_errors):
@@ -630,6 +640,7 @@ class EnaReads:
 
             submission_message = "Submitting: " + str(submission_file_names)
             self.submission_helper.logging_info(submission_message)
+            self.submission_helper.add_submission_info(submission_message)
 
             try:
                 thread = pexpect.spawn(cli_cmd, timeout=None)
@@ -648,14 +659,14 @@ class EnaReads:
 
                             if receipt_root.get('success') == 'true':
                                 run_dict = dict(
-                                    accession=receipt_root.find('RUN').get('accession', default='undefined'),
-                                    alias=receipt_root.find('RUN').get('alias', default='undefined'),
+                                    accession=receipt_root.find('RUN').get('accession', default=str()),
+                                    alias=receipt_root.find('RUN').get('alias', default=str()),
                                     datafiles=submitted_files_id
                                 )
 
                                 experiment_dict = dict(
-                                    accession=receipt_root.find('EXPERIMENT').get('accession', default='undefined'),
-                                    alias=receipt_root.find('EXPERIMENT').get('alias', default='undefined'),
+                                    accession=receipt_root.find('EXPERIMENT').get('accession', default=str()),
+                                    alias=receipt_root.find('EXPERIMENT').get('alias', default=str()),
                                 )
 
                                 submission_record = Submission().get_record(self.submission_id)
@@ -720,25 +731,64 @@ class EnaReads:
             datafiles_df = datafiles_df[~datafiles_df.datafile_id.isin(submitted_files)]
 
             if not len(datafiles_df):
-                # all files have been successfully submitted
-                self.submission_helper.logging_info("Finalising submission...")
-
-                try:
-                    shutil.rmtree(files_dir)
-                except Exception as e:
-                    message = "Error removing files folder: " + str(e)
-                    self.submission_helper.logging_error(message)
-
-                # mark submission as complete
-                submission_record = Submission().get_record(self.submission_id)
-                submission_record['complete'] = True
-                submission_record['completed_on'] = datetime.now()
-                submission_record['target_id'] = str(submission_record.pop('_id'))
-
-                Submission().save_record(dict(), **submission_record)
-                self.submission_helper.logging_info("Submission marked as complete.")
+                # all files have been successfully submitted, finalise submission
+                self.finalise_submission()
 
         return result
+
+    def get_cli_command(self, manifest_location=str()):
+        """
+        function composes the command line interface command to use for datafiles submission
+        :param manifest_location:
+        :return:
+        """
+
+        test_service = ''
+        if 'wwwdev' in self.ena_service:  # using ena's test service
+            test_service = ' -test '
+            self.submission_helper.logging_info("This is a test submission")
+
+        cli_cmd = 'java -Xmx2048m -jar ' + ENA_CLI + ' -context reads -userName ' + self.user_token + \
+                  ' -password ' + self.pass_word + ' -manifest ' + manifest_location + test_service + ' -submit -centerName ' + \
+                  self.sra_settings["sra_center"] + ' -inputDir ' + self.datafiles_dir + ' -ascp '
+
+        return cli_cmd
+
+    def finalise_submission(self):
+        """
+        function runs final steps to complete the submission
+        :return:
+        """
+
+        # all files have been successfully submitted
+        log_message = "Finalising submission..."
+        self.submission_helper.logging_info(log_message)
+        self.submission_helper.add_submission_info(log_message)
+
+        # remove submission files folder
+        try:
+            shutil.rmtree(self.datafiles_dir)
+        except Exception as e:
+            message = "Error removing files folder: " + str(e)
+            self.submission_helper.logging_error(message)
+
+        # mark submission as complete
+        submission_record = Submission().get_record(self.submission_id)
+        submission_record['complete'] = True
+        submission_record['completed_on'] = datetime.now()
+
+        submission_record['target_id'] = str(submission_record.pop('_id'))
+        Submission().save_record(dict(), **submission_record)
+
+        # update submission status
+        status_message = "Submission marked as complete!"
+        self.submission_helper.logging_info(status_message)
+        self.submission_helper.add_submission_info(status_message)
+
+        # clear any existing submission error
+        self.submission_helper.clear_submission_status()
+
+        return True
 
     def write_xml_file(self, doc_root, file_name):
         """
@@ -768,3 +818,101 @@ class EnaReads:
         result['value'] = xml_file_path
 
         return result
+
+    def release_study(self):
+        """
+        function makes the study public
+        :return:
+        """
+
+        # instantiate helper object - performs most auxiliary tasks associated with the submission
+        self.submission_helper = SubmissionHelper(submission_id=self.submission_id)
+
+        # clear any existing submission error
+        self.submission_helper.clear_submission_status()
+
+        # submission location
+        self.submission_location = self.create_submission_location()
+
+        parser = etree.XMLParser(remove_blank_text=True)
+        root = etree.parse(SRA_SUBMISSION_MODIFY_TEMPLATE, parser).getroot()
+        actions = root.find('ACTIONS')
+        action = etree.SubElement(actions, 'ACTION')
+
+        # get study accession
+        submission_record = Submission().get_record(self.submission_id)
+        prj = submission_record.get('accessions', dict()).get('project', [{}])
+        prj_accession = prj[0].get("accession", str())
+
+        if not prj_accession:
+            message = 'Project accession not found!'
+            self.submission_helper.logging_error(message)
+            result = dict(status=False, value='', message=message)
+            return result
+
+        self.submission_helper.logging_info('Releasing study with accession: ' + prj_accession)
+
+        action_type = etree.SubElement(action, 'RELEASE')
+        action_type.set("target", prj_accession)
+
+        context = self.write_xml_file(root, "submission_modify.xml")
+
+        if context['status'] is False:
+            self.submission_helper.add_submission_error(context.get("message", str()))
+            return context
+
+        submission_xml_path = context['value']
+
+        result = dict(status=True, value='')
+
+        # compose curl command for study release
+        curl_cmd = 'curl -u ' + self.user_token + ':' + self.pass_word \
+                   + ' -F "SUBMISSION=@' \
+                   + submission_xml_path \
+                   + '" "' + self.ena_service \
+                   + '"'
+
+        self.submission_helper.logging_info("Modifying study via CURL. CURL command is: " + curl_cmd)
+
+        try:
+            receipt = subprocess.check_output(curl_cmd, shell=True)
+        except Exception as e:
+            message = 'API call error ' + str(e)
+            self.submission_helper.logging_error(message)
+            result['message'] = message
+            result['status'] = False
+
+            return result
+
+        root = etree.fromstring(receipt)
+
+        if root.get('success') == 'false':
+            result['status'] = False
+            result['message'] = "Couldn't release STUDY due to the following errors: "
+            errors = root.findall('.//ERROR')
+            if errors:
+                error_text = str()
+                for e in errors:
+                    error_text = error_text + " \n" + e.text
+
+                result['message'] = result['message'] + error_text
+
+            # log error
+            self.submission_helper.logging_error(result['message'])
+
+            return result
+
+        # update submission record with study status
+        self.write_xml_file(root, "submission_receipt.xml")
+        self.submission_helper.logging_info("Study successfully released. Updating status in the database")
+        prj[0]['status'] = 'PUBLIC'
+        prj[0]['release_date'] = date.today()
+
+        submission_record['target_id'] = str(submission_record.pop('_id'))
+        Submission().save_record(dict(), **submission_record)
+
+        # update submission status
+        status_message = "Study successfully released."
+        self.submission_helper.add_submission_info(status_message)
+
+        return dict(status=True, value='')

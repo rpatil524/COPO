@@ -18,6 +18,9 @@ $(document).ready(function () {
     var tableLoader = $('<div class="copo-i-loader"></div>');
     $("#component_table_loader").append(tableLoader);
 
+    //ajax handles
+    var submit_to_repo_handle = null;
+
     sanitise_submissions(); //enables update of new meta fields before loading submission
     load_submissions();
 
@@ -78,6 +81,168 @@ $(document).ready(function () {
         });
 
     })
+
+    //ena-study-release
+    $(document).on('click', '.ena-study-release', function (event) {
+        event.preventDefault();
+
+        var target_id = $(this).attr("data-target");
+        var elem = $(this);
+
+        BootstrapDialog.show({
+            title: "Release study",
+            message: 'Are you sure you want to go ahead with the release of this study?',
+            cssClass: 'copo-modal2',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_PRIMARY,
+            buttons: [{
+                label: 'Cancel',
+                cssClass: 'tiny ui basic button',
+                action: function (dialogRef) {
+                    dialogRef.close();
+                }
+            }, {
+                label: 'Release',
+                cssClass: 'tiny ui basic primary button',
+                action: function (dialogRef) {
+                    elem.addClass("disabled");
+
+                    var request_params = {
+                        'sub_id': target_id,
+                        'sub_task': 'release_study'
+                    };
+
+                    submit_to_repo_handle = $.ajax({
+                        url: "/rest/submit_to_repo/",
+                        type: "POST",
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        },
+                        data: request_params,
+                        success: function (data) {
+                            get_submission_information();
+                            dialogRef.close();
+                            try {
+                                data = JSON.parse(data);
+                                if (data.hasOwnProperty("status") && data.status == 1) {
+                                    elem.removeClass("disabled");
+                                    var error_message = "Couldn't complete request due to error";
+
+                                    if (data.hasOwnProperty("message")) {
+                                        error_message = data.message;
+                                    }
+
+                                    BootstrapDialog.show({
+                                        title: "Submission update error",
+                                        type: BootstrapDialog.TYPE_DANGER,
+                                        message: error_message,
+                                        cssClass: 'copo-modal3',
+                                        buttons: [{
+                                            label: 'OK',
+                                            cssClass: 'tiny ui basic button',
+                                            action: function (dialogRef) {
+                                                dialogRef.close();
+                                            }
+                                        }]
+                                    });
+                                }
+                            } catch (err) {
+                                elem.removeClass("disabled");
+                                console.log(err)
+                            }
+                        },
+                        error: function (data) {
+                            elem.removeClass("disabled");
+                            dialogRef.close();
+                            BootstrapDialog.show({
+                                title: "Submission update error",
+                                type: BootstrapDialog.TYPE_DANGER,
+                                message: data.statusText + " - Error " + data.responseText,
+                                cssClass: 'copo-modal3',
+                                buttons: [{
+                                    label: 'OK',
+                                    cssClass: 'tiny ui basic button',
+                                    action: function (dialogRef) {
+                                        dialogRef.close();
+                                    }
+                                }]
+                            });
+                        }
+                    });
+                }
+            }]
+        });
+    });
+
+    //delete submission record
+    $(document).on('click', '.delete-submission', function (event) {
+        event.preventDefault();
+
+        var target_id = $(this).attr("data-target");
+
+
+        var message = $('<div/>', {class: "webpop-content-div"});
+        message.append("Are you sure you want to delete this submission record?</div>");
+
+        BootstrapDialog.show({
+            title: "Delete submission",
+            message: message,
+            cssClass: 'copo-modal2',
+            closable: false,
+            animate: true,
+            type: BootstrapDialog.TYPE_DANGER,
+            // size: BootstrapDialog.SIZE_NORMAL,
+            buttons: [
+                {
+                    label: 'Cancel',
+                    cssClass: 'tiny ui basic button',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                    }
+                },
+                {
+                    id: "btn-remove-bundle",
+                    label: '<i style="padding-right: 5px;" class="fa fa-trash-o" aria-hidden="true"></i> Delete',
+                    cssClass: 'tiny ui basic red button',
+                    action: function (dialogRef) {
+                        var $button = this;
+                        $button.disable();
+
+                        $.ajax({
+                            url: copoFormsURL,
+                            type: "POST",
+                            headers: {
+                                'X-CSRFToken': csrftoken
+                            },
+                            data: {
+                                'task': 'delete',
+                                'component': component,
+                                'target_ids': JSON.stringify([target_id]),
+                            },
+                            success: function (data) {
+                                var tableID = componentMeta.tableID;
+
+                                if ($.fn.dataTable.isDataTable('#' + tableID)) {
+                                    var table = $('#' + tableID).DataTable();
+                                    table.row("#row_" + target_id).remove().draw();
+                                }
+
+                                dialogRef.close();
+                            },
+                            error: function () {
+                                alert("Couldn't delete submission!");
+                                dialogRef.close();
+                            }
+                        });
+
+                        return false;
+                    }
+                }
+            ]
+        });
+
+    });
 
     refresh_tool_tips();
 
@@ -178,8 +343,22 @@ $(document).ready(function () {
                 special_repositories = data.special_repositories.toString().toLowerCase();
             }
 
+            //get row id
+            var DT_RowId = '';
+            if (data.hasOwnProperty("DT_RowId")) {
+                DT_RowId = data.DT_RowId;
+            }
+
+            //get s_n
+            var s_n = '';
+            if (data.hasOwnProperty("s_n")) {
+                s_n = data.s_n;
+            }
+
             if (record_id) {
                 var option = {};
+                option["s_n"] = s_n;
+                option["DT_RowId"] = DT_RowId;
                 option["accessions"] = accessions;
                 option["meta"] = meta;
                 option["destination_repo"] = destination_repo
@@ -230,13 +409,14 @@ $(document).ready(function () {
                     ordering: true,
                     lengthChange: true,
                     buttons: [
-                        'selectAll',
-                        'selectNone'
+                        // 'selectAll',
+                        // 'selectNone'
                     ],
-                    select: {
-                        style: 'multi', //os, multi, api
-                        items: 'row' //row, cell, column
-                    },
+                    // select: {
+                    //     style: 'multi', //os, multi, api
+                    //     items: 'row' //row, cell, column
+                    // },
+                    select: false,
                     language: {
                         "info": "Showing _START_ to _END_ of _TOTAL_ submissions",
                         "search": " ",
@@ -247,7 +427,7 @@ $(document).ready(function () {
                         }
                     },
                     order: [
-                        [2, "desc"]
+                        [1, "desc"]
                     ],
                     columns: [
                         {
@@ -268,98 +448,108 @@ $(document).ready(function () {
                                 //set body
                                 var bodyRow = $('<div class="row" style="margin-bottom: 10px;"></div>');
 
+                                var delete_submission_button = '<div id="submission_delete_button_' + data.record_id + '" class="tiny ui basic red button disabled delete-submission" tabindex="0" data-target="' + data.record_id + '"><i class="copo-components-icons fa fa-trash"></i><span style="padding-left: 3px;">Delete</span></div>';
                                 var colsFirstHTML = $('<div class="col-sm-6 col-md-6 col-lg-6" id="submission_firstcol_' + data.record_id + '"></div>')
-                                    .append('<div>Created:</div>')
-                                    .append('<div style="margin-bottom: 10px;">' + data.date_created + '</div>')
-                                    .append('<div class="firstcol-completed1" style="display: none;">Completed:</div>')
-                                    .append('<div class="firstcol-completed2" style="margin-bottom: 10px; display: none;"></div>')
+                                    .append('<div style="margin-bottom: 20px;">' + delete_submission_button + '</div>')
+                                    .append('<div class="submission-attributes">Created: ' + '<span id="submission_created_label_' + data.record_id + '">' + data.date_created + '</span></div>')
+                                    .append('<div class="submission-attributes">Completed: ' + '<span id="submission_completed_label_' + data.record_id + '">Pending</span></div>')
 
                                 var repo_selected = false
                                 if (data.destination_repo != undefined) {
                                     repo_selected = true;
                                 }
 
-                                if (data.complete == 'true') {
-                                    if (data.special_repositories == 'dataverse') {
-                                        // add publish button to table if complete
-                                        colsFirstHTML.append('<button style="margin-left: 5px"  data-submission_id="' + data.record_id + '" class="btn btn-default" type="button" id="publish_dataset">Publish</button>')
-                                    } else {
-                                        ;
-                                    }
+                                var fixed_repos = ["ena", "figshare", "ena-ant"]
+
+                                if (fixed_repos.indexOf(data.special_repositories) > -1) {
+                                    colsFirstHTML.append('<div class="submission-attributes">Target Repository: ' + '<span id="target_repo_label_' + data.record_id + '">' + data.repository + '</span></div>');
                                 } else {
-                                    if (jQuery.isEmptyObject(data.destination_repo)) {
-                                        colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label_' + data.record_id + '" style="margin-bottom: 10px;"></span></div>')
-                                    } else {
-                                        colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label_' + data.record_id + '" style="margin-bottom: 10px;">' + data.destination_repo.url + '</span></div>')
-                                    }
-
-                                    if (data.special_repositories == 'cg_core' || data.special_repositories == 'dcterms' || data.special_repositories == 'ckan' || data.special_repositories == 'dataverse' || data.special_repositories == 'dspace') {
-
-                                        if (repos.length) {
-
-                                            /*if data has repos attached then this user has permission to submit to one or more
-                                            institutional repos, so add them into a dropdown here*/
-
-                                            colsFirstHTML.append('<div id="target_repo_dropdown" class="dropdown">')
-                                                .append('<button class="btn btn-default dropdown-toggle" type="button" id="target_repo_option_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Choose Repository<span class="caret"></span></button>')
-
-                                            var ul = $('<ul class="dropdown-menu" aria-labelledby="">')
-                                            var li_default = $('<li><a data-repo-id="default" data-submission_id="' + data.record_id + '" class="target_repo_option" href="#">Default ' + data.repository + '</a></li>')
-                                            ul.append(li_default)
-                                            for (r in repos) {
-                                                row = repos[r]
-                                                var li = $('<li><a data-repo-id="' + row._id + '" data-submission_id="' + data.record_id + '" class="target_repo_option" href="#">' + row.name + ' - ' + row.url + '</a></li>')
-                                                ul.append(li)
-                                            }
-                                            colsFirstHTML.append(ul)
-                                        }
-                                        if (data.complete != true) {
-                                            if (repo_selected == true) {
-                                                colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
-                                            } else {
-                                                colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default disabled" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
-
-                                            }
-                                        }
-
-                                        if (data.accessions == undefined) {
-                                            ;
-                                        } else if (!jQuery.isEmptyObject(data.meta) && data.meta != "") {
-                                            if ($(data.meta)[0].hasOwnProperty('identifier') || $(data.meta)[0].hasOwnProperty('alias')) {
-                                                if (data.destination_repo['type'] == 'dspace') {
-                                                    colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' - ' + data.meta.dspace_item_name + '</span></div>')
-                                                } else if (data.destination_repo['type'] == 'dataverse') {
-                                                    if ($(data.meta)[0].hasOwnProperty('identifier')) {
-                                                        colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' ' + data.meta.alias + ' - ' + data.meta.doi + '</span></div>')
-                                                    } else if ($(data.meta)[0].hasOwnProperty('alias')) {
-                                                        colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataverse: <span class="badge">' + data.meta.alias + '</span></div>')
-                                                    }
-                                                } else if (data.destination_repo['type'] == 'ckan') {
-                                                    colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to CKAN Package: <span class="badge">' + data.meta.identifier + '</span></div>')
-                                                }
-                                            } else if (data.meta.hasOwnProperty("repo_type") && data.meta.repo_type == "ckan") {
-                                                colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to New CKAN Package</div>')
-                                            }
+                                    if (data.complete == 'true') {
+                                        if (data.special_repositories == 'dataverse') {
+                                            // add publish button to table if complete
+                                            colsFirstHTML.append('<button style="margin-left: 5px"  data-submission_id="' + data.record_id + '" class="btn btn-default" type="button" id="publish_dataset">Publish</button>')
                                         } else {
-                                            colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Choose Submission Target</span></div>')
+                                            ;
                                         }
-                                    }
+                                    } else {
+                                        if (jQuery.isEmptyObject(data.destination_repo)) {
+                                            colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label_' + data.record_id + '" style="margin-bottom: 10px;"></span></div>')
+                                        } else {
+                                            colsFirstHTML.append('<div>Target Repository:' + '<span style="font-weight: bolder; margin: 5px 0 5px 5px" id="target_repo_label_' + data.record_id + '" style="margin-bottom: 10px;">' + data.destination_repo.url + '</span></div>')
+                                        }
 
+                                        if (data.special_repositories == 'cg_core' || data.special_repositories == 'dcterms' || data.special_repositories == 'ckan' || data.special_repositories == 'dataverse' || data.special_repositories == 'dspace') {
+
+                                            if (repos.length) {
+
+                                                /*if data has repos attached then this user has permission to submit to one or more
+                                                institutional repos, so add them into a dropdown here*/
+
+                                                colsFirstHTML.append('<div id="target_repo_dropdown" class="dropdown">')
+                                                    .append('<button class="btn btn-default dropdown-toggle" type="button" id="target_repo_option_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Choose Repository<span class="caret"></span></button>')
+
+                                                var ul = $('<ul class="dropdown-menu" aria-labelledby="">')
+                                                var li_default = $('<li><a data-repo-id="default" data-submission_id="' + data.record_id + '" class="target_repo_option" href="#">Default ' + data.repository + '</a></li>')
+                                                ul.append(li_default)
+                                                for (r in repos) {
+                                                    row = repos[r]
+                                                    var li = $('<li><a data-repo-id="' + row._id + '" data-submission_id="' + data.record_id + '" class="target_repo_option" href="#">' + row.name + ' - ' + row.url + '</a></li>')
+                                                    ul.append(li)
+                                                }
+                                                colsFirstHTML.append(ul)
+                                            }
+                                            if (data.complete != true) {
+                                                if (repo_selected == true) {
+                                                    colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
+                                                } else {
+                                                    colsFirstHTML.append('<button style="margin-left: 5px" data-toggle="modal" data-submission_id="' + data.record_id + '" data-target="#repo_modal" class="btn btn-default disabled" type="button" id="view_repo_structure_' + data.record_id + '">Inspect Repository</button>')
+
+                                                }
+                                            }
+
+                                            if (data.accessions == undefined) {
+                                                ;
+                                            } else if (!jQuery.isEmptyObject(data.meta) && data.meta != "") {
+                                                if ($(data.meta)[0].hasOwnProperty('identifier') || $(data.meta)[0].hasOwnProperty('alias')) {
+                                                    if (data.destination_repo['type'] == 'dspace') {
+                                                        colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' - ' + data.meta.dspace_item_name + '</span></div>')
+                                                    } else if (data.destination_repo['type'] == 'dataverse') {
+                                                        if ($(data.meta)[0].hasOwnProperty('identifier')) {
+                                                            colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataset: <span class="badge">' + data.meta.identifier + ' ' + data.meta.alias + ' - ' + data.meta.doi + '</span></div>')
+                                                        } else if ($(data.meta)[0].hasOwnProperty('alias')) {
+                                                            colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to Dataverse: <span class="badge">' + data.meta.alias + '</span></div>')
+                                                        }
+                                                    } else if (data.destination_repo['type'] == 'ckan') {
+                                                        colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to CKAN Package: <span class="badge">' + data.meta.identifier + '</span></div>')
+                                                    }
+                                                } else if (data.meta.hasOwnProperty("repo_type") && data.meta.repo_type == "ckan") {
+                                                    colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Submitting to New CKAN Package</div>')
+                                                }
+                                            } else {
+                                                colsFirstHTML.append('<div style="margin-top: 20px; display: block" class="dataset-label">Choose Submission Target</span></div>')
+                                            }
+                                        }
+
+                                    }
                                 }
 
-                                var colsThirdHTML = $('<div class="col-sm-2 col-md-2 col-lg-2" style="padding-left: 2px; margin-left: -50px;"></div>')
-                                    .append('<div data-repo-selected="' + repo_selected + '" class="pull-right " id="submission_control_' + data.record_id + '"></div>');
-
-
-                                // set submission status
-                                var colsSecondHTML = $('<div class="col-sm-4 col-md-4 col-lg-4" style="padding-right: 2px; margin-left: 50px;"></div>')
-                                    .append($(".submission-progess-wrapper").clone().attr("id", "submission_progress_" + data.record_id));
-
-                                $(colsThirdHTML).attr('data-repo-selected', repo_selected);
+                                var colsSecondHTML = $('<div class="col-sm-6 col-md-6 col-lg-6"></div>');
 
                                 bodyRow.append(colsFirstHTML);
                                 bodyRow.append(colsSecondHTML);
-                                bodyRow.append(colsThirdHTML);
+
+                                var uigrid = $('<div class="ui grid"></div>');
+                                colsSecondHTML.append(uigrid);
+
+                                var uicol1 = $('<div class="twelve wide column"></div>');
+                                var uicol2 = $('<div class="four wide column"></div>');
+
+                                uigrid
+                                    .append(uicol1)
+                                    .append(uicol2)
+
+                                uicol1.append($(".submission-progess-wrapper").clone().attr("id", "submission_progress_" + data.record_id));
+                                uicol2.append($('<div data-repo-selected="' + repo_selected + '" id="submission_control_' + data.record_id + '"></div>'));
 
 
                                 //set datafiles bundle
@@ -377,14 +567,18 @@ $(document).ready(function () {
                             }
                         },
                         {
+                            "data": "s_n",
+                            "title": "S/N",
+                            "visible": false
+                        },
+                        {
                             "data":
                                 "repository",
                             "title":
                                 "Repository",
                             "visible":
                                 false
-                        }
-                        ,
+                        },
                         {
                             "data":
                                 "date_created",
@@ -392,15 +586,13 @@ $(document).ready(function () {
                                 "Created",
                             "visible":
                                 false
-                        }
-                        ,
+                        },
                         {
                             "data":
                                 "status",
                             "visible":
                                 false
-                        }
-                        ,
+                        },
                         {
                             "data":
                                 "record_id",
@@ -444,17 +636,6 @@ $(document).ready(function () {
             .attr("placeholder", "Search Submissions")
             .attr("size", 30);
 
-
-        if (table) {
-            table.on('select', function (e, dt, type, indexes) {
-                set_selected_rows(dt);
-            });
-
-            table.on('deselect', function (e, dt, type, indexes) {
-                set_selected_rows(dt);
-            });
-        }
-
     }
 
     function set_selected_rows(dt) {
@@ -492,51 +673,74 @@ $(document).ready(function () {
 
         var tableID = 'submission_bundle_table_' + submissionRecord.record_id;
 
+
+        var table = null;
+
         if ($.fn.dataTable.isDataTable('#' + tableID)) {
-            //if table instance already exists, then destroy in order to successfully re-initialise
-            $('#' + tableID).destroy();
+            //if table instance already exists, then do refresh
+            table = $('#' + tableID).DataTable();
         }
 
-        var subTable = $('#' + tableID).DataTable({
-            data: dtd,
-            searchHighlight: true,
-            ordering: true,
-            lengthChange: true,
-            buttons: [
-                'selectAll',
-                'selectNone'
-            ],
-            select: false,
-            language: {
-                "info": "Showing _START_ to _END_ of _TOTAL_ datafiles",
-                "search": ''
-            },
-            order: [
-                [2, "desc"]
-            ],
-            columns: [
-                {
-                    "title": "Datafile",
-                    "data": "target_label",
-                    "visible": true
+        if (table) {
+            //clear old, set new data
+            table
+                .clear()
+                .draw();
+            table
+                .rows
+                .add(dtd);
+            table
+                .columns
+                .adjust()
+                .draw();
+            table
+                .search('')
+                .columns()
+                .search('')
+                .draw();
+        } else {
+            table = $('#' + tableID).DataTable({
+                data: dtd,
+                searchHighlight: true,
+                ordering: true,
+                lengthChange: true,
+                buttons: [
+                    'selectAll',
+                    'selectNone'
+                ],
+                select: false,
+                language: {
+                    "info": "Showing _START_ to _END_ of _TOTAL_ datafiles",
+                    "search": ''
                 },
-                {
-                    "title": "Status",
-                    "data": null,
-                    "width": "5%",
-                    "orderable": false,
-                    "render": function (data) {
-                        var renderHTML = $('<div class="submission-status" id="' + submissionRecord.record_id + '_' + data.target_id + '"></div>');
-                        return $('<div/>').append(renderHTML).html();
+                order: [
+                    [2, "desc"]
+                ],
+                columns: [
+                    {
+                        "title": "Datafile",
+                        "data": "target_label",
+                        "visible": true
+                    },
+                    {
+                        "title": "Status",
+                        "data": null,
+                        "width": "5%",
+                        "orderable": false,
+                        "render": function (data) {
+                            var renderHTML = $('<div class="submission-status" id="' + submissionRecord.record_id + '_' + data.target_id + '"></div>');
+                            return $('<div/>').append(renderHTML).html();
+                        }
+                    },
+                    {
+                        "data": "target_id",
+                        "visible": false
                     }
-                },
-                {
-                    "data": "target_id",
-                    "visible": false
-                }
-            ],
-            dom: 'fr<"row"><"row info-rw2" i>tlp',
-        });
+                ],
+                dom: 'fr<"row"><"row info-rw2" i>tlp',
+            });
+        }
+
 
         $('#submission_bundle_table_' + submissionRecord.record_id + '_filter')
             .find("input")
@@ -555,22 +759,9 @@ $(document).ready(function () {
             $("#submission_control_" + submissionRecord.submission_id).html('');
             $("#submission_progress_" + submissionRecord.submission_id).find('.submission-progress-status').html('');
 
-            //set datafile upload status if available
-            submissionRecord.bundle.forEach(function (item) {//first use bundle to clear
-                $("#" + submissionRecord.submission_id + "_" + item).html('');
-            });
-
-            submissionRecord.bundle_meta.forEach(function (item) {//then use bundle_meta to set status
-                if (item.upload_status) {
-                    $("#" + submissionRecord.submission_id + "_" + item.file_id)
-                        .html('<i class="fa fa-check-circle-o" data-toggle="tooltip" title="uploaded" aria-hidden="true" style="color:#339933; font-size: 18px;"></i>');
-                }
-            });
-
-            if (submissionRecord.submission_status) {
+            if (submissionRecord.hasOwnProperty("submission_status") && (submissionRecord.submission_status.toString() == "true")) {
                 //submission is complete
-                $("#submission_firstcol_" + submissionRecord.submission_id).find(".firstcol-completed1").css("display", "block");
-                $("#submission_firstcol_" + submissionRecord.submission_id).find(".firstcol-completed2").css("display", "block").html(submissionRecord.completed_on);
+                $("#submission_completed_label_" + submissionRecord.submission_id).html(submissionRecord.completed_on);
 
                 $("#submission_progress_" + submissionRecord.submission_id).find(".progress-bar")
                     .attr(
@@ -583,93 +774,126 @@ $(document).ready(function () {
                     .html("Complete");
 
                 var progressObject = $("#submission_progress_" + submissionRecord.submission_id).find('.submission-progress-status');
+
+                //feedback message
+                var submisson_message_div = $('<div/>',
+                    {
+                        style: "word-wrap: break-word; max-height: 300px; overflow-y: scroll",
+                        "class": "ui success message",
+                        "html": '<div class="webpop-content-div">Submission completed. Click the view button for accessions.</div>'
+                    });
+
                 progressObject
                     .html('')
-                    .append('<div><span class=" submission-info-label">Click \'View\' for accessions.</span></div>');
+                    .append(submisson_message_div);
+
                 actionButton = get_accession_action(submissionRecord.submission_id);
 
                 $("#submission_control_" + submissionRecord.submission_id)
                     .html('')
                     .append(actionButton);
 
-            } else {
-                //is this an active submission?
-                if (submissionRecord.active_submission) {
-                    //this is an active submission
-                    $("#submission_progress_" + submissionRecord.submission_id).find(".progress-bar")
-                        .attr(
-                            {
-                                "class": "progress-bar progress-bar-striped active",
-                                "aria-valuenow": submissionRecord.pct_completed
-                            }
-                        )
-                        .css({"min-width": "2em", "width": submissionRecord.pct_completed + "%"})
-                        .html(submissionRecord.pct_completed + "%");
+                //disable delete button
+                $("#submission_delete_button_" + submissionRecord.submission_id).addClass("disabled");
 
-                    var uploading_datafile = '';
-                    if (submissionRecord.hasOwnProperty('datafile')) {
-                        uploading_datafile = submissionRecord.datafile;
+                //embargo info for ena submissions
+                if (submissionRecord.hasOwnProperty("release_status")) {
+                    var release_button = '<div><hr/></div>' + submissionRecord.release_message;
+                    if (submissionRecord.release_status == "PRIVATE") {
+                        release_button = '<div data-html="' + submissionRecord.release_message + '"  class="tiny ui blue button copo-tooltip ena-study-release" tabindex="0" data-target="' + submissionRecord.submission_id + '">Release study</div></span>';
+                    } else if (submissionRecord.release_status == "PUBLIC") {
+                        release_button = '<a data-html="' + submissionRecord.release_message + '"  class="tiny ui blue button copo-tooltip" tabindex="0" data-target="' + submissionRecord.submission_id + '" href="' + submissionRecord.study_view_url + '" target="_blank"><span>Public</span><i style="margin-left: 5px; font-size: 12px;" class="fa fa-external-link"></i></a>';
                     }
 
+                    var release_status = $('<div style="margin-top: 10px;">' + release_button + '</div>');
+                    submisson_message_div.find(".webpop-content-div").append(release_status);
+                }
+
+            } else {
+                //is this an active submission?
+                if (submissionRecord.hasOwnProperty("submission_report")) {
+                    var actionButton = '';
+                    var progressClass = "progress-bar active";
+                    var submisson_message_div = $('<div/>',
+                        {
+                            style: "word-wrap: break-word; max-height: 300px; overflow-y: scroll",
+                        });
+
+                    if (submissionRecord.submission_report.type == "info") {
+                        progressClass = progressClass + " progress-bar-striped ";
+                        submisson_message_div.addClass("ui info message");
+                    } else if (submissionRecord.submission_report.type == "error") {
+                        progressClass = progressClass + " progress-bar-danger progress-bar-striped ";
+                        actionButton = get_submit_action(submissionRecord.submission_id, "retry");
+                        submisson_message_div.addClass("ui negative message");
+
+                        //enable delete button
+                        $("#submission_delete_button_" + submissionRecord.submission_id).removeClass("disabled");
+                    }
+
+                    $("#submission_progress_" + submissionRecord.submission_id).find(".progress-bar")
+                        .attr({"class": progressClass, "aria-valuenow": '100'})
+                        .css({"min-width": "2em", "width": "100%"})
+                        .html('');
+
                     var progressObject = $("#submission_progress_" + submissionRecord.submission_id).find('.submission-progress-status');
-                    progressObject.html('');
+                    submisson_message_div.append('<div class="webpop-content-div">' + submissionRecord.submission_report.message + '</div>');
+                    progressObject
+                        .html('')
+                        .append(submisson_message_div);
 
-                    //if all files have been uploaded and feedback given, then display that
-                    if (submissionRecord.hasOwnProperty("transfer_status") && submissionRecord.transfer_status == "completed") {
-                        $("#submission_progress_" + submissionRecord.submission_id).find(".progress-bar")
-                            .attr(
-                                {
-                                    "class": "progress-bar progress-bar-striped active",
-                                    "aria-valuenow": "100"
-                                }
-                            )
-                            .css({"min-width": "2em", "width": "100%"})
-                            .html("");
+                    $("#submission_control_" + submissionRecord.submission_id)
+                        .html('')
+                        .append(actionButton);
 
-                        progressObject.append('<div><span class="submission-info-label copo-e-loading">Completing submission</span></div>');
-                    } else {
-                        if (uploading_datafile) {
-                            progressObject.append('<div><span class=" submission-info-label">' + uploading_datafile + '</span></div>');
-                        }
-
-                        if (submissionRecord.upload_sizerate_summary != '') {
-                            progressObject.append('<div><span class=" submission-info-label">' + submissionRecord.upload_sizerate_summary + '</span></div>');
-                        }
-
-                        if (submissionRecord.uploaded_summary != '') {
-                            progressObject.append('<div><span class=" submission-info-label">' + submissionRecord.uploaded_summary + '</span></div>');
-                        }
+                    //report on submitted datafiles
+                    if (submissionRecord.hasOwnProperty("submitted_files")) {
+                        submissionRecord.submitted_files.forEach(function (item) {
+                            try {
+                                $("#" + submissionRecord.submission_id + "_" + item)
+                                    .html('<i class="fa fa-check-circle-o" data-toggle="tooltip" title="submitted" aria-hidden="true" style="color:#339933; font-size: 18px;"></i>');
+                            } catch (err) {
+                                ;
+                            }
+                        });
                     }
 
                 } else {
-                    //this is not an active submission, but was it previously started and error reported?
                     var actionButton = '';
+                    var typeMessage = 'pending';
 
-                    if (submissionRecord.hasOwnProperty("submission_error") && submissionRecord.submission_error) {
-                        $("#submission_progress_" + submissionRecord.submission_id).find(".progress-bar")
-                            .attr(
-                                {
-                                    "class": "progress-bar progress-bar-danger progress-bar-striped active",
-                                    "aria-valuenow": "100"
-                                }
-                            )
-                            .css({"min-width": "2em", "width": "100%"})
-                            .html("");
-
-                        var progressObject = $("#submission_progress_" + submissionRecord.submission_id).find('.submission-progress-status');
-                        var errorMessage = submissionRecord.submission_error + "<br/> Please click 'Retry' to restart.";
-                        progressObject
-                            .html('')
-                            .append('<div><span class=" submission-info-label" style="color: #c93c00;">' + errorMessage + '</span></div>');
-                        actionButton = get_submit_action(submissionRecord.submission_id, "retry");
-                    } else {
-                        var progressObject = $("#submission_progress_" + submissionRecord.submission_id).find('.submission-progress-status');
-                        progressObject
-                            .html('')
-                            .append('<div><span class=" submission-info-label">Pending submission. Please click \'Submit\' to begin.</span></div>');
-                        actionButton = get_submit_action(submissionRecord.submission_id, $("#submission_control_" + submissionRecord.submission_id), "submit", submissionRecord);
+                    if (submissionRecord.hasOwnProperty("enable_submit_button") && (submissionRecord.enable_submit_button.toString() == "true")) {
+                        typeMessage = 'submit';
                     }
 
+                    $("#submission_progress_" + submissionRecord.submission_id).find(".progress-bar")
+                        .attr(
+                            {
+                                "class": "progress-bar",
+                                "aria-valuenow": "100"
+                            }
+                        )
+                        .css({"min-width": "2em", "width": "100%"})
+                        .html("Pending");
+
+                    var progressObject = $("#submission_progress_" + submissionRecord.submission_id).find('.submission-progress-status');
+
+                    //feedback message
+                    var submisson_message_div = $('<div/>',
+                        {
+                            style: "word-wrap: break-word; max-height: 300px; overflow-y: scroll",
+                            "class": "ui info message",
+                            "html": '<div class="webpop-content-div">Pending submission. Please click the submit button to continue.</div>'
+                        });
+
+                    progressObject
+                        .html('')
+                        .append(submisson_message_div);
+
+                    actionButton = get_submit_action(submissionRecord.submission_id, typeMessage);
+
+                    //enable delete button
+                    $("#submission_delete_button_" + submissionRecord.submission_id).removeClass("disabled");
 
                     $("#submission_control_" + submissionRecord.submission_id)
                         .html('')
@@ -686,8 +910,10 @@ $(document).ready(function () {
 
             //set polling into motion
             setInterval(function () {
-                //get submissions information
-                get_submission_information();
+                //get submissions information, only if there is an ongoing submission
+                if (submit_to_repo_handle !== null && submit_to_repo_handle.state() == 'pending') {
+                    get_submission_information();
+                }
             }, 1000);
         }
     }
@@ -734,48 +960,6 @@ $(document).ready(function () {
         });
     }
 
-    function treat_ena_status(status, targetID) {
-        //submission to ena has been divided into several callable micro-tasks,
-        // and this function enables iteration through the submission micro-tasks,
-        // making server calls to actually fulfill them
-
-        if (status.trim().toLowerCase() == "completed") {
-            ; //submission completed, this will be picked up and reported elsewhwere
-        } else if (status.trim().toLowerCase() == "error") {
-            ; //submission error, this will be picked up and reported elsewhwere
-        } else {
-            //move on to next stage of the submission
-
-            var request_params = {
-                'sub_id': targetID,
-                'ena_status': status
-            };
-            $.ajax({
-                url: "/rest/submit_to_repo/",
-                type: "POST",
-                headers: {
-                    'X-CSRFToken': csrftoken
-                },
-                data: request_params,
-                success: function (data) {
-                    try {
-                        data = JSON.parse(data);
-                        if (data.status.hasOwnProperty("ena_status")) {
-                            console.log(data.status.ena_status);
-                            treat_ena_status(data.status.ena_status, targetID);
-                            return;
-                        }
-                    } catch (err) {
-                        console.log(err)
-                    }
-                },
-                error: function () {
-                    console.log("Couldn't complete submission to the target repository!");
-                }
-            });
-        }
-    }
-
     function get_submission_information() {
         var request_params = {
             'ids': JSON.stringify(submissionIDS)
@@ -792,27 +976,24 @@ $(document).ready(function () {
                 update_submission_progress(data.submission_information);
             },
             error: function () {
-                //alert("Couldn't retrieve submissions information!");
+                console.log("Couldn't retrieve submissions information!");
             }
         });
     }
 
-    function get_submit_action(submission_id, element, typeMessage, sub_data) {
+    function get_submit_action(submission_id, typeMessage) {
         var buttonLabel = 'Submit';
-        var is_enabled
+        var buttonClass = "tiny ui basic button ";
 
-        if (sub_data && sub_data.enable_submit_button) {
-            is_enabled = 'enabled'; //toni's comments - this will force even ENA based submission to be disabled, so overriding
-        } else {
-            is_enabled = 'disabled'
-        }
-
-
-        var buttonClass = "tiny ui basic primary button " + is_enabled;
-        if (typeMessage == 'retry') {
+        if (typeMessage == "submit") {
+            buttonClass = buttonClass + "primary enabled";
+        } else if (typeMessage == 'retry') {
             buttonLabel = 'Retry';
-            buttonClass = "tiny ui basic red button";
+            buttonClass = buttonClass + "red enabled";
+        } else {
+            buttonClass = buttonClass + "primary disabled";
         }
+
 
         var actionButton = $('<div/>',
             {
@@ -847,7 +1028,7 @@ $(document).ready(function () {
                                     'form_data': form_data
                                 };
 
-                                $.ajax({
+                                submit_to_repo_handle = $.ajax({
                                     url: "/rest/submit_to_repo/",
                                     type: "POST",
                                     headers: {
@@ -855,13 +1036,11 @@ $(document).ready(function () {
                                     },
                                     data: request_params,
                                     success: function (data) {
+                                        get_submission_information();
                                         try {
                                             data = JSON.parse(data);
-                                            if (data.status.hasOwnProperty("ena_status")) {
-                                                treat_ena_status(data.status.ena_status, targetID);
-                                            }
                                             if (data.hasOwnProperty("status") && data.status == 1) {
-                                                alert(data.message)
+                                                console.log(data.message)
                                                 return false
                                             }
                                         } catch (err) {
@@ -869,6 +1048,7 @@ $(document).ready(function () {
                                         }
                                     },
                                     error: function (data) {
+                                        get_submission_information();
                                         BootstrapDialog.show({
                                             title: "Submission Error",
                                             message: data.statusText + " - Error " + data.responseText,

@@ -18,15 +18,21 @@ lg = settings.LOGGER
 class SubmissionHelper:
     def __init__(self, submission_id=str()):
         self.submission_id = submission_id
-        self.submission_record = Submission().get_record(self.submission_id)
         self.profile_id = str()
-        self.description = dict()
         self.__converter_errors = list()
+
+        try:
+            self.submission_record = Submission().get_record(self.submission_id)
+        except:
+            self.submission_record = dict()
 
         self.profile_id = self.submission_record.get("profile_id", str())
         self.description_token = self.submission_record.get("description_token", str())
 
-        self.description = Description().GET(self.description_token)
+        try:
+            self.description = Description().GET(self.description_token)
+        except:
+            self.description = dict()
 
     def get_converter_errors(self):
         return self.__converter_errors
@@ -364,9 +370,10 @@ class SubmissionHelper:
 
         return accessions
 
-    def add_submission_error(self, message):
+    def update_submission_status(self, status, message):
         """
-        function stores submission error in the db
+        function updates status of submission
+        :param status:
         :param message:
         :return:
         """
@@ -374,9 +381,8 @@ class SubmissionHelper:
         if message:
             submission_record = Submission().get_record(self.submission_id)
             transcript = submission_record.get("transcript", dict())
-            error = transcript.get("error", list())
-            error.append(message)
-            transcript['error'] = error
+            status = dict(type=status, message=message)
+            transcript['status'] = status
 
             submission_record['transcript'] = transcript
             submission_record['target_id'] = str(submission_record.pop('_id'))
@@ -385,7 +391,25 @@ class SubmissionHelper:
 
         return True
 
-    def clear_submission_error(self):
+    def add_submission_error(self, message):
+        """
+        function records submission error
+        :param message:
+        :return:
+        """
+
+        return self.update_submission_status('error', message)
+
+    def add_submission_info(self, message):
+        """
+        function records submission info
+        :param message:
+        :return:
+        """
+
+        return self.update_submission_status('info', message)
+
+    def clear_submission_status(self):
         """
         function clears submission error from the db
         :return:
@@ -393,7 +417,7 @@ class SubmissionHelper:
 
         submission_record = Submission().get_record(self.submission_id)
         transcript = submission_record.get("transcript", dict())
-        transcript.pop('error', '')
+        transcript.pop('status', '')
 
         submission_record['transcript'] = transcript
         submission_record['target_id'] = str(submission_record.pop('_id'))

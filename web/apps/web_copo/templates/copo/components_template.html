@@ -200,48 +200,55 @@
 
     <!-- Description bundle template -->
     <div class="description-bundle-template">
-        <div class="ui fluid raised card description-bundle-panel" style="margin-top: 30px;">
-            <div class="content">
-                <div class="right floated meta"><i title="" class="large icon copo-tooltip bundle-status"></i></div>
-                <div class="header bundle-header bundlename">
-                </div>
-                <div class="meta bundle-modified-date">
-                </div>
-                <div class="description bundle-description">
-                </div>
+        <div class="panel panel-dtables2">
+            <div class="panel-heading" style="background-image: none; border: none;">
+                <div class="bundle-header bundlename" style="font-weight: bold; font-size: 15px;"></div>
+                <div style="font-weight: normal; font-size: 12px; color: #ecf2f9;">Last modified: <span class="bundle-modified-date"></span></div>
             </div>
-            <div class="ui grid container">
-                <div class="column">
-                    <div class="ui dropdown">
-                        <div class="ui active buttons">
-                            <div class="ui inverted secondary button">Bundle Actions</div>
-                            <div class="ui secondary floating dropdown icon button">
-                                <i class="dropdown icon"></i>
+            <div class="panel-body">
+                <div class="row" style="margin-bottom: 20px;">
+                    <div class="col-sm-10 col-md-10 col-lg-10">
+                        <div class="ui dropdown">
+                            <div class="ui active buttons">
+                                <div class="ui grey button">Bundle Actions</div>
+                                <div class="ui basic grey floating dropdown icon button">
+                                    <i class="dropdown icon"></i>
+                                </div>
+                            </div>
+                            <div class="text" style="color: #35637e;"></div>
+                            <i data-html="Please note that some bundle actions may be unavailable depending on the bundle's status."
+                               class="info circle grey icon copo-tooltip"></i>
+                            <div class="menu">
+                                <div data-task="add_datafiles" class="item bundlemenu">Add datafiles</div>
+                                <div data-task="view_datafiles" class="item bundlemenu">Show datafiles</div>
+                                <div class="divider"></div>
+                                <div data-task="add_metadata" class="item bundlemenu"><i class="clipboard icon"></i> Add/Edit metadata</div>
+                                <div data-task="view_metadata" class="item bundlemenu">Show metadata</div>
+                                <div class="divider"></div>
+                                <div data-task="edit_bundle" class="item bundlemenu">Rename bundle</div>
+                                <div data-task="clone_bundle" class="item bundlemenu"><i class="clone icon"></i> Clone bundle</div>
+                                <div data-task="delete_bundle" class="item bundlemenu">
+                                    <i class="trash icon"></i>
+                                    Delete bundle
+                                </div>
+                                <div class="divider"></div>
+                                <div data-task="submit_bundle" class="item bundlemenu">Submit bundle</div>
+                                <div data-task="view_accessions" class="item bundlemenu">View accessions</div>
+                                <div data-task="view_issues" class="item bundlemenu">View issues</div>
                             </div>
                         </div>
-                        <div class="text" style="color: #35637e;">Please note that certain actions might only be applicable in specific bundle states.</div>
-                        <div class="menu">
-                            <div data-task="add_metadata" class="item bundlemenu">Add/Edit metadata</div>
-                            <div data-task="view_metadata" class="item bundlemenu">Show metadata</div>
-                            <div class="divider"></div>
-                            <div data-task="view_datafiles" class="item bundlemenu">Show datafiles</div>
-                            <div class="divider"></div>
-                            <div data-task="edit_bundle" class="item bundlemenu">Rename bundle</div>
-                            <div data-task="clone_bundle" class="item bundlemenu">Clone bundle</div>
-                            <div data-task="delete_bundle" class="item bundlemenu">
-                                <i class="trash icon"></i>
-                                Delete bundle
-                            </div>
-                            <div class="divider"></div>
-                            <div data-task="submit_bundle" class="item bundlemenu">Submit bundle</div>
-                            <div data-task="view_accessions" class="item bundlemenu">View accessions</div>
-                            <div data-task="view_issues" class="item bundlemenu">View issues</div>
+                    </div>
+                    <div class="col-sm-2 col-md-2 col-lg-2">
+                        <div class="pull-right">
+                            <i title="" class="big icon copo-tooltip bundle-status"></i>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="ui grid container ignored message" style="background: #fff;">
-                <div class="column pbody"></div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="pbody"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -453,11 +460,11 @@
                     <div class="col-sm-10 col-md-10 col-lg-10 row-title">
                     </div>
                     <div class="col-sm-2 col-md-2 col-lg-2">
-                        <div class="pull-right row-select-icon">
-                            <i class="fa fa-square-o" title="Toggle record selection"
-                               style="cursor: pointer; font-size: 20px; font-weight: bold; display: block;"
-                               aria-hidden="true"></i>
-                        </div>
+{#                        <div class="pull-right row-select-icon">#}
+{#                            <i class="fa fa-square-o" title="Toggle record selection"#}
+{#                               style="cursor: pointer; font-size: 20px; font-weight: bold; display: block;"#}
+{#                               aria-hidden="true"></i>#}
+{#                        </div>#}
                     </div>
                 </div>
             </div>
@@ -472,11 +479,11 @@
                     <div class="col-sm-10 col-md-10 col-lg-10 row-title">
                     </div>
                     <div class="col-sm-2 col-md-2 col-lg-2">
-                        <div class="pull-right row-select-icon">
-                            <i class="fa fa-square-o" title="Toggle record selection"
-                               style="cursor: pointer; font-size: 20px; font-weight: bold; display: block;"
-                               aria-hidden="true"></i>
-                        </div>
+{#                        <div class="pull-right row-select-icon">#}
+{#                            <i class="fa fa-square-o" title="Toggle record selection"#}
+{#                               style="cursor: pointer; font-size: 20px; font-weight: bold; display: block;"#}
+{#                               aria-hidden="true"></i>#}
+{#                        </div>#}
                     </div>
                 </div>
             </div>

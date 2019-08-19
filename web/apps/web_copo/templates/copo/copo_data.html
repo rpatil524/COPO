@@ -46,7 +46,8 @@
         <input type="hidden" id="table_columns" value="{{ table_columns }}"/>
         <input type="hidden" value="{% url 'copo:copo_submissions' profile_id=profile_id %}" name="submission_url"
                id="submission_url"/>
-        <input type="hidden" value="{% url 'copo:annotate_meta' file_id=999 %}" name="file_annotate_url" id="file_annotate_url"/>
+        <input type="hidden" value="{% url 'copo:annotate_meta' file_id=999 %}" name="file_annotate_url"
+               id="file_annotate_url"/>
         <input type="hidden" value="{{ cyverse_files }}" name="cyverse_file_data"
                id="cyverse_file_data"/>
         <input type="hidden" id="selected_datafile" value="{{ selected_file }}"/>
@@ -68,8 +69,8 @@
 
     <div id="wizard_toggle" class="collapse" style="margin-bottom: 20px;">
 
-        <div class="ui attached black message">
-            <div class="header">
+        <div class="ui attached blue message" style="background-color: rgba(17, 70, 110, 1.0); color: #fff;">
+            <div class="header" style="color: #fff;">
                 Adding Metadata [<span
                     id="datafile_description_panel_title"></span>]
             </div>
@@ -78,7 +79,7 @@
             <div class="col-sm-12 col-md-12 col-lg-12">
                 <div class="pull-right" style="margin-bottom: 15px;">
                     <!-- exit description button -->
-                    <div id="exit_wizard" class="big ui secondary inverted button"
+                    <div id="exit_wizard" class="big ui basic orange button"
                          tabindex="0">
                         <span style="padding-left: 3px;">Exit description</span>
                     </div>
@@ -124,46 +125,6 @@
                 </div>
             </div>
         </div>
-        {#        <div class="ui bottom attached message">#}
-        {#            Datafiles description#}
-        {#        </div>#}
-    </div>
-
-    <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-12" style="margin-bottom: 10px;">
-            <button data-toggle="collapse" data-target="#datafiles_workflow" class="btn btn-link">View Datafiles
-                Workflow
-            </button>
-
-            <div id="datafiles_workflow" class="collapse">
-                <div class="ui ordered steps">
-                    <div class=" step">
-                        <div class="content">
-                            <div class="title">Upload datafiles</div>
-                            <div class="description">Start by uploading one or more datafiles</div>
-                        </div>
-                    </div>
-                    <div class=" step">
-                        <div class="content">
-                            <div class="title">Create a bundle</div>
-                            <div class="description">A bundle groups one or more datafiles</div>
-                        </div>
-                    </div>
-                    <div class=" step">
-                        <div class="content">
-                            <div class="title">Add datafiles to bundle</div>
-                            <div class="description">You can drag and drop datafiles to a bundle</div>
-                        </div>
-                    </div>
-                    <div class=" step">
-                        <div class="content">
-                            <div class="title">Add metadata</div>
-                            <div class="description">Describe & submit files in the bundle</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="row">
@@ -175,7 +136,7 @@
                     Datafiles
                 </div>
                 <p>
-                <div class="webpop-content-div" id="datafile-list-message"><span style="color: #35637e;">Use the upload button to add datafiles.<br/>To add to a bundle, highlight one or more files, drag and drop to the target bundle. </span>
+                <div class="webpop-content-div" id="datafile-list-message"><span style="color: #35637e;">Use the upload button to add one or more datafiles</span>
                 </div>
                 </p>
             </div>
@@ -190,7 +151,7 @@
                                     {% csrf_token %}
                                     <span data-copo-tour-id="copo_data_upload_file_button"
                                           id="upload_files_button"
-                                          class="big ui primary button fileinput-button"
+                                          class="big ui button fileinput-button"
                                           style="background-image: none; border-color:transparent;">
                                                                                 <span>Upload datafiles...</span>
                                                                                 <input id="main_file_upload" type="file"
@@ -226,20 +187,17 @@
                 </div>
 
             </div>
-            {#            <div class="ui bottom attached message">#}
-            {#                Datafiles#}
-            {#            </div>#}
         </div>
-        <div class="col-sm-6 col-md-6 col-lg-6" style="max-height: 900px; overflow-y: scroll;">
+        <div class="col-sm-6 col-md-6 col-lg-6">
             <!-- description bundle section -->
 
             <div class="ui attached message">
                 <div class="header">
-                    Description bundles
+                    Datafiles bundles
                 </div>
                 <p>
-                <div class="webpop-content-div" id="bundle-list-message" style="display: none;"><span
-                        style="color: #35637e;">Drag and drop datafiles to a bundle, then click <strong>Add Metadata</strong> to describe the bundle. </span>
+                <div class="webpop-content-div" id="bundle-list-message" style="display: block;"><span
+                        style="color: #35637e;">Drag and drop datafiles to a bundle, select the <strong>Add/Edit metadata</strong> action to describe </span>
                 </div>
                 <div class="webpop-content-div" id="new-bundle-message" style="display: none;">
                         <span style="color: #35637e;">Use the create
@@ -249,26 +207,9 @@
             </div>
             <div class="ui attached fluid segment" style="font-size: inherit;">
                 <div class="row">
-                    <div class="col-sm-8 col-md-8 col-lg-8">
-                        <div>
-                            <div>Bundle status codes:</div>
-                            <div title="Bundle has been submitted. Use the view submission option for accessions and DOIs."
-                                 class="ui green large label copo-tooltip">
-                                Submitted
-                            </div>
-                            <div title="Bundle is pending submission. Use the resume submission option to go ahead with the submission."
-                                 class="ui orange large label copo-tooltip">
-                                Pending
-                            </div>
-                            <div title="Bundle is in an invalid state due to error. Please resolved the reported issues to continue."
-                                 class="ui red large label copo-tooltip">
-                                Issues
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-md-4 col-lg-4">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
                         <div class="pull-right">
-                            <div class="create-bundle-btn big ui primary button"
+                            <div class="create-bundle-btn big ui button"
                                  tabindex="0">
                                 <i class="fa fa-layer-group"></i>
                                 <span style="padding-left: 3px;">Create a bundle...</span>
@@ -281,12 +222,13 @@
 
                 <div class="desc-bundle-display-div" style="display: block; margin-top: 25px;">
                     <div class="desc-bundle-display-div-2">
+                        <table id="copo_datafiles_bundle_table"
+                               class="ui celled table copo-noselect-table copo-noborders-table"
+                               cellspacing="0" width="100%">
+                        </table>
                     </div>
                 </div>
             </div>
-            {#            <div class="ui bottom attached message">#}
-            {#                Description bundles#}
-            {#            </div>#}
         </div>
     </div>
 

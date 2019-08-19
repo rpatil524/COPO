@@ -287,7 +287,7 @@ $(document).ready(function () {
             buttons: [
                 {
                     label: 'Exit',
-                    cssClass: 'tiny ui button',
+                    cssClass: 'tiny ui basic orange button',
                     action: function (dialogRef) {
                         terminate_description();
 
@@ -297,7 +297,7 @@ $(document).ready(function () {
                 },
                 {
                     label: 'Cancel',
-                    cssClass: 'tiny ui button',
+                    cssClass: 'tiny ui basic button',
                     action: function (dialogRef) {
                         dialogRef.close();
                         return false;
@@ -446,7 +446,7 @@ $(document).ready(function () {
                                 } else {
                                     BootstrapDialog.show({
                                         title: 'Submission Error!',
-                                        message: "Couldn't create submission record. Please make sure there are described datafiles in the bundle.",
+                                        message: "Couldn't initiate submission of bundle. No datafiles in bundle.",
                                         cssClass: 'copo-modal3',
                                         closable: false,
                                         animate: true,

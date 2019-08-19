@@ -474,7 +474,7 @@ function do_render_server_side_table(componentMeta) {
             }
         });
 
-    //hnadle event for annotation of of datafile
+    //handle event for annotation of of datafile
     $('#' + tableID + ' tbody')
         .off('click', 'td.annotate-datafile')
         .on('click', 'td.annotate-datafile', function (event) {
@@ -484,7 +484,7 @@ function do_render_server_side_table(componentMeta) {
             var record_id = tr.attr("id");
             record_id = record_id.split("row_").slice(-1)[0];
             var loc = $("#file_annotate_url").val().replace("999", record_id);
-            window.location.href = loc;
+            window.location.replace(loc);
         });
 
 } //end of func

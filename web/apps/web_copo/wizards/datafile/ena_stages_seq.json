@@ -41,8 +41,8 @@
         {
           "id": "project_release_date",
           "type": "string",
-          "help_tip": "Please specify when you want this study to be made publicly available. <div class='copo-text-danger' style='margin-top: 10px;'>Your submission might be instantly released to the public if a date in the past is specified.</span>",
-          "label": "Release date",
+          "help_tip": "Please specify when you want this study to be made publicly available. <div class='copo-text-danger' style='margin-top: 10px;'>Specifying a date in the past will trigger an instant release of the study.</span>",
+          "label": "Embargo end date",
           "hidden": "false",
           "required": "false",
           "control": "date-picker",

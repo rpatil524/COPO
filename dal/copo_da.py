@@ -992,8 +992,6 @@ class RemoteDataFile:
 
     def get_by_sub_id(self, sub_id):
         doc = self.RemoteFileCollection.find_one({"submission_id": sub_id})
-        if not doc:
-            pass
         return doc
 
     def create_transfer(self, submission_id, file_path=None):

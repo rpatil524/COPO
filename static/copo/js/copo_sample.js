@@ -30,19 +30,6 @@ $(document).ready(function () {
     var dtRows = [];
     var dtColumns = [];
 
-    //wizard help tip switch
-    var wizhlptipchk = 'wizard-help-checkbox';
-    $("[name='" + wizhlptipchk + "']").bootstrapSwitch(
-        {
-            size: "mini",
-            onColor: "primary",
-            state: true
-        });
-
-    $('input[name="' + wizhlptipchk + '"]').on('switchChange.bootstrapSwitch', function (event, state) {
-        toggle_display_help_tips(state, wizardElement);
-    });
-
 
     // handle/attach events to table buttons
     $('body').on('addbuttonevents', function (event) {
@@ -285,8 +272,6 @@ $(document).ready(function () {
 
     //handle events for step change
     wizardElement.on('changed.fu.wizard', function (evt, data) {
-        toggle_display_help_tips($('input[name="' + wizhlptipchk + '"]').bootstrapSwitch('state'), wizardElement);
-
         //form controls help tip
         refresh_tool_tips();
         var activeStageIndx = wizardElement.wizard('selectedItem').step;
@@ -1351,7 +1336,6 @@ $(document).ready(function () {
                     }
 
                     refresh_tool_tips();
-                    toggle_display_help_tips($('input[name="' + wizhlptipchk + '"]').bootstrapSwitch('state'), wizardElement);
 
                     //set focus to selectize control
                     if (selectizeObjects.hasOwnProperty(formElem.id)) {
@@ -1569,7 +1553,7 @@ $(document).ready(function () {
 
 
                 customButtons.append(applyButton);
-                customButtons.append($("#file_upload_template1").clone().html());
+                // customButtons.append($("#file_upload_template1").clone().html());
 
 
                 refresh_tool_tips();

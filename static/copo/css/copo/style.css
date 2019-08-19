@@ -71,9 +71,13 @@
 }
 
 .submission-info-label {
-    font-size: 12px;
-    background-color: #fff;
-    color: #000;
+    word-wrap: break-word !important;
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
+.submission-attributes {
+    margin-bottom: 5px;
 }
 
 div[class^="col-"],

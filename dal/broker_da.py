@@ -120,12 +120,13 @@ class BrokerDA:
         # if ever it was needed to re-implement 'soft' delete uncomment the following lines and
         # comment out the 'hard' delete query
 
-        self.da_object.get_collection_handle().update_many(
-            {"_id": {"$in": target_ids}}, {"$set": {"deleted": d_utils.get_deleted_flag()}}
-        )
+        # soft delete
+        # self.da_object.get_collection_handle().update_many(
+        #     {"_id": {"$in": target_ids}}, {"$set": {"deleted": d_utils.get_deleted_flag()}}
+        # )
 
         # hard delete
-        # self.da_object.get_collection_handle().remove({'_id': {'$in': target_ids}})
+        self.da_object.get_collection_handle().remove({'_id': {'$in': target_ids}})
 
         self.context = self.broker_visuals.do_table_data()
         return self.context
