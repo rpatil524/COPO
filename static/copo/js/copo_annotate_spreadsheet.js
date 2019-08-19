@@ -251,6 +251,7 @@ function refresh_display() {
             $(document).data(id, hot)
             make_dropabble()
             refresh_annotations()
+            console.log("refresh display")
         })
 
     }).error(function (data) {
@@ -260,28 +261,25 @@ function refresh_display() {
 
 function do_cell_mouse_over(evt, coords, td) {
     var last = $(document).data("mouse_over_cell")
-    if (last == undefined) {
+    if(last == undefined){
         var pan = $('<span class="panel panel-default annotation_for_cell">' + $(evt.target).data("label") + '</span>')
         $("#annotations_for_cell").append(pan).fadeIn()
-    } else if (coords.col != last.col) {
+    }
+    else if (coords.col != last.col) {
         // change contents
         //$("#annotations_for_cell").fadeOut()
         $("#annotations_for_cell").empty()
-        if ($(evt.target).data("label") == undefined) {
 
-        }
-        else {
-            console.log($(evt.target).data())
-            var pan = $('<span class="panel panel-default annotation_for_cell" >' + $(evt.target).data("label") + '</span>')
-            $("#annotations_for_cell").append(pan)
-        }
-        }
+        var pan = $('<span class="panel panel-default annotation_for_cell" >' + $(evt.target).data("label") + '</span>')
+        $("#annotations_for_cell").append(pan)
+        //$("#annotations_for_cell").show()
+    }
 
 
     $(document).data("mouse_over_cell", coords)
 }
 
-function do_cell_mouse_out(evt, coords, td) {
+function do_cell_mouse_out(evt, coords, td){
     var last = $(document).data("mouse_over_cell")
     if (coords[0] != last[0]) {
         $("#annotations_for_cell").fadeOut()
@@ -315,6 +313,7 @@ function refresh_annotations() {
         var a = $(document).data("nav_tab")
         $("a[href=" + a + "]").tab("show")
     })
+    console.log("refresh annotations")
     do_my_annotations()
 
 }
@@ -376,6 +375,7 @@ function do_my_annotations(event) {
     })
     //console.log($($(document).data("selected_nav_tab")).find("a").attr("href"))
     //$($(document).data("selected_nav_tab")).find("a").tab("show")
+    console.log("my annotations")
 }
 
 function make_annotation_panel(data, d) {
