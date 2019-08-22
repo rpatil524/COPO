@@ -15,7 +15,8 @@ from datetime import datetime, date
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from submission.helpers.ena_helper import SubmissionHelper
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
-from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_PROJECT_TEMPLATE, SRA_SAMPLE_TEMPLATE, SRA_SUBMISSION_MODIFY_TEMPLATE, ENA_CLI
+from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_PROJECT_TEMPLATE, SRA_SAMPLE_TEMPLATE, \
+    SRA_SUBMISSION_MODIFY_TEMPLATE, ENA_CLI
 
 """
 class handles read data submissions to the ENA - see: https://ena-docs.readthedocs.io/en/latest/cli_06.html
@@ -222,7 +223,7 @@ class EnaReads:
                    + '" "' + self.ena_service \
                    + '"'
 
-        self.submission_helper.logging_info("Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd)
+        self.submission_helper.logging_info("Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx"))
 
         try:
             receipt = subprocess.check_output(curl_cmd, shell=True)
@@ -373,7 +374,7 @@ class EnaReads:
                    + '" "' + self.ena_service \
                    + '"'
 
-        self.submission_helper.logging_info("Submitting samples xml to ENA via CURL. CURL command is: " + curl_cmd)
+        self.submission_helper.logging_info("Submitting samples xml to ENA via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx"))
 
         try:
             receipt = subprocess.check_output(curl_cmd, shell=True)
@@ -481,7 +482,7 @@ class EnaReads:
         # compose the cli command to use
         manifest_location = os.path.join(self.submission_location, "manifest.txt")
         cli_cmd = self.get_cli_command(manifest_location=manifest_location)
-        self.submission_helper.logging_info("CURL command is: " + cli_cmd)
+        self.submission_helper.logging_info("CURL command is: " + cli_cmd.replace(self.pass_word, "xxxxxx"))
 
         # get run accessions - these provide info on already submitted datafiles
         run_accessions = self.submission_helper.get_run_accessions()
@@ -872,7 +873,7 @@ class EnaReads:
                    + '" "' + self.ena_service \
                    + '"'
 
-        self.submission_helper.logging_info("Modifying study via CURL. CURL command is: " + curl_cmd)
+        self.submission_helper.logging_info("Modifying study via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx"))
 
         try:
             receipt = subprocess.check_output(curl_cmd, shell=True)
@@ -906,13 +907,14 @@ class EnaReads:
         self.write_xml_file(root, "submission_receipt.xml")
         self.submission_helper.logging_info("Study successfully released. Updating status in the database")
         prj[0]['status'] = 'PUBLIC'
-        prj[0]['release_date'] = date.today()
+        prj[0]['release_date'] = d_utils.get_datetime()
 
         submission_record['target_id'] = str(submission_record.pop('_id'))
         Submission().save_record(dict(), **submission_record)
 
         # update submission status
-        status_message = "Study successfully released."
+        status_message = "Study release successful."
         self.submission_helper.add_submission_info(status_message)
 
-        return dict(status=True, value='')
+        result = dict(status=True, value='', message=status_message)
+        return result

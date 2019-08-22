@@ -480,7 +480,7 @@ class Submission(DAComponent):
                     complete='false',
                     is_cg=str(repo == "cg_core"),
                     user_id=data_utils.get_current_user().id,
-                    date_created=date.today()
+                    date_created=data_utils.get_datetime()
             ).items():
                 auto_fields[self.get_qualified_field(k)] = v
 

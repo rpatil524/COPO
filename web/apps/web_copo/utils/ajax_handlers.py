@@ -160,20 +160,17 @@ def get_upload_information(request):
                                                        "<div style='margin-top:10px;'>The release date is set for " \
                                                        "" + sub_info_dict["release_date"] + \
                                                        ".</div><div style='margin-top:10px;'>" \
-                                                       "Click to lift the embargo on this study.</div>"
+                                                       "To release this study to the public, " \
+                                                       "click the release study button.</div>"
                 elif status.upper() == "PUBLIC":
                     sub_info_dict["release_status"] = "PUBLIC"
                     sub_info_dict["study_view_url"] = "https://www.ebi.ac.uk/ena/data/view/" + prj[0].get("accession",
                                                                                                           str())
                     sub_info_dict["release_message"] = "<div>All objects in " \
                                                        "this submission are set to public status.</div> " \
-                                                       "<div style='margin-top:10px;'>Click to view this study " \
-                                                       "on the ENA browser (opens is a new browser tab)." \
-                                                       "</div><div class='text-primary' style='margin-top:10px;'>" \
-                                                       "Please note that it can take " \
-                                                       "up to 24 hours, from the " \
-                                                       "time of submission, for a study to be publicly " \
-                                                       "available on the ENA browser.</div>"
+                                                       "<div style='margin-top:10px;'>To view this study " \
+                                                       "on the ENA browser (opens in a new browser tab), " \
+                                                       "click the view on ENA button.</div>"
                 else:
                     sub_info_dict["release_status"] = "Unknown"
                     sub_info_dict["release_message"] = "<div>The embargo status of " \

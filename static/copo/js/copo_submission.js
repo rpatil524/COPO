@@ -91,7 +91,7 @@ $(document).ready(function () {
 
         BootstrapDialog.show({
             title: "Release study",
-            message: 'Are you sure you want to go ahead with the release of this study?',
+            message: 'Are you sure you want to go ahead with the release of this study? <div class="text-primary" style="margin-top:10px;">Please note that this study, and all dependent objects, will be made public. It can take up to 24 hours, from the time of release, for a study to be publicly available on the ENA browser.</div>',
             cssClass: 'copo-modal2',
             closable: false,
             animate: true,
@@ -127,16 +127,36 @@ $(document).ready(function () {
                                 data = JSON.parse(data);
                                 if (data.hasOwnProperty("status") && data.status == 1) {
                                     elem.removeClass("disabled");
-                                    var error_message = "Couldn't complete request due to error";
+                                    var message = "Couldn't complete request due to error";
 
                                     if (data.hasOwnProperty("message")) {
-                                        error_message = data.message;
+                                        message = data.message;
                                     }
 
                                     BootstrapDialog.show({
                                         title: "Submission update error",
                                         type: BootstrapDialog.TYPE_DANGER,
-                                        message: error_message,
+                                        message: message,
+                                        cssClass: 'copo-modal3',
+                                        buttons: [{
+                                            label: 'OK',
+                                            cssClass: 'tiny ui basic button',
+                                            action: function (dialogRef) {
+                                                dialogRef.close();
+                                            }
+                                        }]
+                                    });
+                                } else if(data.hasOwnProperty("status") && data.status == 0) {
+                                    var message = "Study release successful.";
+
+                                    if (data.hasOwnProperty("message")) {
+                                        message = data.message;
+                                    }
+
+                                    BootstrapDialog.show({
+                                        title: "Submission update success",
+                                        type: BootstrapDialog.TYPE_SUCCESS,
+                                        message: message,
                                         cssClass: 'copo-modal3',
                                         buttons: [{
                                             label: 'OK',
@@ -149,7 +169,7 @@ $(document).ready(function () {
                                 }
                             } catch (err) {
                                 elem.removeClass("disabled");
-                                console.log(err)
+                                console.log(err);
                             }
                         },
                         error: function (data) {
@@ -780,7 +800,7 @@ $(document).ready(function () {
                     {
                         style: "word-wrap: break-word; max-height: 300px; overflow-y: scroll",
                         "class": "ui success message",
-                        "html": '<div class="webpop-content-div">Submission completed. Click the view button for accessions.</div>'
+                        "html": '<div class="message">Submission completed. Click the view button for accessions.</div>'
                     });
 
                 progressObject
@@ -798,15 +818,15 @@ $(document).ready(function () {
 
                 //embargo info for ena submissions
                 if (submissionRecord.hasOwnProperty("release_status")) {
-                    var release_button = '<div><hr/></div>' + submissionRecord.release_message;
+                    var release_message = '<hr/><div style="margin-bottom: 10px;">' + submissionRecord.release_message+'</div>';
                     if (submissionRecord.release_status == "PRIVATE") {
-                        release_button = '<div data-html="' + submissionRecord.release_message + '"  class="tiny ui blue button copo-tooltip ena-study-release" tabindex="0" data-target="' + submissionRecord.submission_id + '">Release study</div></span>';
+                        release_message = release_message + '<div class="tiny ui blue button ena-study-release" tabindex="0" data-target="' + submissionRecord.submission_id + '">Release study</div>';
                     } else if (submissionRecord.release_status == "PUBLIC") {
-                        release_button = '<a data-html="' + submissionRecord.release_message + '"  class="tiny ui blue button copo-tooltip" tabindex="0" data-target="' + submissionRecord.submission_id + '" href="' + submissionRecord.study_view_url + '" target="_blank"><span>Public</span><i style="margin-left: 5px; font-size: 12px;" class="fa fa-external-link"></i></a>';
+                        release_message = release_message + '<div><a class="tiny ui blue button" tabindex="0" data-target="' + submissionRecord.submission_id + '" href="' + submissionRecord.study_view_url + '" target="_blank"><span>View on ENA</span><i style="margin-left: 5px; font-size: 12px;" class="fa fa-external-link"></i></a></div>';
                     }
 
-                    var release_status = $('<div style="margin-top: 10px;">' + release_button + '</div>');
-                    submisson_message_div.find(".webpop-content-div").append(release_status);
+                    var release_status = $('<div style="margin-top: 10px;">' + release_message + '</div>');
+                    submisson_message_div.find(".message").append(release_status);
                 }
 
             } else {

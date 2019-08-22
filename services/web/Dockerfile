@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.7
 
 ENV PYTHONUNBUFFERED 1
 
@@ -23,14 +23,12 @@ RUN gem install sass
 RUN pip install --upgrade pip
 
 COPY ./requirements/ /tmp/requirements/
-
 RUN pip install -r /tmp/requirements/dev.txt
 
 RUN mkdir /copo
 RUN mkdir /code
 
 WORKDIR /copo
-
 COPY . /code/
 
 # add aspera client to path

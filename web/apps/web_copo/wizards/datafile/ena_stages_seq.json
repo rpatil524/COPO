@@ -41,10 +41,10 @@
         {
           "id": "project_release_date",
           "type": "string",
-          "help_tip": "Please specify when you want this study to be made publicly available. <div class='copo-text-danger' style='margin-top: 10px;'>Specifying a date in the past will trigger an instant release of the study.</span>",
+          "help_tip": "Please specify when you want this study to be made publicly available. <div class='copo-text-danger' style='margin-top: 10px;'>Please note: You can place an embargo of up to 2 years, after which the study will be automatically released to the public. <div>Specifying a date in the past will trigger an instant release of the study.</div></div>",
           "label": "Embargo end date",
           "hidden": "false",
-          "required": "false",
+          "required": "true",
           "control": "date-picker",
           "default_value": ""
         }

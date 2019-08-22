@@ -313,7 +313,7 @@ class WizardHelper:
             Reference("ena", "project_details", "project_name"): self.get_bundle_name,
             Reference("ena", "project_details", "project_title"): self.get_profile_title,
             Reference("ena", "project_details", "project_description"): self.get_profile_description,
-            Reference("ena", "project_details", "project_release_date"): self.get_current_date
+            # Reference("ena", "project_details", "project_release_date"): self.get_current_date
         }
 
         if not self.description_token:
