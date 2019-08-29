@@ -26,70 +26,72 @@
         </div>
     </div>
     <div class="row">
-    <div class="col-sm-4 col-md-4 col-lg-4" style="min-height: 300px; border-right:1px dashed #286090;">
+        <div class="col-sm-4 col-md-4 col-lg-4" style="padding-top: 10px;min-height: 300px; background-color: #f9f9f9;">
             <!-- search controls go here -->
-            <div class="row">
-                <div class="col-sm-12 col-md-12 col-lg-12" style="min-height: 150px">
-                    <p class="lead">Search Term</p>
-                    <small id="term_help" class="form-text text-muted">Start typing to find matching ontology
-                                terms
-                            </small>
-                            <input type="text" class="form-control" id="search_term_text_box"
-                                   aria-describedby="term_help" placeholder="Search">
-                    <form>
-                        <div class="form-group">
 
-                            <div class="dropdown ontology_dropdown pull-right">
-                                        <div class="medium ui basic button dropdown-toggle"
-                                             id="ontology_filter_button"
-                                             data-toggle="dropdown"
-                                             aria-haspopup="true" aria-expanded="true">
-                                            <span class="ontology_label">All Ontologies</span>
-                                            <span class="caret"></span>
-                                        </div>
+            <p class="h4">
+                Search Term
+                <small class="small">Query the Ontology Lookup Service</small>
+            </p>
+            <br/>
+            <small id="term_help" class="form-text text-muted">Start typing to find matching ontology
+                terms
+            </small>
+            <input type="text" class="form-control" id="search_term_text_box"
+                   aria-describedby="term_help" placeholder="Search">
+            <form>
+                <div class="form-group">
 
-                                        <ul class="dropdown-menu" id="ontology_dropdown_filter"
-                                            aria-labelledby="dropdownMenu1">
-                                            <a>
-                                                <li class="ontology_dd_item" data-name="All Ontologies" data-id="">
+                    <div class="dropdown ontology_dropdown pull-right">
+                        <div class="medium ui basic button dropdown-toggle"
+                             id="ontology_filter_button"
+                             data-toggle="dropdown"
+                             aria-haspopup="true" aria-expanded="true">
+                            <span class="ontology_label">All Ontologies</span>
+                            <span class="caret"></span>
+                        </div>
+
+                        <ul class="dropdown-menu" id="ontology_dropdown_filter"
+                            aria-labelledby="dropdownMenu1">
+                            <a>
+                                <li class="ontology_dd_item" data-name="All Ontologies" data-id="">
                                 <span class="h5">
                                     <span class="ontology_dd_name">All Ontologies</span>
                                     <br/>
                                     <small class="ontology_dd_description">Search all ontologies for terms.</small>
                                 </span>
-                                                </li>
-                                            </a>
-                                        </ul>
-                            </div>
+                                </li>
+                            </a>
+                        </ul>
+                    </div>
 
-
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="row">
-
-                <p class="lead">Search Results
-                    <small class="text-muted">Drag Term to Column</small>
-                </p>
-                <!-- search results go here -->
-                <div id="search_results" style="overflow-y: scroll">
 
                 </div>
+            </form>
+
+
+            <p class="h4" style="margin-top:60px">Search Results
+                <small class="text-muted">Drag Term to Column</small>
+            </p>
+            <!-- search results go here -->
+            <div id="search_results" style="overflow-y: scroll">
+
             </div>
         </div>
-    <div class="col-sm-4 col-md-4 col-lg-4" style="background-color: #f9f9f9; ">
+
+
+        <div class="col-sm-4 col-md-4 col-lg-4" style="padding-top: 10px; border-left: 10px solid white; background-color: #f9f9f9;">
 
             <div class="col-sm-12 col-md-12 col-lg-12" style="min-height: 650px">
-                <p class="lead">Annotations</p>
+                <p class="h4">Sheet Annotations <small>Current Annotations for this Sheet</small></p>
                 <div id="existing_annotations"></div>
             </div>
 
 
         </div>
-    <span class="col-sm-4 col-md-4 col-lg-4" id="filters" style=" border-left:1px dashed #286090; min-height: 650px">
+        <div class="col-sm-4 col-md-4 col-lg-4" id="filters" style="padding-top: 10px; min-height: 650px; border-left: 10px solid white; background-color: #f9f9f9">
             <!-- element filters go here -->
-            <p class="lead">Your Annotations</p>
+            <p class="h4">All Annotations <small>Annotations from all Documents</small></p>
             <span id="filters">
                 <a href="#" data-filter="all" class="label label-default label-primary">All Terms</a>
                 <a href="#" data-filter="by_count" class="label label-default">By Times Used</a>
@@ -98,8 +100,9 @@
 
             <hr/>
             <div id="your_annotations"></div>
-        </span>
+        </div>
     </div>
+
 
 
 {% endblock %}
