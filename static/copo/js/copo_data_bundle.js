@@ -376,9 +376,9 @@ $(document).ready(function () {
 
                 var dtd = data.records;
 
-                if (dtd.length == 0) {
-                    return false;
-                }
+                // if (dtd.length == 0) {
+                //     return false;
+                // }
 
                 var tableID = bundleTableId;
 

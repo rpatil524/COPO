@@ -562,7 +562,7 @@ class WizardCallbacks:
                 df_odd = df_odd[['_id', 'name']]
                 df_odd.index = range(0, len(df_odd))
                 df_even.index = range(0, len(df_even))
-                df_result = pd.concat([df_odd, df_even], axis=1, join_axes=[df_odd.index])
+                df_result = pd.concat([df_odd, df_even], axis=1).reindex(df_odd.index)
                 saved_copy = df_result[['_id', '_id2']].to_dict('records')
                 df_result = df_result[['name', 'name2']]
                 df_result.columns = ['file1', 'file2']

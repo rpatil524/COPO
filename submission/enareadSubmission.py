@@ -11,7 +11,7 @@ import pandas as pd
 from lxml import etree
 from tools import resolve_env
 from dal.copo_da import Submission
-from datetime import datetime, date
+from datetime import datetime
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from submission.helpers.ena_helper import SubmissionHelper
 import web.apps.web_copo.schemas.utils.data_utils as d_utils

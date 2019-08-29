@@ -53,6 +53,14 @@ SESSION_ENGINE = 'redis_sessions.session'
 SESSION_REDIS_HOST = resolve_env.get_env('REDIS_HOST')
 SESSION_REDIS_PORT = int(resolve_env.get_env('REDIS_PORT'))
 
+# celery settings
+CELERY_BROKER_URL = f'redis://{SESSION_REDIS_HOST}:{SESSION_REDIS_PORT}'
+CELERY_RESULT_BACKEND = f'redis://{SESSION_REDIS_HOST}:{SESSION_REDIS_PORT}'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_IMPORTS = ("celerytasks.add_task",)
+
 # settings for figshare
 FIGSHARE_CREDENTIALS = {
     'client_id': resolve_env.get_env('FIGSHARE_CLIENT_ID'),
