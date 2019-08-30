@@ -34,11 +34,16 @@
                 <small class="small">Query the Ontology Lookup Service</small>
             </p>
             <br/>
+            <p>
             <small id="term_help" class="form-text text-muted">Start typing to find matching ontology
                 terms
             </small>
-            <input type="text" class="form-control" id="search_term_text_box"
-                   aria-describedby="term_help" placeholder="Search">
+            </p>
+            <div class="search-term-div ui icon input ">
+                <input type="text" id="search_term_text_box"
+                       aria-describedby="term_help" placeholder="Search">
+                <i class="search icon"></i>
+            </div>
             <form>
                 <div class="form-group">
 
@@ -80,7 +85,8 @@
         </div>
 
 
-        <div class="col-sm-4 col-md-4 col-lg-4" style="padding-top: 10px; border-left: 10px solid white; background-color: #f9f9f9;">
+        <div class="col-sm-4 col-md-4 col-lg-4"
+             style="padding-top: 10px; border-left: 10px solid white; background-color: #f9f9f9;">
 
             <div class="col-sm-12 col-md-12 col-lg-12" style="min-height: 650px">
                 <p class="h4">Sheet Annotations <small>Current Annotations for this Sheet</small></p>
@@ -89,7 +95,8 @@
 
 
         </div>
-        <div class="col-sm-4 col-md-4 col-lg-4" id="filters" style="padding-top: 10px; min-height: 650px; border-left: 10px solid white; background-color: #f9f9f9">
+        <div class="col-sm-4 col-md-4 col-lg-4" id="filters"
+             style="padding-top: 10px; min-height: 650px; border-left: 10px solid white; background-color: #f9f9f9">
             <!-- element filters go here -->
             <p class="h4">All Annotations <small>Annotations from all Documents</small></p>
             <span id="filters">

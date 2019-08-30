@@ -106,6 +106,7 @@ function delay(fn, ms) {
 var lastValue = '';
 // this is the handler which is called 1 second after the user stops typing in the search box
 $(document).on("input propertychange", "#search_term_text_box", delay(function (e) {
+    $(".search-term-div").addClass("loading")
     var val = $(e.currentTarget).val()
     var url = $(document).data("autocomplete")
     if (!url) {
@@ -128,7 +129,7 @@ $(document).on("input propertychange", "#search_term_text_box", delay(function (
             var p = build_result_panel(d, idx, entry)
             $("#search_results").append(p)
         })
-
+        $(".search-term-div").removeClass("loading")
 
     })
 
