@@ -131,6 +131,15 @@ $(document).on("input propertychange", "#search_term_text_box", delay(function (
         })
         $(".search-term-div").removeClass("loading")
 
+    }).error(function(data){
+        console.log("error")
+        $(".search-term-div").removeClass("loading")
+        $("#search_results").empty()
+        var result = $("<div/>", {
+            class: "annotation_term panel panel-default",
+            html: "<h4>Possible Network Error <small>Check Connection</small></h4>"
+        })
+        $("#search_results").append(result)
     })
 
 
