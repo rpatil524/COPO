@@ -254,6 +254,7 @@ then
       fi
     elif [[ $opsys == "Ubuntu" ]]
     then
+
       pac_man='apt-get -q'
     elif [[ $opsys == "CentOS" ]]
     then
@@ -267,7 +268,10 @@ then
     os=check
 
     # now check dependencies are installed
-    $pac_man install -y git
+    $pac_man install -y git libpq-dev libbz2-dev liblzma-dev libxml2-dev libxslt1-dev
+    easy_install lxml
+
+
     if [[ $opsys == "Darwin" ]]
     then
       # install python3
