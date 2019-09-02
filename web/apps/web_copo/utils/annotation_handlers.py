@@ -82,3 +82,7 @@ def delete_annotation(request):
     doc = Annotation().decrement_or_delete_annotation(uid, iri)
     doc = DataFile().delete_annotation(col_idx=col_idx, sheet_name=sheet_name, file_id=file_id)
     return HttpResponse("Hello World")
+
+def new_text_annotation(request):
+    print(request)
+    return HttpResponse("Hello World")

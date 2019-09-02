@@ -49,7 +49,7 @@
 
 
 
-
+    cxzcxz
 
 
 {% endblock %}
@@ -62,7 +62,13 @@
     <script>
 
         $(document).ready(function () {
-
+            var app = new annotator.App();
+            app.include(annotator.ui.main);
+            app.include(annotator.storage.debug);
+            app.include(annotator.storage.http,{
+                prefix: '/copo'
+            });
+            app.start();
         })
 
 
