@@ -6,7 +6,7 @@
 {% block stylesheet_block %}
     <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
 
-    <link rel="stylesheet" type="text/css" href="{% static "copo/annotator2.0.0-alpha/css/annotator.css" %} "/>
+    <link rel="stylesheet" type="text/css" href="{% static "copo/annotator-2.0.0-alpha.3/css/annotator.css" %} "/>
     <link rel="stylesheet" href="{% static 'copo/css/copo/copo_ontology_styles.css' %}"
           xmlns="http://www.w3.org/1999/html">
 
@@ -48,26 +48,44 @@
     {% csrf_token %}
 
 
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            cxzcxz
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6">
+            <h4 class="h4">Search results</h4>
+            <div id="search_results">
 
-    cxzcxz
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+
+        </div>
+    </div>
 
 
 {% endblock %}
 
 
 {% block js_block %}
-    <script type="text/javascript" src="{% static "copo/annotator2.0.0-alpha/annotator.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/annotator-2.0.0-alpha.3/pkg/annotator.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/js/copo_annotate_spreadsheet.js" %}"></script>
 
 
     <script>
 
         $(document).ready(function () {
+            v = new Object()
+            v
             var app = new annotator.App();
             app.include(annotator.ui.main);
             app.include(annotator.storage.debug);
-            app.include(annotator.storage.http,{
+            app.include(annotator.storage.http, {
                 prefix: '/copo'
             });
+            //app.include(HelloWorld)
             app.start();
         })
 
