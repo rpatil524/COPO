@@ -4,6 +4,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from jsonpickle import encode
+from django.utils.safestring import mark_safe
 
 from submission.submissionDelegator import delegate_submission
 from api.handlers.general import *
@@ -25,6 +26,7 @@ from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.decorators import user_is_staff
 import web.apps.web_copo.templatetags.html_tags as htags
 from dal.copo_da import DataFile
+from pexpect import run
 
 LOGGER = settings.LOGGER
 
@@ -51,8 +53,15 @@ def login(request):
 
 
 def test(request):
-    records = Annotation().get_all_records("5c90f5c518af69000da2097f")
-    return render(request, 'copo/test_page.html', {"records": records})
+    records = Annotation().get_all_records("5d6d2df56f3ca55f1ef968dd")
+    run("pdftotext -layout -raw /home/fshaw/pdf/2.pdf   /home/fshaw/Desktop/temp.txt")
+    #run("pdftohtml -i -s /home/fshaw/pdf/2.pdf   /home/fshaw/Desktop/temp.html")
+
+    with open("/home/fshaw/Desktop/temp.txt", 'r') as f:
+        html = f.read()
+        html = html.replace("\n", "<br/>")
+    return render(request, 'copo/test_page.html',
+                  {"records": records, "file_id": "5d6d2df56f3ca55f1ef968dd", "file_name": "2.pdf", "html": html})
 
 
 '''
