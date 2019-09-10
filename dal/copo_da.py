@@ -2,7 +2,7 @@ __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 
 import os
 import copy
-from datetime import datetime, date
+from datetime import datetime
 from bson import ObjectId, json_util
 from chunked_upload.models import ChunkedUpload
 from web.apps.web_copo.lookup.lookup import DB_TEMPLATES

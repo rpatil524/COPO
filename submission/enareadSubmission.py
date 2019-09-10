@@ -10,6 +10,7 @@ import subprocess
 import pandas as pd
 from lxml import etree
 from tools import resolve_env
+from dal import cursor_to_list
 from dal.copo_da import Submission
 from datetime import datetime
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
@@ -223,7 +224,8 @@ class EnaReads:
                    + '" "' + self.ena_service \
                    + '"'
 
-        self.submission_helper.logging_info("Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx"))
+        self.submission_helper.logging_info(
+            "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx"))
 
         try:
             receipt = subprocess.check_output(curl_cmd, shell=True)
@@ -374,7 +376,8 @@ class EnaReads:
                    + '" "' + self.ena_service \
                    + '"'
 
-        self.submission_helper.logging_info("Submitting samples xml to ENA via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx"))
+        self.submission_helper.logging_info(
+            "Submitting samples xml to ENA via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx"))
 
         try:
             receipt = subprocess.check_output(curl_cmd, shell=True)
@@ -873,7 +876,8 @@ class EnaReads:
                    + '" "' + self.ena_service \
                    + '"'
 
-        self.submission_helper.logging_info("Modifying study via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx"))
+        self.submission_helper.logging_info(
+            "Modifying study via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx"))
 
         try:
             receipt = subprocess.check_output(curl_cmd, shell=True)
@@ -917,4 +921,30 @@ class EnaReads:
         self.submission_helper.add_submission_info(status_message)
 
         result = dict(status=True, value='', message=status_message)
+        return result
+
+    def update_study_status(self):
+        """
+        function updates the embargo status of studies
+        :return:
+        """
+
+        # this manages its own mongodb connection as it will be accessed by a celery worker subprocess
+        import dal.mongo_util as mutil
+        mongo_client = mutil.get_mongo_client()
+        collection_handle = mongo_client['SubmissionCollection']
+
+        records = cursor_to_list(collection_handle.find({"$and": [
+            {"repository": "ena", "complete": True, 'deleted': d_utils.get_not_deleted_flag()},
+            {'accessions.project.0': {"$exists": True}}]},
+            {'accessions.project': 1}))
+
+        status_message = "Checking for ENA Study status updates " + str(len(records))
+        SubmissionHelper.log_general_info(status_message)
+        #
+        # if submissions:
+        #     pass
+
+        result = dict(status=True, value='')
+
         return result

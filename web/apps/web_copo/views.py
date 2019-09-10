@@ -99,7 +99,16 @@ def authenticate_figshare(request):
 
 
 def test_dataverse_submit(request):
+    from submission import enareadSubmission
+    enareadSubmission.EnaReads().update_study_status()
     return render(request, 'copo/test_page.html', {})
+
+
+def test_chat(request, room_name):
+    from django.utils.safestring import mark_safe
+    return render(request, 'copo/test_chat.html', {
+        'room_name_json': mark_safe(json.dumps(room_name))
+    })
 
 
 @login_required
@@ -177,7 +186,7 @@ def resolve_submission_id(request, submission_id):
     # get all file metadata
     output = dict()
     files = list()
-    for f in sub["bundle"]:
+    for f in sub.get("bundle", list()):
         file = DataFile().get_record(f)
         files.append(file["description"]["attributes"])
     output["files"] = files

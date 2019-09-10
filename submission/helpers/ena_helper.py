@@ -311,7 +311,7 @@ class SubmissionHelper:
         except Exception as e:
             pass
 
-        return False
+        return True
 
     def logging_info(self, message):
         """
@@ -320,6 +320,34 @@ class SubmissionHelper:
         :return:
         """
         lg.log('[Submission: ' + self.submission_id + '] ' + message, level=Loglvl.INFO, type=Logtype.FILE)
+
+        return True
+
+    @staticmethod
+    def log_general_info(message):
+        """
+        logs info not tied to a specific submission record
+        :param message:
+        :return:
+        """
+
+        lg.log('[Submission:] ' + message, level=Loglvl.INFO, type=Logtype.FILE)
+
+        return True
+
+    @staticmethod
+    def log_general_error(message):
+        """
+        logs error not tied to a specific submission record
+        :param message:
+        :return:
+        """
+        try:
+            lg.log('[Submission: ] ' + message, level=Loglvl.ERROR, type=Logtype.FILE)
+        except Exception as e:
+            pass
+
+        return True
 
     def get_study_accessions(self):
         """

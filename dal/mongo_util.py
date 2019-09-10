@@ -8,8 +8,12 @@ from django.conf import settings
 def get_collection_ref(collection_name):
     return settings.MONGO_CLIENT[collection_name]
 
+
 def get_mongo_client():
-    return settings.MONGO_CLIENT
+    MONGO_CLIENT = pymongo.MongoClient(host=settings.MONGO_HOST, maxPoolSize=settings.MONGO_MAX_POOL_SIZE, )[settings.MONGO_DB]
+    MONGO_CLIENT.authenticate(settings.MONGO_USER, settings.MONGO_USER_PASSWORD, source='admin')
+    return MONGO_CLIENT
+
 
 def to_mongo_id(id):
     return ObjectId(id)
@@ -42,12 +46,14 @@ def verify_doc_type(doc):
             return data[0]["data"]
     return data
 
+
 def change_mongo_id_format_to_standard(cursor):
     # changes ids of records in a cursor to be 'id' instead of '_id'
     l = cursor_to_list(cursor)
     for r in l:
         r['id'] = r.pop('_id')
     return l
+
 
 def convert_text(data):
     # change text to shortform :=: iri

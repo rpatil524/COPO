@@ -35,6 +35,7 @@ DJANGO_APPS = [
 
 # user-defined applications definition
 PROJECT_APPS = [
+    'channels',
     'web.apps.web_copo',
     'web.apps.web_copo.rest',
     'allauth',
@@ -129,7 +130,6 @@ TEMPLATES = [
                 "web.apps.web_copo.context_processors.get_status",
                 "web.apps.web_copo.context_processors.add_partial_submissions_to_context",
 
-
                 'django.contrib.auth.context_processors.auth',
             ],
             'debug': True,
@@ -138,6 +138,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'web.wsgi.application'
+ASGI_APPLICATION = 'web.routing.application'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
