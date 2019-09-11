@@ -12,12 +12,12 @@ app.autodiscover_tasks()
 
 # define periodic tasks here
 
-app.conf.beat_schedule = {
-    'update_ena_status': {
-        'task': 'web.apps.web_copo.tasks.update_ena_status',
-        'schedule': crontab()  # execute every 5 minutes minute="*/5"
-    }
-}
+# app.conf.beat_schedule = {
+#     'update_ena_status': {
+#         'task': 'web.apps.web_copo.tasks.update_ena_status',
+#         'schedule': crontab()  # execute every 5 minutes minute="*/5"
+#     }
+# }
 
 
 @app.task(bind=True)

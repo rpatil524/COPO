@@ -96,9 +96,6 @@ def receive_data_file(request):
         files['files']['deleteUrl'] = ''
         files['files']['deleteType'] = 'DELETE'
 
-        # status = register_to_irods()
-        # print(status)
-
         str = jsonpickle.encode(files)
     return HttpResponse(str, content_type='json')
 
