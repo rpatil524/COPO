@@ -84,5 +84,6 @@ def delete_annotation(request):
     return HttpResponse("Hello World")
 
 def new_text_annotation(request):
-    print(request)
+    annotation = json.loads(request.body.decode('utf-8'))
+    print(annotation)
     return HttpResponse("Hello World")

@@ -6,9 +6,37 @@
 {% block stylesheet_block %}
     <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
 
-    <link rel="stylesheet" type="text/css" href="{% static "copo/annotator-2.0.0-alpha.3/css/annotator.css" %} "/>
+    <link rel="stylesheet" type="text/css" href="{% static "copo/annotator.min.css" %} "/>
     <link rel="stylesheet" href="{% static 'copo/css/copo/copo_ontology_styles.css' %}"
           xmlns="http://www.w3.org/1999/html">
+    <style>
+        body {
+            background-color: #f4f4f4;
+        }
+
+        #text-area {
+            max-height: 250px;
+            border: 1px solid #dcdcdc;
+            overflow-y: scroll;
+            background-color: white;
+            padding: 20px
+        }
+
+        .annotator-listing {
+            height: 300px;
+            overflow-y: scroll
+        }
+
+        .list_el {
+            padding: 10px
+        }
+
+        #search_results {
+
+            background-color: white;
+            border: 1px solid #dcdcdc;
+        }
+    </style>
 
 {% endblock %}
 
@@ -49,17 +77,20 @@
 
     <input type="hidden" id="file_id" value="{{ file_id }}"/>
     <input type="hidden" id="file_name" value="{{ file_name }}"/>
+    <input type="hidden" id="annotation_type" value="text"/>
 
-
-            {{ html | safe}}
+    <div id="text-area">
+        {#        {{ html | safe }}#}
+        {% lorem 4 p random %}
+    </div>
 
 
     <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-6">
-            <h4 class="h4">Search results</h4>
-            <div id="search_results">
-
-            </div>
+            <h4 class="h4" style="margin-top:1em">Search results</h4>
+{#            <div id="search_results">#}
+{##}
+{#            </div>#}
         </div>
         <div class="col-lg-6 col-md-6 col-sm-6">
 
@@ -71,23 +102,37 @@
 
 
 {% block js_block %}
+
     <script type="text/javascript" src="{% static "copo/annotator-2.0.0-alpha.3/pkg/annotator.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/annotator-full.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/js/annotator_ols.js" %}"></script>
     <script type="text/javascript" src="{% static "copo/js/copo_annotate_spreadsheet.js" %}"></script>
 
 
     <script>
 
         $(document).ready(function () {
-            v = new Object()
-            v
+
             var app = new annotator.App();
-            app.include(annotator.ui.main);
+            app.include(annotator.ui.main, {
+                element: document.getElementById("text-area"),
+                editorExtensions: [ols_annotator.getEditorExtension({defaultFields: false})],
+
+                viewerExtensions: [],
+
+            });
             app.include(annotator.storage.debug);
             app.include(annotator.storage.http, {
+                headers:{'X-CSRFToken': $.cookie('csrftoken')},
                 prefix: '/copo'
             });
+
+
+
             //app.include(HelloWorld)
             app.start();
+            app.annotations
+
         })
 
 

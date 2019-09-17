@@ -17,7 +17,7 @@ $(document).ready(function () {
     $("#search_term_text_box").val("")
 
     $(document).on("click", "#filters a", do_my_annotations)
-
+    $(document).on("click", ".expand_annotation", expand_annotation)
 })
 
 $(document).ajaxStart(function () {
@@ -105,7 +105,7 @@ function delay(fn, ms) {
 
 var lastValue = '';
 // this is the handler which is called 1 second after the user stops typing in the search box
-$(document).on("input propertychange", "#search_term_text_box", delay(function (e) {
+$(document).on("input propertychange", "#search_term_text_box, [id^=annotator-field]", delay(function (e) {
     $(".search-term-div").addClass("loading")
     var val = $(e.currentTarget).val()
     var url = $(document).data("autocomplete")
@@ -118,20 +118,26 @@ $(document).on("input propertychange", "#search_term_text_box", delay(function (
     }).done(function (data) {
         var d = JSON.parse(data)
         $("#search_results").empty()
+        //$(".ols-listings").remove()
+        //var div = $("<span>", {class: "ols-listings"})
+        //$(".annotator-listing").append(div)
+
         if (!d.response.numFound > 0) {
             p = build_result_panel(undefined)
             $("#search_results").append(p)
             return false
+        } else {
+            $(".annotator-controls").hide()
+            d.response.docs.forEach(function (entry, idx) {
+                if (idx == 0) {
+                }
+                var p = build_result_panel(d, idx, entry)
+                $("#search_results").append(p)
+            })
+            $(".search-term-div").removeClass("loading")
         }
-        d.response.docs.forEach(function (entry, idx) {
-            if (idx == 0) {
-            }
-            var p = build_result_panel(d, idx, entry)
-            $("#search_results").append(p)
-        })
-        $(".search-term-div").removeClass("loading")
 
-    }).error(function(data){
+    }).error(function (data) {
         console.log("error")
         $(".search-term-div").removeClass("loading")
         $("#search_results").empty()
@@ -139,13 +145,37 @@ $(document).on("input propertychange", "#search_term_text_box", delay(function (
             class: "annotation_term panel panel-default",
             html: "<h4>Possible Network Error <small>Check Connection</small></h4>"
         })
-        $("#search_results").append(result)
+        if ($('#annotation_type').val() == "ss") {
+            $("#search_results").append(result)
+        } else {
+            $("#search_results").append(result)
+        }
     })
 
 
 }))
 
+function expand_annotation(el) {
+    e = $(el.currentTarget).closest("li")
+    var iri = $(e).data("iri")
+    var label = $(e).data("label")
+    var id = $(e).data("id")
+    var obo_id = $(e).data("obo_id")
+    var ontology_name = $(e).data("onotology_name")
+    var ontology_prefix = $(e).data("ontology_prefix")
+    var short_form = $(e).data("short_form")
+    var type = $(e).data("type")
+
+    // var res = $("<li>", {
+    //     class: "annotator-item",
+    //     html: label + " " + ontology_prefix
+    // })
+    $("#search_results").empty().html(label + " " + ontology_prefix)
+    $(".annotator-controls").show()
+}
+
 function build_result_panel(d, idx, entry) {
+    var annotation_type = $('#annotation_type').val()
     if (d == undefined) {
         var result = $("<div/>", {
             class: "annotation_term panel panel-default",
@@ -169,24 +199,39 @@ function build_result_panel(d, idx, entry) {
         v = entry.label
         desc = entry.description
     }
-    var result = $("<div/>", {
-        class: "annotation_term panel panel-default align-middle",
-        "data-iri": entry.iri,
-        "data-label": entry.label,
-        "data-id": entry.id,
-        "data-obo_id": entry.obo_id,
-        "data-ontology_name": entry.ontology_name,
-        "data-ontology_prefix": entry.ontology_prefix,
-        "data-short_form": entry.short_form,
-        "data-type": entry.type,
-        "data-is_search_result": true
-    }).draggable({
-        helper: "clone",
-        containment: 'window',
-        opacity: 0.6,
-        start: startDrag,
-        stop: stopDrag
-    })
+    if (annotation_type == "ss") {
+        var result = $("<div/>", {
+            class: "annotation_term panel panel-default align-middle",
+            "data-iri": entry.iri,
+            "data-label": entry.label,
+            "data-id": entry.id,
+            "data-obo_id": entry.obo_id,
+            "data-ontology_name": entry.ontology_name,
+            "data-ontology_prefix": entry.ontology_prefix,
+            "data-short_form": entry.short_form,
+            "data-type": entry.type,
+            "data-is_search_result": true
+        }).draggable({
+            helper: "clone",
+            containment: 'window',
+            opacity: 0.6,
+            start: startDrag,
+            stop: stopDrag
+        })
+    } else {
+        var result = $("<li/>", {
+            "class": "list_el",
+            "data-iri": entry.iri,
+            "data-label": entry.label,
+            "data-id": entry.id,
+            "data-obo_id": entry.obo_id,
+            "data-ontology_name": entry.ontology_name,
+            "data-ontology_prefix": entry.ontology_prefix,
+            "data-short_form": entry.short_form,
+            "data-type": entry.type,
+            "data-is_search_result": true
+        })
+    }
     $(result).append($("<span/>", {
         html: v,
         class: "highlight"
@@ -195,6 +240,15 @@ function build_result_panel(d, idx, entry) {
         html: " - <strong>" + entry["ontology_prefix"] + "</strong>",
         class: ""
     }))
+    if (annotation_type == "text") {
+        $(result).append($("<a/>", {
+            "html": "Add",
+            "class": "btn btn-info btn-sm pull-right expand_annotation",
+
+        }))
+    }
+    //$(result).find("a").on("click", app.trigger("annotationCreated"));
+
     if (used) {
         $(result.append($("<span/>", {
             html: "used: " + entry["count"],
@@ -271,11 +325,10 @@ function refresh_display() {
 
 function do_cell_mouse_over(evt, coords, td) {
     var last = $(document).data("mouse_over_cell")
-    if(last == undefined){
+    if (last == undefined) {
         var pan = $('<span class="panel panel-default annotation_for_cell">' + $(evt.target).data("label") + '</span>')
         $("#annotations_for_cell").append(pan).fadeIn()
-    }
-    else if (coords.col != last.col) {
+    } else if (coords.col != last.col) {
         // change contents
         //$("#annotations_for_cell").fadeOut()
         $("#annotations_for_cell").empty()
@@ -289,7 +342,7 @@ function do_cell_mouse_over(evt, coords, td) {
     $(document).data("mouse_over_cell", coords)
 }
 
-function do_cell_mouse_out(evt, coords, td){
+function do_cell_mouse_out(evt, coords, td) {
     var last = $(document).data("mouse_over_cell")
     if (coords[0] != last[0]) {
         $("#annotations_for_cell").fadeOut()

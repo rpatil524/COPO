@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from jsonpickle import encode
 from django.utils.safestring import mark_safe
-
+import uuid, os
 from submission.submissionDelegator import delegate_submission
 from api.handlers.general import *
 from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, CopoGroup, Repository, AnnotationReference
@@ -27,6 +27,7 @@ from web.apps.web_copo.decorators import user_is_staff
 import web.apps.web_copo.templatetags.html_tags as htags
 from dal.copo_da import DataFile
 from pexpect import run
+import shutil
 
 LOGGER = settings.LOGGER
 
@@ -54,12 +55,16 @@ def login(request):
 
 def test(request):
     records = Annotation().get_all_records("5d6d2df56f3ca55f1ef968dd")
-    run("pdftotext -layout -raw /home/fshaw/pdf/2.pdf   /home/fshaw/Desktop/temp.txt")
+    #run("pdftotext -raw /home/fshaw/pdf/1.pdf   /home/fshaw/Desktop/temp.txt")
     #run("pdftohtml -i -s /home/fshaw/pdf/2.pdf   /home/fshaw/Desktop/temp.html")
-
-    with open("/home/fshaw/Desktop/temp.txt", 'r') as f:
-        html = f.read()
-        html = html.replace("\n", "<br/>")
+    # folder_name = str(uuid.uuid1())
+    # full_path = os.path.join('/home/fshaw/Desktop/htmls', folder_name)
+    # os.makedirs(full_path)
+    # run("ebook-convert /home/fshaw/pdf/1.pdf " + full_path + " --no-images --pretty-print --insert-blank-line")
+    # with open(os.path.join(full_path, "index.html"), 'r') as f:
+    #     html = f.read()
+    # shutil.rmtree(full_path)
+    html = ""
     return render(request, 'copo/test_page.html',
                   {"records": records, "file_id": "5d6d2df56f3ca55f1ef968dd", "file_name": "2.pdf", "html": html})
 

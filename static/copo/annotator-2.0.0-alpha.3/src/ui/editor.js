@@ -249,15 +249,15 @@ var Editor = exports.Editor = Widget.extend({
 
         var self = this;
         // custom field
-        this.addField({
-            type: "input",
-            label: "Search OLS",
-            load: function (field, annotation) {
-                console.log(field)
-                $(field).find("input").attr('id', 'search_term_text_box')
-                //$(field).find('input').val(annotation.text || '');
-            },
-        })
+        // this.addField({
+        //     type: "input",
+        //     label: "Comments...",
+        //     load: function (field, annotation) {
+        //         console.log(field)
+        //         //$(field).find("input").attr('id', 'search_term_text_box')
+        //         //$(field).find('input').val(annotation.text || '');
+        //     },
+        // })
 
         this.element
             .on("submit." + NS, 'form', function (e) {
@@ -341,6 +341,7 @@ var Editor = exports.Editor = Widget.extend({
     //
     // Returns nothing.
     submit: function () {
+        console.log(this)
         for (var i = 0, len = this.fields.length; i < len; i++) {
             var field = this.fields[i];
             field.submit(field.element, this.annotation);
@@ -442,6 +443,8 @@ var Editor = exports.Editor = Widget.extend({
             input = $('<input />');
         } else if (field.type === 'select') {
             input = $('<select />');
+        } else if(field.type === 'div'){
+            input = $('<div />')
         }
 
         element.append(input);
