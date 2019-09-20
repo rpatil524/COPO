@@ -28,8 +28,8 @@ var ols_annotator = {
                 type: "div",
                 id: "search_results",
                 submit: function(field, annotation) {
-                    annotation.ols_string = $(field).html()
-
+                    annotation.data = $("#search_results").data("annotation")
+                    annotation.file_id = $("#file_id").val()
                 }
             })
 

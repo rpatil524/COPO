@@ -55,16 +55,14 @@ def login(request):
 
 def test(request):
     records = Annotation().get_all_records("5d6d2df56f3ca55f1ef968dd")
-    #run("pdftotext -raw /home/fshaw/pdf/1.pdf   /home/fshaw/Desktop/temp.txt")
-    #run("pdftohtml -i -s /home/fshaw/pdf/2.pdf   /home/fshaw/Desktop/temp.html")
-    # folder_name = str(uuid.uuid1())
-    # full_path = os.path.join('/home/fshaw/Desktop/htmls', folder_name)
-    # os.makedirs(full_path)
-    # run("ebook-convert /home/fshaw/pdf/1.pdf " + full_path + " --no-images --pretty-print --insert-blank-line")
-    # with open(os.path.join(full_path, "index.html"), 'r') as f:
-    #     html = f.read()
-    # shutil.rmtree(full_path)
-    html = ""
+    folder_name = str(uuid.uuid1())
+    full_path = os.path.join('/home/fshaw/Desktop/htmls', folder_name)
+    os.makedirs(full_path)
+    run("ebook-convert /home/fshaw/pdf/1.pdf " + full_path + " --no-images --pretty-print --insert-blank-line")
+    with open(os.path.join(full_path, "index.html"), 'r') as f:
+        html = f.read()
+    shutil.rmtree(full_path)
+
     return render(request, 'copo/test_page.html',
                   {"records": records, "file_id": "5d6d2df56f3ca55f1ef968dd", "file_name": "2.pdf", "html": html})
 

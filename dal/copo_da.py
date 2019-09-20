@@ -7,7 +7,7 @@ from bson import ObjectId, json_util
 from chunked_upload.models import ChunkedUpload
 from web.apps.web_copo.lookup.lookup import DB_TEMPLATES
 import web.apps.web_copo.utils.EnaUtils as u
-from dal import cursor_to_list
+from dal import cursor_to_list, cursor_to_list_str
 from dal.copo_base_da import DataSchemas
 from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.schemas.utils import data_utils
@@ -35,6 +35,7 @@ AnnotationReference = 'AnnotationCollection'
 GroupCollection = 'GroupCollection'
 RepositoryCollection = 'RepositoryCollection'
 CGCoreCollection = 'CGCoreCollection'
+TextAnnotationCollection = 'TextAnnotationCollection'
 
 handle_dict = dict(publication=get_collection_ref(PubCollection),
                    person=get_collection_ref(PersonCollection),
@@ -46,7 +47,8 @@ handle_dict = dict(publication=get_collection_ref(PubCollection),
                    annotation=get_collection_ref(AnnotationReference),
                    group=get_collection_ref(GroupCollection),
                    repository=get_collection_ref(RepositoryCollection),
-                   cgcore=get_collection_ref(CGCoreCollection)
+                   cgcore=get_collection_ref(CGCoreCollection),
+                   textannotation=get_collection_ref(TextAnnotationCollection)
                    )
 
 
@@ -241,6 +243,20 @@ class DAComponent:
 class Publication(DAComponent):
     def __init__(self, profile_id=None):
         super(Publication, self).__init__(profile_id, "publication")
+
+
+class TextAnnotation(DAComponent):
+    def __init__(self, profile_id=None):
+        super(TextAnnotation, self).__init__(profile_id, "textannotation")
+
+    def add_term(self, data):
+        id = self.get_collection_handle().insert(data)
+        return id
+
+    def get_all_for_file_id(self, file_id):
+        records = self.get_collection_handle().find({"file_id": file_id})
+        return cursor_to_list_str(records, use_underscore_in_id=False)
+
 
 
 class Annotation(DAComponent):

@@ -157,20 +157,19 @@ $(document).on("input propertychange", "#search_term_text_box, [id^=annotator-fi
 
 function expand_annotation(el) {
     e = $(el.currentTarget).closest("li")
-    var iri = $(e).data("iri")
-    var label = $(e).data("label")
-    var id = $(e).data("id")
-    var obo_id = $(e).data("obo_id")
-    var ontology_name = $(e).data("onotology_name")
-    var ontology_prefix = $(e).data("ontology_prefix")
-    var short_form = $(e).data("short_form")
-    var type = $(e).data("type")
+    var data = new Object()
+    data.iri = $(e).data("iri")
+    data.label = $(e).data("label")
+    data.id = $(e).data("id")
+    data.obo_id = $(e).data("obo_id")
+    data.ontology_name = $(e).data("onotology_name")
+    data.ontology_prefix = $(e).data("ontology_prefix")
+    data.short_form = $(e).data("short_form")
+    data.type = $(e).data("type")
 
-    // var res = $("<li>", {
-    //     class: "annotator-item",
-    //     html: label + " " + ontology_prefix
-    // })
-    $("#search_results").empty().html(label + " " + ontology_prefix)
+    $("#search_results").empty().html(data.label + " " + data.ontology_prefix)
+    $("#search_results").removeData()
+    $("#search_results").data("annotation", data)
     $(".annotator-controls").show()
 }
 

@@ -36,6 +36,10 @@
             background-color: white;
             border: 1px solid #dcdcdc;
         }
+
+        .annotator-filter {
+            margin-top: 50px
+        }
     </style>
 
 {% endblock %}
@@ -80,7 +84,7 @@
     <input type="hidden" id="annotation_type" value="text"/>
 
     <div id="text-area">
-        {#        {{ html | safe }}#}
+        {{ html | safe }}
         {% lorem 4 p random %}
     </div>
 
@@ -88,9 +92,9 @@
     <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-6">
             <h4 class="h4" style="margin-top:1em">Search results</h4>
-{#            <div id="search_results">#}
-{##}
-{#            </div>#}
+            {#            <div id="search_results">#}
+            {##}
+            {#            </div>#}
         </div>
         <div class="col-lg-6 col-md-6 col-sm-6">
 
@@ -104,6 +108,9 @@
 {% block js_block %}
 
     <script type="text/javascript" src="{% static "copo/annotator-2.0.0-alpha.3/pkg/annotator.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/annotator-2.0.0-alpha.3/pkg/annotator.document.js" %}"></script>
+    <script type="text/javascript"
+            src="{% static "copo/annotator-2.0.0-alpha.3/pkg/annotator.unsupported.js" %}"></script>
     <script type="text/javascript" src="{% static "copo/annotator-full.min.js" %}"></script>
     <script type="text/javascript" src="{% static "copo/js/annotator_ols.js" %}"></script>
     <script type="text/javascript" src="{% static "copo/js/copo_annotate_spreadsheet.js" %}"></script>
@@ -112,26 +119,37 @@
     <script>
 
         $(document).ready(function () {
-
             var app = new annotator.App();
             app.include(annotator.ui.main, {
                 element: document.getElementById("text-area"),
                 editorExtensions: [ols_annotator.getEditorExtension({defaultFields: false})],
+                viewerExtensions: [
+                    annotator.ui.tags.viewerExtension,
 
-                viewerExtensions: [],
-
+                ]
             });
-            app.include(annotator.storage.debug);
+
+
             app.include(annotator.storage.http, {
-                headers:{'X-CSRFToken': $.cookie('csrftoken')},
+                headers: {'X-CSRFToken': $.cookie('csrftoken')},
                 prefix: '/copo'
             });
 
+            var additional = function () {
+                return {
+                    beforeAnnotationCreated: function (ann) {
+                    },
+                    start: function (ann) {
+                    }
+                };
+            };
+            app.include(additional)
+            app.start().then(function () {
+                var file_id = $("#file_id").val()
+                app.annotations.load({"file_id": file_id});
+                app.modules
+            });
 
-
-            //app.include(HelloWorld)
-            app.start();
-            app.annotations
 
         })
 

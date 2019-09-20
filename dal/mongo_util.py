@@ -31,6 +31,19 @@ def cursor_to_list(cursor):
     return records
 
 
+def cursor_to_list_str(cursor, use_underscore_in_id=True):
+    # method to return pymongo cursor into standard python list
+    # with ids as strings rather than ObjectIds
+    records = cursor_to_list(cursor)
+    for r in records:
+        if use_underscore_in_id:
+            r["_id"] = str(r["_id"])
+        else:
+            r["id"] = str(r["_id"])
+            r.pop("_id")
+    return records
+
+
 def verify_doc_type(doc):
     data = []
     if isinstance(doc, dict):

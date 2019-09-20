@@ -101,7 +101,9 @@ urlpatterns = [path('', views.index, name='index'),
                     name="delete_annotation"),
                path('refresh_annotations_for_user/', annotation_handlers.refresh_annotations_for_user,
                     name="refresh_annotations_for_user"),
-                path('annotations', annotation_handlers.new_text_annotation,
+               path('annotations', annotation_handlers.new_text_annotation,
+                    name="new_text_annotation"),
+               path('search', annotation_handlers.search_text_annotation,
                     name="new_text_annotation"),
 
                ]

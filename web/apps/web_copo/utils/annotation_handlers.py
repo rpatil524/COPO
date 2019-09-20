@@ -3,6 +3,7 @@ import pandas
 from django.http import HttpResponse
 import json
 from bson import json_util
+from dal.copo_da import TextAnnotation
 
 # how many rows of each sheet should be shown to the user
 truncate_after = 5
@@ -83,7 +84,23 @@ def delete_annotation(request):
     doc = DataFile().delete_annotation(col_idx=col_idx, sheet_name=sheet_name, file_id=file_id)
     return HttpResponse("Hello World")
 
+
 def new_text_annotation(request):
-    annotation = json.loads(request.body.decode('utf-8'))
+    print(request)
+    input = json.loads(request.body.decode("utf-8"))
+    id = TextAnnotation().add_term(input)
+    annotation = json.dumps({
+        "id": str(id),
+        "uri": request.build_absolute_uri('?'),
+        "user": request.user.id,
+        "ranges": input["ranges"]
+    })
     print(annotation)
-    return HttpResponse("Hello World")
+    return HttpResponse(annotation, content_type="application/json")
+
+def search_text_annotation(request):
+    if "file_id" in request.GET:
+        file_id = request.GET["file_id"]
+    annotations = TextAnnotation().get_all_for_file_id(file_id)
+    out = {"rows": annotations}
+    return HttpResponse(json.dumps(out), content_type="application/json")

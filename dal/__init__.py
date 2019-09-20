@@ -9,7 +9,7 @@ from .mongo_util import get_collection_ref
 from .mongo_util import verify_doc_type
 from .orcid_da import Orcid
 from .ena_da import EnaCollection
-from .mongo_util import cursor_to_list
+from .mongo_util import cursor_to_list, cursor_to_list_str
 
 
 #__all__ = [Resource, Collection_Head, get_collection_ref, ObjectId, Orcid, EnaCollection,
