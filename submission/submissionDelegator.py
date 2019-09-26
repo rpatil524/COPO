@@ -14,10 +14,8 @@ def delegate_submission(request):
     if not sub_id:
         sub_id = request.GET.get('sub_id')
 
-    # tonietuk's intercept starts
     if not sub_id:
         return HttpResponse({'status': 0})
-    # tonietuk's intercept ends
 
     sub = Submission().get_record(sub_id)
 
@@ -44,12 +42,7 @@ def delegate_submission(request):
 
     # Submit to ENA Sequence reads
     elif repo == 'ena':
-        sub_task = request.POST.get("sub_task", str())
-
-        if sub_task == "release_study":
-            result = enareadSubmission.EnaReads(submission_id=sub_id).release_study()
-        else:
-            result = enareadSubmission.EnaReads(submission_id=sub_id).submit()
+        result = schedule_submission(submission_id=sub_id)
 
         if result.get("status", True) is True:
             return HttpResponse(jsonpickle.dumps({'status': 0}))
@@ -109,3 +102,38 @@ def delegate_submission(request):
 
     # return error
     return HttpResponse(error["message"], status=error["status"])
+
+
+def schedule_submission(submission_id=str()):
+    """
+    function adds submission to a queue for processing
+    :return:
+    """
+
+    from submission.helpers import generic_helper as ghlper
+    import web.apps.web_copo.schemas.utils.data_utils as d_utils
+
+    context = dict(status=True, message='')
+
+    if not submission_id:
+        context = dict(status=False, message='Submission identifier not found!')
+        return context
+
+    collection_handle = ghlper.get_submission_queue_handle()
+    doc = collection_handle.find_one({"submission_id": submission_id})
+
+    if not doc:  # submission not already in queue, add to queue
+        fields = dict(
+            submission_id=submission_id,
+            date_modified=d_utils.get_datetime()
+        )
+
+        collection_handle.insert(fields)
+        context['message'] = 'Submission has been added to the processing queue. Status updates to follow.'
+    else:
+        context['message'] = 'Submission is already in the processing queue. Status updates to follow.'
+
+    ghlper.update_submission_status(status='info', message=context['message'], submission_id=submission_id)
+    ghlper.logging_info(context['message'], submission_id)
+
+    return context

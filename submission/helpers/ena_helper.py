@@ -6,13 +6,10 @@ import pandas as pd
 from bson import ObjectId
 from datetime import datetime
 from dal import cursor_to_list
-from django.conf import settings
 from collections import defaultdict
+from submission.helpers import generic_helper as ghlper
 import web.apps.web_copo.schemas.utils.data_utils as data_utils
-from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
 from dal.copo_da import Submission, Person, Description, DataFile, Sample, DAComponent
-
-lg = settings.LOGGER
 
 
 class SubmissionHelper:
@@ -21,13 +18,13 @@ class SubmissionHelper:
         self.profile_id = str()
         self.__converter_errors = list()
 
-        try:
-            self.submission_record = Submission().get_record(self.submission_id)
-        except:
-            self.submission_record = dict()
+        collection_handle = ghlper.get_submission_handle()
+        doc = collection_handle.find_one({"_id": ObjectId(self.submission_id)},
+                                         {"profile_id": 1, "description_token": 1})
 
-        self.profile_id = self.submission_record.get("profile_id", str())
-        self.description_token = self.submission_record.get("description_token", str())
+        if doc:
+            self.profile_id = doc.get("profile_id", str())
+            self.description_token = doc.get("description_token", str())
 
         try:
             self.description = Description().GET(self.description_token)
@@ -141,12 +138,17 @@ class SubmissionHelper:
         bundle = list(df.file_id)
         bundle_meta = df.to_dict('records')
 
-        submission_record = Submission().get_record(self.submission_id)
-        submission_record['bundle'] = bundle
-        submission_record['bundle_meta'] = bundle_meta
-        submission_record['target_id'] = str(submission_record.pop('_id'))
+        records = cursor_to_list(
+            Submission().get_collection_handle().find({"_id": ObjectId(self.submission_id)},
+                                                      {"_id": 1}))
 
-        Submission().save_record(dict(), **submission_record)
+        if records:
+            submission_record = records[0]
+            submission_record['bundle'] = bundle
+            submission_record['bundle_meta'] = bundle_meta
+            submission_record['target_id'] = str(submission_record.pop('_id'))
+
+            Submission().save_record(dict(), **submission_record)
 
         samples_id = list()
         df_attributes = []  # holds datafiles attributes
@@ -300,55 +302,6 @@ class SubmissionHelper:
 
         return resolved_attributes
 
-    def logging_error(self, message):
-        """
-        function provides a consistent way of logging error during submission
-        :param message:
-        :return:
-        """
-        try:
-            lg.log('[Submission: ' + self.submission_id + '] ' + message, level=Loglvl.ERROR, type=Logtype.FILE)
-        except Exception as e:
-            pass
-
-        return True
-
-    def logging_info(self, message):
-        """
-        function provides a consistent way of logging submission status/information
-        :param message:
-        :return:
-        """
-        lg.log('[Submission: ' + self.submission_id + '] ' + message, level=Loglvl.INFO, type=Logtype.FILE)
-
-        return True
-
-    @staticmethod
-    def log_general_info(message):
-        """
-        logs info not tied to a specific submission record
-        :param message:
-        :return:
-        """
-
-        lg.log('[Submission:] ' + message, level=Loglvl.INFO, type=Logtype.FILE)
-
-        return True
-
-    @staticmethod
-    def log_general_error(message):
-        """
-        logs error not tied to a specific submission record
-        :param message:
-        :return:
-        """
-        try:
-            lg.log('[Submission: ] ' + message, level=Loglvl.ERROR, type=Logtype.FILE)
-        except Exception as e:
-            pass
-
-        return True
-
     def get_study_accessions(self):
         """
         function returns study accessions
@@ -397,59 +350,3 @@ class SubmissionHelper:
         accessions = records[0].get('accessions', dict()).get('run', list())
 
         return accessions
-
-    def update_submission_status(self, status, message):
-        """
-        function updates status of submission
-        :param status:
-        :param message:
-        :return:
-        """
-
-        if message:
-            submission_record = Submission().get_record(self.submission_id)
-            transcript = submission_record.get("transcript", dict())
-            status = dict(type=status, message=message)
-            transcript['status'] = status
-
-            submission_record['transcript'] = transcript
-            submission_record['target_id'] = str(submission_record.pop('_id'))
-
-            Submission().save_record(dict(), **submission_record)
-
-        return True
-
-    def add_submission_error(self, message):
-        """
-        function records submission error
-        :param message:
-        :return:
-        """
-
-        return self.update_submission_status('error', message)
-
-    def add_submission_info(self, message):
-        """
-        function records submission info
-        :param message:
-        :return:
-        """
-
-        return self.update_submission_status('info', message)
-
-    def clear_submission_status(self):
-        """
-        function clears submission error from the db
-        :return:
-        """
-
-        submission_record = Submission().get_record(self.submission_id)
-        transcript = submission_record.get("transcript", dict())
-        transcript.pop('status', '')
-
-        submission_record['transcript'] = transcript
-        submission_record['target_id'] = str(submission_record.pop('_id'))
-
-        Submission().save_record(dict(), **submission_record)
-
-        return True

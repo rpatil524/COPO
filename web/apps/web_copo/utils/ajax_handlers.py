@@ -183,8 +183,8 @@ def get_upload_information(request):
             status = sub.get("transcript", dict()).get('status', dict())
             if status:
                 # status types are either 'info' or 'error'
-                status = dict(type=status.get('type', str()), message=status.get('message', str()))
-                sub_info_dict["submission_report"] = status
+                sub_info_dict["submission_report"] = dict(type=status.get('type', str()),
+                                                          message=status.get('message', str()))
 
             # report on submitted datafiles - ENA for now...
             if repo == "ena":

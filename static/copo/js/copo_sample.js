@@ -74,6 +74,14 @@ $(document).ready(function () {
         initiate_description(parameters);
     });
 
+    $(document).on('click', '.wiz-btn-next', function (event) {
+        wizardElement.wizard('next');
+    });
+
+    $(document).on('click', '.wiz-btn-prev', function (event) {
+        wizardElement.wizard('previous');
+    });
+
     //custom stage renderers
     var dispatchStageRenderer = {
         perform_sample_generation: function (stage) {

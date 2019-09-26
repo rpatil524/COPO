@@ -1376,7 +1376,7 @@ $(document).ready(function () {
                         '  <p>No issues found!</p>\n' +
                         '</div>');
                 } else {
-                    viewPort.html('<div class="submission-issues text-danger">\n' +
+                    viewPort.html('<div class="submission-issues">\n' +
                         '  <p>The following issues were found.</p>\n' +
                         '</div>');
 
@@ -1384,9 +1384,7 @@ $(document).ready(function () {
                         class: "ui list",
                     });
 
-                    for (var i = 0; i < issues.length; ++i) {
-                        issuesList.append('<li class="text-danger">' + issues[i] + '</li>');
-                    }
+                    issuesList.append('<li class="text-danger">' + issues + '</li>');
 
                     viewPort.find(".submission-issues").append(issuesList);
                 }

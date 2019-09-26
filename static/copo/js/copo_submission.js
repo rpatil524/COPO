@@ -1,8 +1,8 @@
 var submissionIDS = [];
-var intervalIsSet = false; //flag to start polling for information
 $(document).ready(function () {
 
     // test starts
+
     // test ends
     //******************************Event Handlers Block*************************//
     var component = "submission";
@@ -18,9 +18,6 @@ $(document).ready(function () {
     var tableLoader = $('<div class="copo-i-loader"></div>');
     $("#component_table_loader").append(tableLoader);
 
-    //ajax handles
-    var submit_to_repo_handle = null;
-
     sanitise_submissions(); //enables update of new meta fields before loading submission
     load_submissions();
 
@@ -28,6 +25,30 @@ $(document).ready(function () {
     $('body').on('addbuttonevents', function (event) {
         do_record_task(event);
     });
+
+    //create a web socket to manage submission progress reports
+    var profileId = $('#profile_id').val();
+
+    var submissionSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/submission_status/' + profileId + '/');
+
+    submissionSocket.onmessage = function (e) {
+        var data = JSON.parse(e.data);
+
+        if (data.hasOwnProperty('submission_id')) {
+            get_submission_information([data.submission_id]);
+        }
+    };
+
+    // submissionSocket.send(JSON.stringify({
+    //         'message': message
+    //     }));
+
+    submissionSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
 
     $(document).on('click', '#publish_dataset', function (event) {
         e = $(event.currentTarget)
@@ -113,7 +134,7 @@ $(document).ready(function () {
                         'sub_task': 'release_study'
                     };
 
-                    submit_to_repo_handle = $.ajax({
+                    $.ajax({
                         url: "/rest/submit_to_repo/",
                         type: "POST",
                         headers: {
@@ -121,7 +142,7 @@ $(document).ready(function () {
                         },
                         data: request_params,
                         success: function (data) {
-                            get_submission_information();
+                            get_submission_information(submissionIDS);
                             dialogRef.close();
                             try {
                                 data = JSON.parse(data);
@@ -146,7 +167,7 @@ $(document).ready(function () {
                                             }
                                         }]
                                     });
-                                } else if(data.hasOwnProperty("status") && data.status == 0) {
+                                } else if (data.hasOwnProperty("status") && data.status == 0) {
                                     var message = "Study release successful.";
 
                                     if (data.hasOwnProperty("message")) {
@@ -630,7 +651,7 @@ $(document).ready(function () {
                             });
 
                             refresh_tool_tips();
-                            get_submission_information();
+                            get_submission_information(submissionIDS);
                         }
 
                     ,
@@ -818,7 +839,7 @@ $(document).ready(function () {
 
                 //embargo info for ena submissions
                 if (submissionRecord.hasOwnProperty("release_status")) {
-                    var release_message = '<hr/><div style="margin-bottom: 10px;">' + submissionRecord.release_message+'</div>';
+                    var release_message = '<hr/><div style="margin-bottom: 10px;">' + submissionRecord.release_message + '</div>';
                     if (submissionRecord.release_status == "PRIVATE") {
                         release_message = release_message + '<div class="tiny ui blue button ena-study-release" tabindex="0" data-target="' + submissionRecord.submission_id + '">Release study</div>';
                     } else if (submissionRecord.release_status == "PUBLIC") {
@@ -923,19 +944,6 @@ $(document).ready(function () {
         }
 
         refresh_tool_tips();
-
-        //now trigger polling if not already started
-        if (!intervalIsSet) {
-            intervalIsSet = true;
-
-            //set polling into motion
-            setInterval(function () {
-                //get submissions information, only if there is an ongoing submission
-                if (submit_to_repo_handle !== null && submit_to_repo_handle.state() == 'pending') {
-                    get_submission_information();
-                }
-            }, 1000);
-        }
     }
 
     function sanitise_submissions() {
@@ -980,9 +988,9 @@ $(document).ready(function () {
         });
     }
 
-    function get_submission_information() {
+    function get_submission_information(submission_ids) {
         var request_params = {
-            'ids': JSON.stringify(submissionIDS)
+            'ids': JSON.stringify(submission_ids)
         };
 
         $.ajax({
@@ -1048,7 +1056,7 @@ $(document).ready(function () {
                                     'form_data': form_data
                                 };
 
-                                submit_to_repo_handle = $.ajax({
+                                $.ajax({
                                     url: "/rest/submit_to_repo/",
                                     type: "POST",
                                     headers: {
@@ -1056,7 +1064,7 @@ $(document).ready(function () {
                                     },
                                     data: request_params,
                                     success: function (data) {
-                                        get_submission_information();
+                                        get_submission_information(submissionIDS);
                                         try {
                                             data = JSON.parse(data);
                                             if (data.hasOwnProperty("status") && data.status == 1) {
@@ -1068,7 +1076,7 @@ $(document).ready(function () {
                                         }
                                     },
                                     error: function (data) {
-                                        get_submission_information();
+                                        get_submission_information(submissionIDS);
                                         BootstrapDialog.show({
                                             title: "Submission Error",
                                             message: data.statusText + " - Error " + data.responseText,

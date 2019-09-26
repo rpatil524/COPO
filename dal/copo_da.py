@@ -35,6 +35,7 @@ AnnotationReference = 'AnnotationCollection'
 GroupCollection = 'GroupCollection'
 RepositoryCollection = 'RepositoryCollection'
 CGCoreCollection = 'CGCoreCollection'
+SubmissionQueueCollection = 'SubmissionQueueCollection'
 
 handle_dict = dict(publication=get_collection_ref(PubCollection),
                    person=get_collection_ref(PersonCollection),
@@ -285,6 +286,7 @@ class Annotation(DAComponent):
         data = cursor_to_list(docs)
         return data
 
+
 class Person(DAComponent):
     def __init__(self, profile_id=None):
         super(Person, self).__init__(profile_id, "person")
@@ -472,7 +474,7 @@ class Submission(DAComponent):
         return doc
 
     def save_record(self, auto_fields=dict(), **kwargs):
-        if kwargs.get("bundle", list()):
+        if not kwargs.get("target_id", str()):
             repo = kwargs.pop("repository", str())
             for k, v in dict(
                     repository=repo,
