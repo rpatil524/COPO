@@ -1,7 +1,7 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 
 import os
-import copy
+import copy, json
 from datetime import datetime, date
 from bson import ObjectId, json_util
 from chunked_upload.models import ChunkedUpload
@@ -257,6 +257,14 @@ class TextAnnotation(DAComponent):
         records = self.get_collection_handle().find({"file_id": file_id})
         return cursor_to_list_str(records, use_underscore_in_id=False)
 
+    def remove_text_annotation(self, id):
+        done = self.get_collection_handle().delete_one({"_id": ObjectId(id)})
+        return done
+
+    def update_text_annotation(self, id, data):
+
+        done = self.get_collection_handle().update_one({"_id": ObjectId(id)}, {"$set": data})
+        return done
 
 
 class Annotation(DAComponent):
@@ -300,6 +308,7 @@ class Annotation(DAComponent):
             ])
         data = cursor_to_list(docs)
         return data
+
 
 class Person(DAComponent):
     def __init__(self, profile_id=None):

@@ -88,8 +88,10 @@ def delete_annotation(request):
 def new_text_annotation(request):
     print(request)
     input = json.loads(request.body.decode("utf-8"))
+    input["text"] = input["data"]["ontology_prefix"] + " - " + input["data"]["label"]
     id = TextAnnotation().add_term(input)
     annotation = json.dumps({
+        "text": input["text"],
         "id": str(id),
         "uri": request.build_absolute_uri('?'),
         "user": request.user.id,
@@ -97,6 +99,22 @@ def new_text_annotation(request):
     })
     print(annotation)
     return HttpResponse(annotation, content_type="application/json")
+
+def edit_or_delete_text_annotation(request, id):
+    if request.method == 'PUT':
+        data = json.loads(request.body.decode("utf-8"))
+        data["text"] = data["data"]["ontology_prefix"] + " - " + data["data"]["label"]
+        result = TextAnnotation().update_text_annotation(id, data)
+        if result:
+            return HttpResponse(json.dumps(data), status=200)
+        else:
+            return HttpResponse(status=500)
+    elif request.method == 'DELETE':
+        done = TextAnnotation().remove_text_annotation(id)
+        if done:
+            return HttpResponse(status=204)
+        else:
+            return HttpResponse(status=500)
 
 def search_text_annotation(request):
     if "file_id" in request.GET:

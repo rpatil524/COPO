@@ -84,8 +84,8 @@
     <input type="hidden" id="annotation_type" value="text"/>
 
     <div id="text-area">
-        {{ html | safe }}
-        {% lorem 4 p random %}
+                {{ html | safe }}
+{#        {% lorem 4 p random %}#}
     </div>
 
 
@@ -122,10 +122,12 @@
             var app = new annotator.App();
             app.include(annotator.ui.main, {
                 element: document.getElementById("text-area"),
-                editorExtensions: [ols_annotator.getEditorExtension({defaultFields: false})],
+                editorExtensions: [
+                    ols_annotator.getEditorExtension({defaultFields: false}),
+                    annotator.ui.tags.editorExtension
+                ],
                 viewerExtensions: [
                     annotator.ui.tags.viewerExtension,
-
                 ]
             });
 
@@ -143,13 +145,13 @@
                     }
                 };
             };
+            app.include(annotator.ui.filter.standalone)
             app.include(additional)
             app.start().then(function () {
                 var file_id = $("#file_id").val()
                 app.annotations.load({"file_id": file_id});
-                app.modules
-            });
 
+            });
 
         })
 
