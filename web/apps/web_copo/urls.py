@@ -40,7 +40,6 @@ urlpatterns = [
             ajax_handlers.search_ontology_ebi, name='ajax_search_ontology'),
     re_path(r'^ajax_search_copo_local/(?P<data_source>[a-zA-Z0-9,_]+)/$',
             ajax_handlers.search_copo_components, name='ajax_search_copo_local'),
-    path('ajax_search_ontology_test/', ajax_handlers.test_ontology, name='test_ontology'),
     path('copo_forms/', views.copo_forms, name="copo_forms"),
     path('copo_visualize/', views.copo_visualize, name="copo_visualize"),
     path('authenticate_figshare/', views.authenticate_figshare, name='authenticate_figshare'),
@@ -97,6 +96,8 @@ urlpatterns = [
          name="send_file_annotation"),
     path('refresh_annotations/', annotation_handlers.refresh_annotations,
          name="refresh_annotations"),
+    path('refresh_text_annotations/', annotation_handlers.refresh_text_annotations,
+         name="refresh_text_annotations"),
     path('delete_annotation/', annotation_handlers.delete_annotation,
          name="delete_annotation"),
     path('refresh_annotations_for_user/', annotation_handlers.refresh_annotations_for_user,
@@ -107,5 +108,5 @@ urlpatterns = [
     path('search', annotation_handlers.search_text_annotation,
          name="new_text_annotation"),
     path('annotations/<str:id>', annotation_handlers.edit_or_delete_text_annotation,
-            name="delete_text_annotation"),
+         name="delete_text_annotation"),
 ]

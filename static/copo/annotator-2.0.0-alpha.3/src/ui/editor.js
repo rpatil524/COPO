@@ -454,6 +454,12 @@ var Editor = exports.Editor = Widget.extend({
             placeholder: field.label
         });
 
+        if(field.type == "select"){
+            if(field.hasOwnProperty("options")){
+
+            }
+        }
+
         if (field.type === 'checkbox') {
             element.addClass('annotator-checkbox');
             element.append($('<label />', {

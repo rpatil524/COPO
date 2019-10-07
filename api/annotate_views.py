@@ -10,6 +10,7 @@ import datetime
 import uuid
 import pandas
 from pandas import read_excel, read_csv, to_datetime
+from xlrd import XLRDError
 from numpy import NaN
 import json
 from os import path
@@ -84,7 +85,11 @@ def handle_upload(request):
     skip_rows = request.POST['skip_rows']
     if file_type == "Spreadsheet":
         # load spreadsheet data and return to backend
-        s = read_excel(f, skiprows=int(skip_rows))
+        try:
+            s = read_excel(f, skiprows=int(skip_rows))
+        except XLRDError as e:
+            s = read_csv(f, skiprows=(int(skip_rows)))
+
         s = s.replace(NaN, "")
         for column in s.iteritems():
             # check data type

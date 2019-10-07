@@ -41,14 +41,6 @@ def get_source_count(self):
     return HttpResponse(encode({'num_sources': num_sources}))
 
 
-def search_ontology(request):
-    term = request.GET['query']
-    url = settings.ELASTIC_SEARCH_URL
-    q = json.dumps({"query": {"match_phrase_prefix": {"name": term}}})
-    data = requests.post(url, q)
-    return HttpResponse(data.text)
-
-
 def search_ontology_ebi(request, ontology_names):
     term = request.GET['q']
     if ontology_names == "999":
@@ -91,11 +83,6 @@ def search_copo_components(request, data_source):
     ).broker_component_search()
 
     return HttpResponse(jsonpickle.encode(data), content_type='application/json')
-
-
-def test_ontology(request):
-    x = {'a': 'x', 'b': 'y', 'c': 'z'}
-    return HttpResponse(encode(x))
 
 
 def get_upload_information(request):
@@ -222,15 +209,9 @@ def delete_token(request):
     return HttpResponse(json_util.dumps({'resp': resp.acknowledged}))
 
 
-def get_excel_data(request):
-    x = read_excel('/Users/fshaw/Dropbox/Shawtuk/dev/snps/test/test_data/ExampleSNPTable_small.xlsx', sheetname=0)
-    return HttpResponse(json.dumps(x.values.tolist()))
-
-
 def get_accession_data(request):
     sub_id = request.GET.get('sub_id')
     sub = Submission().get_file_accession(sub_id)
-
     return HttpResponse(json_util.dumps({'sub': sub}))
 
 
@@ -339,11 +320,8 @@ def get_users_in_group(request):
 def get_users(request):
     q = request.GET['q']
     x = list(User.objects.filter(
-        Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q)).values_list('id',
-                                                                                                             'first_name',
-                                                                                                             'last_name',
-                                                                                                             'email',
-                                                                                                             'username'))
+        Q(first_name__istartswith=q) | Q(last_name__istartswith=q) | Q(username__istartswith=q))
+             .values_list('id', 'first_name', 'last_name', 'email', 'username'))
     if not x:
         return HttpResponse()
     return HttpResponse(json.dumps(x))

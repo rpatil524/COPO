@@ -1,7 +1,12 @@
 $(document).ready(function () {
     // attach array to document which will be used to hold spreadsheet data
     $(document).data('ss_data', new Array())
-    refresh_display()
+    if ($("#file_type").val() == "ss") {
+        refresh_display()
+    }
+    if ($("#file_type").val() == "pdf") {
+        refresh_text_annotations()
+    }
     //refresh_annotations()
     $(document).on("shown.bs.tab", ".hot_tab", function () {
         $(document).data("nav_tab", $(this).find("a").attr("href"))
@@ -24,6 +29,21 @@ $(document).ajaxStart(function () {
 
 })
 
+function refresh_text_annotations() {
+    var file_id = $("#file_id").val()
+    $.ajax({
+        url: "/copo/refresh_text_annotations/",
+        data: {"file_id": file_id},
+        type: "GET"
+    }).done(function (data) {
+        data = JSON.parse(data)
+        $("#existing_annotations").empty()
+        for (var d in data.annotations) {
+            var result = make_annotation_panel(data.annotations, d)
+            $("#annotation-area").append(result)
+        }
+    })
+}
 
 function startDrag(ev) {
 
@@ -68,7 +88,9 @@ function dropHandler(ev, ui) {
         },
     }).done(function (d) {
         d = JSON.parse(d)
-        refresh_display()
+        if ($("#file_type").val() == "ss") {
+            refresh_display()
+        }
 
     }).error(function (d) {
         console.error("error: " + d)
@@ -446,26 +468,44 @@ function make_annotation_panel(data, d) {
     if (data[d].hasOwnProperty("file_level_annotation")) {
         obj = data[d].file_level_annotation
         do_delete = true
+        var result = $("<div/>", {
+            class: "panel panel-default annotation_term",
+            "data-iri": obj.iri,
+            "data-col_idx": obj.column_idx,
+            "data-is_search_result": false,
+        })
+        var content = $("<div></div>")
+        if (do_delete) {
+            $(content).append('<button type="button" ' +
+                'data-col_idx="' + obj.column_idx + '" ' +
+                'data-sheet_name="' + obj.sheet_name + '"' +
+                'class="btn pull-right btn-danger btn-sm delete_annotation" style="padding:5px" aria-label="Left Align"><span style="margin: 0" class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>')
+        }
+        $(content).append("<u style='" + "font-size: larger" + "'>" + obj.label + "</u><br/>")
+        $(content).append("<strong>" + obj.ontology_name + "</strong><br>")
+        $(content).append(obj.description)
+        $(result).append(content)
+    } else if (data[d].hasOwnProperty("quote")) {
+        console.log(data[d].data)
+        var obj = data[d].data
+        var result = $("<div/>", {
+            class: "panel panel-default annotation_term",
+            "data-iri": obj.iri,
+        })
+        var content = $("<div></div>")
+        if (do_delete) {
+            $(content).append('<button type="button" ' +
+                'class="btn pull-right btn-danger btn-sm delete_annotation" style="padding:5px" aria-label="Left Align"><span style="margin: 0" class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>')
+        }
+        $(content).append("<u style='" + "font-size: larger" + "'>" + obj.label + "</u><br/>")
+        $(content).append("<strong>" + obj.ontology_prefix + "</strong><br>")
+        $(content).append(obj.description)
+        $(result).append(content)
+
     } else {
         obj = data[d]
     }
-    var result = $("<div/>", {
-        class: "panel panel-default annotation_term",
-        "data-iri": obj.iri,
-        "data-col_idx": obj.column_idx,
-        "data-is_search_result": false,
-    })
-    var content = $("<div></div>")
-    if (do_delete) {
-        $(content).append('<button type="button" ' +
-            'data-col_idx="' + obj.column_idx + '" ' +
-            'data-sheet_name="' + obj.sheet_name + '"' +
-            'class="btn pull-right btn-danger btn-sm delete_annotation" style="padding:5px" aria-label="Left Align"><span style="margin: 0" class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>')
-    }
-    $(content).append("<u style='" + "font-size: larger" + "'>" + obj.label + "</u><br/>")
-    $(content).append("<strong>" + obj.ontology_name + "</strong><br>")
-    $(content).append(obj.description)
-    $(result).append(content)
+
     return result
 }
 
@@ -497,7 +537,9 @@ $(document).on("click", ".delete_annotation", function (ev) {
         type: "GET",
         data: {"col_idx": col_idx, "sheet_name": sheet_name, "file_id": file_id, "iri": label}
     }).done(function (data) {
-        refresh_display()
+        if ($("#file_type").val() == "ss") {
+            refresh_display()
+        }
     }).error(function (data) {
         console.error(data)
     })

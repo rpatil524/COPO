@@ -250,11 +250,12 @@ class TextAnnotation(DAComponent):
         super(TextAnnotation, self).__init__(profile_id, "textannotation")
 
     def add_term(self, data):
+        data["file_id"] = ObjectId(data["file_id"])
         id = self.get_collection_handle().insert(data)
         return id
 
     def get_all_for_file_id(self, file_id):
-        records = self.get_collection_handle().find({"file_id": file_id})
+        records = self.get_collection_handle().find({"file_id": ObjectId(file_id)})
         return cursor_to_list_str(records, use_underscore_in_id=False)
 
     def remove_text_annotation(self, id):
@@ -262,9 +263,14 @@ class TextAnnotation(DAComponent):
         return done
 
     def update_text_annotation(self, id, data):
-
+        data["file_id"] = ObjectId(data["file_id"])
         done = self.get_collection_handle().update_one({"_id": ObjectId(id)}, {"$set": data})
         return done
+
+    def get_file_level_metadata_for_pdf(self, file_id):
+        docs = self.get_collection_handle().find({"file_id": ObjectId(file_id)})
+        if docs:
+            return cursor_to_list_str(docs)
 
 
 class Annotation(DAComponent):

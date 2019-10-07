@@ -10,20 +10,43 @@ truncate_after = 5
 
 
 def refresh_display(request):
+
     file_id = request.GET["file_id"]
     file = DataFile().get_record(file_id)
     path = file["file_location"]
     data = list()
-    x1 = pandas.ExcelFile(path)
-    sheet_names = x1.sheet_names
-    for name in sheet_names:
-        d = pandas.read_excel(path, name).fillna(0)
-        out = list()
-        out.append(d.columns.tolist())
-        out.extend(d.values[0:5].tolist())
-        data.append(out)
+    if "ss_data" in request.session:
+        # if data previously loaded then just load from session
+        data = json_util.loads(request.session["ss_data"])
+        sheet_names = json_util.loads(request.session["ss_sheet_names"])
+    else:
+        try:
+            #x1 = pandas.read_excel(path)
+            sheet_names = pandas.ExcelFile(path).sheet_names
+        except Exception as e:
+            print(e)
+            # support CSV here (N.B. CSV does not support multiple sheets)
+
+        # read entire spreadsheet
+
+        #ss =
+        for name in sheet_names:
+            d = pandas.read_excel(path, sheet_name=name, nrows=4).fillna(0)
+            out = list()
+            out.append(d.columns.tolist())
+            out.extend(d.values.tolist())
+            data.append(out)
+        try:
+            request.session["ss_data"] = json_util.dumps(data)
+            request.session["ss_sheet_names"] = json_util.dumps(sheet_names)
+        except:
+            pass
     return HttpResponse(json_util.dumps({"data": data, "names": sheet_names}))
 
+def refresh_text_annotations(request):
+    file_id = request.GET["file_id"]
+    annotations = TextAnnotation().get_file_level_metadata_for_pdf(file_id)
+    return HttpResponse(json_util.dumps({"annotations": annotations}))
 
 def refresh_annotations(request):
     file_id = request.GET["file_id"]
@@ -106,7 +129,7 @@ def edit_or_delete_text_annotation(request, id):
         data["text"] = data["data"]["ontology_prefix"] + " - " + data["data"]["label"]
         result = TextAnnotation().update_text_annotation(id, data)
         if result:
-            return HttpResponse(json.dumps(data), status=200)
+            return HttpResponse(json_util.dumps(data), status=200)
         else:
             return HttpResponse(status=500)
     elif request.method == 'DELETE':
@@ -121,4 +144,4 @@ def search_text_annotation(request):
         file_id = request.GET["file_id"]
     annotations = TextAnnotation().get_all_for_file_id(file_id)
     out = {"rows": annotations}
-    return HttpResponse(json.dumps(out), content_type="application/json")
+    return HttpResponse(json_util.dumps(out), content_type="application/json")

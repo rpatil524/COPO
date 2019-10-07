@@ -6,16 +6,17 @@ $(document).ready(function () {
 
     get_ontologies_for_filter()
 
-    $(document).on('click', '#ontology_dropdown_filter li', handle_ontology_filter_click)
+    $(document).on('click', '#ontology_dropdown_filter li, .annotator_option', handle_ontology_filter_click)
 
-    $(document).ajaxStart(function(){
+    $(document).ajaxStart(function () {
         $('#annotation_loader').css('visibility', 'visible')
     })
-    $(document).ajaxStop(function(){
+    $(document).ajaxStop(function () {
         $('#annotation_loader').css('visibility', 'hidden')
     })
 
 })
+
 
 
 function get_ontologies_for_filter() {
@@ -50,13 +51,14 @@ function get_ontologies_for_filter() {
             $('#ontology_dropdown_filter').append(anchor)
 
         })
-    }).error(function(msg){
+    }).error(function (msg) {
         console.log("HERE WE GOO")
     })
 }
 
 
 function handle_ontology_filter_click(e) {
+
     var li = e.currentTarget
     $('#ontology_filter_button').find(".ontology_label").html(
         $(li).data('name')
@@ -65,8 +67,7 @@ function handle_ontology_filter_click(e) {
 
     if ($(li).data('name') == 'All Ontologies') {
         var autocomplete_url = '/copo/ajax_search_ontology/999/'
-    }
-    else {
+    } else {
         var autocomplete_url = '/copo/ajax_search_ontology/' + $(li).data('id')
     }
     $(document).data('autocomplete', autocomplete_url)

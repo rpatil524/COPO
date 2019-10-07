@@ -28,6 +28,7 @@ import web.apps.web_copo.templatetags.html_tags as htags
 from dal.copo_da import DataFile
 from pexpect import run
 import shutil
+from django.conf import settings
 
 LOGGER = settings.LOGGER
 
@@ -69,7 +70,7 @@ def test(request):
     else:
         print("using session text data")
         html = request.session["annotation_html"]
-    return render(request, 'copo/test_page.html',
+    return render(request, 'copo/annotate_text_file.html',
                   {"records": records, "file_id": "5d6d2df56f3ca55f1ef968dd", "file_name": "2.pdf", "html": html})
 
 
@@ -94,7 +95,7 @@ def test(request):
 
 def test_submission(request):
     delegate_submission(request)
-    return render(request, 'copo/test_page.html', {})
+    return render(request, 'copo/annotate_text_file.html', {})
 
 
 @login_required
@@ -117,7 +118,7 @@ def authenticate_figshare(request):
 
 
 def test_dataverse_submit(request):
-    return render(request, 'copo/test_page.html', {})
+    return render(request, 'copo/annotate_text_file.html', {})
 
 
 @login_required
@@ -171,8 +172,31 @@ def copo_samples(request, profile_id):
 
 @login_required()
 def annotate_meta(request, file_id):
-    name = DataFile().get_record(ObjectId(file_id))["name"]
-    return render(request, 'copo/copo_annotate_spreadsheet.html', {'file_id': file_id, 'file_name': name})
+    df = DataFile().get_record(ObjectId(file_id))
+    name = df["name"]
+    if name.endswith(('xls', 'xlsx')):
+        if "ss_data" in request.session:
+            del request.session["ss_data"]
+        if "ss_sheet_names" in request.session:
+            del request.session["ss_sheet_names"]
+        return render(request, 'copo/copo_annotate_spreadsheet.html', {'file_id': file_id, 'file_name': name, 'file_type': "ss"})
+    elif name.endswith(('pdf')):
+        html = ""
+        records = Annotation().get_all_records()
+        if "annotation_html" not in request.session:
+        #if True:
+            folder_name = str(uuid.uuid1())
+            full_path = os.path.join(settings.MEDIA_ROOT, folder_name)
+            os.makedirs(full_path)
+            run("ebook-convert  " + df["file_location"] + " " + full_path + " --no-images --pretty-print --insert-blank-line")
+            with open(os.path.join(full_path, "index.html"), 'r') as f:
+                html = f.read()
+            shutil.rmtree(full_path)
+            request.session["annotation_html"] = html
+        else:
+            print("using session text data")
+            html = request.session["annotation_html"]
+        return render(request, 'copo/annotate_text_file.html', {'html': html, 'file_id': file_id, 'file_name': name, "file_type": "pdf"})
 
 
 @login_required
