@@ -27,8 +27,6 @@ urlpatterns = [
             name='copo_submissions'),
     re_path(r'^copo_people/(?P<profile_id>[a-z0-9]+)/view', views.copo_people,
             name='copo_people'),
-    re_path(r'^copo_annotation/(?P<profile_id>[a-z0-9]+)/view', views.copo_annotation,
-            name='copo_annotation'),
     re_path(r'^copo_repository/(?P<profile_id>[a-z0-9]+)/view', views.copo_repository,
             name='copo_repository'),
     re_path(r'^annotate_meta/(?P<file_id>[a-z0-9]+)/view', views.annotate_meta, name='annotate_meta'),

@@ -1,11 +1,15 @@
 // FS - 03/10/19
+// For javascript relating to pdf annotations
 
 $(document).ready(function () {
+    // get latest list of ontologies from OLS
     get_ontologies_data()
+    // setup and init Annotator
     var app = new annotator.App();
     app.include(annotator.ui.main, {
         element: document.getElementById("text-area"),
         editorExtensions: [
+            // add ols_annotator which contains custom fields for the annotator window
             ols_annotator.getEditorExtension({defaultFields: false}),
             annotator.ui.tags.editorExtension
         ],
@@ -23,10 +27,9 @@ $(document).ready(function () {
     var additional = function () {
         return {
             beforeAnnotationCreated: function (ann) {
-                alert("cock")
+
             },
             annotationCreated: function(ann){
-                alert("cock")
                 refresh_text_annotations()
             },
             start: function (ann) {

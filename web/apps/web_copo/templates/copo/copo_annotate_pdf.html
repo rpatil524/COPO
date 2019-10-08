@@ -100,8 +100,9 @@
                 {{ html | safe }}
             </div>
         </div>
-        <div class="col-lg-3 col-md-3 col-sm-3" id="annotation-area">
+        <div class="col-lg-3 col-md-3 col-sm-3" >
             <h4 class="h4" style="margin-top:1em">Annotations</h4>
+            <div id="annotation-area"></div>
         </div>
     </div>
 
@@ -119,7 +120,7 @@
     <script type="text/javascript" src="{% static "copo/annotator-2.0.0-alpha.3/pkg/annotator.unsupported.js" %}"></script>
     <script type="text/javascript" src="{% static "copo/annotator-full.min.js" %}"></script>
     <script type="text/javascript" src="{% static "copo/js/annotator_ols.js" %}"></script>
-    <script type="text/javascript" src="{% static "copo/js/copo_annotate_spreadsheet.js" %}"></script>
+    <script type="text/javascript" src="{% static "copo/js/copo_file_level_annotations.js" %}"></script>
     <script type="text/javascript" src="{% static "copo/js/copo_annotate_pdf.js" %}"></script>
     <script type="text/javascript" src="{% static "copo/js/copo_ontology_functions.js" %}"></script>
 

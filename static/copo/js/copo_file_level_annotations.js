@@ -1,8 +1,10 @@
+// for javascript related to both spreadsheet and pdf annotations
+
 $(document).ready(function () {
     // attach array to document which will be used to hold spreadsheet data
     $(document).data('ss_data', new Array())
     if ($("#file_type").val() == "ss") {
-        refresh_display()
+        refresh_spreadsheet_display()
     }
     if ($("#file_type").val() == "pdf") {
         refresh_text_annotations()
@@ -37,7 +39,7 @@ function refresh_text_annotations() {
         type: "GET"
     }).done(function (data) {
         data = JSON.parse(data)
-        $("#existing_annotations").empty()
+        $("#annotation-area").empty()
         for (var d in data.annotations) {
             var result = make_annotation_panel(data.annotations, d)
             $("#annotation-area").append(result)
@@ -89,7 +91,7 @@ function dropHandler(ev, ui) {
     }).done(function (d) {
         d = JSON.parse(d)
         if ($("#file_type").val() == "ss") {
-            refresh_display()
+            refresh_spreadsheet_display()
         }
 
     }).error(function (d) {
@@ -286,7 +288,7 @@ function build_result_panel(d, idx, entry) {
     return result
 }
 
-function refresh_display() {
+function refresh_spreadsheet_display() {
 
     var file_id = $("#file_id").val()
     $.ajax({
@@ -538,7 +540,7 @@ $(document).on("click", ".delete_annotation", function (ev) {
         data: {"col_idx": col_idx, "sheet_name": sheet_name, "file_id": file_id, "iri": label}
     }).done(function (data) {
         if ($("#file_type").val() == "ss") {
-            refresh_display()
+            refresh_spreadsheet_display()
         }
     }).error(function (data) {
         console.error(data)
