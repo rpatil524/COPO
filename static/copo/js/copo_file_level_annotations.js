@@ -1,4 +1,4 @@
-// for javascript related to both spreadsheet and pdf annotations
+// For javascript related to both spreadsheet and pdf annotations
 
 $(document).ready(function () {
     // attach array to document which will be used to hold spreadsheet data
@@ -22,7 +22,6 @@ $(document).ready(function () {
         $(document).data("selected_nav_tab", $(this))
     })
     $("#search_term_text_box").val("")
-
     $(document).on("click", "#filters a", do_my_annotations)
     $(document).on("click", ".expand_annotation", expand_annotation)
 })
@@ -257,21 +256,28 @@ function build_result_panel(d, idx, entry) {
     }
     $(result).append($("<span/>", {
         html: v,
-        class: "highlight"
+        class: "highlight",
+
     }))
     $(result).append($("<span/>", {
-        html: " - <strong>" + entry["ontology_prefix"] + "</strong>",
-        class: ""
+        html: " - <strong style='font-size: bigger;color: black !important; font-weight: bolder'>" + entry["ontology_prefix"] + "</strong>",
+        class: "",
+        style: ""
     }))
     if (annotation_type == "text") {
-        $(result).append($("<a/>", {
-            "html": "Add",
-            "class": "btn btn-info btn-sm pull-right expand_annotation",
+        var btn_div = $("<button/>", {
+            class: "ui mini icon button green expand_annotation pull-right",
 
-        }))
+        })
+        var icon = $("<i/>",{
+            class: "icon plus",
+            style: "color: white; margin-bottom: 5px"
+
+
+        })
+        $(btn_div).append(icon)
+        $(result).append(btn_div)
     }
-    //$(result).find("a").on("click", app.trigger("annotationCreated"));
-
     if (used) {
         $(result.append($("<span/>", {
             html: "used: " + entry["count"],
@@ -284,7 +290,10 @@ function build_result_panel(d, idx, entry) {
         t = "Description Unavailable"
     }
     $(result).data("description", t)
-    $(result).append($("<div/>", {html: t}))
+    $(result).append($("<div/>", {
+        html: t,
+        "style": "color: black; padding-top: 10px"
+    }))
     return result
 }
 
@@ -503,6 +512,7 @@ function make_annotation_panel(data, d) {
         $(content).append("<strong>" + obj.ontology_prefix + "</strong><br>")
         $(content).append(obj.description)
         $(result).append(content)
+        $(result).data("data", data[d])
 
     } else {
         obj = data[d]
@@ -513,15 +523,17 @@ function make_annotation_panel(data, d) {
 
 $(document).on("mouseover", ".annotation_term", function (data) {
     if ($(data.currentTarget).data("is_search_result") == false) {
-        var sheet_name = $("div[name^='table']:visible").attr("name")
-        var hot = $(document).data(sheet_name)
-        var col = $(data.currentTarget).data("col_idx")
-        $(".selectedAnnotation").removeClass("selectedAnnotation")
-        $(data.currentTarget).addClass("selectedAnnotation")
-        $(".selectedColumn").removeClass("selectedColumn")
-        for (var i = 0; i < hot.countRows(); i++) {
-            var cell = hot.getCell(i, col)
-            $(cell).addClass("selectedColumn");
+        if($("#annotation_type").val() == "ss") {
+            var sheet_name = $("div[name^='table']:visible").attr("name")
+            var hot = $(document).data(sheet_name)
+            var col = $(data.currentTarget).data("col_idx")
+            $(".selectedAnnotation").removeClass("selectedAnnotation")
+            $(data.currentTarget).addClass("selectedAnnotation")
+            $(".selectedColumn").removeClass("selectedColumn")
+            for (var i = 0; i < hot.countRows(); i++) {
+                var cell = hot.getCell(i, col)
+                $(cell).addClass("selectedColumn");
+            }
         }
     }
 })

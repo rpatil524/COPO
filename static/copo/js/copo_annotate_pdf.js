@@ -11,11 +11,9 @@ $(document).ready(function () {
         editorExtensions: [
             // add ols_annotator which contains custom fields for the annotator window
             ols_annotator.getEditorExtension({defaultFields: false}),
-            annotator.ui.tags.editorExtension
+
         ],
-        viewerExtensions: [
-            annotator.ui.tags.viewerExtension,
-        ]
+        viewerExtensions: []
     });
 
 
@@ -29,7 +27,10 @@ $(document).ready(function () {
             beforeAnnotationCreated: function (ann) {
 
             },
-            annotationCreated: function(ann){
+            annotationCreated: function (ann) {
+                refresh_text_annotations()
+            },
+            annotationUpdated: function (ann) {
                 refresh_text_annotations()
             },
             start: function (ann) {
@@ -44,16 +45,30 @@ $(document).ready(function () {
 
     });
 
+    $(document).on("click", ".annotation_term", scroll_to_element)
+    $(document).on("mouseover", ".annotation_term", function () {
+            $(this).closest(".panel").addClass("selectedAnnotation")
+        }
+    )
+
+    function scroll_to_element(e) {
+        var annotation_id = $(e.currentTarget).data("data")._id
+        var element = document.querySelector('[data-annotation-id="' + annotation_id + '"]');
+        $(".annotator-hl-active").removeClass("annotator-hl-active")
+        $(element).addClass("annotator-hl-active")
+        console.log($(element).position().top + 40)
+        $("#text-area").scrollTop($("#text-area").scrollTop() + $(element).position().top - 100)
+    }
+
+    function get_ontologies_data() {
+        $.ajax({
+            url: '/rest/get_ontologies/',
+            method: 'GET',
+            dataType: 'json'
+        }).done(function (d) {
+            $(document).data("ontologies", d)
+        })
+    }
 })
 
-
-function get_ontologies_data() {
-    $.ajax({
-        url: '/rest/get_ontologies/',
-        method: 'GET',
-        dataType: 'json'
-    }).done(function (d) {
-        $(document).data("ontologies", d)
-    })
-}
 

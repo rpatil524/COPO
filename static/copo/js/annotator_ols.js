@@ -16,10 +16,11 @@ var ols_annotator = {
             }
             editor.addField({
                 type: "input",
-                label: "OLS Searchbox",
+                label: "Search",
                 id: "search_term_text_box",
                 load: function (field, annotation) {
-                    $(field).find("select").addClass("form-control")
+                    $(field).find("input").addClass("form-control ui icon input")
+
                 }
             })
             editor.addField({
@@ -29,6 +30,7 @@ var ols_annotator = {
                 load: function (field, annotation) {
                     options = $(document).data("ontologies")
                     $(field).find("select").addClass("form-control")
+
                     $(field).find("select").append("<option class='annotator_option'>All Ontologies</option>")
                     for (option in options) {
                         var option_html = $("<option/>", {
