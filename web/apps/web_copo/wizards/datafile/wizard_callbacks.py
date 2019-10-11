@@ -287,11 +287,19 @@ class WizardCallbacks:
                 title = stage_df["stage_label"]
 
                 ref = "cg_stage_" + s_id
-                # todo: get message for stage, and an appropriate title
+
                 message = stage_df["stage_message"]
 
-                items = schema_df[schema_df.stage_id == s_id].sort_values(
+                # items = schema_df[schema_df.stage_id == s_id].sort_values(
+                #     by=['field_constraint_rank']).to_dict('records')
+
+                # todo: temporary measure for demo - display only required fields
+                items = schema_df[(schema_df.stage_id == s_id) & (schema_df.field_constraint == 'required')].sort_values(
                     by=['field_constraint_rank']).to_dict('records')
+
+                # if not items, don't display stage
+                if not len(items):
+                    continue
 
                 # delete non-relevant attributes
                 for item in items:

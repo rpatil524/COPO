@@ -29,6 +29,7 @@ urlpatterns = [
     path('forward_to_figshare/', wizard.forward_to_figshare, name='forward_to_figshare'),
     path('get_upload_information/', ajax.get_upload_information, name='get_upload_information'),
     path('submit_to_repo/', submit.delegate_submission, name='delegate_submission'),
+    path('release_ena_study/', ajax.release_ena_study, name='release_ena_study'),
     path('test_submission/', views.test_submission, name='test_ena_submission'),
     path('resume_chunked/', rest.resume_chunked, name='resume_chunked'),
     path('get_partial_uploads/', rest.get_partial_uploads, name='get_partial_uploads'),
@@ -46,4 +47,3 @@ urlpatterns = [
     path('get_ontologies/', ajax.get_ontologies, name='get_ontologies'),
     path('export_generic_annotation/', ajax.export_generic_annotation, name='export_generic_annotation')
 ]
-

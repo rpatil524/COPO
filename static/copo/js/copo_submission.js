@@ -29,7 +29,7 @@ $(document).ready(function () {
     //create a web socket to manage submission progress reports
     var profileId = $('#profile_id').val();
 
-    var submissionSocket = new WebSocket(
+    var submissionSocket = new ReconnectingWebSocket(
         'ws://' + window.location.host +
         '/ws/submission_status/' + profileId + '/');
 
@@ -129,18 +129,15 @@ $(document).ready(function () {
                 action: function (dialogRef) {
                     elem.addClass("disabled");
 
-                    var request_params = {
-                        'sub_id': target_id,
-                        'sub_task': 'release_study'
-                    };
-
                     $.ajax({
-                        url: "/rest/submit_to_repo/",
+                        url: "/rest/release_ena_study/",
                         type: "POST",
                         headers: {
                             'X-CSRFToken': csrftoken
                         },
-                        data: request_params,
+                        data: {
+                            'target_id': target_id
+                        },
                         success: function (data) {
                             get_submission_information(submissionIDS);
                             dialogRef.close();
@@ -799,7 +796,9 @@ $(document).ready(function () {
             //some housekeeping...
             $("#submission_control_" + submissionRecord.submission_id).html('');
             $("#submission_progress_" + submissionRecord.submission_id).find('.submission-progress-status').html('');
+            var processed_status = false;
 
+            // is this a completed submission?
             if (submissionRecord.hasOwnProperty("submission_status") && (submissionRecord.submission_status.toString() == "true")) {
                 //submission is complete
                 $("#submission_completed_label_" + submissionRecord.submission_id).html(submissionRecord.completed_on);
@@ -850,97 +849,135 @@ $(document).ready(function () {
                     submisson_message_div.find(".message").append(release_status);
                 }
 
-            } else {
-                //is this an active submission?
-                if (submissionRecord.hasOwnProperty("submission_report")) {
-                    var actionButton = '';
-                    var progressClass = "progress-bar active";
-                    var submisson_message_div = $('<div/>',
-                        {
-                            style: "word-wrap: break-word; max-height: 300px; overflow-y: scroll",
-                        });
+                processed_status = true;
+                continue;
 
-                    if (submissionRecord.submission_report.type == "info") {
-                        progressClass = progressClass + " progress-bar-striped ";
-                        submisson_message_div.addClass("ui info message");
-                    } else if (submissionRecord.submission_report.type == "error") {
-                        progressClass = progressClass + " progress-bar-danger progress-bar-striped ";
-                        actionButton = get_submit_action(submissionRecord.submission_id, "retry");
-                        submisson_message_div.addClass("ui negative message");
-
-                        //enable delete button
-                        $("#submission_delete_button_" + submissionRecord.submission_id).removeClass("disabled");
-                    }
-
-                    $("#submission_progress_" + submissionRecord.submission_id).find(".progress-bar")
-                        .attr({"class": progressClass, "aria-valuenow": '100'})
-                        .css({"min-width": "2em", "width": "100%"})
-                        .html('');
-
-                    var progressObject = $("#submission_progress_" + submissionRecord.submission_id).find('.submission-progress-status');
-                    submisson_message_div.append('<div class="webpop-content-div">' + submissionRecord.submission_report.message + '</div>');
-                    progressObject
-                        .html('')
-                        .append(submisson_message_div);
-
-                    $("#submission_control_" + submissionRecord.submission_id)
-                        .html('')
-                        .append(actionButton);
-
-                    //report on submitted datafiles
-                    if (submissionRecord.hasOwnProperty("submitted_files")) {
-                        submissionRecord.submitted_files.forEach(function (item) {
-                            try {
-                                $("#" + submissionRecord.submission_id + "_" + item)
-                                    .html('<i class="fa fa-check-circle-o" data-toggle="tooltip" title="submitted" aria-hidden="true" style="color:#339933; font-size: 18px;"></i>');
-                            } catch (err) {
-                                ;
-                            }
-                        });
-                    }
-
-                } else {
-                    var actionButton = '';
-                    var typeMessage = 'pending';
-
-                    if (submissionRecord.hasOwnProperty("enable_submit_button") && (submissionRecord.enable_submit_button.toString() == "true")) {
-                        typeMessage = 'submit';
-                    }
-
-                    $("#submission_progress_" + submissionRecord.submission_id).find(".progress-bar")
-                        .attr(
-                            {
-                                "class": "progress-bar",
-                                "aria-valuenow": "100"
-                            }
-                        )
-                        .css({"min-width": "2em", "width": "100%"})
-                        .html("Pending");
-
-                    var progressObject = $("#submission_progress_" + submissionRecord.submission_id).find('.submission-progress-status');
-
-                    //feedback message
-                    var submisson_message_div = $('<div/>',
-                        {
-                            style: "word-wrap: break-word; max-height: 300px; overflow-y: scroll",
-                            "class": "ui info message",
-                            "html": '<div class="webpop-content-div">Pending submission. Please click the submit button to continue.</div>'
-                        });
-
-                    progressObject
-                        .html('')
-                        .append(submisson_message_div);
-
-                    actionButton = get_submit_action(submissionRecord.submission_id, typeMessage);
-
-                    //enable delete button
-                    $("#submission_delete_button_" + submissionRecord.submission_id).removeClass("disabled");
-
-                    $("#submission_control_" + submissionRecord.submission_id)
-                        .html('')
-                        .append(actionButton);
-                }
             }
+
+            //is this an active submission?
+            if (submissionRecord.hasOwnProperty("is_active_submission") && submissionRecord.is_active_submission.toString().toLowerCase() == "true") {
+                var actionButton = '';
+                var status_message = '';
+
+                //disable delete button
+                $("#submission_delete_button_" + submissionRecord.submission_id).addClass("disabled");
+
+                var progressClass = "progress-bar active";
+                var submisson_message_div = $('<div/>',
+                    {
+                        style: "word-wrap: break-word; max-height: 300px; overflow-y: scroll",
+                    });
+
+                if (submissionRecord.hasOwnProperty("submission_report") && submissionRecord.submission_report.type == "info") {
+                    status_message = submissionRecord.submission_report.message;
+                    progressClass = progressClass + " progress-bar-striped ";
+                    submisson_message_div.addClass("ui info message");
+                } else if (submissionRecord.hasOwnProperty("submission_report") && submissionRecord.submission_report.type == "error") {
+                    status_message = submissionRecord.submission_report.message;
+                    progressClass = progressClass + " progress-bar-danger progress-bar-striped ";
+                    submisson_message_div.addClass("ui negative message");
+                }
+
+                $("#submission_progress_" + submissionRecord.submission_id).find(".progress-bar")
+                    .attr({"class": progressClass, "aria-valuenow": '100'})
+                    .css({"min-width": "2em", "width": "100%"})
+                    .html('');
+
+                var progressObject = $("#submission_progress_" + submissionRecord.submission_id).find('.submission-progress-status');
+                submisson_message_div.append('<div class="webpop-content-div">' + status_message + '</div>');
+                progressObject
+                    .html('')
+                    .append(submisson_message_div);
+
+                $("#submission_control_" + submissionRecord.submission_id)
+                    .html('')
+                    .append(actionButton);
+
+                //report on submitted datafiles
+                if (submissionRecord.hasOwnProperty("submitted_files")) {
+                    submissionRecord.submitted_files.forEach(function (item) {
+                        try {
+                            $("#" + submissionRecord.submission_id + "_" + item)
+                                .html('<i class="fa fa-check-circle-o" data-toggle="tooltip" title="submitted" aria-hidden="true" style="color:#339933; font-size: 18px;"></i>');
+                        } catch (err) {
+                            ;
+                        }
+                    });
+                }
+
+                processed_status = true;
+                continue;
+
+            }
+
+
+            //not submitted, not active
+            if (!processed_status) {
+                var actionButton = '';
+                var typeMessage = 'pending';
+                var status_message = 'Pending submission. Please click the submit button to continue.';
+                var progressClass = "progress-bar active";
+
+                //enable delete button
+                $("#submission_delete_button_" + submissionRecord.submission_id).removeClass("disabled");
+
+                //feedback message
+                var submisson_message_div = $('<div/>',
+                    {
+                        style: "word-wrap: break-word; max-height: 300px; overflow-y: scroll",
+                    });
+
+                var feedback_class = "ui info message";
+
+
+                if (submissionRecord.hasOwnProperty("enable_submit_button") && (submissionRecord.enable_submit_button.toString() == "true")) {
+                    typeMessage = 'submit';
+                }
+
+                if (submissionRecord.hasOwnProperty("submission_report") && submissionRecord.submission_report.type == "error") {
+                    typeMessage = 'retry';
+                    feedback_class = "ui negative message";
+                    status_message = submissionRecord.submission_report.message;
+                    progressClass = progressClass + " progress-bar-danger progress-bar-striped ";
+                }
+
+                submisson_message_div.addClass(feedback_class);
+
+                var progressObject = $("#submission_progress_" + submissionRecord.submission_id).find('.submission-progress-status');
+                submisson_message_div.append('<div class="webpop-content-div">' + status_message + '</div>');
+                progressObject
+                    .html('')
+                    .append(submisson_message_div);
+
+                actionButton = get_submit_action(submissionRecord.submission_id, typeMessage);
+
+                $("#submission_progress_" + submissionRecord.submission_id).find(".progress-bar")
+                    .attr({"class": progressClass, "aria-valuenow": '100'})
+                    .css({"min-width": "2em", "width": "100%"})
+                    .html('');
+
+                $("#submission_control_" + submissionRecord.submission_id)
+                    .html('')
+                    .append(actionButton);
+
+                //report on submitted datafiles
+                if (submissionRecord.hasOwnProperty("submitted_files")) {
+                    submissionRecord.submitted_files.forEach(function (item) {
+                        try {
+                            $("#" + submissionRecord.submission_id + "_" + item)
+                                .html('<i class="fa fa-check-circle-o" data-toggle="tooltip" title="submitted" aria-hidden="true" style="color:#339933; font-size: 18px;"></i>');
+                        } catch (err) {
+                            ;
+                        }
+                    });
+                }
+
+                processed_status = true;
+                continue
+
+            }
+
+
         }
 
         refresh_tool_tips();

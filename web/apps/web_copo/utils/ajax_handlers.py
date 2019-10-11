@@ -31,6 +31,7 @@ from dal.orcid_da import Orcid
 from submission.dataverseSubmission import DataverseSubmit as ds
 from submission.dspaceSubmission import DspaceSubmit as dspace
 from submission.ckanSubmission import CkanSubmit as ckan
+from submission.helpers import generic_helper as ghlper
 
 DV_STRING = 'HARVARD_TEST_API'
 
@@ -103,6 +104,8 @@ def get_upload_information(request):
 
     ids = json.loads(request.POST.get("ids", "[]"))
     sub_info_list = list()
+
+    submission_queue_handle = ghlper.get_submission_queue_handle()
 
     for id in ids:
         # get submission record and check submission status
@@ -179,7 +182,13 @@ def get_upload_information(request):
                                                        "Alternatively, you can try searching for the study on the " \
                                                        "ENA browser to verify its status.</div>"
         else:
-            # any status to report for running submissions?
+            sub_info_dict["is_active_submission"] = False
+            if repo == "ena":  # this will be extended to other repositories/submission end-points
+                submission_in_queue = submission_queue_handle.find_one({"submission_id": sub_info_dict["submission_id"]})
+                if submission_in_queue:  # submission not queued, flag up to enable resubmission
+                    sub_info_dict["is_active_submission"] = True
+
+            # get status report
             status = sub.get("transcript", dict()).get('status', dict())
             if status:
                 # status types are either 'info' or 'error'
@@ -207,6 +216,17 @@ def publish_figshare(request):
     resp = FigshareSubmit(sub_id).publish_article(s['accession'])
     return HttpResponse(
         json.dumps({'status_code': resp.status_code, 'location': json.loads(resp.content.decode('utf8'))['location']}))
+
+
+def release_ena_study(request):
+    from submission import enareadSubmission
+    submission_id = request.POST.get("target_id", str())
+    result = enareadSubmission.EnaReads(submission_id=submission_id).release_study()
+
+    if result.get("status", True) is True:
+        return HttpResponse(jsonpickle.dumps({'status': 0}))
+    else:
+        return HttpResponse(jsonpickle.dumps({'status': 1, 'message': result.get("message", str())}))
 
 
 def get_tokens_for_user(request):

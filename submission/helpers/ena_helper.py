@@ -9,7 +9,6 @@ from dal import cursor_to_list
 from collections import defaultdict
 from submission.helpers import generic_helper as ghlper
 import web.apps.web_copo.schemas.utils.data_utils as data_utils
-from dal.copo_da import Submission, Person, Description, DataFile, Sample, DAComponent
 
 
 class SubmissionHelper:
@@ -18,18 +17,15 @@ class SubmissionHelper:
         self.profile_id = str()
         self.__converter_errors = list()
 
-        collection_handle = ghlper.get_submission_handle()
-        doc = collection_handle.find_one({"_id": ObjectId(self.submission_id)},
-                                         {"profile_id": 1, "description_token": 1})
+        self.collection_handle = ghlper.get_submission_handle()
+        doc = self.collection_handle.find_one({"_id": ObjectId(self.submission_id)},
+                                              {"profile_id": 1, "description_token": 1})
 
         if doc:
             self.profile_id = doc.get("profile_id", str())
             self.description_token = doc.get("description_token", str())
 
-        try:
-            self.description = Description().GET(self.description_token)
-        except:
-            self.description = dict()
+        self.description = ghlper.get_description_handle().find_one({"_id": ObjectId(self.description_token)})
 
     def get_converter_errors(self):
         return self.__converter_errors
@@ -56,16 +52,16 @@ class SubmissionHelper:
         sra_contacts = defaultdict(list)
         expected_roles = [x.lower() for x in ['SRA Inform On Status', 'SRA Inform On Error']]
 
-        for rec in Person(profile_id=self.profile_id).get_all_records():
+        records = ghlper.get_person_handle().find({"profile_id": self.profile_id})
+
+        for rec in records:
             roles = [role.get("annotationValue", str()).lower() for role in rec.get('roles', []) if
                      role.get("annotationValue", str()).lower() in expected_roles]
             if roles:
-                sra_contacts[(rec['email'], rec['firstName'], rec['lastName'])].extend(roles)
-
-        # if no sra contacts, add one from session user
-        if not sra_contacts:
-            user = data_utils.get_current_user()
-            sra_contacts[(user.email, user.first_name, user.last_name)].append(expected_roles)
+                email = rec.get('email', str())
+                firstName = rec.get('firstName', str())
+                lastName = rec.get('lastName', str())
+                sra_contacts[(email, firstName, lastName)].extend(roles)
 
         return sra_contacts
 
@@ -120,10 +116,9 @@ class SubmissionHelper:
         sra_samples = list()
 
         # get datafiles
-        datafiles = cursor_to_list(
-            DataFile().get_collection_handle().find(
-                {"description_token": self.description_token, 'deleted': data_utils.get_not_deleted_flag()},
-                {'_id': 1, 'file_location': 1, "description.attributes": 1, "name": 1}))
+        datafiles = cursor_to_list(ghlper.get_datafiles_handle().find(
+            {"description_token": self.description_token, 'deleted': data_utils.get_not_deleted_flag()},
+            {'_id': 1, 'file_location': 1, "description.attributes": 1, "name": 1, "file_hash": 1}))
 
         if not len(datafiles):
             self.__converter_errors.append("No datafiles found in submission!")
@@ -138,20 +133,14 @@ class SubmissionHelper:
         bundle = list(df.file_id)
         bundle_meta = df.to_dict('records')
 
-        records = cursor_to_list(
-            Submission().get_collection_handle().find({"_id": ObjectId(self.submission_id)},
-                                                      {"_id": 1}))
+        submission_record = dict(bundle=bundle, bundle_meta=bundle_meta)
 
-        if records:
-            submission_record = records[0]
-            submission_record['bundle'] = bundle
-            submission_record['bundle_meta'] = bundle_meta
-            submission_record['target_id'] = str(submission_record.pop('_id'))
-
-            Submission().save_record(dict(), **submission_record)
+        ghlper.get_submission_handle().update(
+            {"_id": ObjectId(self.submission_id)},
+            {'$set': submission_record})
 
         samples_id = list()
-        df_attributes = []  # holds datafiles attributes
+        df_attributes = []  # datafiles attributes
 
         for datafile in datafiles:
             datafile_attributes = [v for k, v in datafile.get("description", dict()).get("attributes", dict()).items()]
@@ -161,6 +150,7 @@ class SubmissionHelper:
 
             new_dict['datafile_id'] = str(datafile['_id'])
             new_dict['datafile_name'] = datafile.get('name', str())
+            new_dict['datafile_hash'] = datafile.get('file_hash', str())
             new_dict['datafile_location'] = datafile.get('file_location', str())
 
             df_attributes.append(new_dict)
@@ -187,10 +177,13 @@ class SubmissionHelper:
         df_attributes_df.to_csv(path_or_buf=file_path, index=False)
 
         samples_id_object_list = [ObjectId(sample_id) for sample_id in samples_id]
-        samples_record = cursor_to_list(Sample().get_collection_handle().find({"_id": {"$in": samples_id_object_list}}))
+
+        sample_records = ghlper.get_samples_handle().find({"_id": {"$in": samples_id_object_list}})
 
         # get sources
-        sources = DAComponent(profile_id=self.profile_id, component="source").get_all_records()
+        sources = ghlper.get_sources_handle().find(
+            {"profile_id": self.profile_id, 'deleted': data_utils.get_not_deleted_flag()})
+
         sra_sources = dict()
 
         for source in sources:
@@ -207,7 +200,7 @@ class SubmissionHelper:
             sra_source['attributes'] = sra_source['attributes'] + self.get_attributes(
                 source.get("factorValues", list()))
 
-        for sample in samples_record:
+        for sample in sample_records:
             sra_sample = dict()
             sra_sample['sample_id'] = str(sample['_id'])
             sra_sample['name'] = sample['name']
@@ -230,7 +223,7 @@ class SubmissionHelper:
             else:
                 self.__converter_errors.append("Sample: " + sample[
                     'name'] + " has no TAXON_ID. Please make sure an organism has "
-                              "been set for the source of this sample from an ontology.")
+                              "been set for the source of this sample from the NCBITAXON ontology.")
 
             if sample_source.get("scientific_name", str()):
                 sra_sample['scientific_name'] = sample_source.get("scientific_name", str())
@@ -309,15 +302,12 @@ class SubmissionHelper:
         :return:
         """
 
-        records = cursor_to_list(
-            Submission().get_collection_handle().find({"_id": ObjectId(self.submission_id)}, {"accessions.project": 1}))
+        doc = self.collection_handle.find_one({"_id": ObjectId(self.submission_id)}, {"accessions.project": 1})
 
-        if not records:
+        if not doc:
             return list()
 
-        accessions = records[0].get('accessions', dict()).get('project', list())
-
-        return accessions
+        return doc.get('accessions', dict()).get('project', list())
 
     def get_sample_accessions(self):
         """
@@ -325,15 +315,12 @@ class SubmissionHelper:
         :return:
         """
 
-        records = cursor_to_list(
-            Submission().get_collection_handle().find({"_id": ObjectId(self.submission_id)}, {"accessions.sample": 1}))
+        doc = self.collection_handle.find_one({"_id": ObjectId(self.submission_id)}, {"accessions.sample": 1})
 
-        if not records:
+        if not doc:
             return list()
 
-        accessions = records[0].get('accessions', dict()).get('sample', list())
-
-        return accessions
+        return doc.get('accessions', dict()).get('sample', list())
 
     def get_run_accessions(self):
         """
@@ -341,12 +328,9 @@ class SubmissionHelper:
         :return:
         """
 
-        records = cursor_to_list(
-            Submission().get_collection_handle().find({"_id": ObjectId(self.submission_id)}, {"accessions.run": 1}))
+        doc = self.collection_handle.find_one({"_id": ObjectId(self.submission_id)}, {"accessions.run": 1})
 
-        if not records:
+        if not doc:
             return list()
 
-        accessions = records[0].get('accessions', dict()).get('run', list())
-
-        return accessions
+        return doc.get('accessions', dict()).get('run', list())

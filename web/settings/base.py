@@ -1,7 +1,6 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from tools import resolve_env
-import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -45,6 +44,7 @@ PROJECT_APPS = [
     'rest_framework',
     'chunked_upload',
     'compressor',
+    'django_extensions'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS
@@ -185,4 +185,5 @@ DATAVERSE = {
 UNIT_TESTING = False
 TEST_USER_NAME = 'jonny'
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400
+DATA_UPLOAD_MAX_MEMORY_SIZE = 500000000
+FILE_UPLOAD_MAX_MEMORY_SIZE = 500000000

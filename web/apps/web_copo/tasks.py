@@ -8,7 +8,7 @@ def update_study_status():
     return True
 
 
-@app.task
-def process_ena_submission():
+@app.task(bind=True)
+def process_ena_submission(self):
     enareadSubmission.EnaReads().process_queue()
     return True

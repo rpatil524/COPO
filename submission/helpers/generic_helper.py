@@ -14,16 +14,51 @@ from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
 lg = settings.LOGGER
 
 
-def get_submission_handle():  # this can be safely called by forked process without issues with gloabl settings
+def get_submission_handle():  # this can be safely called by forked process
     mongo_client = mutil.get_mongo_client()
     collection_handle = mongo_client['SubmissionCollection']
 
     return collection_handle
 
 
-def get_submission_queue_handle():  # this can be safely called by forked process without issues with gloabl settings
+def get_submission_queue_handle():  # this can be safely called by forked process
     mongo_client = mutil.get_mongo_client()
     collection_handle = mongo_client['SubmissionQueueCollection']
+
+    return collection_handle
+
+
+def get_description_handle():  # this can be safely called by forked process
+    mongo_client = mutil.get_mongo_client()
+    collection_handle = mongo_client['DescriptionCollection']
+
+    return collection_handle
+
+
+def get_person_handle():  # this can be safely called by forked process
+    mongo_client = mutil.get_mongo_client()
+    collection_handle = mongo_client['PersonCollection']
+
+    return collection_handle
+
+
+def get_datafiles_handle():  # this can be safely called by forked process
+    mongo_client = mutil.get_mongo_client()
+    collection_handle = mongo_client['DataFileCollection']
+
+    return collection_handle
+
+
+def get_samples_handle():  # this can be safely called by forked process
+    mongo_client = mutil.get_mongo_client()
+    collection_handle = mongo_client['SampleCollection']
+
+    return collection_handle
+
+
+def get_sources_handle():  # this can be safely called by forked process
+    mongo_client = mutil.get_mongo_client()
+    collection_handle = mongo_client['SourceCollection']
 
     return collection_handle
 
@@ -117,9 +152,12 @@ def update_submission_status(status=str(), message=str(), submission_id=str()):
         {"_id": ObjectId(str(submission_record.pop('_id')))},
         {'$set': submission_record})
 
-    # notify client agent on status change - the client decides how to react to this notification
-    notify_status_change(profile_id=submission_record.get("profile_id", str()),
-                         submission_id=submission_id)
+    # notify client agent on status change
+    try:
+        notify_status_change(profile_id=submission_record.get("profile_id", str()),
+                             submission_id=submission_id)
+    except Exception as e:
+        log_general_error(str(e))
 
     return True
 

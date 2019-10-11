@@ -2,8 +2,7 @@ __author__ = 'felix.shaw@tgac.ac.uk - 27/05/2016'
 
 from django.http import HttpResponse
 from dal.copo_da import Submission
-from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission, \
-    enareadSubmission
+from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission
 from django.urls import reverse
 import jsonpickle, json
 
@@ -42,7 +41,7 @@ def delegate_submission(request):
 
     # Submit to ENA Sequence reads
     elif repo == 'ena':
-        result = schedule_submission(submission_id=sub_id)
+        result = schedule_submission(submission_id=sub_id, submission_repo='ena')
 
         if result.get("status", True) is True:
             return HttpResponse(jsonpickle.dumps({'status': 0}))
@@ -104,7 +103,7 @@ def delegate_submission(request):
     return HttpResponse(error["message"], status=error["status"])
 
 
-def schedule_submission(submission_id=str()):
+def schedule_submission(submission_id=str(), submission_repo=str()):
     """
     function adds submission to a queue for processing
     :return:
@@ -125,13 +124,15 @@ def schedule_submission(submission_id=str()):
     if not doc:  # submission not already in queue, add to queue
         fields = dict(
             submission_id=submission_id,
-            date_modified=d_utils.get_datetime()
+            date_modified=d_utils.get_datetime(),
+            repository=submission_repo,
+            processing_status='pending'
         )
 
         collection_handle.insert(fields)
-        context['message'] = 'Submission has been added to the processing queue. Status updates to follow.'
+        context['message'] = 'Submission has been added to the processing queue. Status update will be reported.'
     else:
-        context['message'] = 'Submission is already in the processing queue. Status updates to follow.'
+        context['message'] = 'Submission is already in the processing queue. Status updates will be reported.'
 
     ghlper.update_submission_status(status='info', message=context['message'], submission_id=submission_id)
     ghlper.logging_info(context['message'], submission_id)

@@ -15,7 +15,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'update_ena_status': {
         'task': 'web.apps.web_copo.tasks.process_ena_submission',
-        'schedule': crontab(minute="*/1")  # execute every 5 minutes minute="*/5"
+        'schedule': crontab(minute="*/1")  # execute every n minutes minute="*/n"
     }
 }
 
