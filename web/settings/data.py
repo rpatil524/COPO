@@ -36,17 +36,13 @@ MONGO_DB_TEST = "testing_copo"
 # this is the global DB connection, either use get_collection_ref in dal.mongo_util.py or refer to this setting
 
 if ENVIRONMENT_TYPE == "prod":
-    MONGO_CLIENT = MongoClient(host=MONGO_HOST, maxPoolSize=MONGO_MAX_POOL_SIZE)[MONGO_DB]
+    MONGO_CLIENT = MongoClient(host=MONGO_HOST, maxPoolSize=MONGO_MAX_POOL_SIZE,)[MONGO_DB]
     MONGO_CLIENT.authenticate(MONGO_USER, MONGO_USER_PASSWORD, source='admin')
 else:
     if resolve_env.get_env('UNIT_TESTING'):
         MONGO_CLIENT = MongoClient(host=MONGO_HOST, maxPoolSize=MONGO_MAX_POOL_SIZE)[MONGO_DB_TEST]
     else:
         MONGO_CLIENT = MongoClient(host=MONGO_HOST, maxPoolSize=MONGO_MAX_POOL_SIZE)[MONGO_DB]
-
-# uri = 'mongodb://' + MONGO_USER + ':' + MONGO_USER_PASSWORD + '@' + MONGO_HOST
-# MONGO_CLIENT = pymongo.MongoClient(uri, maxPoolSize=MONGO_MAX_POOL_SIZE)[MONGO_DB]
-
 
 # settings for redis
 SESSION_ENGINE = 'redis_sessions.session'
@@ -58,6 +54,16 @@ FIGSHARE_CREDENTIALS = {
     'client_id': resolve_env.get_env('FIGSHARE_CLIENT_ID'),
     'consumer_secret': resolve_env.get_env('FIGSHARE_CONSUMER_SECRET'),
     'client_secret': resolve_env.get_env('FIGSHARE_CLIENT_SECRET')
+}
+
+# django channels settings
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(SESSION_REDIS_HOST, SESSION_REDIS_PORT)],
+        },
+    },
 }
 
 # settings for object stores

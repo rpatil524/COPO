@@ -1,7 +1,6 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from tools import resolve_env
-import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -35,6 +34,7 @@ DJANGO_APPS = [
 
 # user-defined applications definition
 PROJECT_APPS = [
+    'channels',
     'web.apps.web_copo',
     'web.apps.web_copo.rest',
     'allauth',
@@ -44,6 +44,7 @@ PROJECT_APPS = [
     'rest_framework',
     'chunked_upload',
     'compressor',
+    'django_extensions'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS
@@ -129,7 +130,6 @@ TEMPLATES = [
                 "web.apps.web_copo.context_processors.get_status",
                 "web.apps.web_copo.context_processors.add_partial_submissions_to_context",
 
-
                 'django.contrib.auth.context_processors.auth',
             ],
             'debug': True,
@@ -138,6 +138,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'web.wsgi.application'
+ASGI_APPLICATION = 'web.routing.application'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -184,4 +185,5 @@ DATAVERSE = {
 UNIT_TESTING = False
 TEST_USER_NAME = 'jonny'
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400
+DATA_UPLOAD_MAX_MEMORY_SIZE = 500000000
+FILE_UPLOAD_MAX_MEMORY_SIZE = 500000000

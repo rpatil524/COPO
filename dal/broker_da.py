@@ -420,7 +420,7 @@ class BrokerVisuals:
         return self.context
 
     def do_wizard_messages(self):
-        self.context['wiz_message'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["datafile_wizard"])["properties"]
+        self.context['wiz_message'] = d_utils.json_to_pytype(lkup.MESSAGES_LKUPS["wizards_messages"])["properties"]
         return self.context
 
     def do_metadata_ratings(self):

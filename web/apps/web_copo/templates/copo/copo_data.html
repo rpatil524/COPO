@@ -131,29 +131,25 @@
         <div class="col-sm-6 col-md-6 col-lg-6" id="datafile_col_table_div">
             <!-- datafile table section -->
 
-            <div class="ui attached message" style="background: #CACBCD;">
-                <div class="header">
-                    Datafiles
+            <div class="panel panel-default">
+                <div class="panel-heading" style="background-image: none; border: none;">
+                    <h4>Datafiles</h4>
                 </div>
-                <p>
-                <div class="webpop-content-div" id="datafile-list-message"><span style="color: #000;">Use the upload button to add one or more datafiles</span>
-                </div>
-                </p>
-            </div>
-            <div class="ui attached fluid segment draggable-parent" style="font-size: inherit;">
-                <div class="row">
-                    <div class="col-sm-12 col-md-12 col-lg-12">
-                        <div class="pull-right">
-                            <div style="display: inline-block; text-indent: 0.5em;">
-                                <form enctype="multipart/form-data" id="upload_0" method="POST"
-                                      action="/rest/receive_data_file_chunked/"
-                                      style="margin-right:40px">
-                                    {% csrf_token %}
-                                    <span data-copo-tour-id="copo_data_upload_file_button"
-                                          id="upload_files_button"
-                                          class="big ui button fileinput-button"
-                                          style="background-image: none; border-color:transparent;">
-                                                                                <span>Upload datafiles...</span>
+                <div class="panel-body">
+                    <div class="webpop-content-div">
+                        Use the upload button to add one or more datafiles.
+                    </div>
+                    <hr/>
+                    <div style="display: inline-block; text-indent: 0.5em;">
+                        <form enctype="multipart/form-data" id="upload_0" method="POST"
+                              action="/rest/receive_data_file_chunked/"
+                              style="margin-right:40px">
+                            {% csrf_token %}
+                            <span data-copo-tour-id="copo_data_upload_file_button"
+                                  id="upload_files_button"
+                                  class="ui large primary button fileinput-button"
+                                  style="background-image: none; border-color:transparent;">
+                                                                                <span>Upload datafiles</span>
                                                                                 <input id="main_file_upload" type="file"
                                                                                        name="file"
                                                                                        onchange="get_chunk_size(event)"
@@ -166,66 +162,48 @@
                                                                                 <input type="hidden" name="exp_id"
                                                                                        value=""/>
                                                                         </span>
-                                </form>
+                        </form>
 
-                                <div id="file_tree" style="visibility:hidden"></div>
+                        <div id="file_tree" style="visibility:hidden"></div>
 
-                                <div class="file_status_label" style="margin-top: 8px;"></div>
-                            </div>
-                        </div>
+                        <div class="file_status_label" style="margin-top: 8px;"></div>
+                    </div>
+                    <hr/>
+                    <!-- datafile table -->
+                    <div id="component_table_loader"
+                         data-copo-tour-id="datafile_table"></div> <!-- div used by the quick tour agent -->
+                    <div style="display: block; margin-top: 25px;">
+                        <table id="datafile_table"
+                               class="ui celled table hover draggable-table copo-noborders-table"
+                               cellspacing="0" width="100%">
+                        </table>
                     </div>
                 </div>
-
-                <!-- datafile table -->
-                <div id="component_table_loader"
-                     data-copo-tour-id="datafile_table"></div> <!-- div used by the quick tour agent -->
-                <div style="display: block; margin-top: 25px;">
-                    <table id="datafile_table"
-                           class="ui celled table hover draggable-table copo-noborders-table"
-                           cellspacing="0" width="100%">
-                    </table>
-                </div>
-
             </div>
         </div>
         <div class="col-sm-6 col-md-6 col-lg-6">
             <!-- description bundle section -->
-
-            <div class="ui attached message" style="background: #CACBCD;">
-                <div class="header">
-                    Datafiles bundles
+            <div class="panel panel-default">
+                <div class="panel-heading" style="background-image: none; border: none;">
+                    <h4>Bundles</h4>
                 </div>
-                <p>
-                <div class="webpop-content-div" id="bundle-list-message" style="display: block;"><span
-                        style="color: #000;">Drag and drop datafiles to a bundle, select the <strong>Add/Edit metadata</strong> action to describe </span>
-                </div>
-                <div class="webpop-content-div" id="new-bundle-message" style="display: none;">
-                        <span style="color: #35637e;">Use the create
-                        button to create a bundle.</span>
-                </div>
-                </p>
-            </div>
-            <div class="ui attached fluid segment" style="font-size: inherit;">
-                <div class="row">
-                    <div class="col-sm-12 col-md-12 col-lg-12">
-                        <div class="pull-right">
-                            <div class="create-bundle-btn big ui button"
-                                 tabindex="0">
-                                <i class="fa fa-layer-group"></i>
-                                <span style="padding-left: 3px;">Create a bundle...</span>
-                            </div>
-                        </div>
+                <div class="panel-body">
+                    <div class="webpop-content-div">
+                        Use the create button to add a new bundle. Drag and drop datafiles to a bundle, and select
+                        <strong>Add/Edit metadata</strong> action from the bundle actions menu to describe.
                     </div>
-                </div>
+                    <hr/>
+                    <div class="ui large primary button create-bundle-btn" tabindex="0">Create a bundle</div>
+                    <hr/>
+                    <div id="cover-spin-bundle"></div>
 
-                <div id="cover-spin-bundle"></div>
-
-                <div class="desc-bundle-display-div" style="display: block; margin-top: 25px;">
-                    <div class="desc-bundle-display-div-2">
-                        <table id="copo_datafiles_bundle_table"
-                               class="ui celled table copo-noselect-table copo-noborders-table"
-                               cellspacing="0" width="100%">
-                        </table>
+                    <div class="desc-bundle-display-div" style="display: block; margin-top: 25px;">
+                        <div class="desc-bundle-display-div-2">
+                            <table id="copo_datafiles_bundle_table"
+                                   class="ui celled table copo-noselect-table copo-noborders-table"
+                                   cellspacing="0" width="100%">
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
