@@ -84,7 +84,7 @@
             $('#myCarousel').data('carousel_counter', ++count)
         });
 
-        $('#email_submit').on('click', submit_email)
+        // $('#email_submit').on('click', submit_email)
     });
 } (jQuery));
 

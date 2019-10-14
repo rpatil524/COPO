@@ -73,7 +73,8 @@ class DOI2Metadata:
 
                 # add the pmid
                 self.resolved_data["pubMedID"] = pmid
-        except:
+        except Exception as e:
+            print(str(e))
             self.error_messages.append("Could not resolve PubMed ID: " + pmid + "!")
 
         return

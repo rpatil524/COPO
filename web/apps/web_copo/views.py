@@ -214,7 +214,7 @@ def resolve_submission_id(request, submission_id):
     # get all file metadata
     output = dict()
     files = list()
-    for f in sub["bundle"]:
+    for f in sub.get("bundle", list()):
         file = DataFile().get_record(f)
         files.append(file["description"]["attributes"])
     output["files"] = files

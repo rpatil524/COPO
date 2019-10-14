@@ -183,8 +183,7 @@ $(document).ready(function () {
                             //set heading
                             if (!data.shared) {
                                 renderHTML.find(".panel-heading").find(".row-title").html('<span style="font-weight: bolder">' + data.title + '</span>');
-                            }
-                            else{
+                            } else {
                                 renderHTML.find(".panel-heading").find(".row-title").html('<span style="">' + data.title + '&nbsp<small>(Shared With Me)</small></span>');
                                 renderHTML.find(".panel-heading").css("background-color", "#007eff")
                             }
@@ -296,15 +295,24 @@ $(document).ready(function () {
             style: "margin-top:15px;"
         });
 
+
         components.forEach(function (item) {
             //skip profile entry metadata
             if (item.component == "profile") {
                 return false;
             }
 
+            var component_link = '#';
+
+            try {
+                component_link = $("#" + item.component + "_url").val().replace("999", record_id);
+            } catch (err) {
+                console.log(item.title);
+            }
+
             var buttonHTML = $(".pcomponent-button").clone();
             buttonHTML.attr("title", "Navigate to " + item.title);
-            buttonHTML.attr("href", $("#" + item.component + "_url").val().replace("999", record_id));
+            buttonHTML.attr("href", component_link);
             buttonHTML.find(".pcomponent-icon").addClass(item.iconClass);
             buttonHTML.find(".pcomponent-name").html(item.title);
             buttonHTML.find(".pcomponent-color").addClass(item.color);

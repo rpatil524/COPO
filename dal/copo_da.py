@@ -1,8 +1,9 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 
 import os
-import copy, json
-from datetime import datetime, date
+import copy
+import json
+from datetime import datetime
 from bson import ObjectId, json_util
 from chunked_upload.models import ChunkedUpload
 from web.apps.web_copo.lookup.lookup import DB_TEMPLATES
@@ -36,6 +37,7 @@ GroupCollection = 'GroupCollection'
 RepositoryCollection = 'RepositoryCollection'
 CGCoreCollection = 'CGCoreCollection'
 TextAnnotationCollection = 'TextAnnotationCollection'
+SubmissionQueueCollection = 'SubmissionQueueCollection'
 
 handle_dict = dict(publication=get_collection_ref(PubCollection),
                    person=get_collection_ref(PersonCollection),
@@ -503,7 +505,7 @@ class Submission(DAComponent):
         return doc
 
     def save_record(self, auto_fields=dict(), **kwargs):
-        if kwargs.get("bundle", list()):
+        if not kwargs.get("target_id", str()):
             repo = kwargs.pop("repository", str())
             for k, v in dict(
                     repository=repo,

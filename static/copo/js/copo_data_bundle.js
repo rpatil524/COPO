@@ -303,7 +303,7 @@ $(document).ready(function () {
         var infoPanelElement = trigger_global_notification();
 
         var codeList = '<div style="margin-top: 10px;"><ul class="list-group">\n' +
-            '  <li class="list-group-item active" style="background: #CACBCD; text-shadow: none; border-color: #CACBCD; color: #000;">Bundle color codes</li>\n' +
+            '  <li class="list-group-item active" style="background: #d9edf7; text-shadow: none; border-color: #d9edf7; color: #31708f;">Bundle color codes</li>\n' +
             '  <li class="list-group-item"><i title="" class="big icon stop circle outline grey"></i>Bundle is yet to be described/submitted or has partial metadata</li>\n' +
             '  <li class="list-group-item"><i title="" class="big icon stop circle outline green"></i>Bundle has been submitted</li>\n' +
             '  <li class="list-group-item"><i title="" class="big icon stop circle outline orange"></i>Bundle is pending submission or its submission is currently being processed</li>\n' +
@@ -321,7 +321,7 @@ $(document).ready(function () {
         var infoPanelElement = trigger_global_notification();
 
         var codeList = '<div style="margin-top: 10px;"><ul class="list-group">\n' +
-            '  <li class="list-group-item active" style="background: #CACBCD; text-shadow: none; border-color: #CACBCD; color: #000;">Datafiles workflow</li>\n' +
+            '  <li class="list-group-item active" style="background: #d9edf7; text-shadow: none; border-color: #d9edf7; color: #31708f;">Datafiles workflow</li>\n' +
             '  <li class="list-group-item">' +
             '      <div class="content">\n' +
             '           <div class="title"><h3 class="ui header">Upload datafiles</h3></div>\n' +
@@ -376,9 +376,9 @@ $(document).ready(function () {
 
                 var dtd = data.records;
 
-                if (dtd.length == 0) {
-                    return false;
-                }
+                // if (dtd.length == 0) {
+                //     return false;
+                // }
 
                 var tableID = bundleTableId;
 
@@ -1376,7 +1376,7 @@ $(document).ready(function () {
                         '  <p>No issues found!</p>\n' +
                         '</div>');
                 } else {
-                    viewPort.html('<div class="submission-issues text-danger">\n' +
+                    viewPort.html('<div class="submission-issues">\n' +
                         '  <p>The following issues were found.</p>\n' +
                         '</div>');
 
@@ -1384,9 +1384,7 @@ $(document).ready(function () {
                         class: "ui list",
                     });
 
-                    for (var i = 0; i < issues.length; ++i) {
-                        issuesList.append('<li class="text-danger">' + issues[i] + '</li>');
-                    }
+                    issuesList.append('<li class="text-danger">' + issues + '</li>');
 
                     viewPort.find(".submission-issues").append(issuesList);
                 }
