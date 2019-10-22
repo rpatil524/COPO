@@ -7,6 +7,7 @@ server {
     ssl_certificate       /run/secrets/copo-project.crt;
     ssl_certificate_key   /run/secrets/copo-project.key;
     client_max_body_size 1000M;
+    upload_max_filesize 1000M;
     # N.B. these lines commented out during ddos testing.....could cause unforseen issues
     # keepalive_timeout 730;
     # proxy_connect_timeout 925s;
