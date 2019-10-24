@@ -173,6 +173,12 @@ def annotate_meta(request, file_id):
             del request.session["ss_sheet_names"]
         return render(request, 'copo/copo_annotate_spreadsheet.html',
                       {'file_id': file_id, 'file_name': name, 'file_type': "ss"})
+    elif name.endswith("csv"):
+        return render(request, 'copo/copo_annotate_spreadsheet.html',
+                      {'file_id': file_id, 'file_name': name, 'file_type': "csv"})
+    elif name.endswith("txt"):
+        return render(request, 'copo/copo_annotate_spreadsheet.html',
+                      {'file_id': file_id, 'file_name': name, 'file_type': "tab"})
     elif name.endswith(('pdf')):
         html = ""
         records = Annotation().get_all_records()

@@ -3,7 +3,7 @@
 $(document).ready(function () {
     // attach array to document which will be used to hold spreadsheet data
     $(document).data('ss_data', new Array())
-    if ($("#file_type").val() == "ss") {
+    if ($("#file_type").val() == "ss" || $("#file_type").val() == "csv") {
         refresh_spreadsheet_display()
     }
     if ($("#file_type").val() == "pdf") {

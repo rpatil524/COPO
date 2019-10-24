@@ -15,32 +15,44 @@ def refresh_display(request):
     file = DataFile().get_record(file_id)
     path = file["file_location"]
     data = list()
+    filetype = None
+    if file["name"].endswith("csv"):
+        filetype = "csv"
+    elif file["name"].endswith("txt"):
+        filetype = "tab"
+    elif file["name"].endswith(("xls", "xlsx")):
+        filetype = "xls"
     if "ss_data" in request.session:
         # if data previously loaded then just load from session
         data = json_util.loads(request.session["ss_data"])
         sheet_names = json_util.loads(request.session["ss_sheet_names"])
     else:
         try:
-            #x1 = pandas.read_excel(path)
             sheet_names = pandas.ExcelFile(path).sheet_names
         except Exception as e:
-            print(e)
             # support CSV here (N.B. CSV does not support multiple sheets)
+            sheet_names = [file["name"]]
 
         # read entire spreadsheet
-
-        #ss =
-        for name in sheet_names:
-            d = pandas.read_excel(path, sheet_name=name, nrows=4).fillna(0)
+        if filetype == "xls":
+            for name in sheet_names:
+                d = pandas.read_excel(path, sheet_name=name, nrows=4).fillna(0)
+                out = list()
+                out.append(d.columns.tolist())
+                out.extend(d.values.tolist())
+                data.append(out)
+            try:
+                request.session["ss_data"] = json_util.dumps(data)
+                request.session["ss_sheet_names"] = json_util.dumps(sheet_names)
+            except:
+                pass
+        elif filetype == "csv":
+            d = pandas.read_csv(path)
+            d = d.fillna('')
             out = list()
             out.append(d.columns.tolist())
             out.extend(d.values.tolist())
             data.append(out)
-        try:
-            request.session["ss_data"] = json_util.dumps(data)
-            request.session["ss_sheet_names"] = json_util.dumps(sheet_names)
-        except:
-            pass
     return HttpResponse(json_util.dumps({"data": data, "names": sheet_names}))
 
 def refresh_text_annotations(request):
