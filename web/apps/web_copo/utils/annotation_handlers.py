@@ -47,7 +47,7 @@ def refresh_display(request):
             except:
                 pass
         elif filetype == "csv":
-            d = pandas.read_csv(path)
+            d = pandas.read_csv(path, nrows=4)
             d = d.fillna('')
             out = list()
             out.append(d.columns.tolist())

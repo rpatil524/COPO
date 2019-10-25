@@ -89,7 +89,7 @@ function dropHandler(ev, ui) {
         },
     }).done(function (d) {
         d = JSON.parse(d)
-        if ($("#file_type").val() == "ss") {
+        if ($("#file_type").val() == "ss" || $("#file_type").val() == "csv" || $("#file_type").val() == "tab") {
             refresh_spreadsheet_display()
         }
 
@@ -551,7 +551,7 @@ $(document).on("click", ".delete_annotation", function (ev) {
         type: "GET",
         data: {"col_idx": col_idx, "sheet_name": sheet_name, "file_id": file_id, "iri": label}
     }).done(function (data) {
-        if ($("#file_type").val() == "ss") {
+        if ($("#file_type").val() == "ss" || $("#file_type").val() == "csv" || $("#file_type").val() == "tab") {
             refresh_spreadsheet_display()
         }
     }).error(function (data) {
