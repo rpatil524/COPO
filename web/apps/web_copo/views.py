@@ -176,7 +176,7 @@ def annotate_meta(request, file_id):
     elif name.endswith("csv"):
         return render(request, 'copo/copo_annotate_spreadsheet.html',
                       {'file_id': file_id, 'file_name': name, 'file_type': "csv"})
-    elif name.endswith("txt"):
+    elif name.endswith(("txt", "tsv")):
         return render(request, 'copo/copo_annotate_spreadsheet.html',
                       {'file_id': file_id, 'file_name': name, 'file_type': "tab"})
     elif name.endswith(('pdf')):

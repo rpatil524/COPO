@@ -18,7 +18,7 @@ def refresh_display(request):
     filetype = None
     if file["name"].endswith("csv"):
         filetype = "csv"
-    elif file["name"].endswith("txt"):
+    elif file["name"].endswith(("txt", "tsv")):
         filetype = "tab"
     elif file["name"].endswith(("xls", "xlsx")):
         filetype = "xls"
