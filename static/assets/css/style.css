@@ -121,7 +121,7 @@ section {
 ==================================================*/
 .color-green {
     /*background-image: url('../img/wheat.jpg');*/
-    background-color: #6cb2ce;
+    background-color: rgba(179, 151, 89, 0.8);
     color: white
 }
 
@@ -538,7 +538,7 @@ nav li {
 
   #about {
     padding-bottom: 0px;
-    margin-bottom: -20px;
+
   }
 
   #about [class^=col-] {
