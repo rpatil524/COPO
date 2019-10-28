@@ -53,6 +53,13 @@ def refresh_display(request):
             out.append(d.columns.tolist())
             out.extend(d.values.tolist())
             data.append(out)
+        elif filetype == "tab":
+            d = pandas.read_csv(path,sep='\t', nrows=4)
+            d = d.fillna('')
+            out = list()
+            out.append(d.columns.tolist())
+            out.extend(d.values.tolist())
+            data.append(out)
     return HttpResponse(json_util.dumps({"data": data, "names": sheet_names}))
 
 def refresh_text_annotations(request):
