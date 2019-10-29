@@ -54,26 +54,6 @@ def login(request):
     return render(request, 'copo/auth/login.html', context)
 
 
-def test(request):
-    html = ""
-    records = Annotation().get_all_records("5d6d2df56f3ca55f1ef968dd")
-    if "annotation_html" not in request.session:
-
-        folder_name = str(uuid.uuid1())
-        full_path = os.path.join('/home/fshaw/Desktop/htmls', folder_name)
-        os.makedirs(full_path)
-        run("ebook-convert /home/fshaw/pdf/1.pdf " + full_path + " --no-images --pretty-print --insert-blank-line")
-        with open(os.path.join(full_path, "index.html"), 'r') as f:
-            html = f.read()
-        shutil.rmtree(full_path)
-        request.session["annotation_html"] = html
-    else:
-        print("using session text data")
-        html = request.session["annotation_html"]
-    return render(request, 'copo/copo_annotate_pdf.html',
-                  {"records": records, "file_id": "5d6d2df56f3ca55f1ef968dd", "file_name": "2.pdf", "html": html})
-
-
 '''
 def test(request):
     try:
@@ -137,6 +117,20 @@ def get_profile_counts(request):
     profile_id = request.session["profile_id"]
     counts = ProfileInfo(profile_id).get_counts()
     return HttpResponse(encode(counts))
+
+
+@login_required
+def view_templates(request, profile_id):
+    request.session["profile_id"] = profile_id
+    profile = Profile().get_record(profile_id)
+
+    return render(request, 'copo/metadata_templates.html', {'profile_id': profile_id, 'profile': profile})
+
+
+
+@login_required
+def author_template(request):
+    return render(request, "copo/author_template")
 
 
 @login_required
