@@ -9,7 +9,7 @@ from api.doi_metadata import DOI2Metadata
 import web.apps.web_copo.templatetags.html_tags as htags
 from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from dal.copo_da import Profile, Publication, Source, Person, Sample, Submission, DataFile, DAComponent, Annotation, \
-    Description, CGCore
+    Description, CGCore, MetadataTemplate
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.metadata_rater import MetadataRater
 from web.apps.web_copo.schemas.utils import data_utils
@@ -39,7 +39,8 @@ class BrokerDA:
             datafile=DataFile,
             submission=Submission,
             annotation=Annotation,
-            cgcore=CGCore
+            cgcore=CGCore,
+            metadata_template=MetadataTemplate
         )
 
         if self.component in da_dict:

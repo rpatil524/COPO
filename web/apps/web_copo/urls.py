@@ -1,14 +1,13 @@
 from django.urls import path, re_path
 from . import views
-from web.apps.web_copo.utils import ajax_handlers, annotation_handlers
+from web.apps.web_copo.utils import ajax_handlers, annotation_handlers, template_handlers
 
 app_name = 'web_copo'
 urlpatterns = [
     path('', views.index, name='index'),
     path('dataverse_submit/', views.test_dataverse_submit, name='test_dataverse_submit'),
     path('test_submission/', views.test_submission, name='test_submission'),
-    path('view_templates/', views.view_templates, name='view_templates'),
-    path('author_template/', views.author_template, name='author_template'),
+
     path('login/', views.login, name='auth'),
     path('logout/', views.copo_logout, name='logout'),
     path('register/', views.copo_register, name='register'),
@@ -39,6 +38,9 @@ urlpatterns = [
             ajax_handlers.search_ontology_ebi, name='ajax_search_ontology'),
     re_path(r'^ajax_search_copo_local/(?P<data_source>[a-zA-Z0-9,_]+)/$',
             ajax_handlers.search_copo_components, name='ajax_search_copo_local'),
+    re_path(r'^view_templates/(?P<profile_id>[a-z0-9]+)/view', views.view_templates, name='view_templates'),
+    path('new_metadata_template/', template_handlers.new_metadata_template, name="new_metadata_template"),
+    path('author_template/<template_id>/view', views.author_template, name='author_template'),
     path('copo_forms/', views.copo_forms, name="copo_forms"),
     path('copo_visualize/', views.copo_visualize, name="copo_visualize"),
     path('authenticate_figshare/', views.authenticate_figshare, name='authenticate_figshare'),

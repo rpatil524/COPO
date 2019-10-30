@@ -15,8 +15,7 @@ import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from dal.copo_base_da import DataSchemas
 from dal.copo_da import ProfileInfo, Repository, Description, Profile, Publication, Source, Person, Sample, Submission, \
-    DataFile, \
-    DAComponent, Annotation, CGCore
+    DataFile, DAComponent, Annotation, CGCore, MetadataTemplate
 from allauth.socialaccount import providers
 from django_tools.middlewares import ThreadLocal
 import hurry
@@ -29,7 +28,8 @@ table_id_dict = dict(publication="publication_table",
                      sample="sample_table",
                      datafile="datafile_table",
                      annotation="annotation_table",
-                     profile="profile_table"
+                     profile="profile_table",
+                     metadata_template="metadata_template_table"
                      )
 da_dict = dict(
     publication=Publication,
@@ -40,7 +40,8 @@ da_dict = dict(
     datafile=DataFile,
     submission=Submission,
     annotation=Annotation,
-    cgcore=CGCore
+    cgcore=CGCore,
+    metadata_template=MetadataTemplate
 )
 
 
@@ -190,6 +191,7 @@ def get_labels():
                       profile=dict(label="Profile"),
                       annotation=dict(label="Annotation"),
                       datafile=dict(label="Datafile"),
+                      metadata_template=dict(label="Metadata Template")
                       )
 
     return label_dict
@@ -514,6 +516,7 @@ def generate_copo_table_data(profile_id=str(), component=str()):
                         source=common_btn_dict,
                         profile=common_btn_dict,
                         annotation=common_btn_dict,
+                        metadata_template=common_btn_dict,
                         datafile=dict(
                             row_btns=[button_templates['info_row'], button_templates['describe_row'],
                                       button_templates['delete_row']],

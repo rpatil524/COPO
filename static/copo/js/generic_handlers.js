@@ -2042,6 +2042,20 @@ function get_profile_components() {
             visibleColumns: 4
         },
         {
+            component: 'metadata_template',
+            title: 'Metadata Template',
+            iconClass: "fa fa-paperclip",
+            semanticIcon: "attach",
+            countsKey: "num_temp",
+            buttons: ["quick-tour-template", "new-component-template"],
+            sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
+            colorClass: "pubs_color",
+            color: "orange",
+            tableID: 'metadata_template_table',
+            recordActions: ["add_record_all", "edit_record_single", "delete_record_multi"],
+            visibleColumns: 4
+        },
+        {
             component: 'person',
             title: 'People',
             iconClass: "fa fa-users",

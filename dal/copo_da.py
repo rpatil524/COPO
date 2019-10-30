@@ -38,6 +38,7 @@ RepositoryCollection = 'RepositoryCollection'
 CGCoreCollection = 'CGCoreCollection'
 TextAnnotationCollection = 'TextAnnotationCollection'
 SubmissionQueueCollection = 'SubmissionQueueCollection'
+MetadataTemplateCollection = 'MetadataTemplateCollection'
 
 handle_dict = dict(publication=get_collection_ref(PubCollection),
                    person=get_collection_ref(PersonCollection),
@@ -50,7 +51,8 @@ handle_dict = dict(publication=get_collection_ref(PubCollection),
                    group=get_collection_ref(GroupCollection),
                    repository=get_collection_ref(RepositoryCollection),
                    cgcore=get_collection_ref(CGCoreCollection),
-                   textannotation=get_collection_ref(TextAnnotationCollection)
+                   textannotation=get_collection_ref(TextAnnotationCollection),
+                   MetadataTemplate=get_collection_ref(MetadataTemplateCollection)
                    )
 
 
@@ -273,6 +275,16 @@ class TextAnnotation(DAComponent):
         docs = self.get_collection_handle().find({"file_id": ObjectId(file_id)})
         if docs:
             return cursor_to_list_str(docs)
+
+
+class MetadataTemplate(DAComponent):
+    def __init__(self, profile_id=None):
+        super(MetadataTemplate, self).__init__(profile_id, "MetadataTemplate")
+
+    def _new(self, profile_id, user_id, template_name):
+        record = self.save_record({}, **{"profile_id": ObjectId(profile_id), "user_id": user_id,
+                                         "template_name": template_name})
+        return record
 
 
 class Annotation(DAComponent):

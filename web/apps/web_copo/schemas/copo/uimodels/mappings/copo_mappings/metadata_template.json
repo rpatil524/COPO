@@ -1,0 +1,84 @@
+{
+  "configuration": {
+    "type": "json",
+    "provider": "copo",
+    "ref": ""
+  },
+  "properties": [
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "name"
+      ],
+      "description": "Name of Template",
+      "deprecated": false,
+      "hidden": "false",
+      "id": "copo.metadata_template.name",
+      "label": "Template Name",
+      "show_in_form": true,
+      "ref": "",
+      "type": "object",
+      "show_in_table": true,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "uid"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "true",
+      "label": "UserId",
+      "show_in_form": false,
+      "id": "copo.metadata_template.uid",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "profile_id"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "true",
+      "label": "profile_id",
+      "show_in_form": false,
+      "id": "copo.metadata_template.profile_id",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "term"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Term",
+      "show_in_form": true,
+      "id": "copo.metadata_template.terms",
+      "type": "array",
+      "show_in_table": false,
+      "control": ""
+    }
+  ],
+  "description": "Attributes for COPO Repository Schema.",
+  "title": "Metadata template mappings"
+}
