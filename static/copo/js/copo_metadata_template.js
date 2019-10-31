@@ -40,46 +40,6 @@ $(document).ready(function () {
 
     function do_record_task(event) {
 
-        BootstrapDialog.show({
-            title: 'Create New Template',
-            message: '<form id="template_name_form" role="form" data-toggle="validator">' +
-                '<div class="form-group">\n' +
-                '<label for="template_name">Template Name</label>\n' +
-                '<input type="text" class="form-control" id="template_name" placeholder="" data-error="Template Name is Required" required>\n' +
-                '<div class="help-block with-errors"></div>\n' +
-                '</div>\n' +
-                '</form>',
-            onshow: function (dialog) {
-
-            },
-            buttons: [{
-                label: 'Cancel',
-                hotkey: 27, // Keycode of esc
-                action: function (dialogRef) {
-                    dialogRef.close()
-                }
-            }, {
-                label: 'Create',
-                hotkey: 13,
-                action: function (dialogRef) {
-                    $("#template_name_form").validator("validate")
-                    var template_name = $(dialogRef.$modalContent).find("#template_name").val()
-                    if (template_name) {
-                        $.ajax({
-                                url: "/copo/new_metadata_template/",
-                                data: {"template_name": template_name},
-                                type: "GET"
-                            }
-                        ).done(function(data){
-                            dialogRef.close()
-                            window.location = data
-                        })
-
-                    }
-                }
-            }]
-        });
-        /*
 
         var task = event.task.toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
         var tableID = event.tableID; //get target table
@@ -93,10 +53,51 @@ $(document).ready(function () {
 
         //add task
         if (task == "add") {
+            BootstrapDialog.show({
+                title: 'Create New Template',
+                message: '<form id="template_name_form" role="form" data-toggle="validator">' +
+                    '<div class="form-group">\n' +
+                    '<label for="template_name">Template Name</label>\n' +
+                    '<input type="text" class="form-control" id="template_name" placeholder="" data-error="Template Name is Required" required>\n' +
+                    '<div class="help-block with-errors"></div>\n' +
+                    '</div>\n' +
+                    '</form>',
+                onshow: function (dialog) {
+
+                },
+                buttons: [{
+                    label: 'Cancel',
+                    hotkey: 27, // Keycode of esc
+                    action: function (dialogRef) {
+                        dialogRef.close()
+                    }
+                }, {
+                    label: 'Create',
+                    hotkey: 13,
+                    action: function (dialogRef) {
+                        $("#template_name_form").validator("validate")
+                        var template_name = $(dialogRef.$modalContent).find("#template_name").val()
+                        if (template_name) {
+                            $.ajax({
+                                    url: "/copo/new_metadata_template/",
+                                    data: {"template_name": template_name},
+                                    type: "GET"
+                                }
+                            ).done(function (data) {
+                                dialogRef.close()
+                                window.location = data
+                            })
+
+                        }
+                    }
+                }]
+            });
 
         }
 
-
+        if (task == "delete") {
+            alert("implement delete")
+        }
         //edit task
         if (task == "edit") {
             $.ajax({
@@ -119,7 +120,7 @@ $(document).ready(function () {
 
         //table.rows().deselect(); //deselect all rows
 
-         */
+
     }
 
 

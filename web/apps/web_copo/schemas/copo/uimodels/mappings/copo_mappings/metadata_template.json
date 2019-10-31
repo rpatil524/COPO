@@ -72,7 +72,7 @@
       "deprecated": false,
       "hidden": "false",
       "label": "Term",
-      "show_in_form": true,
+      "show_in_form": false,
       "id": "copo.metadata_template.terms",
       "type": "array",
       "show_in_table": false,
