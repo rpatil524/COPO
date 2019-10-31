@@ -1,10 +1,137 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'copo/base_1col.html' %}
 
-</body>
-</html>
+{% load staticfiles %}
+{% load web_tags %}
+{% load html_tags %}
+
+
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+
+            <!-- template name to go here -->
+            <p class="h4" id="template_name_label">{{ template_name }}</p>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4 col-md-4 col-lg-4" style="padding-top: 10px;min-height: 300px; background-color: #f9f9f9;">
+            <!-- search controls go here -->
+
+            <p class="h4">
+                Search Term
+                <small class="small">Query the Ontology Lookup Service</small>
+            </p>
+            <br/>
+            <p>
+                <small id="term_help" class="form-text text-muted">Start typing to find matching ontology
+                    terms
+                </small>
+            </p>
+            <div class="search-term-div ui icon input ">
+                <input type="text" id="search_term_text_box"
+                       aria-describedby="term_help" placeholder="Search">
+                <i class="search icon"></i>
+            </div>
+            <form>
+                <div class="form-group">
+
+                    <div class="dropdown ontology_dropdown pull-right">
+                        <div class="medium ui basic button dropdown-toggle"
+                             id="ontology_filter_button"
+                             data-toggle="dropdown"
+                             aria-haspopup="true" aria-expanded="true">
+                            <span class="ontology_label">All Ontologies</span>
+                            <span class="caret"></span>
+                        </div>
+
+                        <ul class="dropdown-menu" id="ontology_dropdown_filter"
+                            aria-labelledby="dropdownMenu1">
+                            <a>
+                                <li class="ontology_dd_item" data-name="All Ontologies" data-id="">
+                                <span class="h5">
+                                    <span class="ontology_dd_name">All Ontologies</span>
+                                    <br/>
+                                    <small class="ontology_dd_description">Search all ontologies for terms.</small>
+                                </span>
+                                </li>
+                            </a>
+                        </ul>
+                    </div>
+
+
+                </div>
+            </form>
+
+
+            <p class="h4" style="margin-top:60px">Search Results
+                <small class="text-muted">Drag Term to Column</small>
+            </p>
+            <!-- search results go here -->
+            <div id="search_results" style="overflow-y: scroll">
+
+            </div>
+        </div>
+
+
+        <div class="col-sm-4 col-md-4 col-lg-4"
+             style="padding-top: 10px; border-left: 10px solid white; background-color: #f9f9f9;">
+
+            <div class="col-sm-12 col-md-12 col-lg-12" style="min-height: 650px">
+                <p class="h4">Sheet Annotations <small>Current Annotations for this Sheet</small></p>
+                <div id="existing_annotations"></div>
+            </div>
+
+
+        </div>
+        <div class="col-sm-4 col-md-4 col-lg-4" id="filters"
+             style="padding-top: 10px; min-height: 650px; border-left: 10px solid white; background-color: #f9f9f9">
+            <!-- element filters go here -->
+            <p class="h4">All Annotations <small>Annotations from all Documents</small></p>
+            <span id="filters">
+                <a href="#" data-filter="all" class="label label-default label-primary">All Terms</a>
+                <a href="#" data-filter="by_count" class="label label-default">By Times Used</a>
+                <a href="#" data-filter="by_dataset" class="label label-default">By Dataset</a>
+            </span>
+
+            <hr/>
+            <div id="your_annotations"></div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+{% block stylesheet_block %}
+    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
+
+    <link rel="stylesheet" href="{% static 'copo/handsontable7.0.3/handsontable.full.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/datafile.css' %}" xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_annotations.css' %}" xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_ontology_styles.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+{% endblock %}
+
+
+{% block js_block %}
+    <script type="text/javascript" src="{% static 'copo/js/copo_metadata_template.js' %}"></script>
+    <script type="text/javascript" src="{% static 'copo/js/copo_file_level_annotations.js.js' %}"></script>
+    <script type="text/javascript" src="{% static 'copo/js/copo_ontology_functions.js' %}"></script>
+
+
+{% endblock %}

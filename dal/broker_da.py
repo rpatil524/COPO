@@ -339,6 +339,7 @@ class BrokerVisuals:
             source=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             submission=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             repository=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
+            metadata_template=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_all_profiles())),
         )
 

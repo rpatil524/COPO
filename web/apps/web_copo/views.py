@@ -8,7 +8,7 @@ from django.utils.safestring import mark_safe
 import uuid, os
 from submission.submissionDelegator import delegate_submission
 from api.handlers.general import *
-from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, CopoGroup, Repository, AnnotationReference
+from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, CopoGroup, Repository, AnnotationReference, MetadataTemplate
 from dal.OAuthTokens import OAuthToken
 from dal.broker_da import BrokerDA, BrokerVisuals
 from dal import cursor_to_list
@@ -129,7 +129,10 @@ def view_templates(request, profile_id):
 
 
 @login_required
-def author_template(request):
+def author_template(request, template_id):
+
+    record = MetadataTemplate().get_by_id(template_id)
+    context = {"template_name": record["template_name"]}
     return render(request, "copo/author_template")
 
 

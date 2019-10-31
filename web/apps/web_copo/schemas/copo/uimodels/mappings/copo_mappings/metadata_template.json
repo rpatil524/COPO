@@ -16,7 +16,7 @@
       "description": "Name of Template",
       "deprecated": false,
       "hidden": "false",
-      "id": "copo.metadata_template.name",
+      "id": "copo.metadata_template.template_name",
       "label": "Template Name",
       "show_in_form": true,
       "ref": "",
@@ -77,6 +77,23 @@
       "type": "array",
       "show_in_table": false,
       "control": ""
+    },{
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "deleted"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "true",
+      "label": "Delete",
+      "show_in_form": false,
+      "id": "copo.metadata_template.deleted",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text"
     }
   ],
   "description": "Attributes for COPO Repository Schema.",

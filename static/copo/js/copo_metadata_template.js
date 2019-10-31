@@ -1,7 +1,7 @@
 $(document).ready(function () {
 
     //******************************Event Handlers Block*************************//
-    var component = "publication";
+    var component = "metadata_template";
     var copoFormsURL = "/copo/copo_forms/";
     var csrftoken = $.cookie('csrftoken');
 
@@ -10,7 +10,7 @@ $(document).ready(function () {
 
     load_records(componentMeta); // call to load component records
 
-    register_resolvers_event(); //register event for publication resolvers
+    //register_resolvers_event(); //register event for publication resolvers
 
     //instantiate/refresh tooltips
     refresh_tool_tips();
