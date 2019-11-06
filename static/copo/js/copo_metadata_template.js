@@ -1,5 +1,27 @@
 $(document).ready(function () {
+    $(document).on("click", ".update_title_button", function (event) {
 
+
+
+        $(".new_title_div").addClass("loading")
+        var title = $('#new_title').val()
+        var template_id = $('#template_id').val()
+        if (title) {
+            $.ajax({
+                    url: "/copo/update_metadata_template_name/",
+                    data: {"template_name": title, "template_id": template_id},
+                    type: "GET"
+                }
+            ).done(function (data) {
+                $('#new_title').val("")
+                $('#new_title').attr("placeholder", data)
+                $(".new_title_div").removeClass("loading")
+            })
+        } else {
+            $(".new_title_div").removeClass("loading")
+        }
+
+    })
     //******************************Event Handlers Block*************************//
     var component = "metadata_template";
     var copoFormsURL = "/copo/copo_forms/";
@@ -20,6 +42,7 @@ $(document).ready(function () {
         do_render_component_table(globalDataBuffer, componentMeta);
     });
 
+
     //handle task button event
     $('body').on('addbuttonevents', function (event) {
         do_record_task(event);
@@ -34,6 +57,7 @@ $(document).ready(function () {
     $(document).on("mouseover", ".detail-hover-message", function (event) {
         $(this).prop('title', 'Click to view ' + component + ' details');
     });
+
 
     //******************************Functions Block******************************//
 
@@ -100,22 +124,7 @@ $(document).ready(function () {
         }
         //edit task
         if (task == "edit") {
-            $.ajax({
-                url: copoFormsURL,
-                type: "POST",
-                headers: {'X-CSRFToken': csrftoken},
-                data: {
-                    'task': 'form',
-                    'component': component,
-                    'target_id': records[0].record_id //only allowing row action for edit, hence first record taken as target
-                },
-                success: function (data) {
-                    json2HtmlForm(data);
-                },
-                error: function () {
-                    alert("Couldn't build publication form!");
-                }
-            });
+            window.location = "/copo/author_template/" + records[0].record_id + "/view"
         }
 
         //table.rows().deselect(); //deselect all rows
@@ -124,4 +133,33 @@ $(document).ready(function () {
     }
 
 
+    $("#template_content").droppable({
+        drop: function (event, ui) {
+            var d = ui.draggable[0]
+            $(d).css("width", "50%").css("margin", "30px 0 0 30px")
+            $(this).append(ui.draggable[0]);
+        }
+        //activeClass: "dropActive",
+        //tolerance: "pointer",
+        // drop: metadata_drop_handler,
+        //accept:".annotation_term"
+    }).sortable({
+
+    })
+
+    function metadata_drop_handler(ev, ui) {
+
+        var data = new Object();
+        var iri = $(ui.draggable.context).data("iri")
+        data.label = $(ui.draggable.context).data("label")
+        data.id = $(ui.draggable.context).data("id")
+        data.obo_id = $(ui.draggable.context).data("obo_id")
+        data.ontology_name = $(ui.draggable.context).data("ontology_name")
+        data.ontology_prefix = $(ui.draggable.context).data("ontology_prefix")
+        data.short_form = $(ui.draggable.context).data("short_form")
+        data.type = $(ui.draggable.context).data("type")
+        data.description = $(ui.draggable.context).data("description")
+    }
+
 })//end document ready
+

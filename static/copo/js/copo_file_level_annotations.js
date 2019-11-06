@@ -46,9 +46,7 @@ function refresh_text_annotations() {
     })
 }
 
-function startDrag(ev) {
 
-}
 
 function stopDrag(ev) {
     $(".selectedColumn").removeClass("selectedColumn")
@@ -221,9 +219,10 @@ function build_result_panel(d, idx, entry) {
         v = entry.label
         desc = entry.description
     }
-    if (annotation_type == "ss") {
+    if (annotation_type == "ss" || annotation_type == "metadata_template") {
         var result = $("<div/>", {
             class: "annotation_term panel panel-default align-middle",
+
             "data-iri": entry.iri,
             "data-label": entry.label,
             "data-id": entry.id,
@@ -236,9 +235,8 @@ function build_result_panel(d, idx, entry) {
         }).draggable({
             helper: "clone",
             containment: 'window',
-            opacity: 0.6,
-            start: startDrag,
-            stop: stopDrag
+            opacity: 1,
+            zIndex: 999,
         })
     } else {
         var result = $("<li/>", {

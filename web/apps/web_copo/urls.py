@@ -41,6 +41,8 @@ urlpatterns = [
     re_path(r'^view_templates/(?P<profile_id>[a-z0-9]+)/view', views.view_templates, name='view_templates'),
     path('new_metadata_template/', template_handlers.new_metadata_template, name="new_metadata_template"),
     path('author_template/<template_id>/view', views.author_template, name='author_template'),
+path('update_metadata_template_name/', template_handlers.update_metadata_template_name, name='update_metadata_template_name'),
+
     path('copo_forms/', views.copo_forms, name="copo_forms"),
     path('copo_visualize/', views.copo_visualize, name="copo_visualize"),
     path('authenticate_figshare/', views.authenticate_figshare, name='authenticate_figshare'),

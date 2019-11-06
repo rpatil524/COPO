@@ -6,17 +6,7 @@
 {% load html_tags %}
 
 {% block stylesheet_block %}
-
-    <style>
-        .row {
-            margin-left: 0 !important
-        }
-
-        .steps li span {
-            margin-left: 10px !important;
-        }
-    </style>
-
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_submission.css' %}" xmlns="http://www.w3.org/1999/html">
 {% endblock %}
 
 
@@ -51,10 +41,10 @@
     <!-- getting started section -->
     <div class="row">
         <div class="col-sm-4 col-md-4 col-lg-4 col-xs-offset-0 page-welcome-message" style="display: none;">
-            <div class="copo-webui-popover">
-                <div class="webui-popover-inner">
-                    <h3 class="copo-webui-popover-title">Submissions - Getting started</h3>
-                    <div class="copo-webui-popover-content">
+            <div class="copo-webui-copo_popover">
+                <div class="webui-copo_popover-inner">
+                    <h3 class="copo-webui-copo_popover-title">Submissions - Getting started</h3>
+                    <div class="copo-webui-copo_popover-content">
                         <div class="webpop-content-div">
                             The submission component of a profile displays submissions created (conclusive or pending)
                             within a profile.<br/><br/>To create a submission entry, you have to first go through
@@ -85,7 +75,10 @@
                cellspacing="0" width="100%">
         </table>
     </div>
-
+    <div class="copo_popover">
+        <input type='text' class='span1'/>
+        <input type='button' class='btn' value='Save'/>
+    </div>
     <div class="modal fade" id="repo_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -109,6 +102,9 @@
         </div>
     </div>
 
+
+
+
 {% endblock %}
 
 {% block help_section %}
@@ -123,4 +119,5 @@
     <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
     <script src="{% static 'copo/js/copo_submission.js' %}"></script>
     <script src="{% static 'copo/js/repository_inspection.js' %}"></script>
+
 {% endblock %}

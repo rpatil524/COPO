@@ -1,0 +1,11 @@
+#template_content{
+    height:800px;
+    border: 1px solid black;
+    margin: 0 auto;
+
+    z-index: 0;
+}
+
+.ui-droppable-active{
+    background-color: #0b97c4;
+}

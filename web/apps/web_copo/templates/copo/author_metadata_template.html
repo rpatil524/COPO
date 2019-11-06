@@ -4,22 +4,29 @@
 {% load web_tags %}
 {% load html_tags %}
 
-
-
 {% block content %}
+    <input type="hidden" id="template_id" value="{{ template_id }}"/>
+    <input type="hidden" id="annotation_type" value="metadata_template"/>
 
     <div class="row">
         <div class="col-sm-12 col-md-12 col-lg-12">
-
-            <!-- template name to go here -->
-            <p class="h4" id="template_name_label">{{ template_name }}</p>
+            <form class="form-inline" style="margin-left:15px">
+                <div class="form-group row">
+                    <label for="new_title">Update Title</label><br/>
+                    <div class="new_title_div ui icon input">
+                        <input type="email" class="form-control" id="new_title" aria-describedby="new_name_note"
+                               placeholder="{{ template_name }}">
+                        <i class="pencil alternate icon"></i>
+                    </div>
+                    <button type="button" id="" class="btn btn-primary update_title_button">Update</button>
+                </div>
+            </form>
 
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-4 col-md-4 col-lg-4" style="padding-top: 10px;min-height: 300px; background-color: #f9f9f9;">
-            <!-- search controls go here -->
-
+        <div class="col-sm-3 col-md-3 col-lg-3" style="">
+            <hr/>
             <p class="h4">
                 Search Term
                 <small class="small">Query the Ontology Lookup Service</small>
@@ -76,62 +83,40 @@
         </div>
 
 
-        <div class="col-sm-4 col-md-4 col-lg-4"
-             style="padding-top: 10px; border-left: 10px solid white; background-color: #f9f9f9;">
-
-            <div class="col-sm-12 col-md-12 col-lg-12" style="min-height: 650px">
-                <p class="h4">Sheet Annotations <small>Current Annotations for this Sheet</small></p>
-                <div id="existing_annotations"></div>
-            </div>
-
+        <div class="col-sm-6 col-md-6 col-lg-6">
+            <div id="template_content"></div>
 
         </div>
-        <div class="col-sm-4 col-md-4 col-lg-4" id="filters"
-             style="padding-top: 10px; min-height: 650px; border-left: 10px solid white; background-color: #f9f9f9">
-            <!-- element filters go here -->
-            <p class="h4">All Annotations <small>Annotations from all Documents</small></p>
-            <span id="filters">
-                <a href="#" data-filter="all" class="label label-default label-primary">All Terms</a>
-                <a href="#" data-filter="by_count" class="label label-default">By Times Used</a>
-                <a href="#" data-filter="by_dataset" class="label label-default">By Dataset</a>
-            </span>
-
-            <hr/>
-            <div id="your_annotations"></div>
+        <div class="col-sm-3 col-md-3 col-lg-3" id="filters"
+             style="">
         </div>
     </div>
-
-
-
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
 
 
 {% block stylesheet_block %}
     <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
-
     <link rel="stylesheet" href="{% static 'copo/handsontable7.0.3/handsontable.full.css' %}"
           xmlns="http://www.w3.org/1999/html">
     <link rel="stylesheet" href="{% static 'copo/css/copo/datafile.css' %}" xmlns="http://www.w3.org/1999/html">
     <link rel="stylesheet" href="{% static 'copo/css/copo/copo_annotations.css' %}" xmlns="http://www.w3.org/1999/html">
     <link rel="stylesheet" href="{% static 'copo/css/copo/copo_ontology_styles.css' %}"
           xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_annotations.css' %}" xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/author_metadata_template.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+
+    <style>
+
+    </style>
 {% endblock %}
 
 
 {% block js_block %}
+    <script src="{% static 'copo/js/generic_handlers.js' %}"></script>
+    <script src="{% static 'copo/js/generic_handlers_ext2.js' %}"></script>
+    <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
     <script type="text/javascript" src="{% static 'copo/js/copo_metadata_template.js' %}"></script>
-    <script type="text/javascript" src="{% static 'copo/js/copo_file_level_annotations.js.js' %}"></script>
+    <script type="text/javascript" src="{% static 'copo/js/copo_file_level_annotations.js' %}"></script>
     <script type="text/javascript" src="{% static 'copo/js/copo_ontology_functions.js' %}"></script>
-
-
 {% endblock %}
