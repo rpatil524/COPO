@@ -105,7 +105,8 @@ path('update_metadata_template_name/', template_handlers.update_metadata_templat
          name="delete_annotation"),
     path('refresh_annotations_for_user/', annotation_handlers.refresh_annotations_for_user,
          name="refresh_annotations_for_user"),
-
+    path('get_dataset_info/', ajax_handlers.get_dataset_info,
+         name="get_dataset_info"),
     path('annotations', annotation_handlers.new_text_annotation,
          name="new_text_annotation"),
     path('search', annotation_handlers.search_text_annotation,

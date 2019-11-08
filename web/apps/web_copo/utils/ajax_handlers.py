@@ -542,6 +542,24 @@ def search_dataverse(request):
 
     return HttpResponse(resp)
 
+def get_dataset_info(request):
+    doi = request.GET["doi"]
+    sub = request.GET["sub_id"]
+    details = Submission().get_dataverse_details(sub)
+    # 'https://dataverse.harvard.edu/api/datasets/export?exporter=schema.org&persistentId=doi:10.7910/DVN/ECFS7N'
+    # 'https://dataverse.harvard.edu/api/datasets/export?exporter=schema.org&persistentId=doi.org/10.7910/DVN/ZDGJ7S'
+    if not details['url'].endswith("/"):
+        url = details['url'] + '/'
+    else:
+        url = details['url']
+    dv_url = url + 'api/datasets/export?exporter=schema.org&persistentId=doi:' + doi
+    resp = requests.get(url=dv_url)
+    if not resp.status_code == 200:
+        return HttpResponse(status=503)
+    else:
+        data = json_util.dumps(resp.content.decode("utf-8"))
+        return HttpResponse(data)
+
 
 def get_dataverse_content(request):
     id = request.GET['id']

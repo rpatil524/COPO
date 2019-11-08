@@ -706,16 +706,90 @@ function expand_table(event) {
         })
     }
 }
+
 //$(document).on("click", ".persistentUrl_cell", function (e) {
 $(document).on("click", ".persistentUrl_cell", function (e) {
     var offset = $(this).offset();
     var left = e.pageX;
     var top = e.pageY;
-    var theHeight = $('.copo_popover').height();
-    $('.copo_popover').show();
-    $('.copo_popover').css('left', (left) + 'px');
-    $('.copo_popover').css('top', (top-(theHeight*2)-10) + 'px');
+    $('.copo_popover').show()
+    $('.copo_popover').html('<div class="ui active inverted dimmer">\
+        <div class="ui text loader">Loading</div>\
+        </div>')
+    var doi = $(this).html()
+    doi = doi.replace("https://doi.org/", "")
+    doi = doi.replace("http://doi.org/", "")
+    var sub_id = $(document).data('submission_id')
+    $.ajax({
+        url: "/copo/get_dataset_info/",
+        type: "GET",
+        data: {
+            'doi': doi,
+            'sub_id': sub_id
+        },
+        dataType: "json"
+    }).done(function (data) {
+        data = JSON.parse(data)
+        var html = "<table class=\"table table-bordered\"> \
+        <tr><th>Name</th><td>" + data.name + "</td></tr>\
+        <tr><th>Description</th><td>" + data.description[0].substring(0, 200) + "..." + "</td></tr>"
+        html = html + "<tr><th>Date Published</th><td>" + data.datePublished + "</td></tr>"
+        html = html + "<tr><th>Date Modified</th><td>" + data.dateModified + "</td></tr>"
+
+        $(data.author).each(function(idx, el){
+            html = html + "<tr>"
+            if (idx == 1){
+                html = html + "<th>Authors</th><td>" + el.name + "</td>"
+            }else{
+                html = html + "<td></td><td>" + el.name + "</td>"
+            }
+            html = html + "</tr>"
+        })
+
+
+
+        $(data.creator).each(function(idx, el){
+            html = html + "<tr>"
+            if (idx == 1){
+                html = html + "<th>Creators</th><td>" + el.name + "</td>"
+            }else{
+                html = html + "<td></td><td>" + el.name + "</td>"
+            }
+            html = html + "</tr>"
+        })
+
+
+
+        $(data.keywords).each(function(idx, el){
+            html = html + "<tr>"
+            if (idx == 1){
+                html = html + "<th>Keywords</th><td>" + el + "</td>"
+            }else{
+                html = html + "<td></td><td>" + el + "</td>"
+            }
+            html = html + "</tr>"
+        })
+
+
+        html = html + "</table>"
+        $('.copo_popover').html(html)
+
+        var theHeight = $('.copo_popover').height();
+        $('.copo_popover').css('left', (left) + 'px');
+        $('.copo_popover').css('top', (top - (theHeight) - 10) + 'px');
+        $('.copo_popover').show();
+    })
 })
+
+
+$(document).on("click", function (e) {
+    // if the target of the click isn't the container nor a descendant of the container
+    if ($(e.target).hasClass("copo_popover") || $(e.target).hasClass("persistentUrl_cell")) {
+    } else {
+        $(".copo_popover").hide();
+        console.log("hidding")
+    }
+});
 
 
 function do_new_dataverse_fields() {
