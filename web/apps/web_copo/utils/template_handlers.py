@@ -13,3 +13,9 @@ def new_metadata_template(request):
     record = MetadataTemplate().save_record({},**d)
     url = reverse("copo:author_template", args=[str(record["_id"])])
     return HttpResponse(url)
+
+def update_metadata_template_name(request):
+    template_name = request.GET["template_name"]
+    template_id = request.GET["template_id"]
+    new_name = MetadataTemplate().update_name(template_name=template_name, template_id=template_id)["template_name"]
+    return HttpResponse(new_name)

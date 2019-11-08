@@ -15,14 +15,23 @@ $(document).ready(function () {
     $(document).on('click', '.target_repo_option', get_existing_metadata)
     //check_repo_id()
     do_new_dataverse_fields()
+
     // here we should call funcs for filling out other repo details
 
+    function delay(fn, ms) {
+        let timer = 0
+        return function (...args) {
+            clearTimeout(timer)
+            timer = setTimeout(fn.bind(this, ...args), ms || 1000)
+        }
+    }
 
-    $(document).on('keyup', '#search_dataverse', function (el) {
+    $(document).on('keyup', '#search_dataverse', delay(function (e) {
         //$(document).data('open_modal', modal
-        e = $(el.currentTarget)
-        var q = e.val()
-        var search_type = e.attr('id')
+        e = $("#repo_modal").find("#search_dataverse")
+        var q = $(e).val()
+
+        var search_type = $(e).attr('id')
         var box = "";
         var repo_type = $('#repo_modal-body').data('repo')
         $('.ajax-loading-div').fadeIn()
@@ -50,7 +59,7 @@ $(document).ready(function () {
             })
 
 
-    })
+    }))
     //$('#repo_modal').find('input[value="existing"]').attr("checked", "checked")
 
 })
@@ -66,8 +75,7 @@ function handle_radio(el) {
         }
         $('#repo_modal').find('#existing_metadata_table_div').show()
         get_existing_metadata()
-    }
-    else {
+    } else {
         $('#repo_modal').find('#table-div-dataverse').show()
         //$('.new-controls').hide()
         //$('.existing-controls').show()
@@ -79,8 +87,7 @@ function handle_radio(el) {
 function get_existing_metadata(e) {
     if (e) {
         var sub_id = $(e.currentTarget).attr('data-submission_id')
-    }
-    else {
+    } else {
         var sub_id = $(document).data('submission_id')
     }
     $.ajax({
@@ -147,8 +154,7 @@ function check_repo_id(e) {
             $('#repo_modal-body').html(form_html)
             $('#repo_modal-body').data('repo', data.repo_type)
             //add_delay_keyup('#search_dataverse')
-        }
-        else if (data.repo_type == 'dspace') {
+        } else if (data.repo_type == 'dspace') {
             // load dspace repo html into modal
             $('.ajax-loading-div').show()
             $('#repo_modal-body').html()
@@ -158,8 +164,7 @@ function check_repo_id(e) {
             $('#repo_modal-body').data('repo', data.repo_type)
             $.getJSON("/copo/get_dspace_communities/", {'submission_id': sub_id}).done(build_dspace_modal
             )
-        }
-        else if (data.repo_type == 'ckan') {
+        } else if (data.repo_type == 'ckan') {
             $('.ajax-loading-div').show()
             $('#repo_modal-body').html()
             var form_html = $('#template_dspace_form').find('.form_content').clone()
@@ -191,8 +196,7 @@ function build_ckan_modal(resp) {
     $(t).attr('id', 'ckan-table')
     if (resp.status == 1) {
         trow = "<tr><td colspan='5'>" + resp.message + "</td></tr>"
-    }
-    else if (resp.result.length > 0) {
+    } else if (resp.result.length > 0) {
         var trow = ""
         $(resp.result).each(function (idx, el) {
             var colCheck = "<tr data-type='ckan' data-alias='" + el + "'><td><div class='pretty p-default' style='font-size: 26px'>" +
@@ -206,8 +210,7 @@ function build_ckan_modal(resp) {
             trow = trow + colCheck
         })
         $('#repo_modal').find('#ckan-table').DataTable()
-    }
-    else {
+    } else {
         trow = "<tr><td colspan='5'>No Data to Show</td></tr>"
     }
     $(t).find('tbody').append(trow)
@@ -235,7 +238,10 @@ function build_dataverse_modal(resp) {
     var checked = $('input[name=dataverse-radio]:checked').val();
     var trow
     if (checked == 'dataverse') {
-        if (resp.data.items.length > 0) {
+        if (resp.data.items.length == 0) {
+            trow = "<tr><td colspan='5'>No Data to Show</td></tr>"
+            $(t).find('tbody').append(trow)
+        } else {
             if (new_or_existing == "new") {
                 colCheck = "<td style='text-align: center'><div class='dataset-checkbox pretty p-default' style='font-size: 26px'>" +
                     "<input type='checkbox'/>" +
@@ -252,10 +258,10 @@ function build_dataverse_modal(resp) {
                         "<td>" + el.published_at + "</td>" +
                         "<td>" + el.type + "</td>"
                     "</tr>"
+                    $(t).find('tbody').append(trow)
 
                 })
-            }
-            else {
+            } else {
                 $(resp.data.items).each(function (idx, el) {
                     trow = "<tr data-alias='" + el.identifier + "' data-type='" + el.type + "' data-entity_id='" + el.entity_id + "'>" +
                         "<td class='summary-details-control' style='text-align:center'></td>" +
@@ -265,15 +271,13 @@ function build_dataverse_modal(resp) {
                         "<td>" + el.published_at + "</td>" +
                         "<td>" + el.type + "</td>"
                     "</tr>"
+                    $(t).find('tbody').append(trow)
                 })
             }
         }
-        else {
-            trow = "<tr><td colspan='5'>No Data to Show</td></tr>"
-        }
-        $(t).find('tbody').append(trow)
-    }
-    else if (checked == 'dataset') {
+
+
+    } else if (checked == 'dataset') {
         var trow
         var colCheck
         $(resp.data.items).each(function (idx, el) {
@@ -385,8 +389,7 @@ function expand_dspace_table(event) {
                 }, function (data) {
                     try {
                         var data = JSON.parse(data)
-                    }
-                    catch (e) {
+                    } catch (e) {
                         row.child($('<div></div>').append("<h5>JSON ERROR</h5>")).show();
                         return
                     }
@@ -457,8 +460,7 @@ function expand_dspace_table(event) {
                                 "</div>" +
                                 "</div>")
                             colTR.append(colCheck).append(col1).append(col11).append(col11).append(col111)
-                        }
-                        else if (new_or_existing == "existing") {
+                        } else if (new_or_existing == "existing") {
                             var plus = "<td class='summary-details-control' style='vertical-align: top; text-align:center'></td>"
                             colTR.append(plus).append(col1).append(col11).append(col11).append(col111)
 
@@ -488,8 +490,7 @@ function expand_dspace_table(event) {
                     $(document).data('shown_tr', tr_temp)
                     $(tr).addClass('shown');
                 })
-            }
-            else if (dspace_type == "collection") {
+            } else if (dspace_type == "collection") {
 
                 $.get("/copo/get_dspace_items/",
                     {
@@ -499,8 +500,7 @@ function expand_dspace_table(event) {
                     function (data) {
                         try {
                             var data = JSON.parse(data)
-                        }
-                        catch (e) {
+                        } catch (e) {
                             row.child($('<div></div>').append("<h5>JSON ERROR</h5>")).show();
                             return
                         }
@@ -629,8 +629,7 @@ function expand_table(event) {
 
             try {
                 var data = JSON.parse(data)
-            }
-            catch (e) {
+            } catch (e) {
                 row.child($('<div></div>').append("<h5>JSON ERROR</h5>")).show();
                 return
             }
@@ -657,7 +656,7 @@ function expand_table(event) {
             var tr_header = $("<tr/>")
 
             var identifier = $("<th/>", {
-                html: "Identifier"
+                html: "DOI"
             })
             var publisher = $("<th/>", {
                 html: "Name"
@@ -686,7 +685,7 @@ function expand_table(event) {
                 $(colTR).attr('data-persistent', el.persistentUrl)
                 $(colTR).attr('data-publisher', el.publisher)
                 $(colTR).attr('data-type', "dataverse")
-                var col1 = $('<td/>').append(el.identifier);
+                var col1 = $('<td class="persistentUrl_cell" data-container="body"/>').append(el.persistentUrl);
                 var col11 = $('<td/>').append(el.publisher);
                 //var col2 = $('<td/>').append(el.dsDescription[0].dsDescriptionValue.value);
                 var col3 = $('<td/>').append(el.publicationDate)
@@ -707,6 +706,90 @@ function expand_table(event) {
         })
     }
 }
+
+//$(document).on("click", ".persistentUrl_cell", function (e) {
+$(document).on("click", ".persistentUrl_cell", function (e) {
+    var offset = $(this).offset();
+    var left = e.pageX;
+    var top = e.pageY;
+    $('.copo_popover').show()
+    $('.copo_popover').html('<div class="ui active inverted dimmer">\
+        <div class="ui text loader">Loading</div>\
+        </div>')
+    var doi = $(this).html()
+    doi = doi.replace("https://doi.org/", "")
+    doi = doi.replace("http://doi.org/", "")
+    var sub_id = $(document).data('submission_id')
+    $.ajax({
+        url: "/copo/get_dataset_info/",
+        type: "GET",
+        data: {
+            'doi': doi,
+            'sub_id': sub_id
+        },
+        dataType: "json"
+    }).done(function (data) {
+        data = JSON.parse(data)
+        var html = "<table class=\"table table-bordered\"> \
+        <tr><th>Name</th><td>" + data.name + "</td></tr>\
+        <tr><th>Description</th><td>" + data.description[0].substring(0, 200) + "..." + "</td></tr>"
+        html = html + "<tr><th>Date Published</th><td>" + data.datePublished + "</td></tr>"
+        html = html + "<tr><th>Date Modified</th><td>" + data.dateModified + "</td></tr>"
+
+        $(data.author).each(function(idx, el){
+            html = html + "<tr>"
+            if (idx == 1){
+                html = html + "<th>Authors</th><td>" + el.name + "</td>"
+            }else{
+                html = html + "<td></td><td>" + el.name + "</td>"
+            }
+            html = html + "</tr>"
+        })
+
+
+
+        $(data.creator).each(function(idx, el){
+            html = html + "<tr>"
+            if (idx == 1){
+                html = html + "<th>Creators</th><td>" + el.name + "</td>"
+            }else{
+                html = html + "<td></td><td>" + el.name + "</td>"
+            }
+            html = html + "</tr>"
+        })
+
+
+
+        $(data.keywords).each(function(idx, el){
+            html = html + "<tr>"
+            if (idx == 1){
+                html = html + "<th>Keywords</th><td>" + el + "</td>"
+            }else{
+                html = html + "<td></td><td>" + el + "</td>"
+            }
+            html = html + "</tr>"
+        })
+
+
+        html = html + "</table>"
+        $('.copo_popover').html(html)
+
+        var theHeight = $('.copo_popover').height();
+        $('.copo_popover').css('left', (left) + 'px');
+        $('.copo_popover').css('top', (top - (theHeight) - 10) + 'px');
+        $('.copo_popover').show();
+    })
+})
+
+
+$(document).on("click", function (e) {
+    // if the target of the click isn't the container nor a descendant of the container
+    if ($(e.target).hasClass("copo_popover") || $(e.target).hasClass("persistentUrl_cell")) {
+    } else {
+        $(".copo_popover").hide();
+        console.log("hidding")
+    }
+});
 
 
 function do_new_dataverse_fields() {
@@ -778,8 +861,7 @@ function select_dataset(e) {
                     'new_or_existing': new_or_existing
                 })
             }
-        }
-        else if (type == 'ckan') {
+        } else if (type == 'ckan') {
             data = {
                 'type': type,
                 'submission_id': sub_id,
@@ -798,8 +880,7 @@ function select_dataset(e) {
             data.form_data = formdata
             var label = $(document).data('current-label')
             $(label).html(identifier + " - " + name)
-        }
-        else {
+        } else {
             data.new_or_existing = "existing"
             var label = $(document).data('current-label')
             if (type == "dspace")
@@ -808,8 +889,7 @@ function select_dataset(e) {
                 $(label).html(identifier)
             }
         }
-    }
-    else {
+    } else {
         if (new_or_existing == "existing") {
             var dataset_id = $(row).data('id')
             var persistent = $(row).data('persistent')
@@ -820,8 +900,7 @@ function select_dataset(e) {
             var label = $(document).data('current-label')
             if (type == "ckan") {
                 $(label).html("Submitting to: <span class='badge'>" + identifier + "</span>")
-            }
-            else {
+            } else {
                 $(label).html("Submitting to: <span class='badge'>" + identifier + " - " + persistent + "</span>")
             }
             data = {

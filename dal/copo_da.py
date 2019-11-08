@@ -281,11 +281,9 @@ class MetadataTemplate(DAComponent):
     def __init__(self, profile_id=None):
         super(MetadataTemplate, self).__init__(profile_id, "metadata_template")
 
-    def _new(self, profile_id, user_id, template_name):
-        record = self.save_record({"profile_id": ObjectId(profile_id), "user_id": user_id,
-                                   "template_name": template_name},
-                                  **{"profile_id": ObjectId(profile_id), "user_id": user_id,
-                                     "template_name": template_name})
+    def update_name(self, template_name, template_id):
+        record = self.get_collection_handle().update({"_id": ObjectId(template_id)}, {"$set": {"template_name": template_name}})
+        record = self.get_by_id(template_id)
         return record
 
     def get_by_id(self, id):

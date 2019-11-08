@@ -132,8 +132,8 @@ def view_templates(request, profile_id):
 def author_template(request, template_id):
 
     record = MetadataTemplate().get_by_id(template_id)
-    context = {"template_name": record["template_name"]}
-    return render(request, "copo/author_template")
+    context = {"template_name": record["template_name"], "template_id": template_id}
+    return render(request, "copo/author_metadata_template.html", context)
 
 
 @login_required
