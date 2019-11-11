@@ -2040,7 +2040,7 @@ function get_profile_components() {
             tableID: 'publication_table',
             recordActions: ["add_record_all", "edit_record_single", "delete_record_multi"],
             visibleColumns: 4
-        },/*
+        },
         {
             component: 'metadata_template',
             title: 'Metadata Template',
@@ -2054,7 +2054,7 @@ function get_profile_components() {
             tableID: 'metadata_template_table',
             recordActions: ["add_record_all", "edit_record_single", "delete_record_multi"],
             visibleColumns: 4
-        },*/
+        },
         {
             component: 'person',
             title: 'People',

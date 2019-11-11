@@ -290,6 +290,11 @@ class MetadataTemplate(DAComponent):
         record = self.get_collection_handle().find_one({"_id": ObjectId(id)})
         return record
 
+    def update_template(self, template_id, data):
+        print(data)
+        record = self.get_collection_handle().update_one({"_id": ObjectId(template_id)}, {"$set": {"terms": data}})
+        return record
+
 
 class Annotation(DAComponent):
     def __init__(self, profile_id=None):

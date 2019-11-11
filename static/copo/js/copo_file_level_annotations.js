@@ -47,7 +47,6 @@ function refresh_text_annotations() {
 }
 
 
-
 function stopDrag(ev) {
     $(".selectedColumn").removeClass("selectedColumn")
 }
@@ -237,6 +236,7 @@ function build_result_panel(d, idx, entry) {
             containment: 'window',
             opacity: 1,
             zIndex: 999,
+            stop: update_template
         })
     } else {
         var result = $("<li/>", {
@@ -267,7 +267,7 @@ function build_result_panel(d, idx, entry) {
             class: "ui mini icon button green expand_annotation pull-right",
 
         })
-        var icon = $("<i/>",{
+        var icon = $("<i/>", {
             class: "icon plus",
             style: "color: white; margin-bottom: 5px"
 
@@ -281,6 +281,12 @@ function build_result_panel(d, idx, entry) {
             html: "used: " + entry["count"],
             class: "pull-right"
         })))
+    } else {
+        $(result).append('<span style="display: none; margin-left: 10px" class="ui red compact icon button delete_button pull-right">\n' +
+            '  <i class="trash icon"></i>\n' +
+            '</span>')
+
+        $(result).append("<span style='font-size: x-large' class='count pull-right'></span>")
     }
     if (entry.hasOwnProperty("description")) {
         t = desc
@@ -292,6 +298,7 @@ function build_result_panel(d, idx, entry) {
         html: t,
         "style": "color: black; padding-top: 10px"
     }))
+
     return result
 }
 
@@ -521,7 +528,7 @@ function make_annotation_panel(data, d) {
 
 $(document).on("mouseover", ".annotation_term", function (data) {
     if ($(data.currentTarget).data("is_search_result") == false) {
-        if($("#annotation_type").val() == "ss") {
+        if ($("#annotation_type").val() == "ss") {
             var sheet_name = $("div[name^='table']:visible").attr("name")
             var hot = $(document).data(sheet_name)
             var col = $(data.currentTarget).data("col_idx")

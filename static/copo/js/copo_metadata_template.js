@@ -1,8 +1,14 @@
 $(document).ready(function () {
+    $("#template_content").sortable(
+        {
+            stop: update_template
+        }
+    )
+    $(document).on("click", ".delete_button", function (event) {
+        $(event.currentTarget).closest(".annotation_term").remove()
+        update_template(event, this)
+    })
     $(document).on("click", ".update_title_button", function (event) {
-
-
-
         $(".new_title_div").addClass("loading")
         var title = $('#new_title').val()
         var template_id = $('#template_id').val()
@@ -20,7 +26,6 @@ $(document).ready(function () {
         } else {
             $(".new_title_div").removeClass("loading")
         }
-
     })
     //******************************Event Handlers Block*************************//
     var component = "metadata_template";
@@ -138,13 +143,13 @@ $(document).ready(function () {
             var d = ui.draggable[0]
             $(d).css("width", "50%").css("margin", "30px 0 0 30px")
             $(this).append(ui.draggable[0]);
+            $(ui.draggable[0]).draggable({disabled: "true"})
+            $(ui.draggable[0]).find(".delete_button").show()
         }
         //activeClass: "dropActive",
         //tolerance: "pointer",
         // drop: metadata_drop_handler,
         //accept:".annotation_term"
-    }).sortable({
-
     })
 
     function metadata_drop_handler(ev, ui) {
@@ -161,5 +166,36 @@ $(document).ready(function () {
         data.description = $(ui.draggable.context).data("description")
     }
 
+
 })//end document ready
 
+function update_template(event, ui) {
+    // get elements in sortable
+    $(".loading_div").show()
+    var items = $("#template_content").children()
+    var terms = new Array()
+    $(items).each(function (idx, el) {
+        $(el).find(".count").html(idx + 1)
+        $(el).data("order", idx)
+        $(el).removeData("ui-draggable")
+        $(el).removeData("sortableItem")
+        $(el).removeData("sortable-item")
+        terms.push($(el).data())
+    })
+    var template_id = $("#template_id").val()
+
+    terms = JSON.stringify(terms)
+    csrftoken = $.cookie('csrftoken');
+    $.ajax({
+            url: "/copo/update_template/",
+            data: {"data": terms, "template_id": template_id},
+            type: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+        }
+    ).done(function (data) {
+
+    })
+    $(".loading_div").hide()
+}
