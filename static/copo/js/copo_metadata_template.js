@@ -1,4 +1,42 @@
 $(document).ready(function () {
+
+    // load existing terms
+    $.getJSON("/copo/load_metadata_template_terms", {"template_id": $("#template_id").val()}, function (data) {
+        $(data.terms).each(function (idx, entry) {
+
+            var result = $("<div/>", {
+                class: "annotation_term panel panel-default align-middle",
+
+                "data-iri": entry.iri,
+                "data-label": entry.label,
+                "data-id": entry.id,
+                "data-obo_id": entry.obo_id,
+                "data-ontology_name": entry.ontology_name,
+                "data-ontology_prefix": entry.ontology_prefix,
+                "data-short_form": entry.short_form,
+                "data-type": entry.type,
+                "data-is_search_result": true
+            })
+
+
+            $(result).append($("<span/>", {
+                html: entry.label + " - <strong style='font-size: bigger;color: black !important; font-weight: bolder'>" + entry["ontology_prefix"] + "</strong>",
+                class: "",
+                style: ""
+            }))
+            $(result).append('<span style="display: none; margin-left: 10px" class="ui red compact icon button delete_button pull-right">\n' +
+                '  <i class="trash icon"></i>\n' +
+                '</span>')
+
+            $(result).append("<span style='font-size: x-large' class='count pull-right'></span>")
+            $(result).css("width", "50%").css("margin", "30px 0 0 30px")
+            $(result).find(".delete_button").show()
+            $(result).find(".count").html(entry.order + 1)
+            //$(result).append("<span style='font-size: x-large' class='count pull-right'>" + (entry.order + 1) + "</span>")
+            $("#template_content").append(result)
+        })
+    })
+
     $("#template_content").sortable(
         {
             stop: update_template
@@ -175,6 +213,7 @@ function update_template(event, ui) {
     var items = $("#template_content").children()
     var terms = new Array()
     $(items).each(function (idx, el) {
+        $(el).find(".count").html()
         $(el).find(".count").html(idx + 1)
         $(el).data("order", idx)
         $(el).removeData("ui-draggable")

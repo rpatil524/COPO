@@ -29,7 +29,7 @@ class Orcid(Resource):
 
         u_id = user.id
         orc = ORCID.find_one({'user': u_id})
-        if(orc != None):
+        if(orc is not None):
             return orc
         else:
             return ''
@@ -39,6 +39,6 @@ class Orcid(Resource):
         if orc:
             name = 'unknown'
             for a in orc['op']['orcid_profile']['orcid_activities']['affiliations']['affiliation']:
-                if a['end_date'] == None:
+                if a['end_date'] is None:
                     return a['organization']['name']
             return name

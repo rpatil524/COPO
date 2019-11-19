@@ -43,7 +43,7 @@ def finish_request(template=None, error=None):
     :return: the complete API return
     """
     wrapper = get_return_template('WRAPPER')
-    if error == None:
+    if error is None:
         wrapper['number_found'] = len(template)
         wrapper['items'] = template
         wrapper['status']['error'] = False

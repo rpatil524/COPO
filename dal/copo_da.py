@@ -1,26 +1,26 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 
-import os
 import copy
-import json
+import os
 from datetime import datetime
+
+import pandas as pd
+import pymongo
+import pymongo.errors as pymongo_errors
 from bson import ObjectId, json_util
 from chunked_upload.models import ChunkedUpload
-from web.apps.web_copo.lookup.lookup import DB_TEMPLATES
+from django.conf import settings
+from django.contrib.auth.models import User
+
 import web.apps.web_copo.utils.EnaUtils as u
 from dal import cursor_to_list, cursor_to_list_str
 from dal.copo_base_da import DataSchemas
 from dal.mongo_util import get_collection_ref
-from web.apps.web_copo.schemas.utils import data_utils
-from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
-from django.contrib.auth.models import User
-from django.conf import settings
-import pandas as pd
-import pymongo.errors as pymongo_errors
-import pymongo
-from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+from web.apps.web_copo.lookup.lookup import DB_TEMPLATES
 from web.apps.web_copo.models import UserDetails
-from django.db.models import Q
+from web.apps.web_copo.schemas.utils import data_utils
+from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
+from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 
 PubCollection = 'PublicationCollection'
 PersonCollection = 'PersonCollection'
@@ -282,7 +282,8 @@ class MetadataTemplate(DAComponent):
         super(MetadataTemplate, self).__init__(profile_id, "metadata_template")
 
     def update_name(self, template_name, template_id):
-        record = self.get_collection_handle().update({"_id": ObjectId(template_id)}, {"$set": {"template_name": template_name}})
+        record = self.get_collection_handle().update({"_id": ObjectId(template_id)},
+                                                     {"$set": {"template_name": template_name}})
         record = self.get_by_id(template_id)
         return record
 
@@ -291,9 +292,12 @@ class MetadataTemplate(DAComponent):
         return record
 
     def update_template(self, template_id, data):
-        print(data)
         record = self.get_collection_handle().update_one({"_id": ObjectId(template_id)}, {"$set": {"terms": data}})
         return record
+
+    def get_terms_by_template_id(self, template_id):
+        terms = self.get_collection_handle().find_one({"_id": ObjectId(template_id)}, {"terms": 1, "_id": 0})
+        return terms
 
 
 class Annotation(DAComponent):

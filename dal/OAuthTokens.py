@@ -50,7 +50,7 @@ class OAuthToken:
             if resp.status_code == 200:
                 new_token = json.loads(resp.content.decode('utf-8'))
                 update_status = self.cyverse_update_token(token, new_token)
-                if update_status['acknowledged'] == True:
+                if update_status['acknowledged']:
                     return new_token
         else:
             return token

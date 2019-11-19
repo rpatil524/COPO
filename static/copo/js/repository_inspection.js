@@ -736,35 +736,33 @@ $(document).on("click", ".persistentUrl_cell", function (e) {
         html = html + "<tr><th>Date Published</th><td>" + data.datePublished + "</td></tr>"
         html = html + "<tr><th>Date Modified</th><td>" + data.dateModified + "</td></tr>"
 
-        $(data.author).each(function(idx, el){
+        $(data.author).each(function (idx, el) {
             html = html + "<tr>"
-            if (idx == 1){
+            if (idx == 1) {
                 html = html + "<th>Authors</th><td>" + el.name + "</td>"
-            }else{
+            } else {
                 html = html + "<td></td><td>" + el.name + "</td>"
             }
             html = html + "</tr>"
         })
 
 
-
-        $(data.creator).each(function(idx, el){
+        $(data.creator).each(function (idx, el) {
             html = html + "<tr>"
-            if (idx == 1){
+            if (idx == 1) {
                 html = html + "<th>Creators</th><td>" + el.name + "</td>"
-            }else{
+            } else {
                 html = html + "<td></td><td>" + el.name + "</td>"
             }
             html = html + "</tr>"
         })
 
 
-
-        $(data.keywords).each(function(idx, el){
+        $(data.keywords).each(function (idx, el) {
             html = html + "<tr>"
-            if (idx == 1){
+            if (idx == 1) {
                 html = html + "<th>Keywords</th><td>" + el + "</td>"
-            }else{
+            } else {
                 html = html + "<td></td><td>" + el + "</td>"
             }
             html = html + "</tr>"
@@ -774,6 +772,13 @@ $(document).on("click", ".persistentUrl_cell", function (e) {
         html = html + "</table>"
         $('.copo_popover').html(html)
 
+        var theHeight = $('.copo_popover').height();
+        $('.copo_popover').css('left', (left) + 'px');
+        $('.copo_popover').css('top', (top - (theHeight) - 10) + 'px');
+        $('.copo_popover').show();
+    }).error(function (data) {
+        var html = "<h4>Cannot get data</h4><p>Check your network connection and check if the Dataverse is up</p>"
+        $('.copo_popover').html(html)
         var theHeight = $('.copo_popover').height();
         $('.copo_popover').css('left', (left) + 'px');
         $('.copo_popover').css('top', (top - (theHeight) - 10) + 'px');

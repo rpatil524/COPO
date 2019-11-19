@@ -20,7 +20,7 @@ def add_br(value):
 
 @register.filter(name="add_uri_break")
 def add_uri_break(value):
-    if value != None:
+    if value is not None:
         return '<br/><strong>URI: </strong><a href="'+ value +'">' + value + '</a>'
 
 @register.filter(name="date_present_year")

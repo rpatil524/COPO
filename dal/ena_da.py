@@ -974,7 +974,6 @@ class EnaCollection(Resource):
                     "experiments.$.data_modal_id": per_panel['data_modal_id'],
                     "experiments.$.copo_exp_name": common['copo_exp_name'], "experiments.$.insert_size": insert_size,
                     "experiments.$.study_id": ObjectId(common['study']),
-                    "experiments.$.study_id": ObjectId(common['study']),
                     "experiments.$.sample_id": ObjectId(per_panel['sample_id']),
                     "experiments.$.Sample_Name": per_panel['sample_name'],
                     "experiments.$.file_type": per_panel['file_type']}}

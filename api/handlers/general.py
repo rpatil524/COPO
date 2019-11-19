@@ -34,7 +34,7 @@ def submit_to_figshare(request, article_id):
         details = FigshareCollection().get_collection_details_from_collection_head(article_id)
         for d in details['collection_details']:
             figshare_article_id = f.submit_to_figshare(d)
-            if (figshare_article_id != None):
+            if (figshare_article_id is not None):
                 # figshare_article_id is the Figshare article id
                 FigshareCollection().mark_as_clean(article_id)
                 data = {'success': True}

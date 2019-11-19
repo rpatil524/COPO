@@ -115,9 +115,7 @@ def check_figshare_credentials(request):
         out = {'exists': True}
     else:
         #if no token exists in the database
-        out = {}
-        out['exists'] = False
-        out['url'] = get_authorize_url()
+        out = {'exists': False, 'url': get_authorize_url()}
 
     return HttpResponse(jsonpickle.encode(out))
 
@@ -170,9 +168,8 @@ def get_access_token(request):
 
     r = requests.post(url=access_token_url, auth=oauth)
     credentials = parse_qs(r.content)
-    tokens = {}
-    tokens['owner_key'] = credentials[b'oauth_token'][0].decode("utf-8")
-    tokens['owner_secret'] = credentials[b'oauth_token_secret'][0].decode("utf-8")
+    tokens = {'owner_key': credentials[b'oauth_token'][0].decode("utf-8"),
+              'owner_secret': credentials[b'oauth_token_secret'][0].decode("utf-8")}
     Figshare_token().add_token(owner_key=tokens['owner_key'], owner_secret=tokens['owner_secret'])
     return tokens
 

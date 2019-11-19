@@ -1,21 +1,23 @@
 __author__ = 'fshaw'
-import os
 import gzip
-import uuid
 import hashlib
+import os
+import uuid
+
+import jsonpickle
+from chunked_upload.models import ChunkedUpload
+from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 from django.conf import settings
+from django.core import serializers
+from django.core.files.base import ContentFile
 from django.http import HttpResponse
 from django.template.context_processors import csrf
 from rest_framework.renderers import JSONRenderer
-import jsonpickle
-from django.core.files.base import ContentFile
-from chunked_upload.models import ChunkedUpload
-import web.apps.web_copo.utils.EnaUtils as u
-from django.core import serializers
-from dal.copo_da import DataFile
-from dal.broker_da import BrokerDA, BrokerVisuals
+
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
-from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
+import web.apps.web_copo.utils.EnaUtils as u
+from dal.broker_da import BrokerDA
+from dal.copo_da import DataFile
 from web.apps.web_copo.rest.models import CopoChunkedUpload
 
 
@@ -27,8 +29,7 @@ class CopoChunkedUploadCompleteView(ChunkedUploadCompleteView):
         Data for the response. Should return a dictionary-like object.
         Called *only* if POST is successful.
         """
-        files = {}
-        files['files'] = {}
+        files = {'files': {}}
         files['files']['name'] = chunked_upload.filename
         files['files']['id'] = chunked_upload.id
         files['files']['size'] = chunked_upload.offset / (1000 * 1000.0)
@@ -85,8 +86,7 @@ def receive_data_file(request):
         c.update(csrf(request))
 
         # create output structure to pass back to jquery-upload
-        files = {}
-        files['files'] = {}
+        files = {'files': {}}
         files['files']['name'] = f._name
 
         files['files']['size'] = path.size / (1000 * 1000.0)

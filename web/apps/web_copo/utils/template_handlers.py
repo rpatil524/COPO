@@ -32,3 +32,11 @@ def update_template(request):
         return HttpResponse(json_util.dumps({"data": data, "template_id": template_id}))
     else:
         return HttpResponse(status=500)
+
+def load_metadata_template_terms(request):
+    template_id = request.GET["template_id"]
+    terms = MetadataTemplate().get_terms_by_template_id(template_id)
+    if (terms):
+        return HttpResponse(json_util.dumps(terms))
+    else:
+        return HttpResponse(status=500)
