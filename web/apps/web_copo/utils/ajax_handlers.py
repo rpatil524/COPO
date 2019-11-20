@@ -167,7 +167,8 @@ def get_upload_information(request):
         else:
             sub_info_dict["is_active_submission"] = False
             if repo == "ena":  # this will be extended to other repositories/submission end-points
-                submission_in_queue = submission_queue_handle.find_one({"submission_id": sub_info_dict["submission_id"]})
+                submission_in_queue = submission_queue_handle.find_one(
+                    {"submission_id": sub_info_dict["submission_id"]})
                 if submission_in_queue:  # submission not queued, flag up to enable resubmission
                     sub_info_dict["is_active_submission"] = True
 
@@ -538,6 +539,7 @@ def search_dataverse(request):
 
     return HttpResponse(resp)
 
+
 def get_dataset_info(request):
     doi = request.GET["doi"]
     sub = request.GET["sub_id"]
@@ -681,3 +683,18 @@ def get_ckan_items(request):
     s = request.GET["submission_id"]
     resp = ckan(s)._get_all_datasets()
     return HttpResponse(resp)
+
+
+def add_personal_dataverse(request):
+
+    url = request.POST["url"]
+    name = request.POST["name"]
+    apikey = request.POST["apikey"]
+    doc = Repository().add_personal_dataverse(url, name, apikey)
+    return HttpResponse(json_util.dumps(doc))
+
+
+def get_personal_dataverses(request):
+    repo_ids = request.user.userdetails.repo_submitter
+    my_repos = Repository().get_from_list(repo_ids)
+    return HttpResponse(json.dumps(my_repos))

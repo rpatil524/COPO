@@ -116,4 +116,10 @@ urlpatterns = [
          name="update_template"),
     path('load_metadata_template_terms/', template_handlers.load_metadata_template_terms,
          name="load_metadata_template_terms"),
+    path('view_my_repos/', views.copo_repositories,
+         name="view_my_repos"),
+    path('add_personal_dataverse/', ajax_handlers.add_personal_dataverse,
+         name="add_personal_dataverse"),
+    path('get_personal_dataverses/', ajax_handlers.get_personal_dataverses,
+         name="get_personal_dataverses"),
 ]

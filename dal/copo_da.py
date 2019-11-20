@@ -11,7 +11,7 @@ from bson import ObjectId, json_util
 from chunked_upload.models import ChunkedUpload
 from django.conf import settings
 from django.contrib.auth.models import User
-
+from django_tools.middlewares import ThreadLocal
 import web.apps.web_copo.utils.EnaUtils as u
 from dal import cursor_to_list, cursor_to_list_str
 from dal.copo_base_da import DataSchemas
@@ -996,6 +996,11 @@ class Repository(DAComponent):
         doc = self.get_collection_handle().find({"uid": uid}, {"name": 1, "type": 1, "url": 1})
         return doc
 
+    def get_from_list(self, repo_list):
+        oids = list(map(lambda x: ObjectId(x), repo_list))
+        docs = self.get_collection_handle().find({"_id": {"$in": oids}, "personal": True}, {"apikey": 0})
+        return cursor_to_list_str(docs, use_underscore_in_id=False)
+
     def get_by_ids(self, uids):
         doc = list()
         if (uids):
@@ -1021,6 +1026,15 @@ class Repository(DAComponent):
     def pull_user(self, repo_id, user_id):
         doc = self.Repository.update({'_id': ObjectId(repo_id)},
                                      {'$pull': {'users': {'uid': user_id}}})
+
+        return doc
+
+    def add_personal_dataverse(self, url, name, apikey):
+        u = ThreadLocal.get_current_user()
+        doc = self.get_collection_handle().insert({"url": url, "name": name, "apikey": apikey, "personal": True, "uid": u.id})
+        udetails = u.userdetails
+        udetails.repo_submitter.append(str(doc))
+        udetails.save()
         return doc
 
     def delete(self, repo_id):

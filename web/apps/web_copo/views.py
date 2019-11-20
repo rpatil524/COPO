@@ -151,6 +151,10 @@ def copo_people(request, profile_id):
 
     return render(request, 'copo/copo_people.html', {'profile_id': profile_id, 'profile': profile})
 
+@login_required
+def copo_repositories(request):
+    user = request.user.id
+    return render(request, 'copo/my_repositories.html')
 
 @login_required
 def copo_samples(request, profile_id):
@@ -518,3 +522,4 @@ def administer_repos(request):
 
 def manage_repos(request):
     return render(request, 'copo/copo_repo_management.html', {'request': request})
+
