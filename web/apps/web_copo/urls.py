@@ -122,4 +122,6 @@ urlpatterns = [
          name="add_personal_dataverse"),
     path('get_personal_dataverses/', ajax_handlers.get_personal_dataverses,
          name="get_personal_dataverses"),
+    path('delete_personal_dataverse/', ajax_handlers.delete_personal_dataverse,
+         name="delete_personal_dataverse"),
 ]

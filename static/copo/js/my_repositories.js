@@ -1,5 +1,6 @@
 $(document).ready(function () {
     update_display()
+    $(document).on("click", ".delete", handle_delete)
     $("#repoForm").validator().on("submit", function (e) {
         if (e.isDefaultPrevented()) {
             // handle the invalid form...
@@ -33,47 +34,32 @@ function update_display() {
     }).done(function (data) {
         var rows
         data = JSON.parse(data)
-        $(data).each(function (idx, el) {
-            rows = rows + "<tr data-repo-id='" + el.id + "'><td>" + el.name + "</td><td>dataverse</td><td>" + el.url + "</td><td><button style=\"margin-left:20px\" class=\"ui red icon button\">\n" +
-                "  <i class=\"cloud icon\"></i>\n" +
-                "</button></td>"
-        })
-        console.log(rows)
-        $("#repos_table").find("tbody").html(rows)
-    }).error(function(data){
-        console.error("error" + data)
+        if (data.length == 0) {
+            rows = rows + "<tr><td colspan='4'>No Repositories Entered</td>"
+            $("#repos_table").find("tbody").html(rows)
+        } else {
+            $(data).each(function (idx, el) {
+                rows = rows + "<tr data-repo-id='" + el.id + "'><td>" + el.name + "</td><td>dataverse</td><td>" + el.url + "</td><td><button style=\"margin-left:20px\" class=\"ui delete red icon button\">\n" +
+                    "  <i class=\"trash icon\"></i>\n" +
+                    "</button></td>"
+            })
+            $("#repos_table").find("tbody").html(rows)
+        }
     })
 }
 
-
-/*
-function get_repos_data() {
-    var u_type = $('#user_type').val()
+function handle_delete(e) {
+    var id = $(e.currentTarget).closest("tr").data("repo-id")
+    csrftoken = $.cookie('csrftoken');
     $.ajax({
-        url: "/copo/get_repos_data/",
-        method: "GET",
-        dataType: "json",
-        data: {"u_type": $('#user_type').val()}
-    }).done(function (data) {
-        $("#repos_table tbody").empty();
-        $(data).each(function (idx, item) {
+        url: "/copo/delete_personal_dataverse/",
+        method: "POST",
+        data: {"repo_id": id},
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
 
-            var tr = document.createElement("tr");
-            if (u_type == "managers") {
-                tr.innerHTML = "<td>" + item.name + "</td><td>" + item.type + "</td><td>" + item.url + "</td><td class='delete_repo'>" +
-                    "<i class='fa fa-minus-square delete-repo-button minus-color'></i>" +
-                    "</td>";
-            } else if (u_type == "submitters") {
-                tr.innerHTML = "<td>" + item.name + "</td><td>" + item.type + "</td><td>" + item.url + "</td>";
-            }
-
-            $(tr).data("id", item._id.$oid)
-            $(tr).data("repo_name", item.repo_name);
-            $(tr).data("url", item.url);
-            $(tr).data("name", item.name)
-            $(tr).addClass("clickable-row")
-            $(tr).appendTo("#repos_table tbody");
-        });
-    });
+    }).done(function () {
+        update_display()
+    })
 }
-*/

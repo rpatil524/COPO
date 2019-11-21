@@ -686,8 +686,8 @@ class Submission(DAComponent):
                 {'_id': ObjectId(submission_id)}, {'$set': {'destination_repo': 'default'}}
             )
         r = Repository().get_record(ObjectId(repo_id))
-        dest = {"url": r['url'], 'apikey': r['apikey'], "isCG": r['isCG'], "repo_id": repo_id, "name": r['name'],
-                "type": r['type'], "username": r['username'], "password": r['password']}
+        dest = {"url": r.get('url'), 'apikey': r.get('apikey', ""), "isCG": r.get('isCG', ""), "repo_id": repo_id, "name": r.get('name', ""),
+                "type": r.get('type', ""), "username": r.get('username', ""), "password": r.get('password', "")}
         self.get_collection_handle().update(
             {'_id': ObjectId(submission_id)}, {'$set': {'destination_repo': dest, 'repository': r['type']}}
         )
@@ -1031,7 +1031,7 @@ class Repository(DAComponent):
 
     def add_personal_dataverse(self, url, name, apikey):
         u = ThreadLocal.get_current_user()
-        doc = self.get_collection_handle().insert({"url": url, "name": name, "apikey": apikey, "personal": True, "uid": u.id})
+        doc = self.get_collection_handle().insert({"isCG": False, "url": url, "name": name, "apikey": apikey, "personal": True, "uid": u.id, "type": "dataverse"})
         udetails = u.userdetails
         udetails.repo_submitter.append(str(doc))
         udetails.save()

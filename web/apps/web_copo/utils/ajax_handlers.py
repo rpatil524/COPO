@@ -698,3 +698,8 @@ def get_personal_dataverses(request):
     repo_ids = request.user.userdetails.repo_submitter
     my_repos = Repository().get_from_list(repo_ids)
     return HttpResponse(json.dumps(my_repos))
+
+def delete_personal_dataverse(request):
+    id = request.POST["repo_id"]
+    res = Repository().delete(id)
+    return HttpResponse(res)
