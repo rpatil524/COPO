@@ -135,6 +135,23 @@
                                 A name by which you will rememeber this repository.
                             </small>
                         </div>
+                        <label for="">Repository Type</label>
+                        <div class="radio" id="radioDiv">
+                            <label>
+                                <input type="radio" name="repoRadio" id="dataverse" value="dataverse" checked>
+                                Dataverse
+                            </label>
+
+                            <label>
+                                <input type="radio" name="repoRadio" id="ckan" value="ckan">
+                                CKAN
+                            </label>
+                            <label>
+                                <input type="radio" name="repoRadio" id="dspace" value="dspace">
+                                DSpace
+                            </label>
+                        </div>
+
                         <div class="form-group">
                             <label for="repoUrl">Repository URL</label>
                             <input type="url" class="form-control" id="url"
@@ -155,6 +172,18 @@
                             <small id="apikeyHelpBlock" class="form-text text-muted">
                                 In the format: xxxxxxxx-xxx-xxxx-xxxx-xxxxxxxxxxxx
                             </small>
+                        </div>
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="username"
+                                   placeholder="Username" required disabled>
+                            <div class="help-block with-errors"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="text" class="form-control" id="password"
+                                   placeholder="Password" required disabled>
+                            <div class="help-block with-errors"></div>
                         </div>
 
                         <div class="form-group">

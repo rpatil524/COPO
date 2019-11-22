@@ -690,7 +690,11 @@ def add_personal_dataverse(request):
     url = request.POST["url"]
     name = request.POST["name"]
     apikey = request.POST["apikey"]
-    doc = Repository().add_personal_dataverse(url, name, apikey)
+    type = request.POST["type"]
+    username = request.POST["username"]
+    password = request.POST["password"]
+
+    doc = Repository().add_personal_dataverse(url, name, apikey, type, username, password)
     return HttpResponse(json_util.dumps(doc))
 
 

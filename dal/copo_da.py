@@ -1029,9 +1029,9 @@ class Repository(DAComponent):
 
         return doc
 
-    def add_personal_dataverse(self, url, name, apikey):
+    def add_personal_dataverse(self, url, name, apikey, type, username, password):
         u = ThreadLocal.get_current_user()
-        doc = self.get_collection_handle().insert({"isCG": False, "url": url, "name": name, "apikey": apikey, "personal": True, "uid": u.id, "type": "dataverse"})
+        doc = self.get_collection_handle().insert({"isCG": False, "url": url, "name": name, "apikey": apikey, "personal": True, "uid": u.id, "type": type, "username": username, "password": password})
         udetails = u.userdetails
         udetails.repo_submitter.append(str(doc))
         udetails.save()
