@@ -1,7 +1,11 @@
 $(document).ready(function () {
+    get_wizard_types()
+    //$(document).on("click", "#export_button", function () {
+    //    $("#export_modal").modal("show")
+    //})
 
     // load existing terms
-    $.getJSON("/copo/load_metadata_template_terms", {"template_id": $("#template_id").val()}, function (data) {
+    $.getJSON("/copo/load_metadata_template_terms/", {"template_id": $("#template_id").val()}, function (data) {
         $(data.terms).each(function (idx, entry) {
 
             var result = $("<div/>", {
@@ -65,6 +69,7 @@ $(document).ready(function () {
             $(".new_title_div").removeClass("loading")
         }
     })
+    $(document).on("click", "#template_dd_button", template_dd_button_click_handler)
     //******************************Event Handlers Block*************************//
     var component = "metadata_template";
     var copoFormsURL = "/copo/copo_forms/";
@@ -237,4 +242,81 @@ function update_template(event, ui) {
 
     })
     $(".loading_div").hide()
+}
+
+
+$(document).on("click", "#export_button", create)
+
+//setTimeout("create('Hello world!', 'myfile.txt', 'text/plain')");
+function create() {
+    var dlbtn = document.getElementById("export_save_btn");
+    console.log("running")
+    $(".loading_div").show()
+    var template_id = $("#template_id").val()
+    csrftoken = $.cookie('csrftoken');
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/copo/export_template/');
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+            let link = document.createElement('a');
+            let blob = new Blob([this.response], {});
+            link.download = "export.csv"
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            window.URL.revokeObjectURL(link.href);
+            $(".loading_div").hide()
+        }
+    }
+    xhr.setRequestHeader('X-CSRFToken', csrftoken)
+    xhr.responseType = 'blob';
+    xhr.send(JSON.stringify({"template_id": template_id}));
+
+}
+
+function get_wizard_types() {
+    $.ajax({
+            url: "/copo/get_wizard_types/",
+            type: "GET",
+            dataType: "json"
+        }
+    ).done(function (data) {
+        $("#template_dd").empty()
+        $(data).each(function (idx, element) {
+
+            var option = "<option value='" + element.value + "'>" + element.key + "</option>"
+            $("#template_dd").append(option)
+        })
+    })
+}
+
+function template_dd_button_click_handler() {
+    let filename = $("#template_dd").find(":selected").val()
+    $.ajax({
+            url: "/copo/get_primer_fields/",
+            type: "GET",
+            dataType: "json",
+            data: {"filename": filename}
+        }
+    ).done(function (data) {
+        $("#field_primer_modal").find(".modal-body").empty()
+
+
+        $(data).each(function (idx, el) {
+            var items = el.items
+            $(el.items).each(function (id, ell) {
+                var d = "<div class=\"form-check\">"
+                d = d + "<input class=\"form-check-input\" type=\"checkbox\" checked value=\"" + ell.id + "\" id=\"" + ell.id + "\">\n" +
+                    "<label class=\"form-check-label\" for=\"" + ell.id + "\">\n" +
+                    ell.label + "\n" +
+                    "  </label>"
+                d = d + "</div>"
+                $("#field_primer_modal").find(".modal-body").append(d)
+            })
+
+        })
+
+
+        $("#field_primer_modal").modal("show")
+    })
+
 }

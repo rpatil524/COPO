@@ -116,6 +116,10 @@ urlpatterns = [
          name="update_template"),
     path('load_metadata_template_terms/', template_handlers.load_metadata_template_terms,
          name="load_metadata_template_terms"),
+    path('get_wizard_types/', template_handlers.get_wizard_types,
+         name="get_wizard_types"),
+    path('export_template/', template_handlers.export_template,
+         name="export_template"),
     path('view_my_repos/', views.copo_repositories,
          name="view_my_repos"),
     path('add_personal_dataverse/', ajax_handlers.add_personal_dataverse,
@@ -124,4 +128,6 @@ urlpatterns = [
          name="get_personal_dataverses"),
     path('delete_personal_dataverse/', ajax_handlers.delete_personal_dataverse,
          name="delete_personal_dataverse"),
+    path('get_primer_fields/', template_handlers.get_primer_fields,
+         name="get_primer_fields"),
 ]

@@ -841,3 +841,4 @@ REPO_NAME_LOOKUP = {
     'figshare': 'Figshare',
     'dataverse': 'Dataverse'
 }
+TEMPLATES_TO_APPEAR_IN_EDITOR = ["dc_stages", "miappe", "dcterms"]
