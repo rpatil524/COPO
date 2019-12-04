@@ -81,3 +81,8 @@ def get_primer_fields(request):
         jason = json_util.loads(jason.read())
         fields = jason["properties"]
     return HttpResponse(json_util.dumps(fields))
+
+
+def add_primer_fields(request):
+
+    fields = request.POST["fields"]

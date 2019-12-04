@@ -130,4 +130,6 @@ urlpatterns = [
          name="delete_personal_dataverse"),
     path('get_primer_fields/', template_handlers.get_primer_fields,
          name="get_primer_fields"),
+    path('add_primer_fields/', template_handlers.add_primer_fields,
+         name="add_primer_fields"),
 ]

@@ -3,43 +3,9 @@ $(document).ready(function () {
     //$(document).on("click", "#export_button", function () {
     //    $("#export_modal").modal("show")
     //})
-
+    $(document).on("click", "#add_fields_button", add_primer_fields)
     // load existing terms
-    $.getJSON("/copo/load_metadata_template_terms/", {"template_id": $("#template_id").val()}, function (data) {
-        $(data.terms).each(function (idx, entry) {
-
-            var result = $("<div/>", {
-                class: "annotation_term panel panel-default align-middle",
-
-                "data-iri": entry.iri,
-                "data-label": entry.label,
-                "data-id": entry.id,
-                "data-obo_id": entry.obo_id,
-                "data-ontology_name": entry.ontology_name,
-                "data-ontology_prefix": entry.ontology_prefix,
-                "data-short_form": entry.short_form,
-                "data-type": entry.type,
-                "data-is_search_result": true
-            })
-
-
-            $(result).append($("<span/>", {
-                html: entry.label + " - <strong style='font-size: bigger;color: black !important; font-weight: bolder'>" + entry["ontology_prefix"] + "</strong>",
-                class: "",
-                style: ""
-            }))
-            $(result).append('<span style="display: none; margin-left: 10px" class="ui red compact icon button delete_button pull-right">\n' +
-                '  <i class="trash icon"></i>\n' +
-                '</span>')
-
-            $(result).append("<span style='font-size: x-large' class='count pull-right'></span>")
-            $(result).css("width", "50%").css("margin", "30px 0 0 30px")
-            $(result).find(".delete_button").show()
-            $(result).find(".count").html(entry.order + 1)
-            //$(result).append("<span style='font-size: x-large' class='count pull-right'>" + (entry.order + 1) + "</span>")
-            $("#template_content").append(result)
-        })
-    })
+    $.getJSON("/copo/load_metadata_template_terms/", {"template_id": $("#template_id").val()}, load_terms_from_backend)
 
     $("#template_content").sortable(
         {
@@ -298,25 +264,85 @@ function template_dd_button_click_handler() {
             data: {"filename": filename}
         }
     ).done(function (data) {
-        $("#field_primer_modal").find(".modal-body").empty()
+        $("#field_primer_modal").find("#field_primer_form").empty()
 
 
         $(data).each(function (idx, el) {
             var items = el.items
             $(el.items).each(function (id, ell) {
+                let checked = ""
+                console.log(ell)
+                if (ell.required == "true") {
+                    checked = "checked=\"checked\" disabled=\"disabled\""
+                }
                 var d = "<div class=\"form-check\">"
-                d = d + "<input class=\"form-check-input\" type=\"checkbox\" checked value=\"" + ell.id + "\" id=\"" + ell.id + "\">\n" +
+                d = d + "<input class=\"form-check-input\" type=\"checkbox\" " + checked + " value=\"" + ell.id + "\" id=\"" + ell.id + "\">\n" +
                     "<label class=\"form-check-label\" for=\"" + ell.id + "\">\n" +
                     ell.label + "\n" +
                     "  </label>"
                 d = d + "</div>"
-                $("#field_primer_modal").find(".modal-body").append(d)
+                $("#field_primer_modal").find("#field_primer_form").append(d)
             })
 
         })
 
 
         $("#field_primer_modal").modal("show")
+    })
+
+}
+
+function add_primer_fields() {
+    let fields = $("#field_primer_form").find(":checked")
+    csrftoken = $.cookie('csrftoken');
+    $.ajax({
+            url: "/copo/add_primer_fields/",
+            type: "GET",
+            dataType: "json",
+            data: {"fields": fields},
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+        }
+    ).done(function (data) {
+        up
+    })
+}
+
+function load_terms_from_backend(data) {
+
+    $(data.terms).each(function (idx, entry) {
+
+        var result = $("<div/>", {
+            class: "annotation_term panel panel-default align-middle",
+
+            "data-iri": entry.iri,
+            "data-label": entry.label,
+            "data-id": entry.id,
+            "data-obo_id": entry.obo_id,
+            "data-ontology_name": entry.ontology_name,
+            "data-ontology_prefix": entry.ontology_prefix,
+            "data-short_form": entry.short_form,
+            "data-type": entry.type,
+            "data-is_search_result": true
+        })
+
+
+        $(result).append($("<span/>", {
+            html: entry.label + " - <strong style='font-size: larger;color: black !important; font-weight: bolder'>" + entry["ontology_prefix"] + "</strong>",
+            class: "",
+            style: ""
+        }))
+        $(result).append('<span style="display: none; margin-left: 10px" class="ui red compact icon button delete_button pull-right">\n' +
+            '  <i class="trash icon"></i>\n' +
+            '</span>')
+
+        $(result).append("<span style='font-size: x-large' class='count pull-right'></span>")
+        $(result).css("width", "50%").css("margin", "30px 0 0 30px")
+        $(result).find(".delete_button").show()
+        $(result).find(".count").html(entry.order + 1)
+        //$(result).append("<span style='font-size: x-large' class='count pull-right'>" + (entry.order + 1) + "</span>")
+        $("#template_content").append(result)
     })
 
 }

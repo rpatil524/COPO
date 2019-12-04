@@ -12,16 +12,21 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
+                    <span class="pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <a type="button" id="add_fields_button" class="btn btn-primary">Go</a>
+                    </span>
                     <h4 class="modal-title">Fields</h4>
                 </div>
                 <div class="modal-body">
+                    <form id="field_primer_form">
+
+                    </form>
 
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <a type="button" id="export_save_btn" class="btn btn-primary">Add Fields</a>
+                    <a type="button" id="add_fields_button" class="btn btn-primary">Go</a>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -155,9 +160,12 @@
 
                     </select>
                     <small id="" class="form-text text-muted">
-                        Here you can choose to add fields from an existing schema or template. You can still add other fields later.
+                        Here you can choose to add fields from an existing schema or template. You can still add other
+                        fields later.
                     </small>
-                    <button type="button" id="template_dd_button" style="margin-top: 10px" class="btn btn-primary pull-right">Add Fields</button>
+                    <button type="button" id="template_dd_button" style="margin-top: 10px"
+                            class="btn btn-primary pull-right">Add Fields
+                    </button>
                 </div>
             </form>
         </div>
