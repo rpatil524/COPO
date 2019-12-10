@@ -28,8 +28,8 @@
     "type": "http://purl.obolibrary.org/obo/NCIT_C45253"
   },
   "date": {
-    "key": "http://purl.obolibrary.org/obo/NCIT_C25164",
-    "type": "http://purl.obolibrary.org/obo/NCIT_C25164"
+    "key": "http://purl.org/dc/elements/1.1/date",
+    "type": "ToDo"
   },
   "type": {
     "key": "http://purl.obolibrary.org/obo/NCIT_C25284",
@@ -54,5 +54,21 @@
   "termsofuse": {
     "key": "http://purl.org/dc/terms/accessRights",
     "type": "http://purl.obolibrary.org/obo/NCIT_C45253"
+  },
+  "isReferencedBy": {
+    "key": "http://purl.org/dc/elements/1.1/isReferencedBy",
+    "type": "http://purl.obolibrary.org/obo/NCIT_C45253"
+  },
+  "coverage": {
+    "key": "http://purl.org/dc/elements/1.1/coverage",
+    "type": "http://purl.obolibrary.org/obo/NCIT_C45253"
+  },
+  "format": {
+    "key": "http://purl.org/dc/terms/format",
+    "type": "http://purl.obolibrary.org/obo/NCIT_C45253"
+  },
+  "language": {
+    "key": "http://purl.org/dc/elements/1.1/language"
   }
+
 }

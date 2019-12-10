@@ -52,7 +52,10 @@ def export_template(request):
     template = MetadataTemplate().get_terms_by_template_id(template_id)
     df = pd.DataFrame()
     for term in template["terms"]:
-        column_heading = term["label"] + "/" + term["obo_id"]
+        try:
+            column_heading = term["label"] + "/" + term["obo_id"]
+        except:
+            column_heading = term["label"] + "/" + term["iri"]
         print(column_heading)
         df[column_heading] = []
     response = HttpResponse(content_type='text/csv')
@@ -84,5 +87,37 @@ def get_primer_fields(request):
 
 
 def add_primer_fields(request):
-
+    outlist = list()
     fields = request.POST["fields"]
+    filename = request.POST["filename"]
+    template_id = request.POST["template_id"]
+    fields = fields.split(",")
+
+    # open ontologies file
+    ontologies = open(lkup.ONTOLOGY_LKUPS["copo_ontologies"])
+    ont = json_util.loads(ontologies.read())
+    with open(filename) as jason:
+        jason = json_util.loads(jason.read())
+        s_fields = jason["properties"]
+        for s_f in s_fields:
+            for ff in s_f["items"]:
+                for f in fields:
+                    if f == ff["id"]:
+                        # we have a match
+                        tmpdict = {"label": ff["label"]}
+                        try:
+                            value = ont[ff["ontologies"]]["key"]
+                            tmpdict["iri"] = value
+                            tmpdict["ontology_prefix"] = value
+                            tmpdict["type"] = "primer"
+
+                        except KeyError as e:
+                            print("Key Error Handled " + str(e))
+                            iri = "Ontology Term Undefined"
+                        outlist.append(tmpdict)
+                        break
+    ontologies.close()
+
+    MetadataTemplate().update_template(template_id, outlist)
+
+    return HttpResponse(json_util.dumps({"terms":outlist}))

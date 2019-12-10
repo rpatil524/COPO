@@ -316,6 +316,7 @@
                     "default_value": [],
                     "show_in_form": true,
                     "id": "isReferencedBy",
+                    "ontologies": "isReferencedBy",
                     "show_in_table": true,
                     "control": "text",
                     "other_schemas": {
@@ -339,6 +340,7 @@
                     "default_value": [],
                     "show_in_form": true,
                     "id": "coverage",
+                    "ontologies": "coverage",
                     "show_in_table": true,
                     "versions": [
                         "coverage"
@@ -355,6 +357,7 @@
                     "default_value": [],
                     "show_in_form": true,
                     "id": "format",
+                    "ontologies": "format",
                     "show_in_table": true,
                     "versions": [
                         "format"

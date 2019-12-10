@@ -214,16 +214,17 @@ function update_template(event, ui) {
 $(document).on("click", "#export_button", create)
 
 //setTimeout("create('Hello world!', 'myfile.txt', 'text/plain')");
-function create() {
+function create(evt) {
+    evt.preventDefault()
     var dlbtn = document.getElementById("export_save_btn");
-    console.log("running")
+
     $(".loading_div").show()
     var template_id = $("#template_id").val()
     csrftoken = $.cookie('csrftoken');
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/copo/export_template/');
     xhr.onreadystatechange = function () {
-        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+       if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
             let link = document.createElement('a');
             let blob = new Blob([this.response], {});
             link.download = "export.csv"
@@ -231,12 +232,12 @@ function create() {
             link.click();
             window.URL.revokeObjectURL(link.href);
             $(".loading_div").hide()
-        }
+       }
     }
     xhr.setRequestHeader('X-CSRFToken', csrftoken)
     xhr.responseType = 'blob';
     xhr.send(JSON.stringify({"template_id": template_id}));
-
+    var a = 1
 }
 
 function get_wizard_types() {
@@ -252,11 +253,13 @@ function get_wizard_types() {
             var option = "<option value='" + element.value + "'>" + element.key + "</option>"
             $("#template_dd").append(option)
         })
+        $(document).data("primer_template", $("#template_dd").find(":selected").val())
     })
 }
 
 function template_dd_button_click_handler() {
     let filename = $("#template_dd").find(":selected").val()
+    $(document).data("primer_template", filename)
     $.ajax({
             url: "/copo/get_primer_fields/",
             type: "GET",
@@ -293,19 +296,23 @@ function template_dd_button_click_handler() {
 }
 
 function add_primer_fields() {
-    let fields = $("#field_primer_form").find(":checked")
+    let fields = $("#field_primer_form").find(":checked").map(function () {
+        return this.id;
+    }).get().join();
+    let filename = $(document).data("primer_template")
     csrftoken = $.cookie('csrftoken');
     $.ajax({
             url: "/copo/add_primer_fields/",
-            type: "GET",
+            type: "POST",
             dataType: "json",
-            data: {"fields": fields},
+            data: {"fields": fields, "filename": filename, "template_id": $("#template_id").val()},
             headers: {
                 'X-CSRFToken': csrftoken
             },
         }
     ).done(function (data) {
-        up
+        load_terms_from_backend(data)
+        $("#field_primer_modal").modal("hide")
     })
 }
 
@@ -315,7 +322,6 @@ function load_terms_from_backend(data) {
 
         var result = $("<div/>", {
             class: "annotation_term panel panel-default align-middle",
-
             "data-iri": entry.iri,
             "data-label": entry.label,
             "data-id": entry.id,
@@ -329,7 +335,7 @@ function load_terms_from_backend(data) {
 
 
         $(result).append($("<span/>", {
-            html: entry.label + " - <strong style='font-size: larger;color: black !important; font-weight: bolder'>" + entry["ontology_prefix"] + "</strong>",
+            html: entry.label + " - <small>" + entry["ontology_prefix"] + "</small>",
             class: "",
             style: ""
         }))
