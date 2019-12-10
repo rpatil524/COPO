@@ -237,7 +237,6 @@ function create(evt) {
     xhr.setRequestHeader('X-CSRFToken', csrftoken)
     xhr.responseType = 'blob';
     xhr.send(JSON.stringify({"template_id": template_id}));
-    var a = 1
 }
 
 function get_wizard_types() {

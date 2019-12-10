@@ -52,11 +52,7 @@ def export_template(request):
     template = MetadataTemplate().get_terms_by_template_id(template_id)
     df = pd.DataFrame()
     for term in template["terms"]:
-        try:
-            column_heading = term["label"] + "/" + term["obo_id"]
-        except:
-            column_heading = term["label"] + "/" + term["iri"]
-        print(column_heading)
+        column_heading = term["label"] + "/" + term["iri"]
         df[column_heading] = []
     response = HttpResponse(content_type='text/csv')
     df.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
@@ -112,8 +108,9 @@ def add_primer_fields(request):
                             tmpdict["type"] = "primer"
 
                         except KeyError as e:
-                            print("Key Error Handled " + str(e))
-                            iri = "Ontology Term Undefined"
+                            tmpdict["iri"] = "Term Undefined"
+                            tmpdict["ontology_prefix"] = "Term Undefined"
+                            tmpdict["type"] = "primer"
                         outlist.append(tmpdict)
                         break
     ontologies.close()
