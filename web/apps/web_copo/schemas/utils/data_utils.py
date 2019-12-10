@@ -1,19 +1,20 @@
 __author__ = 'etuka'
 
-import os
-import json
 import copy
-import pandas as pd
-from urllib.parse import urljoin
-from bson.json_util import dumps
-from collections import namedtuple
+import json
+import os
 import xml.etree.ElementTree as ET
-from django_tools.middlewares import ThreadLocal
-import web.apps.web_copo.lookup.lookup as lookup
-from web.apps.web_copo.lookup.resolver import RESOLVER
+from collections import namedtuple
+from datetime import datetime, tzinfo, timedelta
+
+import pandas as pd
+from bson.json_util import dumps
 from django.conf import settings
 from django.contrib.auth.models import User
-from datetime import datetime, tzinfo, timedelta
+from django_tools.middlewares import ThreadLocal
+
+import web.apps.web_copo.lookup.lookup as lookup
+from web.apps.web_copo.lookup.resolver import RESOLVER
 
 
 class simple_utc(tzinfo):
@@ -25,7 +26,7 @@ class simple_utc(tzinfo):
 
 
 def pretty_print(data, path=None):
-    if path == None:
+    if path is None:
         print(dumps(data, sort_keys=True,
                     indent=4, separators=(',', ': ')))
     else:

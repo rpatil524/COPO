@@ -84,7 +84,7 @@ def is_sam_file(file_name):
         li = f.readline().strip()
         regex1 = "^@[A-Za-z][A-Za-z](\t[A-Za-z][A-Za-z0-9]:[ -~]+)+$"
         regex2 = "^@CO\t.*"
-        return (re.match(regex1, li) != None or re.match(regex2, li) != None)
+        return (re.match(regex1, li) is not None or re.match(regex2, li) is not None)
 
 
 def is_bam_file(file_name):
@@ -117,13 +117,13 @@ def filesize_toString(f_size):
     GB = math.pow(10,9)
     TB = math.pow(10,12)
 
-    if f_size >= 0 and f_size < KB:
+    if 0 <= f_size < KB:
         out = "%.2f" % f_size + ' B'
-    elif f_size >= KB and f_size < MB:
+    elif KB <= f_size < MB:
         out = "%.2f" % (f_size / KB) + " KB"
-    elif f_size >= MB and f_size < GB:
+    elif MB <= f_size < GB:
         out = "%.2f" % (f_size / MB) + " MB"
-    elif f_size >= GB and f_size < TB:
+    elif GB <= f_size < TB:
         out = "%.2f" % (f_size / GB) + " GB"
     else:
         out = "%.2f" % (f_size / TB) + " TB"

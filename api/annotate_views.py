@@ -1,19 +1,19 @@
-from django.http import HttpResponse
+import datetime
+import json
+import os
+from os import path
+
 import bson.json_util as j
+import pexpect
 from bson import ObjectId
+from django.conf import settings
+from django.http import HttpResponse
+from numpy import NaN
+from pandas import read_excel, read_csv
+from xlrd import XLRDError
+
 from dal.copo_da import Annotation
 from dal.mongo_util import change_mongo_id_format_to_standard, convert_text
-from django.conf import settings
-import os
-import pexpect
-import datetime
-import uuid
-import pandas
-from pandas import read_excel, read_csv, to_datetime
-from xlrd import XLRDError
-from numpy import NaN
-import json
-from os import path
 
 
 def post_annotations(request):

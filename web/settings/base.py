@@ -75,6 +75,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware',
+    'django_brotli.middleware.BrotliMiddleware',
     # 'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth',
     # 'web.apps.web_copo.copo_middleware.OrcidMiddleware.OrcidOAuth',
 ]

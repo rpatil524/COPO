@@ -1,12 +1,12 @@
 __author__ = 'felixshaw'
 
 import bson.objectid as o
-from web.apps.web_copo.schemas.utils import data_utils
 from django.urls import reverse
 
-from web.apps.web_copo.vocab.status_vocab import STATUS_CODES
-from dal.mongo_util import get_collection_ref
 from dal.base_resource import Resource
+from dal.mongo_util import get_collection_ref
+from web.apps.web_copo.schemas.utils import data_utils
+from web.apps.web_copo.vocab.status_vocab import STATUS_CODES
 
 Schemas = get_collection_ref("Schemas")
 Collections = get_collection_ref("CollectionHeads")
@@ -49,7 +49,6 @@ class Collection_Head(Resource):
 class Profile_Status_Info(Resource):
 
     def get_profiles_status(self):
-        from .copo_da import Profile
         # this method examines all the profiles owned by the current user and returns
         # the number of profiles which have been marked as dirty
         issues = {}
@@ -68,9 +67,7 @@ class Profile_Status_Info(Resource):
                 collections_ids = p['collections']
             except:
                 issues_count += 1
-                context = {}
-                context["profile_name"] = p['title']
-                context["link"] = reverse('copo:view_copo_profile', args=[p["_id"]])
+                context = {"profile_name": p['title'], "link": reverse('copo:view_copo_profile', args=[p["_id"]])}
                 issue_desc.append(STATUS_CODES['PROFILE_EMPTY'].format(**context))
                 break
             # now get the corresponding collection_heads

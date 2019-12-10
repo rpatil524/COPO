@@ -1,0 +1,211 @@
+{% extends 'copo/base_1col.html' %}
+
+{% load staticfiles %}
+{% load web_tags_orcid %}
+{% load web_tags %}
+
+{% block stylesheet_block %}
+    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/lou-multi-select-e052211/css/multi-select.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+    <link rel="stylesheet" href="{% static 'copo/css/copo/orcid_profile.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+    <style>
+        .group-button {
+            vertical-align: middle;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 1.5em;
+        }
+
+        .plus-color {
+            color: #0ec36b;
+        }
+
+        .minus-color {
+            color: #d34e22;
+        }
+
+        .custom-header {
+            text-align: center;
+            padding: 3px;
+            background: #f5f5f5;
+            color: black;
+        }
+
+        .autocomplete {
+            margin-top: 40px;
+            min-width: 200px;
+        }
+
+        #users_table {
+            width: 300px;
+            margin-top: 40px;
+        }
+
+        .delete_cell {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .saving_status {
+            margin-right: 25px
+        }
+
+    </style>
+{% endblock %}
+
+
+{% block title_block %} COPO - My Repositories {% endblock %}
+
+{% block tagline_block %}
+
+
+{% endblock %}
+
+{% block browse_header_block %}
+    {% csrf_token %}
+    <div hidden id="hidden_attrs">
+        <!-- hidden attributes  -->
+        <input type="hidden" id="nav_component_name" value="group"/>
+        <input type="hidden" id="user_type" value="managers"/>
+
+    </div>
+{% endblock browse_header_block %}
+
+
+{% block page_tile %}
+    <div class="row">
+        <div class="page-title-custom" style="margin-left:10px;">My Repositories
+            <span class="pull-right saving_status">
+                <span class="lead label label-default">Accessing</span>
+                <img height="20px" src="{% static "copo/img/ajax.gif" %}"/>
+            </span>
+        </div>
+    </div>
+{% endblock page_tile %}
+
+
+{% block content %}
+
+    <div class="row">
+
+        <div class="col-sm-6 col-md-6 col-lg-6">
+            <table class="table" id="repos_table">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">URL</th>
+                    <th scope="col">Delete</th>
+                </tr>
+                </thead>
+                <tbody class=".table-hover">
+                <tr>
+                    <td>No Repositories Entered</td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <div class="col-sm-6 col-md-6 col-lg-6"></div>
+
+
+    </div>
+    <button class="btn btn-info" data-toggle="modal" data-target="#add_repo_modal">Add Repository</button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="add_repo_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Add Repository</h4>
+                </div>
+                <div class="modal-body">
+                    <form role="form" id="repoForm">
+
+                        <div class="form-group">
+                            <label for="repoName">Repository Name</label>
+                            <input type="text" class="form-control" id="name" placeholder="Name" required>
+
+                            <div class="help-block with-errors"></div>
+                            <small id="passwordHelpBlock" class="form-text text-muted">
+                                A name by which you will rememeber this repository.
+                            </small>
+                        </div>
+                        <label for="">Repository Type</label>
+                        <div class="radio" id="radioDiv">
+                            <label>
+                                <input type="radio" name="repoRadio" id="dataverse" value="dataverse" checked>
+                                Dataverse
+                            </label>
+
+                            <label>
+                                <input type="radio" name="repoRadio" id="ckan" value="ckan">
+                                CKAN
+                            </label>
+                            <label>
+                                <input type="radio" name="repoRadio" id="dspace" value="dspace">
+                                DSpace
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="repoUrl">Repository URL</label>
+                            <input type="url" class="form-control" id="url"
+                                   placeholder="URL" required>
+
+
+                            <div class="help-block with-errors"></div>
+                            <small id="urlHelpBlock" class="form-text text-muted">
+                                For example: https://demo.dataverse.org
+                            </small>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="apikey">API Key</label>
+                            <input type="text" class="form-control" id="apikey"
+                                   placeholder="API Key" required>
+                            <div class="help-block with-errors"></div>
+                            <small id="apikeyHelpBlock" class="form-text text-muted">
+                                In the format: xxxxxxxx-xxx-xxxx-xxxx-xxxxxxxxxxxx
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="username"
+                                   placeholder="Username" required disabled>
+                            <div class="help-block with-errors"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="text" class="form-control" id="password"
+                                   placeholder="Password" required disabled>
+                            <div class="help-block with-errors"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <button id="submit_group" type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
+
+{% block js_block %}
+    <script src="{% static 'copo/js/generic_handlers.js' %}"></script>
+    <script src="{% static 'copo/js/generic_handlers_ext2.js' %}"></script>
+    <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
+    <script src="{% static 'copo/js/my_repositories.js' %}"></script>
+    <script src="{% static 'copo/lou-multi-select-e052211/js/jquery.multi-select.js' %}"></script>
+    <script src="{% static 'copo/js/bootstrapValidator.js' %}"></script>
+{% endblock %}

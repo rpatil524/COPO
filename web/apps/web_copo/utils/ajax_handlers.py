@@ -2,36 +2,32 @@ __author__ = 'felix.shaw@tgac.ac.uk - 01/12/2015'
 # this python file is for small utility functions which will be called from Javascript
 import json
 import time
-import jsonpickle
 from datetime import datetime
-from bson import json_util, ObjectId
 
+import jsonpickle
 import requests
+from bson import json_util, ObjectId
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest
-from web.apps.web_copo.schemas.utils import data_utils
 from jsonpickle import encode
-from dateutil import parser
-from dal.copo_da import Profile
+
 import web.apps.web_copo.lookup.lookup as ol
-from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
-from django.conf import settings
+from dal import mongo_util as util
+from dal.copo_da import Profile
 from dal.copo_da import ProfileInfo, Submission, DataFile, Sample, Source, CopoGroup, Annotation, \
     Repository, Person
-from submission.figshareSubmission import FigshareSubmit
 from dal.figshare_da import Figshare
-from dal import mongo_util as util
-from pandas import read_excel
-from submission.dataverseSubmission import DataverseSubmit
-from django.contrib.auth.models import User
-from web.apps.web_copo.models import UserDetails
-from django.db.models import Q
-from django.contrib.auth.models import Group
-from django.core import serializers
 from dal.orcid_da import Orcid
+from submission.ckanSubmission import CkanSubmit as ckan
 from submission.dataverseSubmission import DataverseSubmit as ds
 from submission.dspaceSubmission import DspaceSubmit as dspace
-from submission.ckanSubmission import CkanSubmit as ckan
+from submission.figshareSubmission import FigshareSubmit
 from submission.helpers import generic_helper as ghlper
+from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
+from web.apps.web_copo.models import UserDetails
+from web.apps.web_copo.schemas.utils import data_utils
 
 DV_STRING = 'HARVARD_TEST_API'
 
@@ -171,7 +167,8 @@ def get_upload_information(request):
         else:
             sub_info_dict["is_active_submission"] = False
             if repo == "ena":  # this will be extended to other repositories/submission end-points
-                submission_in_queue = submission_queue_handle.find_one({"submission_id": sub_info_dict["submission_id"]})
+                submission_in_queue = submission_queue_handle.find_one(
+                    {"submission_id": sub_info_dict["submission_id"]})
                 if submission_in_queue:  # submission not queued, flag up to enable resubmission
                     sub_info_dict["is_active_submission"] = True
 
@@ -425,7 +422,7 @@ def add_user_to_repo(request):
         dms.user_set.add(u)
         # User.UserDetails is an extension to User via a one-to-one django field....look in models.py
         repos = u.userdetails.repo_manager
-        if repos == None:
+        if repos is None:
             u.userdetails.repo_manager = [repo_id]
             u.save()
         else:
@@ -434,7 +431,7 @@ def add_user_to_repo(request):
                 u.save()
     elif u_type == "submitters":
         repos = u.userdetails.repo_submitter
-        if repos == None:
+        if repos is None:
             u.userdetails.repo_submitter = [repo_id]
             u.save()
         else:
@@ -541,6 +538,7 @@ def search_dataverse(request):
     resp = resp.content.decode('utf-8')
 
     return HttpResponse(resp)
+
 
 def get_dataset_info(request):
     doi = request.GET["doi"]
@@ -685,3 +683,27 @@ def get_ckan_items(request):
     s = request.GET["submission_id"]
     resp = ckan(s)._get_all_datasets()
     return HttpResponse(resp)
+
+
+def add_personal_dataverse(request):
+
+    url = request.POST["url"]
+    name = request.POST["name"]
+    apikey = request.POST["apikey"]
+    type = request.POST["type"]
+    username = request.POST["username"]
+    password = request.POST["password"]
+
+    doc = Repository().add_personal_dataverse(url, name, apikey, type, username, password)
+    return HttpResponse(json_util.dumps(doc))
+
+
+def get_personal_dataverses(request):
+    repo_ids = request.user.userdetails.repo_submitter
+    my_repos = Repository().get_from_list(repo_ids)
+    return HttpResponse(json.dumps(my_repos))
+
+def delete_personal_dataverse(request):
+    id = request.POST["repo_id"]
+    res = Repository().delete(id)
+    return HttpResponse(res)
