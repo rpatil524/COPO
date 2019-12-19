@@ -132,4 +132,8 @@ urlpatterns = [
          name="get_primer_fields"),
     path('add_primer_fields/', template_handlers.add_primer_fields,
          name="add_primer_fields"),
+    path('automate_num_cols/', annotation_handlers.automate_num_cols,
+         name="automate_num_cols"),
+    path('term_lookup/', annotation_handlers.term_lookup,
+         name="term_lookup"),
 ]

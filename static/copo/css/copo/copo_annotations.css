@@ -3,7 +3,7 @@
     width: 98%
 }
 
-#annotation_list{
+#annotation_list {
     margin-top: 25px;
     padding-top: 15px
 }
@@ -48,44 +48,77 @@ td.table-header-labeled {
     color: white;
 }
 
-.currentColClass{
+.currentColClass {
     background-color: #f2f2f2 !important;
 }
 
-.labelledColumnClass{
+.labelledColumnClass {
     background-color: #ecf9ec !important;
     color: dimgrey !important;
     font-weight: bolder;
 }
 
-.highlightedColumnClass{
+.highlightedColumnClass {
     background-color: #8cd98c !important;
     color: white !important;
 }
 
-.currentHeaderClass{
+.currentHeaderClass {
     background-color: #4478ba !important;
     color: white !important;
 }
 
-#save_ss_annotation{
+#save_ss_annotation {
     margin: 5px 10px 5px 0;
 }
 
-.delete_annotation{
+.delete_annotation {
     cursor: pointer
 }
 
-.panel-body{
+.panel-body {
     padding: 10px !important;
 }
 
-.ajax_loading_div{
+.ajax_loading_div {
     width: 150px;
 
 }
 
-.ajax_loading_img{
+.ajax_loading_img {
     width: 44px;
     margin-right: 20px
+}
+
+
+.flex-container {
+    display: flex;
+    overflow-x: scroll
+}
+
+.flex-container > div {
+    background-color: #f1f1f1;
+    margin: 10px;
+    padding: 10px;
+    min-width: 50px;
+}
+
+@media (min-width: 768px) {
+  .modal-xl {
+    width: 90%;
+   max-width:1200px;
+  }
+}
+
+.automation_table{
+    border-collapse: collapse;
+    cell-padding: 10px;
+    cell-spacing: 10px
+}
+.automation_table td{
+
+    padding: 10px;
+    margin: 10px;
+    border:5px solid white;
+    background-color: #f1f1f1;
 }

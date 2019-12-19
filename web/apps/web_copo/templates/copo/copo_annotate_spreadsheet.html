@@ -32,14 +32,23 @@
             <!-- search controls go here -->
 
             <p class="h4">
+                Auto Annotate
+            </p>
+
+            <small>COPO can attempt to discover appropriate ontology terms for this dataset. Click to continue.</small>
+            <div>
+                <button id="auto_annotate_btn" class="positive ui button">Annotate</button>
+            </div>
+            <br/>
+            <p class="h4">
                 Search Term
                 <small class="small">Query the Ontology Lookup Service</small>
             </p>
             <br/>
             <p>
-            <small id="term_help" class="form-text text-muted">Start typing to find matching ontology
-                terms
-            </small>
+                <small id="term_help" class="form-text text-muted">Start typing to find matching ontology
+                    terms
+                </small>
             </p>
             <div class="search-term-div ui icon input ">
                 <input type="text" id="search_term_text_box"
@@ -112,7 +121,25 @@
         </div>
     </div>
 
+    <div class="modal fade" tabindex="-1" role="dialog" id="automate_modal">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Annotating Spreadsheet</h4>
+                </div>
+                <div class="modal-body">
+                <table class="automation_table">
+                </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
 {% endblock %}
 
@@ -141,15 +168,7 @@
 
 {% block js_block %}
     <script type="text/javascript" src="{% static 'copo/js/copo_file_level_annotations.js' %}"></script>
-    <script>
-
-
-        //$(document).ready(function () {
-        //    $('.global-page-title').append('<span class="ajax_loading_div pull-right"><img style="display: inline" src="{% static 'copo/img/preload.gif' %}" class="ajax_loading_img"/> Saving ...</span>')
-        //})
-
-    </script>
-
+    <script type="text/javascript" src="{% static 'copo/js/copo_automate_spreadsheet_annotations.js' %}"></script>
     <script type="text/javascript" src="{% static 'copo/handsontable7.0.3/handsontable.full.js' %}"></script>
     <script type="text/javascript" src="{% static 'copo/js/copo_ontology_functions.js' %}"></script>
 

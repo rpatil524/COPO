@@ -4,13 +4,14 @@ from django.http import HttpResponse
 import json
 from bson import json_util
 from dal.copo_da import TextAnnotation
+import numpy as np
+from web.apps.web_copo.utils import ajax_handlers
 
 # how many rows of each sheet should be shown to the user
 truncate_after = 5
 
 
 def refresh_display(request):
-
     file_id = request.GET["file_id"]
     file = DataFile().get_record(file_id)
     path = file["file_location"]
@@ -54,7 +55,7 @@ def refresh_display(request):
             out.extend(d.values.tolist())
             data.append(out)
         elif filetype == "tab":
-            d = pandas.read_csv(path,sep='\t', nrows=4)
+            d = pandas.read_csv(path, sep='\t', nrows=4)
             d = d.fillna('')
             out = list()
             out.append(d.columns.tolist())
@@ -62,10 +63,12 @@ def refresh_display(request):
             data.append(out)
     return HttpResponse(json_util.dumps({"data": data, "names": sheet_names}))
 
+
 def refresh_text_annotations(request):
     file_id = request.GET["file_id"]
     annotations = TextAnnotation().get_file_level_metadata_for_pdf(file_id)
     return HttpResponse(json_util.dumps({"annotations": annotations}))
+
 
 def refresh_annotations(request):
     file_id = request.GET["file_id"]
@@ -142,6 +145,7 @@ def new_text_annotation(request):
     print(annotation)
     return HttpResponse(annotation, content_type="application/json")
 
+
 def edit_or_delete_text_annotation(request, id):
     if request.method == 'PUT':
         data = json.loads(request.body.decode("utf-8"))
@@ -158,9 +162,31 @@ def edit_or_delete_text_annotation(request, id):
         else:
             return HttpResponse(status=500)
 
+
 def search_text_annotation(request):
     if "file_id" in request.GET:
         file_id = request.GET["file_id"]
     annotations = TextAnnotation().get_all_for_file_id(file_id)
     out = {"rows": annotations}
     return HttpResponse(json_util.dumps(out), content_type="application/json")
+
+
+def automate_num_cols(request):
+    file_id = request.GET.get("file_id", "")
+    file_obj = DataFile().get_record(file_id)
+    d = pandas.read_csv(file_obj["file_location"], nrows=4)
+    headers = d.columns.values.tolist()
+    cols = len(d.columns)
+    output = {"num": cols, "headers": headers}
+    return HttpResponse(json.dumps(output))
+
+
+def term_lookup(request):
+    loader_id = request.GET.get("loader_id")
+    index = request.GET.get("index")
+    resp = json_util.loads(ajax_handlers.search_ontology_ebi(request, "999", False))
+    if resp["response"]["numFound"] > 0:
+        el = resp["response"]["docs"][0]
+    else:
+        el = {"label": "Nothing"}
+    return HttpResponse(json_util.dumps({"loader_id": loader_id, "term": el, "index": index}))

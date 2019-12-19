@@ -165,13 +165,13 @@ def copo_samples(request, profile_id):
 
 @login_required()
 def annotate_meta(request, file_id):
+    if "ss_data" in request.session:
+        del request.session["ss_data"]
+    if "ss_sheet_names" in request.session:
+        del request.session["ss_sheet_names"]
     df = DataFile().get_record(ObjectId(file_id))
     name = df["name"]
     if name.endswith(('xls', 'xlsx')):
-        if "ss_data" in request.session:
-            del request.session["ss_data"]
-        if "ss_sheet_names" in request.session:
-            del request.session["ss_sheet_names"]
         return render(request, 'copo/copo_annotate_spreadsheet.html',
                       {'file_id': file_id, 'file_name': name, 'file_type': "ss"})
     elif name.endswith("csv"):

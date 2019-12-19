@@ -38,7 +38,7 @@ def get_source_count(self):
     return HttpResponse(encode({'num_sources': num_sources}))
 
 
-def search_ontology_ebi(request, ontology_names):
+def search_ontology_ebi(request, ontology_names, wrap_in_response=True):
     term = request.GET['q']
     if ontology_names == "999":
         ontology_names = str()
@@ -49,7 +49,10 @@ def search_ontology_ebi(request, ontology_names):
     print(query)
     data = requests.get(query, timeout=2).text
     # TODO - add return here for when OLS is down
-    return HttpResponse(data)
+    if wrap_in_response == True:
+        return HttpResponse(data)
+    else:
+        return data
 
 
 def search_copo_components(request, data_source):
