@@ -40,6 +40,10 @@ def get_source_count(self):
 
 def search_ontology_ebi(request, ontology_names, wrap_in_response=True):
     term = request.GET['q']
+    term = term.lower()
+    term = term.split("(")[0]
+    term = term.replace("_", " ")
+    term = term.strip()
     if ontology_names == "999":
         ontology_names = str()
 

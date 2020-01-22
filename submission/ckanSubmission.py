@@ -9,7 +9,10 @@ from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSc
 from urllib.parse import urljoin
 from web.apps.web_copo.schemas.utils.data_utils import get_base_url
 from urllib.parse import urljoin
+from urllib import parse
 import unicodedata
+from django.conf import Settings
+from django_tools.middlewares import ThreadLocal
 
 
 class CkanSubmit:
@@ -21,9 +24,11 @@ class CkanSubmit:
         if sub_id:
             self.host = Submission().get_dataverse_details(sub_id)
             self.headers = {'X-CKAN-API-Key': self.host['apikey']}
-
+            self.hostname = self.host["url"]
             if self.host["url"].endswith(".org"):
+
                 self.host["url"] = self.host["url"] + "/api/3/action/"
+
 
     def submit(self, sub_id, dataFile_ids=None):
         s = Submission().get_record(ObjectId(sub_id))
@@ -99,7 +104,9 @@ class CkanSubmit:
             data["mimetype"] = ext
 
             fullurl = self.host["url"] + "resource_create"
-            data["url"] = str(uuid.uuid4())
+            url = parse.urlparse(self.host["url"])
+
+            #data["url"] = urljoin(self.hostname, "dataset/" + str(uuid.uuid4()))
 
             with open(df["file_location"], 'rb') as f:
                 files = [
@@ -126,8 +133,10 @@ class CkanSubmit:
                 except TypeError as t:
                     print(t)
                 if resp.status_code == 200:
+                    req = ThreadLocal.get_current_request()
                     details = json.loads(resp.content.decode("utf-8"))
                     details["result"]["repo_url"] = self.host["url"]
+                    #details["result"]["url"] = req.build_absolute_uri("/") + "rest/get_accession_data?sub_id=" + sub_id
                     self._update_and_complete_submission(details, sub_id)
                 elif resp.status_code == 400:
                     # try again checking for https

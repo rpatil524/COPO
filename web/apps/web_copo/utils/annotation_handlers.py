@@ -174,7 +174,10 @@ def search_text_annotation(request):
 def automate_num_cols(request):
     file_id = request.GET.get("file_id", "")
     file_obj = DataFile().get_record(file_id)
-    d = pandas.read_csv(file_obj["file_location"], nrows=4)
+    try:
+        d = pandas.read_csv(file_obj["file_location"], nrows=4)
+    except UnicodeDecodeError as e:
+        d = pandas.read_excel(file_obj["file_location"], nrows=4)
     headers = d.columns.values.tolist()
     cols = len(d.columns)
     output = {"num": cols, "headers": headers}
@@ -184,6 +187,7 @@ def automate_num_cols(request):
 def term_lookup(request):
     loader_id = request.GET.get("loader_id")
     index = request.GET.get("index")
+    q = request.GET.get("q")
     resp = json_util.loads(ajax_handlers.search_ontology_ebi(request, "999", False))
     if resp["response"]["numFound"] > 0:
         el = resp["response"]["docs"][0]

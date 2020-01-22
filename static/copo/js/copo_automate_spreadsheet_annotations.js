@@ -4,7 +4,7 @@ $(document).ready(function () {
 
 
 function automate(evt) {
-    $("#automate_modal").modal("show")
+    $("#automate_modal").modal("show").draggable()
     var id = $("#file_id").val()
     // get number of columns
     $.getJSON('/copo/automate_num_cols/', {"file_id": id}, function (data) {
