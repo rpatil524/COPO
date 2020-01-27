@@ -431,6 +431,11 @@ DROP_DOWNS = {
             'description': 'Template for describing CG-compliant data objects'
         },
         {
+            'value': "dtol",
+            'label': 'Darwin Tree of Life / Sanger',
+            'description': 'Template for descripbing samples created for the Darwin Tree of Life Project'
+        },
+        {
             'value': 'ena',
             'label': 'ENA - Sequence Reads',
             'description': 'This repository option defines metadata for submission of <strong>raw sequence reads</strong> to the European Nucleotide Archive (ENA)'
@@ -497,6 +502,11 @@ DROP_DOWNS = {
             "value": "isasample",
             "label": "COPO Standard",
             "description": "COPO samples are based on the <a href='http://isa-tools.org/' target='_blank'>Investigation, Study and Assay </a> (ISA) specifications, and are better tailored for describing samples that will subsequently become part of data submissions to repositories such as <strong>ENA</strong> and <strong>Metabolights</strong>."
+        },
+        {
+            "value": "dtol",
+            "label": "Sanger / Darwin Tree of Life",
+            "description": "Samples to be entered for the Darwin Tree of Life Project"
         }
     ],
     "GROWTH_AREAS": [
@@ -672,7 +682,8 @@ WIZARD_FILES = {
     'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json'),
     'dataverse': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
     'dcterms': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
-    'cg_core': os.path.join(RESOLVER['wizards_datafile'], 'cg_core_stages.json')
+    'cg_core': os.path.join(RESOLVER['wizards_datafile'], 'cg_core_stages.json'),
+    'dtol': os.path.join(RESOLVER['wizards_datafile'], 'dtol_stages.json'),
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#

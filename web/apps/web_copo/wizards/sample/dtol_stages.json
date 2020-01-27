@@ -1,0 +1,14 @@
+{
+  "title": "General Sample Description - stages defined here apply to all description instances",
+  "description": "Definitions for elements that appear in different stages of a wizard targeted: 'ref', id of stage; 'title',  header used for the stage; items, actual form elements on the page; 'is_singular_stage', if all items must have same value for this stage",
+   "properties": [
+    {
+      "ref": "sample_attributes",
+      "title": "Sample Attributes",
+      "message": "Enter the attributes that describe your sample(s). <br/><span style='color:#a94442;'>Note: Cloned sample attributes may not entirely capture your intended metadata attribution. Please check carefully to ensure that you are happy with the presented attributes, and that they meet your metadata requirement!</span>",
+      "items": [
+
+      ]
+    }
+  ]
+}

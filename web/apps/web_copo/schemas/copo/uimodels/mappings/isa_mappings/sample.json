@@ -13,7 +13,8 @@
       "required": "true",
       "specifications": [
         "isasample",
-        "biosample"
+        "biosample",
+        "dtol"
       ],
       "versions": [
         "name"
@@ -81,6 +82,380 @@
       "data_maxItems": 1,
       "data_source": "sample_source_lookup",
       "option_values": []
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "dwc": "http://rs.tdwg.org/dwc/terms/measurementID",
+      "versions": [
+        "sanger_tube_id"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Sanger Tube ID (FluidX Barcode)",
+      "show_in_form": true,
+      "id": "copo.sample.sanger_tube_id",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "dwc": "http://rs.tdwg.org/dwc/terms/measurementID",
+      "versions": [
+        "supplier_sample_name"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Supplier Sample Name",
+      "show_in_form": true,
+      "id": "copo.sample.supplier_sample_name",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "control_meta": {},
+      "versions": [
+        "collectedBy"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "specifications": [
+        "dtol"
+      ],
+      "default_value": "",
+      "show_in_form": true,
+      "label": "Collected By",
+      "id": "copo.sample.collectedBy",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": "",
+      "dwc": "http://rs.tdwg.org/dwc/terms/recordedBy",
+      "type": "string"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "control_meta": {},
+      "versions": [
+        "dateOfSampleCollection"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "specifications": [
+        "dtol"
+      ],
+      "show_in_form": true,
+      "label": "Date of Sample Collection",
+      "id": "copo.sample.dateOfSampleCollection",
+      "show_in_table": true,
+      "control": "date-picker",
+      "default_value": "",
+      "dwc": "http://rs.tdwg.org/dwc/terms/verbatimEventDate",
+      "type": "string"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "control_meta": {},
+      "versions": [
+        "dateOfSampleIdentification"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "specifications": [
+        "dtol"
+      ],
+      "show_in_form": true,
+      "label": "Date of Sample Identification",
+      "id": "copo.sample.dateOfSampleIdentification",
+      "show_in_table": true,
+      "control": "date-picker",
+      "default_value": "",
+      "dwc": "http://rs.tdwg.org/dwc/terms/eventDate",
+      "type": "string"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "dwc": "http://rs.tdwg.org/dwc/terms/sex",
+      "versions": [
+        "sex"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Sex",
+      "show_in_form": true,
+      "id": "copo.sample.sex",
+      "type": "string",
+      "show_in_table": true,
+      "control": "select",
+      "default_value": "Unknown",
+      "option_values": [
+        "Male",
+        "Female",
+        "Unknown"
+      ]
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "dwc": "http://rs.tdwg.org/dwc/terms/lifeStage",
+      "versions": [
+        "lifeStage"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Lifestage",
+      "show_in_form": true,
+      "id": "copo.sample.lifeStage",
+      "type": "string",
+      "show_in_table": true,
+      "control": "select",
+      "default_value": "Adult",
+      "option_values": [
+        "adult",
+        "embryo",
+        "gamete",
+        "gametophyte",
+        "juvenile",
+        "larva",
+        "pupa",
+        "spore",
+        "sporophyte",
+        "zygote"
+      ]
+    },
+    {
+      "help_tip": "Separate multiple names with '|'",
+      "required": "true",
+      "control_meta": {},
+      "versions": [
+        "identifiedBy"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "specifications": [
+        "dtol"
+      ],
+      "default_value": "",
+      "show_in_form": true,
+      "label": "Identified By",
+      "id": "copo.sample.identifiedBy",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": "",
+      "dwc": "http://rs.tdwg.org/dwc/terms/identifiedBy",
+      "type": "string"
+    },
+    {
+      "help_tip": "A taxonomic determination (e.g., the assignment to a taxon).",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "ontology term",
+      "versions": [
+        "taxonid"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.taxonid",
+      "label": "Taxon ID",
+      "show_in_table": false,
+      "ontology_names": [
+        "ncbitaxon"
+      ],
+      "dwc": "http://rs.tdwg.org/dwc/terms/taxonID"
+    },
+    {
+      "help_tip": "The full scientific name of the order in which the taxon is classified.",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "ontology term",
+      "versions": [
+        "order"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.order",
+      "label": "Order",
+      "show_in_table": false,
+      "ontology_names": [
+        "ncbitaxon"
+      ],
+      "dwc": "http://rs.tdwg.org/dwc/terms/order"
+
+    },
+    {
+      "help_tip": "The full scientific name of the family in which the taxon is classified.",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "ontology term",
+      "versions": [
+        "family"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.family",
+      "label": "Family",
+      "show_in_table": false,
+      "ontology_names": [
+        "ncbitaxon"
+      ],
+      "dwc": "http://rs.tdwg.org/dwc/terms/family"
+    },
+    {
+      "help_tip": "The full scientific name of the genus in which the taxon is classified.",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "ontology term",
+      "versions": [
+        "genus"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.genus",
+      "label": "Genus",
+      "show_in_table": false,
+      "ontology_names": [
+        "ncbitaxon"
+      ],
+      "dwc": "http://rs.tdwg.org/dwc/terms/genus"
+    },
+    {
+      "help_tip": "The full scientific name of the species in which the species is classified.",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "ontology term",
+      "versions": [
+        "species"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.species",
+      "label": "Species",
+      "show_in_table": false,
+      "ontology_names": [
+        "ncbitaxon"
+      ],
+      "dwc": "http://rs.tdwg.org/dwc/terms/scientificName"
+    },
+    {
+      "help_tip": "A common or vernacular name.",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "commonName"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.commonName",
+      "label": "Common Name",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/vernacularName"
+    },
+    {
+      "help_tip": "An identifier given to the Occurrence at the time it was recorded. Often serves as a link between field notes and an Occurrence record, such as a specimen collector's number.",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "donorId"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.donorId",
+      "label": "Donor ID",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/recordNumber"
     },
     {
       "help_tip": "Characteristics of the sample e.g., height, sex",
