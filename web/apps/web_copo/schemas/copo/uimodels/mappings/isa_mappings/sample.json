@@ -331,7 +331,6 @@
         "ncbitaxon"
       ],
       "dwc": "http://rs.tdwg.org/dwc/terms/order"
-
     },
     {
       "help_tip": "The full scientific name of the family in which the taxon is classified.",
@@ -456,6 +455,125 @@
       "label": "Donor ID",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/recordNumber"
+    },
+    {
+      "help_tip": "The name (or acronym) in use by the institution having custody of the object(s) or information referred to in the record.",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "affiliatedOrganisation"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.affiliatedOrganisation",
+      "label": "Affiliated Organisation",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/institutionCode"
+    },
+    {
+      "help_tip": "The name (or acronym) in use by the institution having custody of the object(s) or information referred to in the record.",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "collectionEvent"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.collectionEvent",
+      "label": "Collection Event",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/occurrenceRemarks"
+    },
+    {
+      "help_tip": "The name (or acronym) in use by the institution having custody of the object(s) or information referred to in the record.",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "collectionCode"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.collectionCode",
+      "label": "Collection Code",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/collectionCode"
+    },
+    {
+      "help_tip": "A list of geographic names less specific than the information captured in the Collection Site term. Starting with the least specific, add geograhic place names to identify location using the blue plus. E.g. U.K., London, Westminster, Westminster Abbey all as separate list entries.",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "ontology term",
+      "versions": [
+        "collectionLocation"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "array",
+      "show_in_form": true,
+      "id": "copo.sample.collectionLocation",
+      "label": "Collection Location",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/higherGeography",
+      "ontology_names": [
+        "gaz"
+      ]
+    },
+    {
+      "help_tip": "The specific description of the place. Less specific geographic information can be provided in other geographic terms (higherGeography, continent, country, stateProvince, county, municipality, waterBody, island, islandGroup). This term may contain information modified from the original to correct perceived errors or standardize the description. E.g. 2 miles east off the coast of Felixtowe",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "collectionSite"
+      ],
+      "ref": "",
+
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.collectionSite",
+      "label": "Collection Site",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/locality"
     },
     {
       "help_tip": "Characteristics of the sample e.g., height, sex",
