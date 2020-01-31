@@ -562,7 +562,6 @@
         "collectionSite"
       ],
       "ref": "",
-
       "specifications": [
         "dtol"
       ],
@@ -574,6 +573,144 @@
       "label": "Collection Site",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/locality"
+    },
+    {
+      "help_tip": "The geographic latitude (in decimal degrees, using the spatial reference system given in geodeticDatum) of the geographic center of a Location. Positive values are north of the Equator, negative values are south of it. Legal values lie between -90 and 90, inclusive.",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "lat"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.lat",
+      "label": "Latitude",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/decimalLatitude"
+    },
+    {
+      "help_tip": "The geographic longitude (in decimal degrees, using the spatial reference system given in geodeticDatum) of the geographic center of a Location. Positive values are east of the Greenwich Meridian, negative values are west of it. Legal values lie between -180 and 180, inclusive.",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "long"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.long",
+      "label": "Longitude",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/decimalLongitude"
+    },
+    {
+      "help_tip": "A list of maps, gazetteers, or other resources used to georeference the Location, described specifically enough to allow anyone in the future to use the same resources.",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "gridReference"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "array",
+      "show_in_form": true,
+      "id": "copo.sample.gridReference",
+      "label": "Grid Reference",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/georeferenceSources"
+    },
+    {
+      "help_tip": "Comments or notes about the Location. e.g. Underwater since 2005",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "habitat"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.habitat",
+      "label": "Habitat Remarks",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/locationRemarks"
+    },
+    {
+      "help_tip": "The original description of the depth below the local surface.",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "depth"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.depth",
+      "label": "Depth (in meters)",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/verbatimDepth"
+    },
+    {
+      "help_tip": "The original description of the elevation (altitude, usually above sea level) of the Location.",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "elevation"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.elevation",
+      "label": "Elevation (in meters)",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/verbatimElevation"
     },
     {
       "help_tip": "Characteristics of the sample e.g., height, sex",
