@@ -173,6 +173,29 @@
       "type": "string"
     },
     {
+      "help_tip": "Either specific time of day, or general period ('noon', 'dusk', '2 hours after sunrise'). 14:07-0600 (2:07pm in the time zone six hours earlier than UTC). 08:40:21Z (8:40:21am UTC). 13:00:00Z/15:30:00Z (the interval between 1pm UTC and 3:30pm UTC).",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "eventTime"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.eventTime",
+      "label": "Event Time",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/eventTime"
+    },
+    {
       "help_tip": "",
       "required": "true",
       "control_meta": {},
@@ -711,6 +734,121 @@
       "label": "Elevation (in meters)",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/verbatimElevation"
+    },
+    {
+      "help_tip": "The name of, reference to, or description of the method or protocol used during an Event. E.g. UV light trap, mist net, bottom trawl, ad hoc observation, point count",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "samplingProtocol"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.samplingProtocol",
+      "label": "Description of Collection Method",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/samplingProtocol"
+    },
+    {
+      "help_tip": "Difficulty of sample re-collection. Quantify ie. 'guaranteed same day', 'several days searching', 'requires considerable effort' (offshore boat/Caving/remote location travel)",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "sampleAvailability"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.sampleAvailability",
+      "label": "Sample Availability",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/samplingEffort"
+    },
+    {
+      "help_tip": "The date-time or interval during which an Event occurred. For occurrences, this is the date-time when the event was recorded. Not suitable for a time in a geological context. In format YYYY-MM-DD",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "dateOfPreservation"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.dateOfPreservation",
+      "label": "Date of Preservation",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/eventDate"
+    },
+    {
+      "help_tip": "The date-time or interval during which an Event occurred. For occurrences, this is the date-time when the event was recorded. Not suitable for a time in a geological context. In format YYYY-MM-DD",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "timeElapsedFromCollectionToPreservation"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.timeElapsedFromCollectionToPreservation",
+      "label": "Time Elapsed From Collection To Preservation (in Hours)",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/eventTime"
+    },
+    {
+      "help_tip": "A list (concatenated and separated) of preparations and preservation methods for a specimen. Example, fossil, cast, photograph, DNA extract, skin, skull, skeleton, whole animal (ETOH), tissue (EDTA)",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "ontology term",
+      "versions": [
+        "Preserved By"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "array",
+      "show_in_form": true,
+      "id": "copo.sample.preservedBy",
+      "label": "Preparations",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
     },
     {
       "help_tip": "Characteristics of the sample e.g., height, sex",
