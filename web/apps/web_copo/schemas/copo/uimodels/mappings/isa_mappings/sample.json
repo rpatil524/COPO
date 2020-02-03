@@ -851,6 +851,52 @@
       "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
     },
     {
+      "help_tip": "e.g. Leg removed from complete organism",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "tissueRemovedForBarcoding"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.tissueRemovedForBarcoding",
+      "label": "Tissue Removed For Barcoding",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
+    },
+    {
+      "help_tip": "e.g. RNA later, 80% Ethanol, Flash Frozen",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "methodOfPreservationInTube"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.methodOfPreservationInTube",
+      "label": "Method of Preservation in Tube",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
+    },
+    {
       "help_tip": "Characteristics of the sample e.g., height, sex",
       "required": "false",
       "default_value": "",
