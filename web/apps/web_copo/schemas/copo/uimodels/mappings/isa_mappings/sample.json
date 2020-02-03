@@ -897,6 +897,76 @@
       "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
     },
     {
+      "help_tip": "Comment if chance of misidentification, reference text used to identify, etc",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "speciesDeterminationMethod"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.speciesDeterminationMethod",
+      "label": "Species Determination Method",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/identificationReferences"
+    },
+    {
+      "help_tip": "Comment if chance of misidentification, reference text used to identify, etc",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "speciesDeterminationMethod"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.speciesDeterminationMethod",
+      "label": "Species Determination Method",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/identificationReferences"
+    },
+
+    {
+      "help_tip": "Expressed as a Percentage",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "identificationConfidence"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.identificationConfidence",
+      "label": "Identification Confidence (%)",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/identificationRemarks"
+    },
+    {
       "help_tip": "Characteristics of the sample e.g., height, sex",
       "required": "false",
       "default_value": "",
