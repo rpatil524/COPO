@@ -682,8 +682,7 @@ WIZARD_FILES = {
     'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json'),
     'dataverse': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
     'dcterms': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
-    'cg_core': os.path.join(RESOLVER['wizards_datafile'], 'cg_core_stages.json'),
-    'dtol': os.path.join(RESOLVER['wizards_datafile'], 'dtol_stages.json'),
+    'cg_core': os.path.join(RESOLVER['wizards_datafile'], 'cg_core_stages.json')
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#

@@ -1,0 +1,59 @@
+{
+  "groupings": {
+    "taxon_group": [
+      "taxonid",
+      "order",
+      "family",
+      "genus",
+      "species",
+      "commonName",
+      "speciesDeterminationMethod",
+      "identificationConfidence"
+    ],
+    "sample_ids": [
+      "sangerTubeId",
+      "supplierSampleName",
+      "donorId",
+      "affiliatedOrganisation"
+    ],
+    "sample_specifics": [
+      "sex",
+      "lifestage",
+      "speciesRarity",
+      "genomeSize",
+      "evidenceForGenomeSize",
+      "plansForSample"
+    ],
+    "collection_info": [
+      "collectedBy",
+      "dateOfSampleCollection",
+      "timeOfSampleCollection",
+      "identifiedBy",
+      "dateOfSampleIdentification",
+      "descriptionOfCollectionMethod",
+      "sampleAvailability"
+    ],
+    "geography": [
+      "collectionEvent",
+      "collectionCode",
+      "collectionLocation",
+      "collectionSite",
+      "lat",
+      "long",
+      "gridReference",
+      "habitat",
+      "depth",
+      "elevation"
+    ],
+    "preparation": [
+      "preservedBy",
+      "dateOfPreservation",
+      "timeElapsedFromCollectionToPreservation",
+      "tissueRemovedForBarcoding",
+      "methodOfPreservationInTube"
+    ],
+    "other": [
+      "otherInformation"
+    ]
+  }
+}
