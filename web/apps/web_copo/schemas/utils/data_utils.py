@@ -4,7 +4,7 @@ import copy
 import json
 import os
 import xml.etree.ElementTree as ET
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 from datetime import datetime, tzinfo, timedelta
 
 import pandas as pd
@@ -18,11 +18,11 @@ from web.apps.web_copo.lookup.resolver import RESOLVER
 
 
 class simple_utc(tzinfo):
-    def tzname(self,**kwargs):
+    def tzname(self, **kwargs):
         return "UTC"
+
     def utcoffset(self, dt):
         return timedelta(0)
-
 
 
 def pretty_print(data, path=None):
@@ -97,6 +97,7 @@ def get_isajson_refactor_type(key):
 def json_to_pytype(path_to_json):
     with open(path_to_json, encoding='utf-8') as data_file:
         data = json.loads(data_file.read())
+
     return data
 
 
@@ -329,6 +330,7 @@ def get_datafiles_json(target_id=None):
 def get_study_type_options():
     return lookup.DROP_DOWNS['STUDY_TYPES']
 
+
 def get_assembly_type_option():
     return lookup.DROP_DOWNS['ASSEMBLY_TYPES']
 
@@ -389,6 +391,7 @@ def get_current_user():
 
 def get_current_request():
     return ThreadLocal.get_current_request()
+
 
 def get_base_url():
     r = ThreadLocal.get_current_request()
@@ -723,7 +726,7 @@ class DecoupleFormSubmission:
                                     key_split = (key.split(f.id + ".")[-1]).split(".")
                                     if len(key_split) == 1:
                                         primary_data[(key_split[0]).rsplit(self.global_key_split, 1)[0]] = \
-                                        self.auto_fields[key]
+                                            self.auto_fields[key]
                                     else:
                                         key_list.append(key_split[:-1])
                                         key_split[-1] = key_split[-1].rsplit(self.global_key_split, 1)[0]
@@ -945,7 +948,7 @@ class DecoupleFormSubmission:
                                     key_split = (key.split(f_id + ".")[-1]).split(".")
                                     if len(key_split) == 1:
                                         primary_data[(key_split[0]).rsplit(self.global_key_split, 1)[0]] = \
-                                        self.auto_fields[key]
+                                            self.auto_fields[key]
                                     else:
                                         key_list.append(key_split[:-1])
                                         key_split[-1] = key_split[-1].rsplit(self.global_key_split, 1)[0]

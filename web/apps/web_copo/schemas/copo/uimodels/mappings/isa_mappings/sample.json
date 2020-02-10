@@ -90,7 +90,7 @@
       "control_meta": {},
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementID",
       "versions": [
-        "sanger_tube_id"
+        "sangerTubeId"
       ],
       "specifications": [
         "dtol"
@@ -112,7 +112,7 @@
       "control_meta": {},
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementID",
       "versions": [
-        "supplier_sample_name"
+        "supplierSampleName"
       ],
       "specifications": [
         "dtol"
@@ -835,7 +835,7 @@
       "control_meta": {},
       "control": "ontology term",
       "versions": [
-        "Preserved By"
+        "preservedBy"
       ],
       "ref": "",
       "specifications": [

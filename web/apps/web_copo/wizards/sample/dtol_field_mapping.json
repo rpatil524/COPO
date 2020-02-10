@@ -1,6 +1,7 @@
-{
-  "groupings": {
-    "taxon_group": [
+[
+  {
+    "group_name": "Taxon Group",
+    "fields": [
       "taxonid",
       "order",
       "family",
@@ -9,22 +10,31 @@
       "commonName",
       "speciesDeterminationMethod",
       "identificationConfidence"
-    ],
-    "sample_ids": [
+    ]
+  },
+  {
+    "group_name": "Sample Ids",
+    "fields": [
       "sangerTubeId",
       "supplierSampleName",
       "donorId",
       "affiliatedOrganisation"
-    ],
-    "sample_specifics": [
+    ]
+  },
+  {
+    "group_name": "Sample Specifics",
+    "fields": [
       "sex",
       "lifestage",
       "speciesRarity",
       "genomeSize",
       "evidenceForGenomeSize",
       "plansForSample"
-    ],
-    "collection_info": [
+    ]
+  },
+  {
+    "group_name": "Collection Information",
+    "fields": [
       "collectedBy",
       "dateOfSampleCollection",
       "timeOfSampleCollection",
@@ -32,8 +42,11 @@
       "dateOfSampleIdentification",
       "descriptionOfCollectionMethod",
       "sampleAvailability"
-    ],
-    "geography": [
+    ]
+  },
+  {
+    "group_name": "Geography",
+    "fields": [
       "collectionEvent",
       "collectionCode",
       "collectionLocation",
@@ -43,17 +56,24 @@
       "gridReference",
       "habitat",
       "depth",
+      "depth",
       "elevation"
-    ],
-    "preparation": [
+    ]
+  },
+  {
+    "group_name": "Preparation",
+    "fields": [
       "preservedBy",
       "dateOfPreservation",
       "timeElapsedFromCollectionToPreservation",
       "tissueRemovedForBarcoding",
       "methodOfPreservationInTube"
-    ],
-    "other": [
+    ]
+  },
+  {
+    "group_name": "Other",
+    "fields": [
       "otherInformation"
     ]
   }
-}
+]
