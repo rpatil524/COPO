@@ -71,7 +71,8 @@ class ProfileInfo:
                         num_data="datafile",
                         num_sample="sample",
                         num_submission="submission",
-                        num_annotation="annotation"
+                        num_annotation="annotation",
+                        num_temp="metadata_template"
                         )
 
         status = dict()

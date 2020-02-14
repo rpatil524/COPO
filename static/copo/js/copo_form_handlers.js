@@ -85,7 +85,8 @@ var controlsMapping = {
     "copo-duration": "do_copo_duration_ctrl",
     "text-percent": "do_percent_text_box",
     "copo-resolver": "do_copo_resolver_ctrl",
-    "copo-input-group": "do_copo_input_group_ctrl"
+    "copo-input-group": "do_copo_input_group_ctrl",
+    "semantic-ui-search": "do_semantic_search_ui"
 };
 
 function initiate_form_call(component) {
@@ -586,7 +587,32 @@ function set_validation_markers(formElem, ctrl) {
 
 //form controls
 var dispatchFormControl = {
+    do_semantic_search_ui: function (formElem, elemValue) {
+        var ctrlsDiv = $('<div/>', {
+            class: "input-group",
 
+        })
+
+        var icon = $('<span>',{
+            class: "input-group-addon",
+            "html":"@"
+        })
+
+        var input = $('<input>', {
+            "type": "text",
+            "class": "form-control",
+            "Placeholder": "Search...",
+            "id": formElem.id,
+            "name": formElem.id,
+            "style": "width: 400px"
+
+        })
+
+        $(ctrlsDiv).append(input)
+
+        $(ctrlsDiv).append(icon)
+        return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
+    },
     do_percent_text_box: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -2226,7 +2252,7 @@ function form_label_ctrl(formElem) {
 
         var helpTip = formElem["help_tip"] || '';
         if (helpTip) {
-            var item = $('<i data-html="'+helpTip+'" class="ui grey icon info circle copo-tooltip" style="margin-left: 5px;"></i>');
+            var item = $('<i data-html="' + helpTip + '" class="ui grey icon info circle copo-tooltip" style="margin-left: 5px;"></i>');
             lblCtrl.append(item);
         }
     }

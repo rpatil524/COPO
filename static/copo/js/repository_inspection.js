@@ -798,6 +798,7 @@ $(document).on("click", function (e) {
 
 
 function do_new_dataverse_fields() {
+    /*
     $.getJSON("/copo/get_info_for_new_dataverse/", function (data) {
 
         $('#dvName').val(data.dvName)
@@ -813,6 +814,8 @@ function do_new_dataverse_fields() {
         $('#dsContactLastname').val(data.dvPerson[0].lastName)
         $('#dsContactEmail').val(data.dvPerson[0].email)
     })
+
+     */
 }
 
 function save_inspection_info(e) {

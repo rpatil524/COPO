@@ -3,10 +3,11 @@
     "group_name": "Taxon Group",
     "fields": [
       "taxonid",
-      "order",
-      "family",
-      "genus",
       "species",
+      "genus",
+      "family",
+      "order",
+      "order",
       "commonName",
       "speciesDeterminationMethod",
       "identificationConfidence"
@@ -22,29 +23,6 @@
     ]
   },
   {
-    "group_name": "Sample Specifics",
-    "fields": [
-      "sex",
-      "lifestage",
-      "speciesRarity",
-      "genomeSize",
-      "evidenceForGenomeSize",
-      "plansForSample"
-    ]
-  },
-  {
-    "group_name": "Collection Information",
-    "fields": [
-      "collectedBy",
-      "dateOfSampleCollection",
-      "timeOfSampleCollection",
-      "identifiedBy",
-      "dateOfSampleIdentification",
-      "descriptionOfCollectionMethod",
-      "sampleAvailability"
-    ]
-  },
-  {
     "group_name": "Geography",
     "fields": [
       "collectionEvent",
@@ -56,8 +34,42 @@
       "gridReference",
       "habitat",
       "depth",
-      "depth",
       "elevation"
+    ]
+  },
+  {
+    "group_name": "Sample Characteristics",
+    "fields": [
+      "sex",
+      "lifestage",
+      "speciesRarity",
+      "genomeSize",
+      "evidenceForGenomeSize",
+      "plansForSample"
+    ]
+  },
+  {
+    "group_name": "Aquatic Characteristics",
+    "fields": [
+      "temperature",
+      "salinity",
+      "ph",
+      "chla",
+      "lightIntensity",
+      "dissolvedOxygen"
+    ]
+
+  },
+  {
+    "group_name": "Collection Information",
+    "fields": [
+      "collectedBy",
+      "dateOfSampleCollection",
+      "timeOfSampleCollection",
+      "identifiedBy",
+      "dateOfSampleIdentification",
+      "descriptionOfCollectionMethod",
+      "sampleAvailability"
     ]
   },
   {

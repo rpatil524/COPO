@@ -305,11 +305,11 @@
     },
     {
       "help_tip": "A taxonomic determination (e.g., the assignment to a taxon).",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
-      "control": "ontology term",
+      "control": "semantic-ui-search",
       "versions": [
         "taxonid"
       ],
@@ -941,6 +941,144 @@
       "label": "Identification Confidence (%)",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/identificationRemarks"
+    },
+    {
+      "help_tip": "Temperature in degrees Centigrade",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "Temperature"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.temperature",
+      "label": "Temperature",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/measurementType"
+    },
+    {
+      "help_tip": "Salinity",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "Salinity"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.salinity",
+      "label": "Salinity in g/Kg",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/measurementType"
+    },
+    {
+      "help_tip": "pH",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "ph"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.ph",
+      "label": "pH",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/measurementType"
+    },
+    {
+      "help_tip": "Chlorophyll a in mg/Litre",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "chlA"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.chlA",
+      "label": "Chlorophyll a mg/Litre",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/measurementType"
+    },
+    {
+      "help_tip": "Light Intensity in Lux",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "lightIntensity"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.lightIntensity",
+      "label": "Light Intensity (Lux)",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/measurementType"
+    },
+    {
+      "help_tip": "Percentage Dissolved Oxygen Saturation",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "dissolvedOxygen"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.dissolvedOxygen",
+      "label": "Dissolved Oxygen (%)",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/measurementType"
     },
     {
       "help_tip": "Other Information",
