@@ -1,0 +1,330 @@
+{% extends 'copo/base_1col.html' %}
+
+{% load staticfiles %}
+{% load web_tags %}
+
+{% block stylesheet_block %}
+    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
+
+    <link rel="stylesheet" type="text/css" href="{% static "copo/annotator-2.0.0-alpha.3/css/annotator.min.css" %} "/>
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_ontology_styles.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+
+{% endblock %}
+
+
+
+
+
+
+{% block title_block %} Index {% endblock %}
+
+{% block tagline_block %}
+
+
+
+{% endblock %}
+
+{% block page_banner %}
+    <!--
+    <div class="page-header warning-banner">
+        <div class="icon">
+            <i class="fa fa-cloud-upload fa-4x"></i>
+        </div>
+        <div class="resume-text">
+            <h3 class="h3">Resume Submission?</h3>
+            It looks like you were in the middle of a submission. <a href="http://www.google.com"> Click here to resume</a>
+        </div>
+
+    </div>
+    -->
+{% endblock %}
+
+
+{% block breadcrumb_block %}
+
+{% endblock %}
+
+{% block browse_header_block %}
+
+
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label for="taxonid"
+                                                                                                         class="control-label">Taxon
+        ID<i data-html="A taxonomic determination (e.g., the assignment to a taxon)."
+             class="ui grey icon info circle copo-tooltip" style="margin-left: 5px;"></i></label>
+        <div class="input-group"><input type="text" class="form-control" placeholder="Search..." id="taxonid"
+                                        name="taxonid" style="width: 400px"><span class="input-group-addon">@</span>
+        </div>
+        <span class="form-input-help"
+              style="display:none;">A taxonomic determination (e.g., the assignment to a taxon).</span></div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="species" class="control-label">Species<span
+                    class="constraint-label required-label"> required</span><i
+                    data-html="The full scientific name of the species in which the species is classified."
+                    class="ui grey icon info circle copo-tooltip" style="margin-left: 5px;"></i></label>
+                <div class="ctrlDIV"><span class="ontology-parent"><input type="hidden" class="ontology-field-hidden"
+                                                                          id="species.annotationValue"
+                                                                          name="species.annotationValue"
+                                                                          data-key="annotationValue"><input
+                        type="hidden" class="ontology-field-hidden" id="species.termSource" name="species.termSource"
+                        data-key="termSource"><input type="hidden" class="ontology-field-hidden"
+                                                     id="species.termAccession" name="species.termAccession"
+                                                     data-key="termAccession"><input type="hidden"
+                                                                                     class="ontology-field-hidden"
+                                                                                     id="species.comments"
+                                                                                     name="species.comments"
+                                                                                     data-key="comments"><select
+                        class="form-control input-copo onto-select selectized"
+                        data-url="/copo/ajax_search_ontology/ncbitaxon/" data-element="species" data-validate="true"
+                        data-error="Species required!" tabindex="-1" style="display: none;"><option value=""
+                                                                                                    selected="selected"></option></select><div
+                        class="selectize-control form-control input-copo onto-select multi plugin-remove_button"><div
+                        class="selectize-input items required invalid not-full"><input type="text" autocomplete="off"
+                                                                                       tabindex="" style="width: 4px;"
+                                                                                       required=""></div><div
+                        class="selectize-dropdown multi form-control input-copo onto-select plugin-remove_button"
+                        style="display: none;"><div class="selectize-dropdown-content"></div></div></div><div
+                        style="margin-top:5px;  padding:3px; background-image:none; border-color:transparent; word-wrap: break-word;"
+                        class="onto-label ontol-span webpop-content-div alert alert-default copo-tooltip"
+                        title="Value not set or free-text value not resolved to an ontology"><span
+                        class="ontology-label"><i class="fa fa-align-justify free-text" style="padding-right: 5px;"></i><img
+                        class="non-free-text" src="/static/copo/img/ontology2.png"
+                        style="cursor: pointer; display: none;"></span><span class="onto-label-span"></span><span
+                        class="onto-label-more collapse"></span></div></span>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">The full scientific name of the species in which the species is classified.</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="genus" class="control-label">Genus<span
+                    class="constraint-label required-label"> required</span><i
+                    data-html="The full scientific name of the genus in which the taxon is classified."
+                    class="ui grey icon info circle copo-tooltip" style="margin-left: 5px;"></i></label>
+                <div class="ctrlDIV"><span class="ontology-parent"><input type="hidden" class="ontology-field-hidden"
+                                                                          id="genus.annotationValue"
+                                                                          name="genus.annotationValue"
+                                                                          data-key="annotationValue"><input
+                        type="hidden" class="ontology-field-hidden" id="genus.termSource" name="genus.termSource"
+                        data-key="termSource"><input type="hidden" class="ontology-field-hidden"
+                                                     id="genus.termAccession" name="genus.termAccession"
+                                                     data-key="termAccession"><input type="hidden"
+                                                                                     class="ontology-field-hidden"
+                                                                                     id="genus.comments"
+                                                                                     name="genus.comments"
+                                                                                     data-key="comments"><select
+                        class="form-control input-copo onto-select selectized"
+                        data-url="/copo/ajax_search_ontology/ncbitaxon/" data-element="genus" data-validate="true"
+                        data-error="Genus required!" tabindex="-1" style="display: none;"><option value=""
+                                                                                                  selected="selected"></option></select><div
+                        class="selectize-control form-control input-copo onto-select multi plugin-remove_button"><div
+                        class="selectize-input items required invalid not-full"><input type="text" autocomplete="off"
+                                                                                       tabindex="" style="width: 4px;"
+                                                                                       required=""></div><div
+                        class="selectize-dropdown multi form-control input-copo onto-select plugin-remove_button"
+                        style="display: none;"><div class="selectize-dropdown-content"></div></div></div><div
+                        style="margin-top:5px;  padding:3px; background-image:none; border-color:transparent; word-wrap: break-word;"
+                        class="onto-label ontol-span webpop-content-div alert alert-default copo-tooltip"
+                        title="Value not set or free-text value not resolved to an ontology"><span
+                        class="ontology-label"><i class="fa fa-align-justify free-text" style="padding-right: 5px;"></i><img
+                        class="non-free-text" src="/static/copo/img/ontology2.png"
+                        style="cursor: pointer; display: none;"></span><span class="onto-label-span"></span><span
+                        class="onto-label-more collapse"></span></div></span>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">The full scientific name of the genus in which the taxon is classified.</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="family" class="control-label">Family<span
+                    class="constraint-label required-label"> required</span><i
+                    data-html="The full scientific name of the family in which the taxon is classified."
+                    class="ui grey icon info circle copo-tooltip" style="margin-left: 5px;"></i></label>
+                <div class="ctrlDIV"><span class="ontology-parent"><input type="hidden" class="ontology-field-hidden"
+                                                                          id="family.annotationValue"
+                                                                          name="family.annotationValue"
+                                                                          data-key="annotationValue"><input
+                        type="hidden" class="ontology-field-hidden" id="family.termSource" name="family.termSource"
+                        data-key="termSource"><input type="hidden" class="ontology-field-hidden"
+                                                     id="family.termAccession" name="family.termAccession"
+                                                     data-key="termAccession"><input type="hidden"
+                                                                                     class="ontology-field-hidden"
+                                                                                     id="family.comments"
+                                                                                     name="family.comments"
+                                                                                     data-key="comments"><select
+                        class="form-control input-copo onto-select selectized"
+                        data-url="/copo/ajax_search_ontology/ncbitaxon/" data-element="family" data-validate="true"
+                        data-error="Family required!" tabindex="-1" style="display: none;"><option value=""
+                                                                                                   selected="selected"></option></select><div
+                        class="selectize-control form-control input-copo onto-select multi plugin-remove_button"><div
+                        class="selectize-input items required invalid not-full"><input type="text" autocomplete="off"
+                                                                                       tabindex="" style="width: 4px;"
+                                                                                       required=""></div><div
+                        class="selectize-dropdown multi form-control input-copo onto-select plugin-remove_button"
+                        style="display: none;"><div class="selectize-dropdown-content"></div></div></div><div
+                        style="margin-top:5px;  padding:3px; background-image:none; border-color:transparent; word-wrap: break-word;"
+                        class="onto-label ontol-span webpop-content-div alert alert-default copo-tooltip"
+                        title="Value not set or free-text value not resolved to an ontology"><span
+                        class="ontology-label"><i class="fa fa-align-justify free-text" style="padding-right: 5px;"></i><img
+                        class="non-free-text" src="/static/copo/img/ontology2.png"
+                        style="cursor: pointer; display: none;"></span><span class="onto-label-span"></span><span
+                        class="onto-label-more collapse"></span></div></span>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">The full scientific name of the family in which the taxon is classified.</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="order" class="control-label">Order<span
+                    class="constraint-label required-label"> required</span><i
+                    data-html="The full scientific name of the order in which the taxon is classified."
+                    class="ui grey icon info circle copo-tooltip" style="margin-left: 5px;"></i></label>
+                <div class="ctrlDIV"><span class="ontology-parent"><input type="hidden" class="ontology-field-hidden"
+                                                                          id="order.annotationValue"
+                                                                          name="order.annotationValue"
+                                                                          data-key="annotationValue"><input
+                        type="hidden" class="ontology-field-hidden" id="order.termSource" name="order.termSource"
+                        data-key="termSource"><input type="hidden" class="ontology-field-hidden"
+                                                     id="order.termAccession" name="order.termAccession"
+                                                     data-key="termAccession"><input type="hidden"
+                                                                                     class="ontology-field-hidden"
+                                                                                     id="order.comments"
+                                                                                     name="order.comments"
+                                                                                     data-key="comments"><select
+                        class="form-control input-copo onto-select selectized"
+                        data-url="/copo/ajax_search_ontology/ncbitaxon/" data-element="order" data-validate="true"
+                        data-error="Order required!" tabindex="-1" style="display: none;"><option value=""
+                                                                                                  selected="selected"></option></select><div
+                        class="selectize-control form-control input-copo onto-select multi plugin-remove_button"><div
+                        class="selectize-input items required invalid not-full"><input type="text" autocomplete="off"
+                                                                                       tabindex="" style="width: 4px;"
+                                                                                       required=""></div><div
+                        class="selectize-dropdown multi form-control input-copo onto-select plugin-remove_button"
+                        style="display: none;"><div class="selectize-dropdown-content"></div></div></div><div
+                        style="margin-top:5px;  padding:3px; background-image:none; border-color:transparent; word-wrap: break-word;"
+                        class="onto-label ontol-span webpop-content-div alert alert-default copo-tooltip"
+                        title="Value not set or free-text value not resolved to an ontology"><span
+                        class="ontology-label"><i class="fa fa-align-justify free-text" style="padding-right: 5px;"></i><img
+                        class="non-free-text" src="/static/copo/img/ontology2.png"
+                        style="cursor: pointer; display: none;"></span><span class="onto-label-span"></span><span
+                        class="onto-label-more collapse"></span></div></span>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">The full scientific name of the order in which the taxon is classified.</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="order" class="control-label">Order<span
+                    class="constraint-label required-label"> required</span><i
+                    data-html="The full scientific name of the order in which the taxon is classified."
+                    class="ui grey icon info circle copo-tooltip" style="margin-left: 5px;"></i></label>
+                <div class="ctrlDIV"><span class="ontology-parent"><input type="hidden" class="ontology-field-hidden"
+                                                                          id="order.annotationValue"
+                                                                          name="order.annotationValue"
+                                                                          data-key="annotationValue"><input
+                        type="hidden" class="ontology-field-hidden" id="order.termSource" name="order.termSource"
+                        data-key="termSource"><input type="hidden" class="ontology-field-hidden"
+                                                     id="order.termAccession" name="order.termAccession"
+                                                     data-key="termAccession"><input type="hidden"
+                                                                                     class="ontology-field-hidden"
+                                                                                     id="order.comments"
+                                                                                     name="order.comments"
+                                                                                     data-key="comments"><select
+                        class="form-control input-copo onto-select selectized"
+                        data-url="/copo/ajax_search_ontology/ncbitaxon/" data-element="order" data-validate="true"
+                        data-error="Order required!" tabindex="-1" style="display: none;"><option value=""
+                                                                                                  selected="selected"></option></select><div
+                        class="selectize-control form-control input-copo onto-select multi plugin-remove_button"><div
+                        class="selectize-input items required invalid not-full"><input type="text" autocomplete="off"
+                                                                                       tabindex="" style="width: 4px;"
+                                                                                       required=""></div><div
+                        class="selectize-dropdown multi form-control input-copo onto-select plugin-remove_button"
+                        style="display: none;"><div class="selectize-dropdown-content"></div></div></div><div
+                        style="margin-top:5px;  padding:3px; background-image:none; border-color:transparent; word-wrap: break-word;"
+                        class="onto-label ontol-span webpop-content-div alert alert-default copo-tooltip"
+                        title="Value not set or free-text value not resolved to an ontology"><span
+                        class="ontology-label"><i class="fa fa-align-justify free-text" style="padding-right: 5px;"></i><img
+                        class="non-free-text" src="/static/copo/img/ontology2.png"
+                        style="cursor: pointer; display: none;"></span><span class="onto-label-span"></span><span
+                        class="onto-label-more collapse"></span></div></span>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">The full scientific name of the order in which the taxon is classified.</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="commonName" class="control-label">Common Name<i data-html="A common or vernacular name."
+                                                                         class="ui grey icon info circle copo-tooltip"
+                                                                         style="margin-left: 5px;"></i></label>
+                <div class="ctrlDIV">
+                    <div><input type="text" class="input-copo form-control copo-text-control" id="commonName"
+                                name="commonName"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">A common or vernacular name.</span></div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="speciesDeterminationMethod" class="control-label">Species Determination Method<i
+                    data-html="Comment if chance of misidentification, reference text used to identify, etc"
+                    class="ui grey icon info circle copo-tooltip" style="margin-left: 5px;"></i></label>
+                <div class="ctrlDIV">
+                    <div><input type="text" class="input-copo form-control copo-text-control"
+                                id="speciesDeterminationMethod" name="speciesDeterminationMethod"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">Comment if chance of misidentification, reference text used to identify, etc</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="identificationConfidence" class="control-label">Identification Confidence (%)<i
+                    data-html="Expressed as a Percentage" class="ui grey icon info circle copo-tooltip"
+                    style="margin-left: 5px;"></i></label>
+                <div class="ctrlDIV">
+                    <div><input type="text" class="input-copo form-control copo-text-control"
+                                id="identificationConfidence" name="identificationConfidence"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">Expressed as a Percentage</span></div>
+        </div>
+    </div>
+
+
+    {% for record in records %}
+
+        {{ record }}
+
+    {% endfor %}
+
+
+
+{% endblock %}
+
+
+{% block js_block %}
+    <script src="{% static 'copo/js/dtol_functions.js' %}"></script>
+
+{% endblock %}

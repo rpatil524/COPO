@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('dataverse_submit/', views.test_dataverse_submit, name='test_dataverse_submit'),
     path('test_submission/', views.test_submission, name='test_submission'),
+    path('test/', views.test_view, name='test_view'),
     path('login/', views.login, name='auth'),
     path('logout/', views.copo_logout, name='logout'),
     path('register/', views.copo_register, name='register'),
@@ -136,4 +137,6 @@ urlpatterns = [
          name="automate_num_cols"),
     path('term_lookup/', annotation_handlers.term_lookup,
          name="term_lookup"),
+path('resolve_taxon_id/', annotation_handlers.resolve_taxon_id,
+         name="resolve_taxon_id"),
 ]

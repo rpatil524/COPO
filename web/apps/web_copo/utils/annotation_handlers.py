@@ -194,3 +194,7 @@ def term_lookup(request):
     else:
         el = {"label": "Nothing"}
     return HttpResponse(json_util.dumps({"loader_id": loader_id, "term": el, "index": index}))
+
+def resolve_taxon_id(request):
+    taxonid = request.GET.get("taxonid")
+    return HttpResponse(taxonid)
