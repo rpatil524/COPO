@@ -20,8 +20,6 @@ RUN apt-get update && apt-get install -y \
     poppler-utils
 
 
-#RUN wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sh /dev/stdin
-
 RUN gem install sass
 RUN pip install --upgrade pip
 

@@ -424,7 +424,7 @@ DROP_DOWNS = {
             'label': 'No'
         }
     ],
-    "REPOSITORIES": [
+    "REPOSITORIES": [ # !!! this is deprecated. moved to lookup/drop_downs/metadata_templates_types.json
         {
             'value': 'cg_core',
             'label': 'CG Core',
@@ -487,7 +487,7 @@ DROP_DOWNS = {
             "description": "Use this option to submit Annotations of objects already submitted"
         }
     ],
-    "SAMPLE_TYPES": [
+    "SAMPLE_TYPES": [ # !!! this is deprecated. moved to lookup/drop_downs/sample_types.json
         {
             "value": "biosample",
             "label": "Biosample Standard",

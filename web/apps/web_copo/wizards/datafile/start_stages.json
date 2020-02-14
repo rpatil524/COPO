@@ -4,14 +4,14 @@
   "properties": [
     {
       "ref": "target_repository",
-      "title": "Repository",
-      "message": "Select the target repository for which this description is intended. The choice of a target repository helps inform the wizard on an appropriate metadata template for your description.",
+      "title": "Metadata template",
+      "message": "Select the metadata template to use in describing your work.",
       "apply_to_all": true,
       "items": [
         {
           "id": "deposition_context",
-          "help_tip": "Select a target repository",
-          "label": "Target Repository",
+          "help_tip": "Select a metadata template",
+          "label": "Metadata template",
           "hidden": "false",
           "required": "true",
           "control": "copo-single-select",

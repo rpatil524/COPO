@@ -28,6 +28,7 @@ urlpatterns = [
     path('small_file_upload/', api.upload_to_figshare_profile, name='receive_data_file'),
     path('forward_to_figshare/', wizard.forward_to_figshare, name='forward_to_figshare'),
     path('get_upload_information/', ajax.get_upload_information, name='get_upload_information'),
+    path('get_submission_status/', ajax.get_submission_status, name='get_submission_status'),
     path('submit_to_repo/', submit.delegate_submission, name='delegate_submission'),
     path('release_ena_study/', ajax.release_ena_study, name='release_ena_study'),
     path('test_submission/', views.test_submission, name='test_ena_submission'),

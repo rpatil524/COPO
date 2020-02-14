@@ -13,8 +13,12 @@ app.autodiscover_tasks()
 # define periodic tasks here
 
 app.conf.beat_schedule = {
-    'update_ena_status': {
+    'process_ena_submission': {
         'task': 'web.apps.web_copo.tasks.process_ena_submission',
+        'schedule': crontab(minute="*/1")  # execute every n minutes minute="*/n"
+    },
+    'process_ena_transfer': {
+        'task': 'web.apps.web_copo.tasks.process_ena_transfer',
         'schedule': crontab(minute="*/1")  # execute every n minutes minute="*/n"
     }
 }

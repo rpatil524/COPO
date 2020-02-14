@@ -333,11 +333,17 @@ def get_assembly_type_option():
 
 
 def get_sample_type_options():
-    return lookup.DROP_DOWNS['SAMPLE_TYPES']
+    from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
+    return COPOLookup(data_source='sample_type_options').broker_data_source()
 
 
 def get_repository_options():
-    return lookup.DROP_DOWNS['REPOSITORIES']
+    from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
+    return COPOLookup(data_source='repository_options').broker_data_source()
+
+def get_repository_types_list():
+    from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
+    return COPOLookup(data_source='repository_types_list').broker_data_source()
 
 
 def get_omics_type_options():

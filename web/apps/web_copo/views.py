@@ -228,6 +228,11 @@ def resolve_submission_id(request, submission_id):
 def copo_visualize(request):
     context = dict()
 
+    # test starts
+    # from submission import dataverseSubmission
+    # result = dataverseSubmission.DataverseSubmit(submission_id="5e42c7da373b6d355c7bcbfe").submit()
+    # test ends
+
     task = request.POST.get("task", str())
 
     profile_id = request.session.get("profile_id", str())
@@ -238,6 +243,7 @@ def copo_visualize(request):
     broker_visuals = BrokerVisuals(context=context,
                                    profile_id=profile_id,
                                    request=request,
+                                   user_id=request.user.id,
                                    component=request.POST.get("component", str()),
                                    target_id=request.POST.get("target_id", str()),
                                    quick_tour_flag=request.POST.get("quick_tour_flag", False),
@@ -256,7 +262,13 @@ def copo_visualize(request):
                      update_quick_tour_flag=broker_visuals.do_update_quick_tour_flag,
                      get_component_info=broker_visuals.do_get_component_info,
                      get_profile_info=broker_visuals.do_get_profile_info,
-                     get_submission_accessions=broker_visuals.do_get_submission_accessions
+                     get_submission_accessions=broker_visuals.do_get_submission_accessions,
+                     get_submission_datafiles=broker_visuals.do_get_submission_datafiles,
+                     get_destination_repo=broker_visuals.do_get_destination_repo,
+                     get_repo_stats=broker_visuals.do_get_repo_stats,
+                     managed_repositories=broker_visuals.do_managed_repositories,
+                     get_submission_meta_repo=broker_visuals.do_get_submission_meta_repo,
+                     view_submission_remote=broker_visuals.do_view_submission_remote,
                      )
 
     if task in task_dict:
@@ -300,6 +312,7 @@ def copo_forms(request):
                      save=broker_da.do_save_edit,
                      edit=broker_da.do_save_edit,
                      delete=broker_da.do_delete,
+                     validate_and_delete=broker_da.validate_and_delete,
                      form=broker_da.do_form,
                      form_and_component_records=broker_da.do_form_and_component_records,
                      doi=broker_da.do_doi,
@@ -310,6 +323,7 @@ def copo_forms(request):
                      sanitise_submissions=broker_da.do_sanitise_submissions,
                      create_rename_description_bundle=broker_da.create_rename_description_bundle,
                      clone_description_bundle=broker_da.do_clone_description_bundle,
+                     lift_submission_embargo=broker_da.do_lift_submission_embargo,
                      )
 
     if task in task_dict:
@@ -513,5 +527,14 @@ def administer_repos(request):
     return render(request, 'copo/copo_repository.html', {'request': request})
 
 
+@user_is_staff
+def copo_repositories(request):
+    return render(request, 'copo/copo_repository_admin.html', {'request': request})
+
+
 def manage_repos(request):
     return render(request, 'copo/copo_repo_management.html', {'request': request})
+
+
+def manage_repositories(request):
+    return render(request, 'copo/copo_repository_manage.html', {'request': request})

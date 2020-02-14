@@ -95,6 +95,9 @@ def is_bam_file(file_name):
     except(Exception) as inst:
         return False
 
+def is_cram_file(file_name):
+    pass
+
 
 def is_gzipped(file_name):
     # try opening the file in gzip and reading the first few chars

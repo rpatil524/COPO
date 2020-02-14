@@ -1369,7 +1369,7 @@ class WizardHelper:
         if not accessions:
             return list()
 
-        accessions = htags.generate_submission_accessions_data(sub)
+        accessions = htags.generate_submission_accessions_data(submission_id=str(sub["_id"]))
 
         return accessions
 
@@ -1520,23 +1520,17 @@ class WizardHelper:
 
         # create a new submission record only if none exist for this description
 
-        submission_records = cursor_to_list(
-            Submission().get_collection_handle().find(
-                {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
-                {'_id': 1}))
+        submission_record = Submission().get_collection_handle().find_one(
+            {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()})
 
-        if len(submission_records):  # submission record exist
-            return dict(submission_id=str(submission_records[0]["_id"]), existing=True)
-
+        # get attached datafiles
         records = cursor_to_list(
             DataFile().get_collection_handle().find(
                 {"description_token": self.description_token, 'deleted': d_utils.get_not_deleted_flag()},
                 {'_id': 1, 'file_location': 1}))
 
-        description = Description().GET(self.description_token)
-        target_repository = description["attributes"].get("target_repository", dict()).get("deposition_context", str())
-
-        submission_id = str()
+        bundle = list()
+        bundle_meta = list()
 
         if len(records):
             df = pd.DataFrame(records)
@@ -1547,9 +1541,30 @@ class WizardHelper:
             df = df[['file_id', 'file_path', 'upload_status']]
             bundle = list(df.file_id)
             bundle_meta = df.to_dict('records')
+
+        if submission_record:  # submission record exist
+            # update bundle and bundle_meta with new entries
+            # we try to maintain 'state' of existing bundle items by not replacing altogether
+            new_bundle = [x for x in bundle if x not in submission_record.get("bundle", list())]
+            new_bundle_meta = [x for x in bundle_meta if x["file_id"] in new_bundle]
+            submission_record["bundle"] = submission_record["bundle"] + new_bundle
+            submission_record["bundle_meta"] = submission_record["bundle_meta"] + new_bundle_meta
+
+            submission_id = str(submission_record.pop('_id'))
+            Submission().get_collection_handle().update(
+                {"_id": ObjectId(submission_id)},
+                {'$set': submission_record})
+
+            return dict(submission_id=submission_id, existing=True)
+
+        description = Description().GET(self.description_token)
+        target_repository = description["attributes"].get("target_repository", dict()).get("deposition_context", str())
+
+        submission_id = str()
+
+        if len(bundle):
             kwarg = dict(bundle=bundle, bundle_meta=bundle_meta, repository=target_repository,
                          description_token=self.description_token)
-
             submission_id = str(Submission(profile_id=self.profile_id).save_record(dict(), **kwarg).get("_id", str()))
 
         return dict(submission_id=submission_id, existing=False)

@@ -12,3 +12,9 @@ def update_study_status():
 def process_ena_submission(self):
     enareadSubmission.EnaReads().process_queue()
     return True
+
+
+@app.task(bind=True)
+def process_ena_transfer(self):
+    enareadSubmission.EnaReads().process_file_transfer()
+    return True

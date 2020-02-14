@@ -66,6 +66,8 @@ var controlsMapping = {
     "copo-select": "do_copo_select_ctrl",
     "copo-select2": "do_copo_select2_ctrl",
     "ontology term": "do_ontology_term_ctrl",
+    "copo-general-onto": "do_general_ontology_term_ctrl",
+    "copo-general-ontoselect": "do_general_ontology_select_ctrl",
     "copo-lookup": "do_copo_lookup_ctrl",
     "copo-lookup2": "do_copo_lookup2_ctrl",
     "select": "do_select_ctrl",
@@ -187,9 +189,6 @@ function json2HtmlForm(data) {
 
             refresh_form_aux_controls();
 
-            var event = jQuery.Event("postformload"); //individual compnents can trap and handle this event as they so wish
-            $('body').trigger(event);
-
 
             //validate on submit event
             htmlForm.find("form").validator().on('submit', function (e) {
@@ -197,17 +196,17 @@ function json2HtmlForm(data) {
                     return false;
                 } else {
                     e.preventDefault();
-
-                    save_form(data.form);
-                    refresh_tool_tips();
-                    dialogRef.close();
+                    save_form(data.form, dialogRef);
                 }
             });
 
+            var event = jQuery.Event("postformload"); //individual compnents can trap and handle this event as they so wish
+            $('body').trigger(event);
 
         },
         buttons: [
             {
+                id: 'btnFormCancel',
                 label: 'Cancel',
                 cssClass: 'tiny ui basic button',
                 action: function (dialogRef) {
@@ -215,6 +214,7 @@ function json2HtmlForm(data) {
                 }
             },
             {
+                id: 'btnFormSave',
                 label: '<i class="copo-components-icons glyphicon glyphicon-save"></i> Save',
                 cssClass: 'tiny ui basic primary button',
                 action: function (dialogRef) {
@@ -331,10 +331,17 @@ function generate_form_controls(formSchema, formValue) {
 
 
 function get_form_message(data) {
-    var messageDiv = $('<div/>',
+    var messageRowDiv = $('<div/>',
         {
-            style: "display:none;"
+            class: "row"
         });
+
+    var messageColDiv = $('<div/>',
+        {
+            class: "col-sm-12 col-md-12 col-lg-12 formMessageDiv"
+        });
+
+    messageRowDiv.append(messageColDiv);
 
     var message_text = null;
     var message_type = null;
@@ -348,20 +355,18 @@ function get_form_message(data) {
     }
 
     if (message_text && message_type) {
-        messageDiv = $('<div/>',
-            {
-                html: '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><i class="' + data.form.form_message.icon_class + '" style="margin-right: 5px;"></i>' + data.form.form_message.text,
-                class: "alert alert-" + data.form.form_message.type
-            });
+        let feedback = get_alert_control();
+        let alertClass = "alert-" + message_type;
+
+        feedback
+            .removeClass("alert-success")
+            .addClass(alertClass);
+
+        feedback.find(".alert-message").html(message_text);
+        messageColDiv.html(feedback);
     }
 
-    return $('<div/>',
-        {
-            class: "row"
-        }).append($('<div/>',
-        {
-            class: "col-sm-12 col-md-12 col-lg-12"
-        }).append(messageDiv));
+    return messageRowDiv;
 }
 
 function get_form_title(data) {
@@ -977,6 +982,138 @@ var dispatchFormControl = {
 
         return get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
     },
+    do_general_ontology_select_ctrl: function (formElem, elemValue) {
+
+        /* example formElem for this control is:
+
+        formElem = {
+            "ref": "",
+                "id": "x_y_id",
+                "label": label,
+                "help_tip": "Please select a value from the list",
+                "required": "true",
+                "type": "string",
+                "control": "copo-general-ontoselect",
+                "value_change_event": "name_of_event_to_trigger",
+                "default_value": "",
+                "placeholder": "Select a ...",
+                "control_meta": {},
+                "deprecated": false,
+                "hidden": "false",
+                "option_values": [{...},{...}],
+        }
+
+        * examples api_schema:
+        * api_schema = [
+                            {'id': 'name', 'label': 'Name', 'show_in_table': true},
+                            {'id': 'type', 'label': 'Type', 'show_in_table': false}
+                        ]
+
+        api_schema = []
+        * */
+
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        //get ontology ctrl
+        var ontologyCtrlObject = get_general_ontologyselect_span($('<span/>'), formElem);
+
+        ontologyCtrlObject.find(".general-onto-select").attr("data-currentValue", elemValue);
+
+        //set placeholder text
+        if (formElem.hasOwnProperty("placeholder")) {
+            ontologyCtrlObject.find(".general-onto-select").attr("placeholder", formElem.placeholder);
+        }
+
+
+        var validationCandidate = ontologyCtrlObject.find(".general-onto")[0];
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, $(validationCandidate));
+
+        ctrlsDiv.append(ontologyCtrlObject);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
+        var hiddenCtrl = $('<input/>',
+            {
+                type: "hidden",
+                name: formElem.id,
+                id: formElem.id
+            });
+
+        ctrlsDiv.append(hiddenCtrl);
+
+        return add_message_segment(get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue));
+    },
+    do_general_ontology_term_ctrl: function (formElem, elemValue) {
+
+        /* example formElem for this control is:
+
+        formElem = {
+            "ref": "",
+            "id": "your_control_id",
+            "label": "Control label",
+            "help_tip": "You can search by x, y, z fields",
+            "required": "false",
+            "type": "string",
+            "control": "copo-general-onto",
+            "value_change_event": "dv_search_change", //event to trigger upon value change
+            "default_value": "",
+            "placeholder": "Enter an optional placeholder",
+            "hidden": "false",
+            "data_url": "/copo/some_copo_url/",
+            "api_schema": [see below for example],
+            "call_parameters": {see below for example}
+        }
+
+        * examples api_schema:
+        * api_schema = [
+                            {'id': 'name', 'label': 'Name', 'show_in_table': true},
+                            {'id': 'type', 'label': 'Type', 'show_in_table': false}
+                        ]
+
+        api_schema = []
+
+        * example call_parameters:
+        * call_parameters =  {'profile_id': 'xyz123', 'abc': 'de'}
+
+        call_parameters = {}
+        * */
+
+        var ctrlsDiv = $('<div/>',
+            {
+                class: "ctrlDIV"
+            });
+
+        //get ontology ctrl
+        var ontologyCtrlObject = get_general_ontology_span($('<span/>'), formElem);
+
+        ontologyCtrlObject.find(":input").each(function () {
+            if (this.id) {
+                var tempID = this.id;
+                this.id = formElem.id + "." + tempID;
+                this.name = formElem.id + "." + tempID;
+            }
+        });
+
+        //set placeholder text
+        if (formElem.hasOwnProperty("placeholder")) {
+            ontologyCtrlObject.find(".general-onto-search").attr("placeholder", formElem.placeholder);
+        }
+
+
+        var validationCandidate = ontologyCtrlObject.find(".general-onto-search")[0];
+
+        //set validation markers
+        var vM = set_validation_markers(formElem, $(validationCandidate));
+
+        ctrlsDiv.append(ontologyCtrlObject);
+        ctrlsDiv.append(vM.errorHelpDiv);
+
+        return add_message_segment(get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue));
+    },
     do_ontology_term_ctrl: function (formElem, elemValue) {
         var ctrlsDiv = $('<div/>',
             {
@@ -993,6 +1130,12 @@ var dispatchFormControl = {
                 this.name = formElem.id + "." + tempID;
             }
         });
+
+        //set placeholder text
+        if (formElem.hasOwnProperty("placeholder")) {
+            ontologyCtrlObject.find(".onto-select").attr("placeholder", formElem.placeholder);
+        }
+
 
         var validationCandidate = ontologyCtrlObject.find(".onto-select")[0];
 
@@ -2224,9 +2367,20 @@ function form_label_ctrl(formElem) {
                 class: "control-label"
             });
 
-        var helpTip = formElem["help_tip"] || '';
+
+        var helpTip = '';
+        if (formElem.hasOwnProperty('help_tip') && formElem.hasOwnProperty('help_tip') != '') {
+            helpTip = formElem["help_tip"];
+        }
+
         if (helpTip) {
-            var item = $('<i data-html="'+helpTip+'" class="ui grey icon info circle copo-tooltip" style="margin-left: 5px;"></i>');
+            var item = $('<i/>',
+                {
+                    style: "margin-left: 5px;",
+                    class: "ui grey icon info circle copo-tooltip",
+                    "title": helpTip
+                });
+
             lblCtrl.append(item);
         }
     }
@@ -2495,6 +2649,157 @@ function get_ontology_span_2(ontologySpan, formElem) {
         });
 
     ontologySpan.append(label);
+
+    return ontologySpan;
+}
+
+function get_general_ontologyselect_span(ontologySpan, formElem) {
+    var apiSchema = []; //schema defines what/how fields are requested from search end-point
+
+    if (formElem.hasOwnProperty("api_schema")) {
+        apiSchema = formElem.api_schema;
+    }
+
+    ontologySpan.addClass("ontology-parent"); //used for selecting siblings in auto-complete
+
+
+    var hiddenFields = $('<input/>',
+        {
+            type: "hidden",
+            class: "elem-fields",
+            value: JSON.stringify(apiSchema)
+        });
+
+    ontologySpan.append(hiddenFields);
+
+    var option_values = [];
+    if (formElem.hasOwnProperty("option_values")) {
+        option_values = formElem.option_values;
+    }
+
+    var hiddenOptions = $('<input/>',
+        {
+            type: "hidden",
+            class: "elem-options",
+            value: JSON.stringify(option_values)
+        });
+
+    ontologySpan.append(hiddenOptions);
+
+    //check for event name
+    var event_name = "";
+    if (formElem.hasOwnProperty("value_change_event")) {
+        event_name = formElem.value_change_event;
+    }
+
+    //build select; basis for auto-completion
+    var selectCtrl = $('<select/>',
+        {
+            class: "form-control input-copo general-onto general-onto-select",
+            "data-element": formElem.id,
+            "data-validate": false,
+            "data-eventname": event_name
+        });
+
+    ontologySpan.append(selectCtrl);
+
+    //set id and label fields
+    if (formElem.hasOwnProperty("control_id_field") && formElem.control_id_field != "") {
+        selectCtrl.attr("data-idField", formElem.control_id_field)
+    }
+
+    if (formElem.hasOwnProperty("control_label_field") && formElem.control_label_field != "") {
+        selectCtrl.attr("data-labelField", formElem.control_label_field)
+    }
+
+    var labelTag = $('' +
+        '<div class="ui divided selection list">\n' +
+        '        <div class="item copo-item">\n' +
+        '               <div class="row">\n' +
+        '                   <div class="col-sm-2"><span class="ui large blue ribbon label copo-tag">Info pane...</span></div>\n' +
+        '                   <div class="col-sm-10"><span class="webpop-content-div copo-tag-2"></span></div>\n' +
+        '               </div>' +
+        '               <div class="row">\n' +
+        '                   <div class="col-sm-12"><div class="collapse copo-tag-content webpop-content-div" style="word-wrap: break-word; margin-top: 5px; max-height: 300px; overflow-y: scroll;">No info</div></div>\n' +
+        '               </div>' +
+        '        </div>\n' +
+        ' </div>'
+    );
+
+    ontologySpan.append(labelTag);
+
+    return ontologySpan;
+}
+
+function get_general_ontology_span(ontologySpan, formElem) {
+    var apiSchema = []; //schema defines what/how fields are requested from search end-point
+
+    if (formElem.hasOwnProperty("api_schema")) {
+        apiSchema = formElem.api_schema;
+    }
+
+    ontologySpan.addClass("ontology-parent"); //used for selecting siblings in auto-complete
+
+    //get service url
+    var localolsURL = formElem.data_url;
+
+    var call_parameters = [];
+    if (formElem.hasOwnProperty("call_parameters")) {
+        call_parameters = formElem.call_parameters;
+    }
+
+    var hiddenFields = $('<input/>',
+        {
+            type: "hidden",
+            class: "elem-fields",
+            value: JSON.stringify(apiSchema)
+        });
+
+    ontologySpan.append(hiddenFields);
+
+
+    var hiddenParams = $('<input/>',
+        {
+            type: "hidden",
+            class: "elem-params",
+            value: JSON.stringify(call_parameters)
+        });
+
+    ontologySpan.append(hiddenParams);
+
+    //check for event name
+    var event_name = "";
+    if (formElem.hasOwnProperty("value_change_event")) {
+        event_name = formElem.value_change_event;
+    }
+
+    //build select; basis for auto-completion
+    var selectCtrl = $('<select/>',
+        {
+            class: "form-control input-copo general-onto general-onto-search",
+            "data-url": localolsURL,
+            "data-element": formElem.id,
+            "data-validate": false,
+            "data-eventname": event_name
+        });
+
+    ontologySpan.append(selectCtrl);
+
+    var labelTag = $('' +
+        '<div class="ui divided selection list">\n' +
+        '        <div class="item copo-item">\n' +
+        '               <div class="row">\n' +
+        '                   <div class="col-sm-2"><span class="ui large blue ribbon label copo-tag">Info pane...</span></div>\n' +
+        '                   <div class="col-sm-10"><span class="webpop-content-div copo-tag-2"></span></div>\n' +
+        '               </div>' +
+        '               <div class="row">\n' +
+        '                   <div class="col-sm-12"><div class="collapse copo-tag-content webpop-content-div" style="word-wrap: break-word; margin-top: 5px; max-height: 300px; overflow-y: scroll;">No info</div></div>\n' +
+        '               </div>' +
+        '        </div>\n' +
+        ' </div>'
+    );
+
+    ontologySpan.append(labelTag);
 
     return ontologySpan;
 }
@@ -2876,7 +3181,7 @@ function custom_validate(formObject) {
     });
 }
 
-function save_form(formJSON) {
+function save_form(formJSON, dialogRef) {
     var task = "save";
     var error_msg = "Couldn't add " + formJSON.form_label + "!";
     if (formJSON.target_id) {
@@ -2900,6 +3205,13 @@ function save_form(formJSON) {
 
     csrftoken = $.cookie('csrftoken');
 
+    var btnSave = dialogRef.getButton('btnFormSave');
+    var btnCancel = dialogRef.getButton('btnFormCancel');
+    btnSave.disable();
+    btnCancel.disable();
+    btnSave.spin();
+
+
     $.ajax({
         url: copoFormsURL,
         type: "POST",
@@ -2913,25 +3225,77 @@ function save_form(formJSON) {
         },
         success: function (data) {
             globalDataBuffer = data;
-            if (data.table_data) {
+
+            //table data
+            if (data.hasOwnProperty("table_data")) {
                 var event = jQuery.Event("refreshtable");
                 $('body').trigger(event);
+            }
 
-                //feedback
-                if (data.action_feedback) {
+            //feedback
+            if (data.hasOwnProperty("action_feedback") &&
+                data.action_feedback.hasOwnProperty("status") &&
+                data.action_feedback.hasOwnProperty("message")) {
+
+                if (["error", "red", "danger", "negative"].indexOf(data.action_feedback.status) > -1) {
+                    let feedbackControl = get_alert_control();
+                    let alertClass = "alert-danger";
+
+                    feedbackControl
+                        .removeClass("alert-success")
+                        .addClass(alertClass);
+                    feedbackControl.find(".alert-message").html(data.action_feedback.message);
+
+                    dialogRef.getModalBody().find(".formMessageDiv").html(feedbackControl);
+
+                    btnSave.enable();
+                    btnCancel.enable();
+                    btnSave.stopSpin();
+
+                    let modalId = dialogRef.getModal().closest(".bootstrap-dialog").attr("id");
+                    $("#" + modalId).scrollTop(0);
+
+                    return true;
+                } else {
+                    dialogRef.close();
+                    refresh_tool_tips();
+
                     do_crud_action_feedback(data.action_feedback);
+                    return true;
                 }
             }
+
+            dialogRef.close();
+            refresh_tool_tips();
         },
-        error: function () {
-            alert(error_msg);
+        error: function (data) {
+            console.log(data.responseText);
+
+            let feedbackControl = get_alert_control();
+            let alertClass = "alert-danger";
+
+            feedbackControl
+                .removeClass("alert-success")
+                .addClass(alertClass);
+            feedbackControl.find(".alert-message").html(error_msg + ". Please check that you are connected to a network and try again.");
+
+            dialogRef.getModalBody().find(".formMessageDiv").html(feedbackControl);
+
+            btnSave.enable();
+            btnCancel.enable();
+            btnSave.stopSpin();
+
+            let modalId = dialogRef.getModal().closest(".bootstrap-dialog").attr("id");
+            $("#" + modalId).scrollTop(0);
+
+            return true;
         }
     });
 } //end of function
 
 function get_del_button(theTitle) {
     var title = theTitle || "Remove";
-    var delBtn = $('<button title="' + title + '"  class="ui blue icon button copo-tooltip">\n' +
+    var delBtn = $('<button title="' + title + '"  class="ui negative icon button copo-tooltip">\n' +
         '  <i class="minus icon"></i>\n' +
         '</button>');
 
@@ -2940,7 +3304,7 @@ function get_del_button(theTitle) {
 
 function get_add_button(theTitle) {
     var title = theTitle || "Add";
-    var addBtn = $('<button title="' + title + '" class="ui blue icon button copo-tooltip">\n' +
+    var addBtn = $('<button title="' + title + '" class="ui primary icon button copo-tooltip">\n' +
         '  <i class="plus icon"></i>\n' +
         '</button>');
 
