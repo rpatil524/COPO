@@ -12,14 +12,15 @@
     <title>{% block title %}COPO - Collaborative Open Plant Omics{% endblock %}</title>
 
     <!-- Semantic UI -->
-    <link rel="stylesheet" href="{% static 'copo/semantic_ui/semantic.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/semantic_ui/components/icon.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/semantic_ui/semantic.min.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/semantic_ui/components/icon.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/semantic_ui/components/dropdown.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/semantic_ui/components/popup.min.css' %}">
 
 
+
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="{% static 'copo/css/bootstrap/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/css/bootstrap/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/bootstrap/bootstrap-dialog.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/bootstrap/dropdowns-enhancement.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/bootstrap/bootstrap-theme.css' %}">
@@ -43,7 +44,7 @@
     <link rel="stylesheet" href="{% static 'copo/selectize/selectize.bootstrap3.css' %}">
 
     <!-- DataTables components -->
-    <link rel="stylesheet" href="{% static 'copo/datatables/css/jquery.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/datatables/css/jquery.dataTables.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/datatables/css/dataTables.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/datatables/css/select.dataTables.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.dataTables.min.css' %}">
@@ -53,11 +54,11 @@
     <link rel="stylesheet" href="{% static 'copo/datatables/css/rowGroup.semanticui.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/datatables/css/buttons.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/search_highlight/dataTables.searchHighlight.css' %}">
-    <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.css' %}">
+    <link rel="stylesheet" href="{% static 'copo/autocomplete.js-2.1.0/autocomplete.min.css' %}">
     <link rel="stylesheet" href="{% static 'copo/css/copo/copo_annotation_spreadsheet.css' %}"/>
 
     <!-- Google Fonts -->
-    <link href='https://fonts.googleapis.com/css?family=Quattrocento+Sans' rel='stylesheet' type='text/css'>
+    <link href={% static 'copo/css/copo/fonts.css' %} rel='stylesheet' type='text/css'>
 
 
     <!--[if lt IE 9]>
@@ -68,7 +69,7 @@
     <script src="{% static 'copo/js/jquery-ui.min.js' %}"></script>
     <!--<![endif]-->
     <script src="{% static 'copo/semantic_ui/semantic.min.js' %}"></script>
-    <script src="{% static 'copo/autocomplete.js-2.1.0/autocomplete.js' %}"></script>
+    <script src="{% static 'copo/autocomplete.js-2.1.0/autocomplete.min.js' %}"></script>
     <script src="{% static 'copo/js/jquery.cookie.js' %}"></script>
     <script src="{% static 'copo/js/serialize_form_json.js' %}"></script>
     <script src="{% static 'copo/js/bootstrap.js' %}"></script>
@@ -76,7 +77,7 @@
     <script src="{% static 'copo/js/dropdowns-enhancement.js' %}"></script>
     <script src="{% static 'copo/selectize/standalone/selectize.min.js' %}"></script>
     <script src="{% static 'copo/bootstrap_switch/js/bootstrap-switch.js' %}"></script>
-    <script src="{% static 'copo/fuelux/js/fuelux.js' %}"></script>
+    <script src="{% static 'copo/fuelux/js/fuelux.min.js' %}"></script>
     <script src="{% static 'copo/validator1000hz/validator.min.js' %}"></script>
     <script src="{% static 'copo/rangeslider/rangeslider.min.js' %}"></script>
     <script src="{% static 'copo/js/jquery.alterclass.js' %}"></script>
@@ -96,7 +97,7 @@
     <script src="{% static 'copo/search_highlight/dataTables.searchHighlight.min.js' %}"></script>
     <script src="{% static 'copo/search_highlight/jquery.highlight.js' %}"></script>
     <script src="{% static 'copo/bootstrap-datepicker-1.6.4-dist/js/bootstrap-datepicker.min.js' %}"></script>
-    <script src="{% static 'copo/webui_popover/jquery.webui-popover.js' %}"></script>
+    <script src="{% static 'copo/webui_popover/jquery.webui-popover.min.js' %}"></script>
     <script src="{% static 'copo/select2-405/js/select2.min.js' %}"></script>
     <script src="{% static 'copo/semantic_ui/components/dropdown.min.js' %}"></script>
     <script src="{% static 'copo/semantic_ui/components/popup.min.js' %}"></script>
@@ -109,8 +110,8 @@
     <link rel="stylesheet" href="{% static 'copo/css/jquery/jquery-ui.min.css' %}">
     <!-- Date picker components -->
     <link rel="stylesheet" href="{% static 'copo/css/datepicker/jquery.datepick.css' %}">
-    <script src="{% static 'copo/js/datepicker/jquery.plugin.js' %}"></script>
-    <script src="{% static 'copo/js/datepicker/jquery.datepick.js' %}"></script>
+    <script src="{% static 'copo/js/datepicker/jquery.plugin.min.js' %}"></script>
+    <script src="{% static 'copo/js/datepicker/jquery.datepick.min.js' %}"></script>
 
     <!-- PAGE LEVEL STYLES -->
     {% block stylesheet_block %}{% endblock %}

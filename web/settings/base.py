@@ -187,3 +187,11 @@ TEST_USER_NAME = 'jonny'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 500000000
 FILE_UPLOAD_MAX_MEMORY_SIZE = 500000000
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'copo_cache_table',
+
+    }
+}
