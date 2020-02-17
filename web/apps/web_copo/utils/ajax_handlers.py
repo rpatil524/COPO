@@ -788,8 +788,8 @@ def search_dataverse_vf(request):
         # add two control fields: for 'id' and 'label' in display
         new_dict['copo_idblank'] = f'item_{str(indx)}'
         new_dict['copo_labelblank'] = new_dict[api_schema[0]['id']]
-        if "type" in new_dict:  # prefix by type
-            new_dict['copo_labelblank'] = new_dict['type'].capitalize() + ": " + new_dict['copo_labelblank']
+        # prefix display by type
+        new_dict['copo_labelblank'] = new_dict.get("type", "Unknown").capitalize() + ": " + new_dict['copo_labelblank']
         filtered_items.append(new_dict)
 
     result_dict['items'] = filtered_items

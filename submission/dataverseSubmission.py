@@ -222,7 +222,44 @@ class DataverseSubmit(object):
         :return:
         """
 
-        return dict(status=True, message="No status message provided!")
+        # get dataverse alias
+        dataverse_alias = params.get("identifier_of_dataverse", 'N/A')
+        if dataverse_alias == 'N/A':
+            message = 'Dataverse identifier not found! '
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        # get dataset doi
+        dataset_doi = params.get("url", 'N/A') if params.get("global_id", 'N/A') == 'N/A' else params.get("global_id",
+                                                                                                          'N/A')
+        if dataset_doi == 'N/A':
+            message = 'Dataset DOI not found! '
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        # get formatted doi
+        dataset_doi = self.get_format_doi(dataset_doi)
+
+        # add file to dataset
+        result = self.post_dataset_creation(persistent_id=dataset_doi)
+
+        if result.get('status', str()) == 'success':
+            acc = dict()
+            acc['dataset_id'] = params.get("entity_id", str())
+            acc['dataset_doi'] = dataset_doi
+            acc['dataverse_alias'] = dataverse_alias
+            acc['dataverse_title'] = params.get("name_of_dataverse", str())
+            acc['dataset_title'] = params.get("name", str())
+
+            # update submission record with accessions
+            submission_record = dict(accessions=acc)
+            Submission().get_collection_handle().update(
+                {"_id": ObjectId(self.submission_id)},
+                {'$set': submission_record})
+
+            self.clear_submission_metadata()
+
+        return result
 
     def truncate_url(self, url):
         if url.startswith('https://'):
@@ -300,149 +337,6 @@ class DataverseSubmit(object):
             ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
 
         return response_data
-
-    def _add_to_dataverse(self):
-        """
-        function adds datafiles to a dataset
-        :return:
-        """
-        sub = self.submission_record
-
-        # check for dataverse alias
-
-        alias = sub.get("meta", dict()).get("dataverse_alias", str()) or sub.get("meta", dict()).get("alias", str())
-
-        if not alias:
-            return {"status": "error", "message": "Error getting dataverse"}
-
-        # check for dataset doi
-        doi = sub.get("meta", dict()).get("doi", str())
-
-        if not doi:
-            return {"status": "error", "message": "Error getting dataset"}
-
-        # add file to dataset
-        result = self.send_files_curl(persistent_id=doi)
-
-        if result is True:
-            # store accessions and clear submission
-            dv_response_data = self.get_dataverse_details(alias)
-            ds_response_data = self.get_dataset_details(doi)
-
-            dataset_title = [x["value"] for x in
-                             ds_response_data.get("latestVersion", dict()).get("metadataBlocks", dict()).get("citation",
-                                                                                                             dict()).get(
-                                 "fields", dict()) if x.get("typeName", str()) == "title"]
-
-            acc = dict()
-            acc['dataset_id'] = ds_response_data.get("id", str())
-            acc['dataset_doi'] = doi
-            acc['dataverse_alias'] = alias
-            acc['dataverse_title'] = dv_response_data.get("name", "N/A")
-            acc['dataset_title'] = "N/A"
-
-            if dataset_title:
-                if isinstance(dataset_title, list):
-                    acc['dataset_title'] = dataset_title[0]
-                elif isinstance(dataset_title, str):
-                    acc['dataset_title'] = dataset_title
-
-            sub['accessions'] = acc
-            sub['target_id'] = sub.pop('_id', self.submission_id)
-            Submission().save_record(dict(), **sub)
-
-            self.clear_submission_metadata()
-
-        return result
-
-    def _create_and_add_to_dataverse(self):
-        """
-        creates a Dataset in a Dataverse
-        :param submission_record:
-        :return:
-        """
-
-        # proceed with the creation of a dataset iff no accessions are recorded
-        dataset_persistent_id = self.submission_record.get("accessions", dict()).get("dataset_doi", str())
-
-        # there's existing dataset associated with this submission
-        if dataset_persistent_id:
-            return self.post_dataset_creation(persistent_id=dataset_persistent_id)
-
-        # get dataverse alias
-        dataverse_alias = self.submission_record.get("meta", dict()).get("alias", str())
-
-        if not dataverse_alias:
-            exception_message = 'Dataverse alias not found! '
-            self.report_error(exception_message)
-            return exception_message
-            # raise OperationFailedError(exception_message)
-
-        # convert to Dataset metadata
-        metadata_file_path = self.do_conversion()
-
-        # make API call
-        api_call = 'curl -H "X-Dataverse-key: {api_token}" -X POST ' \
-                   '{server_url}/api/dataverses/{dv_alias}/datasets --upload-file {dataset_json}'
-
-        api_call = api_call.format(api_token=self.api_token,
-                                   server_url=self.host,
-                                   dv_alias=dataverse_alias,
-                                   dataset_json=metadata_file_path)
-
-        # retrieve call result
-        try:
-            receipt = subprocess.check_output(api_call, shell=True)
-            receipt = json.loads(receipt.decode('utf-8'))
-        except Exception as e:
-            exception_message = 'API call error: ' + str(e)
-            self.report_error(exception_message)
-            return exception_message
-            # raise OperationFailedError(exception_message)
-        else:
-            if receipt.get("status", str()).lower() in ("ok", "200"):
-                receipt = receipt.get("data", dict())
-            else:
-                exception_message = 'The Dataset could not be created. ' + str(receipt)
-                self.report_error(exception_message)
-                return exception_message
-                # raise OperationFailedError(exception_message)
-
-        dataset_persistent_id = receipt.get("persistentId", str())
-        dataset_id = receipt.get("id", str())
-
-        # retrieve and store accessions to db
-        sub = self.submission_record
-        acc = dict()
-        acc['dataset_id'] = dataset_id
-        acc['dataset_doi'] = dataset_persistent_id
-        acc['dataverse_alias'] = dataverse_alias
-        acc['dataset_title'] = "N/A"
-
-        # retrieve dataverse details given its alias
-        dv_response_data = self.get_dataverse_details(dataverse_alias)
-        acc['dataverse_title'] = dv_response_data.get("name", "N/A")
-
-        # retrieve dataset details given its doi
-        ds_response_data = self.get_dataset_details(dataset_persistent_id)
-        dataset_title = [x["value"] for x in
-                         ds_response_data.get("latestVersion", dict()).get("metadataBlocks", dict()).get("citation",
-                                                                                                         dict()).get(
-                             "fields", dict()) if x.get("typeName", str()) == "title"]
-
-        if dataset_title:
-            if isinstance(dataset_title, list):
-                acc['dataset_title'] = dataset_title[0]
-            elif isinstance(dataset_title, str):
-                acc['dataset_title'] = dataset_title
-
-        # update submission record with accessions
-        sub['accessions'] = acc
-        sub['target_id'] = sub.pop('_id', self.submission_id)
-        Submission().save_record(dict(), **sub)
-
-        # do post creation tasks
-        return self.post_dataset_creation(persistent_id=dataset_persistent_id)
 
     def post_dataset_creation(self, persistent_id=str()):
         """

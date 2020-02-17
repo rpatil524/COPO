@@ -875,25 +875,13 @@ function select_dataset(e) {
     });
 }
 
-function get_dataverse_api_schema() {
-    return [
-        {'id': 'name', 'label': 'Name', 'show_in_table': true},
-        {'id': 'type', 'label': 'Type', 'show_in_table': true},
-        {'id': 'url', 'label': 'URL', 'show_in_table': true},
-        {'id': 'identifier', 'label': 'Identifier', 'show_in_table': true},
-        {'id': 'description', 'label': 'Description', 'show_in_table': true},
-        {'id': 'published_at', 'label': 'Published', 'show_in_table': true},
-        {'id': 'entity_id', 'label': 'Entity Id', 'show_in_table': false},
-
-    ];
-}
-
 function get_dataset_api_schema() {
     return [
         {'id': 'name', 'label': 'Name', 'show_in_table': true},
         {'id': 'description', 'label': 'Description', 'show_in_table': true},
         {'id': 'name_of_dataverse', 'label': 'Name_Of_Dataverse', 'show_in_table': false},
         {'id': 'identifier_of_dataverse', 'label': 'Identifier_Of_Dataverse', 'show_in_table': false},
+        {'id': 'identifier', 'label': 'Identifier', 'show_in_table': true},
         {'id': 'url', 'label': 'URL', 'show_in_table': true},
         {'id': 'authors', 'label': 'Authors', 'show_in_table': true},
         {'id': 'published_at', 'label': 'Published', 'show_in_table': true},
@@ -939,13 +927,13 @@ function get_dataverse_display(displayPanel, params) {
     localPanel.append(dvSummaryDiv);
 
     //schema will be used to format API returned fields
-    params.api_schema = get_dataverse_api_schema();
+    params.api_schema = get_dataset_api_schema();
 
     var search_context = params.submission_context;
 
     if (search_context == "dataset") {
-        search_context = "dataverse,dataset" //to search across dataverses and datasets
-        params.label = "Dataset/Dataverse search"
+        search_context = "dataverse,dataset"; //to search across dataverses and datasets
+        params.label = "Dataset/Dataverse search";
     }
 
     params.call_parameters = {'context': search_context, 'submission_id': params.submission_id};
@@ -1091,7 +1079,7 @@ function handle_dv_choice(eventObj) {
         return true;
     }
 
-    var apiSchema = get_dataverse_api_schema();
+    var apiSchema = get_dataset_api_schema();
 
     //dataset list engaged - user has selected a dataset to submit to
     if (eventObj.type == "ds_value_change") {
@@ -1103,20 +1091,9 @@ function handle_dv_choice(eventObj) {
         //get user selection
         var form_values = {};
 
-        //get parent dataverse information
-        var dv_form_values = {};
-        var parentDV = JSON.parse(dsListPanel.find("#ds-dv-parent-values" + submission_id).val());
+        //obtain fields based on schema used
         for (var i = 0; i < apiSchema.length; ++i) {
             var schemaNode = apiSchema[i];
-            dv_form_values[schemaNode.id] = parentDV[schemaNode.id];
-        }
-
-        form_values["dataverse"] = dv_form_values; // information about parent dataverse
-
-        //obtain fields based on schema
-        var dsapischema = get_dataset_api_schema();
-        for (var i = 0; i < dsapischema.length; ++i) {
-            var schemaNode = dsapischema[i];
             form_values[schemaNode.id] = valueObject[schemaNode.id];
         }
 
@@ -1157,7 +1134,7 @@ function handle_dv_choice(eventObj) {
         return true;
     }
 
-    //dataverse list engaged - a new dataset will be created under the selected dataverse
+    //dataverse list engaged -
     if (context == "dataverse" && eventObj.type == "dv_value_change") {
         let message = "<div>Your submission will be made to a new dataset within " +
             " <label>" + valueObject.copo_labelblank + "</label> dataverse. " +
@@ -1224,8 +1201,9 @@ function handle_dv_choice(eventObj) {
         var form_values = {};
 
         //obtain fields based on schema
-        for (var i = 0; i < apiSchema.length; ++i) {
-            var schemaNode = apiSchema[i];
+        var dsapischema = get_dataset_api_schema();
+        for (var i = 0; i < dsapischema.length; ++i) {
+            var schemaNode = dsapischema[i];
             form_values[schemaNode.id] = valueObject[schemaNode.id];
         }
 
@@ -1268,7 +1246,6 @@ function handle_dv_choice(eventObj) {
 
 
     //come this far, we want to display datasets under selected dataverse
-    var api_schema = get_dataset_api_schema();
 
     var searchPane = $('' +
         '               <div class="row">\n' +
@@ -1279,6 +1256,8 @@ function handle_dv_choice(eventObj) {
     );
 
     dsListPanel.html(searchPane);
+
+    var api_schema = get_dataset_api_schema();
 
     $.ajax({
         url: "/copo/get_dataverse_content_vf/",

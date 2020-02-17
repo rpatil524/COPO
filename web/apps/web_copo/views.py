@@ -228,11 +228,6 @@ def resolve_submission_id(request, submission_id):
 def copo_visualize(request):
     context = dict()
 
-    # test starts
-    # from submission import dataverseSubmission
-    # result = dataverseSubmission.DataverseSubmit(submission_id="5e42c7da373b6d355c7bcbfe").submit()
-    # test ends
-
     task = request.POST.get("task", str())
 
     profile_id = request.session.get("profile_id", str())
