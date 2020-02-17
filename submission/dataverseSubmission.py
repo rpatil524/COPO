@@ -1,7 +1,10 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 19/04/2017'
 
+import traceback
+import urllib.parse
 from datetime import datetime
 import os, uuid, requests, json
+from dal import cursor_to_list
 from django_tools.middlewares import ThreadLocal
 from dataverse import Connection, Dataset
 from dal.copo_da import Submission, DataFile, DAComponent
@@ -17,6 +20,8 @@ from django.conf import settings
 from collections import namedtuple
 from web.apps.web_copo.lookup.resolver import RESOLVER
 from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
+from submission.helpers import generic_helper as ghlper
+import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 
 lg = settings.LOGGER
@@ -26,45 +31,235 @@ class DataverseSubmit(object):
     def __init__(self, submission_id=str()):
         self.submission_id = submission_id
 
-        self.submission_record = dict()
-        self.file_path = str()
-        self.host = str()
-        self.api_token = str()
-        self.headers = dict()
-
-        if self.submission_id:
-            # get submission record
-            self.submission_record = Submission().get_record(self.submission_id)
-
-            # set up submission parameters...
-
-            # submission path
-            dir = os.path.join(os.path.dirname(__file__), "data")
-            self.file_path = os.path.join(os.path.join(dir, self.submission_id), 'dataverse')
-
-            # dataverse host
-            self.host = self.submission_record.get("destination_repo", dict()).get("url", str())
-
-            # api_token
-            self.api_token = self.submission_record.get("destination_repo", dict()).get("apikey", str())
-
-            # headers
-            self.headers = {'X-Dataverse-key': self.api_token}
+        self.file_path = None
+        self.host = None
+        self.api_token = None
+        self.headers = None
+        self.profile_id = None
 
     def submit(self):
         """
-        function controls the submission of objects to a Dataverse
+        function controls the submission of objects to dataverse
         :return:
         """
 
-        sub_meta = self.submission_record.get("meta", dict())
+        # submission path
+        dir = os.path.join(os.path.dirname(__file__), "data")
+        self.file_path = os.path.join(os.path.join(dir, self.submission_id), 'dataverse')
 
-        # if dataset id in submission meta, we are adding to existing dataset, otherwise
-        #  we are creating a new dataset
-        if "fields" in sub_meta:
-            return self._create_and_add_to_dataverse()
-        elif ('entity_id' in sub_meta and 'alias' in sub_meta) or ('dataverse_alias' in sub_meta and 'doi' in sub_meta):
-            return self._add_to_dataverse()
+        if not self.submission_id:
+            return dict(status=False, message='Submission identifier not found!')
+
+        # specify filtering
+        filter_by = dict(_id=ObjectId(str(self.submission_id)))
+
+        # specify projection
+        query_projection = {
+            "_id": 1,
+            "repository_docs.apikey": 1,
+            "repository_docs.url": 1,
+            "profile_id": 1,
+            "meta.type": 1,
+            "meta.params": 1,
+            "complete": 1
+
+        }
+
+        doc = Submission().get_collection_handle().aggregate(
+            [
+                {"$addFields": {
+                    "destination_repo_converted": {
+                        "$convert": {
+                            "input": "$destination_repo",
+                            "to": "objectId",
+                            "onError": 0
+                        }
+                    }
+                }
+                },
+                {
+                    "$lookup":
+                        {
+                            "from": "RepositoryCollection",
+                            "localField": "destination_repo_converted",
+                            "foreignField": "_id",
+                            "as": "repository_docs"
+                        }
+                },
+                {
+                    "$project": query_projection
+                },
+                {
+                    "$match": filter_by
+                }
+            ])
+
+        records = cursor_to_list(doc)
+
+        # get submission record
+        try:
+            submission_record = records[0]
+        except Exception as ex:
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            message = "Submission record not found. Please try resubmitting."
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        try:
+            repository_info = submission_record['repository_docs'][0]
+        except Exception as ex:
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            error_type = type(ex).__name__
+            message = f"Couldn't retrieve repository information due to the following error: '{error_type}'"
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        if str(submission_record.get("complete", False)).lower() == 'true':
+            message = 'Submission is marked as completed.'
+            ghlper.logging_info(message, self.submission_id)
+
+            return dict(status=True, message=message)
+
+        # set submission parameters
+        self.profile_id = submission_record.get("profile_id", str())
+        self.host = repository_info.get("url", str())
+        self.api_token = repository_info.get("apikey", str())
+        self.headers = {'X-Dataverse-key': self.api_token}
+
+        # check submission context and select submission pathway
+        type = submission_record.get("meta", dict()).get("type", str())
+        params = submission_record.get("meta", dict()).get("params", dict())
+
+        if type == "dataverse":  # a dataverse specified, create a dataset to submit
+            return self._do_dataverse_submit(**params)
+
+        if type == "dataset":  # a dataset specified proceed to submit
+            return self._do_dataset_submit(**params)
+
+        return dict(status=True, message="No status message provided!")
+
+    def _do_dataverse_submit(self, **params):
+        """
+        function creates a new dataset under a specified dataverse to fulfill submission
+        :param params:
+        :return:
+        """
+
+        submission_record = Submission().get_collection_handle().find_one({'_id': ObjectId(self.submission_id)},
+                                                                          {"accessions": 1})
+
+        dataset_persistent_id = submission_record.get("accessions", dict()).get("dataset_doi", str())
+
+        # there's existing dataset associated with this submission
+        if dataset_persistent_id:
+            return self.post_dataset_creation(persistent_id=dataset_persistent_id)
+
+        # get dataverse alias
+        dataverse_alias = params.get("identifier", str())
+
+        if not dataverse_alias:
+            message = 'Dataverse alias not found! '
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        # convert to Dataset metadata
+        metadata_file_path = self.do_conversion()
+
+        # make API call
+        call_url = urllib.parse.urljoin(self.host, f'/api/dataverses/{dataverse_alias}/datasets')
+        api_token = self.api_token
+        api_call = f'curl -H "X-Dataverse-key: {api_token}" -X POST {call_url} --upload-file {metadata_file_path}'
+
+        # make api call and retrieve result result
+        try:
+            receipt = subprocess.check_output(api_call, shell=True)
+            receipt = json.loads(receipt.decode('utf-8'))
+
+            if receipt.get("status", str()).lower() in ("ok", "200"):
+                receipt = receipt.get("data", dict())
+        except Exception as ex:
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            message = f"Dataset creation or retrieval error: '{str(ex)}'"
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        dataset_persistent_id = receipt.get("persistentId", str())
+        dataset_id = receipt.get("id", str())
+
+        # retrieve and store accessions to db
+        acc = dict()
+        acc['dataset_id'] = dataset_id
+        acc['dataset_doi'] = dataset_persistent_id
+        acc['dataverse_alias'] = dataverse_alias
+        acc['dataverse_title'] = params.get("name", str())
+
+        # retrieve dataset details given its doi
+        ds_response_data = self.get_dataset_details(dataset_persistent_id)
+        dataset_title = [x["value"] for x in
+                         ds_response_data.get("latestVersion", dict()).get("metadataBlocks", dict()).get("citation",
+                                                                                                         dict()).get(
+                             "fields", dict()) if x.get("typeName", str()) == "title"]
+
+        if dataset_title:
+            if isinstance(dataset_title, list):
+                acc['dataset_title'] = dataset_title[0]
+            elif isinstance(dataset_title, str):
+                acc['dataset_title'] = dataset_title
+
+        # update submission record with accessions
+        submission_record = dict(accessions=acc)
+        Submission().get_collection_handle().update(
+            {"_id": ObjectId(self.submission_id)},
+            {'$set': submission_record})
+
+        # do post creation tasks
+        return self.post_dataset_creation(persistent_id=dataset_persistent_id)
+
+    def _do_dataset_submit(self, **params):
+        """
+        function submits to a specified dataset
+        :param params:
+        :return:
+        """
+
+        # get dataverse alias
+        dataverse_alias = params.get("identifier_of_dataverse", 'N/A')
+        if dataverse_alias == 'N/A':
+            message = 'Dataverse identifier not found! '
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        # get dataset doi
+        dataset_doi = params.get("url", 'N/A') if params.get("global_id", 'N/A') == 'N/A' else params.get("global_id",
+                                                                                                          'N/A')
+        if dataset_doi == 'N/A':
+            message = 'Dataset DOI not found! '
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        # get formatted doi
+        dataset_doi = self.get_format_doi(dataset_doi)
+
+        # add file to dataset
+        result = self.post_dataset_creation(persistent_id=dataset_doi)
+
+        if result.get('status', str()) == 'success':
+            acc = dict()
+            acc['dataset_id'] = params.get("entity_id", str())
+            acc['dataset_doi'] = dataset_doi
+            acc['dataverse_alias'] = dataverse_alias
+            acc['dataverse_title'] = params.get("name_of_dataverse", str())
+            acc['dataset_title'] = params.get("name", str())
+
+            # update submission record with accessions
+            submission_record = dict(accessions=acc)
+            Submission().get_collection_handle().update(
+                {"_id": ObjectId(self.submission_id)},
+                {'$set': submission_record})
+
+            self.clear_submission_metadata()
+
+        return result
 
     def truncate_url(self, url):
         if url.startswith('https://'):
@@ -105,9 +300,10 @@ class DataverseSubmit(object):
             response = requests.get(url)
             if str(response.status_code).lower() in ("ok", "200"):
                 response_data = response.json().get("data", dict())
-        except Exception as e:
-            exception_message = "Error retrieving dataverse details " + url + " : " + str(e)
-            self.report_error(exception_message)
+        except Exception as ex:
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            message = f"Error retrieving dataverse details {url}: '{str(ex)}'"
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
 
         return response_data
 
@@ -135,154 +331,12 @@ class DataverseSubmit(object):
             response = requests.get(url, headers=headers, params=params)
             if str(response.status_code).lower() in ("ok", "200"):
                 response_data = response.json().get("data", dict())
-        except Exception as e:
-            exception_message = "Error retrieving dataset details " + url + " : " + str(e)
-            self.report_error(exception_message)
+        except Exception as ex:
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            message = f"Error retrieving dataset details {url}: '{str(ex)}'"
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
 
         return response_data
-
-    def _add_to_dataverse(self):
-        """
-        function adds datafiles to a dataset
-        :return:
-        """
-        sub = self.submission_record
-
-        # check for dataverse alias
-
-        alias = sub.get("meta", dict()).get("dataverse_alias", str()) or sub.get("meta", dict()).get("alias", str())
-
-        if not alias:
-            return {"status": 404, "message": "\n Error getting dataverse"}
-
-        # check for dataset doi
-        doi = sub.get("meta", dict()).get("doi", str())
-
-        if not doi:
-            return {"status": 404, "message": "\n Error getting dataset"}
-
-        # add file to dataset
-        result = self.send_files_curl(persistent_id=doi)
-
-        if result is True:
-            # store accessions and clear submission
-            dv_response_data = self.get_dataverse_details(alias)
-            ds_response_data = self.get_dataset_details(doi)
-
-            dataset_title = [x["value"] for x in
-                             ds_response_data.get("latestVersion", dict()).get("metadataBlocks", dict()).get("citation",
-                                                                                                             dict()).get(
-                                 "fields", dict()) if x.get("typeName", str()) == "title"]
-
-            acc = dict()
-            acc['dataset_id'] = ds_response_data.get("id", str())
-            acc['dataset_doi'] = doi
-            acc['dataverse_alias'] = alias
-            acc['dataverse_title'] = dv_response_data.get("name", "N/A")
-            acc['dataset_title'] = "N/A"
-
-            if dataset_title:
-                if isinstance(dataset_title, list):
-                    acc['dataset_title'] = dataset_title[0]
-                elif isinstance(dataset_title, str):
-                    acc['dataset_title'] = dataset_title
-
-            sub['accessions'] = acc
-            sub['target_id'] = sub.pop('_id', self.submission_id)
-            Submission().save_record(dict(), **sub)
-
-            self.clear_submission_metadata()
-
-        return result
-
-    def _create_and_add_to_dataverse(self):
-        """
-        creates a Dataset in a Dataverse
-        :param submission_record:
-        :return:
-        """
-
-        # proceed with the creation of a dataset iff no accessions are recorded
-        dataset_persistent_id = self.submission_record.get("accessions", dict()).get("dataset_doi", str())
-
-        # there's existing submission associated with this submission
-        if dataset_persistent_id:
-            return self.post_dataset_creation(persistent_id=dataset_persistent_id)
-
-        # get dataverse alias
-        dataverse_alias = self.submission_record.get("meta", dict()).get("alias", str())
-
-        if not dataverse_alias:
-            exception_message = 'Dataverse alias not found! '
-            self.report_error(exception_message)
-            return exception_message
-            # raise OperationFailedError(exception_message)
-
-        # convert to Dataset metadata
-        metadata_file_path = self.do_conversion()
-
-        # make API call
-        api_call = 'curl -H "X-Dataverse-key: {api_token}" -X POST ' \
-                   '{server_url}/api/dataverses/{dv_alias}/datasets --upload-file {dataset_json}'
-
-        api_call = api_call.format(api_token=self.api_token,
-                                   server_url=self.host,
-                                   dv_alias=dataverse_alias,
-                                   dataset_json=metadata_file_path)
-
-        # retrieve call result
-        try:
-            receipt = subprocess.check_output(api_call, shell=True)
-            receipt = json.loads(receipt.decode('utf-8'))
-        except Exception as e:
-            exception_message = 'API call error: ' + str(e)
-            self.report_error(exception_message)
-            return exception_message
-            # raise OperationFailedError(exception_message)
-        else:
-            if receipt.get("status", str()).lower() in ("ok", "200"):
-                receipt = receipt.get("data", dict())
-            else:
-                exception_message = 'The Dataset could not be created. ' + str(receipt)
-                self.report_error(exception_message)
-                return exception_message
-                # raise OperationFailedError(exception_message)
-
-        dataset_persistent_id = receipt.get("persistentId", str())
-        dataset_id = receipt.get("id", str())
-
-        # retrieve and store accessions to db
-        sub = self.submission_record
-        acc = dict()
-        acc['dataset_id'] = dataset_id
-        acc['dataset_doi'] = dataset_persistent_id
-        acc['dataverse_alias'] = dataverse_alias
-        acc['dataset_title'] = "N/A"
-
-        # retrieve dataverse details given its alias
-        dv_response_data = self.get_dataverse_details(dataverse_alias)
-        acc['dataverse_title'] = dv_response_data.get("name", "N/A")
-
-        # retrieve dataset details given its doi
-        ds_response_data = self.get_dataset_details(dataset_persistent_id)
-        dataset_title = [x["value"] for x in
-                         ds_response_data.get("latestVersion", dict()).get("metadataBlocks", dict()).get("citation",
-                                                                                                         dict()).get(
-                             "fields", dict()) if x.get("typeName", str()) == "title"]
-
-        if dataset_title:
-            if isinstance(dataset_title, list):
-                acc['dataset_title'] = dataset_title[0]
-            elif isinstance(dataset_title, str):
-                acc['dataset_title'] = dataset_title
-
-        # update submission record with accessions
-        sub['accessions'] = acc
-        sub['target_id'] = sub.pop('_id', self.submission_id)
-        Submission().save_record(dict(), **sub)
-
-        # do post creation tasks
-        return self.post_dataset_creation(persistent_id=dataset_persistent_id)
 
     def post_dataset_creation(self, persistent_id=str()):
         """
@@ -295,8 +349,9 @@ class DataverseSubmit(object):
 
         if result is True:
             self.clear_submission_metadata()
+            return dict(status='success', message='Submission is marked as complete!')
 
-        return result
+        return dict(status='error', message='Error in submission')
 
     def send_files(self, sub, ds):
 
@@ -316,7 +371,8 @@ class DataverseSubmit(object):
         """
 
         # get submission record
-        sub = self.submission_record
+        sub = Submission().get_collection_handle().find_one({'_id': ObjectId(self.submission_id)},
+                                                            {"bundle_meta": 1})
 
         # get formatted doi
         persistent_id = self.get_format_doi(persistent_id)
@@ -326,12 +382,16 @@ class DataverseSubmit(object):
         # get all pending files
         pending_files = [x for x in datafiles if x.get("upload_status", False) is False]
 
-        if not pending_files:  # update status and exit method
+        if not pending_files:  # update status, marking submission as complete
             if sub.get("complete", False) is False:
-                sub['complete'] = True
-                sub['completed_on'] = datetime.now()
-                sub['target_id'] = sub.pop('_id', self.submission_id)
-                Submission().save_record(dict(), **sub)
+                submission_record = dict(complete=True, completed_on=d_utils.get_datetime())
+                Submission().get_collection_handle().update(
+                    {"_id": ObjectId(self.submission_id)},
+                    {'$set': submission_record})
+
+            status_message = "Submission is marked as complete!"
+            ghlper.logging_info(status_message, self.submission_id)
+            ghlper.update_submission_status(status='success', message=status_message, submission_id=self.submission_id)
 
             return True
 
@@ -344,34 +404,32 @@ class DataverseSubmit(object):
                                    persistent_id=persistent_id,
                                    data_file='mock-datafile')
 
-        upload_error = ""
+        upload_error = list()
         for df in pending_files:
             upload_string = api_call.replace("mock-datafile", df.get("file_path", str()))
             try:
                 receipt = subprocess.check_output(upload_string, shell=True)
                 receipt = json.loads(receipt.decode('utf-8'))
-            except Exception as e:
-                exception_message = "Error uploading file " + df.get("file_path", str()) + " : " + str(e)
-                self.report_error(exception_message)
-                upload_error = upload_error + "\n" + exception_message
-            else:
                 if receipt.get("status", str()).lower() in ("ok", "200"):
                     df["upload_status"] = True
-                else:
-                    exception_message = "Error uploading file " + df.get("file_path", str()) + " : " + str(receipt)
-                    self.report_error(exception_message)
-                    upload_error = upload_error + "\n" + exception_message
+            except Exception as e:
+                exception_message = "Error uploading file " + df.get("file_path", str()) + " : " + str(e)
+                ghlper.logging_error(exception_message, self.submission_id)
+                upload_error.append(exception_message)
 
-        # if all files uploaded, mark submission as complete
-        pending_files = [x for x in pending_files if x.get("upload_status", False) is False]
+        if upload_error:
+            ghlper.logging_error(str(upload_error), self.submission_id)
+            return dict(status='error', message=str(upload_error))
 
-        if pending_files:
-            return {"status": 404, "message": upload_error}
+        # update status, marking submission as complete
+        submission_record = dict(complete=True, completed_on=d_utils.get_datetime())
+        Submission().get_collection_handle().update(
+            {"_id": ObjectId(self.submission_id)},
+            {'$set': submission_record})
 
-        sub['complete'] = True
-        sub['completed_on'] = datetime.now()
-        sub['target_id'] = sub.pop('_id', self.submission_id)
-        Submission().save_record(dict(), **sub)
+        status_message = "Submission is marked as complete!"
+        ghlper.logging_info(status_message, self.submission_id)
+        ghlper.update_submission_status(status='success', message=status_message, submission_id=self.submission_id)
 
         return True
 
@@ -529,7 +587,7 @@ class DataverseSubmit(object):
         items = CgCoreSchemas().extract_repo_fields(str(f_id), "dataverse")
         temp_id = "copo:" + str(sub_id)
         # add the submission_id to the dataverse metadata to allow backwards treversal from dataverse
-        items.append({"dc": "dc.relation", "copo_id": "submission_id", "vals": temp_id})
+        items.append({"dc": "dc.relation", "copo_id": "submission_id", "vals": temp_id, "label": "COPO Id"})
         Submission().update_meta(sub_id, json.dumps(items))
 
     def get_registered_types(self):
@@ -558,7 +616,7 @@ class DataverseSubmit(object):
         """
 
         template = self.get_metadata_template()
-        user_data = self.submission_record.get("meta", dict()).get("fields", list())
+        user_data = Submission().get_submission_metadata(submission_id=self.submission_id)["meta"]
         citation_fragment = template["datasetVersion"]["metadataBlocks"]["citation"]
         citation_fragment["fields"] = self.get_dv_attributes(user_data=user_data)
         citation_fragment["displayName"] = self.get_display_name()
@@ -692,8 +750,7 @@ class DataverseSubmit(object):
         :return:
         """
 
-        profile = DAComponent(component="profile").get_record(self.submission_record.get("profile_id", str()))
-
+        profile = DAComponent(component="profile").get_record(self.profile_id)
         return profile.get("title", str())
 
     def dump_metadata(self, dv_metadata):

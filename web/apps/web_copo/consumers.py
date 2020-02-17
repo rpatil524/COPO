@@ -26,20 +26,22 @@ class SubmissionConsumer(WebsocketConsumer):
     # receive message from WebSocket
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
 
-        # my_add.delay(self.group_name)
-
-        # send message to room group
+        # send message to group
         async_to_sync(self.channel_layer.group_send)(
             self.group_name,
             {
-                'type': 'submission_status',
-                'message': message
+                'type': text_data_json['type'],
+                'message': text_data_json['message']
             }
         )
 
-    # receive message from room group
+    # receive message from group
     def submission_status(self, event):
+        # send message to WebSocket
+        self.send(text_data=json.dumps(event))
+
+    # receive message from group
+    def file_transfer_status(self, event):
         # send message to WebSocket
         self.send(text_data=json.dumps(event))

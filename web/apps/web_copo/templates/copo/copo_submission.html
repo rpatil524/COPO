@@ -24,8 +24,6 @@
         <!-- hidden attributes  -->
         <input type="hidden" id="profile_id" value="{{ profile_id }}"/>
         <input type="hidden" id="nav_component_name" value="submission"/>
-        <input type="hidden" id="custom_repo_id" value=""/>
-        <input type="hidden" id="dataset_id"/>
     </div>
 {% endblock %}
 
@@ -67,38 +65,14 @@
         </div>
     </div>
 
-    <!-- people table -->
+    <!-- submission table -->
     <div id="component_table_loader" class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-5"
          data-copo-tour-id="submission_table"></div> <!-- div used by the quick tour agent -->
+    <div id="cover-spin-bundle"></div>
     <div class="table-parent-div">
-        <table id="submission_table" class="ui celled table copo-noselect-table copo-noborders-table"
+        <table id="submission_table" class="ui table"
                cellspacing="0" width="100%">
         </table>
-    </div>
-    <div class="copo_popover">
-
-    </div>
-    <div class="modal fade" id="repo_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Submission Details</h4>
-                </div>
-                <div class="modal-body" id="repo_modal-body">
-                    <!-- RADIO BUTTON TO CHOOSE BETWEEN EXISTING AND NEW REPO -->
-
-
-                </div>
-
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" id="save_inspection_button" class="btn btn-primary">Save</button>
-                </div>
-            </div>
-        </div>
     </div>
 
 

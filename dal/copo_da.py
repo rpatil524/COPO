@@ -21,6 +21,11 @@ from web.apps.web_copo.models import UserDetails
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
+from web.apps.web_copo.models import UserDetails
+from django.db.models import Q
+from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
+
+lg = settings.LOGGER
 
 PubCollection = 'PublicationCollection'
 PersonCollection = 'PersonCollection'
@@ -39,6 +44,7 @@ CGCoreCollection = 'CGCoreCollection'
 TextAnnotationCollection = 'TextAnnotationCollection'
 SubmissionQueueCollection = 'SubmissionQueueCollection'
 MetadataTemplateCollection = 'MetadataTemplateCollection'
+FileTransferQueueCollection = 'FileTransferQueueCollection'
 
 handle_dict = dict(publication=get_collection_ref(PubCollection),
                    person=get_collection_ref(PersonCollection),
@@ -126,6 +132,7 @@ class DAComponent:
             source="copo.source",
             profile="copo.profile",
             submission="copo.submission",
+            repository="copo.repository",
             annotation="copo.annotation",
             investigation="i_",
             study="s_",
@@ -147,6 +154,21 @@ class DAComponent:
 
     def get_component_schema(self, **kwargs):
         return DataSchemas("COPO").get_ui_template_node(self.component)
+
+    def validate_record(self, auto_fields=dict(), validation_result=dict(), **kwargs):
+        """
+        validates record, could be overriden by sub-classes to perform component
+        specific validation of a record before saving
+        :param auto_fields:
+        :param validation_result:
+        :param kwargs:
+        :return:
+        """
+
+        local_result = dict(status=validation_result.get("status", True),
+                            message=validation_result.get("message", str()))
+
+        return local_result
 
     def save_record(self, auto_fields=dict(), **kwargs):
         fields = dict()
@@ -537,13 +559,231 @@ class Submission(DAComponent):
                     repository=repo,
                     status=False,
                     complete='false',
-                    is_cg=str(repo == "cg_core"),
                     user_id=data_utils.get_current_user().id,
                     date_created=data_utils.get_datetime()
             ).items():
                 auto_fields[self.get_qualified_field(k)] = v
 
         return super(Submission, self).save_record(auto_fields, **kwargs)
+
+    def validate_and_delete(self, target_id=str()):
+        """
+        function deletes a submission record, but first checks for dependencies
+        :param target_id:
+        :return:
+        """
+
+        submission_id = str(target_id)
+
+        result = dict(status='success', message="")
+
+        if not submission_id:
+            return dict(status='error', message="Submission record identifier not found!")
+
+        # get submission record
+        submission_record = self.get_collection_handle().find_one({"_id": ObjectId(submission_id)})
+
+        # check completion status - can't delete a completed submission
+        if str(submission_record.get("complete", False)).lower() == 'true':
+            return dict(status='error', message="Submission record might be tied to a remote or public record!")
+
+        # check for accession - can't delete record with accession
+        if submission_record.get("accessions", dict()):
+            return dict(status='error', message="Submission record has associated accessions or object identifiers!")
+
+        # ..and other checks as they come up
+
+        # delete record
+        self.get_collection_handle().remove({"_id": ObjectId(submission_id)})
+
+        return result
+
+    def get_submission_metadata(self, submission_id=str()):
+        """
+        function returns the metadata associated with this submission
+        :param submission_id:
+        :return:
+        """
+
+        result = dict(status='error', message="Metadata not found or unspecified procedure.", meta=list())
+
+        if not submission_id:
+            return dict(status='error', message="Submission record identifier not found!", meta=list())
+
+        try:
+            repository_type = self.get_repository_type(submission_id=submission_id)
+        except Exception as error:
+            repository_type = str()
+
+        if not repository_type:
+            return dict(status='error', message="Submission repository unknown!", meta=list())
+
+        if repository_type in ["dataverse", "ckan", "dspace"]:
+            query_projection = dict()
+
+            for x in self.get_schema().get("schema_dict"):
+                query_projection[x["id"].split(".")[-1]] = 0
+
+            query_projection["bundle"] = {"$slice": 1}
+
+            submission_record = self.get_collection_handle().find_one({"_id": ObjectId(submission_id)},
+                                                                      query_projection)
+
+            if len(submission_record["bundle"]):
+                items = CgCoreSchemas().extract_repo_fields(str(submission_record["bundle"][0]), repository_type)
+
+                if repository_type == "dataverse":
+                    items.append({"dc": "dc.relation", "copo_id": "submission_id", "vals": "copo:" + str(submission_id),
+                                  "label": "COPO Id"})
+
+                return dict(status='success', message="", meta=items)
+        else:
+            pass  # todo: if required for other repo, can use metadata from linked bundle
+
+        return result
+
+    def lift_embargo(self, submission_id=str()):
+        """
+        function attempts to lift the embargo on the submission, releasing to the public
+        :param submission_id:
+        :return:
+        """
+
+        result = dict(status='info', message="Release status unknown or unspecified procedure.")
+
+        if not submission_id:
+            return dict(status='error', message="Submission record identifier not found!")
+
+        # this process is repository-centric...
+        # so every repository type should provide its own implementation if needed
+
+        try:
+            repository_type = self.get_repository_type(submission_id=submission_id)
+        except Exception as error:
+            repository_type = str()
+
+        if not repository_type:
+            return dict(status='error', message="Submission repository unknown!")
+
+        if repository_type == "ena":
+            from submission import enareadSubmission
+            return enareadSubmission.EnaReads(submission_id=submission_id).process_study_release(force_release=True)
+
+        return result
+
+    def get_repository_type(self, submission_id=str()):
+        """
+        function returns the repository type for this submission
+        :param submission_id:
+        :return:
+        """
+
+        # specify filtering
+        filter_by = dict(_id=ObjectId(str(submission_id)))
+
+        # specify projection
+        query_projection = {
+            "_id": 1,
+            "repository_docs.type": 1,
+        }
+
+        doc = self.get_collection_handle().aggregate(
+            [
+                {"$addFields": {
+                    "destination_repo_converted": {
+                        "$convert": {
+                            "input": "$destination_repo",
+                            "to": "objectId",
+                            "onError": 0
+                        }
+                    }
+                }
+                },
+                {
+                    "$lookup":
+                        {
+                            "from": "RepositoryCollection",
+                            "localField": "destination_repo_converted",
+                            "foreignField": "_id",
+                            "as": "repository_docs"
+                        }
+                },
+                {
+                    "$project": query_projection
+                },
+                {
+                    "$match": filter_by
+                }
+            ])
+
+        records = cursor_to_list(doc)
+
+        try:
+            repository = records[0]['repository_docs'][0]['type']
+        except (IndexError, AttributeError) as error:
+            message = "Error retrieving submission repository " + str(error)
+            lg.log(message, level=Loglvl.ERROR, type=Logtype.FILE)
+            raise
+
+        return repository
+
+    def get_repository_details(self, submission_id=str()):
+        """
+        function returns the repository details for this submission
+        :param submission_id:
+        :return:
+        """
+
+        # specify filtering
+        filter_by = dict(_id=ObjectId(str(submission_id)))
+
+        # specify projection
+        query_projection = {
+            "_id": 1,
+        }
+
+        for x in Repository().get_schema().get("schema_dict"):
+            query_projection["repository_docs." + x["id"].split(".")[-1]] = 1
+
+        doc = self.get_collection_handle().aggregate(
+            [
+                {"$addFields": {
+                    "destination_repo_converted": {
+                        "$convert": {
+                            "input": "$destination_repo",
+                            "to": "objectId",
+                            "onError": 0
+                        }
+                    }
+                }
+                },
+                {
+                    "$lookup":
+                        {
+                            "from": "RepositoryCollection",
+                            "localField": "destination_repo_converted",
+                            "foreignField": "_id",
+                            "as": "repository_docs"
+                        }
+                },
+                {
+                    "$project": query_projection
+                },
+                {
+                    "$match": filter_by
+                }
+            ])
+
+        records = cursor_to_list(doc)
+
+        try:
+            repository_details = records[0]['repository_docs'][0]
+        except (IndexError, AttributeError) as error:
+            message = "Error retrieving submission repository details " + str(error)
+            lg.log(message, level=Loglvl.ERROR, type=Logtype.FILE)
+            raise
+
+        return repository_details
 
     def mark_all_token_obtained(self, user_id):
 
@@ -690,7 +930,8 @@ class Submission(DAComponent):
         dest = {"url": r.get('url'), 'apikey': r.get('apikey', ""), "isCG": r.get('isCG', ""), "repo_id": repo_id, "name": r.get('name', ""),
                 "type": r.get('type', ""), "username": r.get('username', ""), "password": r.get('password', "")}
         self.get_collection_handle().update(
-            {'_id': ObjectId(submission_id)}, {'$set': {'destination_repo': dest, 'repository': r['type']}}
+            {'_id': ObjectId(submission_id)},
+            {'$set': {'destination_repo': dest, 'repository': r['type'], 'date_modified': data_utils.get_datetime()}}
         )
 
         return r
@@ -989,9 +1230,8 @@ class CopoGroup(DAComponent):
 
 
 class Repository(DAComponent):
-    def __init__(self):
+    def __init__(self, profile=None):
         super(Repository, self).__init__(None, "repository")
-        self.Repository = get_collection_ref(RepositoryCollection)
 
     def get_by_uid(self, uid):
         doc = self.get_collection_handle().find({"uid": uid}, {"name": 1, "type": 1, "url": 1})
@@ -1019,14 +1259,14 @@ class Repository(DAComponent):
 
     def push_user(self, repo_id, uid, first_name, last_name, username, email):
         args = {'uid': uid, "first_name": first_name, "last_name": last_name, "username": username, "email": email}
-        return self.Repository.update(
+        return self.get_collection_handle().update(
             {'_id': ObjectId(repo_id)},
             {'$push': {'users': args}}
         )
 
     def pull_user(self, repo_id, user_id):
-        doc = self.Repository.update({'_id': ObjectId(repo_id)},
-                                     {'$pull': {'users': {'uid': user_id}}})
+        doc = self.get_collection_handle().update({'_id': ObjectId(repo_id)},
+                                                  {'$pull': {'users': {'uid': user_id}}})
 
         return doc
 
@@ -1038,6 +1278,65 @@ class Repository(DAComponent):
         udetails.save()
         return doc
 
+    def validate_record(self, auto_fields=dict(), validation_result=dict(), **kwargs):
+        """
+        validates record. useful before CRUD actions
+        :param auto_fields:
+        :param validation_result:
+        :param kwargs:
+        :return:
+        """
+
+        if validation_result.get("status", True) is False:  # no need continuing with validation, propagate error
+            return super(Repository, self).validate_record(auto_fields, result=validation_result, **kwargs)
+
+        local_result = dict(status=True, message="")
+        kwargs["validate_only"] = True  # causes the subsequent call to save_record to do everything else but save
+
+        new_record = super(Repository, self).save_record(auto_fields, **kwargs)
+        new_record_id = kwargs.get("target_id", str())
+
+        existing_records = cursor_to_list(
+            self.get_collection_handle().find({}, {"name": 1, "type": 1, "visibility": 1}))
+
+        # check for uniqueness of name - repository names must be unique!
+        same_name_records = [str(x["_id"]) for x in existing_records if
+                             x.get("name", str()).strip().lower() == new_record.get("name", str()).strip().lower()]
+
+        uniqueness_error = "Action error: duplicate repository name is not allowed."
+        if len(same_name_records) > 1:
+            # multiple duplicate names, shouldn't be
+            local_result["status"] = False
+            local_result["message"] = uniqueness_error
+
+            return super(Repository, self).validate_record(auto_fields, validation_result=local_result, **kwargs)
+        elif len(same_name_records) == 1 and new_record_id != same_name_records[0]:
+            local_result["status"] = False
+            local_result["message"] = uniqueness_error
+
+            return super(Repository, self).validate_record(auto_fields, validation_result=local_result, **kwargs)
+
+        # check repo visibility constraint - i.e. one public repository per repository type
+        if new_record.get("visibility", str()).lower() == 'public':
+            same_visibility_records = [str(x["_id"]) for x in existing_records if
+                                       x.get("type", str()).strip().lower() == new_record.get("type",
+                                                                                              str()).strip().lower()
+                                       and x.get("visibility", str()).lower() == 'public']
+
+            visibility_error = "Action error: multiple public instances of the same repository type is not allowed."
+            if len(same_visibility_records) > 1:
+                local_result["status"] = False
+                local_result[
+                    "message"] = visibility_error
+                return super(Repository, self).validate_record(auto_fields, validation_result=local_result, **kwargs)
+            elif len(same_visibility_records) == 1 and new_record_id != same_visibility_records[0]:
+                local_result["status"] = False
+                local_result[
+                    "message"] = visibility_error
+                return super(Repository, self).validate_record(auto_fields, validation_result=local_result, **kwargs)
+
+        return super(Repository, self).validate_record(auto_fields, validation_result=local_result, **kwargs)
+
     def delete(self, repo_id):
         # have to delete repo id from UserDetails model as well as remove mongo record
         uds = UserDetails.objects.filter(repo_manager__contains=[repo_id])
@@ -1048,8 +1347,43 @@ class Repository(DAComponent):
         for ud in uds:
             ud.repo_submitter.remove(repo_id)
             ud.save()
-        doc = self.Repository.remove({"_id": ObjectId(repo_id)})
+        doc = self.get_collection_handle().remove({"_id": ObjectId(repo_id)})
         return doc
+
+    def validate_and_delete(self, target_id=str()):
+        """
+        function deletes repository only if there are no dependent records
+        :param target_id:
+        :return:
+        """
+
+        repository_id = target_id
+
+        result = dict(status='success', message="")
+
+        if not repository_id:
+            return dict(status='error', message="Repository record identifier not found!")
+
+        # any dependent submission record?
+
+        count_submissions = Submission().get_collection_handle().find(
+            {"destination_repo": repository_id, 'deleted': data_utils.get_not_deleted_flag()}).count()
+
+        if count_submissions > 0:
+            return dict(status='error', message="Action not allowed: dependent records exist!")
+
+        uds = UserDetails.objects.filter(repo_manager__contains=[repository_id])
+        for ud in uds:
+            ud.repo_manager.remove(repository_id)
+            ud.save()
+
+        uds = UserDetails.objects.filter(repo_submitter__contains=[repository_id])
+        for ud in uds:
+            ud.repo_submitter.remove(repository_id)
+            ud.save()
+        self.get_collection_handle().remove({"_id": ObjectId(repository_id)})
+
+        return result
 
 
 class RemoteDataFile:

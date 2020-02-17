@@ -2,6 +2,8 @@ __author__ = 'felix.shaw@tgac.ac.uk - 01/12/2015'
 # this python file is for small utility functions which will be called from Javascript
 import json
 import time
+import jsonpickle
+import urllib.parse
 from datetime import datetime
 
 import jsonpickle
@@ -19,6 +21,13 @@ from dal.copo_da import Profile
 from dal.copo_da import ProfileInfo, Submission, DataFile, Sample, Source, CopoGroup, Annotation, \
     Repository, Person
 from dal.figshare_da import Figshare
+from dal import mongo_util as util
+from pandas import read_excel
+from django.contrib.auth.models import User
+from web.apps.web_copo.models import UserDetails
+from django.db.models import Q
+from django.contrib.auth.models import Group
+from django.core import serializers
 from dal.orcid_da import Orcid
 from submission.ckanSubmission import CkanSubmit as ckan
 from submission.dataverseSubmission import DataverseSubmit as ds
@@ -28,6 +37,7 @@ from submission.helpers import generic_helper as ghlper
 from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from web.apps.web_copo.models import UserDetails
 from web.apps.web_copo.schemas.utils import data_utils
+import web.apps.web_copo.templatetags.html_tags as htags
 
 DV_STRING = 'HARVARD_TEST_API'
 
@@ -87,6 +97,53 @@ def search_copo_components(request, data_source):
     ).broker_component_search()
 
     return HttpResponse(jsonpickle.encode(data), content_type='application/json')
+
+
+def get_submission_status(request):
+    """
+    function returns the status of a submission record
+    :param request:
+    :return:
+    """
+
+    context = dict()
+    submission_ids = json.loads(request.POST.get("submission_ids", "[]"))
+    submission_ids = [ObjectId(x) for x in submission_ids]
+
+    # get completed submissions
+    submission_records = Submission().get_collection_handle().find(
+        {"_id": {"$in": submission_ids}},
+        {'_id': 1, 'complete': 1, 'transcript': 1})
+
+    for rec in submission_records:
+        record_id = str(rec['_id'])
+        new_data = dict(record_id=record_id)
+        context[new_data["record_id"]] = new_data
+
+        new_data["complete"] = str(rec.get("complete", False)).lower()
+
+        # get any transcript to provide a clearer picture
+        status = rec.get("transcript", dict()).get('status', dict())
+        new_data['transcript_status'] = status.get('type', str())  # status type is: 'info', 'error', or 'success'
+        new_data['transcript_message'] = status.get('message', str())
+
+        # completed submissions
+        if new_data["complete"] == 'true':  # this is where we part ways
+            continue
+
+        # processing or queued for processing
+        submission_queue_handle = ghlper.get_submission_queue_handle()
+
+        if submission_queue_handle.find_one({"submission_id": record_id}):
+            new_data["complete"] = "processing"
+            continue
+
+        # not submitted, not in processing queue, must be unsubmitted or in error state
+        # we turn to transcript for answer: reason why recording status in transcript is important!
+        # see: update_submission_status() in generic_helper.py
+        new_data["complete"] = "error" if new_data['transcript_status'] == 'error' else "pending"
+
+    return HttpResponse(jsonpickle.encode(context), content_type='application/json')
 
 
 def get_upload_information(request):
@@ -415,6 +472,84 @@ def get_repos_data(request):
     return HttpResponse(json_util.dumps(doc))
 
 
+def assign_repo_users(request):
+    """
+    function assigns users to a repository as managers or submitters
+    :param request:
+    :return:
+    """
+    repo_id = request.POST['repo_id']
+    user_ids = json.loads(request.POST.get("user_ids", "[]"))
+    user_type = request.POST['user_type']
+    user_objects = list()
+
+    for user_id in user_ids:
+        try:
+            user = User.objects.get(pk=user_id)
+        except Exception as e:
+            continue
+        else:
+            user_objects.append(user)
+
+    if user_type == "managers":
+        dms = Group.objects.get(name='data_managers')
+        for user in user_objects:
+            dms.user_set.add(user)
+            user_repos = user.userdetails.repo_manager
+            if user_repos is None:
+                user.userdetails.repo_manager = [repo_id]
+                user.save()
+            elif repo_id not in user_repos:
+                user.userdetails.repo_manager.append(repo_id)
+                user.save()
+    elif user_type == "submitters":
+        for user in user_objects:
+            user_repos = user.userdetails.repo_submitter
+            if user_repos is None:
+                user.userdetails.repo_submitter = [repo_id]
+                user.save()
+            elif repo_id not in user_repos:
+                user.userdetails.repo_submitter.append(repo_id)
+                user.save()
+    out = jsonpickle.encode({}, unpicklable=False)
+    return HttpResponse(out, content_type='application/json')
+
+
+def deassign_repo_users(request):
+    """
+    function removes users from a repository as managers or submitters, etc
+    :param request:
+    :return:
+    """
+    repo_id = request.POST['repo_id']
+    user_ids = json.loads(request.POST.get("user_ids", "[]"))
+    user_type = request.POST['user_type']
+    user_objects = list()
+
+    for user_id in user_ids:
+        try:
+            user = User.objects.get(pk=user_id)
+        except Exception as e:
+            continue
+        else:
+            user_objects.append(user)
+
+    if user_type == "managers":
+        dms = Group.objects.get(name='data_managers')
+        for user in user_objects:
+            user.userdetails.repo_manager.remove(repo_id)
+            user.save()
+
+            if len(user.userdetails.repo_manager) == 0:
+                dms.user_set.remove(user)
+    elif user_type == "submitters":
+        for user in user_objects:
+            user.userdetails.repo_submitter.remove(repo_id)
+            user.save()
+    out = jsonpickle.encode({}, unpicklable=False)
+    return HttpResponse(out, content_type='application/json')
+
+
 def add_user_to_repo(request):
     repo_id = request.GET['repo_id']
     user_id = request.GET['user_id']
@@ -479,6 +614,32 @@ def get_users_in_repo(request):
     return HttpResponse(json_util.dumps(u_list))
 
 
+def get_users_repo_users(request):
+    repository_id = request.POST.get("repository_id", str())
+    context = request.POST.get("context", str())
+
+    result_dict = dict()
+
+    if context == 'managers':
+        repo_users = UserDetails.objects.filter(repo_manager__contains=[repository_id])
+    elif context == 'submitters':
+        repo_users = UserDetails.objects.filter(repo_submitter__contains=[repository_id])
+
+    assigned_user_ids = [x[0] for x in list(repo_users.all().values_list('user_id'))]
+
+    # get all users
+    all_users = list(User.objects.all().values_list('id', 'first_name', 'last_name', 'email', 'username'))
+
+    result_dict['context_users'] = [dict(id=x[0], first_name=x[1], last_name=x[2], email=x[3], username=x[4]) for x in
+                                    all_users if x[0] in assigned_user_ids]
+
+    result_dict['filtered_users'] = [dict(id=x[0], first_name=x[1], last_name=x[2], email=x[3], username=x[4]) for x in
+                                     all_users if x[0] not in assigned_user_ids]
+
+    out = jsonpickle.encode(result_dict, unpicklable=False)
+    return HttpResponse(out, content_type='application/json')
+
+
 def get_repos_for_user(request):
     # u_type = request.GET['u_type']
     uid = str(request.user.id)
@@ -507,6 +668,19 @@ def remove_repo_from_group(request):
         return HttpResponseBadRequest(json.dumps({'resp': 'Server Error - Try again'}))
 
 
+def get_submission_metadata(request):
+    """
+    function returns the metadata associated with a submission
+    :param request:
+    :return:
+    """
+
+    result = Submission().get_submission_metadata(submission_id=request.POST.get("submission_id", str()))
+
+    out = jsonpickle.encode(result, unpicklable=False)
+    return HttpResponse(out, content_type='application/json')
+
+
 def get_repo_info(request, sub=None):
     # this ajax method is called when user clicks "inspect repo" button on submission view
     try:
@@ -528,9 +702,11 @@ def get_repo_info(request, sub=None):
         print(e)
         return HttpResponse(json.dumps({"status": 404, "message": "error getting dataverse"}))
     s = Submission().get_record(ObjectId(sub_id))
-    out = {'repo_type': repo['type'], 'repo_url': repo['url'], 'meta': s["meta"]}
+    out = dict(repo_type=repo['type'], repo_url=repo['url'], meta=s.get("meta", list()))
+    out = jsonpickle.encode(out, unpicklable=False)
+    return HttpResponse(out, content_type='application/json')
 
-    return HttpResponse(json.dumps(out))
+    # return HttpResponse(json.dumps(out))
 
 
 def search_dataverse(request):
@@ -564,6 +740,182 @@ def get_dataset_info(request):
     else:
         data = json_util.dumps(resp.content.decode("utf-8"))
         return HttpResponse(data)
+
+
+def search_dataverse_vf(request):
+    """
+    this variation of the 'search_dataverse' function provides a formatted output to return caller's requested fields
+    :param request:
+    :return:
+    """
+    context = request.GET.get("context", str())
+    q = request.GET.get("q", str())
+    submission_id = request.GET.get("submission_id", str())
+    api_schema = json.loads(request.GET.get("api_schema", "[]"))
+
+    # example api_schema:
+    # api_schema = [
+    #     {'id': 'name', 'label': 'Name', 'show_in_table': true},
+    #     {'id': 'type', 'label': 'Type', 'show_in_table': false}
+    # ]
+
+    # validate api_schema before proceeding
+    if api_schema:
+        schema_keys = [x.get('id', str()) for x in api_schema if isinstance(x, dict)]
+        if len(schema_keys) != len(api_schema):
+            return HttpResponse(jsonpickle.dumps({'status': "error", 'message': "Badly formed API schema"}))
+
+    try:
+        url = Submission().get_repository_details(submission_id=submission_id)['url']
+    except Exception as e:
+        return HttpResponse(jsonpickle.dumps({'status': "error", 'message': str(e)}))
+
+    dv_url = urllib.parse.urljoin(url, '/api/v1/search')
+
+    params = [
+        ('q', q),
+        ('per_page', 100),
+        ('show_entity_ids', True),
+    ]
+
+    if not context:
+        context = ['dataset,dataverse']  # search will be filtered by dataset and dataverse types
+
+    context = [('type', x) for x in context.split(",")]
+    params = tuple(params + context)
+
+    try:
+        response = requests.get(url=dv_url, params=params)
+        if str(response.status_code).lower() in ("ok", "200"):
+            response_data = response.json().get("data", dict())
+        else:
+            return HttpResponse(
+                jsonpickle.dumps({'status': "error", 'message': response.json().get("message", str())}))
+    except Exception as e:
+        return HttpResponse(
+            jsonpickle.dumps({'status': "error", 'message': "Error retrieving information: " + str(e)}))
+
+    items = response_data.get('items', list())
+
+    pluralise = 'records' if len(items) != 1 else 'record'
+    message = f'Search returned {len(items)} {pluralise}.'
+
+    if len(items) == 0:
+        message = message + " You can try searching with a different term."
+
+    result_dict = dict(status='success', message=message)
+
+    # if no schema was supplied, form one by aggregating fields from all items
+    if not api_schema:
+        all_keys = {k for b in items for k, v in b.items()}
+        api_schema = [dict(id=x, label=x.title(), show_in_table=True) for x in all_keys]
+        result_dict['api_schema'] = api_schema
+
+    filtered_items = list()
+
+    for indx, rec in enumerate(items):
+        new_dict = {k["id"]: rec.get(k["id"], 'N/A') for k in api_schema}
+
+        # add two control fields: for 'id' and 'label' in display
+        new_dict['copo_idblank'] = f'item_{str(indx)}'
+        new_dict['copo_labelblank'] = new_dict[api_schema[0]['id']]
+        # prefix display by type
+        new_dict['copo_labelblank'] = new_dict.get("type", "Unknown").capitalize() + ": " + new_dict['copo_labelblank']
+        filtered_items.append(new_dict)
+
+    result_dict['items'] = filtered_items
+
+    out = jsonpickle.encode(result_dict, unpicklable=False)
+    return HttpResponse(out, content_type='application/json')
+
+
+def get_dataverse_content_vf(request):
+    """
+    given some identifier of a dataverse, this function returns the datasets under the dataverse
+    :param request:
+    :return:
+    """
+    dataverse_record = request.POST.get("dataverse_record", dict())
+    submission_id = request.POST.get("submission_id", str())
+    api_schema = json.loads(request.POST.get("api_schema", "[]"))
+
+    if dataverse_record and isinstance(dataverse_record, str):
+        dataverse_record = json.loads(dataverse_record)
+
+    # example api_schema:
+    # api_schema = [
+    #     {'id': 'name', 'label': 'Name', 'show_in_table': true},
+    #     {'id': 'type', 'label': 'Type', 'show_in_table': false}
+    # ]
+
+    # validate api_schema before proceeding
+    if api_schema:
+        schema_keys = [x.get('id', str()) for x in api_schema if isinstance(x, dict)]
+        if len(schema_keys) != len(api_schema):
+            return HttpResponse(jsonpickle.dumps({'status': "error", 'message': "Badly formed API schema"}))
+
+    try:
+        url = Submission().get_repository_details(submission_id=submission_id)['url']
+    except Exception as e:
+        return HttpResponse(jsonpickle.dumps({'status': "error", 'message': str(e)}))
+
+    dv_url = urllib.parse.urljoin(url, '/api/v1/search')
+
+    name_of_dataverse = dataverse_record.get("name", str())
+    identifier_of_dataverse = dataverse_record.get("identifier", str()).lower()
+
+    params = [
+        ('q', f'name_of_dataverse {name_of_dataverse}'),
+        ('per_page', 500),
+        ('show_entity_ids', True),
+    ]
+    params = tuple(params)
+
+    try:
+        response = requests.get(url=dv_url, params=params)
+        if str(response.status_code).lower() in ("ok", "200"):
+            response_data = response.json().get("data", dict())
+        else:
+            return HttpResponse(
+                jsonpickle.dumps({'status': "error", 'message': response.json().get("message", str())}))
+    except Exception as e:
+        return HttpResponse(
+            jsonpickle.dumps({'status': "error", 'message': "Error retrieving information: " + str(e)}))
+
+    # filter based on object type and parent
+    items = [x for x in response_data.get('items', list()) if
+             x.get("type", str()).lower() == 'dataset' and x.get("identifier_of_dataverse",
+                                                                 str()).lower() == identifier_of_dataverse]
+
+    pluralise = 'records' if len(items) != 1 else 'record'
+    message = f'Search returned {len(items)} {pluralise}.'
+
+    if len(items) == 0:
+        message = message + " You can try searching a different dataverse"
+
+    result_dict = dict(status='success', message=message)
+
+    # if no schema was supplied, form one by aggregating fields from returned items
+    if not api_schema:
+        all_keys = {k for b in items for k, v in b.items()}
+        api_schema = [dict(id=x, label=x.title(), show_in_table=True) for x in all_keys]
+        result_dict['api_schema'] = api_schema
+
+    filtered_items = list()
+
+    for indx, rec in enumerate(items):
+        new_dict = {k["id"]: rec.get(k["id"], 'N/A') for k in api_schema}
+
+        # add two control fields: for 'id' and 'label' in display
+        new_dict['copo_idblank'] = f'item_{str(indx)}'
+        new_dict['copo_labelblank'] = new_dict[api_schema[0]['id']]
+        new_dict['copo_labelblank'] = new_dict['type'].capitalize() + ": " + new_dict['copo_labelblank']
+        filtered_items.append(new_dict)
+
+    result_dict['items'] = filtered_items
+
+    out = jsonpickle.encode(result_dict, unpicklable=False)
+    return HttpResponse(out, content_type='application/json')
 
 
 def get_dataverse_content(request):
@@ -604,6 +956,51 @@ def get_info_for_new_dataverse(request):
     return HttpResponse(json_util.dumps(out))
 
 
+def set_destination_repository(request):
+    """
+    function sets the destination repository of a submission record, the updated record is returned
+    :param request:
+    :return:
+    """
+    submission_id = request.POST['submission_id']
+    destination_repo_id = request.POST['destination_repo_id']
+    kwargs = dict(target_id=submission_id, destination_repo=destination_repo_id, meta=dict())
+    Submission().save_record(dict(), **kwargs)
+
+    result = htags.generate_submissions_records(component="submission", record_id=str(submission_id))
+
+    out = jsonpickle.encode(result, unpicklable=False)
+    return HttpResponse(out, content_type='application/json')
+
+
+def update_submission_meta(request):
+    """
+    function updates a submission record with relevant metadata to aid in fulfilling a submission
+    :param request:
+    :return:
+    """
+
+    submission_id = request.POST.get("submission_id", str())
+    form_values = request.POST.get("form_values", dict())
+
+    if form_values and isinstance(form_values, str):
+        form_values = json.loads(form_values)
+
+    submission_record = Submission().get_collection_handle().find_one({'_id': ObjectId(submission_id)}, {"meta": 1})
+
+    submission_record["meta"]["type"] = form_values.pop("type", 'unknown')
+    submission_record["meta"]["params"] = form_values
+
+    Submission().get_collection_handle().update(
+        {"_id": ObjectId(submission_id)},
+        {'$set': submission_record})
+
+    result = dict(status=True, message="", value="")
+
+    out = jsonpickle.encode(result, unpicklable=False)
+    return HttpResponse(out, content_type='application/json')
+
+
 def update_submission_repo_data(request):
     task = request.POST['task']
     submission_id = request.POST['submission_id']
@@ -612,9 +1009,13 @@ def update_submission_repo_data(request):
         submission_id = request.POST['submission_id']
         s = Submission().update_destination_repo(repo_id=custom_repo_id, submission_id=submission_id)
         s['record_id'] = str(submission_id)
+
         clear_submission_metadata(request)
-        get_repo_info(request, sub=submission_id)
-        return HttpResponse(json_util.dumps(s))
+
+        # return updated submission record for calling agent display
+        result = htags.generate_submissions_records(component="submission", record_id=str(submission_id))
+
+        return HttpResponse(json_util.dumps(result))
     elif task == 'change_meta':
         meta = json.loads(request.POST['meta'])
         new_or_existing = meta["new_or_existing"]

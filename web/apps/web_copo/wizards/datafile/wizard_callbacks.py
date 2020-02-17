@@ -290,12 +290,12 @@ class WizardCallbacks:
 
                 message = stage_df["stage_message"]
 
-                # items = schema_df[schema_df.stage_id == s_id].sort_values(
-                #     by=['field_constraint_rank']).to_dict('records')
+                items = schema_df[schema_df.stage_id == s_id].sort_values(by=['field_constraint_rank']).to_dict(
+                    'records')
 
                 # todo: temporary measure for demo - display only required fields
-                items = schema_df[(schema_df.stage_id == s_id) & (schema_df.field_constraint == 'required')].sort_values(
-                    by=['field_constraint_rank']).to_dict('records')
+                # items = schema_df[(schema_df.stage_id == s_id) & (schema_df.field_constraint == 'required')].sort_values(
+                #     by=['field_constraint_rank']).to_dict('records')
 
                 # if not items, don't display stage
                 if not len(items):

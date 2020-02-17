@@ -38,7 +38,27 @@ $(document).ready(function () {
 
     setup_dismissable_message();
 
+    setup_collapsible_event();
+
+    setup_copo_general_lookup_event();
+
 });
+
+
+function setup_collapsible_event() {
+    $(document).on('show.bs.collapse', '.copo-details-coll.collapse', function (event) {
+        $(this).prev(".panel-heading").find(".fa").removeClass("fa-plus").addClass("fa-minus");
+    }).on('hide.bs.collapse', '.copo-details-coll.collapse', function () {
+        $(this).prev(".panel-heading").find(".fa").removeClass("fa-minus").addClass("fa-plus");
+    });
+}
+
+function setup_copo_general_lookup_event() {
+    $(document).on('click', '.copo-tag ', function (event) {
+        var content = $(this).closest(".copo-item").find(".copo-tag-content");
+        content.slideToggle("slow");
+    })
+}
 
 function setup_autocomplete() {
     var copoFormsURL = "/copo/copo_forms/";
@@ -191,6 +211,21 @@ function set_selectize_select_event() {
                 var accession = activeElem.attr("data-accession");
 
                 showontopop(item, label, prefix, desc, accession);
+            } else if ($(event.target).closest(".general-onto").length) {
+                var item = $(event.target).closest(".general-onto");
+                var activeElem = item.find(".selectize-dropdown-content .active").find(".onto-label");
+
+                var indx = activeElem.data("indx");
+                var parentid = activeElem.data("parentid");
+                var lblField = activeElem.data("lblfield");
+                var elemFields = JSON.parse(activeElem.closest(".ontology-parent").find(".elem-fields").val());
+
+                try {
+                    var valueObject = selectizeObjects[parentid].options[indx];
+                    showgeneraldetails(item, valueObject, elemFields, lblField);
+                } catch (e) {
+                    console.log("Couldn't retrieve control value object [value, parent id]: [" + indx + "," + parentid + "]");
+                }
 
             } else if ($(event.target).closest(".copo-multi-search").length) {
                 var eventTarget = $(event.target).closest(".copo-multi-search");
@@ -228,6 +263,21 @@ function set_selectize_select_event() {
             var accession = $(this).find(".onto-label").attr("data-accession");
 
             showontopop(item, label, prefix, desc, accession);
+        } else if ($(this).closest(".selectize-control.general-onto").length) {
+            var item = $(this).closest(".selectize-control.general-onto");
+            var activeElem = $(this).find(".onto-label");
+
+            var indx = $(this).find(".onto-label").data("indx");
+            var parentid = activeElem.data("parentid");
+            var lblField = activeElem.data("lblfield");
+            var elemFields = JSON.parse(activeElem.closest(".ontology-parent").find(".elem-fields").val());
+
+            try {
+                var valueObject = selectizeObjects[parentid].options[indx];
+                showgeneraldetails(item, valueObject, elemFields, lblField);
+            } catch (e) {
+                console.log("Couldn't retrieve control value object [value, parent id]: [" + indx + "," + parentid + "]");
+            }
         } else if ($(this).closest(".selectize-control.copo-multi-search").length) {
             var item = $(this).closest(".selectize-control.copo-multi-search");
 
@@ -392,6 +442,41 @@ function showontopop(item, label, prefix, desc, accession) {
             dismissible: true
         });
     }
+
+}
+
+function showgeneraldetails(item, dataObject, schema, lblField) {
+    var result = $('<div/>',
+        {
+            class: "limit-text"
+        });
+
+    item.webuiPopover('destroy');
+
+    let message = $('<div class="webpop-content-div"></div>');
+    var codeList = $('<div class="ui relaxed divided list"></div>');
+
+    result.append(message);
+    message.append(codeList);
+
+    for (var i = 0; i < schema.length; ++i) {
+        var schemaNode = schema[i];
+        if (schemaNode.hasOwnProperty("show_in_table") && (schemaNode.show_in_table.toString().toLowerCase() == "true")) {
+            var itemNode = $('<div class="item"></div>');
+            codeList.append(itemNode);
+            itemNode.append('<div class="content"><div class="header">' + schemaNode.label + '</div><div class="description webpop-content-div">' + dataObject[schemaNode.id] + '</div></div>');
+        }
+    }
+
+    item.webuiPopover({
+        title: dataObject[lblField],
+        content: '<div class="webpop-content-div">' + $('<div/>').append(result).html() + '</div>',
+        trigger: 'sticky',
+        width: 300,
+        arrow: true,
+        placement: 'right',
+        dismissible: true
+    });
 
 }
 
@@ -832,7 +917,6 @@ function refresh_tool_tips() {
         .popup()
     ;
 
-
     apply_color();
     refresh_selectbox();
     refresh_select2box();
@@ -841,6 +925,8 @@ function refresh_tool_tips() {
     refresh_singleselectbox();
     refresh_multisearch();
     refresh_ontology_select();
+    refresh_general_ontology_search();
+    refresh_general_ontology_select();
     refresh_copo_lookup();
     refresh_copo_lookup2();
 
@@ -856,6 +942,7 @@ function setup_datepicker() {
         format: "dd/mm/yyyy"
     });
 }
+
 
 function refresh_validator(formObject) {
     formObject.validator('update');
@@ -1408,6 +1495,314 @@ function refresh_ontology_select() {
 
         }
     });
+}
+
+
+function refresh_general_ontology_search() {
+    //this control supports remote data source
+    $('.general-onto-search').each(function () {
+        var elem = $(this);
+        var url = elem.attr("data-url");
+        var elemId = elem.attr("data-element");
+        var eventName = elem.attr("data-eventname");
+        var api_schema = JSON.parse(elem.closest('.copo-form-group').find('.elem-fields').val());
+        var call_params = JSON.parse(elem.closest('.copo-form-group').find('.elem-params').val());
+
+        var options = [];
+
+        if (!(/selectize/i.test(elem.attr('class')))) { // if not already instantiated
+            var $funSelect = elem.selectize({
+                onChange: function (selectedValue) {
+                    //set value in hidden fields
+
+                    var ontologySpan = elem.closest(".ontology-parent");
+                    ontologySpan.find(".ontology-field-hidden").remove();
+                    var valueObject = {};
+
+                    if (selectedValue) {
+                        var schema = JSON.parse(ontologySpan.find(".elem-fields").val());
+
+                        try {
+                            valueObject = $funSelect[0].selectize.options[selectedValue];
+                            for (var i = 0; i < schema.length; ++i) {
+                                var fv = schema[i];
+                                ontologySpan.append($('<input/>',
+                                    {
+                                        type: "hidden",
+                                        class: "ontology-field-hidden",
+                                        id: elemId + "." + fv.id,
+                                        name: elemId + "." + fv.id,
+                                        value: valueObject[fv.id]
+                                    }));
+                            }
+
+                        } catch (e) {
+                            console.log("Couldn't retrieve control value object [value, parent id]: [" + indx + "," + parentid + "]");
+                        }
+
+                    }
+
+                    WebuiPopovers.hideAll();
+                    set_general_ontology_detail(elem, valueObject);
+
+                    //trigger event to be handled externally
+                    if (eventName) {
+                        let controlEvent = jQuery.Event(eventName);
+                        controlEvent.elementId = elemId;
+                        controlEvent.selectedValue = selectedValue;
+                        $('body').trigger(controlEvent);
+                    }
+
+                },
+                onBlur: function () {
+                    WebuiPopovers.hideAll();
+                },
+                score: function () {
+                    return function () {
+                        return 1; //this enables all options to be listed on upon search return
+                    };
+                },
+                maxItems: '1',
+                create: false,
+                plugins: ['remove_button'],
+                valueField: 'copo_idblank',
+                labelField: 'copo_labelblank',
+                searchField: 'copo_labelblank',
+                options: options,
+                sortField: [
+                    {field: 'copo_labelblank', direction: 'asc'},
+                ],
+                render: {
+                    option: function (item, escape) {
+
+                        return '<div>' +
+                            '<span data-lblfield="copo_labelblank" data-parentid="' + elemId + '"  data-indx="' + escape(item.copo_idblank) + '"  class="webpop-content-div ontology-label onto-label">' + escape(item.copo_labelblank) + '</span></div>';
+
+                    },
+                    item: function (item, escape) {
+                        var lbl = escape(item.copo_labelblank);
+                        if (lbl.length > 9) {
+                            lbl = escape(item.copo_labelblank).substr(0, 9) + "...";
+                        }
+                        return '<div><span>' + lbl + '</span></div>'
+                    }
+                },
+                load: function (query, callback) {
+                    this.clearOptions();        // clear the data
+                    this.close();
+                    WebuiPopovers.hideAll();
+                    this.renderCache = {};
+                    query = query.trim();
+
+                    if (!query.length) {
+                        report_call_feedback(elem, "No query term entered", "success");
+                        return callback();
+                    }
+
+                    var params = {q: query};
+                    if (call_params) {
+                        params = $.extend(params, call_params);
+                    }
+                    params.api_schema = JSON.stringify(api_schema);
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        dataType: 'json',
+                        data: params,
+                        error: function () {
+                            callback();
+                        },
+                        success: function (data) {
+                            var ontologies = [];
+
+                            if (data.hasOwnProperty('message')) {
+                                report_call_feedback(elem, data.message, data.status);
+                            }
+
+                            if (data.hasOwnProperty('api_schema')) { //backened is sending a schema, retain this
+                                elem.closest(".ontology-parent").find(".elem-fields").val(JSON.stringify(data.api_schema));
+                            }
+
+                            if (data.hasOwnProperty('status') && data.status == 'success') {
+                                ontologies = data.items;
+                            }
+
+                            callback(ontologies);
+                        }
+                    });
+                }
+            });
+
+            //reference to selectize object
+            selectizeObjects[elemId] = $funSelect[0].selectize;
+        }
+    });
+}
+
+function refresh_general_ontology_select() {
+    //this control works on predefined options and doesn't support remote data source, or dynamic updates to options
+    $('.general-onto-select').each(function () {
+        var elem = $(this);
+        var elemId = elem.attr("data-element");
+        var eventName = elem.attr("data-eventname");
+        var options = JSON.parse(elem.closest('.copo-form-group').find('.elem-options').val());
+
+        var idField = 'copo_idblank';
+        var labelField = 'copo_labelblank';
+
+        if (elem.attr('data-idField')) {
+            idField = elem.attr("data-idField");
+        }
+
+        if (elem.attr('data-labelField')) {
+            labelField = elem.attr("data-labelField");
+        }
+
+        if (!(/selectize/i.test(elem.attr('class')))) { // if not already instantiated
+            var $funSelect = elem.selectize({
+                onChange: function (selectedValue) {
+                    //set value in hidden fields
+
+                    var ontologySpan = elem.closest(".ontology-parent");
+                    ontologySpan.find(".ontology-field-hidden").remove();
+                    var valueObject = {};
+
+                    var valElem = document.getElementById(elemId);
+                    if (selectedValue) {
+
+                        valElem.value = selectedValue;
+
+                        valueObject = $funSelect[0].selectize.options[selectedValue];
+                    } else {
+                        valElem.value = '';
+                    }
+
+                    WebuiPopovers.hideAll();
+                    set_general_ontology_detail(elem, valueObject);
+
+                    //trigger event to be handled externally
+                    if (eventName) {
+                        let controlEvent = jQuery.Event(eventName);
+                        controlEvent.elementId = elemId;
+                        controlEvent.selectedValue = selectedValue;
+                        $(document).trigger(controlEvent);
+                    }
+
+                },
+                onBlur: function () {
+                    WebuiPopovers.hideAll();
+                },
+                score: function () {
+                    return function () {
+                        return 1; //this enables all options to be listed on upon search return
+                    };
+                },
+                maxItems: '1',
+                create: false,
+                plugins: ['remove_button'],
+                valueField: idField,
+                labelField: labelField,
+                searchField: labelField,
+                options: options,
+                sortField: [
+                    {field: labelField, direction: 'asc'},
+                ],
+                render: {
+                    option: function (item, escape) {
+
+                        return '<div>' +
+                            '<span data-lblfield="' + labelField + '"  data-parentid="' + elemId + '"  data-indx="' + escape(item[idField]) + '"  class="webpop-content-div ontology-label onto-label">' + escape(item[labelField]) + '</span></div>';
+
+                    },
+                    item: function (item, escape) {
+                        var lbl = escape(item[labelField]);
+                        if (lbl.length > 9) {
+                            lbl = escape(item[labelField]).substr(0, 9) + "...";
+                        }
+                        return '<div><span>' + lbl + '</span></div>'
+                    }
+                },
+            });
+
+            var control = $funSelect[0].selectize;
+            selectizeObjects[elem.attr("data-element")] = control;
+
+            //report options tally
+            var message = options.length + " option in list";
+            if (options.length != 1) {
+                message = options.length + " options in list";
+            }
+
+            report_call_feedback(elem, message, "success");
+
+            //set value
+            var elemValue = elem.attr("data-currentValue");
+            if (elemValue) {
+                for (var p in control.options) {
+                    if (elemValue == p) {
+                        control.setValue(p);
+                    }
+                }
+            }
+        }
+    });
+}
+
+function report_call_feedback(elem, feedback, status) {
+    var iconNode = elem.closest(".ontology-parent").find(".copo-tag");
+    var contentNode = elem.closest(".ontology-parent").find(".copo-tag-2");
+    iconNode.html("Feedback...");
+
+    contentNode.html(feedback);
+
+    iconNode.removeClass("green red blue");
+
+    if (status == "error") {
+        iconNode.addClass("red");
+        iconNode.html("Error");
+    } else if (status == "success") {
+        iconNode.addClass("blue");
+    }
+}
+
+function set_general_ontology_detail(elem, onto_value) {
+    var contentNode = elem.closest(".ontology-parent").find(".copo-tag-content");
+    contentNode.hide();
+
+    var iconNode = elem.closest(".ontology-parent").find(".copo-tag");
+    iconNode.removeClass("green red blue");
+
+    if ($.isEmptyObject(onto_value)) {
+        contentNode.html("No option selected");
+        return false;
+    }
+
+    var schema = JSON.parse(elem.closest(".ontology-parent").find(".elem-fields").val());
+    var result = $('<div/>',
+        {
+            class: "limit-text"
+        });
+
+    contentNode.html(result);
+
+    let message = $('<div class="webpop-content-div" style="padding: 5px;"></div>');
+    var codeList = $('<div class="ui relaxed divided list"></div>');
+
+    message.append(codeList);
+
+    for (var i = 0; i < schema.length; ++i) {
+        var schemaNode = schema[i];
+        if (schemaNode.hasOwnProperty("show_in_table") && (schemaNode.show_in_table.toString().toLowerCase() == "true")) {
+            var itemNode = $('<div class="item"></div>');
+            codeList.append(itemNode);
+            itemNode.append('<div class="content"><div class="header">' + schemaNode.label + '</div><div class="description webpop-content-div">' + onto_value[schemaNode.id] + '</div></div>');
+        }
+    }
+
+    result.append(message);
+    iconNode.html("Click for info...");
+    iconNode.addClass("green");
+    // contentNode.slideToggle("slow");
 }
 
 
@@ -1994,6 +2389,7 @@ function get_profile_components() {
             sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
             colorClass: "samples_color",
             color: "olive",
+            profile_component: true,
             tableID: 'sample_table',
             recordActions: ["show_sample_source", "describe_record_all", "edit_record_single"],
             visibleColumns: 3 //no of columns to be displayed, if tabular data is required. remaining columns will be displayed in a sub-table
@@ -2009,6 +2405,7 @@ function get_profile_components() {
             buttons: ["quick-tour-template"],
             sidebarPanels: ["copo-sidebar-info", "copo-sidebar-help"],
             tableID: 'datafile_table',
+            profile_component: true,
             // recordActions: ["describe_record_multi", "unbundle_record_multi", "undescribe_record_multi"],
             recordActions: [],
             visibleColumns: 3
@@ -2024,6 +2421,7 @@ function get_profile_components() {
             colorClass: "submissions_color",
             color: "green",
             tableID: 'submission_table',
+            profile_component: true,
             recordActions: [],
             visibleColumns: 3
         },
@@ -2038,6 +2436,7 @@ function get_profile_components() {
             colorClass: "pubs_color",
             color: "orange",
             tableID: 'publication_table',
+            profile_component: true,
             recordActions: ["add_record_all", "edit_record_single", "delete_record_multi"],
             visibleColumns: 4
         },
@@ -2066,6 +2465,7 @@ function get_profile_components() {
             colorClass: "people_color",
             color: "red",
             tableID: 'person_table',
+            profile_component: true,
             recordActions: ["add_record_all", "edit_record_single"],
             visibleColumns: 5
         },/*
@@ -2119,7 +2519,12 @@ function do_page_controls(componentName) {
         return false;
     }
 
+    generate_component_control(component);
 
+} //end of func
+
+
+function generate_component_control(component) {
     var pageHeaders = $(".copo-page-headers"); //page header/icons
     var pageIcons = $(".copo-page-icons"); //profile component icons
     var sideBar = $(".copo-sidebar"); //sidebar panels
@@ -2178,35 +2583,40 @@ function do_page_controls(componentName) {
     });
 
     //...and profile component buttons
-    if (componentName != "profile") {
+    if (component.hasOwnProperty("profile_component") && component.profile_component.toString() == "true") {
         var pcomponentHTML = $(".pcomponents-icons-templates").clone().removeClass("pcomponents-icons-templates");
         var pcomponentAnchor = pcomponentHTML.find(".pcomponents-anchor").clone().removeClass("pcomponents-anchor");
         pcomponentHTML.find(".pcomponents-anchor").remove();
 
         pageIcons.append(pcomponentHTML);
 
+        var components = get_profile_components();
+
         for (var i = 1; i < components.length; ++i) {
             var comp = components[i];
-            if ((comp.component == componentName) || (comp.component == "profile")) {
-                continue;
+            if (comp.hasOwnProperty("profile_component") && comp.profile_component.toString() == "true") {
+
+                if ((comp.component == component.component)) {
+                    continue;
+                }
+
+                var newAnchor = pcomponentAnchor.clone();
+                pcomponentHTML.append(newAnchor);
+
+                newAnchor.attr("title", "Navigate to " + comp.title);
+                newAnchor.attr("href", $("#" + comp.component + "_url").val());
+                newAnchor.find("i")
+                    .addClass(comp.color)
+                    .addClass(comp.semanticIcon);
+
             }
-
-            var newAnchor = pcomponentAnchor.clone();
-            pcomponentHTML.append(newAnchor);
-
-            newAnchor.attr("title", "Navigate to " + comp.title);
-            newAnchor.attr("href", $("#" + comp.component + "_url").val());
-            newAnchor.find("i")
-                .addClass(comp.color)
-                .addClass(comp.semanticIcon);
         }
     }
 
     //refresh components...
     quick_tour_event();
     refresh_tool_tips();
-
-} //end of func
+}
 
 function refresh_webpop(elem, title, content, exrta_meta) {
     var config = {
@@ -2752,4 +3162,171 @@ function quick_tour_messages() {
     }
 
     return qt.properties;
+}
+
+
+function get_menu_control() {
+    let menu_control = $('<div class="copo-actions-dropdown ui dropdown">' +
+        '<div class="ui active buttons">' +
+        '<div class="ui big blue button menu-action-label"></div>' +
+        '<div class="ui big basic blue floating dropdown icon button">' +
+        '<i class="dropdown icon"></i>' +
+        '</div>' +
+        '</div>' +
+        '<div class="text" style="color: #35637e; padding-left: 5px;"></div>' +
+        '<i data-html="Please note that some items in the menu may be unavailable depending on the status"' +
+        'class="info circle grey icon copo-tooltip"></i>' +
+        '<div class="menu component-menu">' +
+        '</div>' +
+        '</div>');
+
+    return menu_control.clone();
+}
+
+function get_description_bundle_panel() {
+    let panel = $('<div class="description-bundle-template">\n' +
+        '        <div class="panel panel-dtables3">\n' +
+        '            <div class="panel-heading" style="background-image: none; border: none;">\n' +
+        '                <div class="bundle-header bundlename" style="font-weight: bold; font-size: 15px;"></div>\n' +
+        '                <div class="attr-placeholder" style="font-weight: normal; font-size: 12px; color: #ecf2f9;"> <span class="attr-placeholder-key"> </span> <span class="attr-placeholder-value"></span></div>\n' +
+        '                <div style="font-weight: normal; font-size: 12px; color: #ecf2f9;">Last modified: <span class="bundle-modified-date"></span></div>\n' +
+        '            </div>\n' +
+        '            <div class="panel-body">\n' +
+        '                <div class="row" style="margin-bottom: 20px;">\n' +
+        '                    <div class="col-sm-10 col-md-10 col-lg-10">\n' +
+        '                        <div class="copo-actions-dropdown ui dropdown">\n' +
+        '                            <div class="ui active buttons">\n' +
+        '                                <div class="ui blue button bundle-action-label">Tasks Menu</div>\n' +
+        '                                <div class="ui basic blue floating dropdown icon button">\n' +
+        '                                    <i class="dropdown icon"></i>\n' +
+        '                                </div>\n' +
+        '                            </div>\n' +
+        '                            <div class="text" style="color: #35637e;"></div>\n' +
+        '                            <i data-html="Please note that some items in the menu may be unavailable depending on the status."\n' +
+        '                               class="info circle grey icon copo-tooltip"></i>\n' +
+        '                            <div class="menu component-menu">\n' +
+        '                                <div data-task="add_datafiles" class="item bundlemenu">Add datafiles</div>\n' +
+        '                                <div data-task="view_datafiles" class="item bundlemenu">Show datafiles</div>\n' +
+        '                                <div class="divider"></div>\n' +
+        '                                <div data-task="add_metadata" class="item bundlemenu">Add/Edit metadata</div>\n' +
+        '                                <div data-task="view_metadata" class="item bundlemenu">Show metadata</div>\n' +
+        '                                <div class="divider"></div>\n' +
+        '                                <div data-task="edit_bundle" class="item bundlemenu">Rename bundle</div>\n' +
+        '                                <div data-task="clone_bundle" class="item bundlemenu">Clone bundle</div>\n' +
+        '                                <div data-task="delete_bundle" class="item bundlemenu">Delete bundle</div>\n' +
+        '                                <div class="divider"></div>\n' +
+        // '                                <div data-task="submit_bundle" class="item bundlemenu">Submit bundle</div>\n' +
+        '                                <div data-task="view_accessions" class="item bundlemenu">View accessions</div>\n' +
+        '                                <div data-task="view_issues" class="item bundlemenu">View issues</div>\n' +
+        '                            </div>\n' +
+        '                        </div>\n' +
+        '                    </div>\n' +
+        '                    <div class="col-sm-2 col-md-2 col-lg-2">\n' +
+        '                        <div class="pull-right">\n' +
+        '                            <i title="" class="big icon copo-tooltip bundle-status"></i>\n' +
+        '                        </div>\n' +
+        '                    </div>\n' +
+        '                </div>\n' +
+        '                <div class="row">\n' +
+        '                    <div class="col-sm-12 col-md-12 col-lg-12">\n' +
+        '                        <div class="pbody"></div>\n' +
+        '                    </div>\n' +
+        '                </div>\n' +
+        '            </div>\n' +
+        '        </div>\n' +
+        '    </div>');
+
+    return panel.clone();
+}
+
+
+function get_card_panel() {
+    let panel = $('<div class="component-type-panel">\n' +
+        '        <div class="panel panel-dtables3">\n' +
+        '            <div class="panel-heading" style="background-image: none; border: none;">\n' +
+        '                <div class="panel-header-1" style="font-weight: bold; font-size: 15px;"></div>\n' +
+        '                <div class="attr-placeholder" style="font-weight: normal; font-size: 12px; color: #ecf2f9; display: none;"><span class="attr-key copo-right-spacer"></span> <span class="attr-value"></span></div>\n' +
+        '            </div>\n' +
+        '            <div class="panel-body">\n' +
+        '                <div class="row" style="margin-bottom: 20px;">\n' +
+        '                    <div class="col-sm-10 col-md-10 col-lg-10">\n' +
+        '                        <div class="copo-actions-dropdown ui dropdown">\n' +
+        '                            <div class="ui active buttons">\n' +
+        '                                <div class="ui blue button menu-label">Tasks Menu</div>\n' +
+        '                                <div class="ui basic blue floating dropdown icon button menu-label-icon">\n' +
+        '                                    <i class="dropdown icon"></i>\n' +
+        '                                </div>\n' +
+        '                            </div>\n' +
+        '                            <div class="text" style="color: #35637e;"></div>\n' +
+        '                            <i data-html="Please note that some items in the menu may be unavailable depending on the status."\n' +
+        '                               class="info circle grey icon copo-tooltip"></i>\n' +
+        '                            <div class="menu component-menu"> </div>\n' +
+        '                        </div>\n' +
+        '                    </div>\n' +
+        '                    <div class="col-sm-2 col-md-2 col-lg-2">\n' +
+        '                        <div class="pull-right">\n' +
+        '                            <i title="" class="big icon copo-tooltip bundle-status"></i>\n' +
+        '                        </div>\n' +
+        '                    </div>\n' +
+        '                </div>\n' +
+        '                <div class="row">\n' +
+        '                    <div class="col-sm-12 col-md-12 col-lg-12">\n' +
+        '                        <div class="pbody"></div>\n' +
+        '                    </div>\n' +
+        '                </div>\n' +
+        '            </div>\n' +
+        '        </div>\n' +
+        '    </div>');
+
+    return panel.clone();
+}
+
+function get_alert_control() {
+    let alert = $('<div class="alert alert-success alert-dismissable fade in copo-alert-message" style="background-image: none; border: none;">\n' +
+        '            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>\n' +
+        '            <span class="webpop-content-div alert-message"></span>\n' +
+        '        </div>');
+
+    return alert.clone();
+}
+
+function get_alert_control_no_close() {
+    let alert = $('<div class="alert alert-success alert-dismissable fade in copo-alert-message" style="background-image: none; border: none;">\n' +
+        '            <span class="webpop-content-div alert-message"></span>\n' +
+        '        </div>');
+
+    return alert.clone();
+}
+
+function get_ajax_loader() {
+    let loader = $('<span class="input-group">\n' +
+        '                    <img style="height: 24px; margin-left:5px;" src="/static/copo/img/loading.gif"></span>');
+
+    return loader.clone();
+}
+
+function get_collapsible_panel() {
+    let panel = $('<div class="panel-group" style="margin-top: 15px;">\n' +
+        '        <div class="panel panel-dtables">\n' +
+        '            <div class="panel-heading" style="background-image: none; border: none;">\n' +
+        '                <h4 class="panel-title">\n' +
+        '                    <div class="row">\n' +
+        '                        <div class="col-sm-8 col-md-8 col-lg-8 copo-details-header"></div>\n' +
+        '                        <div class="col-sm-2 col-md-2 col-lg-2 pull-right">\n' +
+        '                            <div class="pull-right">\n' +
+        '                                <i data-toggle="collapse" href="" class="fa fa-plus text-primary copo-details-icon"\n' +
+        '                                   style="cursor: pointer; display: block;"\n' +
+        '                                   aria-hidden="true"></i>\n' +
+        '                            </div>\n' +
+        '                        </div>\n' +
+        '                    </div>\n' +
+        '                </h4>\n' +
+        '            </div>\n' +
+        '            <div id="" class="panel-collapse collapse copo-details-coll">\n' +
+        '                <div class="panel-body pbody"></div>\n' +
+        '            </div>\n' +
+        '        </div>\n' +
+        '    </div>');
+
+    return panel.clone();
 }

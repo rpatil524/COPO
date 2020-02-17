@@ -3,9 +3,8 @@ __date__ = '27 March 2019'
 
 import os
 import glob
+import time
 import shutil
-import ftplib
-import ntpath
 import pexpect
 import subprocess
 import pandas as pd
@@ -15,7 +14,6 @@ from datetime import datetime
 from tools import resolve_env
 from dal import cursor_to_list
 import dal.mongo_util as mutil
-from contextlib import closing
 from django.conf import settings
 from submission.helpers import generic_helper as ghlper
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
@@ -26,7 +24,6 @@ from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_EXPERIM
     SRA_PROJECT_TEMPLATE, SRA_SAMPLE_TEMPLATE, \
     SRA_SUBMISSION_MODIFY_TEMPLATE, ENA_CLI
 
-REPOSITORIES = settings.REPOSITORIES
 BASE_DIR = settings.BASE_DIR
 
 """
@@ -34,6 +31,7 @@ class handles read data submissions to the ENA - see: https://ena-docs.readthedo
 """
 
 REFRESH_THRESHOLD = 5 * 3600  # in hours, time to reset a potentially staled task to pending
+TRANSFER_REFRESH_THRESHOLD = 10 * 3600
 
 
 class EnaReads:
@@ -44,6 +42,7 @@ class EnaReads:
         self.ena_service = resolve_env.get_env('ENA_SERVICE')
         self.pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
         self.user_token = resolve_env.get_env('WEBIN_USER').split("@")[0]
+        self.webin_user = resolve_env.get_env('WEBIN_USER')
         self.webin_domain = resolve_env.get_env('WEBIN_USER').split("@")[1]
 
         self.submission_helper = None
@@ -51,6 +50,8 @@ class EnaReads:
         self.sra_settings = None
         self.datafiles_dir = None
         self.submission_context = None
+        self.tmp_folder = None
+        self.remote_location = None
 
     def process_queue(self):
         """
@@ -78,7 +79,7 @@ class EnaReads:
             current_time = d_utils.get_datetime()
             time_difference = current_time - recorded_time
             if time_difference.seconds >= (REFRESH_THRESHOLD):  # time submission is perceived to have been running
-                # refresh task to be rescheduled again
+                # refresh task to be rescheduled
                 rec['date_modified'] = d_utils.get_datetime()
                 rec['processing_status'] = 'pending'
                 collection_handle.update(
@@ -123,32 +124,39 @@ class EnaReads:
         """
 
         self.project_alias = self.submission_id
+        self.remote_location = os.path.join(self.project_alias, 'reads')  # ENA-Dropbox upload path
 
         collection_handle = ghlper.get_submission_handle()
 
+        if not self.submission_id:
+            return dict(status=False, message='Submission identifier not found!')
+
         # check status of submission record
-        doc = collection_handle.find_one({"_id": ObjectId(self.submission_id)})
+        submission_record = collection_handle.find_one({"_id": ObjectId(self.submission_id)},
+                                                       {"profile_id": 1, "complete": 1})
 
-        if not doc:
-            return dict(status=True, message='Submission record not found!')
+        if not submission_record:
+            return dict(status=False, message='Submission record not found!')
 
-        if str(doc.get("complete", False)).lower() == 'true':
-            return dict(status=True,
-                        message='This submission is marked as completed. '
-                                'Please contact your administrator to raise any issues.')
+        if str(submission_record.get("complete", False)).lower() == 'true':
+            message = 'Submission is marked as completed.'
+            ghlper.logging_info(message, self.submission_id)
+
+            return dict(status=True, message=message)
 
         # instantiate helper object - performs most auxiliary tasks associated with the submission
         self.submission_helper = SubmissionHelper(submission_id=self.submission_id)
 
         ghlper.logging_info('Initiating submission...', self.submission_id)
 
-        # clear any existing submission error
+        # clear any existing submission transcript - error or info alike
         ghlper.update_submission_status(submission_id=self.submission_id)
 
         # submission location
         self.submission_location = self.create_submission_location()
         self.datafiles_dir = os.path.join(self.submission_location, "files")
         self.submission_context = os.path.join(self.submission_location, "reads")
+        self.tmp_folder = os.path.join(self.submission_location, "tmp")
 
         # retrieve sra settings
         self.sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -180,18 +188,29 @@ class EnaReads:
                                             submission_id=self.submission_id)
             return context
 
-        # submit datafiles via either CLI or RESTful pathways - only use one at a time
-        # todo: uncomment this to use the CLI submission pathway
+        # submit datafiles via the CLI pathway
+        # todo: uncomment the following line to use the CLI submission pathway,
+        #  and comment out _submit_datafiles_rest below
         # context = self._submit_datafiles_cli(submission_xml_path=submission_xml_path)
-        # todo: uncomment this to use the RESTful submission pathway
+
+        # submit datafiles via the RESTful pathway
         context = self._submit_datafiles_rest(submission_xml_path=submission_xml_path)
         if context['status'] is False:
             ghlper.update_submission_status(status='error', message=context.get("message", str()),
                                             submission_id=self.submission_id)
             return context
 
-        # release project
-        context = self._process_study_release()
+        # process study release
+        self.process_study_release()
+
+        # depending on the release status of the study, process emabargo message
+        self.set_embargo_message()
+
+        # report on file upload status
+        context = self.get_upload_status()
+        if context['status'] is True and context['message']:
+            ghlper.notify_transfer_status(profile_id=submission_record['profile_id'], submission_id=self.submission_id,
+                                          status_message=context['message'])
 
         return context
 
@@ -549,21 +568,160 @@ class EnaReads:
 
         return dict(status=True, value='')
 
-    def _process_study_release(self):
+    def process_study_release(self, force_release=False):
         """
-        function manages the decision to release a study
+        function manages release of a study
+        :param force_release: if True, study will be released even if still on embargo
         :return:
         """
 
-        release_date = self.submission_helper.get_study_release()
-        if release_date and release_date["in_the_past"] is True:
-            return self.release_study()
+        self.submission_helper = SubmissionHelper(submission_id=self.submission_id)
 
-        return dict(status=True, value='', message='')
+        context = dict(status=True, value='', message='')
+
+        # get study accession
+        prj = self.submission_helper.get_study_accessions()
+
+        if not prj:
+            message = 'Project accession not found!'
+            ghlper.logging_error(message, self.submission_id)
+            result = dict(status=False, value='', message=message)
+
+            return result
+
+        project_accession = prj[0].get('accession', str())
+
+        # get study status from API
+        project_status = ghlper.get_study_status(user_token=self.user_token, pass_word=self.pass_word,
+                                                 project_accession=project_accession)
+
+        if not project_status:
+            message = 'Cannot determine project release status!'
+            ghlper.logging_error(message, self.submission_id)
+            result = dict(status=False, value='', message=message)
+
+            return result
+
+        release_status = project_status[0].get('report', dict()).get('releaseStatus', str())
+
+        if release_status.upper() == 'PUBLIC':
+            # study already released, update the information in the db
+
+            first_public = project_status[0].get('report', dict()).get('firstPublic', str())
+
+            try:
+                first_public = datetime.strptime(first_public, "%Y-%m-%dT%H:%M:%S")
+            except Exception as e:
+                first_public = d_utils.get_datetime()
+
+            collection_handle = self.submission_helper.collection_handle
+            submission_record = collection_handle.find_one({"_id": ObjectId(self.submission_id)}, {"accessions": 1})
+            prj = submission_record.get('accessions', dict()).get('project', [{}])
+            prj[0]['status'] = 'PUBLIC'
+            prj[0]['release_date'] = first_public
+
+            collection_handle.update(
+                {"_id": ObjectId(str(submission_record.pop('_id')))},
+                {'$set': submission_record})
+
+            self.set_embargo_message()
+
+            return dict(status=True, value='', message='Project is already public.')
+
+        # release study
+        release_date = self.submission_helper.get_study_release()
+
+        if (release_date and release_date["in_the_past"] is True) or force_release is True:
+            # clear any existing submission error
+            ghlper.update_submission_status(submission_id=self.submission_id)
+
+            self.submission_location = self.create_submission_location()
+            parser = etree.XMLParser(remove_blank_text=True)
+            root = etree.parse(SRA_SUBMISSION_MODIFY_TEMPLATE, parser).getroot()
+            actions = root.find('ACTIONS')
+            action = etree.SubElement(actions, 'ACTION')
+
+            ghlper.logging_info('Releasing project with accession: ' + project_accession, self.submission_id)
+
+            action_type = etree.SubElement(action, 'RELEASE')
+            action_type.set("target", project_accession)
+
+            context = self.write_xml_file(xml_object=root, file_name="submission_modify.xml")
+
+            if context['status'] is False:
+                ghlper.update_submission_status(status='error', message=context.get("message", str()),
+                                                submission_id=self.submission_id)
+                return context
+
+            submission_xml_path = context['value']
+
+            result = dict(status=True, value='')
+
+            # compose curl command for study release
+            curl_cmd = 'curl -u ' + self.user_token + ':' + self.pass_word \
+                       + ' -F "SUBMISSION=@' \
+                       + submission_xml_path \
+                       + '" "' + self.ena_service \
+                       + '"'
+
+            ghlper.logging_info(
+                "Releasing study via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx"),
+                self.submission_id)
+
+            try:
+                receipt = subprocess.check_output(curl_cmd, shell=True)
+            except Exception as e:
+                message = 'API call error ' + str(e)
+                ghlper.logging_error(message, self.submission_id)
+                result['message'] = message
+                result['status'] = False
+
+                return result
+
+            root = etree.fromstring(receipt)
+
+            if root.get('success') == 'false':
+                result['status'] = False
+                result['message'] = "Couldn't release project due to the following errors: "
+                errors = root.findall('.//ERROR')
+                if errors:
+                    error_text = str()
+                    for e in errors:
+                        error_text = error_text + " \n" + e.text
+
+                    result['message'] = result['message'] + error_text
+
+                # log error
+                ghlper.logging_error(result['message'], self.submission_id)
+
+                return result
+
+            # update submission record with study status
+            self.write_xml_file(xml_object=root, file_name="submission_receipt.xml")
+            ghlper.logging_info("Project successfully released. Updating status in the database",
+                                self.submission_id)
+
+            collection_handle = self.submission_helper.collection_handle
+            submission_record = collection_handle.find_one({"_id": ObjectId(self.submission_id)}, {"accessions": 1})
+            prj = submission_record.get('accessions', dict()).get('project', [{}])
+            prj[0]['status'] = 'PUBLIC'
+            prj[0]['release_date'] = d_utils.get_datetime()
+
+            collection_handle.update(
+                {"_id": ObjectId(str(submission_record.pop('_id')))},
+                {'$set': submission_record})
+
+            # set embargo message
+            self.set_embargo_message()
+
+            return dict(status=True, value='', message="Project release successful.")
+
+        return context
 
     def _submit_datafiles_rest(self, submission_xml_path=str()):
         """
-        function submits files uisng the ENA resfulness API
+        function submits run xmls using ENA RESTfulness API,
+        and also schedules the transfer of datafiles to ENA Dropbox
         :param submission_xml_path:
         :return:
         """
@@ -581,7 +739,7 @@ class EnaReads:
         try:
             datafiles_df = pd.read_csv(os.path.join(self.submission_location, "datafiles.csv"))
         except Exception as e:
-            message = 'Datafiles information not found ' + str(e)
+            message = "Couldn't retrieve data files information " + str(e)
             ghlper.logging_error(message, self.submission_id)
             result = dict(status=False, value='', message=message)
             return result
@@ -596,7 +754,7 @@ class EnaReads:
         for k in datafile_columns:
             datafiles_df[k].fillna('', inplace=True)
 
-        # get run accessions - these provide info on already submitted datafiles
+        # get run accessions - to provide info on datafiles submission status
         run_accessions = self.submission_helper.get_run_accessions()
 
         submitted_files = [x for y in run_accessions for x in y.get('datafiles', list())]
@@ -613,27 +771,24 @@ class EnaReads:
         datafiles_pairs = pd.DataFrame(self.submission_helper.get_pairing_info(), columns=['_id', '_id2'])
 
         # filter datafiles_pairs based on submitted_files and datafiles_df
-        # i.e. if any of the paired files has been submitted, then remove the paired record
+        # i.e. if any file in a pair has been submitted, then remove the paired record
         if len(datafiles_pairs):
             datafiles_pairs = datafiles_pairs[
                 ~((datafiles_pairs['_id'].isin(submitted_files)) | (datafiles_pairs['_id2'].isin(submitted_files)))]
 
         datafile_ids = list(datafiles_df.datafile_id)
 
-        # ...also, it's a valid pair if both files in a pair are in datafiles_df
+        # ...also, it's a valid pair if paired files are in datafiles_df
         if len(datafiles_pairs):
             datafiles_pairs = datafiles_pairs[
                 (datafiles_pairs['_id'].isin(datafile_ids)) & (datafiles_pairs['_id2'].isin(datafile_ids))]
 
-        # datafiles will be submitted on the following guideline:
-        # if a datafile is marked as paired, but no pairing information is found (in datafiles_pairs),
-        # the datafile will be submitted as a single file
+        # information found in 'datafiles_pairs' is used to match datafiles in the course of this submission
 
         left_right_pair = list(datafiles_pairs['_id']) + list(datafiles_pairs['_id2'])
-        unpaired_datafiles = [x for x in datafile_ids if x not in left_right_pair]
+        unpaired_datafiles = [[x, ''] for x in datafile_ids if x not in left_right_pair]
 
         if unpaired_datafiles:
-            unpaired_datafiles = [[x, ''] for x in unpaired_datafiles]
             frames = [datafiles_pairs, pd.DataFrame(unpaired_datafiles, columns=['_id', '_id2'])]
             datafiles_pairs = pd.concat(frames, ignore_index=True)
 
@@ -660,7 +815,7 @@ class EnaReads:
         # store file submission error
         submission_errors = list()
 
-        # create submission context - where all
+        # create submission context - holds xmls for the different reads
         try:
             if not os.path.exists(self.submission_context):
                 os.makedirs(self.submission_context)
@@ -670,7 +825,36 @@ class EnaReads:
             result = dict(status=False, value='', message=message)
             return result
 
-        # get instruments
+        # create tmp folder to hold mock files
+        try:
+            if not os.path.exists(self.tmp_folder):
+                os.makedirs(self.tmp_folder)
+        except Exception as e:
+            message = 'Error creating temporary directory ' + self.tmp_folder + ": " + str(e)
+            ghlper.logging_error(message, self.submission_id)
+            result = dict(status=False, value='', message=message)
+            return result
+
+        # retrieve already uploaded files
+        files_in_remote = [x.get('report', dict()).get('fileName', str()) for x in
+                           ghlper.get_ena_remote_files(user_token=self.user_token, pass_word=self.pass_word)]
+
+        files_not_in_remote = [x for x in list(datafiles_df.datafile_name) if
+                               os.path.join(self.remote_location, x) not in files_in_remote]
+
+        mock_file_names = [os.path.join(self.tmp_folder, x) for x in files_not_in_remote]
+
+        # create and upload datafile 'placeholders' to facilitate submission; actual datafiles uploaded separately
+        ghlper.touch_files(file_paths=mock_file_names)
+
+        kwargs = dict(submission_id=self.submission_id)
+        ghlper.transfer_to_ena(webin_user=self.webin_user, pass_word=self.pass_word, remote_path=
+        self.remote_location, file_paths=mock_file_names, **kwargs)
+
+        # schedule the transfer of actual datafiles to ENA Dropbox
+        ghlper.schedule_file_transfer(submission_id=self.submission_id, remote_location=self.remote_location)
+
+        # get sequencing instruments
         instruments = COPOLookup(data_source='sequencing_instrument').broker_data_source()
 
         for indx in range(len(datafiles_pairs)):
@@ -695,7 +879,7 @@ class EnaReads:
                            x['sample_id'] == files_pair[0]['study_samples']]
 
             if not s_accession:
-                accession_error = 'Sample accession not found for datafiles: ' + str(
+                accession_error = 'Sample accession not found for data files: ' + str(
                     [file_meta['datafile_name'] for file_meta in files_pair])
                 ghlper.logging_error(accession_error, self.submission_id)
                 submission_errors.append(accession_error)
@@ -746,12 +930,9 @@ class EnaReads:
                 submission_errors.append(message)
                 continue
 
-            submission_message = f'Transferring {str(submission_file_names)} to remote location...'
+            submission_message = f'Submitting {str(submission_file_names)} ...'
             ghlper.logging_info(submission_message, self.submission_id)
             ghlper.update_submission_status(status='info', message=submission_message, submission_id=self.submission_id)
-
-            if not self.ftp_transfer_handler(local_paths=file_paths, remote_location=submission_name):
-                continue
 
             # construct experiment xml
             experiment_root = etree.parse(SRA_EXPERIMENT_TEMPLATE, xml_parser).getroot()
@@ -816,9 +997,9 @@ class EnaReads:
 
             for file in files_pair:
                 run_file_node = etree.SubElement(run_files_node, 'FILE')
-                run_file_node.set("filename", os.path.join(submission_name, file.datafile_name))
-                run_file_node.set("filetype", "fastq")
-                run_file_node.set("checksum", file.datafile_hash)
+                run_file_node.set("filename", os.path.join(self.remote_location, file.datafile_name))
+                run_file_node.set("filetype", "fastq")  # todo: what about BAM, CRAM files?
+                run_file_node.set("checksum", file.datafile_hash)  # todo: is this correct as submission time?
                 run_file_node.set("checksum_method", "MD5")
 
             # write run xml
@@ -890,7 +1071,7 @@ class EnaReads:
             )
 
             submission_record = collection_handle.find_one({"_id": ObjectId(self.submission_id)},
-                                             {"accessions": 1})
+                                                           {"accessions": 1})
             if submission_record:
                 accessions = submission_record.get("accessions", dict())
 
@@ -948,7 +1129,7 @@ class EnaReads:
         try:
             datafiles_df = pd.read_csv(os.path.join(self.submission_location, "datafiles.csv"))
         except Exception as e:
-            message = 'Datafiles information not found ' + str(e)
+            message = 'Data files information not found ' + str(e)
             ghlper.logging_error(message, self.submission_id)
             result = dict(status=False, value='', message=message)
             return result
@@ -1278,17 +1459,26 @@ class EnaReads:
         :return:
         """
 
-        # all files have been successfully submitted
+        # all metadata have been successfully submitted
         log_message = "Finalising submission..."
         ghlper.logging_info(log_message, self.submission_id)
         ghlper.update_submission_status(status='info', message=log_message, submission_id=self.submission_id)
 
-        # remove submission files folder
-        try:
-            shutil.rmtree(self.datafiles_dir)
-        except Exception as e:
-            message = "Error removing files folder: " + str(e)
-            ghlper.logging_error(message, self.submission_id)
+        # remove submission auxiliary folders
+
+        if os.path.exists(self.datafiles_dir):
+            try:
+                shutil.rmtree(self.datafiles_dir)
+            except Exception as e:
+                message = "Error removing files folder: " + str(e)
+                ghlper.logging_error(message, self.submission_id)
+
+        if os.path.exists(self.tmp_folder):
+            try:
+                shutil.rmtree(self.tmp_folder)
+            except Exception as e:
+                message = "Error removing temporary folder: " + str(e)
+                ghlper.logging_error(message, self.submission_id)
 
         # mark submission as complete
         collection_handle = ghlper.get_submission_handle()
@@ -1298,12 +1488,9 @@ class EnaReads:
             {'$set': submission_record})
 
         # update submission status
-        status_message = "Submission marked as complete!"
+        status_message = "Submission is marked as complete!"
         ghlper.logging_info(status_message, self.submission_id)
-        ghlper.update_submission_status(status='info', message=status_message, submission_id=self.submission_id)
-
-        # clear any existing submission error
-        ghlper.update_submission_status(submission_id=self.submission_id)
+        ghlper.update_submission_status(status='success', message=status_message, submission_id=self.submission_id)
 
         return True
 
@@ -1476,102 +1663,171 @@ class EnaReads:
 
         return result
 
-    def delete_submission(self):
+    def set_embargo_message(self):
         """
-        function deletes submission: can only delete non-submitted submission
+        function sets embargo status message for submission
         :return:
         """
 
-        # todo: to delete submission record, delete or also cancel the already registered project and samples on ENA
+        self.submission_helper = SubmissionHelper(submission_id=self.submission_id)
 
-        return True
+        # get study accession
+        prj = self.submission_helper.get_study_accessions()
+        if not prj:
+            message = 'Project accession not found!'
+            ghlper.logging_error(message, self.submission_id)
+            result = dict(status=False, value='', message=message)
+            return result
 
-    def ftp_transfer_handler(self, local_paths=list(), remote_location=str()):
-        """
-        function transfers file to ENA using ftp
-        :param local_paths: paths to file in the local system
-        :param remote_location: remote folder
-        :return:
-        """
+        status = prj[0].get('status', "Unknown")
+        release_date = prj[0].get("release_date", str())
 
-        with closing(ftplib.FTP(self.webin_domain)) as ftp:
-            try:
-                ftp.login(self.user_token, self.pass_word)
+        extra_info = ''
 
-                if remote_location not in ftp.nlst():
-                    ftp.mkd(remote_location)
-
-            except ftplib.all_errors as e:
-                message = 'FTP error:' + str(e)
-                ghlper.logging_error(message, self.submission_id)
-                return False
-
-            ftp.cwd(remote_location)
-
-            for f_path in local_paths:
+        if status.upper() == "PRIVATE":
+            if len(release_date) >= 10:  # e.g. '2019-08-30'
                 try:
-                    with open(f_path, 'rb') as fp:
-                        filename = ntpath.basename(f_path)
-                        res = ftp.storlines("STOR " + filename, fp)
-                        if not res.startswith('226 Transfer complete'):
-                            message = f'Upload of {filename} failed!'
-                            ghlper.logging_error(message, self.submission_id)
-                            return False
+                    datetime_object = datetime.strptime(release_date[:10], '%Y-%m-%d')
+                    release_date = time.strftime('%a, %d %b %Y %H:%M', datetime_object.timetuple())
+                except Exception as e:
+                    ghlper.logging_error("Could not resolve submission release date" + str(e), self.submission_id)
 
-                except ftplib.all_errors as e:
-                    message = 'FTP error:' + str(e)
-                    ghlper.logging_error(message, self.submission_id)
-                    return False
+            extra_info = "<li>An embargo is placed on this submission. Embargo will be automatically lifted on: " + release_date + \
+                         "</li><li>" \
+                         "To release this study now, select " \
+                         "<strong>Lift Embargo</strong> from the menu</li>"
+        elif status.upper() == "PUBLIC":
+            extra_info = "<li>" \
+                         "To view this study on the ENA browser, select <strong>" \
+                         "View in Remote</strong> from the menu (<span style='font-size:10px;'>Recently " \
+                         "completed submissions can take up to 24 hours to appear on ENA</span>)</li>"
 
-        return True
+        # add transfer status
+        transfer_status_message = ''
+        transfer_status = self.get_upload_status()
+        if transfer_status['status'] is True and transfer_status['message']:
+            transfer_status_message = "<li>" + transfer_status['message'] + "</li>"
 
-    def aspera_transfer_handler(self):
+        status_message = f'<div>Submission completed.</div><ul>{transfer_status_message}<li>To view accessions, ' \
+            f'select <strong>View Accessions</strong> from the menu</li>{extra_info}</ul>'
+
+        ghlper.update_submission_status(status='success', message=status_message, submission_id=self.submission_id)
+
+        return dict(status=True, value='', message='')
+
+    def get_upload_status(self):
         """
-        function transfers file to ENA using aspera
+        function reports on the upload status of files to ENA
         :return:
         """
 
-        # get aspera library
-        # path2library = os.path.join(BASE_DIR, REPOSITORIES['ASPERA']['resource_path'])
-        # webin_user = resolve_env.get_env('WEBIN_USER')
+        result = dict(status=True, value='', message='')
+        transfer_collection_handle = ghlper.get_filetransfer_queue_handle()
 
-        # f_str = ' '.join(file_paths)
-        # aspera_cmd = f'./ascp -d -QT -l700M -L- {f_str} {webin_user}:{submission_name}'
-        # message = "Aspera command: " + aspera_cmd
-        # ghlper.logging_info(message, self.submission_id)
-        # ghlper.logging_info(path2library, self.submission_id)
-        # os.chdir(path2library)
+        transfer_record = transfer_collection_handle.find_one({"submission_id": self.submission_id})
 
-        # try:
-        #     thread = pexpect.spawn(aspera_cmd, timeout=None)
-        #     thread.expect(["assword:", pexpect.EOF])
-        #     thread.sendline(self.pass_word)
-        #
-        #     cpl = thread.compile_pattern_list([pexpect.EOF, '(.+)'])
-        #
-        #     while True:
-        #         i = thread.expect_list(cpl, timeout=None)
-        #         if i == 0:  # EOF! Possible error point if encountered before transfer completion
-        #             print("Process termination - check exit status!")
-        #             break
-        #         elif i == 1:
-        #             pexp_match = thread.match.group(1)
-        #             tokens_to_match = ["status=success"]
-        #
-        #             if any(tm in pexp_match.decode("utf-8") for tm in tokens_to_match):
-        #                 tokens = pexp_match.decode("utf-8").split(" ")
-        #
-        #                 # file successfully transferred
-        #                 if 'status=success' in tokens:
-        #                     submission_message = f'Successfully transferred {str(submission_file_names)}'
-        #                     ghlper.logging_info(submission_message, self.submission_id)
-        #
-        #     thread.close()
-        # except Exception as e:
-        #     message = 'File transfer error ' + str(e)
-        #     ghlper.logging_error(message, self.submission_id)
-        #     submission_errors.append(message)
-        #
-        #     continue
+        if not transfer_record:
+            # transfer probably done
+            return result
+
+        status_message = "Currently uploading data files. Progress report will be provided."
+        if transfer_record.get("processing_status", str()) == "pending":
+            status_message = "Data files upload pending. Progress will be reported."
+
+        result['message'] = status_message
+
+        return result
+
+    def process_file_transfer(self):
+        """
+        function processes the file transfer queue and initiates transfer to ENA Dropbox
+        :return:
+        """
+
+        transfer_collection_handle = ghlper.get_filetransfer_queue_handle()
+
+        # check and update status for long running transfers - possibly stalled
+        records = cursor_to_list(
+            transfer_collection_handle.find({'processing_status': 'running'}))
+
+        for rec in records:
+            recorded_time = rec.get("date_modified", None)
+
+            if not recorded_time:
+                rec['date_modified'] = d_utils.get_datetime()
+                transfer_collection_handle.update(
+                    {"_id": ObjectId(str(rec.pop('_id')))},
+                    {'$set': rec})
+
+                continue
+
+            current_time = d_utils.get_datetime()
+            time_difference = current_time - recorded_time
+            if time_difference.seconds >= (TRANSFER_REFRESH_THRESHOLD):  # time transfer has been running
+                # refresh task to be rescheduled
+                rec['date_modified'] = d_utils.get_datetime()
+                rec['processing_status'] = 'pending'
+                transfer_collection_handle.update(
+                    {"_id": ObjectId(str(rec.pop('_id')))},
+                    {'$set': rec})
+
+        # obtain pending submission for processing
+        records = cursor_to_list(
+            transfer_collection_handle.find({'processing_status': 'pending'}).sort([['date_modified', 1]]))
+
+        if not records:
+            return True
+
+        # pick top of the list, update status and timestamp
+        queued_record = records[0]
+        queued_record['processing_status'] = 'running'
+        queued_record['date_modified'] = d_utils.get_datetime()
+
+        queued_record_id = queued_record.pop('_id', '')
+
+        transfer_collection_handle.update(
+            {"_id": ObjectId(str(queued_record_id))},
+            {'$set': queued_record})
+
+        self.submission_id = str(queued_record['submission_id'])
+        self.remote_location = str(queued_record['remote_location'])
+
+        # get submission record
+        submission_collection_handle = ghlper.get_submission_handle()
+        submission_record = submission_collection_handle.find_one(
+            {'_id': ObjectId(self.submission_id)}, {"bundle_meta": 1, "profile_id": 1})
+
+        local_paths = [x['file_path'] for x in submission_record['bundle_meta'] if
+                       x.get('upload_status', False) is False]
+
+        if not local_paths:
+            message = "File transfer request: There are files to transfer."
+            ghlper.logging_info(message, self.submission_id)
+            return True
+
+        # push updates to client via to channels layer
+        status_message = f'Commencing transfer of {len(local_paths)} data files to ENA. Progress will be reported.'
+        ghlper.notify_transfer_status(profile_id=submission_record['profile_id'], submission_id=self.submission_id,
+                                      status_message=status_message)
+
+        kwargs = dict(submission_id=self.submission_id, transfer_queue_id=queued_record_id, report_status=True)
+        ghlper.transfer_to_ena(webin_user=self.webin_user, pass_word=self.pass_word, remote_path=self.remote_location,
+                               file_paths=local_paths, **kwargs)
+
+        # another sanity check...this time for transfer completion
+        submission_record = submission_collection_handle.find_one(
+            {'_id': ObjectId(self.submission_id)}, {"bundle_meta": 1, "profile_id": 1})
+
+        local_paths = [x['file_path'] for x in submission_record['bundle_meta'] if
+                       x.get('upload_status', False) is False]
+
+        if not local_paths:
+            message = "All data files successfully transferred to ENA."
+            ghlper.logging_info(message, self.submission_id)
+            transfer_collection_handle.remove({"_id": queued_record_id})
+            self.set_embargo_message()
+
+            ghlper.notify_transfer_status(profile_id=submission_record['profile_id'], submission_id=self.submission_id,
+                                          status_message=message)
 
         return True

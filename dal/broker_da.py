@@ -8,7 +8,8 @@ import web.apps.web_copo.lookup.lookup as lkup
 from api.doi_metadata import DOI2Metadata
 import web.apps.web_copo.templatetags.html_tags as htags
 from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
-from dal.copo_da import Profile, Publication, Source, Person, Sample, Submission, DataFile, DAComponent, Annotation, \
+from dal.copo_da import Profile, Publication, Source, Person, Repository, Sample, Submission, DataFile, DAComponent, \
+    Annotation, \
     Description, CGCore, MetadataTemplate
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.metadata_rater import MetadataRater
@@ -41,6 +42,8 @@ class BrokerDA:
             annotation=Annotation,
             cgcore=CGCore,
             metadata_template=MetadataTemplate
+            cgcore=CGCore,
+            repository=Repository
         )
 
         if self.component in da_dict:
@@ -70,25 +73,39 @@ class BrokerDA:
         # set report parameter
         status = "success"  # 'success', 'warning', 'info', 'danger' - modelled after bootstrap alert classes
         action_type = "add"
+        action_message = "creating"
 
         report_metadata = dict()
 
         if self.param_dict.get("target_id", str()):
             action_type = "edit"
+            action_message = "updating"
 
-        record_object = self.da_object.save_record(self.auto_fields, **kwargs)
+        # validate record
+        validation_result = self.da_object.validate_record(auto_fields=self.auto_fields, **kwargs)
+
+        if validation_result.get("status", True) is False:
+            report_metadata["status"] = "error"
+            report_metadata["message"] = validation_result.get("message",
+                                                               "There was a problem " + action_message
+                                                               + " the " + self.component + " record!")
+            self.context["action_feedback"] = report_metadata
+            return self.context
+
+        # save/edit record
+        record_object = self.da_object.save_record(auto_fields=self.auto_fields, **kwargs)
 
         if not record_object:
             status = "danger"
 
-        if action_type == "add":
+        if action_type == "add" and status == "success":
             report_metadata["message"] = "New " + self.component + " record created!"
-            if status != "success":
-                report_metadata["message"] = "There was a problem creating the " + self.component + " record!"
-        elif action_type == "edit":
+        elif action_type == "add" and status != "success":
+            report_metadata["message"] = "There was a problem creating the " + self.component + " record!"
+        elif action_type == "edit" and status == "success":
             report_metadata["message"] = "Record updated!"
-            if status != "success":
-                report_metadata["message"] = "There was a problem updating the " + self.component + " record!"
+        elif action_type == "edit" and status != "success":
+            report_metadata["message"] = "There was a problem updating the " + self.component + " record!"
 
         report_metadata["status"] = status
         self.context["action_feedback"] = report_metadata
@@ -115,6 +132,23 @@ class BrokerDA:
 
         return self.context
 
+    def validate_and_delete(self):
+        """
+        function handles the delete of a record for those components
+        that have provided a way of first validating (dependencies checks etc.) this action
+        :return:
+        """
+
+        validate_delete_method = getattr(self.da_object, "validate_and_delete", None)
+
+        if validate_delete_method is None:
+            return self.context
+
+        if not callable(validate_delete_method):
+            return self.context
+
+        return self.da_object.validate_and_delete(target_id=self.param_dict.get("target_id", str()))
+
     def do_delete(self):
         target_ids = [ObjectId(i) for i in self.param_dict.get("target_ids")]
 
@@ -131,6 +165,14 @@ class BrokerDA:
 
         self.context = self.broker_visuals.do_table_data()
         return self.context
+
+    def do_lift_submission_embargo(self):
+        """
+        function brokers the release of a submission
+        :return:
+        """
+
+        return Submission().lift_embargo(submission_id=self.param_dict.get("target_id", str()))
 
     def do_form(self):
         target_id = self.param_dict.get("target_id")
@@ -323,6 +365,7 @@ class BrokerVisuals:
         self.param_dict = kwargs
         self.component = self.param_dict.get("component", str())
         self.profile_id = self.param_dict.get("profile_id", str())
+        self.user_id = self.param_dict.get("user_id", str())
         self.context = self.param_dict.get("context", dict())
 
     def set_extra_params(self, extra_param):
@@ -337,10 +380,10 @@ class BrokerVisuals:
             datafile=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             sample=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             source=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
-            submission=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
-            repository=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
+            repository=(htags.generate_repositories_records, dict(component=self.component)),
             metadata_template=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_all_profiles())),
+            submission=(htags.generate_submissions_records, dict(profile_id=self.profile_id, component=self.component)),
         )
 
         # NB: in table_data_dict, use an empty dictionary as a parameter for listed functions that define zero arguments
@@ -351,6 +394,35 @@ class BrokerVisuals:
 
         self.context["component"] = self.component
 
+        return self.context
+
+    def do_managed_repositories(self):
+        """
+        function returns repositories for which the request user is a manager
+        :return:
+        """
+
+        self.context["table_data"] = htags.generate_managed_repositories(component=self.component, user_id=self.user_id)
+        self.context["component"] = self.component
+
+        return self.context
+
+    def do_get_submission_meta_repo(self):
+        """
+        function brokers metadata and repository details for a submission
+        :return:
+        """
+        target_id = self.param_dict.get("target_id", str())
+        self.context["result"] = htags.get_submission_meta_repo(submission_id=target_id, user_id=self.user_id)
+        return self.context
+
+    def do_view_submission_remote(self):
+        """
+        function brokers the generation of resource url/identifier to a submission in its remote location
+        :return:
+        """
+
+        self.context = htags.get_submission_remote_url(submission_id=self.param_dict.get("target_id", str()))
         return self.context
 
     def do_server_side_table_data(self):
@@ -368,13 +440,15 @@ class BrokerVisuals:
     def do_row_data(self):
         record_object = self.param_dict.get("record_object", dict())
 
+        target_id = record_object.get("_id", str())
+
         table_data_dict = dict(
             publication=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             person=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             sample=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
             profile=(htags.generate_copo_profiles_data, dict(profiles=Profile().get_for_user())),
             datafile=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
-            repository=(htags.generate_table_records, dict(profile_id=self.profile_id, component=self.component)),
+            repository=(htags.generate_repositories_records, dict(component=self.component)),
         )
 
         # NB: in table_data_dict, use an empty dictionary as a parameter to functions that define zero arguments
@@ -388,9 +462,30 @@ class BrokerVisuals:
 
     def do_get_submission_accessions(self):
         target_id = self.param_dict.get("target_id", str())
-        submission_record = Submission().get_record(target_id)
+        self.context["submission_accessions"] = htags.generate_submission_accessions_data(submission_id=target_id)
+        return self.context
 
-        self.context["submission_accessions"] = htags.generate_submission_accessions_data(submission_record)
+    def do_get_submission_datafiles(self):
+        target_id = self.param_dict.get("target_id", str())
+        self.context["table_data"] = htags.generate_submission_datafiles_data(submission_id=target_id)
+        return self.context
+
+    def do_get_destination_repo(self):
+        """
+        function brokers submission destination repository details
+        :return:
+        """
+        target_id = self.param_dict.get("target_id", str())
+        self.context["result"] = htags.get_destination_repo(submission_id=target_id)
+        return self.context
+
+    # do_get_repo_stats
+    def do_get_repo_stats(self):
+        """
+        function brokers statistics for the target repository
+        :return:
+        """
+        self.context["result"] = htags.get_repo_stats(repository_id=self.param_dict.get("target_id", str()))
         return self.context
 
     def do_profiles_counts(self):

@@ -231,7 +231,7 @@ class CgCoreSchemas:
         schema_df = pd.DataFrame(cg_schema)
         schema_df.id = schema_df.id.str.lower().str.split(".").str[-1]
         schema_df.index = schema_df.id
-        schema_df = schema_df[['ref', 'id', 'prefix']]
+        schema_df = schema_df[['ref', 'id', 'prefix', 'label']]
         schema_df = schema_df[~schema_df['ref'].isna()]
 
         # get all stage items
@@ -259,7 +259,7 @@ class CgCoreSchemas:
         schema_df['vals'] = new_dict_series
         schema_df['vals'] = schema_df['vals'].fillna('')
 
-        schema_df = schema_df[['ref', 'id', 'vals', 'prefix']]
+        schema_df = schema_df[['ref', 'id', 'vals', 'prefix', 'label']]
 
         # get composite attributes
         composite_attrib = [x for x in all_items if x["id"] in list(schema_df.id) and x.get("create_new_item", False)]
@@ -282,7 +282,8 @@ class CgCoreSchemas:
 
             attr_list = list()
             for child in children_schemas:
-                child_dict = dict(ref=child["ref"], id=child["id"].split(".")[-1], prefix=child["prefix"], vals=[])
+                child_dict = dict(ref=child["ref"], id=child["id"].split(".")[-1], prefix=child["prefix"], vals=[],
+                                  label=child["label"])
                 attr_list.append(child_dict)
                 for rec in records:
                     child_dict["vals"].append(rec.get(child_dict["id"], str()))
@@ -290,14 +291,13 @@ class CgCoreSchemas:
             if attr_list:
                 attr_df = pd.DataFrame(attr_list)
                 attr_df.index = attr_df.id
-                schema_df = pd.concat([schema_df, attr_df])
+                schema_df = pd.concat([schema_df, attr_df], sort=False)
 
         schema_df.rename(index=str, columns={"ref": "dc", "id": "copo_id"}, inplace=True)
 
         dc_list = schema_df.to_dict('records')
 
         return dc_list
-
 
     def controls_mapping(self):
         """
