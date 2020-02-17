@@ -88,6 +88,7 @@ function dropHandler(ev, ui) {
         d = JSON.parse(d)
         if ($("#file_type").val() == "ss" || $("#file_type").val() == "csv" || $("#file_type").val() == "txt" || $("#file_type").val() == "tab") {
             refresh_spreadsheet_display()
+            $(ui).remove()
         }
 
     }).error(function (d) {

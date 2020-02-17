@@ -163,7 +163,10 @@ class DataverseSubmit(object):
             return dict(status='error', message=message)
 
         # convert to Dataset metadata
-        metadata_file_path = self.do_conversion()
+        try:
+            metadata_file_path = self.do_conversion()
+        except Exception as ex:
+            print(traceback.format_exc())
 
         # make API call
         call_url = urllib.parse.urljoin(self.host, f'/api/dataverses/{dataverse_alias}/datasets')
@@ -702,16 +705,21 @@ class DataverseSubmit(object):
                         for indx, vv in enumerate(vals):
                             children_values.setdefault(indx, []).append(self.get_dv_primitive(child, vv))
 
-                for entry in children_values:
-                    new_dict = dict()
-                    for descendant in children_values[entry]:
-                        new_dict[descendant["typeName"]] = descendant
+                if children_values:
+                    for entry in children_values:
+                        new_dict = dict()
+                        for descendant in children_values[entry]:
+                            if not descendant:
+                                continue
+                            new_dict[descendant["typeName"]] = descendant
 
-                    # add predefined children values
-                    for descendant in predefined_children_values:
-                        new_dict[descendant["typeName"]] = descendant
+                        # add predefined children values
+                        for descendant in predefined_children_values:
+                            if not descendant:
+                                continue
+                            new_dict[descendant["typeName"]] = descendant
 
-                    values.append(new_dict)
+                        values.append(new_dict)
 
                 field = self.get_dv_primitive(attrib, [1])  # pass any value to generate parent dict
                 field["value"] = values

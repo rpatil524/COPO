@@ -9,8 +9,7 @@ from api.doi_metadata import DOI2Metadata
 import web.apps.web_copo.templatetags.html_tags as htags
 from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from dal.copo_da import Profile, Publication, Source, Person, Repository, Sample, Submission, DataFile, DAComponent, \
-    Annotation, \
-    Description, CGCore, MetadataTemplate
+    Annotation, Description, CGCore, MetadataTemplate
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.metadata_rater import MetadataRater
 from web.apps.web_copo.schemas.utils import data_utils
@@ -41,8 +40,7 @@ class BrokerDA:
             submission=Submission,
             annotation=Annotation,
             cgcore=CGCore,
-            metadata_template=MetadataTemplate
-            cgcore=CGCore,
+            metadata_template=MetadataTemplate,
             repository=Repository
         )
 
