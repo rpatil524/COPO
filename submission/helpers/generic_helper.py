@@ -367,7 +367,8 @@ def transfer_to_ena(webin_user, pass_word, remote_path, file_paths=list(), **kwa
     message = f'Commencing transfer of {len(file_paths)} data files to ENA. Progress will be reported.'
     logging_info(message, submission_id)
 
-    os.chdir(os.path.join(BASE_DIR, REPOSITORIES['ASPERA']['resource_path']))
+    resource_path = os.path.join(BASE_DIR, REPOSITORIES.get('ASPERA', dict()).get('resource_path', str()))
+    os.chdir(resource_path)
 
     local_paths = ' '.join(file_paths)
     aspera_cmd = f'./ascp -d -QT -l700M -L- {local_paths} {webin_user}:{remote_path}'

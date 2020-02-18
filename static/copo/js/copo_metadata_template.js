@@ -64,6 +64,7 @@ $(document).ready(function () {
 
     //add new component button
     $(document).on("click", ".new-component-template", function (event) {
+        event.task = 'add';
         do_record_task(event)
     });
 
@@ -80,14 +81,14 @@ $(document).ready(function () {
 
 
         var task = event.task.toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
-        var tableID = event.tableID; //get target table
-
-        //retrieve target records and execute task
-        var table = $('#' + tableID).DataTable();
-        var records = []; //
-        $.map(table.rows('.selected').data(), function (item) {
-            records.push(item);
-        });
+        // var tableID = event.tableID; //get target table
+        //
+        // //retrieve target records and execute task
+        // var table = $('#' + tableID).DataTable();
+        // var records = []; //
+        // $.map(table.rows('.selected').data(), function (item) {
+        //     records.push(item);
+        // });
 
         //add task
         if (task == "add") {
