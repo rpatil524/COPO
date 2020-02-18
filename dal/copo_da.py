@@ -975,7 +975,7 @@ class DataFile(DAComponent):
         docs = None
         if file_id:
             docs = self.get_collection_handle().find_one(
-                {"file_id": ObjectId(file_id), "deleted": data_utils.get_not_deleted_flag()})
+                {"file_id": file_id, "deleted": data_utils.get_not_deleted_flag()})
 
         return docs
 
