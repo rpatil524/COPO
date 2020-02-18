@@ -3,6 +3,7 @@ from . import views
 from web.apps.web_copo.utils import ajax_handlers, annotation_handlers, template_handlers
 
 app_name = 'web_copo'
+
 urlpatterns = [
     path('', views.index, name='index'),
     path('dataverse_submit/', views.test_dataverse_submit, name='test_dataverse_submit'),

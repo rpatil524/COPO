@@ -29,7 +29,6 @@ MONGO_DB = resolve_env.get_env('MONGO_DB')
 MONGO_HOST = resolve_env.get_env('MONGO_HOST')
 MONGO_USER = resolve_env.get_env('MONGO_USER')
 MONGO_USER_PASSWORD = resolve_env.get_env('MONGO_USER_PASSWORD')
-MONGO_USER_PASSWORD = resolve_env.get_env('MONGO_PASSWORD')
 MONGO_PORT = int(resolve_env.get_env('MONGO_PORT'))
 MONGO_MAX_POOL_SIZE = int(resolve_env.get_env('MONGO_MAX_POOL_SIZE'))
 MONGO_DB_TEST = "testing_copo"
