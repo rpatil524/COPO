@@ -19,7 +19,7 @@ SECRET_KEY = resolve_env.get_env('SECRET_KEY')
 LOGIN_URL = '/accounts/auth/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True if resolve_env.get_env('DEBUG') == 'true' else False
+DEBUG = True if str(resolve_env.get_env('DEBUG')).lower() == 'true' else False
 
 ALLOWED_HOSTS = ['*']
 
