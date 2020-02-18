@@ -679,14 +679,18 @@ var dispatchFormControl = {
         if (formElem.control == 'email') {
             formElem.email = true;
         }
-
+        var disabled = ""
+        if (formElem.disabled == "true"){
+            disabled = "disabled"
+        }
         var txt = $('<input/>',
             {
                 type: "text",
                 class: "input-copo form-control copo-text-control",
                 id: formElem.id,
                 name: formElem.id,
-                readonly: readonly
+                readonly: readonly,
+                disabled: true
             });
 
         //set validation markers

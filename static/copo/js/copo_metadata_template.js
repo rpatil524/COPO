@@ -63,6 +63,7 @@ $(document).ready(function () {
     });
 
     //add new component button
+    //add new component button
     $(document).on("click", ".new-component-template", function (event) {
         event.task = 'add';
         do_record_task(event)
@@ -78,8 +79,6 @@ $(document).ready(function () {
 
 
     function do_record_task(event) {
-
-
         var task = event.task.toLowerCase(); //action to be performed e.g., 'Edit', 'Delete'
         // var tableID = event.tableID; //get target table
         //
@@ -89,7 +88,6 @@ $(document).ready(function () {
         // $.map(table.rows('.selected').data(), function (item) {
         //     records.push(item);
         // });
-
         //add task
         if (task == "add") {
             BootstrapDialog.show({
@@ -102,7 +100,6 @@ $(document).ready(function () {
                     '</div>\n' +
                     '</form>',
                 onshow: function (dialog) {
-
                 },
                 buttons: [{
                     label: 'Cancel',
@@ -126,14 +123,11 @@ $(document).ready(function () {
                                 dialogRef.close()
                                 window.location = data
                             })
-
                         }
                     }
                 }]
             });
-
         }
-
         if (task == "delete") {
             alert("implement delete")
         }
@@ -141,10 +135,7 @@ $(document).ready(function () {
         if (task == "edit") {
             window.location = "/copo/author_template/" + records[0].record_id + "/view"
         }
-
         //table.rows().deselect(); //deselect all rows
-
-
     }
 
 
@@ -225,7 +216,7 @@ function create(evt) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/copo/export_template/');
     xhr.onreadystatechange = function () {
-       if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
             let link = document.createElement('a');
             let blob = new Blob([this.response], {});
             link.download = "export.csv"
@@ -233,7 +224,7 @@ function create(evt) {
             link.click();
             window.URL.revokeObjectURL(link.href);
             $(".loading_div").hide()
-       }
+        }
     }
     xhr.setRequestHeader('X-CSRFToken', csrftoken)
     xhr.responseType = 'blob';
@@ -312,6 +303,7 @@ function add_primer_fields() {
         }
     ).done(function (data) {
         load_terms_from_backend(data)
+
         $("#field_primer_modal").modal("hide")
     })
 }
