@@ -679,10 +679,12 @@ var dispatchFormControl = {
         if (formElem.control == 'email') {
             formElem.email = true;
         }
-        var disabled = ""
+
+        var disabled = "";
         if (formElem.disabled == "true"){
             disabled = "disabled"
         }
+
         var txt = $('<input/>',
             {
                 type: "text",
