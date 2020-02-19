@@ -598,9 +598,9 @@ var dispatchFormControl = {
 
         })
 
-        var icon = $('<span>',{
+        var icon = $('<span>', {
             class: "input-group-addon",
-            "html":"@"
+            "html": "@"
         })
 
         var input = $('<input>', {
@@ -680,20 +680,27 @@ var dispatchFormControl = {
             formElem.email = true;
         }
 
-        var disabled = "";
-        if (formElem.disabled == "true"){
-            disabled = "disabled"
+        if (formElem.disabled == "true") {
+            var txt = $('<input/>',
+                {
+                    type: "text",
+                    class: "input-copo form-control copo-text-control",
+                    id: formElem.id,
+                    name: formElem.id,
+                    readonly: readonly,
+                    disabled: true
+                });
+        } else {
+            var txt = $('<input/>',
+                {
+                    type: "text",
+                    class: "input-copo form-control copo-text-control",
+                    id: formElem.id,
+                    name: formElem.id,
+                    readonly: readonly,
+                });
         }
 
-        var txt = $('<input/>',
-            {
-                type: "text",
-                class: "input-copo form-control copo-text-control",
-                id: formElem.id,
-                name: formElem.id,
-                readonly: readonly,
-                disabled: true
-            });
 
         //set validation markers
         var vM = set_validation_markers(formElem, txt);

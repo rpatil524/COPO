@@ -1133,7 +1133,7 @@ $(document).ready(function () {
                     var feedback = get_alert_control();
                     feedback
                         .removeClass("alert-success")
-                        .addClass("alert-danger no-repo-feedback");
+                        .addClass("alert-warning no-repo-feedback");
 
                     var message = $('<div/>', {class: "webpop-content-div"});
                     message

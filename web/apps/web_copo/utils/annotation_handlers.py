@@ -6,6 +6,7 @@ from bson import json_util
 from dal.copo_da import TextAnnotation
 import numpy as np
 from web.apps.web_copo.utils import ajax_handlers
+from Bio import Entrez
 
 # how many rows of each sheet should be shown to the user
 truncate_after = 5
@@ -197,4 +198,12 @@ def term_lookup(request):
 
 def resolve_taxon_id(request):
     taxonid = request.GET.get("taxonid")
+    if not taxonid.isnumeric():
+        # not valid taxon id
+        return HttpResponse(status=400, content="Taxon ID")
+    Entrez.email = "copo@earlham.ac.uk"
+    handle = Entrez.efetch(db="Taxonomy", id=taxonid, retmode="xml")
+    records = Entrez.read(handle)
+
+
     return HttpResponse(taxonid)
