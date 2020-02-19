@@ -77,6 +77,7 @@ function dropHandler(ev, ui) {
     data.file_id = $("#file_id").val()
     data.file_name = $("#file_name").val()
     csrftoken = $.cookie('csrftoken');
+
     $.ajax({
         url: "/copo/send_file_annotation/",
         type: "POST",
@@ -88,7 +89,6 @@ function dropHandler(ev, ui) {
         d = JSON.parse(d)
         if ($("#file_type").val() == "ss" || $("#file_type").val() == "csv" || $("#file_type").val() == "txt" || $("#file_type").val() == "tab") {
             refresh_spreadsheet_display()
-            $(ui).remove()
         }
 
     }).error(function (d) {
@@ -237,7 +237,7 @@ function build_result_panel(d, idx, entry) {
             containment: 'window',
             opacity: 1,
             zIndex: 999,
-            stop: update_template
+
         })
     } else {
         var result = $("<li/>", {

@@ -7,7 +7,6 @@ $(document).ready(function () {
 
     // test begins
     // test ends
-
     //page global variables
     var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
     var component = "sample";
@@ -81,6 +80,21 @@ $(document).ready(function () {
     $(document).on('click', '.wiz-btn-prev', function (event) {
         wizardElement.wizard('previous');
     });
+
+    $(document).on("change", "#number_of_samples", function(evt){
+        let count = parseInt($(evt.currentTarget).val())
+        disable_rack_id(count)
+    })
+    function disable_rack_id(count){
+        if (count > 1){
+            $("#rack_id").removeAttr("disabled")
+        }
+        else{
+            $("#rack_id").attr("disabled", "disabled")
+        }
+    }
+
+
 
     //custom stage renderers
     var dispatchStageRenderer = {
