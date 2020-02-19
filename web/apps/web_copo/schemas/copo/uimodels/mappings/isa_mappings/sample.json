@@ -309,7 +309,7 @@
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
-      "control": "semantic-ui-search",
+      "control": "text",
       "versions": [
         "taxonid"
       ],
@@ -335,7 +335,7 @@
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
-      "control": "ontology term",
+      "control": "text",
       "versions": [
         "order"
       ],
@@ -361,7 +361,7 @@
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
-      "control": "ontology term",
+      "control": "text",
       "versions": [
         "family"
       ],
@@ -387,7 +387,7 @@
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
-      "control": "ontology term",
+      "control": "text",
       "versions": [
         "genus"
       ],
@@ -413,7 +413,7 @@
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
-      "control": "ontology term",
+      "control": "text",
       "versions": [
         "species"
       ],
