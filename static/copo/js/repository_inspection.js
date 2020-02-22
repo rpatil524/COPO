@@ -62,6 +62,14 @@ $(document).ready(function () {
         reload_dv_search(parentElem, elem.val());
     });
 
+    // handle ckan submission context change
+    $(document).on('change', '#ckan_submission_context', function (event) {
+        let elem = $(this);
+
+        let parentElem = elem.closest(".submission-panel");
+        reload_ckan_panel(parentElem, elem.val());
+    });
+
 
     //handle dataverse/dataset value change
     $(document).on('dv_value_change', function (event) {
@@ -70,6 +78,11 @@ $(document).ready(function () {
 
     $(document).on('ds_value_change', function (event) {
         handle_dv_choice(event);
+    });
+
+    //ckan dataset search value change
+    $(document).on('ckan_value_change', function (event) {
+        handle_ckan_choice(event);
     });
 
 
@@ -1357,11 +1370,257 @@ function build_dspace_display(params) {
     return panel;
 }
 
-function build_ckan_display(params) {
+function reload_ckan_panel(parentElem, dv_type) {
+
+    let params = {
+        'submission_id': parentElem.attr("data-id"),
+        "submission_context": dv_type
+    };
+
+    get_ckan_display(parentElem.find(".submission-proceed-section"), params);
+    return true
+}
+
+function get_ckan_display(displayPanel, params) {
     //build ui components and place on panel
+
+    displayPanel.find(".dv-local-panel").remove();
+    var localPanel = $('<div/>', {class: "dv-local-panel"});
+
+    displayPanel.append(localPanel);
+
+    // add displayable sections
+    var dvTypeDiv = $('<div class="dv-type-div"></div>');
+    var searchDiv = $('<div class="search-ctrl-div"></div>');
+    var dsListDiv = $('<div class="ds-list-div copo-form-group"></div>');
+    var dvSummaryDiv = $('<div class="dv-summary-div copo-form-group"></div>');
+
+
+    localPanel.append(dvTypeDiv);
+    localPanel.append(searchDiv);
+    localPanel.append(dsListDiv);
+    localPanel.append(dvSummaryDiv);
+
+    var submission_context = params.submission_context;
+    var submission_id = params.submission_id;
+    dvTypeDiv.append(get_ckan_submission_context(params));
+
+    if (submission_context == "existing") {
+        //schema will be used to format API returned fields
+        params.api_schema = get_ckan_api_schema();
+        params.call_parameters = {'submission_id': params.submission_id};
+
+        searchDiv.append(get_ckan_search(params));
+    } else if (submission_context == "new") {
+        let summary_message = "<div>Your submission will be made to a new dataset together with your existing metadata." +
+            " <a class='ui green tag label show-sub-meta' data-submission-id='" + submission_id + "'> show metadata</a></div>" +
+            "<div style='margin-top: 10px;'>Click the submit button when you are ready to proceed.</div>";
+
+        params.summary_message = summary_message;
+        get_ckan_summary(params);
+    }
+
+    refresh_tool_tips();
+    return true;
+}
+
+function get_ckan_summary(params) {
+    var context = params.submission_context;
+    var submission_id = params.submission_id;
+    var parentElem = get_viewport(submission_id);
+    var dvSummaryPanel = parentElem.find(".dv-summary-div");
+
+    var form_values = {};
+    form_values['type'] = context;
+
+    if (context == "existing") {
+        form_values = params.form_values;
+        form_values['type'] = context;
+    }
+
+    $.ajax({
+        url: "/copo/update_submission_meta/",
+        type: "POST",
+        dataType: "json",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            'submission_id': submission_id,
+            'form_values': JSON.stringify(form_values),
+        },
+        success: function (data) {
+            dvSummaryPanel.html(format_summary_message(params.summary_message));
+            $('html, body').animate({
+                scrollTop: dvSummaryPanel.offset().top - 250
+            }, 'slow');
+
+            dvSummaryPanel.append(submit_submission_record(submission_id));
+            refresh_tool_tips();
+        },
+        error: function () {
+            dvSummaryPanel.html('');
+
+            let feedback = get_alert_control();
+            feedback
+                .removeClass("alert-success")
+                .addClass("alert-danger")
+                .addClass("page-notifications-node");
+
+            feedback.find(".alert-message").html("Encountered an error. Please check that you are connected to a network and try again.");
+            dvSummaryPanel.append(feedback);
+        }
+    });
+
+    return true;
+}
+
+function get_ckan_submission_context(params) {
     var panel = $('<div/>');
 
-    panel.append("Watch this space for ckan");
+    var formElem = {
+        "ref": "ckan_submission_context",
+        "id": "ckan_submission_context",
+        "label": "Submission context ",
+        "help_tip": "Please specify where you want to place this submission.",
+        "control": "copo-button-list",
+        "type": "string",
+        "required": true,
+        "control_meta": {},
+        "default_value": params.submission_context,
+        "option_values": [
+            {
+                "value": "new",
+                "label": "Create a new dataset",
+                "description": "A new dataset will be created for this submission."
+            },
+            {
+                "value": "existing",
+                "label": "Add to an existing dataset",
+                "description": "Submission will be made to an existing dataset. Use the search box below to locate a target dataset."
+            }
+        ]
+    };
+
+    var elemValue = formElem.default_value;
+    panel.append(dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue));
+    panel.find(".constraint-label").remove();
 
     return panel;
 }
+
+
+function get_ckan_search(params) {
+    var panel = $('<div/>');
+
+    //place search box
+
+    var formElem = {
+        "ref": "",
+        "id": "ckan_dataset_search",
+        "label": "Dataset search",
+        "help_tip": "Start typing to search. You can search by author, keyword, name, etc.",
+        "required": "true",
+        "type": "string",
+        "control": "copo-general-onto",
+        "value_change_event": "ckan_value_change",
+        "default_value": "",
+        "placeholder": "Enter author, keyword, etc.",
+        "control_meta": {},
+        "deprecated": false,
+        "hidden": "false",
+        "data_url": "/copo/ckan_package_search/",
+        "api_schema": params.api_schema,
+        "call_parameters": params.call_parameters
+    }
+
+    var elemValue = formElem.default_value;
+    panel.append(dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue));
+    panel.find(".constraint-label").remove();
+
+    return panel;
+}
+
+function get_ckan_api_schema() {
+    return [
+        {'id': 'title', 'label': 'Title', 'show_in_table': true},
+        {'id': 'name', 'label': 'Name', 'show_in_table': true},
+        {'id': 'author', 'label': 'Author', 'show_in_table': true},
+        {'id': 'author_email', 'label': 'Author Email', 'show_in_table': true},
+        {'id': 'id', 'label': 'Identifier', 'show_in_table': true}
+    ]
+}
+
+function handle_ckan_choice(eventObj) {
+    var elemId = eventObj.elementId;
+    var selectedVal = eventObj.selectedValue;
+    var elem = $(document).find("[data-element='" + elemId + "']");
+    var parentElem = elem.closest(".submission-panel");
+    var submission_id = parentElem.attr("data-id");
+    var dsListPanel = parentElem.find(".ds-list-div");
+    var dvSummaryPanel = parentElem.find(".dv-summary-div");
+
+    dvSummaryPanel.html("");
+    dsListPanel.html("");
+
+    if (!selectedVal) {
+        return true;
+    }
+
+    var valueObject = null;
+
+    try {
+        valueObject = selectizeObjects[elemId].options[selectedVal];
+    } catch (e) {
+        let feedback = get_alert_control();
+        feedback
+            .removeClass("alert-success")
+            .addClass("alert-danger");
+
+        feedback.find(".alert-message").html("Couldn't retrieve selected value. Please try searching again.");
+        dsListPanel.append(feedback);
+
+        return true;
+    }
+
+    if (!valueObject) {
+        let feedback = get_alert_control();
+        feedback
+            .removeClass("alert-success")
+            .addClass("alert-danger");
+
+        feedback.find(".alert-message").html("Couldn't retrieve selected value. Please try searching again.");
+        dsListPanel.append(feedback);
+
+        return true;
+    }
+
+    // summary message
+    let summary_message = "Your submission will be made to " +
+        " <label>" + valueObject.copo_labelblank + "</label> dataset. " +
+        "Your existing metadata is not required for this submission." +
+        "<div>Click the submit button when you are ready to proceed.</div>";
+
+    let params = {
+        'submission_id': submission_id,
+        "submission_context": "existing",
+        "summary_message": summary_message
+
+    };
+
+    var apiSchema = get_ckan_api_schema();
+
+    //obtain fields based on schema used
+    var form_values = {}
+    for (var i = 0; i < apiSchema.length; ++i) {
+        var schemaNode = apiSchema[i];
+        form_values[schemaNode.id] = valueObject[schemaNode.id];
+    }
+
+    params.form_values = form_values;
+
+    get_ckan_summary(params);
+
+    return true;
+}
+

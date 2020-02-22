@@ -918,6 +918,98 @@ def get_dataverse_content_vf(request):
     return HttpResponse(out, content_type='application/json')
 
 
+def ckan_package_search(request):
+    """
+    this function searches a ckan for datasets based on the search term
+    :param request:
+    :return:
+    """
+    q = request.GET.get("q", str())
+    submission_id = request.GET.get("submission_id", str())
+    api_schema = json.loads(request.GET.get("api_schema", "[]"))
+
+    # example api_schema:
+    # api_schema = [
+    #     {'id': 'name', 'label': 'Name', 'show_in_table': true},
+    #     {'id': 'type', 'label': 'Type', 'show_in_table': false}
+    # ]
+
+    # validate api_schema before proceeding
+    if api_schema:
+        schema_keys = [x.get('id', str()) for x in api_schema if isinstance(x, dict)]
+        if len(schema_keys) != len(api_schema):
+            return HttpResponse(jsonpickle.dumps({'status': "error", 'message': "Badly formed API schema"}))
+
+    try:
+        url = Submission().get_repository_details(submission_id=submission_id)['url']
+    except Exception as e:
+        return HttpResponse(jsonpickle.dumps({'status': "error", 'message': str(e)}))
+
+    dv_url = urllib.parse.urljoin(url, '/api/3/action/package_search')
+
+    params = [
+        ('q', q),
+        ('rows', 500),
+    ]
+
+    params = tuple(params)
+
+    try:
+        response = requests.get(url=dv_url, params=params)
+        if str(response.status_code).lower() in ("ok", "200"):
+            response_data = response.json()
+        else:
+            return HttpResponse(
+                jsonpickle.dumps({'status': "error", 'message': response.json().get("message", str())}))
+    except Exception as e:
+        return HttpResponse(
+            jsonpickle.dumps({'status': "error", 'message': "Error retrieving datasets: " + str(e)}))
+
+    # check for error
+    if str(response_data.get('success', str())).lower() == "false":
+        message = "Error retrieving datasets "
+        if response_data.get('error', dict()).get('message', str()):
+            message = message + response_data.get('error', dict()).get('message', str())
+        return HttpResponse(jsonpickle.dumps({'status': "error", 'message': message}))
+
+    # get record count
+    result_count = response_data.get('result', dict()).get('count', 0)
+    pluralise = 'records' if result_count != 1 else 'record'
+    message = f'Search returned {result_count} {pluralise}.'
+
+    if result_count == 0:
+        message = message + " You can try searching with a different term."
+
+    result_dict = dict(status='success', message=message)
+    items = response_data.get('result', dict()).get('results', list())
+
+    # if no schema was supplied, form one by aggregating fields from all items
+    if not api_schema:
+        api_schema = [
+            {'id': 'title', 'label': 'Title', 'show_in_table': True},
+            {'id': 'name', 'label': 'Name', 'show_in_table': True},
+            {'id': 'author', 'label': 'Author', 'show_in_table': True},
+            {'id': 'author_email', 'label': 'Author Email', 'show_in_table': True},
+            {'id': 'id', 'label': 'Identifier', 'show_in_table': True}
+        ]
+        result_dict['api_schema'] = api_schema
+
+    filtered_items = list()
+
+    for indx, rec in enumerate(items):
+        new_dict = {k["id"]: rec.get(k["id"], 'N/A') for k in api_schema}
+
+        # add two control fields: for 'id' and 'label' in display
+        new_dict['copo_idblank'] = f'item_{str(indx)}'
+        new_dict['copo_labelblank'] = new_dict[api_schema[0]['id']]
+        filtered_items.append(new_dict)
+
+    result_dict['items'] = filtered_items
+
+    out = jsonpickle.encode(result_dict, unpicklable=False)
+    return HttpResponse(out, content_type='application/json')
+
+
 def get_dataverse_content(request):
     id = request.GET['id']
     url = Submission().get_dataverse_details(request.GET['submission_id'])
@@ -1094,7 +1186,6 @@ def get_ckan_items(request):
 
 
 def add_personal_dataverse(request):
-
     url = request.POST["url"]
     name = request.POST["name"]
     apikey = request.POST["apikey"]
@@ -1110,6 +1201,7 @@ def get_personal_dataverses(request):
     repo_ids = request.user.userdetails.repo_submitter
     my_repos = Repository().get_from_list(repo_ids)
     return HttpResponse(json.dumps(my_repos))
+
 
 def delete_personal_dataverse(request):
     id = request.POST["repo_id"]

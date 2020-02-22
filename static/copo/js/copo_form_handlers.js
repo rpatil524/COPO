@@ -1270,8 +1270,12 @@ var dispatchFormControl = {
         var newItemCreate = formElem.create_new_item || false;
         var optionComponent = formElem.option_component || false;
 
-        var lookupMessage = "<div class='copo-text-primary' style='margin-top: 10px;'>Enter one or more characters to search for a term.</div>";
-        formElem["help_tip"] = formElem["help_tip"] || '';
+        var lookupMessage = "<div class='text-primary' style='margin-top: 10px;'>Enter one or more characters to search for a term.</div>";
+
+        if(!formElem.hasOwnProperty("help_tip")) {
+            formElem["help_tip"] = '';
+        }
+
         formElem["help_tip"] = formElem["help_tip"] + lookupMessage;
 
         var returnDiv = get_form_ctrl(ctrlsDiv.clone(), formElem, elemValue);
@@ -2417,7 +2421,7 @@ function form_label_ctrl(formElem) {
                 {
                     style: "margin-left: 5px;",
                     class: "ui grey icon info circle copo-tooltip",
-                    "title": helpTip
+                    "data-html": helpTip
                 });
             lblCtrl.append(item);
         }

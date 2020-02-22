@@ -38,7 +38,7 @@ class DataverseSubmit(object):
 
     def submit(self):
         """
-        function controls the submission of objects to dataverse
+        function manages the submission of objects to dataverse
         :return:
         """
 
@@ -48,6 +48,8 @@ class DataverseSubmit(object):
 
         if not self.submission_id:
             return dict(status=False, message='Submission identifier not found!')
+
+        # retrieve submssion record from db
 
         # specify filtering
         filter_by = dict(_id=ObjectId(str(self.submission_id)))
@@ -166,7 +168,10 @@ class DataverseSubmit(object):
         try:
             metadata_file_path = self.do_conversion()
         except Exception as ex:
-            print(traceback.format_exc())
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            message = "Error converting from CG Core to Dataverse"
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
 
         # make API call
         call_url = urllib.parse.urljoin(self.host, f'/api/dataverses/{dataverse_alias}/datasets')
@@ -394,7 +399,8 @@ class DataverseSubmit(object):
 
         upload_error = list()
         for df in datafiles:
-            if str(sub.get("upload_status", False)).lower() == 'true':
+            # check for already uploaded file
+            if str(df.get("upload_status", False)).lower() == 'true':
                 continue
 
             upload_string = api_call.replace("mock-datafile", df.get("file_path", str()))

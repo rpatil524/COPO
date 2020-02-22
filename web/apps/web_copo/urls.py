@@ -84,6 +84,7 @@ urlpatterns = [
     path('get_dataverse/', ajax_handlers.search_dataverse, name="get_dataverse"),
     path('get_dataverse_vf/', ajax_handlers.search_dataverse_vf, name="search_dataverse_vf"),
     path('get_dataverse_content_vf/', ajax_handlers.get_dataverse_content_vf, name="get_dataverse_content_vf"),
+    path('ckan_package_search/', ajax_handlers.ckan_package_search, name="ckan_package_search"),
     path('get_collection/', ajax_handlers.get_dspace_collection, name="get_dspace_collections"),
     path('get_dataverse_content/', ajax_handlers.get_dataverse_content, name="get_dataverse_content"),
     path('get_info_for_new_dataverse/', ajax_handlers.get_info_for_new_dataverse,
@@ -151,6 +152,6 @@ urlpatterns = [
          name="automate_num_cols"),
     path('term_lookup/', annotation_handlers.term_lookup,
          name="term_lookup"),
-path('resolve_taxon_id/', annotation_handlers.resolve_taxon_id,
+    path('resolve_taxon_id/', annotation_handlers.resolve_taxon_id,
          name="resolve_taxon_id"),
 ]

@@ -1023,10 +1023,12 @@ $(document).ready(function () {
         function process_ckan(submission_id) {
             var processPanel = get_viewport(submission_id).find(".submission-proceed-section");
 
-            refresh_tool_tips();
+            let params = {
+                'submission_id': submission_id,
+                "submission_context": "new"
+            };
 
-            //invoke submit button when all submission conditions are met.
-
+            get_ckan_display(processPanel, params);
             return true
         }
 
