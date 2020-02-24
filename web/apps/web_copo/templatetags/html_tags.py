@@ -19,7 +19,7 @@ from dal.copo_base_da import DataSchemas
 from dal.copo_da import ProfileInfo, Repository, Description, Profile, Publication, Source, Person, Sample, Submission, \
     DataFile, DAComponent, Annotation, CGCore, MetadataTemplate
 from allauth.socialaccount import providers
-import hurry
+from hurry.filesize import size as hurrysize
 
 register = template.Library()
 
@@ -1200,7 +1200,7 @@ def generate_submission_accessions_data(submission_id=str()):
                 meta_link = '<a target="_blank" href="' + a["meta_url"] + '">' + a["meta_url"] + '</a>'
                 retrieve_link = '<a href="' + link_ref + '/retrieve">' + link_ref + '</a>'
                 data_set.append(
-                    [a["description"], a["format"], (hurry.filesize.size(a["sizeBytes"])),
+                    [a["description"], a["format"], (hurrysize(a["sizeBytes"])),
                      retrieve_link,
                      meta_link]
                 )

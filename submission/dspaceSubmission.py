@@ -20,7 +20,6 @@ class DspaceSubmit:
         self.host = None
         self.username = None
         self.password = None
-        self.profile_id = None
         self.login_details = None
         self.dspace_type = None
 
@@ -44,7 +43,6 @@ class DspaceSubmit:
             "repository_docs.url": 1,
             "repository_docs.username": 1,
             "repository_docs.password": 1,
-            "profile_id": 1,
             "meta.type": 1,
             "meta.params": 1,
             "complete": 1
@@ -111,7 +109,6 @@ class DspaceSubmit:
         self.host = repository_info.get("url", str())
         self.username = repository_info.get("username", str())
         self.password = repository_info.get("password", str())
-        self.profile_id = submission_record.get("profile_id", str())
 
         # authenticate against the repository
         try:
@@ -694,8 +691,8 @@ class DspaceSubmit:
         return out
 
     def _update_dspace_submission(self, sub, dspace_url, data_id, item_id):
-        data_url = dspace_url + "/rest/bitstreams/" + str(data_id)
-        meta_url = dspace_url + "/rest/items/" + str(item_id) + "?expand=all"
+        data_url = urljoin(dspace_url, "/rest/bitstreams/" + str(data_id))
+        meta_url = urljoin(dspace_url, "/rest/items/" + str(item_id) + "?expand=all")
         resp = requests.get(data_url)
         data = json.loads(resp.content.decode('utf-8'))
         if "uuid" not in data:
