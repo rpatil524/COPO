@@ -3,6 +3,7 @@ __author__ = 'felix.shaw@tgac.ac.uk - 01/12/2015'
 import json
 import time
 import jsonpickle
+import pandas as pd
 import urllib.parse
 from datetime import datetime
 
@@ -763,12 +764,12 @@ def search_dataverse_vf(request):
     if api_schema:
         schema_keys = [x.get('id', str()) for x in api_schema if isinstance(x, dict)]
         if len(schema_keys) != len(api_schema):
-            return HttpResponse(jsonpickle.dumps({'status': "error", 'message': "Badly formed API schema"}))
+            return format_json_response({'status': "error", 'message': "Badly formed API schema"})
 
     try:
         url = Submission().get_repository_details(submission_id=submission_id)['url']
     except Exception as e:
-        return HttpResponse(jsonpickle.dumps({'status': "error", 'message': str(e)}))
+        return format_json_response({'status': "error", 'message': str(e)})
 
     dv_url = urllib.parse.urljoin(url, '/api/v1/search')
 
@@ -789,11 +790,9 @@ def search_dataverse_vf(request):
         if str(response.status_code).lower() in ("ok", "200"):
             response_data = response.json().get("data", dict())
         else:
-            return HttpResponse(
-                jsonpickle.dumps({'status': "error", 'message': response.json().get("message", str())}))
+            return format_json_response({'status': "error", 'message': response.json().get("message", str())})
     except Exception as e:
-        return HttpResponse(
-            jsonpickle.dumps({'status': "error", 'message': "Error retrieving information: " + str(e)}))
+        return format_json_response({'status': "error", 'message': "Error retrieving information: " + str(e)})
 
     items = response_data.get('items', list())
 
@@ -852,12 +851,12 @@ def get_dataverse_content_vf(request):
     if api_schema:
         schema_keys = [x.get('id', str()) for x in api_schema if isinstance(x, dict)]
         if len(schema_keys) != len(api_schema):
-            return HttpResponse(jsonpickle.dumps({'status': "error", 'message': "Badly formed API schema"}))
+            return format_json_response({'status': "error", 'message': "Badly formed API schema"})
 
     try:
         url = Submission().get_repository_details(submission_id=submission_id)['url']
     except Exception as e:
-        return HttpResponse(jsonpickle.dumps({'status': "error", 'message': str(e)}))
+        return format_json_response({'status': "error", 'message': str(e)})
 
     dv_url = urllib.parse.urljoin(url, '/api/v1/search')
 
@@ -876,11 +875,9 @@ def get_dataverse_content_vf(request):
         if str(response.status_code).lower() in ("ok", "200"):
             response_data = response.json().get("data", dict())
         else:
-            return HttpResponse(
-                jsonpickle.dumps({'status': "error", 'message': response.json().get("message", str())}))
+            return format_json_response({'status': "error", 'message': response.json().get("message", str())})
     except Exception as e:
-        return HttpResponse(
-            jsonpickle.dumps({'status': "error", 'message': "Error retrieving information: " + str(e)}))
+        return format_json_response({'status': "error", 'message': "Error retrieving information: " + str(e)})
 
     # filter based on object type and parent
     items = [x for x in response_data.get('items', list()) if
@@ -938,12 +935,14 @@ def ckan_package_search(request):
     if api_schema:
         schema_keys = [x.get('id', str()) for x in api_schema if isinstance(x, dict)]
         if len(schema_keys) != len(api_schema):
-            return HttpResponse(jsonpickle.dumps({'status': "error", 'message': "Badly formed API schema"}))
+            out = jsonpickle.encode({'status': "error", 'message': "Badly formed API schema"}, unpicklable=False)
+            return HttpResponse(out, content_type='application/json')
 
     try:
         url = Submission().get_repository_details(submission_id=submission_id)['url']
     except Exception as e:
-        return HttpResponse(jsonpickle.dumps({'status': "error", 'message': str(e)}))
+        out = jsonpickle.encode({'status': "error", 'message': str(e)}, unpicklable=False)
+        return HttpResponse(out, content_type='application/json')
 
     dv_url = urllib.parse.urljoin(url, '/api/3/action/package_search')
 
@@ -959,18 +958,21 @@ def ckan_package_search(request):
         if str(response.status_code).lower() in ("ok", "200"):
             response_data = response.json()
         else:
-            return HttpResponse(
-                jsonpickle.dumps({'status': "error", 'message': response.json().get("message", str())}))
+            out = jsonpickle.encode({'status': "error", 'message': response.json().get("message", str())},
+                                    unpicklable=False)
+            return HttpResponse(out, content_type='application/json')
     except Exception as e:
-        return HttpResponse(
-            jsonpickle.dumps({'status': "error", 'message': "Error retrieving datasets: " + str(e)}))
+        out = jsonpickle.encode({'status': "error", 'message': "Error retrieving datasets: " + str(e)},
+                                unpicklable=False)
+        return HttpResponse(out, content_type='application/json')
 
     # check for error
     if str(response_data.get('success', str())).lower() == "false":
         message = "Error retrieving datasets "
         if response_data.get('error', dict()).get('message', str()):
             message = message + response_data.get('error', dict()).get('message', str())
-        return HttpResponse(jsonpickle.dumps({'status': "error", 'message': message}))
+        out = jsonpickle.encode({'status': "error", 'message': message}, unpicklable=False)
+        return HttpResponse(out, content_type='application/json')
 
     # get record count
     result_count = response_data.get('result', dict()).get('count', 0)
@@ -1005,6 +1007,92 @@ def ckan_package_search(request):
         filtered_items.append(new_dict)
 
     result_dict['items'] = filtered_items
+
+    out = jsonpickle.encode(result_dict, unpicklable=False)
+    return HttpResponse(out, content_type='application/json')
+
+
+def retrieve_dspace_objects(request):
+    """
+    function retrieves dspace objects, specified by object_type
+    :param request:
+    :return:
+    """
+    submission_id = request.POST.get("submission_id", str())
+    community_id = request.POST.get("community_id", str())
+    collection_id = request.POST.get("collection_id", str())
+    object_type = request.POST.get("object_type", str())
+    api_schema = json.loads(request.POST.get("api_schema", "[]"))
+
+    # example api_schema:
+    # api_schema = [
+    #     {'id': 'name', 'label': 'Name', 'show_in_table': true},
+    #     {'id': 'type', 'label': 'Type', 'show_in_table': false}
+    # ]
+
+    # validate api_schema before proceeding
+    if api_schema:
+        schema_keys = [x.get('id', str()) for x in api_schema if isinstance(x, dict)]
+        if len(schema_keys) != len(api_schema):
+            out = jsonpickle.encode({'status': "error", 'message': "Badly formed API schema"}, unpicklable=False)
+            return HttpResponse(out, content_type='application/json')
+
+    try:
+        url = Submission().get_repository_details(submission_id=submission_id)["url"]
+    except Exception as e:
+        out = jsonpickle.encode({'status': "error", 'message': str(e)}, unpicklable=False)
+        return HttpResponse(out, content_type='application/json')
+
+    url_maps = dict(
+        communities='/rest/communities',
+        collections=f'/rest/communities/{community_id}/collections',
+        items=f'/rest/collections/{collection_id}/items',
+    )
+
+    dv_url = urllib.parse.urljoin(url, url_maps.get(object_type, str()))
+
+    params = [
+        ('limit', 100),
+    ]
+
+    params = tuple(params)
+
+    try:
+        response = requests.get(url=dv_url, params=params)
+        if str(response.status_code).lower() in ("ok", "200"):
+            items = response.json()
+        else:
+            out = jsonpickle.encode({'status': "error", 'message': response.json().get("message", str())},
+                                    unpicklable=False)
+            return HttpResponse(out, content_type='application/json')
+    except Exception as e:
+        out = jsonpickle.encode({'status': "error", 'message': f"Error retrieving DSpace {object_type}: " + str(e)},
+                                unpicklable=False)
+        return HttpResponse(out, content_type='application/json')
+
+    result_dict = dict(status='success', message='')
+
+    # if no schema was supplied, form one by aggregating fields from all items
+    if not api_schema:
+        api_schema = [
+            {'id': 'name', 'label': 'Name', 'show_in_table': True},
+            {'id': 'id', 'label': 'Id', 'show_in_table': False},
+            {'id': 'handle', 'label': 'Handle', 'show_in_table': False},
+        ]
+        result_dict['api_schema'] = api_schema
+
+    filtered_items = list()
+    result_dict['items'] = filtered_items
+
+    if len(items):
+        df = pd.DataFrame(items)
+        if 'uuid' in df.columns:
+            df["id"] = df.uuid
+        for k in [x['id'] for x in api_schema if x['id'] not in df.columns]:
+            df.loc[k] = df.loc[k].fillna('n/a')
+
+        df = df[[x['id'] for x in api_schema]]
+        result_dict['items'] = df.to_dict('records')
 
     out = jsonpickle.encode(result_dict, unpicklable=False)
     return HttpResponse(out, content_type='application/json')
@@ -1207,3 +1295,8 @@ def delete_personal_dataverse(request):
     id = request.POST["repo_id"]
     res = Repository().delete(id)
     return HttpResponse(res)
+
+
+def format_json_response(dict_obj):
+    out = jsonpickle.encode(dict_obj, unpicklable=False)
+    return HttpResponse(out, content_type='application/json')

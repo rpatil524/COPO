@@ -1032,6 +1032,18 @@ $(document).ready(function () {
             return true
         }
 
+        function process_dspace(submission_id) {
+            var processPanel = get_viewport(submission_id).find(".submission-proceed-section");
+
+            let params = {
+                'submission_id': submission_id,
+                "submission_context": "new"
+            };
+
+            get_dspace_display(processPanel, params);
+            return true
+        }
+
 
         function do_submit_task(submission_id) {
             var viewPort = get_viewport(submission_id);

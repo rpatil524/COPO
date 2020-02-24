@@ -80,6 +80,7 @@ urlpatterns = [
     path('remove_repo_from_group/', ajax_handlers.remove_repo_from_group, name="remove_repo_from_group"),
     path('get_repo_info/', ajax_handlers.get_repo_info, name="get_repo_info"),
     path('get_dspace_communities/', ajax_handlers.get_dspace_communities, name="get_dspace_communities"),
+    path('retrieve_dspace_objects/', ajax_handlers.retrieve_dspace_objects, name="retrieve_dspace_objects"),
     path('get_dspace_items/', ajax_handlers.get_dspace_items, name="get_dspace_items"),
     path('get_dataverse/', ajax_handlers.search_dataverse, name="get_dataverse"),
     path('get_dataverse_vf/', ajax_handlers.search_dataverse_vf, name="search_dataverse_vf"),

@@ -124,7 +124,7 @@ class CkanSubmit:
         params = submission_record.get("meta", dict()).get("params", dict())
 
         if type == "new":  # create a dataset to submit
-            return self._do_dataset_create_submit(**params)
+            return self._do_dataset_create_submit()
 
         if type == "existing":  # a dataset specified proceed to submit
             return self._do_dataset_submit(**params)
@@ -142,8 +142,8 @@ class CkanSubmit:
         dataset_name = params.get("name", str()).strip()
         dataset_title = params.get("title", str())
 
-        if not all((dataset_id,dataset_name)):
-            message = f"Error submitting to dataset. Missing identifier and/or name!"
+        if not all((dataset_id, dataset_name)):
+            message = f"Error submitting to CKAN. Missing dataset identifier and/or name!"
             ghlper.logging_error(message, self.submission_id)
             ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
             return dict(status='error', message=message)
@@ -398,14 +398,14 @@ class CkanSubmit:
             ghlper.logging_error(traceback.format_exc(), self.submission_id)
 
         # define a mapping from cgcore to ckan fields
-        MetaMap = namedtuple('MetaMap', ['ckan', 'cgcore'])
+        MetaMap = namedtuple('MetaMap', ['repo', 'cgcore'])
 
         schema_mappings = [
-            MetaMap(ckan="title", cgcore="dc.title"),
-            MetaMap(ckan="notes", cgcore="dc.description"),
-            MetaMap(ckan="author", cgcore="dc.creator"),
-            MetaMap(ckan="publisher", cgcore="dc.publisher"),
-            MetaMap(ckan="", cgcore="dc.type"),  # doing this penalises the cgcore field
+            MetaMap(repo="title", cgcore="dc.title"),
+            MetaMap(repo="notes", cgcore="dc.description"),
+            MetaMap(repo="author", cgcore="dc.creator"),
+            MetaMap(repo="publisher", cgcore="dc.publisher"),
+            MetaMap(repo="", cgcore="dc.type"),  # doing this penalises the cgcore field
         ]
 
         # map defined fields first
@@ -416,17 +416,17 @@ class CkanSubmit:
                 continue
 
             target_dict = target_val[0]
-            target_val = target_dict['vals']
+            target_val = target_dict.get("vals", str())
 
             # remove mapped entry from list
             description_metadata.remove(target_dict)
 
             # can't map unspecified ckan field
-            if not mapping.ckan:
+            if not mapping.repo:
                 continue
 
             if isinstance(target_val, str) and target_val.strip() != "":
-                submission_metadata[mapping.ckan] = target_val
+                submission_metadata[mapping.repo] = target_val
 
             elif isinstance(target_val, list):
                 value_set = False
@@ -436,7 +436,7 @@ class CkanSubmit:
                         continue
 
                     if not value_set:
-                        submission_metadata[mapping.ckan] = str(val).strip()
+                        submission_metadata[mapping.repo] = str(val).strip()
                         value_set = True
                         continue
 
@@ -459,7 +459,7 @@ class CkanSubmit:
                     if str(val).strip() == "":
                         continue
 
-                    extra_value_key = target_dict['label'] + "[" + str(idx + 1) + "]"
+                    extra_value_key = target_dict['label'] + " [" + str(idx + 1) + "]"
                     extra_value_value = val
                     submission_metadata["extras"].append(dict(key=extra_value_key, value=extra_value_value))
 
@@ -504,6 +504,7 @@ class CkanSubmit:
             ppt="application/vnd.ms-powerpoint",
             gif="image/gif",
             jpg="image/jpeg",
+            jpeg="image/jpeg",
             png="image/png",
             tif="image/tiff",
             tiff="image/tiff",

@@ -7,7 +7,7 @@
   },
   {
     "value": "dspace",
-    "label": "dSPACE",
+    "label": "DSpace",
     "supported_templates": ["cg_core", "dcterms"],
     "description": "An instance of the dSPACE repository. For more information about this repository type, visit: https://duraspace.org/dspace/"
   },

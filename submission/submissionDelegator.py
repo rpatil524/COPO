@@ -115,15 +115,8 @@ def delegate_submission(request):
 
     # Submit to dspace
     elif repo == 'dspace':
-        result = dspaceSubmission.DspaceSubmit().submit(
-            sub_id=sub_id,
-            dataFile_ids=sub['bundle']
-        )
-        if result == True:
-            return HttpResponse(jsonpickle.dumps({'status': 0}))
-        else:
-            error = result
-
+        result = dspaceSubmission.DspaceSubmit(submission_id=sub_id).submit()
+        return HttpResponse(jsonpickle.encode(result, unpicklable=False), content_type='application/json')
 
 
 def schedule_submission(submission_id=str(), submission_repo=str()):
