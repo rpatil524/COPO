@@ -19,7 +19,7 @@ from dal.copo_base_da import DataSchemas
 from dal.copo_da import ProfileInfo, Repository, Description, Profile, Publication, Source, Person, Sample, Submission, \
     DataFile, DAComponent, Annotation, CGCore, MetadataTemplate
 from allauth.socialaccount import providers
-import hurry
+from hurry.filesize import size as hurrysize
 
 register = template.Library()
 
@@ -1202,21 +1202,19 @@ def generate_submission_accessions_data(submission_id=str()):
                 meta_link = '<a target="_blank" href="' + a["meta_url"] + '">' + a["meta_url"] + '</a>'
                 retrieve_link = '<a href="' + link_ref + '/retrieve">' + link_ref + '</a>'
                 data_set.append(
-                    [a["description"], a["format"], (hurry.filesize.size(a["sizeBytes"])),
+                    [a["description"], a["format"], (hurrysize(a["sizeBytes"])),
                      retrieve_link,
                      meta_link]
                 )
 
         elif repository == "ckan":
-            columns = [{"title": "Name"}, {"title": "Metadata Link"}, {"title": "Resource Link"}, {"title": "Format"}]
-            for a in accessions:
-                retrieve_link = '<a href="' + a["result"]["url"] + '">' + \
-                                a["result"]["url"] + '</a>'
-                meta_link = '<a target="_blank" href="' + a["result"]["repo_url"] + 'package_show?id=' + a['result'][
-                    'package_id'] + '">' + 'Show Metadata' + '</a>'
-                data_set.append(
-                    [a["result"]["name"], meta_link, retrieve_link, a["result"]["format"]]
-                )
+            columns = [{"title": "Title"}, {"title": "Metadata Link"}, {"title": "Resource Link"}, {"title": "Name"}]
+            retrieve_link = '<a target="_blank" href="' + accessions["url"] + '/dataset/'+ accessions["dataset_name"] + '">' + accessions["url"] + '/dataset/'+ accessions["dataset_name"] + '</a>'
+            meta_link = '<a target="_blank" href="' + accessions["repo_url"] + 'package_show?id=' + accessions[
+                'dataset_id'] + '">' + 'Show Metadata' + '</a>'
+            data_set.append(
+                [accessions["dataset_title"], meta_link, retrieve_link, accessions["dataset_name"]]
+            )
 
     return_dict = dict(dataSet=data_set,
                        columns=columns,

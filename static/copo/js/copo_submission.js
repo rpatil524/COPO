@@ -1023,10 +1023,24 @@ $(document).ready(function () {
         function process_ckan(submission_id) {
             var processPanel = get_viewport(submission_id).find(".submission-proceed-section");
 
-            refresh_tool_tips();
+            let params = {
+                'submission_id': submission_id,
+                "submission_context": "new"
+            };
 
-            //invoke submit button when all submission conditions are met.
+            get_ckan_display(processPanel, params);
+            return true
+        }
 
+        function process_dspace(submission_id) {
+            var processPanel = get_viewport(submission_id).find(".submission-proceed-section");
+
+            let params = {
+                'submission_id': submission_id,
+                "submission_context": "new"
+            };
+
+            get_dspace_display(processPanel, params);
             return true
         }
 
@@ -1133,7 +1147,7 @@ $(document).ready(function () {
                     var feedback = get_alert_control();
                     feedback
                         .removeClass("alert-success")
-                        .addClass("alert-danger no-repo-feedback");
+                        .addClass("alert-warning no-repo-feedback");
 
                     var message = $('<div/>', {class: "webpop-content-div"});
                     message

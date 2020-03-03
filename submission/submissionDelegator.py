@@ -108,30 +108,15 @@ def delegate_submission(request):
         result = dataverseSubmission.DataverseSubmit(submission_id=sub_id).submit()
         return HttpResponse(jsonpickle.encode(result, unpicklable=False), content_type='application/json')
 
-    # Submit to dspace
-    elif repo == 'dspace':
-        result = dspaceSubmission.DspaceSubmit().submit(
-            sub_id=sub_id,
-            dataFile_ids=sub['bundle']
-        )
-        if result == True:
-            return HttpResponse(jsonpickle.dumps({'status': 0}))
-        else:
-            error = result
-
     # Submit to CKAN
     elif repo == 'ckan':
-        result = ckanSubmission.CkanSubmit(sub_id).submit(
-            sub_id=sub_id,
-            dataFile_ids=sub['bundle']
-        )
-        if result == True:
-            return HttpResponse(jsonpickle.dumps({'status': 0}))
-        else:
-            error = json.loads(result)
+        result = ckanSubmission.CkanSubmit(submission_id=sub_id).submit()
+        return HttpResponse(jsonpickle.encode(result, unpicklable=False), content_type='application/json')
 
-    # return error
-    return HttpResponse(error["message"], status=error["status"])
+    # Submit to dspace
+    elif repo == 'dspace':
+        result = dspaceSubmission.DspaceSubmit(submission_id=sub_id).submit()
+        return HttpResponse(jsonpickle.encode(result, unpicklable=False), content_type='application/json')
 
 
 def schedule_submission(submission_id=str(), submission_repo=str()):

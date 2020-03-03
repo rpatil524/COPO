@@ -2,7 +2,6 @@ __author__ = 'felix.shaw@tgac.ac.uk - 19/04/2017'
 
 import traceback
 import urllib.parse
-from datetime import datetime
 import os, uuid, requests, json
 from dal import cursor_to_list
 from django_tools.middlewares import ThreadLocal
@@ -39,7 +38,7 @@ class DataverseSubmit(object):
 
     def submit(self):
         """
-        function controls the submission of objects to dataverse
+        function manages the submission of objects to dataverse
         :return:
         """
 
@@ -49,6 +48,8 @@ class DataverseSubmit(object):
 
         if not self.submission_id:
             return dict(status=False, message='Submission identifier not found!')
+
+        # retrieve submssion record from db
 
         # specify filtering
         filter_by = dict(_id=ObjectId(str(self.submission_id)))
@@ -115,8 +116,9 @@ class DataverseSubmit(object):
             return dict(status='error', message=message)
 
         if str(submission_record.get("complete", False)).lower() == 'true':
-            message = 'Submission is marked as completed.'
+            message = 'Submission is marked as complete!'
             ghlper.logging_info(message, self.submission_id)
+            ghlper.update_submission_status(status='success', message=message, submission_id=self.submission_id)
 
             return dict(status=True, message=message)
 
@@ -166,7 +168,10 @@ class DataverseSubmit(object):
         try:
             metadata_file_path = self.do_conversion()
         except Exception as ex:
-            print(traceback.format_exc())
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            message = "Error converting from CG Core to Dataverse"
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
 
         # make API call
         call_url = urllib.parse.urljoin(self.host, f'/api/dataverses/{dataverse_alias}/datasets')
@@ -380,23 +385,8 @@ class DataverseSubmit(object):
         # get formatted doi
         persistent_id = self.get_format_doi(persistent_id)
 
+        # get files to upload
         datafiles = sub.get("bundle_meta", list())
-
-        # get all pending files
-        pending_files = [x for x in datafiles if x.get("upload_status", False) is False]
-
-        if not pending_files:  # update status, marking submission as complete
-            if sub.get("complete", False) is False:
-                submission_record = dict(complete=True, completed_on=d_utils.get_datetime())
-                Submission().get_collection_handle().update(
-                    {"_id": ObjectId(self.submission_id)},
-                    {'$set': submission_record})
-
-            status_message = "Submission is marked as complete!"
-            ghlper.logging_info(status_message, self.submission_id)
-            ghlper.update_submission_status(status='success', message=status_message, submission_id=self.submission_id)
-
-            return True
 
         # compose api call
         api_call = 'curl -H "X-Dataverse-key:{api_token}" -X ' \
@@ -408,8 +398,13 @@ class DataverseSubmit(object):
                                    data_file='mock-datafile')
 
         upload_error = list()
-        for df in pending_files:
+        for df in datafiles:
+            # check for already uploaded file
+            if str(df.get("upload_status", False)).lower() == 'true':
+                continue
+
             upload_string = api_call.replace("mock-datafile", df.get("file_path", str()))
+
             try:
                 receipt = subprocess.check_output(upload_string, shell=True)
                 receipt = json.loads(receipt.decode('utf-8'))
@@ -421,11 +416,19 @@ class DataverseSubmit(object):
                 upload_error.append(exception_message)
 
         if upload_error:
+            # save status of uploaded files
+            submission_record = dict(bundle_meta=datafiles)
+            Submission().get_collection_handle().update(
+                {"_id": ObjectId(self.submission_id)},
+                {'$set': submission_record})
+
             ghlper.logging_error(str(upload_error), self.submission_id)
+            ghlper.update_submission_status(status='error', message=str(upload_error), submission_id=self.submission_id)
+
             return dict(status='error', message=str(upload_error))
 
         # update status, marking submission as complete
-        submission_record = dict(complete=True, completed_on=d_utils.get_datetime())
+        submission_record = dict(complete=True, completed_on=d_utils.get_datetime(), bundle_meta=datafiles)
         Submission().get_collection_handle().update(
             {"_id": ObjectId(self.submission_id)},
             {'$set': submission_record})
