@@ -954,7 +954,9 @@ def get_submission_meta_repo(submission_id=str(), user_id=str()):
     # get relevant user repositories given metadata template
     user = User.objects.get(pk=user_id)
     user_repo_ids = user.userdetails.repo_submitter
-    user_repo_ids = {ObjectId(x) for x in user_repo_ids}
+    user_repo_ids = {ObjectId(x) for x in list(user_repo_ids) if x}
+
+
 
     repository_projection = [('name', 1), ('type', 1), ('templates', 1), ('url', 1)]
     repository_schema = [x for x in Repository().get_schema().get("schema_dict") if

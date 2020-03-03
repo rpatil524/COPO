@@ -196,14 +196,40 @@ def term_lookup(request):
         el = {"label": "Nothing"}
     return HttpResponse(json_util.dumps({"loader_id": loader_id, "term": el, "index": index}))
 
+
 def resolve_taxon_id(request):
     taxonid = request.GET.get("taxonid")
     if not taxonid.isnumeric():
         # not valid taxon id
-        return HttpResponse(status=400, content="Taxon ID")
+        return HttpResponse(status=400, content="Taxon ID must be Numeric")
     Entrez.email = "copo@earlham.ac.uk"
     handle = Entrez.efetch(db="Taxonomy", id=taxonid, retmode="xml")
     records = Entrez.read(handle)
+    if len(records) == 0:
+        return HttpResponse(status=400, content="Nothing for for ID")
+    output = dict()
+    if records[0]["Rank"] == "species":
+        output["species"] = records[0]["ScientificName"]
+        try:
+            # output["commonName"] = records[0]["OtherNames"]["CommonName"][0]
+            output["commonName"] = records[0]["OtherNames"]["GenbankCommonName"]
+        except:
+            pass
+    for el in records[0]["LineageEx"]:
+        if el["Rank"] == "genus":
+            output["genus"] = el["ScientificName"]
+        elif el["Rank"] == "family":
+            output["family"] = el["ScientificName"]
+        elif el["Rank"] == "order":
+            output["order"] = el["ScientificName"]
+
+    return HttpResponse(json.dumps(output))
 
 
-    return HttpResponse(taxonid)
+def search_species(request):
+    term = request.GET.get("s")
+    Entrez.email = "copo@earlham.ac.uk"
+    handle = Entrez.esearch(db="Taxonomy", term=term)
+    records = Entrez.read(handle)
+
+    return HttpResponse(json.dumps(records))

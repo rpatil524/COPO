@@ -5,7 +5,7 @@ from tools import resolve_env
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-SCHEMA_DIR = os.path.join(BASE_DIR, 'web', 'apps', 'web_cop', 'schemas')
+SCHEMA_DIR = os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'schemas')
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 

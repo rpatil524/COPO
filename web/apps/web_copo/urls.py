@@ -151,6 +151,8 @@ urlpatterns = [
          name="automate_num_cols"),
     path('term_lookup/', annotation_handlers.term_lookup,
          name="term_lookup"),
-path('resolve_taxon_id/', annotation_handlers.resolve_taxon_id,
+    path('resolve_taxon_id/', annotation_handlers.resolve_taxon_id,
          name="resolve_taxon_id"),
+    path('search_species/', annotation_handlers.search_species,
+         name="search_species"),
 ]
