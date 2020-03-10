@@ -81,19 +81,18 @@ $(document).ready(function () {
         wizardElement.wizard('previous');
     });
 
-    $(document).on("change", "#number_of_samples", function(evt){
+    $(document).on("change", "#number_of_samples", function (evt) {
         let count = parseInt($(evt.currentTarget).val())
         disable_rack_id(count)
     })
-    function disable_rack_id(count){
-        if (count > 1){
+
+    function disable_rack_id(count) {
+        if (count > 1) {
             $("#rack_id").removeAttr("disabled")
-        }
-        else{
+        } else {
             $("#rack_id").attr("disabled", "disabled")
         }
     }
-
 
 
     //custom stage renderers
@@ -1399,7 +1398,19 @@ $(document).ready(function () {
 
         var stagearea = $('#custom-renderer_' + stage.ref).find(".stage-content")
 
-        // firstly get the fields into the right order according to the groupings in stage.field_groupings
+        // firstly add a dropdown to select type of dtol sample
+        var label = '<label for="dtol_type_select">Select Sample Sub Type</label>'
+        var dd = $("<select/>", {
+            id: "dtol_type_select",
+            class: "form-control"
+        })
+        $(dd).append($("<option></option>"))
+        $(dd).append($("<option>aquatic</option>"))
+        $(dd).append($("<option>protist</option>"))
+        $(dd).append($("<option>other</option>"))
+        $(stagearea).append(label).append(dd)
+
+        // get the fields into the right order according to the groupings in stage.field_groupings
         var grouped_fields = new Object()
         for (var group_idx in stage.field_groupings) {
             group = stage.field_groupings[group_idx]
@@ -1419,7 +1430,7 @@ $(document).ready(function () {
         }
         // grouped fields now contains all the fields required split into categories
         // each of these groups should be rendered as an accordion panel
-        var accordion_head = '<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">'
+        var accordion_head = '<div hidden class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">'
 
 
         for (var title in grouped_fields) {
@@ -1439,11 +1450,11 @@ $(document).ready(function () {
                     }
                 }
                 //set default values
-            if (formElem.default_value) {
-                elemValue = formElem.default_value;
-            } else {
-                elemValue = "";
-            }
+                if (formElem.default_value) {
+                    elemValue = formElem.default_value;
+                } else {
+                    elemValue = "";
+                }
                 var htmlCtrl = dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue);
                 body = body + $(htmlCtrl).prop('outerHTML')
             }

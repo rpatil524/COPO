@@ -157,4 +157,6 @@ urlpatterns = [
          name="resolve_taxon_id"),
     path('search_species/', annotation_handlers.search_species,
          name="search_species"),
+    path('get_subsample_stages/', ajax_handlers.get_subsample_stages,
+         name="get_subsample_stages"),
 ]

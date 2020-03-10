@@ -4,6 +4,7 @@ __date__ = '21 Nov 2016'
 import json
 import web.apps.web_copo.wizards.sample.wizard_helper as wizh
 import web.apps.web_copo.wizards.sample.ingest_data as tcsv
+from dal.copo_da import Description
 
 
 class BrokerRequests:

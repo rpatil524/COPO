@@ -1300,3 +1300,7 @@ def delete_personal_dataverse(request):
 def format_json_response(dict_obj):
     out = jsonpickle.encode(dict_obj, unpicklable=False)
     return HttpResponse(out, content_type='application/json')
+
+def get_subsample_stages(request):
+    stage = request.GET["stage"]
+    return HttpResponse(stage)

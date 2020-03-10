@@ -1,5 +1,17 @@
 $(document).ready(function () {
 
+    $(document).on("change", "#dtol_type_select", function (e) {
+        $.ajax({
+            url: "/copo/get_subsample_stages",
+            method: "GET",
+            data: {
+                "stage": $(e.currentTarget).val()
+            }
+        }).done(function (data) {
+            alert(data)
+        })
+    })
+
     $(document).on("keyup", "#taxonid", delay(function (e) {
             $("#taxonid").addClass("loading-spinner")
             var taxonid = $("#taxonid").val()
@@ -43,8 +55,8 @@ $(document).ready(function () {
                 var ul = $("ul", {
                     class: "species_results"
                 })
-                $(data).each(function(d){
-                    $(ul).append("<li>",{
+                $(data).each(function (d) {
+                    $(ul).append("<li>", {
                         html: d
                     })
                 })
