@@ -6,9 +6,18 @@ $(document).ready(function () {
             method: "GET",
             data: {
                 "stage": $(e.currentTarget).val()
-            }
+            },
+            dataType: "json"
         }).done(function (data) {
-            alert(data)
+            $("#accordion").fadeOut(function () {
+                $("[id^='section']").hide()
+                $(data).each(function (idx, el) {
+                    el = el.replace(" ", "_")
+                    el = "section_" + el
+                    $("#" + el).show()
+                    $("#accordion").fadeIn()
+                })
+            })
         })
     })
 

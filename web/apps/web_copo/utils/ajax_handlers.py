@@ -1,6 +1,6 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 01/12/2015'
 # this python file is for small utility functions which will be called from Javascript
-import json
+import json, os
 import time
 import jsonpickle
 import pandas as pd
@@ -39,6 +39,7 @@ from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from web.apps.web_copo.models import UserDetails
 from web.apps.web_copo.schemas.utils import data_utils
 import web.apps.web_copo.templatetags.html_tags as htags
+from web.apps.web_copo.lookup.lookup import WIZARD_FILES as wf
 
 DV_STRING = 'HARVARD_TEST_API'
 
@@ -1303,4 +1304,7 @@ def format_json_response(dict_obj):
 
 def get_subsample_stages(request):
     stage = request.GET["stage"]
-    return HttpResponse(stage)
+    # here we should return a list of the stages which should be displayed for the given sample type
+    with open(os.path.join(wf["dtol_manifests"], stage + ".json")) as f:
+        sections = json.load(f)
+    return HttpResponse(json.dumps(sections))

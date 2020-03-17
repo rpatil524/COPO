@@ -1402,12 +1402,14 @@ $(document).ready(function () {
         var label = '<label for="dtol_type_select">Select Sample Sub Type</label>'
         var dd = $("<select/>", {
             id: "dtol_type_select",
-            class: "form-control"
+            class: "form-control",
+            "style": "margin-bottom:30px"
         })
+        // the values of these options point to json files in wizards/sample/dtol_manifests
         $(dd).append($("<option></option>"))
-        $(dd).append($("<option>aquatic</option>"))
-        $(dd).append($("<option>protist</option>"))
-        $(dd).append($("<option>other</option>"))
+        $(dd).append($("<option value='dtol_aquatic'>aquatic</option>"))
+        $(dd).append($("<option value='dtol_protist'>protist</option>"))
+        $(dd).append($("<option value=''dtol_other'>other</option>"))
         $(stagearea).append(label).append(dd)
 
         // get the fields into the right order according to the groupings in stage.field_groupings
@@ -1434,7 +1436,7 @@ $(document).ready(function () {
 
 
         for (var title in grouped_fields) {
-            var header = '<div class="panel panel-default">' +
+            var header = '<div hidden class="panel panel-default" id="section_' + title.replace(" ", "_") + '">' +
                 '<div class="panel-heading" role="tab" id="heading_' + title.replace(" ", "_") + '">' +
                 '<h4 class="panel-title">' +
                 '<a role="button" data-toggle="collapse" data-parent="#accordion" href="#' + title.replace(" ", "_") + '" aria-expanded="true" aria-controls="' + title.replace(" ", "_") + '">' + title + '</a></h4></div>'
