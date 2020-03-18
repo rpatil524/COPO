@@ -10,12 +10,17 @@ $(document).ready(function () {
             dataType: "json"
         }).done(function (data) {
             $("#accordion").fadeOut(function () {
+                $("[id^='section']").find(".collapse").collapse("hide")
                 $("[id^='section']").hide()
                 $(data).each(function (idx, el) {
                     el = el.replace(" ", "_")
                     el = "section_" + el
                     $("#" + el).show()
-                    $("#accordion").fadeIn()
+
+                })
+
+                $("#accordion").fadeIn(function(){
+                    $(document).find("[id^='section']:visible:first").find(".collapse").collapse('show')
                 })
             })
         })

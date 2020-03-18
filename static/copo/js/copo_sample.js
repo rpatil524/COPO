@@ -1436,7 +1436,7 @@ $(document).ready(function () {
 
 
         for (var title in grouped_fields) {
-            var header = '<div hidden class="panel panel-default" id="section_' + title.replace(" ", "_") + '">' +
+            var header = '<hr/><div hidden class="panel panel-default" id="section_' + title.replace(" ", "_") + '">' +
                 '<div class="panel-heading" role="tab" id="heading_' + title.replace(" ", "_") + '">' +
                 '<h4 class="panel-title">' +
                 '<a role="button" data-toggle="collapse" data-parent="#accordion" href="#' + title.replace(" ", "_") + '" aria-expanded="true" aria-controls="' + title.replace(" ", "_") + '">' + title + '</a></h4></div>'
