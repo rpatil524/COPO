@@ -101,7 +101,7 @@ $(document).ready(function () {
             generate_sample_edit_table(stage);
         },
         generate_dtol_stage: function (stage) {
-            generate_dtol_stage(stage)
+            generate_dtol_stage(stage);
         }
     }; //end of dispatchStageCallback
 
@@ -1396,7 +1396,7 @@ $(document).ready(function () {
         $('#custom-renderer_' + stage.ref).find(".stage-content").html('');
         var formValue = stage.data;
 
-        var stagearea = $('#custom-renderer_' + stage.ref).find(".stage-content")
+        var stagearea = $('#custom-renderer_' + stage.ref).find("form")
 
         // firstly add a dropdown to select type of dtol sample
         var label = '<label for="dtol_type_select">Select Sample Sub Type</label>'
