@@ -238,6 +238,33 @@
 
     </div>
 
+    <div class="modal fade" tabindex="-1" role="dialog" id="sample_spreadsheet_modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Upload Spreadsheet</h4>
+                </div>
+                <div class="modal-body">
+
+                    <label class="btn btn-success" for="file">
+                        <input id="file" type="file" style="display:none"
+                               onchange="$('#upload-file-info').html(this.files[0].name); upload_spreadsheet(this.files[0])">
+                        Select Spreadsheet
+                    </label>
+                    <span class='label label-primary' id="upload-file-info"></span>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
 {% endblock %}
 
 {% block help_section %}
@@ -250,5 +277,5 @@
     <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
     <script src="{% static 'copo/js/copo_sample.js' %}"></script>
     <script src="{% static 'copo/js/dtol_functions.js' %}"></script>
-
+    <script src="{% static 'copo/js/copo_sample_parse_spreadsheet.js' %}"></script>
 {% endblock %}

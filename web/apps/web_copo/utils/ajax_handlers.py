@@ -40,6 +40,7 @@ from web.apps.web_copo.models import UserDetails
 from web.apps.web_copo.schemas.utils import data_utils
 import web.apps.web_copo.templatetags.html_tags as htags
 from web.apps.web_copo.lookup.lookup import WIZARD_FILES as wf
+from web.apps.web_copo.utils import dtol
 
 DV_STRING = 'HARVARD_TEST_API'
 
@@ -1308,3 +1309,13 @@ def get_subsample_stages(request):
     with open(os.path.join(wf["dtol_manifests"], stage + ".json")) as f:
         sections = json.load(f)
     return HttpResponse(json.dumps(sections))
+
+def sample_spreadsheet(request):
+    file = request.FILES["file"]
+    name = file.name
+    if name.endswith("xlsx") or name.endswith("xls"):
+        return dtol.loadExcel(file)
+    elif name.endswith("csv"):
+        return dtol.loadCsv(file)
+    else:
+        return HttpResponse(status=415,content="Only Excel or CSV files in the exact Darwin Core format are supported.")

@@ -45,6 +45,10 @@ $(document).ready(function () {
         initiate_description({});
     });
 
+    $(document).on("click", ".new-samples-spreadsheet-template", function(event){
+        open_parse_modal()
+    })
+
     //details button hover
     $(document).on("mouseover", ".detail-hover-message", function (event) {
         $(this).prop('title', 'Click to view ' + component + ' details');

@@ -790,7 +790,7 @@
       "control_meta": {},
       "control": "text",
       "versions": [
-        "dateOfPreservation"
+        "DATE_OF_PRESERVATION"
       ],
       "ref": "",
       "specifications": [
@@ -813,7 +813,7 @@
       "control_meta": {},
       "control": "text",
       "versions": [
-        "timeElapsedFromCollectionToPreservation"
+        "TIME_ELAPSED_FROM_COLLECTION _TO_PRESERVATION"
       ],
       "ref": "",
       "specifications": [
@@ -829,6 +829,52 @@
       "dwc": "http://rs.tdwg.org/dwc/terms/eventTime"
     },
     {
+      "help_tip": "Preparations and preservation methods for a specimen",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "PRESERVATION_APPROACH"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.preservationApproach",
+      "label": "Preservation Approach",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
+    },
+    {
+      "help_tip": "Specific preservative solution used in preparation",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "PRESERVATIVE_SOLUTION"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.preservativeSolution",
+      "label": "Preservative Solution",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
+    },
+    {
       "help_tip": "A list (concatenated and separated) of preparations and preservation methods for a specimen. Example, fossil, cast, photograph, DNA extract, skin, skull, skeleton, whole animal (ETOH), tissue (EDTA)",
       "required": "true",
       "default_value": "",
@@ -836,7 +882,7 @@
       "control_meta": {},
       "control": "ontology term",
       "versions": [
-        "preservedBy"
+        "PRESERVED_BY"
       ],
       "ref": "",
       "specifications": [
@@ -1164,6 +1210,97 @@
       "control_meta": {},
       "dwc": "",
       "versions": [
+        "SIZE_OF_TISSUE_IN_TUBE"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Size Of Tissue In Tube",
+      "show_in_form": true,
+      "id": "copo.sample.sizeOfTissueInTube",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "TISSUE_REMOVED_FOR_BARCODING"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Tissue Removed for Barcoding",
+      "show_in_form": true,
+      "id": "copo.sample.tissueRemovedForBarcoding",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
+    },{
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "SPECIMEN_VOUCHER_ID"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Specimen Voucher ID",
+      "show_in_form": true,
+      "id": "copo.sample.specimenVoucherId",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "SPECIMEN_VOUCHER_COLLECTION"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Specimen Voucher Collection",
+      "show_in_form": true,
+      "id": "copo.sample.specimenVoucherCollection",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
         "evidenceForGenomeSize"
       ],
       "specifications": [
@@ -1175,6 +1312,29 @@
       "label": "Evidence for Genome Size",
       "show_in_form": true,
       "id": "copo.sample.evidenceForGenomeSize",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "PURPOSE_OF_SPECIMEN"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Purpose Of Specimen",
+      "show_in_form": true,
+      "id": "copo.sample.purposeOfSpecimen",
       "type": "string",
       "show_in_table": true,
       "control": "text",
