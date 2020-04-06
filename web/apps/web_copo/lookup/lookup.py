@@ -684,7 +684,8 @@ WIZARD_FILES = {
     'dcterms': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
     'cg_core': os.path.join(RESOLVER['wizards_datafile'], 'cg_core_stages.json'),
     'dtol_mappings': os.path.join(RESOLVER['wizards_sample'], 'dtol_field_mapping.json'),
-    'dtol_manifests': os.path.join(RESOLVER['wizards_sample'], 'dtol_manifests')
+    'dtol_manifests': os.path.join(RESOLVER['wizards_sample'], 'dtol_manifests'),
+    'sample_details': "web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/sample.json"
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#
