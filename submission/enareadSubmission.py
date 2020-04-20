@@ -122,6 +122,8 @@ class EnaReads:
         :return:
         """
 
+        print(self)
+
         self.project_alias = self.submission_id
 
         collection_handle = ghlper.get_submission_handle()
