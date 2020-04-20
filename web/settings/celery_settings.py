@@ -11,4 +11,4 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_WORKER_MAX_MEMORY_PER_CHILD = 50000
 
-CELERY_BIN = '/home/fshaw/Documents/environments/copo_conda1/bin/python -m celery'
+#CELERY_BIN = '/home/fshaw/Documents/environments/copo_conda1/bin/python -m celery'

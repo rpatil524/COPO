@@ -110,8 +110,6 @@ class EnaReads:
 
         ghlper.update_submission_status(status='info', message=message, submission_id=self.submission_id)
 
-        with open("/home/fshaw/Desktop/log.log", "a") as log:
-            log.write("log: " + str(datetime.now()) + "\n")
 
         collection_handle.update(
             {"_id": ObjectId(str(queued_record_id))},
@@ -132,30 +130,23 @@ class EnaReads:
         :return:
         """
 
-        with open("/home/fshaw/Desktop/log.log", "a") as log:
-            log.write("submit: " + str(self) + "\n")
+
 
         self.project_alias = self.submission_id
         self.remote_location = os.path.join(self.project_alias, 'reads')  # ENA-Dropbox upload path
 
-        with open("/home/fshaw/Desktop/log.log", "a") as log:
-            log.write("accessing mongo: " + str(datetime.now()) + "\n")
+
         collection_handle = ghlper.get_submission_handle()
-        with open("/home/fshaw/Desktop/log.log", "a") as log:
-            log.write("accessed mongo: " + str(datetime.now()) + "\n")
+
 
         if not self.submission_id:
             return dict(status=False, message='Submission identifier not found!')
 
         # check status of submission record
-        with open("/home/fshaw/Desktop/log.log", "a") as log:
-            log.write("getting sub: " + str(datetime.now()) + "\n")
         submission_record = collection_handle.find_one({"_id": ObjectId(self.submission_id)},
                                                        {"profile_id": 1, "complete": 1})
 
 
-        with open("/home/fshaw/Desktop/log.log", "a") as log:
-            log.write("got sub: " + str(datetime.now()) + "\n")
 
 
         if not submission_record:
