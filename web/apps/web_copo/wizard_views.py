@@ -58,6 +58,7 @@ def sample_wiz(request):
 
     out = jsonpickle.encode(context, unpicklable=False)
 
+
     return HttpResponse(out, content_type='application/json')
 
 

@@ -185,6 +185,26 @@
     "platform": "CAPILLARY"
   },
   {
+    "value": "MinION",
+    "label": "MinION",
+    "platform": "OXFORD_NANOPORE"
+  },
+  {
+    "value": "GridION",
+    "label": "GridION",
+    "platform": "OXFORD_NANOPORE"
+  },
+  {
+    "value": "PromethION",
+    "label": "PromethION",
+    "platform": "OXFORD_NANOPORE"
+  },
+  {
+    "value": "BGISEQ-500",
+    "label": "BGISEQ-500",
+    "platform": "BGISEQ"
+  },
+  {
     "value": "unspecified",
     "label": "unspecified",
     "platform": ""

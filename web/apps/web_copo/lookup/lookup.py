@@ -424,11 +424,16 @@ DROP_DOWNS = {
             'label': 'No'
         }
     ],
-    "REPOSITORIES": [
+    "REPOSITORIES": [ # !!! this is deprecated. moved to lookup/drop_downs/metadata_templates_types.json
         {
             'value': 'cg_core',
             'label': 'CG Core',
             'description': 'Template for describing CG-compliant data objects'
+        },
+        {
+            'value': "dtol",
+            'label': 'Darwin Tree of Life / Sanger',
+            'description': 'Template for descripbing samples created for the Darwin Tree of Life Project'
         },
         {
             'value': 'ena',
@@ -487,7 +492,7 @@ DROP_DOWNS = {
             "description": "Use this option to submit Annotations of objects already submitted"
         }
     ],
-    "SAMPLE_TYPES": [
+    "SAMPLE_TYPES": [ # !!! this is deprecated. moved to lookup/drop_downs/sample_types.json
         {
             "value": "biosample",
             "label": "Biosample Standard",
@@ -497,6 +502,11 @@ DROP_DOWNS = {
             "value": "isasample",
             "label": "COPO Standard",
             "description": "COPO samples are based on the <a href='http://isa-tools.org/' target='_blank'>Investigation, Study and Assay </a> (ISA) specifications, and are better tailored for describing samples that will subsequently become part of data submissions to repositories such as <strong>ENA</strong> and <strong>Metabolights</strong>."
+        },
+        {
+            "value": "dtol",
+            "label": "Sanger / Darwin Tree of Life",
+            "description": "Samples to be entered for the Darwin Tree of Life Project"
         }
     ],
     "GROWTH_AREAS": [
@@ -672,7 +682,10 @@ WIZARD_FILES = {
     'sample_attributes': os.path.join(RESOLVER['wizards_sample'], 'attributes_stages.json'),
     'dataverse': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
     'dcterms': os.path.join(RESOLVER['wizards_datafile'], 'dc_stages.json'),
-    'cg_core': os.path.join(RESOLVER['wizards_datafile'], 'cg_core_stages.json')
+    'cg_core': os.path.join(RESOLVER['wizards_datafile'], 'cg_core_stages.json'),
+    'dtol_mappings': os.path.join(RESOLVER['wizards_sample'], 'dtol_field_mapping.json'),
+    'dtol_manifests': os.path.join(RESOLVER['wizards_sample'], 'dtol_manifests'),
+    'sample_details': "web/apps/web_copo/schemas/copo/uimodels/mappings/isa_mappings/sample.json"
 }
 
 # •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••#

@@ -2,27 +2,86 @@ __author__ = 'felix.shaw@tgac.ac.uk - 27/05/2016'
 
 from django.http import HttpResponse
 from dal.copo_da import Submission
-from . import enaSubmission, figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission
+from . import figshareSubmission, dataverseSubmission, dspaceSubmission, ckanSubmission
 from django.urls import reverse
 import jsonpickle, json
+from bson import ObjectId
+from dal import cursor_to_list
 
 
 def delegate_submission(request):
-    # get submission object
-    sub_id = request.POST.get('sub_id')
-    if not sub_id:
-        sub_id = request.GET.get('sub_id')
+    """
+    function delegates incoming submission request to handlers based on repository type
+    :param request:
+    :return:
+    """
+    sub_id = request.POST.get('submission_id', str())
 
     if not sub_id:
-        return HttpResponse({'status': 0})
+        sub_id = request.GET.get('submission_id', str())
 
-    sub = Submission().get_record(sub_id)
+    # submission record id not received
+    if not sub_id:
+        context = dict(status='error', message='Submission ID not found! Please try resubmitting with a valid ID.')
+        out = jsonpickle.encode(context, unpicklable=False)
+        return HttpResponse(out, content_type='application/json')
 
-    repo = sub['repository']
+    # get submission record and dependencies
+    doc = Submission().get_collection_handle().aggregate(
+        [
+            {"$addFields": {
+                "destination_repo_converted": {
+                    "$convert": {
+                        "input": "$destination_repo",
+                        "to": "objectId",
+                        "onError": 0
+                    }
+                },
+            }
+            },
+            {
+                "$lookup":
+                    {
+                        "from": "RepositoryCollection",
+                        "localField": "destination_repo_converted",
+                        "foreignField": "_id",
+                        "as": "repository_docs"
+                    }
+            },
+            {
+                "$project": {
+                    "repository_docs.type": 1,
+                    "bundle": 1
+                }
+            },
+            {
+                "$match": {
+                    "_id": ObjectId(str(sub_id)),
+                }
+            },
+            {"$sort": {"date_modified": 1}}
+        ])
 
-    error = None
+    records = cursor_to_list(doc)
 
-    ## Submit to Figshare
+    # get submission record
+    try:
+        sub = records[0]
+    except (IndexError, AttributeError) as error:
+        context = dict(status='error', message='Submission record not found. Please try resubmitting.')
+        out = jsonpickle.encode(context, unpicklable=False)
+        return HttpResponse(out, content_type='application/json')
+
+    # get repository type
+    try:
+        repo = sub['repository_docs'][0]['type']
+    except (IndexError, AttributeError) as error:
+        # destination repository record not found
+        context = dict(status='error', message='Repository information not found. Please contact an administrator.')
+        out = jsonpickle.encode(context, unpicklable=False)
+        return HttpResponse(out, content_type='application/json')
+
+    #  Submit to Figshare
     if repo == 'figshare':
 
         # check figshare credentials
@@ -41,66 +100,23 @@ def delegate_submission(request):
 
     # Submit to ENA Sequence reads
     elif repo == 'ena':
-        result = schedule_submission(submission_id=sub_id, submission_repo='ena')
+        result = schedule_submission(submission_id=sub_id, submission_repo=repo)
+        return HttpResponse(jsonpickle.encode(result, unpicklable=False), content_type='application/json')
 
-        if result.get("status", True) is True:
-            return HttpResponse(jsonpickle.dumps({'status': 0}))
-        else:
-            return HttpResponse(jsonpickle.dumps({'status': 1, 'message': result.get("message", str())}))
-
-    # Submit to ENA
-    elif 'ena' in repo:
-        result = enaSubmission.EnaSubmit().submit(
-            sub_id=sub_id,
-            dataFile_ids=sub['bundle'],
-        )
-        if result is True:
-            return HttpResponse(jsonpickle.dumps({'status': 1}))
-        else:
-            error = result
-
-
-    ## Submit to Dataverse
+    # Submit to Dataverse
     elif repo == 'dataverse':
         result = dataverseSubmission.DataverseSubmit(submission_id=sub_id).submit()
-        if result is True:
-            return HttpResponse(jsonpickle.dumps({'status': 0}))
-        else:
-            if isinstance(result, str):
-                message = result
-                status = 404
-            elif isinstance(result, dict):
-                message = result.get("message", str())
-                status = result.get("status", 404)
-
-            message = "\n " + message
-            return HttpResponse(message, status=status)
-
-    ## Submit to dspace
-    elif repo == 'dspace':
-        result = dspaceSubmission.DspaceSubmit().submit(
-            sub_id=sub_id,
-            dataFile_ids=sub['bundle']
-        )
-        if result == True:
-            return HttpResponse(jsonpickle.dumps({'status': 0}))
-        else:
-            error = result
-
+        return HttpResponse(jsonpickle.encode(result, unpicklable=False), content_type='application/json')
 
     # Submit to CKAN
     elif repo == 'ckan':
-        result = ckanSubmission.CkanSubmit(sub_id).submit(
-            sub_id=sub_id,
-            dataFile_ids=sub['bundle']
-        )
-        if result == True:
-            return HttpResponse(jsonpickle.dumps({'status': 0}))
-        else:
-            error = json.loads(result)
+        result = ckanSubmission.CkanSubmit(submission_id=sub_id).submit()
+        return HttpResponse(jsonpickle.encode(result, unpicklable=False), content_type='application/json')
 
-    # return error
-    return HttpResponse(error["message"], status=error["status"])
+    # Submit to dspace
+    elif repo == 'dspace':
+        result = dspaceSubmission.DspaceSubmit(submission_id=sub_id).submit()
+        return HttpResponse(jsonpickle.encode(result, unpicklable=False), content_type='application/json')
 
 
 def schedule_submission(submission_id=str(), submission_repo=str()):
@@ -121,7 +137,7 @@ def schedule_submission(submission_id=str(), submission_repo=str()):
     collection_handle = ghlper.get_submission_queue_handle()
     doc = collection_handle.find_one({"submission_id": submission_id})
 
-    if not doc:  # submission not already in queue, add to queue
+    if not doc:  # submission not in queue, add to queue
         fields = dict(
             submission_id=submission_id,
             date_modified=d_utils.get_datetime(),
@@ -130,9 +146,9 @@ def schedule_submission(submission_id=str(), submission_repo=str()):
         )
 
         collection_handle.insert(fields)
-        context['message'] = 'Submission has been added to the processing queue. Status update will be reported.'
+        context['message'] = 'Submission has been added to the processing queue. Status update will be provided.'
     else:
-        context['message'] = 'Submission is already in the processing queue. Status updates will be reported.'
+        context['message'] = 'Submission is already in the processing queue.'
 
     ghlper.update_submission_status(status='info', message=context['message'], submission_id=submission_id)
     ghlper.logging_info(context['message'], submission_id)

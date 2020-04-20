@@ -66,8 +66,41 @@ function place_task_buttons(componentMeta) {
 }
 
 function do_crud_action_feedback(meta) {
-    //feedback to the user on CRUD actions
-    display_copo_alert(meta.status, meta.message, 20000);
+    var feedbackClass;
+
+    if (["success", "green", "positive"].indexOf(meta.status) > -1) {
+        feedbackClass = "alert-success";
+    } else if (["error", "red", "danger", "negative"].indexOf(meta.status) > -1) {
+        feedbackClass = "alert-danger";
+    } else if (["warning"].indexOf(meta.status) > -1) {
+        feedbackClass = "alert-warning";
+    } else {
+        feedbackClass = "alert-info";
+    }
+
+    var infoPanelElement = trigger_global_notification();
+
+    var feedback = get_alert_control();
+    feedback
+        .removeClass("alert-success")
+        .addClass(feedbackClass)
+        .addClass("page-notifications-node");
+
+    feedback.find(".alert-message").html(meta.message);
+    infoPanelElement.prepend(feedback);
+}
+
+function format_feedback_message(message, messageClass, messageTitle) {
+    let feedback = '<div class="ui small ' + messageClass + ' message">\n' +
+        '  <i class="close icon"></i>\n' +
+        '  <div class="header">\n' +
+        '    ' + messageTitle + '\n' +
+        '  </div>\n' +
+        '  <div class="webpop-content-div copo-alert-message" style="margin-top: 10px;">' + message + '</div>\n' +
+        '</div>'
+
+    return feedback;
+
 }
 
 function do_table_buttons_events() {
@@ -217,11 +250,38 @@ function deselect_records(tableID) {
 }
 
 function do_render_server_side_table(componentMeta) {
+    //use this function for server-side processing of large tables
+
+    try {
+        componentMeta.table_columns = JSON.parse($("#table_columns").val());
+
+    } catch (err) {
+    }
+
     var tableID = componentMeta.tableID;
     var component = componentMeta.component;
 
-    var table = null;
+    var columnDefs = [];
 
+    //add special formatting here for datafile name column to break on length file names
+
+    if (component == "datafile") {
+        var target = -1;
+        for (var i = 0; i < componentMeta.table_columns.length; ++i) {
+            if (componentMeta.table_columns[i].data == "name") {
+                columnDefs.push({
+                    render: function (data, type, full, meta) {
+                        return "<div style='word-wrap: break-word; width:400px;'>" + data + "</div>";
+                    },
+                    targets: i
+                });
+
+                break
+            }
+        }
+    }
+
+    var table = null;
 
     if ($.fn.dataTable.isDataTable('#' + tableID)) {
         // get table instance
@@ -312,6 +372,7 @@ function do_render_server_side_table(componentMeta) {
                     }
                 }
             ],
+            columnDefs: columnDefs,
             language: {
                 select: {
                     rows: {
@@ -443,10 +504,9 @@ function do_render_server_side_table(componentMeta) {
                             // expand row
 
                             var contentHtml = $('<table/>', {
-                                // cellpadding: "5",
                                 cellspacing: "0",
                                 border: "0",
-                                // style: "padding-left:50px;"
+                                class: "ui compact definition selectable celled table"
                             });
 
                             for (var i = 0; i < data.component_attributes.columns.length; ++i) {
@@ -457,8 +517,7 @@ function do_render_server_side_table(componentMeta) {
 
                                 colTR
                                     .append($('<td/>').append(colVal.title))
-                                    .append($('<td/>').append(data.component_attributes.data_set[colVal.data]));
-
+                                    .append($('<td/>').append("<div style='width:300px; word-wrap: break-word;'>" + data.component_attributes.data_set[colVal.data] + "</div>"));
                             }
 
                             row.child($('<div></div>').append(contentHtml).html()).show();
@@ -495,7 +554,7 @@ function do_render_component_table(data, componentMeta) {
     var dataSet = data.table_data.dataSet;
     var cols = data.table_data.columns;
 
-    set_empty_component_message(dataSet.length); //display empty component message for potential first time users
+    set_empty_component_message(dataSet.length); //display empty component message when there's no record
 
     if (dataSet.length == 0) {
         return false;
@@ -551,7 +610,8 @@ function do_render_component_table(data, componentMeta) {
                 {
                     extend: 'csv',
                     text: 'Export CSV',
-                    title: null
+                    title: null,
+                    filename: "copo_" + String(tableID) + "_data"
                 }
             ],
             language: {
@@ -608,6 +668,7 @@ function do_render_component_table(data, componentMeta) {
         .removeClass("input-sm")
         .attr("placeholder", "Search " + componentMeta.title)
         .attr("size", 30);
+
 
     //handle event for table details
     $('#' + tableID + ' tbody')

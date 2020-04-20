@@ -77,6 +77,7 @@ function dropHandler(ev, ui) {
     data.file_id = $("#file_id").val()
     data.file_name = $("#file_name").val()
     csrftoken = $.cookie('csrftoken');
+
     $.ajax({
         url: "/copo/send_file_annotation/",
         type: "POST",
@@ -236,7 +237,7 @@ function build_result_panel(d, idx, entry) {
             containment: 'window',
             opacity: 1,
             zIndex: 999,
-            stop: update_template
+
         })
     } else {
         var result = $("<li/>", {

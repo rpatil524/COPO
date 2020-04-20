@@ -2,9 +2,10 @@
 import os
 from tools import resolve_env
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-SCHEMA_DIR = os.path.join(BASE_DIR, 'web', 'apps', 'web_cop', 'schemas')
+SCHEMA_DIR = os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'schemas')
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
@@ -14,10 +15,11 @@ SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = resolve_env.get_env('SECRET_KEY')
 
+
 LOGIN_URL = '/accounts/auth/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True if resolve_env.get_env('DEBUG') == 'true' else False
+DEBUG = True if str(resolve_env.get_env('DEBUG')).lower() == 'true' else False
 
 ALLOWED_HOSTS = ['*']
 
@@ -48,7 +50,6 @@ PROJECT_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS
-
 # sass, social accounts...
 sass_exe = '/usr/local/bin/sass'
 COMPRESS_PRECOMPILERS = (
