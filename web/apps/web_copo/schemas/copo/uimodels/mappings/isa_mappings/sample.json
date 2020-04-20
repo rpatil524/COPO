@@ -89,7 +89,7 @@
       "control_meta": {},
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementID",
       "versions": [
-        "sangerTubeId"
+        "INTERNAL_ID"
       ],
       "specifications": [
         "dtol"
@@ -97,7 +97,7 @@
       "ref": "",
       "deprecated": false,
       "hidden": "false",
-      "label": "Sanger Tube ID (FluidX Barcode)",
+      "label": "Internal Id",
       "show_in_form": true,
       "id": "copo.sample.sangerTubeId",
       "type": "string",

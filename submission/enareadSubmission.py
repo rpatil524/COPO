@@ -79,6 +79,7 @@ class EnaReads:
             current_time = d_utils.get_datetime()
             time_difference = current_time - recorded_time
             if time_difference.seconds >= (REFRESH_THRESHOLD):  # time submission is perceived to have been running
+
                 # refresh task to be rescheduled
                 rec['date_modified'] = d_utils.get_datetime()
                 rec['processing_status'] = 'pending'
@@ -89,6 +90,8 @@ class EnaReads:
         # obtain pending submission for processing
         records = cursor_to_list(
             collection_handle.find({'repository': 'ena', 'processing_status': 'pending'}).sort([['date_modified', 1]]))
+
+
 
         if not records:
             return True
@@ -104,11 +107,17 @@ class EnaReads:
         message = "Now processing submission..."
 
         ghlper.logging_info(message, self.submission_id)
+
         ghlper.update_submission_status(status='info', message=message, submission_id=self.submission_id)
+
+        with open("/home/fshaw/Desktop/log.log", "a") as log:
+            log.write("log: " + str(datetime.now()) + "\n")
 
         collection_handle.update(
             {"_id": ObjectId(str(queued_record_id))},
             {'$set': queued_record})
+
+
 
         result = self.submit()
         # remove from queue - this supposes that submissions that returned error will have
@@ -123,17 +132,31 @@ class EnaReads:
         :return:
         """
 
+        with open("/home/fshaw/Desktop/log.log", "a") as log:
+            log.write("submit: " + str(self) + "\n")
+
         self.project_alias = self.submission_id
         self.remote_location = os.path.join(self.project_alias, 'reads')  # ENA-Dropbox upload path
 
+        with open("/home/fshaw/Desktop/log.log", "a") as log:
+            log.write("accessing mongo: " + str(datetime.now()) + "\n")
         collection_handle = ghlper.get_submission_handle()
+        with open("/home/fshaw/Desktop/log.log", "a") as log:
+            log.write("accessed mongo: " + str(datetime.now()) + "\n")
 
         if not self.submission_id:
             return dict(status=False, message='Submission identifier not found!')
 
         # check status of submission record
+        with open("/home/fshaw/Desktop/log.log", "a") as log:
+            log.write("getting sub: " + str(datetime.now()) + "\n")
         submission_record = collection_handle.find_one({"_id": ObjectId(self.submission_id)},
                                                        {"profile_id": 1, "complete": 1})
+
+
+        with open("/home/fshaw/Desktop/log.log", "a") as log:
+            log.write("got sub: " + str(datetime.now()) + "\n")
+
 
         if not submission_record:
             return dict(status=False, message='Submission record not found!')
@@ -160,10 +183,10 @@ class EnaReads:
 
         # retrieve sra settings
         self.sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
-
+        print("create self")
         # get submission xml
         context = self._get_submission_xml()
-
+        print("got xml")
         if context['status'] is False:
             ghlper.update_submission_status(status='error', message=context.get("message", str()),
                                             submission_id=self.submission_id)
@@ -347,7 +370,9 @@ class EnaReads:
         try:
             receipt = subprocess.check_output(curl_cmd, shell=True)
         except Exception as e:
-            message = 'API call error ' + str(e)
+            message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
+                self.pass_word, "xxxxxx")
+
             ghlper.logging_error(message, self.submission_id)
             result['message'] = message
             result['status'] = False
@@ -1709,7 +1734,7 @@ class EnaReads:
             transfer_status_message = "<li>" + transfer_status['message'] + "</li>"
 
         status_message = f'<div>Submission completed.</div><ul>{transfer_status_message}<li>To view accessions, ' \
-            f'select <strong>View Accessions</strong> from the menu</li>{extra_info}</ul>'
+                         f'select <strong>View Accessions</strong> from the menu</li>{extra_info}</ul>'
 
         ghlper.update_submission_status(status='success', message=status_message, submission_id=self.submission_id)
 
