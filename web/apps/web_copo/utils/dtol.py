@@ -5,7 +5,8 @@ from web.apps.web_copo.lookup import lookup
 import jsonpath_rw_ext as jp
 
 def loadCsv(file):
-    return HttpResponse()
+    raise NotImplementedError
+
 
 
 def loadExcel(file):
