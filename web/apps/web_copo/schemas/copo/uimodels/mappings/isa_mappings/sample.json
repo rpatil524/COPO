@@ -89,7 +89,7 @@
       "control_meta": {},
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementID",
       "versions": [
-        "INTERNAL_ID"
+        "SEQUENCING_ORG_SAMPLE_ID"
       ],
       "specifications": [
         "dtol"
@@ -99,7 +99,7 @@
       "hidden": "false",
       "label": "Internal Id",
       "show_in_form": true,
-      "id": "copo.sample.sangerTubeId",
+      "id": "copo.sample.sequencing_org_sample_id",
       "type": "string",
       "show_in_table": true,
       "control": "text",
@@ -156,7 +156,7 @@
       "required": "true",
       "control_meta": {},
       "versions": [
-        "DATE_OF_SAMPLE_COLLECTION"
+        "DATE_OF_SPECIMEN_COLLECTION"
       ],
       "ref": "",
       "deprecated": false,
@@ -165,8 +165,8 @@
         "dtol"
       ],
       "show_in_form": true,
-      "label": "Date of Sample Collection",
-      "id": "copo.sample.dateOfSampleCollection",
+      "label": "Date of Specimen Collection",
+      "id": "copo.sample.dateOfSpecimenCollection",
       "show_in_table": true,
       "control": "date-picker",
       "default_value": "",
@@ -178,7 +178,7 @@
       "required": "true",
       "control_meta": {},
       "versions": [
-        "DATE_OF_SAMPLE_IDENTIFICATION"
+        "DATE_OF_SPECIMEN_IDENTIFICATION"
       ],
       "ref": "",
       "deprecated": false,
@@ -188,7 +188,7 @@
       ],
       "show_in_form": true,
       "label": "Date of Sample Identification",
-      "id": "copo.sample.dateOfSampleIdentification",
+      "id": "copo.sample.dateOfSpecimenIdentification",
       "show_in_table": true,
       "control": "date-picker",
       "default_value": "",
@@ -491,7 +491,7 @@
       "control_meta": {},
       "control": "text",
       "versions": [
-        "INFRASPECIFIC_EPIPHET"
+        "INFRASPECIFIC_EPITHET"
       ],
       "ref": "",
       "specifications": [
@@ -540,7 +540,7 @@
       "control_meta": {},
       "control": "text",
       "versions": [
-        "DONOR_ID"
+        "SPECIMEN_ID"
       ],
       "ref": "",
       "specifications": [
@@ -550,8 +550,8 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.donorId",
-      "label": "Donor Id",
+      "id": "copo.sample.specimenId",
+      "label": "Specimen Id",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/recordNumber"
     },
@@ -563,7 +563,7 @@
       "control_meta": {},
       "control": "text",
       "versions": [
-        "COLLECTOR_INSTITUTE"
+        "COLLECTOR_AFFILIATION"
       ],
       "ref": "",
       "specifications": [
@@ -573,8 +573,8 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.collectorInstitute",
-      "label": "Collector Institute",
+      "id": "copo.sample.collectorAffiliation",
+      "label": "Collector Affiliation",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/institutionCode"
     },
@@ -721,7 +721,7 @@
     },
     {
       "help_tip": "A list of maps, gazetteers, or other resources used to georeference the Location, described specifically enough to allow anyone in the future to use the same resources.",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -744,7 +744,7 @@
     },
     {
       "help_tip": "Comments or notes about the Location. e.g. Underwater since 2005",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -842,7 +842,7 @@
       "control_meta": {},
       "control": "text",
       "versions": [
-        "SAMPLE_AVAILABILITY"
+        "EASE_OF_SPECIMEN_COLLECTION"
       ],
       "ref": "",
       "specifications": [
@@ -852,8 +852,8 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.sampleAvailability",
-      "label": "Sample Availability",
+      "id": "copo.sample.easeOfSpecimenCollection",
+      "label": "Ease of Specimen Collection",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/samplingEffort"
     },
@@ -1141,7 +1141,7 @@
       "control_meta": {},
       "control": "text",
       "versions": [
-        "SPECIES_DETERMINATION_METHOD"
+        "IDENTIFIED_HOW"
       ],
       "ref": "",
       "specifications": [
@@ -1151,7 +1151,7 @@
       "hidden": "true",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.speciesDeterminationMethod",
+      "id": "copo.sample.identifiedHow",
       "label": "Species Determination Method",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/identificationReferences"

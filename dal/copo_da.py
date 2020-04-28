@@ -237,7 +237,7 @@ class DAComponent:
             filter_by["profile_id"] = self.profile_id
 
         return cursor_to_list(
-            self.get_collection_handle().find(filter_by, projection).sort([[sort_by, sort_direction]], allo))
+            self.get_collection_handle().find(filter_by, projection).sort([[sort_by, sort_direction]]))
 
     def get_all_records_columns_server(self, sort_by='_id', sort_direction=-1, projection=dict(), filter_by=dict(),
                                        search_term=str(),
