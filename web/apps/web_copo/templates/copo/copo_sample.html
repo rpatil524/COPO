@@ -247,15 +247,15 @@
                     <h4 class="modal-title">Upload Spreadsheet</h4>
                 </div>
                 <div class="modal-body">
-
-                    <label class="btn btn-success" for="file">
-                        <input id="file" type="file" style="display:none"
-                               onchange="$('#upload-file-info').html(this.files[0].name); upload_spreadsheet(this.files[0])">
-                        Select Spreadsheet
-                    </label>
-                    <span class='label label-primary' id="upload-file-info"></span>
-
-
+                    <div id="upload_controls">
+                        <label class="btn btn-success" for="file">
+                            <input id="file" type="file" style="display:none"
+                                   onchange="$('#upload-file-info').html(this.files[0].name); upload_spreadsheet(this.files[0])">
+                            Select Spreadsheet
+                        </label>
+                        <span class='label label-primary' id="upload-file-info"></span>
+                    </div>
+                    <div style="display:none; margin-top: 30px; " id="sample_info" class="alert alert-info" role="alert"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

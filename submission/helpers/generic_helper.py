@@ -195,6 +195,25 @@ def notify_status_change(profile_id=str(), submission_id=str()):
     return True
 
 
+def notify_sample_status(profile_id=str(), action="message", msg=str(), html_id=""):
+    """
+        function notifies client of ENA file transfer status
+        :param profile_id:
+        :param action:
+        :param msg:
+        :return:
+    """
+    # type points to the object type which will be passed to the socket and is a method defined in consumer.py
+    group_name = 'sample_status_%s' % profile_id
+    event = {"type": "msg", "action": action, "message": msg, "html_id": html_id}
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        group_name,
+        event
+    )
+    return True
+
+
 def notify_transfer_status(profile_id=str(), submission_id=str(), status_message=str()):
     """
     function notifies client of ENA file transfer status
@@ -428,7 +447,7 @@ def transfer_to_ena(webin_user, pass_word, remote_path, file_paths=list(), **kwa
                                                  x.get('upload_status', False) is True]
 
                             status_message = f"{len(total_transferred)}/{total_files_in_bundle}" \
-                                f" data files transferred..."
+                                             f" data files transferred..."
                             notify_transfer_status(profile_id=profile_id, submission_id=submission_id,
                                                    status_message=status_message)
 

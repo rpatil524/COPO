@@ -76,9 +76,10 @@ class SampleConsumer(AsyncWebsocketConsumer):
 
     async def msg(self, event):
         # send message to WebSocket
-        message = event["message"]
         await self.send(text_data=json.dumps({
-            'message': message
+            'message': event["message"],
+            'action': event["action"],
+            'html_id': event["html_id"]
         }))
 
     async def disconnect(self, close_code):
