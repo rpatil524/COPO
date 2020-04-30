@@ -13,6 +13,7 @@ function upload_spreadsheet(file) {
         headers: {"X-CSRFToken": csrftoken},
 
     }).error(function (data) {
+        $("#upload_controls").fadeIn()
         console.log(data)
         BootstrapDialog.show({
             title: 'Error',
