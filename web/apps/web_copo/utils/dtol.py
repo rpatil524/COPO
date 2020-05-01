@@ -8,6 +8,7 @@ from django_tools.middlewares import ThreadLocal
 from asgiref.sync import async_to_sync
 import math
 import time
+from dal.copo_da import Sample
 
 
 class DtolSpreadsheet:
@@ -75,9 +76,20 @@ class DtolSpreadsheet:
             notify_sample_status(profile_id=self.profile_id, msg="Spreadsheet is Valid", action="info",
                                  html_id="sample_info")
             notify_sample_status(profile_id=self.profile_id, msg="", action="close", html_id="upload_controls")
+            notify_sample_status(profile_id=self.profile_id, msg="", action="make_valid", html_id="sample_info")
+
             return True
 
     def parse(self):
         for index, row in self.data.iterrows():
-            notify_sample_status(profile_id=self.profile_id, msg=row[3], action="info",
-                                 html_id="sample_info")
+            time.sleep(0.1)
+            notify_sample_status(profile_id=self.profile_id,
+                                 msg="Creating sample " + str(index) + " with ID: " + str(row["RACK_OR_PLATE_ID"]),
+                                 action="info",
+                                 html_id="parse_info")
+            sample_data = dict(row)
+            print(row)
+            Sample(profile_id=self.profile_id).save_record(auto_fields={}, **sample_data)
+
+    def get_biosampleId(self):
+        raise NotImplementedError()

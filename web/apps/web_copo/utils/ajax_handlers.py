@@ -1317,6 +1317,7 @@ def sample_spreadsheet(request):
     if name.endswith("xlsx") or name.endswith("xls"):
         dtol.loadExcel()
         if dtol.validate():
+            
             dtol.parse()
         return HttpResponse()
     elif name.endswith("csv"):

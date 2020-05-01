@@ -197,7 +197,7 @@ def notify_status_change(profile_id=str(), submission_id=str()):
 
 def notify_sample_status(profile_id=str(), action="message", msg=str(), html_id=""):
     """
-        function notifies client of ENA file transfer status
+        function notifies client changes in Sample creation status
         :param profile_id:
         :param action:
         :param msg:

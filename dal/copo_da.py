@@ -198,9 +198,16 @@ class DAComponent:
         # add system fields to 'fields' and set default values - insert mode only
         for f in schema:
             f_id = f["id"].split(".")[-1]
-
+            try:
+                v_id = f["versions"][0]
+            except:
+                v_id = ""
             if f_id in system_fields:
                 fields[f_id] = system_fields.get(f_id)
+            elif v_id in system_fields:
+                fields[f_id] = system_fields.get(v_id)
+
+
 
             if not target_id and f_id not in fields:
                 fields[f_id] = data_utils.default_jsontype(f["type"])

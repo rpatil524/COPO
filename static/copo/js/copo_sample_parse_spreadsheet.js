@@ -48,6 +48,8 @@ $(document).ready(function () {
         d = JSON.parse(e.data)
         if (d.action == "close") {
             $("#" + d.html_id).fadeOut("50")
+        } else if (d.action == "make_valid") {
+            $("#" + d.html_id).html("Validated").removeClass("alert-info").addClass("alert-success")
         } else if (d.action == "info") {
             // check info div is visible
             if (!$("#" + d.html_id).is(":visible")) {
@@ -58,10 +60,7 @@ $(document).ready(function () {
     }
 })
 
-$('#bbtn').on("click", function () {
-    console.log("sending")
-    socket.send(JSON.stringify({"message": "OBE"}))
-})
+
 
 $(document).on("click", ".new-samples-spreadsheet-template", function (event) {
     $("#sample_spreadsheet_modal").modal("show")
