@@ -81,7 +81,9 @@ class COPOLookup:
             nutrient_control_options=d_utils.get_nutrient_control_options(),
             watering_control_options=d_utils.get_watering_control_options(),
             dataverse_subject_dropdown=d_utils.get_dataverse_subject_dropdown(),
-            repository_options=d_utils.get_repository_options()
+            repository_options=os.path.join(self.drop_downs_pth, 'metadata_template_types.json'),
+            repository_types_list=os.path.join(self.drop_downs_pth, 'repository_types.json'),
+            sample_type_options=os.path.join(self.drop_downs_pth, 'sample_types.json'),
         )
 
         data = pths_map.get(self.data_source, str())

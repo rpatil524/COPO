@@ -115,29 +115,11 @@ class SubmissionHelper:
 
         sra_samples = list()
 
-        # get datafiles
-        datafiles = cursor_to_list(ghlper.get_datafiles_handle().find(
-            {"description_token": self.description_token, 'deleted': data_utils.get_not_deleted_flag()},
-            {'_id': 1, 'file_location': 1, "description.attributes": 1, "name": 1, "file_hash": 1}))
+        # get datafiles attached to submission
+        submission_record = self.collection_handle.find_one({"_id": ObjectId(self.submission_id)}, {"bundle": 1})
+        object_ids = [ObjectId(x) for x in submission_record.get("bundle", list())]
 
-        if not len(datafiles):
-            self.__converter_errors.append("No datafiles found in submission!")
-            return sra_samples
-
-        df = pd.DataFrame(datafiles)
-        df['file_id'] = df._id.astype(str)
-        df['file_path'] = df['file_location'].fillna('')
-        df['upload_status'] = False
-
-        df = df[['file_id', 'file_path', 'upload_status']]
-        bundle = list(df.file_id)
-        bundle_meta = df.to_dict('records')
-
-        submission_record = dict(bundle=bundle, bundle_meta=bundle_meta)
-
-        ghlper.get_submission_handle().update(
-            {"_id": ObjectId(self.submission_id)},
-            {'$set': submission_record})
+        datafiles = cursor_to_list(ghlper.get_datafiles_handle().find({"_id": {"$in": object_ids}}, {'_id': 1, 'file_location': 1, "description.attributes": 1, "name": 1, "file_hash": 1}))
 
         samples_id = list()
         df_attributes = []  # datafiles attributes

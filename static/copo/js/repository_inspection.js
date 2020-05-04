@@ -14,24 +14,15 @@ $(document).ready(function () {
     $(document).on('change', '.create_add_community_radio_div', get_existing_communites)
     $(document).on('click', '.target_repo_option', get_existing_metadata)
     //check_repo_id()
-    do_new_dataverse_fields()
-
+    // do_new_dataverse_fields()
     // here we should call funcs for filling out other repo details
 
-    function delay(fn, ms) {
-        let timer = 0
-        return function (...args) {
-            clearTimeout(timer)
-            timer = setTimeout(fn.bind(this, ...args), ms || 1000)
-        }
-    }
 
-    $(document).on('keyup', '#search_dataverse', delay(function (e) {
+    $(document).on('keyup', '#search_dataverse', function (el) {
         //$(document).data('open_modal', modal
-        e = $("#repo_modal").find("#search_dataverse")
-        var q = $(e).val()
-
-        var search_type = $(e).attr('id')
+        e = $(el.currentTarget)
+        var q = e.val()
+        var search_type = e.attr('id')
         var box = "";
         var repo_type = $('#repo_modal-body').data('repo')
         $('.ajax-loading-div').fadeIn()
@@ -59,10 +50,48 @@ $(document).ready(function () {
             })
 
 
-    }))
+    })
     //$('#repo_modal').find('input[value="existing"]').attr("checked", "checked")
 
-})
+
+    // handle dataverse submission context change
+    $(document).on('change', '#dataverse_submission_context', function (event) {
+        let elem = $(this);
+
+        let parentElem = elem.closest(".submission-panel");
+        reload_dv_search(parentElem, elem.val());
+    });
+
+    // handle ckan submission context change
+    $(document).on('change', '#ckan_submission_context', function (event) {
+        let elem = $(this);
+
+        let parentElem = elem.closest(".submission-panel");
+        reload_ckan_panel(parentElem, elem.val());
+    });
+
+    //handle dspace context change
+    $(document).on('change', '#dspace_submission_context', function (event) {
+        handle_dspace_context_change($(this).closest(".submission-panel"));
+    });
+
+    //handle dataverse/dataset value change
+    $(document).on('dv_value_change', function (event) {
+        handle_dv_choice(event);
+    });
+
+    $(document).on('ds_value_change', function (event) {
+        handle_dv_choice(event);
+    });
+
+    //ckan dataset search value change
+    $(document).on('ckan_value_change', function (event) {
+        handle_ckan_choice(event);
+    });
+
+
+}); //end of document ready
+
 
 // enable / disable inputs depending on which radio has been selected
 function handle_radio(el) {
@@ -238,10 +267,7 @@ function build_dataverse_modal(resp) {
     var checked = $('input[name=dataverse-radio]:checked').val();
     var trow
     if (checked == 'dataverse') {
-        if (resp.data.items.length == 0) {
-            trow = "<tr><td colspan='5'>No Data to Show</td></tr>"
-            $(t).find('tbody').append(trow)
-        } else {
+        if (resp.data.items.length > 0) {
             if (new_or_existing == "new") {
                 colCheck = "<td style='text-align: center'><div class='dataset-checkbox pretty p-default' style='font-size: 26px'>" +
                     "<input type='checkbox'/>" +
@@ -258,7 +284,6 @@ function build_dataverse_modal(resp) {
                         "<td>" + el.published_at + "</td>" +
                         "<td>" + el.type + "</td>"
                     "</tr>"
-                    $(t).find('tbody').append(trow)
 
                 })
             } else {
@@ -271,12 +296,12 @@ function build_dataverse_modal(resp) {
                         "<td>" + el.published_at + "</td>" +
                         "<td>" + el.type + "</td>"
                     "</tr>"
-                    $(t).find('tbody').append(trow)
                 })
             }
+        } else {
+            trow = "<tr><td colspan='5'>No Data to Show</td></tr>"
         }
-
-
+        $(t).find('tbody').append(trow)
     } else if (checked == 'dataset') {
         var trow
         var colCheck
@@ -656,7 +681,7 @@ function expand_table(event) {
             var tr_header = $("<tr/>")
 
             var identifier = $("<th/>", {
-                html: "DOI"
+                html: "Identifier"
             })
             var publisher = $("<th/>", {
                 html: "Name"
@@ -685,7 +710,7 @@ function expand_table(event) {
                 $(colTR).attr('data-persistent', el.persistentUrl)
                 $(colTR).attr('data-publisher', el.publisher)
                 $(colTR).attr('data-type', "dataverse")
-                var col1 = $('<td class="persistentUrl_cell" data-container="body"/>').append(el.persistentUrl);
+                var col1 = $('<td/>').append(el.identifier);
                 var col11 = $('<td/>').append(el.publisher);
                 //var col2 = $('<td/>').append(el.dsDescription[0].dsDescriptionValue.value);
                 var col3 = $('<td/>').append(el.publicationDate)
@@ -706,95 +731,6 @@ function expand_table(event) {
         })
     }
 }
-
-//$(document).on("click", ".persistentUrl_cell", function (e) {
-$(document).on("click", ".persistentUrl_cell", function (e) {
-    var offset = $(this).offset();
-    var left = e.pageX;
-    var top = e.pageY;
-    $('.copo_popover').show()
-    $('.copo_popover').html('<div class="ui active inverted dimmer">\
-        <div class="ui text loader">Loading</div>\
-        </div>')
-    var doi = $(this).html()
-    doi = doi.replace("https://doi.org/", "")
-    doi = doi.replace("http://doi.org/", "")
-    var sub_id = $(document).data('submission_id')
-    $.ajax({
-        url: "/copo/get_dataset_info/",
-        type: "GET",
-        data: {
-            'doi': doi,
-            'sub_id': sub_id
-        },
-        dataType: "json"
-    }).done(function (data) {
-        data = JSON.parse(data)
-        var html = "<table class=\"table table-bordered\"> \
-        <tr><th>Name</th><td>" + data.name + "</td></tr>\
-        <tr><th>Description</th><td>" + data.description[0].substring(0, 200) + "..." + "</td></tr>"
-        html = html + "<tr><th>Date Published</th><td>" + data.datePublished + "</td></tr>"
-        html = html + "<tr><th>Date Modified</th><td>" + data.dateModified + "</td></tr>"
-
-        $(data.author).each(function (idx, el) {
-            html = html + "<tr>"
-            if (idx == 1) {
-                html = html + "<th>Authors</th><td>" + el.name + "</td>"
-            } else {
-                html = html + "<td></td><td>" + el.name + "</td>"
-            }
-            html = html + "</tr>"
-        })
-
-
-        $(data.creator).each(function (idx, el) {
-            html = html + "<tr>"
-            if (idx == 1) {
-                html = html + "<th>Creators</th><td>" + el.name + "</td>"
-            } else {
-                html = html + "<td></td><td>" + el.name + "</td>"
-            }
-            html = html + "</tr>"
-        })
-
-
-        $(data.keywords).each(function (idx, el) {
-            html = html + "<tr>"
-            if (idx == 1) {
-                html = html + "<th>Keywords</th><td>" + el + "</td>"
-            } else {
-                html = html + "<td></td><td>" + el + "</td>"
-            }
-            html = html + "</tr>"
-        })
-
-
-        html = html + "</table>"
-        $('.copo_popover').html(html)
-
-        var theHeight = $('.copo_popover').height();
-        $('.copo_popover').css('left', (left) + 'px');
-        $('.copo_popover').css('top', (top - (theHeight) - 10) + 'px');
-        $('.copo_popover').show();
-    }).error(function (data) {
-        var html = "<h4>Cannot get data</h4><p>Check your network connection and check if the Dataverse is up</p>"
-        $('.copo_popover').html(html)
-        var theHeight = $('.copo_popover').height();
-        $('.copo_popover').css('left', (left) + 'px');
-        $('.copo_popover').css('top', (top - (theHeight) - 10) + 'px');
-        $('.copo_popover').show();
-    })
-})
-
-
-$(document).on("click", function (e) {
-    // if the target of the click isn't the container nor a descendant of the container
-    if ($(e.target).hasClass("copo_popover") || $(e.target).hasClass("persistentUrl_cell")) {
-    } else {
-        $(".copo_popover").hide();
-        console.log("hidding")
-    }
-});
 
 
 function do_new_dataverse_fields() {
@@ -953,8 +889,1419 @@ function select_dataset(e) {
             },
         error: function () {
         }
-    })
-    ;
+    });
+}
 
+function get_dataset_api_schema() {
+    return [
+        {'id': 'name', 'label': 'Name', 'show_in_table': true},
+        {'id': 'description', 'label': 'Description', 'show_in_table': true},
+        {'id': 'name_of_dataverse', 'label': 'Name_Of_Dataverse', 'show_in_table': false},
+        {'id': 'identifier_of_dataverse', 'label': 'Identifier_Of_Dataverse', 'show_in_table': false},
+        {'id': 'identifier', 'label': 'Identifier', 'show_in_table': true},
+        {'id': 'url', 'label': 'URL', 'show_in_table': true},
+        {'id': 'authors', 'label': 'Authors', 'show_in_table': true},
+        {'id': 'published_at', 'label': 'Published', 'show_in_table': true},
+        {'id': 'citation', 'label': 'Citation', 'show_in_table': true},
+        {'id': 'type', 'label': 'Type', 'show_in_table': false},
+        {'id': 'global_id', 'label': 'Global Id', 'show_in_table': false},
+        {'id': 'citationHtml', 'label': 'Citationhtml', 'show_in_table': false},
+        {'id': 'entity_id', 'label': 'Entity_Id', 'show_in_table': false}
+    ]
+}
+
+function reload_dv_search(parentElem, dv_type) {
+
+    let params = {
+        'submission_id': parentElem.attr("data-id"),
+        "submission_context": dv_type
+    };
+
+    get_dataverse_display(parentElem.find(".submission-proceed-section"), params);
+    return true
 
 }
+
+
+function get_dataverse_display(displayPanel, params) {
+    //build ui components and place on panel
+
+    displayPanel.find(".dv-local-panel").remove();
+    var localPanel = $('<div/>', {class: "dv-local-panel"});
+
+    displayPanel.append(localPanel);
+
+    // add displayable sections
+    var dvTypeDiv = $('<div class="dv-type-div"></div>');
+    var searchDiv = $('<div class="search-ctrl-div"></div>');
+    var dsListDiv = $('<div class="ds-list-div copo-form-group"></div>');
+    var dvSummaryDiv = $('<div class="dv-summary-div copo-form-group"></div>');
+
+
+    localPanel.append(dvTypeDiv);
+    localPanel.append(searchDiv);
+    localPanel.append(dsListDiv);
+    localPanel.append(dvSummaryDiv);
+
+    //schema will be used to format API returned fields
+    params.api_schema = get_dataset_api_schema();
+
+    var search_context = params.submission_context;
+
+    if (search_context == "dataset") {
+        search_context = "dataverse,dataset"; //to search across dataverses and datasets
+        params.label = "Dataset/Dataverse search";
+    }
+
+    params.call_parameters = {'context': search_context, 'submission_id': params.submission_id};
+
+    dvTypeDiv.append(get_submission_context(params));
+    searchDiv.append(get_dv_search(params));
+
+    refresh_tool_tips();
+
+    return true;
+}
+
+function get_submission_context(params) {
+    var panel = $('<div/>');
+
+    var formElem = {
+        "ref": "dataverse_submission_context",
+        "id": "dataverse_submission_context",
+        "label": "Submission context ",
+        "help_tip": "Please specify where you want to place this submission.",
+        "control": "copo-button-list",
+        "type": "string",
+        "required": true,
+        "control_meta": {},
+        "default_value": params.submission_context,
+        "option_values": [
+            {
+                "value": "dataverse",
+                "label": "Create a new dataset",
+                "description": "Submission will be made to a new dataset. Use the search box below to locate a target dataverse."
+            },
+            {
+                "value": "dataset",
+                "label": "Add to an existing dataset",
+                "description": "Submission will be made to an existing dataset. Use the search box below to locate a target dataset."
+            }
+        ]
+    };
+
+    var elemValue = formElem.default_value;
+    panel.append(dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue));
+    panel.find(".constraint-label").remove();
+
+    return panel;
+}
+
+function get_dv_search(params) {
+    var panel = $('<div/>');
+
+    //place search box
+    var label = "Dataverse search";
+
+    if (params.hasOwnProperty("label")) {
+        label = params.label;
+    }
+
+    var formElem = {
+        "ref": "",
+        "id": "dataverse_search",
+        "label": label,
+        "help_tip": "Start typing to search. You can search by author, keyword, name, etc.",
+        "required": "true",
+        "type": "string",
+        "control": "copo-general-onto",
+        "value_change_event": "dv_value_change",
+        "default_value": "",
+        "placeholder": "Enter author, keyword, etc.",
+        "control_meta": {},
+        "deprecated": false,
+        "hidden": "false",
+        "data_url": "/copo/get_dataverse_vf/",
+        "api_schema": params.api_schema,
+        "call_parameters": params.call_parameters
+    }
+
+    var elemValue = formElem.default_value;
+    panel.append(dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue));
+    panel.find(".constraint-label").remove();
+
+    return panel;
+}
+
+function format_summary_message(message) {
+    let feedback = '<div class="ui info message">\n' +
+        '  <i class="close icon"></i>\n' +
+        '  <div class="header">\n' +
+        '    Summary\n' +
+        '  </div>\n' +
+        '  <p>' + message + '</p>\n' +
+        '</div>'
+
+    return feedback;
+
+}
+
+function handle_dv_choice(eventObj) {
+    var elemId = eventObj.elementId;
+    var selectedVal = eventObj.selectedValue;
+    var elem = $(document).find("[data-element='" + elemId + "']");
+    var parentElem = elem.closest(".submission-panel");
+    var submission_id = parentElem.attr("data-id");
+    var dsListPanel = parentElem.find(".ds-list-div");
+    var dvSummaryPanel = parentElem.find(".dv-summary-div");
+    var context = parentElem.find("#dataverse_submission_context").val().toLowerCase(); //dataverse, dataset
+
+
+    if (!selectedVal) {
+        dvSummaryPanel.html("");
+
+        if (context == "dataset" && eventObj.type == "dv_value_change") {
+            dsListPanel.html("");
+        }
+
+        return true;
+    }
+
+    var valueObject = null;
+
+
+    try {
+        valueObject = selectizeObjects[elemId].options[selectedVal];
+    } catch (e) {
+        let feedback = get_alert_control();
+        feedback
+            .removeClass("alert-success")
+            .addClass("alert-danger");
+
+        feedback.find(".alert-message").html("Couldn't retrieve selected value. Please try searching again.");
+        dsListPanel.append(feedback);
+
+        return true;
+    }
+
+    if (!valueObject) {
+        let feedback = get_alert_control();
+        feedback
+            .removeClass("alert-success")
+            .addClass("alert-danger");
+
+        feedback.find(".alert-message").html("Couldn't retrieve selected value. Please try searching again.");
+        dsListPanel.append(feedback);
+
+        return true;
+    }
+
+    var apiSchema = get_dataset_api_schema();
+
+    //dataset list engaged - user has selected a dataset to submit to
+    if (eventObj.type == "ds_value_change") {
+        let message = "Your submission will be made to " +
+            " <label>" + valueObject.copo_labelblank + "</label> dataset. " +
+            "Your existing metadata is not required for this submission." +
+            "<div>Click the submit button when you are ready to proceed.</div>";
+
+        //get user selection
+        var form_values = {};
+
+        //obtain fields based on schema used
+        for (var i = 0; i < apiSchema.length; ++i) {
+            var schemaNode = apiSchema[i];
+            form_values[schemaNode.id] = valueObject[schemaNode.id];
+        }
+
+        $.ajax({
+            url: "/copo/update_submission_meta/",
+            type: "POST",
+            dataType: "json",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'submission_id': submission_id,
+                'form_values': JSON.stringify(form_values),
+            },
+            success: function (data) {
+                dvSummaryPanel.html(format_summary_message(message));
+                $('html, body').animate({
+                    scrollTop: dvSummaryPanel.offset().top - 60
+                }, 'slow');
+
+                dvSummaryPanel.append(submit_submission_record(submission_id));
+                refresh_tool_tips();
+            },
+            error: function () {
+                dvSummaryPanel.html('');
+
+                let feedback = get_alert_control();
+                feedback
+                    .removeClass("alert-success")
+                    .addClass("alert-danger")
+                    .addClass("page-notifications-node");
+
+                feedback.find(".alert-message").html("Encountered an error. Please check that you are connected to a network and try again.");
+                dvSummaryPanel.append(feedback);
+            }
+        });
+
+        return true;
+    }
+
+    //dataverse list engaged -
+    if (context == "dataverse" && eventObj.type == "dv_value_change") {
+        let message = "<div>Your submission will be made to a new dataset within " +
+            " <label>" + valueObject.copo_labelblank + "</label> dataverse. " +
+            "Your existing metadata will be used for the submission. " +
+            " <a class='ui green tag label show-sub-meta' data-submission-id='" + submission_id + "'> show metadata</a></div>" +
+            "<div style='margin-top: 10px;'>Click the submit button when you are ready to proceed.</div>";
+
+        //get user selection
+
+        var form_values = {};
+
+        //obtain fields based on schema
+        for (var i = 0; i < apiSchema.length; ++i) {
+            var schemaNode = apiSchema[i];
+            form_values[schemaNode.id] = valueObject[schemaNode.id];
+        }
+
+        $.ajax({
+            url: "/copo/update_submission_meta/",
+            type: "POST",
+            dataType: "json",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'submission_id': submission_id,
+                'form_values': JSON.stringify(form_values),
+            },
+            success: function (data) {
+                dvSummaryPanel.html(format_summary_message(message));
+                $('html, body').animate({
+                    scrollTop: dvSummaryPanel.offset().top - 60
+                }, 'slow');
+
+                dvSummaryPanel.append(submit_submission_record(submission_id));
+                refresh_tool_tips();
+            },
+            error: function () {
+                dvSummaryPanel.html('');
+
+                let feedback = get_alert_control();
+                feedback
+                    .removeClass("alert-success")
+                    .addClass("alert-danger")
+                    .addClass("page-notifications-node");
+
+                feedback.find(".alert-message").html("Encountered an error. Please check that you are connected to a network and try again.");
+                dvSummaryPanel.append(feedback);
+            }
+        });
+
+        return true;
+    }
+
+    //dataverse list engaged and selected value has type - dataset - user has specified a dataset to submit to
+    if (context == "dataset" && eventObj.type == "dv_value_change" && valueObject.hasOwnProperty("type") && valueObject.type == "dataset") {
+        let message = "Your submission will be made to " +
+            " <label>" + valueObject.copo_labelblank + "</label> dataset. " +
+            "Your existing metadata is not required for this submission." +
+            "<div>Click the submit button when you are ready to proceed.</div>";
+
+        //get user selection
+
+        var form_values = {};
+
+        //obtain fields based on schema
+        var dsapischema = get_dataset_api_schema();
+        for (var i = 0; i < dsapischema.length; ++i) {
+            var schemaNode = dsapischema[i];
+            form_values[schemaNode.id] = valueObject[schemaNode.id];
+        }
+
+        $.ajax({
+            url: "/copo/update_submission_meta/",
+            type: "POST",
+            dataType: "json",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'submission_id': submission_id,
+                'form_values': JSON.stringify(form_values),
+            },
+            success: function (data) {
+                dvSummaryPanel.html(format_summary_message(message));
+                $('html, body').animate({
+                    scrollTop: dvSummaryPanel.offset().top - 60
+                }, 'slow');
+
+                dvSummaryPanel.append(submit_submission_record(submission_id));
+                refresh_tool_tips();
+            },
+            error: function () {
+                dvSummaryPanel.html('');
+
+                let feedback = get_alert_control();
+                feedback
+                    .removeClass("alert-success")
+                    .addClass("alert-danger")
+                    .addClass("page-notifications-node");
+
+                feedback.find(".alert-message").html("Encountered an error. Please check that you are connected to a network and try again.");
+                dvSummaryPanel.append(feedback);
+            }
+        });
+
+        return true;
+    }
+
+
+    //come this far, we want to display datasets under selected dataverse
+
+    var searchPane = $('' +
+        '               <div class="row">\n' +
+        '                   <div class="col-sm-1"><span class="input-group">\n' +
+        '                    <img style="height: 24px; margin-left:5px;" src="/static/copo/img/loading.gif"></span></div>\n' +
+        '                   <div class="col-sm-11"><span class="webpop-content-div">Searching for datasets under ' + valueObject.copo_labelblank + '</span></div>\n' +
+        '               </div>'
+    );
+
+    dsListPanel.html(searchPane);
+
+    var api_schema = get_dataset_api_schema();
+
+    $.ajax({
+        url: "/copo/get_dataverse_content_vf/",
+        type: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            "dataverse_record": JSON.stringify(valueObject),
+            "submission_id": submission_id,
+            "api_schema": JSON.stringify(api_schema),
+        },
+        success: function (data) {
+
+            if (data.hasOwnProperty('message') && data.hasOwnProperty('status') && data.status == "error") {
+                let feedback = get_alert_control();
+                feedback
+                    .removeClass("alert-success")
+                    .addClass("alert-danger");
+
+                feedback.find(".alert-message").html(data.message);
+                dsListPanel.html(feedback);
+
+                return true;
+            }
+
+            if (data.hasOwnProperty('status') && data.status == 'success' && data.items.length == 0) {
+                let feedback = get_alert_control();
+                feedback
+                    .removeClass("alert-success")
+                    .addClass("alert-info");
+
+                feedback.find(".alert-message").html(data.message);
+                dsListPanel.html(feedback);
+
+                return true;
+            }
+
+            var ontologies = data.items;
+
+
+            var panel = $('<div/>');
+
+            //place search box
+            var label = "Dataset select";
+
+            var formElem = {
+                "ref": "",
+                "id": "dataset_select",
+                "label": label,
+                "help_tip": "Please select a dataset from the list",
+                "required": "true",
+                "type": "string",
+                "control": "copo-general-ontoselect",
+                "value_change_event": "ds_value_change",
+                "default_value": "",
+                "placeholder": "Select a dataset...",
+                "control_meta": {},
+                "deprecated": false,
+                "hidden": "false",
+                "api_schema": api_schema,
+                "option_values": ontologies,
+            }
+
+            var elemValue = formElem.default_value;
+            panel.append(dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue));
+            panel.find(".constraint-label").remove();
+
+            // retain info about parent dataverse
+            dsListPanel.html(panel);
+            dsListPanel.append($('<input/>',
+                {
+                    type: "hidden",
+                    id: "ds-dv-parent-values" + submission_id,
+                    value: JSON.stringify(valueObject)
+                }));
+
+            refresh_tool_tips();
+
+            if (selectizeObjects.hasOwnProperty(formElem.id)) {
+                var selectizeControl = selectizeObjects[formElem.id];
+                selectizeControl.focus();
+            }
+        },
+        error: function () {
+
+        }
+    });
+}
+
+function build_dspace_display(params) {
+    //build ui components and place on panel
+    var panel = $('<div/>');
+
+    panel.append("Watch this space for dspace");
+
+    return panel;
+}
+
+function reload_ckan_panel(parentElem, dv_type) {
+
+    let params = {
+        'submission_id': parentElem.attr("data-id"),
+        "submission_context": dv_type
+    };
+
+    get_ckan_display(parentElem.find(".submission-proceed-section"), params);
+    return true
+}
+
+function get_ckan_display(displayPanel, params) {
+    //build ui components and place on panel
+
+    displayPanel.find(".dv-local-panel").remove();
+    var localPanel = $('<div/>', {class: "dv-local-panel"});
+
+    displayPanel.append(localPanel);
+
+    // add displayable sections
+    var dvTypeDiv = $('<div class="dv-type-div"></div>');
+    var searchDiv = $('<div class="search-ctrl-div"></div>');
+    var dsListDiv = $('<div class="ds-list-div copo-form-group"></div>');
+    var dvSummaryDiv = $('<div class="dv-summary-div copo-form-group"></div>');
+
+
+    localPanel.append(dvTypeDiv);
+    localPanel.append(searchDiv);
+    localPanel.append(dsListDiv);
+    localPanel.append(dvSummaryDiv);
+
+    var submission_context = params.submission_context;
+    var submission_id = params.submission_id;
+    dvTypeDiv.append(get_ckan_submission_context(params));
+
+    if (submission_context == "existing") {
+        //schema will be used to format API returned fields
+        params.api_schema = get_ckan_api_schema();
+        params.call_parameters = {'submission_id': params.submission_id};
+
+        searchDiv.append(get_ckan_search(params));
+    } else if (submission_context == "new") {
+        let summary_message = "<div>Your submission will be made to a new dataset together with your existing metadata." +
+            " <a class='ui green tag label show-sub-meta' data-submission-id='" + submission_id + "'> show metadata</a></div>" +
+            "<div style='margin-top: 10px;'>Click the submit button when you are ready to proceed.</div>";
+
+        params.summary_message = summary_message;
+        get_ckan_summary(params);
+    }
+
+    refresh_tool_tips();
+    return true;
+}
+
+function get_ckan_summary(params) {
+    var context = params.submission_context;
+    var submission_id = params.submission_id;
+    var parentElem = get_viewport(submission_id);
+    var dvSummaryPanel = parentElem.find(".dv-summary-div");
+
+    var form_values = {};
+    form_values['type'] = context;
+
+    if (context == "existing") {
+        form_values = params.form_values;
+        form_values['type'] = context;
+    }
+
+    $.ajax({
+        url: "/copo/update_submission_meta/",
+        type: "POST",
+        dataType: "json",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            'submission_id': submission_id,
+            'form_values': JSON.stringify(form_values),
+        },
+        success: function (data) {
+            dvSummaryPanel.html(format_summary_message(params.summary_message));
+            $('html, body').animate({
+                scrollTop: dvSummaryPanel.offset().top - 250
+            }, 'slow');
+
+            dvSummaryPanel.append(submit_submission_record(submission_id));
+            refresh_tool_tips();
+        },
+        error: function () {
+            dvSummaryPanel.html('');
+
+            let feedback = get_alert_control();
+            feedback
+                .removeClass("alert-success")
+                .addClass("alert-danger")
+                .addClass("page-notifications-node");
+
+            feedback.find(".alert-message").html("Encountered an error. Please check that you are connected to a network and try again.");
+            dvSummaryPanel.append(feedback);
+        }
+    });
+
+    return true;
+}
+
+function get_ckan_submission_context(params) {
+    var panel = $('<div/>');
+
+    var formElem = {
+        "ref": "ckan_submission_context",
+        "id": "ckan_submission_context",
+        "label": "Submission context ",
+        "help_tip": "Please specify where you want to place this submission.",
+        "control": "copo-button-list",
+        "type": "string",
+        "required": true,
+        "control_meta": {},
+        "default_value": params.submission_context,
+        "option_values": [
+            {
+                "value": "new",
+                "label": "Create a new dataset",
+                "description": "A new dataset will be created for this submission."
+            },
+            {
+                "value": "existing",
+                "label": "Add to an existing dataset",
+                "description": "Submission will be made to an existing dataset. Use the search box below to locate a target dataset."
+            }
+        ]
+    };
+
+    var elemValue = formElem.default_value;
+    panel.append(dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue));
+    panel.find(".constraint-label").remove();
+
+    return panel;
+}
+
+
+function get_ckan_search(params) {
+    var panel = $('<div/>');
+
+    //place search box
+
+    var formElem = {
+        "ref": "",
+        "id": "ckan_dataset_search",
+        "label": "Dataset search",
+        "help_tip": "Start typing to search. You can search by author, keyword, name, etc.",
+        "required": "true",
+        "type": "string",
+        "control": "copo-general-onto",
+        "value_change_event": "ckan_value_change",
+        "default_value": "",
+        "placeholder": "Enter author, keyword, etc.",
+        "control_meta": {},
+        "deprecated": false,
+        "hidden": "false",
+        "data_url": "/copo/ckan_package_search/",
+        "api_schema": params.api_schema,
+        "call_parameters": params.call_parameters
+    }
+
+    var elemValue = formElem.default_value;
+    panel.append(dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue));
+    panel.find(".constraint-label").remove();
+
+    return panel;
+}
+
+function get_ckan_api_schema() {
+    return [
+        {'id': 'title', 'label': 'Title', 'show_in_table': true},
+        {'id': 'name', 'label': 'Name', 'show_in_table': true},
+        {'id': 'author', 'label': 'Author', 'show_in_table': true},
+        {'id': 'author_email', 'label': 'Author Email', 'show_in_table': true},
+        {'id': 'id', 'label': 'Identifier', 'show_in_table': true}
+    ]
+}
+
+function handle_ckan_choice(eventObj) {
+    var elemId = eventObj.elementId;
+    var selectedVal = eventObj.selectedValue;
+    var elem = $(document).find("[data-element='" + elemId + "']");
+    var parentElem = elem.closest(".submission-panel");
+    var submission_id = parentElem.attr("data-id");
+    var dsListPanel = parentElem.find(".ds-list-div");
+    var dvSummaryPanel = parentElem.find(".dv-summary-div");
+
+    dvSummaryPanel.html("");
+    dsListPanel.html("");
+
+    if (!selectedVal) {
+        return true;
+    }
+
+    var valueObject = null;
+
+    try {
+        valueObject = selectizeObjects[elemId].options[selectedVal];
+    } catch (e) {
+        let feedback = get_alert_control();
+        feedback
+            .removeClass("alert-success")
+            .addClass("alert-danger");
+
+        feedback.find(".alert-message").html("Couldn't retrieve selected value. Please try searching again.");
+        dsListPanel.append(feedback);
+
+        return true;
+    }
+
+    if (!valueObject) {
+        let feedback = get_alert_control();
+        feedback
+            .removeClass("alert-success")
+            .addClass("alert-danger");
+
+        feedback.find(".alert-message").html("Couldn't retrieve selected value. Please try searching again.");
+        dsListPanel.append(feedback);
+
+        return true;
+    }
+
+    // summary message
+    let summary_message = "Your submission will be made to " +
+        " <label>" + valueObject.copo_labelblank + "</label> dataset. " +
+        "Your existing metadata is not required for this submission." +
+        "<div>Click the submit button when you are ready to proceed.</div>";
+
+    let params = {
+        'submission_id': submission_id,
+        "submission_context": "existing",
+        "summary_message": summary_message
+
+    };
+
+    var apiSchema = get_ckan_api_schema();
+
+    //obtain fields based on schema used
+    var form_values = {}
+    for (var i = 0; i < apiSchema.length; ++i) {
+        var schemaNode = apiSchema[i];
+        form_values[schemaNode.id] = valueObject[schemaNode.id];
+    }
+
+    params.form_values = form_values;
+
+    get_ckan_summary(params);
+
+    return true;
+}
+
+
+function get_dspace_display(displayPanel, params) {
+    //build ui components and place on panel
+
+    displayPanel.find(".dv-local-panel").remove();
+    var localPanel = $('<div/>', {class: "dv-local-panel"});
+
+    displayPanel.append(localPanel);
+
+    // add displayable sections
+    var dvTypeDiv = $('<div class="dv-type-div"></div>');
+    var ObjectsDiv = $('<div class="objects-display row" style="margin-bottom: 30px;"></div>');
+    var communitiesDiv = $('<div class="communities-display col-sm-4 col-md-4 col-lg-4"></div>');
+    var collectionsDiv = $('<div class="collections-display col-sm-4 col-md-4 col-lg-4"></div>');
+    var itemsDiv = $('<div class="items-display col-sm-4 col-md-4 col-lg-4"></div>');
+    var dsListDiv = $('<div class="ds-list-div copo-form-group"></div>');
+    var dvSummaryDiv = $('<div class="dv-summary-div copo-form-group"></div>');
+
+    ObjectsDiv
+        .append(communitiesDiv)
+        .append(collectionsDiv)
+        .append(itemsDiv)
+
+
+    localPanel.append(dvTypeDiv);
+    localPanel.append(ObjectsDiv);
+    localPanel.append(dsListDiv);
+    localPanel.append(dvSummaryDiv);
+
+    dvTypeDiv.append(get_dspace_submission_context(params));
+    params.communitiesDiv = communitiesDiv;
+    params.collectionsDiv = collectionsDiv;
+    params.itemsDiv = itemsDiv;
+    display_dspace_communities(params);
+
+    refresh_tool_tips();
+    return true;
+}
+
+function get_dspace_submission_context(params) {
+    var panel = $('<div/>');
+
+    var formElem = {
+        "ref": "dspace_submission_context",
+        "id": "dspace_submission_context",
+        "label": "Submission context ",
+        "help_tip": "Please specify where you want to place this submission.",
+        "control": "copo-button-list",
+        "type": "string",
+        "required": true,
+        "control_meta": {},
+        "default_value": params.submission_context,
+        "option_values": [
+            {
+                "value": "new",
+                "label": "Create a new DSpace item",
+                "description": "A new item will be created for your submission. Please locate the community/collection of interest below."
+            },
+            {
+                "value": "existing",
+                "label": "Add to an existing DSpace item",
+                "description": "Submission will be made to an existing item. Please locate the community/collection/item of interest below."
+            }
+        ]
+    };
+
+    var elemValue = formElem.default_value;
+    panel.append(dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue));
+    panel.find(".constraint-label").remove();
+
+    return panel;
+}
+
+function display_dspace_communities(params) {
+    var displayPanel = params.communitiesDiv;
+    var submission_id = params.submission_id;
+
+    var tableID = 'communities_view_tbl' + submission_id;
+    var table = null;
+    var tbl = $('<table/>',
+        {
+            id: tableID,
+            "class": "ui blue celled table hover copo-noborders-table",
+            cellspacing: "0",
+            width: "100%"
+        });
+
+
+    var table_div = $('<div/>').append(tbl);
+    var filter_message = $('<div style="margin-bottom: 20px;"><div class="text-info filter-message" style="margin-bottom: 5px; padding: 5px;">Loading DSpace communities...</div></div>');
+    var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader-50"></div>'));
+
+    var panelTitleDiv = $('<div class="webpop-content-div"></div>');
+    var recordDetailDiv = $('<div class="webpop-content-div rdetail-view"></div>');
+    var codeList = '<div style="margin-top: 10px;"><ul class="list-group">\n' +
+        '  <li class="list-group-item active" style="background: #31708f; text-shadow: none; border-color: #d9edf7; color: #fff;">Communities</li>\n' +
+        '</ul></div>'
+
+
+    panelTitleDiv.append(codeList);
+
+    displayPanel
+        .html('')
+        .append(panelTitleDiv)
+        .append(filter_message)
+        .append(recordDetailDiv)
+        .append(spinner_div)
+        .append(table_div);
+
+    var api_schema = get_dspace_communities_schema();
+
+    $.ajax({
+        url: '/copo/retrieve_dspace_objects/',
+        type: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            'submission_id': submission_id,
+            'object_type': 'communities',
+            'api_schema': JSON.stringify(api_schema)
+        },
+        success: function (data) {
+            spinner_div.remove();
+
+            if (data.hasOwnProperty('status') && data.status == "error") {
+
+                filter_message.find(".filter-message").html("No records returned");
+
+                var errorMessage = "Encountered an error! No specific details provided.";
+                if (data.hasOwnProperty('message') && data.message != "") {
+                    errorMessage = data.message;
+                }
+
+                let feedback = get_alert_control();
+                feedback
+                    .removeClass("alert-success")
+                    .addClass("alert-danger");
+
+                feedback.find(".alert-message").html(errorMessage);
+                displayPanel.append(feedback);
+
+                return true;
+            }
+
+            var dtd = data.items;
+            var cols = [
+                {title: "", className: 'select-checkbox', data: null, orderable: false, "defaultContent": ''}
+            ];
+
+            filter_message.find(".filter-message").html('');
+
+            if (dtd.length > 0) {
+                filter_message.find(".filter-message").html("Select a community to view corresponding collections.");
+            }
+
+            var visible = false;
+            for (var i = 0; i < api_schema.length; ++i) {
+                var entry = api_schema[i];
+                var option = {};
+
+                //display only the first displayable item
+                option["visible"] = false;
+                if (!visible) {
+                    visible = entry.show_in_table;
+                    option["visible"] = visible;
+                }
+
+                option["title"] = entry.label;
+                option["data"] = entry.id;
+                cols.push(option);
+            }
+
+            table = $('#' + tableID).DataTable({
+                data: dtd,
+                searchHighlight: true,
+                "lengthChange": false,
+                order: [
+                    [1, "asc"]
+                ],
+                scrollY: "300px",
+                scrollX: true,
+                scrollCollapse: true,
+                paging: false,
+                language: {
+                    "info": " _START_ to _END_ of _TOTAL_ communities",
+                    "search": " "
+                },
+                select: {
+                    style: 'single',
+                    // selector: 'td:first-child'
+                },
+                columns: cols,
+                dom: 'fr<"row"><"row info-rw" i>tlp'
+            });
+
+            $('#' + tableID + '_wrapper')
+                .find(".dataTables_filter")
+                .find("input")
+                .removeClass("input-sm")
+                .attr("placeholder", "Search communities");
+
+            table
+                .on('select', function (e, dt, type, indexes) {
+                    var selectedData = dt.row({selected: true}).data();
+                    //todo: uncomment this for row details
+                    //
+                    // var subTable = $('<table cellpadding="5" cellspacing="0" border="0"></table>');
+                    // recordDetailDiv.html(subTable);
+                    //
+                    // for (var i = 0; i < api_schema.length; ++i) {
+                    //     var entry = api_schema[i];
+                    //     if(entry.show_in_table) {
+                    //         subTable.append('<tr><td>'+entry.label+':</td>' +'<td>' + selectedData[entry.id] + '</td></tr>');
+                    //     }
+                    // }
+                    params.community_record = selectedData;
+                    display_dspace_collections(params);
+                });
+
+            table
+                .on('deselect', function (e, dt, type, indexes) {
+                    params.itemsDiv.html('');
+                    params.collectionsDiv.html('');
+                    recordDetailDiv.html('');
+                });
+
+        },
+        error: function () {
+            spinner_div.remove();
+
+            let feedback = get_alert_control();
+            feedback
+                .removeClass("alert-success")
+                .addClass("alert-danger")
+                .addClass("page-notifications-node");
+
+            feedback.find(".alert-message").html("Encountered an error. Please check that you are connected to a network and try again.");
+            displayPanel.append(feedback);
+        }
+    });
+
+}
+
+function display_dspace_collections(params) {
+    var displayPanel = params.collectionsDiv;
+    var submission_id = params.submission_id;
+    var community_record = params.community_record;
+
+    displayPanel.html('');
+
+    var tableID = 'collections_view_tbl' + submission_id;
+    var table = null;
+    var tbl = $('<table/>',
+        {
+            id: tableID,
+            "class": "ui blue celled table hover copo-noborders-table",
+            cellspacing: "0",
+            width: "100%"
+        });
+
+
+    var table_div = $('<div/>').append(tbl);
+    var filter_message = $('<div style="margin-bottom: 20px;"><div class="text-info filter-message" style="margin-bottom: 5px; padding: 5px;">Loading collections...</div></div>');
+    var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader-50"></div>'));
+
+    var panelTitleDiv = $('<div class="webpop-content-div"></div>');
+    var recordDetailDiv = $('<div class="webpop-content-div rdetail-view"></div>');
+    var codeList = '<div style="margin-top: 10px;"><ul class="list-group">\n' +
+        '  <li class="list-group-item active" style="background: #31708f; text-shadow: none; border-color: #d9edf7; color: #fff;">Collections</li>\n' +
+        '</ul></div>'
+
+
+    panelTitleDiv.append(codeList);
+
+    displayPanel
+        .html('')
+        .append(panelTitleDiv)
+        .append(filter_message)
+        .append(recordDetailDiv)
+        .append(spinner_div)
+        .append(table_div);
+
+    var api_schema = get_dspace_communities_schema();
+
+
+    $.ajax({
+        url: '/copo/retrieve_dspace_objects/',
+        type: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            'submission_id': submission_id,
+            'community_id': community_record.id,
+            'object_type': 'collections',
+            'api_schema': JSON.stringify(api_schema)
+        },
+        success: function (data) {
+            spinner_div.remove();
+
+            if (data.hasOwnProperty('status') && data.status == "error") {
+
+                filter_message.find(".filter-message").html("No records returned");
+
+                var errorMessage = "Encountered an error! No specific details provided.";
+                if (data.hasOwnProperty('message') && data.message != "") {
+                    errorMessage = data.message;
+                }
+
+                let feedback = get_alert_control();
+                feedback
+                    .removeClass("alert-success")
+                    .addClass("alert-danger");
+
+                feedback.find(".alert-message").html(errorMessage);
+                displayPanel.append(feedback);
+
+                return true;
+            }
+
+            var dtd = data.items;
+            var cols = [
+                {title: "", className: 'select-checkbox', data: null, orderable: false, "defaultContent": ''}
+            ];
+
+            filter_message.find(".filter-message").html('');
+
+            if (dtd.length > 0) {
+                var filterMessage = "Select a collection to view corresponding items.";
+                var submission_context = displayPanel.closest(".submission-panel").find("#dspace_submission_context").val();
+                if (submission_context == "new") {
+                    filterMessage = "Select a collection to place your new item.";
+                }
+                filter_message.find(".filter-message").html(filterMessage);
+            }
+
+            var visible = false;
+            for (var i = 0; i < api_schema.length; ++i) {
+                var entry = api_schema[i];
+                var option = {};
+
+                //display only the first displayable item
+                option["visible"] = false;
+                if (!visible) {
+                    visible = entry.show_in_table;
+                    option["visible"] = visible;
+                }
+
+                option["title"] = entry.label;
+                option["data"] = entry.id;
+                cols.push(option);
+            }
+
+            table = $('#' + tableID).DataTable({
+                data: dtd,
+                searchHighlight: true,
+                "lengthChange": false,
+                order: [
+                    [1, "asc"]
+                ],
+                scrollY: "300px",
+                scrollX: true,
+                scrollCollapse: true,
+                paging: false,
+                language: {
+                    "info": " _START_ to _END_ of _TOTAL_ collections",
+                    "search": " "
+                },
+                select: {
+                    style: 'single',
+                    // selector: 'td:first-child'
+                },
+                columns: cols,
+                dom: 'fr<"row"><"row info-rw" i>tlp'
+            });
+
+            $('#' + tableID + '_wrapper')
+                .find(".dataTables_filter")
+                .find("input")
+                .removeClass("input-sm")
+                .attr("placeholder", "Search collections");
+
+            table
+                .on('select', function (e, dt, type, indexes) {
+                    var selectedData = dt.row({selected: true}).data();
+                    var submission_context = displayPanel.closest(".submission-panel").find("#dspace_submission_context").val();
+                    if (submission_context == "existing") {
+                        //load items
+                        params.collection_record = selectedData;
+                        display_dspace_items(params);
+                    } else {
+                        //save user choice and display summary
+                        var form_values = {};
+                        form_values['type'] = submission_context;
+                        form_values['identifier'] = selectedData.id;
+                        params.form_values = form_values;
+
+
+                        let summary_message = "<div>Your submission will be made to a new collection together with your existing metadata." +
+                            " <a class='ui green tag label show-sub-meta' data-submission-id='" + submission_id + "'> show metadata</a></div>" +
+                            "<div style='margin-top: 10px;'>Click the submit button when you are ready to proceed.</div>";
+
+                        params.summary_message = summary_message;
+                        get_dspace_summary(params);
+                    }
+                });
+
+            table
+                .on('deselect', function (e, dt, type, indexes) {
+                    params.itemsDiv.html('');
+                    recordDetailDiv.html('');
+                    get_viewport(submission_id).find(".dv-summary-div").html('');
+                });
+
+        },
+        error: function () {
+            spinner_div.remove();
+
+            let feedback = get_alert_control();
+            feedback
+                .removeClass("alert-success")
+                .addClass("alert-danger")
+                .addClass("page-notifications-node");
+
+            feedback.find(".alert-message").html("Encountered an error. Please check that you are connected to a network and try again.");
+            displayPanel.append(feedback);
+        }
+    });
+
+}
+
+function display_dspace_items(params) {
+    var displayPanel = params.itemsDiv;
+    var submission_id = params.submission_id;
+    var community_record = params.community_record;
+    var collection_record = params.collection_record;
+
+    displayPanel.html('');
+
+    var tableID = 'items_view_tbl' + submission_id;
+    var table = null;
+    var tbl = $('<table/>',
+        {
+            id: tableID,
+            "class": "ui blue celled table hover copo-noborders-table",
+            cellspacing: "0",
+            width: "100%"
+        });
+
+
+    var table_div = $('<div/>').append(tbl);
+    var filter_message = $('<div style="margin-bottom: 20px;"><div class="text-info filter-message" style="margin-bottom: 5px; padding: 5px;">Loading items...</div></div>');
+    var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader-50"></div>'));
+
+    var panelTitleDiv = $('<div class="webpop-content-div"></div>');
+    var recordDetailDiv = $('<div class="webpop-content-div rdetail-view"></div>');
+    var codeList = '<div style="margin-top: 10px;"><ul class="list-group">\n' +
+        '  <li class="list-group-item active" style="background: #31708f; text-shadow: none; border-color: #d9edf7; color: #fff;">Items</li>\n' +
+        '</ul></div>'
+
+
+    panelTitleDiv.append(codeList);
+
+    displayPanel
+        .html('')
+        .append(panelTitleDiv)
+        .append(filter_message)
+        .append(recordDetailDiv)
+        .append(spinner_div)
+        .append(table_div);
+
+    var api_schema = get_dspace_communities_schema();
+
+
+    $.ajax({
+        url: '/copo/retrieve_dspace_objects/',
+        type: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            'submission_id': submission_id,
+            'collection_id': collection_record.id,
+            'object_type': 'items',
+            'api_schema': JSON.stringify(api_schema)
+        },
+        success: function (data) {
+            spinner_div.remove();
+
+            if (data.hasOwnProperty('status') && data.status == "error") {
+
+                filter_message.find(".filter-message").html("No records returned");
+
+                var errorMessage = "Encountered an error! No specific details provided.";
+                if (data.hasOwnProperty('message') && data.message != "") {
+                    errorMessage = data.message;
+                }
+
+                let feedback = get_alert_control();
+                feedback
+                    .removeClass("alert-success")
+                    .addClass("alert-danger");
+
+                feedback.find(".alert-message").html(errorMessage);
+                displayPanel.append(feedback);
+
+                return true;
+            }
+
+            var dtd = data.items;
+            var cols = [
+                {title: "", className: 'select-checkbox', data: null, orderable: false, "defaultContent": ''}
+            ];
+
+            filter_message.find(".filter-message").html('');
+
+            if (dtd.length > 0) {
+                filter_message.find(".filter-message").html("Select an item to submit to.");
+            }
+
+            var visible = false;
+            for (var i = 0; i < api_schema.length; ++i) {
+                var entry = api_schema[i];
+                var option = {};
+
+                //display only the first displayable item
+                option["visible"] = false;
+                if (!visible) {
+                    visible = entry.show_in_table;
+                    option["visible"] = visible;
+                }
+
+                option["title"] = entry.label;
+                option["data"] = entry.id;
+                cols.push(option);
+            }
+
+            table = $('#' + tableID).DataTable({
+                data: dtd,
+                searchHighlight: true,
+                "lengthChange": false,
+                order: [
+                    [1, "asc"]
+                ],
+                scrollY: "300px",
+                scrollX: true,
+                scrollCollapse: true,
+                paging: false,
+                language: {
+                    "info": " _START_ to _END_ of _TOTAL_ items",
+                    "search": " "
+                },
+                select: {
+                    style: 'single',
+                    // selector: 'td:first-child'
+                },
+                columns: cols,
+                dom: 'fr<"row"><"row info-rw" i>tlp'
+            });
+
+            $('#' + tableID + '_wrapper')
+                .find(".dataTables_filter")
+                .find("input")
+                .removeClass("input-sm")
+                .attr("placeholder", "Search items");
+
+            table
+                .on('select', function (e, dt, type, indexes) {
+                    var selectedData = dt.row({selected: true}).data();
+                    var submission_context = displayPanel.closest(".submission-panel").find("#dspace_submission_context").val();
+
+                    //save user choice and display summary
+                    var form_values = {};
+                    form_values['type'] = submission_context;
+                    form_values['identifier'] = selectedData.id;
+                    params.form_values = form_values;
+
+                    let summary_message = "Your submission will be made to the selected item. " +
+                        "Your existing metadata is not required for this submission." +
+                        "<div>Click the submit button when you are ready to proceed.</div>";
+
+                    params.summary_message = summary_message;
+                    get_dspace_summary(params);
+                });
+
+            table
+                .on('deselect', function (e, dt, type, indexes) {
+                    recordDetailDiv.html('');
+                    get_viewport(submission_id).find(".dv-summary-div").html('');
+                });
+
+        },
+        error: function () {
+            spinner_div.remove();
+
+            let feedback = get_alert_control();
+            feedback
+                .removeClass("alert-success")
+                .addClass("alert-danger")
+                .addClass("page-notifications-node");
+
+            feedback.find(".alert-message").html("Encountered an error. Please check that you are connected to a network and try again.");
+            displayPanel.append(feedback);
+        }
+    });
+
+}
+
+function get_dspace_summary(params) {
+    var submission_id = params.submission_id;
+    var parentElem = get_viewport(submission_id);
+    var dvSummaryPanel = parentElem.find(".dv-summary-div");
+    var summary_message = params.summary_message;
+    var form_values = params.form_values;
+
+
+    $.ajax({
+        url: "/copo/update_submission_meta/",
+        type: "POST",
+        dataType: "json",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        data: {
+            'submission_id': submission_id,
+            'form_values': JSON.stringify(form_values),
+        },
+        success: function (data) {
+            dvSummaryPanel.html(format_summary_message(summary_message));
+            $('html, body').animate({
+                scrollTop: dvSummaryPanel.offset().top - 250
+            }, 'slow');
+
+            dvSummaryPanel.append(submit_submission_record(submission_id));
+            refresh_tool_tips();
+        },
+        error: function () {
+            dvSummaryPanel.html('');
+
+            let feedback = get_alert_control();
+            feedback
+                .removeClass("alert-success")
+                .addClass("alert-danger")
+                .addClass("page-notifications-node");
+
+            feedback.find(".alert-message").html("Encountered an error. Please check that you are connected to a network and try again.");
+            dvSummaryPanel.append(feedback);
+        }
+    });
+
+    return true;
+}
+
+
+function handle_dspace_context_change(parentElem) {
+    parentElem.find(".dv-summary-div").html('');
+    parentElem.find(".ds-list-div").html('');
+    parentElem.find(".items-display").html('');
+    parentElem.find(".collections-display").html('');
+
+    var submission_id = parentElem.attr("data-id");
+    var tableID = 'communities_view_tbl' + submission_id;
+
+    var table = $('#' + tableID).DataTable();
+    table.rows().deselect();
+}
+
+function get_dspace_communities_schema() {
+    return [
+        {'id': 'name', 'label': 'Name', 'show_in_table': true},
+        {'id': 'id', 'label': 'Id', 'show_in_table': true},
+        {'id': 'handle', 'label': 'Handle', 'show_in_table': true},
+    ]
+}
+
+

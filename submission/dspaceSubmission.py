@@ -2,37 +2,477 @@
 from dal.copo_da import Submission, DataFile
 import requests, os
 import json
-from web.apps.web_copo.schemas.utils import data_utils
+import traceback
 from bson import ObjectId
 from urllib.request import quote
+from collections import namedtuple
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 from web.apps.web_copo.schemas.utils.data_utils import get_base_url
 from urllib.parse import urljoin
+from dal import cursor_to_list
+from submission.helpers import generic_helper as ghlper
 
-class DspaceSubmit(object):
-    host = None
-    headers = None
-    numeric_limit = 50
-    error_msg = "Cannot communicate with server. Are you connected to a network?"
-    not_found = "Nothing Found for Entry"
 
-    def __init__(self, sub_id=None):
-        if sub_id:
-            self.host = Submission().get_dataverse_details(sub_id)
-            self.headers = {'X-Dataverse-key': self.host['apikey']}
+class DspaceSubmit:
+    def __init__(self, submission_id=str()):
+        self.submission_id = submission_id
 
-    def submit(self, sub_id, dataFile_ids):
-        profile_id = data_utils.get_current_request().session.get('profile_id')
-        s = Submission().get_record(ObjectId(sub_id))
+        self.host = None
+        self.username = None
+        self.password = None
+        self.login_details = None
+        self.dspace_type = None
 
-        # get url for dataverse
-        self.host = Submission().get_dataverse_details(sub_id)
-        self.headers = {'X-Dataverse-key': self.host['apikey']}
+    def submit(self):
+        """
+        function manages the submission of objects to ckan
+        :return:
+        """
 
-        # if dataset id in submission meta, we are adding to existing dataset, otherwise
-        #  we are creating a new dataset
-        new_or_existing = s['meta']['new_or_existing']
-        return self._add_to_dspace(s, new_or_existing)
+        if not self.submission_id:
+            return dict(status=False, message='Submission identifier not found!')
+
+            # retrieve submssion record from db
+
+        # specify filtering
+        filter_by = dict(_id=ObjectId(str(self.submission_id)))
+
+        # specify projection
+        query_projection = {
+            "_id": 1,
+            "repository_docs.url": 1,
+            "repository_docs.username": 1,
+            "repository_docs.password": 1,
+            "meta.type": 1,
+            "meta.params": 1,
+            "complete": 1
+
+        }
+
+        doc = Submission().get_collection_handle().aggregate(
+            [
+                {"$addFields": {
+                    "destination_repo_converted": {
+                        "$convert": {
+                            "input": "$destination_repo",
+                            "to": "objectId",
+                            "onError": 0
+                        }
+                    }
+                }
+                },
+                {
+                    "$lookup":
+                        {
+                            "from": "RepositoryCollection",
+                            "localField": "destination_repo_converted",
+                            "foreignField": "_id",
+                            "as": "repository_docs"
+                        }
+                },
+                {
+                    "$project": query_projection
+                },
+                {
+                    "$match": filter_by
+                }
+            ])
+
+        records = cursor_to_list(doc)
+
+        # get submission record
+        try:
+            submission_record = records[0]
+        except Exception as ex:
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            message = "Submission record not found. Please try resubmitting."
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        try:
+            repository_info = submission_record['repository_docs'][0]
+        except Exception as ex:
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            error_type = type(ex).__name__
+            message = f"Couldn't retrieve repository information due to the following error: '{error_type}'"
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        if str(submission_record.get("complete", False)).lower() == 'true':
+            message = 'Submission is marked as complete!'
+            ghlper.logging_info(message, self.submission_id)
+            ghlper.update_submission_status(status='success', message=message, submission_id=self.submission_id)
+
+            return dict(status=True, message=message)
+
+        # set submission parameters
+        self.host = repository_info.get("url", str())
+        self.username = repository_info.get("username", str())
+        self.password = repository_info.get("password", str())
+
+        # authenticate against the repository
+        try:
+            authentication_result = self._do_dspace_authenticate()
+            if authentication_result['status'] is not True:
+                return authentication_result
+        except Exception as ex:
+            user_message = f"DSpace Authentication error"  # risk of exposing login credentials
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            ghlper.update_submission_status(status='error', message=user_message, submission_id=self.submission_id)
+            return dict(status='error', message=user_message)
+
+        login_details, dspace_type = authentication_result['value']
+        self.login_details = login_details
+        self.dspace_type = dspace_type
+
+        # check submission context and select submission pathway
+        type = submission_record.get("meta", dict()).get("type", str())
+        params = submission_record.get("meta", dict()).get("params", dict())
+
+        if type == "new":  # create a dataset to submit
+            return self._do_item_create_submit(**params)
+
+        if type == "existing":  # a dataset specified proceed to submit
+            return self._do_item_submit(**params)
+
+        return dict(status=True, message="No status message provided!")
+
+    def _do_dspace_authenticate(self):
+        """
+        function authenticates against the dspace repository to facilitate interactions
+        :return:
+        """
+
+        login_url = urljoin(self.host, '/rest/login')
+
+        # try to login using v6 method
+        # special characters must be urlencoded (but only for version 6!)
+        param_string = "?email=" + quote(self.username) + "&password=" + self.password
+
+        try:
+            response = requests.post(login_url + param_string)
+        except Exception as ex:
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            message = f"DSpace Authentication error"  # risk of exposing login credentials
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            return dict(status='error', message=message)
+
+        response_status_code = response.status_code
+
+        if response_status_code != 200:
+            # try using v5 method
+            params = dict(email=self.username, password=self.password)
+            try:
+                response = requests.post(login_url, json=params)
+            except Exception as ex:
+                ghlper.logging_error(traceback.format_exc(), self.submission_id)
+                message = f"DSpace Authentication error"  # risk of exposing login credentials
+                ghlper.logging_error(traceback.format_exc(), self.submission_id)
+                return dict(status='error', message=message)
+
+            response_status_code = response.status_code
+
+            if response_status_code != 200:
+                error_code = response.status_code
+                message = f"DSpace Authentication error: '{str(error_code)}'"
+                ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+                return dict(status='error', message=message)
+
+        try:
+            login_details = response.cookies["JSESSIONID"]
+            dspace_type = 6
+        except KeyError:
+            login_details = response.content
+            dspace_type = 5
+
+        return dict(status=True, value=(login_details, dspace_type))
+
+    def _do_item_submit(self, **params):
+        """
+        function fulfills submission given item identifier
+        :param params:
+        :return:
+        """
+
+        # get collection id for which a new item is to be created
+        item_id = params.get("identifier", str())
+
+        if not item_id:
+            message = 'Missing item identifier! Please try resubmitting.'
+            ghlper.logging_error(message, self.submission_id)
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        return self._submit_datafiles(item_id=item_id)
+
+    def _do_item_create_submit(self, **params):
+        """
+        function creates a new item to fulfill submission
+        :return:
+        """
+
+        # get collection id for which a new item is to be created
+        collection_id = params.get("identifier", str())
+
+        if not collection_id:
+            message = 'Missing collection identifier! Please try resubmitting.'
+            ghlper.logging_error(message, self.submission_id)
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        # convert to DSpace metadata
+        try:
+            submission_metadata = self._get_submission_metadata()
+        except Exception as ex:
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+            message = f"Error converting from CG Core to DSpace: '{str(ex)}'"
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        # create item
+        call_url = urljoin(self.host, f"/rest/collections/{collection_id}/items")
+        dspace_meta = dict(metadata=submission_metadata)
+
+        if self.dspace_type == 6:
+            try:
+                response = requests.post(call_url, json=dspace_meta,
+                                         headers={"Content-Type": "application/json",
+                                                  "accept": "application/json"},
+                                         cookies={"JSESSIONID": self.login_details})
+            except Exception as ex:
+                ghlper.logging_error(traceback.format_exc(), self.submission_id)
+                message = f"Error creating DSpace item: '{str(ex)}'"
+                ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+                return dict(status='error', message=message)
+
+        elif self.dspace_type == 5:
+            try:
+                response = requests.post(call_url, json=dspace_meta,
+                                         headers={"rest-dspace-token": self.login_details,
+                                                  "Content-Type": "application/json",
+                                                  "accept": "application/json"})
+            except Exception as ex:
+                ghlper.logging_error(traceback.format_exc(), self.submission_id)
+                message = f"Error creating DSpace item: '{str(ex)}'"
+                ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+                return dict(status='error', message=message)
+
+        if response.status_code == 200:
+            response_data = response.json()
+        else:
+            error_message = response.reason
+            message = f"Error creating DSpace item.'{error_message}'"
+            ghlper.logging_error(message, self.submission_id)
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        item_id = response_data.get("id", str()) or response_data.get("uuid", str())
+        if not item_id:
+            message = f"Error creating DSpace item. Couldn't obtain item identifier."
+            ghlper.logging_error(message, self.submission_id)
+            ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+            return dict(status='error', message=message)
+
+        return self._submit_datafiles(item_id=item_id)
+
+    def _get_submission_metadata(self):
+        """
+        function composes the metadata for a new dataset creation
+        :return:
+        """
+
+        submission_metadata = list()
+
+        # get user data
+        description_metadata = Submission().get_submission_metadata(submission_id=self.submission_id)["meta"]
+
+        # get metadata language
+
+        lang = [x.get("vals", str()) for x in description_metadata if x.get("dc", str()) == "dc.language"]
+
+        lang = lang[0] if lang else str()
+        if isinstance(lang, list):
+            lang = lang[0]
+
+        # predefined fields
+
+        try:
+            url = get_base_url()
+            submission_metadata.append(
+                dict(key="dc.relation.ispartof", value=urljoin(url, 'copo/resolve/' + self.submission_id),
+                     language=lang))
+        except Exception as ex:
+            ghlper.logging_error(traceback.format_exc(), self.submission_id)
+
+        # define a mapping from cgcore to dspace fields
+        MetaMap = namedtuple('MetaMap', ['repo', 'cgcore'])
+
+        schema_mappings = [
+            MetaMap(repo="dc.contributor.author", cgcore="dc.creator"),
+            MetaMap(repo="", cgcore="dc.relation isPartOf"),  # doing this penalises the cgcore field
+        ]
+
+        # map defined fields first
+        for mapping in schema_mappings:
+            target_val = [x for x in description_metadata if x.get("dc", str()) == mapping.cgcore]
+
+            if not target_val:
+                continue
+
+            target_dict = target_val[0]
+            target_val = target_dict.get("vals", str())
+
+            # remove mapped entry from list
+            description_metadata.remove(target_dict)
+
+            # can't map unspecified repository field
+            if not mapping.repo:
+                continue
+
+            if isinstance(target_val, str) and target_val.strip() != "":
+                submission_metadata.append(dict(key=mapping.repo, value=target_val, language=lang))
+
+            # set one value from the list that isn't empty
+            elif isinstance(target_val, list):
+                target_val = [x for x in target_val if str(x).strip() != ""]
+                if target_val:
+                    submission_metadata.append(dict(key=mapping.repo, value=target_val[0], language=lang))
+
+        # now map non-predefined entries
+        for target_dict in description_metadata:
+            # process key
+            prefix = target_dict.get("prefix", "dc")
+            key = target_dict.get("dc", str()).replace('dc.', f'{prefix}.', 1)
+            key = '.'.join(key.split())
+            key = '.'.join(key.split('.type='))
+            key = key.lower()
+
+            # process value
+            target_val = target_dict.get("vals", str())
+            if isinstance(target_val, str) and target_val.strip() != "":
+                submission_metadata.append(dict(key=key, value=target_val, language=lang))
+
+            # set one value from the list that isn't empty
+            elif isinstance(target_val, list):
+                target_val = [x for x in target_val if str(x).strip() != ""]
+                if target_val:
+                    submission_metadata.append(dict(key=key, value=target_val[0], language=lang))
+
+        return submission_metadata
+
+    def _submit_datafiles(self, item_id=str()):
+        """
+        function uploads files to DSpace given an item
+        :param item_id:
+        :return:
+        """
+
+        submission_record = Submission().get_collection_handle().find_one({'_id': ObjectId(self.submission_id)},
+                                                                          {"bundle_meta": 1})
+
+        # get files to upload
+        datafiles = submission_record.get("bundle_meta", list())
+
+        # set post parameters
+        headers = {"Content-Type": "application/json", "accept": "application/json"}
+        policy = [{"action": "DEFAULT_*", "epersonId": -1, "groupId": 0, "resourceId": 47166,
+                   "resourceType": "bitstream", "rpDescription": None, "rpName": None, "rpType": "TYPE_INHERITED",
+                   "startDate": None, "endDate": None}]
+
+        for df in datafiles:
+            # # check for already uploaded file
+            # if str(df.get("upload_status", False)).lower() == 'true':
+            #     continue
+
+            file_basename = os.path.basename(df.get("file_path", str()))
+            filename, file_extension = os.path.splitext(file_basename)
+            file_extension = file_extension.lstrip(".")
+            file_mimetype = self.get_media_type_from_file_ext(file_extension)
+
+            name = description = filename
+
+            bitstream_url = urljoin(self.host,
+                                    f"/rest/items/{str(item_id)}/bitstreams?name={name}&description={description}")
+            bitstream = dict(
+                name=name,
+                description=description,
+                type="bitstream",
+                format=file_mimetype,
+                bundleName="ORIGINAL",
+                policies=policy
+            )
+
+            # request new bitstream
+            if self.dspace_type == 6:
+                try:
+                    response = requests.post(bitstream_url, data=bitstream, headers=headers,
+                                             cookies={"JSESSIONID": self.login_details})
+                except Exception as ex:
+                    ghlper.logging_error(traceback.format_exc(), self.submission_id)
+                    message = f"Error obtaining DSpace bitstream: '{str(ex)}'"
+                    ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+                    return dict(status='error', message=message)
+
+            elif self.dspace_type == 5:
+                try:
+                    response = requests.post(bitstream_url, json=bitstream,
+                                             headers={"rest-dspace-token": self.login_details,
+                                                      "accept": "application/json"})
+                except Exception as ex:
+                    ghlper.logging_error(traceback.format_exc(), self.submission_id)
+                    message = f"Error obtaining DSpace bitstream: '{str(ex)}'"
+                    ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+                    return dict(status='error', message=message)
+
+            if response.status_code == 200:
+                response_data = response.json()
+            else:
+                error_message = response.reason
+                message = f"Error obtaining DSpace bitstream.'{error_message}'"
+                ghlper.logging_error(message, self.submission_id)
+                ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+                return dict(status='error', message=message)
+
+            data_id = response_data.get("id", str()) or response_data.get("uuid", str())
+
+            if not data_id:
+                message = "Error uploading datafile. Couldn't obtain bitstream identifier."
+                ghlper.logging_error(message, self.submission_id)
+                ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+                return dict(status='error', message=message)
+
+            data_url = urljoin(self.host, f"/rest/bitstreams/{str(data_id)}/data")
+
+            # upload file
+            try:
+                with open(df.get("file_path", str()), 'rb') as file_stream:
+                    if self.dspace_type == 6:
+                        response = requests.put(data_url, data=file_stream, headers=headers,
+                                                 cookies={"JSESSIONID": self.login_details})
+                    elif self.dspace_type == 5:
+                        response = requests.put(data_url, data=file_stream,
+                                                 headers={"rest-dspace-token": self.login_details})
+            except Exception as ex:
+                ghlper.logging_error(traceback.format_exc(), self.submission_id)
+                message = f"Error uploading datafile: '{str(ex)}'"
+                ghlper.update_submission_status(status='error', message=message, submission_id=self.submission_id)
+                return dict(status='error', message=message)
+
+            if response.status_code == 200:
+                self._update_dspace_submission(submission_record, self.host, data_id, item_id)
+
+        logout_url = urljoin(self.host, "/rest/logout")
+        if self.dspace_type == 6:
+            requests.post(logout_url, cookies={"JSESSIONID": self.login_details})
+        elif self.dspace_type == 5:
+            requests.post(logout_url, headers={"rest-dspace-token": self.login_details})
+        Submission().mark_submission_complete(self.submission_id)
+
+        status_message = "Submission is marked as complete!"
+        ghlper.logging_info(status_message, self.submission_id)
+        ghlper.update_submission_status(status='success', message=status_message, submission_id=self.submission_id)
+
+        return dict(status='success', message=status_message)
 
     def _add_to_dspace(self, sub, new_or_existing):
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
@@ -186,7 +626,7 @@ class DspaceSubmit(object):
             if f["dc"] == "dc.language":
                 lang = f.get("vals", "")
                 #  check if lang is array if so take first element
-                #if type(lang) != type(""):
+                # if type(lang) != type(""):
                 #    lang = lang[0]
                 if isinstance(lang, list):
                     lang = lang[0] if lang else ""
@@ -251,8 +691,8 @@ class DspaceSubmit(object):
         return out
 
     def _update_dspace_submission(self, sub, dspace_url, data_id, item_id):
-        data_url = dspace_url + "/rest/bitstreams/" + str(data_id)
-        meta_url = dspace_url + "/rest/items/" + str(item_id) + "?expand=all"
+        data_url = urljoin(dspace_url, "/rest/bitstreams/" + str(data_id))
+        meta_url = urljoin(dspace_url, "/rest/items/" + str(item_id) + "?expand=all")
         resp = requests.get(data_url)
         data = json.loads(resp.content.decode('utf-8'))
         if "uuid" not in data:
@@ -263,8 +703,9 @@ class DspaceSubmit(object):
         Submission().insert_dspace_accession(sub, data)
 
     def get_dspace_communites(self):
+        numeric_limit = 50
         url = self.host['url']
-        url = url + '/rest/communities?limit=' + str(self.numeric_limit)
+        url = url + '/rest/communities?limit=' + str(numeric_limit)
         resp = requests.get(url)
 
         if resp.status_code == 200:
@@ -323,34 +764,36 @@ class DspaceSubmit(object):
             return json.dumps({"error": self.error_msg})
 
     def get_media_type_from_file_ext(self, ext):
-        if ext == "pdf":
-            return "application/pdf"
-        elif ext == "ai" or ext == "eps" or ext == "ps":
-            return "application/postscript"
-        elif ext == "xls" or ext == "xlsx":
-            return "application/vnd.ms-excel"
-        elif ext == "ppt":
-            return "application/vnd.ms-powerpoint"
-        elif ext == "gif":
-            return "image/gif"
-        elif ext == "jpg" or ext == "jpeg":
-            return "image/jpeg"
-        elif ext == "png":
-            return "image/png"
-        elif ext == "tif" or ext == "tiff":
-            return "image/tiff"
-        elif ext == "bmp":
-            return "image/x-ms-bmp"
-        elif ext == "html" or ext == "htm":
-            return "text/html"
-        elif ext == "asc" or ext == "txt":
-            return "text/plain"
-        elif ext == "xml":
-            return "text/xml"
-        elif ext == "doc" or ext == "docx":
-            return "application/msword"
-        else:
-            return ""
+        """
+        function returns the mimetype matching an extension
+        :param ext:
+        :return:
+        """
+        mime_type = dict(
+            pdf="application/pdf",
+            ai="application/postscript",
+            eps="application/postscript",
+            ps="application/postscript",
+            xls="application/vnd.ms-excel",
+            xlsx="application/vnd.ms-excel",
+            ppt="application/vnd.ms-powerpoint",
+            gif="image/gif",
+            jpg="image/jpeg",
+            jpeg="image/jpeg",
+            png="image/png",
+            tif="image/tiff",
+            tiff="image/tiff",
+            bmp="image/x-ms-bmp",
+            html="text/html",
+            htm="text/html",
+            asc="text/plain",
+            txt="text/plain",
+            xml="text/xml",
+            doc="application/msword",
+            docx="application/msword",
+        )
+
+        return mime_type.get(ext.lower(), str())
 
     def dc_dict_to_dc(self, sub_id):
         # get file metadata, call converter to strip out dc fields

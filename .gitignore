@@ -57,7 +57,7 @@ coverage.xml
 
 
 # Django stuff:
-*.log
+exceptions_and_logging/logs/*.log
 local_settings.py
 
 # Flask stuff:
@@ -135,6 +135,5 @@ submission/data/.gitignore
 web/src/tools/reposit/aspera/AsperaConnect.app/Contents/Resources/aspera_mac_plugin/
 tools/reposit/aspera/AsperaConnect.app/Contents/Resources/aspera_mac_plugin/
 
-# logs
-web/src/exceptions_and_logging/logs
-exceptions_and_logging/logs
+
+

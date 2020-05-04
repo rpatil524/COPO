@@ -21,7 +21,7 @@
             "show_in_form": true,
             "ref": "",
             "type": "object",
-            "show_in_table": true,
+            "show_in_table": false,
             "control": "text"
         },
         {
@@ -65,7 +65,7 @@
             "show_in_form": true,
             "ref": "",
             "type": "array",
-            "show_in_table": true,
+            "show_in_table": false,
             "control": "copo-datafile-id"
         },
         {
@@ -84,7 +84,7 @@
             "show_in_form": true,
             "ref": "",
             "type": "array",
-            "show_in_table": true,
+            "show_in_table": false,
             "control": "text"
         },
         {
@@ -103,7 +103,7 @@
             "show_in_form": true,
             "ref": "",
             "type": "string",
-            "show_in_table": true,
+            "show_in_table": false,
             "control": "text"
         },
         {
@@ -141,7 +141,8 @@
             "show_in_form": true,
             "ref": "",
             "type": "string",
-            "show_in_table": true,
+            "show_in_table": false,
+            "show_as_attribute": true,
             "control": "text"
         },
         {
@@ -160,7 +161,7 @@
             "show_in_form": true,
             "ref": "",
             "type": "string",
-            "show_in_table": true,
+            "show_in_table": false,
             "control": "datetime"
         },
         {
@@ -197,7 +198,7 @@
             "show_in_form": true,
             "ref": "",
             "type": "boolean",
-            "show_in_table": true,
+            "show_in_table": false,
             "control": "text"
         },
         {
@@ -216,7 +217,7 @@
             "show_in_form": true,
             "ref": "",
             "type": "string",
-            "show_in_table": true,
+            "show_in_table": false,
             "control": "text"
         },
         {
@@ -235,7 +236,7 @@
             "show_in_form": true,
             "ref": "",
             "type": "object",
-            "show_in_table": true,
+            "show_in_table": false,
             "control": "text"
         },
         {
@@ -250,7 +251,7 @@
             "deprecated": false,
             "hidden": "true",
             "id": "copo.submission.complete",
-            "label": "complete",
+            "label": "Completed",
             "show_in_form": true,
             "ref": "",
             "type": "boolean",
@@ -273,7 +274,7 @@
             "show_in_form": true,
             "ref": "",
             "type": "boolean",
-            "show_in_table": true,
+            "show_in_table": false,
             "control": "text"
         },
         {
@@ -346,7 +347,7 @@
             "show_in_form": false,
             "id": "copo.submission.meta",
             "type": "string",
-            "show_in_table": true,
+            "show_in_table": false,
             "control": "text"
         },
         {
@@ -378,11 +379,12 @@
             "ref": "",
             "deprecated": false,
             "hidden": "true",
-            "label": "published",
+            "label": "Published",
             "show_in_form": false,
             "id": "copo.submission.published",
             "type": "string",
-            "show_in_table": true,
+            "show_in_table": false,
+            "show_as_attribute": true,
             "control": "text"
         },
         {

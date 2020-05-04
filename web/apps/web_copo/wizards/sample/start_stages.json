@@ -1,6 +1,6 @@
 {
   "title": "General Sample Description - stages defined here apply to all description instances",
-  "description": "Definitions for elements that appear in different stages of a wizard targeted: 'ref', id of stage; 'title',  header used for the stage; items, actual form elements on the page; 'is_singular_stage', if all items must have same value for this stage",
+  "description": "Definitions for elements that appear in different stages of a wizard targeted: 'ref', id of stage; 'title',  header used for the stage; items, actual form elements on the page;",
   "properties": [
     {
       "ref": "number_of_samples",
@@ -17,6 +17,16 @@
           "control": "copo-item-count",
           "min": 1,
           "max": 70000
+        },
+        {
+          "id": "rack_id",
+          "type": "string",
+          "help_tip": "If multiple samples from a rack or plate, enter the rack or plate ID.",
+          "label": "Rack or Plate ID",
+          "hidden": "false",
+          "required": "false",
+          "control": "text",
+          "disabled": "true"
         }
       ]
     },

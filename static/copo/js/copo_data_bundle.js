@@ -303,11 +303,11 @@ $(document).ready(function () {
         var infoPanelElement = trigger_global_notification();
 
         var codeList = '<div style="margin-top: 10px;"><ul class="list-group">\n' +
-            '  <li class="list-group-item active" style="background: #d9edf7; text-shadow: none; border-color: #d9edf7; color: #31708f;">Bundle color codes</li>\n' +
-            '  <li class="list-group-item"><i title="" class="big icon stop circle outline grey"></i>Bundle is yet to be described/submitted or has partial metadata</li>\n' +
-            '  <li class="list-group-item"><i title="" class="big icon stop circle outline green"></i>Bundle has been submitted</li>\n' +
-            '  <li class="list-group-item"><i title="" class="big icon stop circle outline orange"></i>Bundle is pending submission or its submission is currently being processed</li>\n' +
-            '  <li class="list-group-item"><i title="" class="big icon stop circle outline red"></i>Bundle has issues</li>\n' +
+            '  <li class="list-group-item active" style="background: #31708f; text-shadow: none; border-color: #d9edf7; color: #fff;">Bundle status codes</li>\n' +
+            '  <li class="list-group-item"><i title="" class=" icon stop circle outline grey"></i>Bundle is yet to be described/submitted or has partial metadata</li>\n' +
+            '  <li class="list-group-item"><i title="" class=" icon stop circle outline green"></i>Bundle has been submitted</li>\n' +
+            '  <li class="list-group-item"><i title="" class=" icon stop circle outline orange"></i>Bundle is pending submission or its submission is currently being processed</li>\n' +
+            '  <li class="list-group-item"><i title="" class=" icon stop circle outline red"></i>Bundle has issues</li>\n' +
             '</ul></div>'
 
 
@@ -321,7 +321,7 @@ $(document).ready(function () {
         var infoPanelElement = trigger_global_notification();
 
         var codeList = '<div style="margin-top: 10px;"><ul class="list-group">\n' +
-            '  <li class="list-group-item active" style="background: #d9edf7; text-shadow: none; border-color: #d9edf7; color: #31708f;">Datafiles workflow</li>\n' +
+            '  <li class="list-group-item active" style="background: #31708f; text-shadow: none; border-color: #d9edf7; color: #fff;">Datafiles workflow</li>\n' +
             '  <li class="list-group-item">' +
             '      <div class="content">\n' +
             '           <div class="title"><h3 class="ui header">Upload datafiles</h3></div>\n' +
@@ -426,8 +426,9 @@ $(document).ready(function () {
                                 "data": null,
                                 "orderable": false,
                                 "render": function (data) {
-                                    var renderHTML = $(".description-bundle-template")
-                                        .clone()
+                                    var renderHTML = get_description_bundle_panel();
+
+                                    renderHTML
                                         .removeClass("datatables-panel-template")
                                         .addClass("description-bundle-panel")
                                         .attr({"data-id": data.id, "data-bundlename": data.name});
@@ -599,10 +600,11 @@ $(document).ready(function () {
         var tbl = $('<table/>',
             {
                 id: tableID,
-                "class": "ui celled table hover copo-noborders-table",
+                "class": "ui compact definition selectable celled table",
                 cellspacing: "0",
                 width: "100%"
             });
+
 
         var meta_div = $('<div/>', {
             "style": "margin-bottom: 20px;"
@@ -650,9 +652,9 @@ $(document).ready(function () {
                             filename: "metadata_" + String(description_token)
                         }
                     ],
-                    scrollY: "300px",
-                    scrollX: true,
-                    scrollCollapse: true,
+                    // scrollY: "300px",
+                    // scrollX: true,
+                    // scrollCollapse: true,
                     paging: false,
                     columns: cols,
                     dom: "<'row'<'col-md-12'Bl>>" +
@@ -685,39 +687,6 @@ $(document).ready(function () {
                     .append(customButtons);
                 $('#' + tableID + '_wrapper').css({"margin-top": "10px"});
                 $('#' + tableID + '_wrapper').find(".info-rw").css({"margin-top": "10px"});
-
-                // var actionMenu = $('<div/>',
-                //     {
-                //         class: "ui compact menu",
-                //     });
-                //
-                // customButtons.append(actionMenu);
-                //
-                // var actionDropdownItem = $('<div/>',
-                //     {
-                //         class: "ui simple dropdown item",
-                //         style: "font-size: 12px;",
-                //         html: "Actions"
-                //     });
-                //
-                // actionMenu.append(actionDropdownItem);
-                // actionDropdownItem.append('<i class="dropdown icon"></i>');
-                //
-                // var actionDropdownMenu = $('<div/>',
-                //     {
-                //         class: "menu",
-                //     });
-
-                // actionDropdownItem.append(actionDropdownMenu);
-
-                //Remove metadata
-                // var actionRemoveMetadata = $('<div data-html="Remove bundle metadata. Datafiles in bundle retain their respective metadata" data-position="right center" class="item copo-tooltip">Remove metadata</div>');
-                // actionDropdownMenu.append(actionRemoveMetadata);
-                // actionRemoveMetadata.click(function (event) {
-                //     event.preventDefault();
-                //     remove_bundle_metadata(description_token);
-                // });
-
 
                 $('#' + tableID + '_wrapper')
                     .find(".dataTables_filter")
@@ -805,7 +774,7 @@ $(document).ready(function () {
                         "search": " ",
                         buttons: {
                             selectAll: "Select all",
-                            selectNone: "clear selection"
+                            selectNone: "Clear selection"
                         }
                     },
                     select: {
@@ -1040,6 +1009,7 @@ $(document).ready(function () {
                                         var contentHtml = $('<table/>', {
                                             cellspacing: "0",
                                             border: "0",
+                                            class: "ui compact definition selectable celled table"
                                         });
 
                                         for (var i = 0; i < data.component_attributes.columns.length; ++i) {
@@ -1122,11 +1092,15 @@ $(document).ready(function () {
         } else if (task == "view_accessions") {
             view_accessions(bundle_id);
         } else if (task == "submit_bundle") {
-            submit_bundle(bundle_id);
+            // submit_bundle(bundle_id);
         }
     }
 
     function submit_bundle(bundle_id) {
+        //todo: this is a somewhat risky workflow, as the bundle can easily get into an inconsistent state,
+        // when new datafiles are added without going through the wizard to validate them. It was meant to be a 'short cut'
+        // to progress into the submission stream. However, it can be turned off if it becomes problematic.
+
         var message = $('<div/>', {class: "webpop-content-div"});
         message.append("Do you want to proceed with the submission of this bundle?");
         var downloadTimer = null;
@@ -1238,21 +1212,6 @@ $(document).ready(function () {
         var loader = $('<div class="copo-i-loader" style="margin-left: 40%;"></div>');
         viewPort.html(loader);
 
-        var tableID = 'bundle_accessions_view_tbl' + bundle_id;
-        var tbl = $('<table/>',
-            {
-                id: tableID,
-                "class": "ui celled table hover copo-noborders-table",
-                cellspacing: "0",
-                width: "100%"
-            });
-
-        var meta_div = $('<div/>', {
-            "style": "margin-bottom: 20px;"
-        });
-        var table_div = $('<div/>').append(tbl);
-
-
         $.ajax({
             url: wizardURL,
             type: "POST",
@@ -1265,7 +1224,6 @@ $(document).ready(function () {
             },
             success: function (data) {
                 loader.remove();
-                viewPort.append(meta_div).append(table_div);
 
                 if (!data.result.hasOwnProperty("dataSet")) {
                     viewPort.html('<div>\n' +
@@ -1288,14 +1246,14 @@ $(document).ready(function () {
 
                 BootstrapDialog.show({
                     title: "Accessions for items in bundle " + bundleName,
-                    message: $('<div></div>').append('<table id="submission_accession_table_' + '" class="ui celled stripe table hover copo-noborders-table" cellspacing="0" width="100%"></table>'),
+                    message: $('<div></div>').append('<table id="submission_accession_table_' + bundle_id + '" class="ui celled stripe table hover copo-noborders-table" cellspacing="0" width="100%"></table>'),
                     cssClass: 'copo-modal4',
                     closable: false,
                     animate: true,
                     type: BootstrapDialog.TYPE_SUCCESS,
                     onshown: function (dialogRef) {
                         //display accessions
-                        var tableID = 'submission_accession_table_';
+                        var tableID = 'submission_accession_table_' + bundle_id;
                         if ($.fn.dataTable.isDataTable('#' + tableID)) {
                             //if table instance already exists, then destroy in order to successfully re-initialise
                             $('#' + tableID).destroy();
@@ -1345,7 +1303,13 @@ $(document).ready(function () {
                 });
             },
             error: function () {
-                alert("Couldn't retrieve accessions!");
+                loader.remove();
+
+                viewPort.html('<div>\n' +
+                    '  <p>Could not retrieve accessions!</p>\n' +
+                    '</div>');
+
+                return false;
             }
         });
     }
@@ -1589,7 +1553,7 @@ $(document).ready(function () {
 
         var $dialogContent = $('<div/>');
         var table_div = $('<div/>').append(tbl);
-        var filter_message = $('<div style="margin-bottom: 20px;"><div style="font-weight: bold; margin-bottom: 5px;">Note: This list only contains unbundled datafiles</div><div style="color: orangered;"></div></div>');
+        var filter_message = $('<div style="margin-bottom: 20px;"><div class="text-info" style="margin-bottom: 5px;">Note: This list only shows unbundled datafiles</div></div>');
         var spinner_div = $('<div/>', {style: "margin-left: 40%; padding-top: 15px; padding-bottom: 15px;"}).append($('<div class="copo-i-loader"></div>'));
 
         var dialog = new BootstrapDialog({
@@ -1720,7 +1684,6 @@ $(document).ready(function () {
         dialog.setMessage($dialogContent);
         dialog.open();
     }
-
 
 }); //end document ready
 

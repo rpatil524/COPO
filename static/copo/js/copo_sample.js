@@ -7,7 +7,6 @@ $(document).ready(function () {
 
     // test begins
     // test ends
-
     //page global variables
     var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
     var component = "sample";
@@ -46,6 +45,8 @@ $(document).ready(function () {
         initiate_description({});
     });
 
+
+
     //details button hover
     $(document).on("mouseover", ".detail-hover-message", function (event) {
         $(this).prop('title', 'Click to view ' + component + ' details');
@@ -82,10 +83,27 @@ $(document).ready(function () {
         wizardElement.wizard('previous');
     });
 
+    $(document).on("change", "#number_of_samples", function (evt) {
+        let count = parseInt($(evt.currentTarget).val())
+        disable_rack_id(count)
+    })
+
+    function disable_rack_id(count) {
+        if (count > 1) {
+            $("#rack_id").removeAttr("disabled")
+        } else {
+            $("#rack_id").attr("disabled", "disabled")
+        }
+    }
+
+
     //custom stage renderers
     var dispatchStageRenderer = {
         perform_sample_generation: function (stage) {
             generate_sample_edit_table(stage);
+        },
+        generate_dtol_stage: function (stage) {
+            generate_dtol_stage(stage);
         }
     }; //end of dispatchStageCallback
 
@@ -564,6 +582,7 @@ $(document).ready(function () {
             evt.preventDefault();
 
             //end of wizard intercept
+            // call this if we are on the last stage....
             if (wizardElement.find('.steps li.active:first').attr('data-name') == 'review') {
                 finalise_description();
                 return false;
@@ -1373,6 +1392,82 @@ $(document).ready(function () {
         });
 
         return $('<div>').append(attributesPanel).append(loaderObject);
+    }
+
+    function generate_dtol_stage(stage) {
+        $('#custom-renderer_' + stage.ref).find(".stage-content").html('');
+        var formValue = stage.data;
+
+        var stagearea = $('#custom-renderer_' + stage.ref).find("form")
+
+        // firstly add a dropdown to select type of dtol sample
+        var label = '<label for="dtol_type_select">Select Sample Sub Type</label>'
+        var dd = $("<select/>", {
+            id: "dtol_type_select",
+            class: "form-control",
+            "style": "margin-bottom:30px"
+        })
+        // the values of these options point to json files in wizards/sample/dtol_manifests
+        $(dd).append($("<option></option>"))
+        $(dd).append($("<option value='dtol_aquatic'>aquatic</option>"))
+        $(dd).append($("<option value='dtol_protist'>protist</option>"))
+        $(dd).append($("<option value=''dtol_other'>other</option>"))
+        $(stagearea).append(label).append(dd)
+
+        // get the fields into the right order according to the groupings in stage.field_groupings
+        var grouped_fields = new Object()
+        for (var group_idx in stage.field_groupings) {
+            group = stage.field_groupings[group_idx]
+            group_name = group.group_name
+            var fieldset = new Array()
+            for (var order_idx in group.fields) {
+                order_name = group.fields[order_idx]
+                //now look for order_name in stage.items
+                for (field in stage.items) {
+                    item = stage.items[field]
+                    if (item.id == order_name) {
+                        fieldset.push(item)
+                    }
+                }
+            }
+            grouped_fields[group_name] = fieldset
+        }
+        // grouped fields now contains all the fields required split into categories
+        // each of these groups should be rendered as an accordion panel
+        var accordion_head = '<div hidden class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">'
+
+
+        for (var title in grouped_fields) {
+            var header = '<hr/><div hidden class="panel panel-default" id="section_' + title.replace(" ", "_") + '">' +
+                '<div class="panel-heading" role="tab" id="heading_' + title.replace(" ", "_") + '">' +
+                '<h4 class="panel-title">' +
+                '<a role="button" data-toggle="collapse" data-parent="#accordion" href="#' + title.replace(" ", "_") + '" aria-expanded="true" aria-controls="' + title.replace(" ", "_") + '">' + title + '</a></h4></div>'
+            var body = '<div id="' + title.replace(" ", "_") + '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading_"' + title.replace(" ", "_") + '>' +
+                '<div class="panel-body">'
+            for (var control in grouped_fields[title]) {
+                var formElem = grouped_fields[title][control]
+                var elemValue = null;
+                if (formValue) {
+                    var elem = formElem.id.split(".").slice(-1)[0];
+                    if (formValue[elem]) {
+                        elemValue = formValue[elem];
+                    }
+                }
+                //set default values
+                if (formElem.default_value) {
+                    elemValue = formElem.default_value;
+                } else {
+                    elemValue = "";
+                }
+                var htmlCtrl = dispatchFormControl[controlsMapping[formElem.control.toLowerCase()]](formElem, elemValue);
+                body = body + $(htmlCtrl).prop('outerHTML')
+            }
+            body = body + '</div></div></div>'
+            var content = header + body
+            accordion_head = accordion_head + content
+        }
+        $(accordion_head).appendTo(stagearea);
+        refresh_tool_tips();
     }
 
     function generate_sample_edit_table(stage) {

@@ -14,6 +14,7 @@ RESOLVER['uimodels_copo'] = os.path.join(web_copo, 'schemas', 'copo', 'uimodels'
 RESOLVER['cg_core_schemas'] = os.path.join(web_copo, 'schemas', 'copo', 'uimodels', "mappings", "cgcore_mappings")
 RESOLVER['schemas_generic'] = os.path.join(web_copo, 'schemas', 'generic')
 RESOLVER['api_return_templates'] = os.path.join(settings.BASE_DIR, 'api', 'return_templates')
+RESOLVER['wizards'] = os.path.join(web_copo, 'wizards')
 RESOLVER['wizards_datafile'] = os.path.join(web_copo, 'wizards', 'datafile')
 RESOLVER['wizards_sample'] = os.path.join(web_copo, 'wizards', 'sample')
 RESOLVER['wizards_messages'] = os.path.join(web_copo, 'wizards', 'messages')

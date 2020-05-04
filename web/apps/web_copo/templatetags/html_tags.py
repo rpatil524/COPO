@@ -7,7 +7,9 @@ import pandas as pd
 from uuid import uuid4
 from bson import ObjectId
 from django import template
+from dal import cursor_to_list
 from django.urls import reverse
+from django.contrib.auth.models import User
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.lookup.lookup import HTML_TAGS
 import web.apps.web_copo.lookup.lookup as lkup
@@ -17,8 +19,7 @@ from dal.copo_base_da import DataSchemas
 from dal.copo_da import ProfileInfo, Repository, Description, Profile, Publication, Source, Person, Sample, Submission, \
     DataFile, DAComponent, Annotation, CGCore, MetadataTemplate
 from allauth.socialaccount import providers
-from django_tools.middlewares import ThreadLocal
-import hurry
+from hurry.filesize import size as hurrysize
 
 register = template.Library()
 
@@ -126,7 +127,7 @@ def get_control_options(f):
 
 
 @register.filter("generate_copo_form")
-def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), message_dict=dict(), profile_id=str(),
+def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), message_dict=dict(), profile_id=None,
                        **kwargs):
     # message_dict templates are defined in the lookup dictionary: "MESSAGES_LKUPS"
 
@@ -191,7 +192,8 @@ def get_labels():
                       profile=dict(label="Profile"),
                       annotation=dict(label="Annotation"),
                       datafile=dict(label="Datafile"),
-                      metadata_template=dict(label="Metadata Template")
+                      metadata_template=dict(label="Metadata Template"),
+                      repository=dict(label="Repository"),
                       )
 
     return label_dict
@@ -270,17 +272,19 @@ def generate_table_columns(component=str()):
     columns.insert(0, detail_dict)
 
     # get indexed fields - only fields that are indexed can be ordered when using server-side processing
-    indexed_fields = list()
-
-    for k, v in da_object.get_collection_handle().index_information().items():
-        indexed_fields.append(v['key'][0][0])
+    # indexed_fields = list()
+    #
+    # for k, v in da_object.get_collection_handle().index_information().items():
+    #     indexed_fields.append(v['key'][0][0])
 
     for x in schema:
         x["id"] = x["id"].split(".")[-1]
-        orderable = False
-        if x["id"] in indexed_fields:
-            orderable = True
-        columns.append(dict(data=x["id"], title=x["label"], orderable=orderable))
+        columns.append(dict(data=x["id"], title=x["label"], orderable=True))
+
+        # orderable = False
+        # if x["id"] in indexed_fields:
+        #     orderable = True
+        # columns.append(dict(data=x["id"], title=x["label"], orderable=orderable))
 
     # add column for annotation control
     if component == "datafile":
@@ -386,7 +390,7 @@ def generate_server_side_table_records(profile_id=str(), component=str(), reques
 
 
 @register.filter("generate_table_records")
-def generate_table_records(profile_id=str(), component=str()):
+def generate_table_records(profile_id=str(), component=str(), record_id=str()):
     # function generates component records for building an UI table - please note that for effective tabular display,
     # all array and object-type fields (e.g., characteristics) are deferred to sub-table display.
     # please define such in the schema as "show_in_table": false and "show_as_attribute": true
@@ -403,12 +407,13 @@ def generate_table_records(profile_id=str(), component=str()):
     # build db column projection
     projection = [(x["id"].split(".")[-1], 1) for x in schema]
 
+    filter_by = dict()
+    if record_id:
+        filter_by["_id"] = ObjectId(str(record_id))
+
     # retrieve and process records
-    if component == "submission":
-        records = da_object.get_all_records_columns(sort_by="date_created", sort_direction=1,
-                                                    projection=dict(projection))
-    else:
-        records = da_object.get_all_records_columns(projection=dict(projection))
+    records = da_object.get_all_records_columns(sort_by="date_modified", sort_direction=1,
+                                                projection=dict(projection), filter_by=filter_by)
 
     if len(records):
         df = pd.DataFrame(records)
@@ -418,11 +423,6 @@ def generate_table_records(profile_id=str(), component=str()):
         df["DT_RowId"] = df.record_id
         df.DT_RowId = 'row_' + df.DT_RowId
         df = df.drop('_id', axis='columns')
-
-        if component == "submission":
-            df["special_repositories"] = df["repository"]
-
-            columns.append(dict(data="special_repositories", visible=False))
 
         columns.append(dict(data="record_id", visible=False))
         detail_dict = dict(className='summary-details-control detail-hover-message', orderable=False, data=None,
@@ -446,24 +446,206 @@ def generate_table_records(profile_id=str(), component=str()):
                        columns=columns
                        )
 
-    # do check for custom repos here
-    if component == "submission":
-        correct_repos = list()
-        user = ThreadLocal.get_current_user()
-        repo_ids = user.userdetails.repo_submitter
-        all_repos = Repository().get_by_ids(repo_ids)
-
-        for repo in all_repos:
-            for r_id in repo_ids:
-                if r_id == str(repo["_id"]):
-                    correct_repos.append(repo)
-
-        for repo in correct_repos:
-            repo["_id"] = str(repo["_id"])
-
-        return_dict["repos"] = correct_repos
-
     return return_dict
+
+
+@register.filter("generate_submissions_records")
+def generate_submissions_records(profile_id=str(), component=str(), record_id=str()):
+    # function generates component records for building an UI table - please note that for effective tabular display,
+    # all array and object-type fields (e.g., characteristics) are deferred to sub-table display.
+    # please define such in the schema as "show_in_table": false and "show_as_attribute": true
+
+    data_set = list()
+
+    # build db column projection
+    submission_projection = [('date_modified', 1), ('complete', 1), ('deleted', 1)]
+    repository_projection = [('name', 1), ('type', 1)]
+
+    schema = [x for x in Submission().get_schema().get("schema_dict") if
+              x["id"].split(".")[-1] in [y[0] for y in submission_projection]]
+
+    repository_schema = [x for x in Repository().get_schema().get("schema_dict") if
+                         x["id"].split(".")[-1] in [y[0] for y in repository_projection]]
+
+    # specify filtering
+    filter_conditions = [dict(deleted=data_utils.get_not_deleted_flag())]
+
+    # add profile
+    if profile_id:
+        filter_conditions.append(dict(profile_id=profile_id))
+
+    if record_id:
+        filter_conditions.append(dict(_id=ObjectId(str(record_id))))
+
+    # specify projection
+    query_projection = {
+        "deleted": 1,
+        "date_modified": 1,
+        "complete": 1,
+        "repository_docs.name": 1,
+        "description_docs.name": 1,
+        "repository_docs.type": 1,
+        "profile_id": 1
+    }
+
+    doc = Submission().get_collection_handle().aggregate(
+        [
+            {"$addFields": {
+                "destination_repo_converted": {
+                    "$convert": {
+                        "input": "$destination_repo",
+                        "to": "objectId",
+                        "onError": 0
+                    }
+                },
+                "description_token_converted": {
+                    "$convert": {
+                        "input": "$description_token",
+                        "to": "objectId",
+                        "onError": 0
+                    }
+                }
+            }
+            },
+            {
+                "$lookup":
+                    {
+                        "from": "RepositoryCollection",
+                        "localField": "destination_repo_converted",
+                        "foreignField": "_id",
+                        "as": "repository_docs"
+                    }
+            },
+            {
+                "$lookup":
+                    {
+                        "from": "DescriptionCollection",
+                        "localField": "description_token_converted",
+                        "foreignField": "_id",
+                        "as": "description_docs"
+                    }
+            },
+            {
+                "$project": query_projection
+            },
+            {
+                "$match": {"$and": filter_conditions}
+            },
+            {"$sort": {"date_modified": 1}}
+        ])
+
+    records = cursor_to_list(doc)
+
+    for indx, rec in enumerate(records):
+        new_data = dict()
+        new_data["s_n"] = indx
+
+        for f in schema:
+            f_id = f["id"].split(".")[-1]
+            new_data[f_id] = resolve_control_output(rec, f)
+
+        new_data["record_id"] = str(rec["_id"])
+        new_data["DT_RowId"] = "row_" + str(rec["_id"])
+
+        try:
+            new_data["bundle_name"] = rec['description_docs'][0].get('name', str())
+        except (IndexError, AttributeError) as error:
+            new_data["bundle_name"] = str()
+
+        try:
+            repository_record = rec['repository_docs'][0]
+        except (IndexError, AttributeError) as error:
+            repository_record = dict()
+
+        for f in repository_schema:
+            f_id = f["id"].split(".")[-1]
+            new_data["repository_" + f_id] = resolve_control_output(repository_record, f)
+
+        data_set.append(new_data)
+
+    return dict(dataSet=data_set, )
+
+
+@register.filter("generate_repositories_records")
+def generate_repositories_records(component=str(), record_id=str()):
+    # function generates component records for building an UI table - please note that for effective tabular display,
+    # all array and object-type fields (e.g., characteristics) are deferred to sub-table display.
+    # please define such in the schema as "show_in_table": false and "show_as_attribute": true
+
+    data_set = list()
+
+    # get and filter schema elements based on displayable columns
+    schema = [x for x in Repository().get_schema().get("schema_dict") if x.get("show_in_table", True)]
+
+    # build db column projection
+    projection = [(x["id"].split(".")[-1], 1) for x in schema]
+
+    filter_by = dict()
+    if record_id:
+        filter_by["_id"] = ObjectId(str(record_id))
+
+    # retrieve and process records
+    records = Repository().get_all_records_columns(sort_by="date_modified", sort_direction=1,
+                                                   projection=dict(projection),
+                                                   filter_by=filter_by)
+
+    for indx, rec in enumerate(records):
+        new_data = dict()
+        new_data["s_n"] = indx
+        new_data["record_id"] = str(rec["_id"])
+        new_data["DT_RowId"] = "row_" + str(rec["_id"])
+
+        for f in schema:
+            f_id = f["id"].split(".")[-1]
+            new_data[f_id] = resolve_control_output(rec, f)
+
+        data_set.append(new_data)
+
+    return dict(dataSet=data_set, )
+
+
+@register.filter("generate_managed_repositories")
+def generate_managed_repositories(component=str(), user_id=str()):
+    # function generates component records for building an UI table - please note that for effective tabular display,
+    # all array and object-type fields (e.g., characteristics) are deferred to sub-table display.
+    # please define such in the schema as "show_in_table": false and "show_as_attribute": true
+
+    data_set = list()
+    records = list()
+
+    # get and filter schema elements based on displayable columns
+    schema = [x for x in Repository().get_schema().get("schema_dict") if x.get("show_in_table", True)]
+
+    # build db column projection
+    projection = [(x["id"].split(".")[-1], 1) for x in schema]
+
+    filter_by = dict()
+
+    user = User.objects.get(pk=user_id)
+    user_repo_ids = user.userdetails.repo_manager
+    user_repo_ids = {ObjectId(x) for x in user_repo_ids}
+
+    if user_repo_ids:
+        filter_by["_id"] = {"$in": list(user_repo_ids)}
+
+        # retrieve and process records
+        records = Repository().get_all_records_columns(sort_by="date_modified", sort_direction=1,
+                                                       projection=dict(projection),
+                                                       filter_by=filter_by)
+
+    for indx, rec in enumerate(records):
+        new_data = dict()
+        new_data["s_n"] = indx
+        new_data["record_id"] = str(rec["_id"])
+        new_data["DT_RowId"] = "row_" + str(rec["_id"])
+
+        for f in schema:
+            f_id = f["id"].split(".")[-1]
+            new_data[f_id] = resolve_control_output(rec, f)
+
+        data_set.append(new_data)
+
+    return dict(dataSet=data_set, )
 
 
 @register.filter("generate_copo_table_data")
@@ -601,19 +783,365 @@ def generate_copo_shared_profiles_data(profiles=list()):
     return return_dict
 
 
+@register.filter("get_repo_stats")
+def get_repo_stats(repository_id=str()):
+    """
+    function
+    :param repository_id:
+    :return:
+    """
+
+    result = list()
+
+    schema = [x for x in Repository().get_schema().get("schema_dict") if x.get("show_in_table", True)]
+
+    # build db column projection
+    projection = [(x["id"].split(".")[-1], 1) for x in schema]
+
+    filter_by = dict(_id=str(repository_id))
+    if repository_id:
+        filter_by["_id"] = ObjectId(filter_by["_id"])
+
+    records = Repository().get_all_records_columns(projection=dict(projection),
+                                                   filter_by=filter_by)
+
+    if records:
+        for f in schema:
+            result.append(dict(label=f["label"], value=resolve_control_output(records[0], f)))
+
+    return result
+
+
+@register.filter("get_submission_remote_url")
+def get_submission_remote_url(submission_id=str()):
+    """
+    function generates the resource urls/identifiers to a submission in its remote location
+    :param submission_id:
+    :return:
+    """
+
+    result = dict(status='info', urls=list(), message="Remote identifiers not found or unspecified procedure.")
+
+    # get repository type, and use this to decide what to return
+
+    try:
+        repository = Submission().get_repository_type(submission_id=submission_id)
+    except (IndexError, AttributeError) as error:
+        result['status'] = 'error'
+        result['message'] = 'Could not retrieve record'
+        return result
+
+    # sacrificing an extra call to the db, based on what is needed, than dumping all accessions to memory
+    if repository == "ena":
+        doc = Submission().get_collection_handle().find_one({"_id": ObjectId(submission_id)},
+                                                            {"accessions.project": 1})
+        if not doc:
+            return result
+
+        prj = doc.get('accessions', dict()).get('project', list())
+        result["urls"].append("https://www.ebi.ac.uk/ena/data/view/" + prj[0].get("accession", str()))
+        return result
+
+    # generate for other repository types here
+
+    return result
+
+
+@register.filter("get_submission_meta_repo")
+def get_submission_meta_repo(submission_id=str(), user_id=str()):
+    """
+    function returns metadata and repository details for a submission
+    :param submission_id:
+    :param user_id:
+    :return:
+    """
+
+    result = dict(status='success')
+
+    # specify filtering
+    filter_by = dict(_id=ObjectId(str(submission_id)))
+
+    # specify projection
+    query_projection = {
+        "_id": 1,
+        ""
+        "description_docs.stages": 1,
+        "description_docs.attributes": 1,
+        "repository_docs.name": 1,
+        "repository_docs.type": 1,
+        "repository_docs._id": 1,
+    }
+
+    doc = Submission().get_collection_handle().aggregate(
+        [
+            {"$addFields": {
+                "destination_repo_converted": {
+                    "$convert": {
+                        "input": "$destination_repo",
+                        "to": "objectId",
+                        "onError": 0
+                    }
+                },
+                "description_token_converted": {
+                    "$convert": {
+                        "input": "$description_token",
+                        "to": "objectId",
+                        "onError": 0
+                    }
+                }
+            }
+            },
+            {
+                "$lookup":
+                    {
+                        "from": "RepositoryCollection",
+                        "localField": "destination_repo_converted",
+                        "foreignField": "_id",
+                        "as": "repository_docs"
+                    }
+            },
+            {
+                "$lookup":
+                    {
+                        "from": "DescriptionCollection",
+                        "localField": "description_token_converted",
+                        "foreignField": "_id",
+                        "as": "description_docs"
+                    }
+            },
+            {
+                "$project": query_projection
+            },
+            {
+                "$match": filter_by
+            }
+        ])
+
+    records = cursor_to_list(doc)
+
+    if not records:
+        result['status'] = "error"
+        result['message'] = "Couldn't find submission record!"
+        return result
+
+    try:
+        description_record = records[0]['description_docs'][0]
+    except (IndexError, AttributeError) as error:
+        result['status'] = "error"
+        result['message'] = "Couldn't find related description bundle!"
+        return result
+
+    # get description template
+    attributes = description_record.get("attributes", dict())
+    dt_value = attributes.get("target_repository", dict()).get("deposition_context", str())
+    dt_label = [x['label'] for x in d_utils.get_repository_options() if x['value'].lower() == dt_value.lower()]
+
+    if not dt_label:
+        result['status'] = "error"
+        result['message'] = "Description template not found or is invalid!"
+        return result
+
+    result['description_template'] = dt_label[0]
+
+    # get destination repository
+    try:
+        repository_record = records[0]['repository_docs'][0]
+    except (IndexError, AttributeError) as error:
+        repository_record = dict()
+
+    result["destination_repository_id"] = str(repository_record.get("_id", str()))
+
+    # get relevant user repositories given metadata template
+    user = User.objects.get(pk=user_id)
+    user_repo_ids = user.userdetails.repo_submitter
+    if user_repo_ids==None:
+        user_repo_ids = []
+    else:
+        user_repo_ids = {ObjectId(x) for x in list(user_repo_ids) if x}
+
+
+
+    repository_projection = [('name', 1), ('type', 1), ('templates', 1), ('url', 1)]
+    repository_schema = [x for x in Repository().get_schema().get("schema_dict") if
+                         x["id"].split(".")[-1] in [y[0] for y in repository_projection]]
+
+    user_repositories = cursor_to_list(Repository().get_collection_handle().find({"$and": [
+        {'deleted': d_utils.get_not_deleted_flag()},
+        {'templates': {"$in": [dt_value]}},
+        {"$or": [
+            {"_id": {"$in": list(user_repo_ids)}},
+            {"visibility": 'public'}]}]},
+        dict(repository_projection)))
+
+    result['relevant_repositories'] = list()
+
+    is_destination_valid = False
+    for rec in user_repositories:
+        repo_data = dict()
+        repo_data["_id"] = str(rec["_id"])
+        repo_data["repo_type_unresolved"] = str(rec.get("type", str()))
+
+        if result["destination_repository_id"] == repo_data["_id"]:
+            is_destination_valid = True
+
+        for f in repository_schema:
+            f_id = f["id"].split(".")[-1]
+            repo_data[f_id] = resolve_control_output(rec, f)
+
+        result['relevant_repositories'].append(repo_data)
+
+    if is_destination_valid is False:  # assigned repository no longer valid for this user/submission
+        result["destination_repository_id"] = str()
+
+    return result
+
+
+@register.filter("get_destination_repo")
+def get_destination_repo(submission_id=str()):
+    """
+    function returns destination repository details for a submission
+    :param submission_id:
+    :return:
+    """
+
+    result = list()
+
+    repository_schema = [x for x in Repository().get_schema().get("schema_dict") if x.get("show_in_table", True)]
+    repository_projection = [(x["id"].split(".")[-1], 1) for x in repository_schema]
+
+    # specify filtering
+    filter_by = dict(_id=ObjectId(str(submission_id)))
+
+    # specify projection
+    query_projection = {'repository_docs.' + x[0]: x[1] for x in repository_projection}
+    query_projection['_id'] = 1
+
+    doc = Submission().get_collection_handle().aggregate(
+        [
+            {"$addFields": {
+                "destination_repo_converted": {
+                    "$convert": {
+                        "input": "$destination_repo",
+                        "to": "objectId",
+                        "onError": 0
+                    }
+                }
+            }
+            },
+            {
+                "$lookup":
+                    {
+                        "from": "RepositoryCollection",
+                        "localField": "destination_repo_converted",
+                        "foreignField": "_id",
+                        "as": "repository_docs"
+                    }
+            },
+            {
+                "$project": query_projection
+            },
+            {
+                "$match": filter_by
+            }
+        ])
+
+    records = cursor_to_list(doc)
+
+    if not records:
+        return result
+
+    try:
+        repository_record = records[0]['repository_docs'][0]
+    except (IndexError, AttributeError) as error:
+        return result
+    else:
+        for f in repository_schema:
+            result.append(dict(label=f["label"], value=resolve_control_output(repository_record, f)))
+
+    return result
+
+
+@register.filter("generate_submission_datafiles_data")
+def generate_submission_datafiles_data(submission_id=str()):
+    """
+    function returns submission datafiles
+    :param submission_id:
+    :return:
+    """
+
+    columns = list()
+    data_set = list()
+
+    columns.append(dict(className='summary-details-control detail-hover-message', orderable=False, data=None,
+                        title='', defaultContent='', width="5%"))
+    columns.append(dict(data="record_id", visible=False))
+    columns.append(dict(data="name", title="Name"))
+
+    try:
+        submission_record = Submission().get_record(submission_id)
+    except:
+        return dict(dataSet=data_set,
+                    columns=columns
+                    )
+
+    submission_record = Submission().get_record(submission_id)
+    bundle = submission_record.get("bundle", list())
+    datafile_object_list = [ObjectId(datafile_id) for datafile_id in bundle]
+
+    projection = dict(name=1)
+    filter_by = dict()
+    filter_by["_id"] = {'$in': datafile_object_list}
+
+    records = DataFile().get_all_records_columns(sort_by='created_on', sort_direction=1, projection=projection,
+                                                 filter_by=filter_by)
+
+    if len(records):
+        df = pd.DataFrame(records)
+        df['s_n'] = df.index
+
+        df['record_id'] = df._id.astype(str)
+        df["DT_RowId"] = df.record_id
+        df.DT_RowId = 'row_' + df.DT_RowId
+        df = df.drop('_id', axis='columns')
+
+        data_set = df.to_dict('records')
+
+    return dict(dataSet=data_set,
+                columns=columns
+                )
+
+
 @register.filter("generate_submission_accessions_data")
-def generate_submission_accessions_data(submission_record):
+def generate_submission_accessions_data(submission_id=str()):
     """
     method presents accession data in a tabular display friendly way
     great care should be taken here to manipulate accessions from different repositories,
     as they might be stored differently
-    :param submission_record:
+    :param submission_id:
     :return:
     """
+
     columns = list()
     data_set = list()
+
+    try:
+        repository = Submission().get_repository_type(submission_id=submission_id)
+    except Exception as error:
+        return dict(dataSet=data_set,
+                    columns=columns,
+                    message="Could not retrieve repository type"
+                    )
+
+    try:
+        submission_record = Submission().get_collection_handle().find_one({'_id': ObjectId(submission_id)},
+                                                                          {"accessions": 1})
+    except Exception as error:
+        return dict(dataSet=data_set,
+                    columns=columns,
+                    message="Could not retrieve submission record"
+                    )
+
     accessions = submission_record.get("accessions", dict())
-    repository = submission_record.get("repository", str())
 
     if accessions:
         # -----------COLLATE ACCESSIONS FOR ENA SEQUENCE READS----------
@@ -664,8 +1192,9 @@ def generate_submission_accessions_data(submission_record):
                        {"title": "Dataset Title"}]
 
             data_set.append(
-                [accessions["dataset_doi"], accessions["dataverse_title"], accessions["dataverse_alias"],
-                 accessions["dataset_title"]]
+                [accessions.get("dataset_doi", str()), accessions.get("dataverse_title", str()),
+                 accessions.get("dataverse_alias", str()),
+                 accessions.get("dataset_title", str())]
             )
 
         elif repository == "dspace":
@@ -676,21 +1205,19 @@ def generate_submission_accessions_data(submission_record):
                 meta_link = '<a target="_blank" href="' + a["meta_url"] + '">' + a["meta_url"] + '</a>'
                 retrieve_link = '<a href="' + link_ref + '/retrieve">' + link_ref + '</a>'
                 data_set.append(
-                    [a["description"], a["format"], (hurry.filesize.size(a["sizeBytes"])),
+                    [a["description"], a["format"], (hurrysize(a["sizeBytes"])),
                      retrieve_link,
                      meta_link]
                 )
 
         elif repository == "ckan":
-            columns = [{"title": "Name"}, {"title": "Metadata Link"}, {"title": "Resource Link"}, {"title": "Format"}]
-            for a in accessions:
-                retrieve_link = '<a href="' + a["result"]["url"] + '">' + \
-                                a["result"]["url"] + '</a>'
-                meta_link = '<a target="_blank" href="' + a["result"]["repo_url"] + 'package_show?id=' + a['result'][
-                    'package_id'] + '">' + 'Show Metadata' + '</a>'
-                data_set.append(
-                    [a["result"]["name"], meta_link, retrieve_link, a["result"]["format"]]
-                )
+            columns = [{"title": "Title"}, {"title": "Metadata Link"}, {"title": "Resource Link"}, {"title": "Name"}]
+            retrieve_link = '<a target="_blank" href="' + accessions["url"] + '/dataset/'+ accessions["dataset_name"] + '">' + accessions["url"] + '/dataset/'+ accessions["dataset_name"] + '</a>'
+            meta_link = '<a target="_blank" href="' + accessions["repo_url"] + 'package_show?id=' + accessions[
+                'dataset_id'] + '">' + 'Show Metadata' + '</a>'
+            data_set.append(
+                [accessions["dataset_title"], meta_link, retrieve_link, accessions["dataset_name"]]
+            )
 
     return_dict = dict(dataSet=data_set,
                        columns=columns,
@@ -816,6 +1343,7 @@ def get_resolver(data, elem):
     func_map["copo-comment"] = resolve_copo_comment_data
     func_map["copo-multi-select"] = resolve_copo_multi_select_data
     func_map["copo-multi-select2"] = resolve_copo_multi_select_data
+    func_map["copo-general-ontoselect"] = resolve_copo_multi_select_data
     func_map["copo-single-select"] = resolve_copo_multi_select_data
     func_map["copo-multi-search"] = resolve_copo_multi_search_data
     func_map["copo-lookup"] = resolve_copo_lookup_data

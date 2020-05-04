@@ -406,6 +406,11 @@ class WizardHelper:
         meta[stage["ref"] + "_sample_clone"] = clone_option
         Description().edit_description(self.description_token, dict(meta=meta))
 
+        # select rendering routine given sample type
+        if user_choice == 'dtol':
+            stage['renderer'] = 'generate_dtol_stage'
+            stage['field_groupings'] = d_utils.json_to_pytype(lkup.WIZARD_FILES["dtol_mappings"])
+
         return stage
 
     def perform_sample_generation(self, next_stage_index):

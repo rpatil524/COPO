@@ -35,10 +35,11 @@ decorator==4.4.0
 deepdiff==4.0.7
 defusedxml==0.6.0
 dict.sorted==1.0.0
-Django==2.2.6
+Django==2.1.4
+django-brotli==0.2.0
+django-allauth
 django_allauth==0.41.0
 django-appconf==1.0.3
-django_brotli
 django-chunked-upload==1.1.3
 django-compressor==2.3
 django-cors-headers==3.0.2
@@ -176,3 +177,5 @@ xlrd==1.2.0
 xmljson==0.1.9
 zipp==0.6.0
 zope.interface==4.6.0
+jsonpath-rw==1.4.0
+jsonpath-rw-ext==1.2.2

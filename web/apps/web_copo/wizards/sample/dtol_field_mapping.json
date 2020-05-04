@@ -1,0 +1,91 @@
+[
+  {
+    "group_name": "Taxon Group",
+    "fields": [
+      "taxonid",
+      "species",
+      "genus",
+      "family",
+      "order",
+      "order",
+      "commonName",
+      "speciesDeterminationMethod",
+      "identificationConfidence"
+    ]
+  },
+  {
+    "group_name": "Sample Ids",
+    "fields": [
+      "sangerTubeId",
+      "supplierSampleName",
+      "donorId",
+      "affiliatedOrganisation"
+    ]
+  },
+  {
+    "group_name": "Geography",
+    "fields": [
+      "collectionEvent",
+      "collectionCode",
+      "collectionLocation",
+      "collectionSite",
+      "lat",
+      "long",
+      "gridReference",
+      "habitat",
+      "depth",
+      "elevation"
+    ]
+  },
+  {
+    "group_name": "Sample Characteristics",
+    "fields": [
+      "sex",
+      "lifestage",
+      "speciesRarity",
+      "genomeSize",
+      "evidenceForGenomeSize",
+      "plansForSample"
+    ]
+  },
+  {
+    "group_name": "Aquatic Characteristics",
+    "fields": [
+      "temperature",
+      "salinity",
+      "ph",
+      "chla",
+      "lightIntensity",
+      "dissolvedOxygen"
+    ]
+
+  },
+  {
+    "group_name": "Collection Information",
+    "fields": [
+      "collectedBy",
+      "dateOfSampleCollection",
+      "timeOfSampleCollection",
+      "identifiedBy",
+      "dateOfSampleIdentification",
+      "descriptionOfCollectionMethod",
+      "sampleAvailability"
+    ]
+  },
+  {
+    "group_name": "Preparation",
+    "fields": [
+      "preservedBy",
+      "dateOfPreservation",
+      "timeElapsedFromCollectionToPreservation",
+      "tissueRemovedForBarcoding",
+      "methodOfPreservationInTube"
+    ]
+  },
+  {
+    "group_name": "Other",
+    "fields": [
+      "otherInformation"
+    ]
+  }
+]

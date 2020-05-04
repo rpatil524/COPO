@@ -191,11 +191,11 @@ def inspect_file(request):
             elif u.is_sam_file(file_name):
                 output_dict['file_type'] = 'sam'
                 if not is_zipped:
-                    output_dict['do_compress'] = True
+                    output_dict['do_compress'] = False
             elif u.is_bam_file(file_name):
                 output_dict['file_type'] = 'bam'
                 if not is_zipped:
-                    output_dict['do_compress'] = True
+                    output_dict['do_compress'] = False
 
             else:  # make file type same as extension
                 output_dict['file_type'] = chunked_upload.filename.rsplit('.')[1]

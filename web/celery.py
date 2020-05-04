@@ -6,7 +6,7 @@ from celery.schedules import crontab
 from datetime import timedelta
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web.settings.all')
-
+#crontab(minute="*/1")
 app = Celery('web')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
@@ -14,9 +14,13 @@ app.autodiscover_tasks()
 # define periodic tasks here
 
 app.conf.beat_schedule = {
-    'update_ena_status': {
+    'process_ena_submission': {
         'task': 'web.apps.web_copo.tasks.process_ena_submission',
-        'schedule': timedelta(seconds=5) #crontab(minute="*/1")  # execute every n minutes minute="*/n"
+        'schedule': timedelta(seconds=60)  # execute every n minutes minute="*/n"
+    },
+    'process_ena_transfer': {
+        'task': 'web.apps.web_copo.tasks.process_ena_transfer',
+        'schedule': timedelta(seconds=60)  # execute every n minutes minute="*/n"
     }
 }
 

@@ -1,0 +1,199 @@
+{% extends 'copo/base_1col.html' %}
+
+{% load staticfiles %}
+{% load web_tags %}
+
+{% block stylesheet_block %}
+    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
+
+    <link rel="stylesheet" type="text/css" href="{% static "copo/annotator-2.0.0-alpha.3/css/annotator.min.css" %} "/>
+    <link rel="stylesheet" href="{% static 'copo/css/copo/copo_ontology_styles.css' %}"
+          xmlns="http://www.w3.org/1999/html">
+
+{% endblock %}
+
+
+
+
+
+
+{% block title_block %} Index {% endblock %}
+
+{% block tagline_block %}
+
+
+
+{% endblock %}
+
+{% block page_banner %}
+    <!--
+    <div class="page-header warning-banner">
+        <div class="icon">
+            <i class="fa fa-cloud-upload fa-4x"></i>
+        </div>
+        <div class="resume-text">
+            <h3 class="h3">Resume Submission?</h3>
+            It looks like you were in the middle of a submission. <a href="http://www.google.com"> Click here to resume</a>
+        </div>
+
+    </div>
+    -->
+{% endblock %}
+
+
+{% block breadcrumb_block %}
+
+{% endblock %}
+
+{% block browse_header_block %}
+
+
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="taxonid" class="control-label">Taxon ID<i style="margin-left: 5px;"
+                                                                   class="ui grey icon info circle copo-tooltip"
+                                                                   title="A taxonomic determination (e.g., the assignment to a taxon)."></i></label>
+                <div class="ctrlDIV">
+                    <div><input type="text" class="input-copo form-control copo-text-control" id="taxonid"
+                                name="taxonid"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">A taxonomic determination (e.g., the assignment to a taxon).</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="species" class="control-label">Species<span
+                    class="constraint-label required-label"> required</span><i style="margin-left: 5px;"
+                                                                               class="ui grey icon info circle copo-tooltip"
+                                                                               title="The full scientific name of the species in which the species is classified."></i></label>
+                <div class="ctrlDIV">
+                    <div><input type="text" class="input-copo form-control copo-text-control" id="species"
+                                name="species" required="required" data-error="Species required!"></div>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">The full scientific name of the species in which the species is classified.</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="genus" class="control-label">Genus<span
+                    class="constraint-label required-label"> required</span><i style="margin-left: 5px;"
+                                                                               class="ui grey icon info circle copo-tooltip"
+                                                                               title="The full scientific name of the genus in which the taxon is classified."></i></label>
+                <div class="ctrlDIV">
+                    <div><input type="text" class="input-copo form-control copo-text-control" id="genus" name="genus"
+                                required="required" data-error="Genus required!"></div>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">The full scientific name of the genus in which the taxon is classified.</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="family" class="control-label">Family<span
+                    class="constraint-label required-label"> required</span><i style="margin-left: 5px;"
+                                                                               class="ui grey icon info circle copo-tooltip"
+                                                                               title="The full scientific name of the family in which the taxon is classified."></i></label>
+                <div class="ctrlDIV">
+                    <div><input type="text" class="input-copo form-control copo-text-control" id="family" name="family"
+                                required="required" data-error="Family required!"></div>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">The full scientific name of the family in which the taxon is classified.</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="order" class="control-label">Order<span
+                    class="constraint-label required-label"> required</span><i style="margin-left: 5px;"
+                                                                               class="ui grey icon info circle copo-tooltip"
+                                                                               title="The full scientific name of the order in which the taxon is classified."></i></label>
+                <div class="ctrlDIV">
+                    <div><input type="text" class="input-copo form-control copo-text-control" id="order" name="order"
+                                required="required" data-error="Order required!"></div>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">The full scientific name of the order in which the taxon is classified.</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="order" class="control-label">Order<span
+                    class="constraint-label required-label"> required</span><i style="margin-left: 5px;"
+                                                                               class="ui grey icon info circle copo-tooltip"
+                                                                               title="The full scientific name of the order in which the taxon is classified."></i></label>
+                <div class="ctrlDIV">
+                    <div><input type="text" class="input-copo form-control copo-text-control" id="order" name="order"
+                                required="required" data-error="Order required!"></div>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">The full scientific name of the order in which the taxon is classified.</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="commonName" class="control-label">Common Name<i style="margin-left: 5px;"
+                                                                         class="ui grey icon info circle copo-tooltip"
+                                                                         title="A common or vernacular name."></i></label>
+                <div class="ctrlDIV">
+                    <div><input type="text" class="input-copo form-control copo-text-control" id="commonName"
+                                name="commonName"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">A common or vernacular name.</span></div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="speciesDeterminationMethod" class="control-label">Species Determination Method<i
+                    style="margin-left: 5px;" class="ui grey icon info circle copo-tooltip"
+                    title="Comment if chance of misidentification, reference text used to identify, etc"></i></label>
+                <div class="ctrlDIV">
+                    <div><input type="text" class="input-copo form-control copo-text-control"
+                                id="speciesDeterminationMethod" name="speciesDeterminationMethod"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">Comment if chance of misidentification, reference text used to identify, etc</span>
+            </div>
+        </div>
+    </div>
+    <div class="row rendered-control">
+        <div class="col-sm-12 control-segment">
+            <div style="padding-bottom:5px; outline: 0;" class="form-group copo-form-group" tabindex="-1"><label
+                    for="identificationConfidence" class="control-label">Identification Confidence (%)<i
+                    style="margin-left: 5px;" class="ui grey icon info circle copo-tooltip"
+                    title="Expressed as a Percentage"></i></label>
+                <div class="ctrlDIV">
+                    <div><input type="text" class="input-copo form-control copo-text-control"
+                                id="identificationConfidence" name="identificationConfidence"></div>
+                </div>
+                <span class="form-input-help" style="display:none;">Expressed as a Percentage</span></div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+
+{% block js_block %}
+    <script src="{% static 'copo/js/dtol_functions.js' %}"></script>
+
+{% endblock %}

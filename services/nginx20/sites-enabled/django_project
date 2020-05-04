@@ -7,15 +7,18 @@ server {
     ssl_certificate       /run/secrets/copo-project.crt;
     ssl_certificate_key   /run/secrets/copo-project.key;
     client_max_body_size 0;
+    upload_max_filesize 0;
+    client_body_timeout 300s;
     # N.B. these lines commented out during ddos testing.....could cause unforseen issues
     # keepalive_timeout 730;
     # proxy_connect_timeout 925s;
     # proxy_read_timeout 1500s;
     # N.B. Finish
-
+    client_body_timeout 300s;
+    client_header_timeout 300s;
     # N.B. this block to protect against ddos and slowloris attacks
-    client_body_timeout 30s;
-    client_header_timeout 30s;
+    #client_body_timeout 10s;
+    #client_header_timeout 10s;
 	proxy_read_timeout 600;
     # limit_req_zone $binary_remote_addr zone=one:10m rate=15r/s;
     # limit_conn_zone $binary_remote_addr zone=addr:10m;
