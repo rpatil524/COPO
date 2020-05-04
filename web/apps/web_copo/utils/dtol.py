@@ -51,7 +51,7 @@ class DtolSpreadsheet:
                     notify_sample_status(profile_id=self.profile_id, msg="Checking - " + item[0],
                                          action="info",
                                          html_id="sample_info")
-                    time.sleep(0.1)
+                    #time.sleep(0.1)
                     if item[0] not in columns:
                         # invalid or missing field, inform user and return false
                         notify_sample_status(profile_id=self.profile_id, msg="Field not found - " + item[0],
