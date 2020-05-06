@@ -7,7 +7,6 @@
       "genus",
       "family",
       "order",
-      "order",
       "commonName",
       "speciesDeterminationMethod",
       "identificationConfidence"
@@ -16,10 +15,10 @@
   {
     "group_name": "Sample Ids",
     "fields": [
-      "sangerTubeId",
-      "supplierSampleName",
-      "donorId",
-      "affiliatedOrganisation"
+      "sequencingOrgSampleId",
+      "collectorSampleName",
+      "specimenId",
+      "collectorAffiliation"
     ]
   },
   {

@@ -297,11 +297,11 @@
       "default_value": "",
       "show_in_form": true,
       "label": "Identified By",
-      "id": "copo.sample.identifiedBy",
+      "id": "copo.sample.identifiedHow",
       "show_in_table": true,
       "control": "text",
       "default_value": "",
-      "dwc": "http://rs.tdwg.org/dwc/terms/identifiedBy",
+      "dwc": "http://rs.tdwg.org/dwc/terms/identifiedHow",
       "type": "string"
     },
     {
@@ -840,7 +840,7 @@
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
-      "control": "text",
+      "control": "date-picker",
       "versions": [
         "DATE_OF_PRESERVATION"
       ],
@@ -1038,29 +1038,6 @@
       "show_in_form": true,
       "id": "copo.sample.preservedBy",
       "label": "Preparations",
-      "show_in_table": true,
-      "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
-    },
-    {
-      "help_tip": "e.g. Leg removed from complete organism",
-      "required": "true",
-      "default_value": "",
-      "show_as_attribute": true,
-      "control_meta": {},
-      "control": "text",
-      "versions": [
-        "TISSUE_REMOVED_FOR_BARCODING"
-      ],
-      "ref": "",
-      "specifications": [
-        "dtol"
-      ],
-      "deprecated": false,
-      "hidden": "false",
-      "type": "string",
-      "show_in_form": true,
-      "id": "copo.sample.tissueRemovedForBarcoding",
-      "label": "Tissue Removed For Barcoding",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
     },
@@ -1661,7 +1638,7 @@
       "id": "copo.sample.dateOfSampleCollection",
       "type": "string",
       "show_in_table": false,
-      "control": "datetime"
+      "control": "date-picker"
     },
     {
       "help_tip": "",
@@ -1715,7 +1692,7 @@
       "id": "copo.sample.date_modified",
       "type": "string",
       "show_in_table": true,
-      "control": "datetime"
+      "control": "date-picker"
     }
   ],
   "description": "Mappings of attribute in the Sample schema to a UI configuration source.",

@@ -66,10 +66,14 @@ class DtolSpreadsheet:
                                              action="info",
                                              html_id="sample_info")
                         return False
+                    # validate for date format
+                    if "DATE" in item[0]:
+                        print("HOG: " + item[0] + " " +  str(self.data[item[0]].values))
 
 
-            except:
-                notify_sample_status(profile_id=self.profile_id, msg="Server Error - Try Again", action="info",
+            except Exception as e:
+                print(e)
+                notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + str(e), action="info",
                                      html_id="sample_info")
                 return False
             # if we get here we have a valid spreadsheet
@@ -82,13 +86,12 @@ class DtolSpreadsheet:
 
     def parse(self):
         for index, row in self.data.iterrows():
-            time.sleep(0.1)
             notify_sample_status(profile_id=self.profile_id,
                                  msg="Creating sample " + str(index) + " with ID: " + str(row["RACK_OR_PLATE_ID"]),
                                  action="info",
                                  html_id="parse_info")
             sample_data = dict(row)
-            print(row)
+
             Sample(profile_id=self.profile_id).save_record(auto_fields={}, **sample_data)
 
     def get_biosampleId(self):
