@@ -51,6 +51,6 @@ For local installation:
         * type "sudo service docker start"
 	
 * assuming everything has worked, you will eventually see the message
- 	*copo-web_1       | Starting ASGI/Channels version 2.2.0 development server at http://0.0.0.0:8000/
+	*copo-web_1       | Starting ASGI/Channels version 2.2.0 development server at http://0.0.0.0:8000/
 
 * navigate in a browser to 127.0.0.1:8000/copo
