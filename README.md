@@ -54,3 +54,7 @@ For local installation:
 	* copo-web_1       | Starting ASGI/Channels version 2.2.0 development server at http://0.0.0.0:8000/
 
 * navigate in a browser to 127.0.0.1:8000/copo
+
+
+[![DOI](https://zenodo.org/badge/31064842.svg)](https://zenodo.org/badge/latestdoi/31064842)
+
