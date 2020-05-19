@@ -260,7 +260,7 @@
     },
     {
       "help_tip": "Public Name",
-      "required": "false",
+      "required": "true",
       "control_meta": {},
       "versions": [
         "PUBLIC_NAME"
@@ -306,7 +306,7 @@
     },
     {
       "help_tip": "A taxonomic determination (e.g., the assignment to a taxon).",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -488,7 +488,7 @@
     },
     {
       "help_tip": "A common or vernacular name.",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -511,7 +511,7 @@
     },
     {
       "help_tip": "An identifier given to the Occurrence at the time it was recorded. Often serves as a link between field notes and an Occurrence record, such as a specimen collector's number.",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -626,7 +626,7 @@
     },
     {
       "help_tip": "A list of geographic names less specific than the information captured in the Collection Site term. Starting with the least specific, add geograhic place names to identify location using the blue plus. E.g. U.K., London, Westminster, Westminster Abbey all as separate list entries.",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -1273,7 +1273,7 @@
     },
     {
       "help_tip": "Other Information",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -1349,7 +1349,7 @@
     },
     {
       "help_tip": "",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "control_meta": {},
       "dwc": "",
@@ -1372,7 +1372,7 @@
     },
     {
       "help_tip": "",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "control_meta": {},
       "dwc": "",
@@ -1395,7 +1395,7 @@
     },
     {
       "help_tip": "",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "control_meta": {},
       "dwc": "",
@@ -1418,7 +1418,7 @@
     },
     {
       "help_tip": "",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "control_meta": {},
       "dwc": "",
@@ -1464,7 +1464,7 @@
     },
     {
       "help_tip": "",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "control_meta": {},
       "dwc": "",

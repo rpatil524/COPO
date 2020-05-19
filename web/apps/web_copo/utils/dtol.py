@@ -44,7 +44,7 @@ class DtolSpreadsheet:
         with open(lookup.WIZARD_FILES["sample_details"]) as json_data:
 
             try:
-                # get definitive list of DTOL fields
+                # get definitive list of DTOL fields from schema
                 s = json.load(json_data)
                 self.fields = jp.match('$.properties[?(@.specifications[*] == "dtol" & @.required=="true")].versions[0]', s)
                 columns = list(self.data.columns)
@@ -72,11 +72,7 @@ class DtolSpreadsheet:
                     if "DATE" in item:
                         print("HOG: " + item + " " +  str(self.data[item].values))
 
-                # check for additional fields in spreadsheet and remove them from list
-                for col in columns:
-                    if col not in self.fields:
-                        # we have an errant field - remove
-                        self.data.drop(columns=col)
+
 
 
             except Exception as e:
