@@ -15,11 +15,16 @@ Featuring:
 [Check out the documentation!](http://copo-project.readthedocs.io/en/latest/)
 
 For local installation:
+
+* the following instructions assume the following pre-requisites
+	* you have created an app in ORCiD, and have the Client Key and Client Secret
+	* you have creates a user in the ENAs Webin system and have the Username and Password
+
 * ensure docker is installed and running
 
 * ensure docker-compose is installed
 
-* create a directory and add the following files each with a random alphanumeric string
+* create a directory and add the following files
     * copo_mongo_initdb_root_password
     * copo_mongo_user_password
     * copo_postgres_user_password
