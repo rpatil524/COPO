@@ -18,6 +18,8 @@ class DtolSpreadsheet:
 
     validation_msg_missing_data = "Missing data detected in column <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of 'NA' and 'none' are allowed."
 
+    fields = ""
+
     def __init__(self, file):
         self.file = file
         req = ThreadLocal.get_current_request()
@@ -40,32 +42,38 @@ class DtolSpreadsheet:
     def validate(self):
         # need to load validation field set
         with open(lookup.WIZARD_FILES["sample_details"]) as json_data:
-            fields = ""
+
             try:
                 # get definitive list of DTOL fields
                 s = json.load(json_data)
-                fields = jp.match('$.properties[?(@.specifications[*] == "dtol" & @.required=="true")].versions', s)
+                self.fields = jp.match('$.properties[?(@.specifications[*] == "dtol" & @.required=="true")].versions[0]', s)
                 columns = list(self.data.columns)
                 # check required fields are present in spreadsheet
-                for item in fields:
-                    notify_sample_status(profile_id=self.profile_id, msg="Checking - " + item[0],
+                for item in self.fields:
+                    notify_sample_status(profile_id=self.profile_id, msg="Checking - " + item,
                                          action="info",
                                          html_id="sample_info")
                     #time.sleep(0.1)
-                    if item[0] not in columns:
+                    if item not in columns:
                         # invalid or missing field, inform user and return false
-                        notify_sample_status(profile_id=self.profile_id, msg="Field not found - " + item[0],
+                        notify_sample_status(profile_id=self.profile_id, msg="Field not found - " + item,
                                              action="info",
                                              html_id="sample_info")
                         return False
                     # if we have a required field and it has null data
-                    if self.data[item[0]].isnull().values.any():
+                    if self.data[item].isnull().values.any():
                         # we have missing data in required cells
                         notify_sample_status(profile_id=self.profile_id,
-                                             msg=(self.validation_msg_missing_data % item[0]),
+                                             msg=(self.validation_msg_missing_data % item),
                                              action="info",
                                              html_id="sample_info")
                         return False
+
+                # check for additional fields in spreadsheet and remove them from list
+                for col in columns:
+                    if col not in self.fields:
+                        # we have an errant field - remove
+                        self.data.drop(columns=col)
 
 
             except:
@@ -89,6 +97,7 @@ class DtolSpreadsheet:
                                  html_id="parse_info")
             sample_data = dict(row)
             print(row)
+            print("--------------------------------------------")
             Sample(profile_id=self.profile_id).save_record(auto_fields={}, **sample_data)
 
     def get_biosampleId(self):

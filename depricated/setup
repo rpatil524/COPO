@@ -6,7 +6,7 @@ set_envs(){
 export ENVIRONMENT_TYPE="dev"
 export COPO_VM_NAME="copo_env"
 # django secret key.....this must be changed before any public deployment
-export SECRET_KEY=f9834op2ji0ikaiowdu9hgcg-9iojla
+export SECRET_KEY=<add secret>
 
 # admin user and password for mongo and postgres
 export MONGO_ADMIN_USER=admin
@@ -38,8 +38,8 @@ export ORCID_REDIRECT=http://127.0.0.1/accounts/orcid/login/callback/
 export MEDIA_PATH=media/
 
 # settings for ENA
-export WEBIN_USER=Webin-39233@webin.ebi.ac.uk
-export WEBIN_USER_PASSWORD=vnZB4gxU7
+export WEBIN_USER=
+export WEBIN_USER_PASSWORD=
 # note this is the test service....url for live service can be found at
 # https://www.ebi.ac.uk/ena/submit/programmatic-submission....USE WITH CAUTION!
 export ENA_SERVICE=https://www-test.ebi.ac.uk

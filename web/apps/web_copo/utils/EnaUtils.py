@@ -3,7 +3,7 @@ import re
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 import os
-import pysam
+
 import PyPDF2
 from datetime import time
 from dal.ena_da import EnaCollection
@@ -86,7 +86,7 @@ def is_sam_file(file_name):
         regex2 = "^@CO\t.*"
         return (re.match(regex1, li) is not None or re.match(regex2, li) is not None)
 
-
+'''
 def is_bam_file(file_name):
     # try opening the file with pysam. If this causes an exception, its not a bam file
     try:
@@ -94,7 +94,7 @@ def is_bam_file(file_name):
             return True
     except(Exception) as inst:
         return False
-
+'''
 def is_cram_file(file_name):
     pass
 
