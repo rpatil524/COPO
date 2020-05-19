@@ -62,8 +62,6 @@ class EnaReads:
         function picks a submission from the queue to process
         :return:
         """
-        logger = open("/home/fshaw/Desktop/log.log", "w+")
-        logger.write(str(datetime.utcnow()) + "\n")
         collection_handle = ghlper.get_submission_queue_handle()
 
         # check and update status for long running tasks
@@ -126,7 +124,6 @@ class EnaReads:
         # remove from queue - this supposes that submissions that returned error will have
         # to be re-scheduled for processing, upon addressing the error, by the user
         collection_handle.remove({"_id": queued_record_id})
-        logger.close()
         return True
 
     def submit(self):
