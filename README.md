@@ -38,6 +38,7 @@ For local installation:
     * copo_facebook_secret_key
     * copo_webin_user
     * copo_webin_user_password
+    - these can all contain random alpha-numeric strings apart from copo_webin_user, copo_webin_user_password and copo_orcid_Secret_key which should contain the details described above.
 * in the secrets section of docker-compose.yml, change "$(COPO_KEYS)" to the directory path you created in the previous step
 
 * in a terminal, navigate to the root of this project
@@ -48,3 +49,8 @@ For local installation:
         * log out and log in again
     * if you receive errors about docker not running, start the docker daemon
         * type "sudo service docker start"
+	
+* assuming everything has worked, you will eventually see the message
+ - copo-web_1       | Starting ASGI/Channels version 2.2.0 development server at http://0.0.0.0:8000/
+
+* navigate in a browser to 127.0.0.1:8000/copo
