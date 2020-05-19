@@ -68,6 +68,9 @@ class DtolSpreadsheet:
                                              action="info",
                                              html_id="sample_info")
                         return False
+                    # validate for date format
+                    if "DATE" in item:
+                        print("HOG: " + item + " " +  str(self.data[item].values))
 
                 # check for additional fields in spreadsheet and remove them from list
                 for col in columns:
@@ -76,8 +79,9 @@ class DtolSpreadsheet:
                         self.data.drop(columns=col)
 
 
-            except:
-                notify_sample_status(profile_id=self.profile_id, msg="Server Error - Try Again", action="info",
+            except Exception as e:
+                print(e)
+                notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + str(e), action="info",
                                      html_id="sample_info")
                 return False
             # if we get here we have a valid spreadsheet
@@ -98,6 +102,7 @@ class DtolSpreadsheet:
             sample_data = dict(row)
             print(row)
             print("--------------------------------------------")
+
             Sample(profile_id=self.profile_id).save_record(auto_fields={}, **sample_data)
 
     def get_biosampleId(self):
