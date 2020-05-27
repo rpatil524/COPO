@@ -239,14 +239,14 @@
     </div>
 
     <div class="modal fade" tabindex="-1" role="dialog" id="sample_spreadsheet_modal">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Upload Spreadsheet</h4>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="overflow:scroll">
                     <div id="upload_controls">
                         <label class="btn btn-success" for="file">
                             <input id="file" type="file" style="display:none"
@@ -255,10 +255,44 @@
                         </label>
                         <span class='label label-primary' id="upload-file-info"></span>
                     </div>
-                    <div style="display:none; margin-top: 30px; " id="sample_info" class="alert alert-info" role="alert"></div>
-                    <div style="display:none; margin-top: 30px; " id="sample_valid" class="alert alert-info" role="alert">Validated</div>
-                    <div style="display:none; margin-top: 10px; " id="parse_info" class="alert alert-info" role="alert">...</div>
+                    <div style="display:none; margin-top: 30px; " id="sample_info" class="alert alert-info"
+                         role="alert"></div>
+                    <div style="display:none; margin-top: 30px; " id="sample_valid" class="alert alert-info"
+                         role="alert">Validated
+                    </div>
+                    <div style="display:none; margin-top: 10px; " id="parse_info" class="alert alert-info" role="alert">
+                        ...
+                    </div>
                 </div>
+
+
+                <table id="sample_parse_table" class="ui celled padded table" >
+
+                    <thead></thead>
+                    <tbody></tbody>
+                    <!--
+                    <tfoot>
+                    <tr>
+                        <th colspan="5">
+                            <div class="ui right floated pagination menu">
+                                <a class="icon item">
+                                    <i class="left chevron icon"></i>
+                                </a>
+                                <a class="item">1</a>
+                                <a class="item">2</a>
+                                <a class="item">3</a>
+                                <a class="item">4</a>
+                                <a class="icon item">
+                                    <i class="right chevron icon"></i>
+                                </a>
+                            </div>
+                        </th>
+                    </tr>
+                    </tfoot>
+                    -->
+                </table>
+
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 

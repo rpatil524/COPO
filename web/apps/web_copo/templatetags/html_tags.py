@@ -438,7 +438,9 @@ def generate_table_records(profile_id=str(), component=str(), record_id=str()):
             if x["id"] not in df_columns:
                 df[x["id"]] = str()
             df[x["id"]] = df[x["id"]].fillna('')
-            df[x["id"]] = df[x["id"]].apply(resolve_control_output_apply, args=(x,))
+
+            if "dtol" not in x.get("specifications", []):
+                df[x["id"]] = df[x["id"]].apply(resolve_control_output_apply, args=(x,))
 
         data_set = df.to_dict('records')
 

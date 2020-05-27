@@ -9,12 +9,15 @@ from asgiref.sync import async_to_sync
 import math
 import time
 from dal.copo_da import Sample
+from bson.json_util import dumps, loads
+from numpy import datetime64
 
 
 class DtolSpreadsheet:
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
     na_vals = ['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
                'NULL', 'NaN', 'n/a', 'nan', 'null']
+    na_vals = ['N/A']
 
     validation_msg_missing_data = "Missing data detected in column <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of 'NA' and 'none' are allowed."
 
@@ -22,8 +25,8 @@ class DtolSpreadsheet:
 
     def __init__(self, file):
         self.file = file
-        req = ThreadLocal.get_current_request()
-        self.profile_id = req.session.get("profile_id", None)
+        self.req = ThreadLocal.get_current_request()
+        self.profile_id = self.req.session.get("profile_id", None)
 
     def loadCsv(file):
         raise NotImplementedError
@@ -33,8 +36,11 @@ class DtolSpreadsheet:
         if self.profile_id is not None:
             notify_sample_status(profile_id=self.profile_id, msg="Loading..", action="info", html_id="sample_info")
             try:
+                # read excel and convert all to string
                 self.data = pandas.read_excel(self.file, keep_default_na=False, na_values=self.na_vals)
-            except pandas.XLRDError as e:
+                self.data = self.data.astype(str)
+            except :
+                # if error notify via web socket
                 notify_sample_status(profile_id=self.profile_id, msg="Unable to load file.", action="info",
                                      html_id="sample_info")
                 return False
@@ -53,6 +59,7 @@ class DtolSpreadsheet:
                     notify_sample_status(profile_id=self.profile_id, msg="Checking - " + item,
                                          action="info",
                                          html_id="sample_info")
+                    print(item)
                     #time.sleep(0.1)
                     if item not in columns:
                         # invalid or missing field, inform user and return false
@@ -68,9 +75,7 @@ class DtolSpreadsheet:
                                              action="info",
                                              html_id="sample_info")
                         return False
-                    # validate for date format
-                    if "DATE" in item:
-                        print("HOG: " + item + " " +  str(self.data[item].values))
+
 
 
 
@@ -88,18 +93,22 @@ class DtolSpreadsheet:
 
             return True
 
-    def parse(self):
+    def collect(self):
+        sample_data = []
         for index, row in self.data.iterrows():
-            time.sleep(0.1)
-            notify_sample_status(profile_id=self.profile_id,
-                                 msg="Creating sample " + str(index) + " with ID: " + str(row["RACK_OR_PLATE_ID"]),
-                                 action="info",
-                                 html_id="parse_info")
-            sample_data = dict(row)
-            print(row)
-            print("--------------------------------------------")
+            r = list(row)
+            for idx, x in enumerate(r):
+                if x is math.nan:
+                    r[idx] = ""
+            sample_data.append(r)
+        self.req.session["sample_data"] = sample_data
 
-            Sample(profile_id=self.profile_id).save_record(auto_fields={}, **sample_data)
+        notify_sample_status(profile_id=self.profile_id, msg=sample_data, action="make_table", html_id="sample_table")
+
+    def save_records(self):
+        sample_data = self.req.session["sample_data"]
+        Sample(profile_id=self.profile_id).save_record(auto_fields={}, **sample_data)
+
 
     def get_biosampleId(self):
         raise NotImplementedError()

@@ -195,7 +195,7 @@ def notify_status_change(profile_id=str(), submission_id=str()):
     return True
 
 
-def notify_sample_status(profile_id=str(), action="message", msg=str(), html_id=""):
+def notify_sample_status(profile_id=str(), action="message", msg=str(), data={}, html_id=""):
     """
         function notifies client changes in Sample creation status
         :param profile_id:
@@ -205,7 +205,7 @@ def notify_sample_status(profile_id=str(), action="message", msg=str(), html_id=
     """
     # type points to the object type which will be passed to the socket and is a method defined in consumer.py
     group_name = 'sample_status_%s' % profile_id
-    event = {"type": "msg", "action": action, "message": msg, "html_id": html_id}
+    event = {"type": "msg", "action": action, "message": msg, "data": data, "html_id": html_id}
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
         group_name,

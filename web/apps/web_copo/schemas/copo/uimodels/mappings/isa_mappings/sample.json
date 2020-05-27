@@ -164,7 +164,7 @@
         "dtol"
       ],
       "show_in_form": true,
-      "label": "Date of Sample Identification",
+      "label": "Date of Specimen Identification",
       "id": "copo.sample.dateOfSpecimenIdentification",
       "show_in_table": true,
       "control": "date-picker",
@@ -1621,24 +1621,6 @@
           "function": "get_sample_type_options"
         }
       }
-    },
-    {
-      "help_tip": "Date sample was collected",
-      "required": "true",
-      "default_value": "",
-      "control_meta": {},
-      "versions": [
-        "DATE_OF_SAMPLE_COLLECTION"
-      ],
-      "ref": "",
-      "deprecated": false,
-      "hidden": "true",
-      "label": "Created",
-      "show_in_form": false,
-      "id": "copo.sample.dateOfSampleCollection",
-      "type": "string",
-      "show_in_table": false,
-      "control": "date-picker"
     },
     {
       "help_tip": "",

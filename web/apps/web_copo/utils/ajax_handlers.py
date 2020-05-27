@@ -1318,7 +1318,7 @@ def sample_spreadsheet(request):
         dtol.loadExcel()
         if dtol.validate():
             
-            dtol.parse()
+            dtol.collect()
         return HttpResponse()
     elif name.endswith("csv"):
         return dtol.loadCsv(file)

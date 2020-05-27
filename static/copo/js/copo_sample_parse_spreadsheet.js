@@ -31,7 +31,7 @@ $(document).ready(function () {
     if (window.location.protocol == "https:") {
         wsprotocol = 'wss://';
     }
-    var socket = new ReconnectingWebSocket(
+    var socket = new WebSocket(
         wsprotocol + window.location.host +
         '/ws/sample_status/' + profileId);
     socket.onerror = function (e) {
@@ -56,6 +56,21 @@ $(document).ready(function () {
                 $("#" + d.html_id).fadeIn("50")
             }
             $("#" + d.html_id).html(d.message)
+        }else if(d.action == "make_table"){
+            var body = $("tbody")
+            for (r in d.message){
+                row = d.message[r]
+                var tr = $("<tr/>")
+                for (c in row){
+
+                    cell = row[c]
+                    var td = $("<td/>", {
+                        "html": cell
+                    })
+                    tr.append(td)
+                }
+                $("#sample_parse_table tbody").append(tr)
+            }
         }
     }
 })
