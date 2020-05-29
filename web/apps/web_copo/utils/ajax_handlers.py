@@ -1313,7 +1313,7 @@ def get_subsample_stages(request):
 def sample_spreadsheet(request):
     file = request.FILES["file"]
     name = file.name
-    dtol = DtolSpreadsheet(file)
+    dtol = DtolSpreadsheet(file=file)
     if name.endswith("xlsx") or name.endswith("xls"):
         dtol.loadExcel()
         if dtol.validate():
@@ -1325,3 +1325,9 @@ def sample_spreadsheet(request):
 
     else:
         return HttpResponse(status=415,content="Only Excel or CSV files in the exact Darwin Core format are supported.")
+
+def create_spreadsheet_samples(request):
+    sample_data = request.session["sample_data"]
+    dtol = DtolSpreadsheet()
+    dtol.save_records()
+    return HttpResponse(status=200)

@@ -55,3 +55,9 @@ def finish_request(template=None, error=None):
 
     return HttpResponse(jsonpickle.encode(wrapper))
 
+def map_to_dict(x, y):
+    # method to make output dict using keys from array x and values from array y
+    out = dict()
+    for idx, el in enumerate(x):
+        out[el] = y[idx]
+    return out

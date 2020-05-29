@@ -56,26 +56,53 @@ $(document).ready(function () {
                 $("#" + d.html_id).fadeIn("50")
             }
             $("#" + d.html_id).html(d.message)
-        }else if(d.action == "make_table"){
+        } else if (d.action == "make_table") {
             var body = $("tbody")
-            for (r in d.message){
+            var count = 0
+            for (r in d.message) {
                 row = d.message[r]
                 var tr = $("<tr/>")
-                for (c in row){
+                for (c in row) {
 
                     cell = row[c]
-                    var td = $("<td/>", {
-                        "html": cell
-                    })
+                    if (count == 0) {
+                        var td = $("<th/>", {
+                            "html": cell
+                        })
+                    } else {
+                        var td = $("<td/>", {
+                            "html": cell
+                        })
+                    }
+
                     tr.append(td)
                 }
-                $("#sample_parse_table tbody").append(tr)
+                if (count == 0) {
+                    $("#sample_parse_table thead").append(tr)
+                } else {
+                    $("#sample_parse_table tbody").append(tr)
+                }
+                count++
+
             }
+            $("#sample_info").hide()
+            $("#table_div").fadeIn(1000)
+            $("#confirm_info").fadeIn(1000)
         }
     }
 })
 
 
+$(document).on("click", "#create_samples", function (event) {
+    $.ajax({
+        url: "/copo/create_spreadsheet_samples",
+
+    }).done(function(){
+        location.reload()
+    }).error(function(){
+        alert("something went wrong")
+    })
+})
 
 $(document).on("click", ".new-samples-spreadsheet-template", function (event) {
     $("#sample_spreadsheet_modal").modal("show")

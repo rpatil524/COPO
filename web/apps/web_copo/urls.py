@@ -159,6 +159,8 @@ urlpatterns = [
          name="search_species"),
     path('get_subsample_stages/', ajax_handlers.get_subsample_stages,
          name="get_subsample_stages"),
-path('sample_spreadsheet/', ajax_handlers.sample_spreadsheet,
+    path('sample_spreadsheet/', ajax_handlers.sample_spreadsheet,
          name="sample_spreadsheet"),
+    path('create_spreadsheet_samples/', ajax_handlers.create_spreadsheet_samples,
+         name="create_spreadsheet_samples"),
 ]

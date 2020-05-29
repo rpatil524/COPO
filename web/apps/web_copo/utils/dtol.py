@@ -11,6 +11,7 @@ import time
 from dal.copo_da import Sample
 from bson.json_util import dumps, loads
 from numpy import datetime64
+from api.utils import map_to_dict
 
 
 class DtolSpreadsheet:
@@ -23,10 +24,17 @@ class DtolSpreadsheet:
 
     fields = ""
 
-    def __init__(self, file):
-        self.file = file
+    def __init__(self, file=None):
         self.req = ThreadLocal.get_current_request()
         self.profile_id = self.req.session.get("profile_id", None)
+        # if a file is passed in, then this is the first time we have seen the spreadsheet,
+        # if not then we are looking at creating samples having previously validated
+        if file:
+            self.file = file
+        else:
+            self.sample_data = self.req.session["sample_data"]
+
+
 
     def loadCsv(file):
         raise NotImplementedError
@@ -75,16 +83,12 @@ class DtolSpreadsheet:
                                              action="info",
                                              html_id="sample_info")
                         return False
-
-
-
-
-
             except Exception as e:
                 print(e)
                 notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + str(e), action="info",
                                      html_id="sample_info")
                 return False
+
             # if we get here we have a valid spreadsheet
             notify_sample_status(profile_id=self.profile_id, msg="Spreadsheet is Valid", action="info",
                                  html_id="sample_info")
@@ -94,7 +98,12 @@ class DtolSpreadsheet:
             return True
 
     def collect(self):
+
         sample_data = []
+        headers = list()
+        for col in list(self.data.columns):
+            headers.append(col)
+        sample_data.append(headers)
         for index, row in self.data.iterrows():
             r = list(row)
             for idx, x in enumerate(r):
@@ -106,8 +115,18 @@ class DtolSpreadsheet:
         notify_sample_status(profile_id=self.profile_id, msg=sample_data, action="make_table", html_id="sample_table")
 
     def save_records(self):
-        sample_data = self.req.session["sample_data"]
-        Sample(profile_id=self.profile_id).save_record(auto_fields={}, **sample_data)
+        sample_data = self.sample_data
+
+
+        for p in range(1, len(sample_data)):
+
+            to_mongo = (map_to_dict(sample_data[0], sample_data[p]))
+            notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + to_mongo["SPECIMEN_ID"], action="info",
+                                 html_id="sample_info")
+            Sample(profile_id=self.profile_id).save_record(auto_fields={}, **to_mongo)
+            print("sample created: " + str(p))
+
+
 
 
     def get_biosampleId(self):
