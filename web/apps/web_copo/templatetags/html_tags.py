@@ -439,7 +439,9 @@ def generate_table_records(profile_id=str(), component=str(), record_id=str()):
                 df[x["id"]] = str()
             df[x["id"]] = df[x["id"]].fillna('')
 
+
             if "dtol" not in x.get("specifications", []):
+
                 df[x["id"]] = df[x["id"]].apply(resolve_control_output_apply, args=(x,))
 
         data_set = df.to_dict('records')
@@ -1338,6 +1340,8 @@ def get_resolver(data, elem):
     :param elem:
     :return:
     """
+    if not data:
+        return ""
     func_map = dict()
     func_map["copo-characteristics"] = resolve_copo_characteristics_data
     func_map["copo-environmental-characteristics"] = resolve_environmental_characteristics_data

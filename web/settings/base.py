@@ -9,6 +9,7 @@ SCHEMA_DIR = os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'schemas')
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
+PROFILE_LOG_BASE = os.path.join(BASE_DIR, 'profiler')
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 
