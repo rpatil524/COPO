@@ -38,6 +38,8 @@ def index(request):
     context = {'user': request.user}
     request.META['test'] = 'test'
 
+    is_DTOL = request.user.groups.filter(name__in=['dtol_users']).exists()
+    print(is_DTOL)
     # check if there are partial_deposits, if so forward user back to that
     if True:
         context['partial_submission_redirect_url'] = 'http://www.google.com'
