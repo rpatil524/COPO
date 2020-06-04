@@ -42,6 +42,28 @@
       "control": "textarea"
     },
     {
+      "help_tip": "Is this a standalone profile or part of a larger project?",
+      "required": "false",
+      "default_value": "Stand-alone",
+      "control_meta": {},
+      "versions": [
+        "type"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Profile Type",
+      "show_in_form": true,
+      "id": "copo.profile.type",
+      "type": "string",
+      "show_in_table": true,
+      "control": "select",
+      "option_values": [
+        "Stand-alone",
+        "Darwin Tree of Life"
+      ]
+    },
+    {
       "help_tip": "",
       "required": "true",
       "default_value": "",

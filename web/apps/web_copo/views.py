@@ -29,6 +29,7 @@ from dal.copo_da import DataFile
 from pexpect import run
 import shutil
 from django.conf import settings
+from web.apps.web_copo.utils import group_functions
 
 LOGGER = settings.LOGGER
 
@@ -37,15 +38,6 @@ LOGGER = settings.LOGGER
 def index(request):
     context = {'user': request.user}
     request.META['test'] = 'test'
-
-    is_DTOL = request.user.groups.filter(name__in=['dtol_users']).exists()
-    print(is_DTOL)
-    # check if there are partial_deposits, if so forward user back to that
-    if True:
-        context['partial_submission_redirect_url'] = 'http://www.google.com'
-    else:
-        context['partial_submission_redirect_url'] = None
-
     return render(request, 'copo/index.html', context)
 
 
@@ -57,24 +49,6 @@ def login(request):
 
 def test_view(request):
     return render(request, "copo/test_1.html")
-'''
-def test(request):
-    try:
-        LOGGER.log('Test Error Message 123', type=Logtype.FILE, level=Loglvl.INFO)
-    except CopoRuntimeError as l:
-        return render(request, 'copo/error_page.html', {'message': str(l)})
-    r = '<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="receipt.xsl"?><RECEIPT receiptDate="2017-12-11T17:26:27.444Z" submissionFile="submission.xml" success="true"><ANALYSIS accession="ERZ481434" alias="5a2ebfbc68236be08e208503:ena-ant:-small5_test.fastq.gz_anaysis" status="PRIVATE"/><STUDY accession="ERP105651" alias="5a2ebfbc68236be08e208503" status="PRIVATE" holdUntilDate="2019-12-11Z"><EXT_ID accession="PRJEB23872" type="Project"/></STUDY><SUBMISSION accession="ERA1153795" alias="5a2ebfbc68236be08e208503:ena-ant:-small5_test.fastq.gz_sub"/><MESSAGES><INFO>Submission has been committed.</INFO><INFO>This submission is a TEST submission and will be discarded within 24 hours</INFO></MESSAGES><ACTIONS>ADD</ACTIONS></RECEIPT>'
-    accessions = EnaSubmit().get_accessions(r, sub_id="5a37edf968236b64bbdfbf16")
-
-    s = Submission().get_record("5a37edf968236b64bbdfbf16")
-    s['accessions'] = accessions
-    s['complete'] = True
-    s['completed_on'] = datetime.now()
-    s['target_id'] = str(s.pop('_id'))
-    Submission().save_record(dict(), **s)
-    return HttpResponse(accessions)
-'''
-
 
 def test_submission(request):
     delegate_submission(request)
@@ -163,7 +137,8 @@ def copo_repositories(request):
 def copo_samples(request, profile_id):
     request.session["profile_id"] = profile_id
     profile = Profile().get_record(profile_id)
-    return render(request, 'copo/copo_sample.html', {'profile_id': profile_id, 'profile': profile})
+    groups = group_functions.get_groups()
+    return render(request, 'copo/copo_sample.html', {'profile_id': profile_id, 'profile': profile, 'groups': groups})
 
 
 @login_required()

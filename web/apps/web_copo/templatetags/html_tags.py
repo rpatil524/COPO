@@ -20,6 +20,7 @@ from dal.copo_da import ProfileInfo, Repository, Description, Profile, Publicati
     DataFile, DAComponent, Annotation, CGCore, MetadataTemplate
 from allauth.socialaccount import providers
 from hurry.filesize import size as hurrysize
+from django_tools.middlewares import ThreadLocal
 
 register = template.Library()
 
@@ -166,6 +167,14 @@ def generate_copo_form(component=str(), target_id=str(), component_dict=dict(), 
             # filter based on sample type
             if component == "sample" and not filter_sample_type(form_value, f):
                 continue
+
+            if component == "profile":
+                if "type" in f["id"]:
+                    # check if this user is in dtol group, if not, break so as to not add dropdown to form
+                    request = ThreadLocal.get_current_request()
+                    is_DTOL = request.user.groups.filter(name__in=['dtol_users']).exists()
+                    if not is_DTOL:
+                        break
 
             form_schema.append(f)
 

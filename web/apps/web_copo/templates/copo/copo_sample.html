@@ -40,6 +40,7 @@
 {% endblock %}
 
 
+
 {% block title_block %} Index {% endblock %}
 
 {% block tagline_block %}
@@ -64,9 +65,12 @@
 
 
 {% block content %}
-
+    <script>
+        var groups = {{ groups|safe }}
+    </script>
     <!--test ends -->
     <!--test ends -->
+    <input type="hidden" id="groups" value="{{ groups|safe }}"/>
 
     <!-- file upload control template -->
     <div id="file_upload_template1" style="display: none;">

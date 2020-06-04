@@ -83,6 +83,11 @@ $(document).ready(function () {
         wizardElement.wizard('previous');
     });
 
+    //var groups = $("#groups").val().split(",")
+    if(groups.includes("dtol_users")){
+        $(".new-samples-spreadsheet-template").show()
+    }
+
     $(document).on("change", "#number_of_samples", function (evt) {
         let count = parseInt($(evt.currentTarget).val())
         disable_rack_id(count)
