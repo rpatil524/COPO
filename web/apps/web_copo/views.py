@@ -30,14 +30,13 @@ from pexpect import run
 import shutil
 from django.conf import settings
 from web.apps.web_copo.utils import group_functions
-
+from dal.copo_da import Sample
 LOGGER = settings.LOGGER
 
 
 @login_required
 def index(request):
     context = {'user': request.user}
-    request.META['test'] = 'test'
     return render(request, 'copo/index.html', context)
 
 
