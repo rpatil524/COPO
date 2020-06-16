@@ -4,7 +4,7 @@
 $(document).ready(function () {
     // get latest list of ontologies from OLS
     get_ontologies_data()
-    // setup and init Annotator
+    // setup.sh and init Annotator
     var app = new annotator.App();
     app.include(annotator.ui.main, {
         element: document.getElementById("text-area"),

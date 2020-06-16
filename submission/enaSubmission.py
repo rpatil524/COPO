@@ -235,7 +235,7 @@ class EnaSubmit(object):
             # save collected metadata to the transfer record
             RemoteDataFile().update_transfer(transfer_token, transfer_fields)
 
-        # setup paths for conversion directories
+        # setup.sh paths for conversion directories
         if self.submission['repository'] == 'ena':
             # this is now deprecated and will never be called
             return self.do_seq_reads_submission(sub_id, remote_path, transfer_token)
@@ -278,7 +278,7 @@ class EnaSubmit(object):
             return {"status": 428, "message": "You must supply an AGP file and a FASTA file"}
 
     def do_seq_reads_submission(self, sub_id, remote_path, transfer_token):
-        # # setup paths for conversion directories
+        # # setup.sh paths for conversion directories
         conv_dir = os.path.join(self._dir, sub_id)
         if not os.path.exists(os.path.join(conv_dir, 'json')):
             os.makedirs(os.path.join(conv_dir, 'json'))
