@@ -8,10 +8,17 @@ from django_tools.middlewares import ThreadLocal
 from asgiref.sync import async_to_sync
 import math
 import time
-from dal.copo_da import Sample
+from dal.copo_da import Sample, Profile
 from bson.json_util import dumps, loads
 from numpy import datetime64
 from api.utils import map_to_dict
+from submission import enareadSubmission
+from lxml import etree
+import xml.etree.ElementTree as ET
+from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_EXPERIMENT_TEMPLATE, SRA_RUN_TEMPLATE, \
+    SRA_PROJECT_TEMPLATE, SRA_SAMPLE_TEMPLATE, \
+    SRA_SUBMISSION_MODIFY_TEMPLATE, ENA_CLI
+
 
 
 class DtolSpreadsheet:
@@ -123,11 +130,53 @@ class DtolSpreadsheet:
             to_mongo = (map_to_dict(sample_data[0], sample_data[p]))
             notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + to_mongo["SPECIMEN_ID"], action="info",
                                  html_id="sample_info")
-            Sample(profile_id=self.profile_id).save_record(auto_fields={}, **to_mongo)
+            obj_id = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **to_mongo)
             print("sample created: " + str(p))
+            #obj = Sample(profile_id=self.profile_id).get_record(obj_id['_id']) #would retrieve same as 133
 
 
 
 
-    def get_biosampleId(self):
-        raise NotImplementedError()
+            #build sample XML
+            tree =  ET.parse(SRA_SAMPLE_TEMPLATE)
+            root = tree.getroot()
+            print(root)
+            print(root.tag)
+            print(root.attrib)
+
+            #sample = {'alias' : obj_id['_id']}
+            sample_alias = ET.SubElement(root, 'SAMPLE')
+            sample_alias.set('alias', str(obj_id['_id']))
+            title = ''
+            title_block = ET.SubElement(sample_alias, 'TITLE')
+            title_block.text = title
+            sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
+            taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
+            sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
+            ####to fill in according to schema
+
+            ET.dump(tree)
+
+
+
+            print(sample_id)
+
+            ####retrieve id and update record
+            # obj = self.get_biosampleId(obj_id)
+
+
+        '''print(sample_data[0])
+        for p in range(1, len(sample_data)):
+
+            ######submit sample to ENA
+            #print(sample_data[p]) #create XML with this is [0] the header?
+            #get sample from mongo
+            s = Sample().get_from_profile_id(profile_id=Profile().get_for_user())
+            print(s)'''
+
+
+    def get_biosampleId(self, sample_id): #####put this in a thread
+        #raise NotImplementedError()
+        s = Sample().get_record(sample_id)
+        s().add_accession() ######
+        print(s)
