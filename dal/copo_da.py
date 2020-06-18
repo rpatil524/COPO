@@ -546,6 +546,10 @@ class Sample(DAComponent):
     def get_from_profile_id(self, profile_id):
         return self.get_collection_handle().find({'profile_id': profile_id})
 
+    ######placeholder function to update records
+    def add_accession(self, sample_id):
+        return self.get_collection_handle().update({}) #####add mongo expression in {}
+
 
 class Submission(DAComponent):
     def __init__(self, profile_id=None):
