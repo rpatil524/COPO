@@ -1,8 +1,9 @@
 #!/bin/bash
-sudo apt-get install software-properties-common
+
+sudo add-apt-repository ppa:deadsnakes/ppa # this is for legacy versions of python....only works on LTS versions of ubuntu
 sudo apt-get update
-sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt-get install -y default-jre \
+sudo apt-get install -y software-properties-common \
+default-jre \
 rsync \
 git \
 nano \
@@ -18,6 +19,11 @@ ruby-dev \
 rubygems \
 poppler-utils \
 postgresql \
-mongodb \
 redis \
-vim
+vim \
+gnupg
+
+# install latest version of mongodb
+wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+sudo apt-get install -y mongodb-org
