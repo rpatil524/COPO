@@ -118,6 +118,9 @@ def delegate_submission(request):
         result = dspaceSubmission.DspaceSubmit(submission_id=sub_id).submit()
         return HttpResponse(jsonpickle.encode(result, unpicklable=False), content_type='application/json')
 
+    else:
+        result = dict(status=False, message="Selected submission type not supported.")
+        return HttpResponse(jsonpickle.encode(result, unpicklable=False), content_type='application/json')
 
 def schedule_submission(submission_id=str(), submission_repo=str()):
     """
