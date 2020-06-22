@@ -139,6 +139,10 @@ def copo_samples(request, profile_id):
     groups = group_functions.get_group_membership_asString()
     return render(request, 'copo/copo_sample.html', {'profile_id': profile_id, 'profile': profile, 'groups': groups})
 
+@login_required
+def copo_sample_accept_reject(request):
+    print("1")
+    return render(request, 'copo/copo_sample_accept_reject.html', {})
 
 @login_required()
 def annotate_meta(request, file_id):

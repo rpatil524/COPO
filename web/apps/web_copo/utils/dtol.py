@@ -120,10 +120,12 @@ class DtolSpreadsheet:
 
         for p in range(1, len(sample_data)):
 
-            to_mongo = (map_to_dict(sample_data[0], sample_data[p]))
-            notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + to_mongo["SPECIMEN_ID"], action="info",
+            s = (map_to_dict(sample_data[0], sample_data[p]))
+            s["sample_type"] = "dtol"
+            s["biosample_accession"] = None
+            notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + s["SPECIMEN_ID"], action="info",
                                  html_id="sample_info")
-            Sample(profile_id=self.profile_id).save_record(auto_fields={}, **to_mongo)
+            Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
             print("sample created: " + str(p))
 
 

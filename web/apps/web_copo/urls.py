@@ -6,6 +6,7 @@ app_name = 'web_copo'
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('accept_reject_sample/', views.copo_sample_accept_reject, name="accept_reject"),
     path('dataverse_submit/', views.test_dataverse_submit, name='test_dataverse_submit'),
     path('test_submission/', views.test_submission, name='test_submission'),
     path('test/', views.test_view, name='test_view'),
@@ -22,6 +23,7 @@ urlpatterns = [
             name='copo_publications'),
     re_path(r'^copo_data/(?P<profile_id>[a-z0-9]+)/view', views.copo_data,
             name='copo_data'),
+
     re_path(r'^copo_samples/(?P<profile_id>[a-z0-9]+)/view', views.copo_samples,
             name='copo_samples'),
     re_path(r'^copo_submissions/(?P<profile_id>[a-z0-9]+)/view', views.copo_submissions,
@@ -163,4 +165,5 @@ urlpatterns = [
          name="sample_spreadsheet"),
     path('create_spreadsheet_samples/', ajax_handlers.create_spreadsheet_samples,
          name="create_spreadsheet_samples"),
+
 ]
