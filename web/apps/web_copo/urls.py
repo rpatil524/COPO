@@ -165,5 +165,6 @@ urlpatterns = [
          name="sample_spreadsheet"),
     path('create_spreadsheet_samples/', ajax_handlers.create_spreadsheet_samples,
          name="create_spreadsheet_samples"),
-
+    path('update_pending_samples_table/', ajax_handlers.update_pending_samples_table,
+         name="update_pending_samples_table"),
 ]

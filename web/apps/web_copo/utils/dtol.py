@@ -122,7 +122,7 @@ class DtolSpreadsheet:
 
             s = (map_to_dict(sample_data[0], sample_data[p]))
             s["sample_type"] = "dtol"
-            s["biosample_accession"] = None
+            s["biosample_accession"] = []
             notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + s["SPECIMEN_ID"], action="info",
                                  html_id="sample_info")
             Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)

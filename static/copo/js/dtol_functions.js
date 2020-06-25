@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+    update_pending_samples_table()
+
     $(document).on("change", "#dtol_type_select", function (e) {
         $.ajax({
             url: "/copo/get_subsample_stages",
@@ -102,4 +104,16 @@ function delay(fn, ms) {
         clearTimeout(timer)
         timer = setTimeout(fn.bind(this, ...args), ms || 1000)
     }
+}
+
+function update_pending_samples_table(){
+    $.ajax({
+        url: "/copo/update_pending_samples_table",
+        method: "GET",
+        dataType: "application/json"
+    }).error(function(e){
+        console.log(e)
+    }).done(function(data){
+        alert(data)
+    })
 }

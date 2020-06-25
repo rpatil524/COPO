@@ -1675,6 +1675,24 @@
       "type": "string",
       "show_in_table": true,
       "control": "date-picker"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "control_meta": {},
+      "versions": [
+        "biosample_id"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "true",
+      "label": "Date Modified",
+      "show_in_form": false,
+      "id": "copo.sample.biosample_id",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text"
     }
   ],
   "description": "Mappings of attribute in the Sample schema to a UI configuration source.",

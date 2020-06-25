@@ -1331,3 +1331,7 @@ def create_spreadsheet_samples(request):
     dtol = DtolSpreadsheet()
     dtol.save_records()
     return HttpResponse(status=200)
+
+def update_pending_samples_table(request):
+    samples = Sample().get_unregistered_dtol_samples()
+    return HttpResponse(json_util.dumps(samples))

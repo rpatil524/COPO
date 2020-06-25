@@ -141,7 +141,6 @@ def copo_samples(request, profile_id):
 
 @login_required
 def copo_sample_accept_reject(request):
-    print("1")
     return render(request, 'copo/copo_sample_accept_reject.html', {})
 
 @login_required()
