@@ -21,7 +21,7 @@ $(document).ready(function () {
 
                 })
 
-                $("#accordion").fadeIn(function(){
+                $("#accordion").fadeIn(function () {
                     $(document).find("[id^='section']:visible:first").find(".collapse").collapse('show')
                 })
             })
@@ -106,14 +106,16 @@ function delay(fn, ms) {
     }
 }
 
-function update_pending_samples_table(){
+function update_pending_samples_table() {
     $.ajax({
         url: "/copo/update_pending_samples_table",
         method: "GET",
         dataType: "application/json"
-    }).error(function(e){
+    }).error(function (e) {
         console.log(e)
-    }).done(function(data){
-        alert(data)
+    }).done(function (data) {
+
     })
 }
+
+
