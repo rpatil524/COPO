@@ -1336,3 +1336,8 @@ def update_pending_samples_table(request):
     #samples = Sample().get_unregistered_dtol_samples()
     profiles = Profile().get_dtol_profiles()
     return HttpResponse(json_util.dumps(profiles))
+
+def get_samples_for_profile(request):
+    profile_id = request.GET["profile_id"]
+    samples = util.cursor_to_list(Sample().get_from_profile_id(profile_id))
+    return HttpResponse(json_util.dumps(samples))

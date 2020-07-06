@@ -37,6 +37,14 @@
             margin-bottom: 20px;
         }
 
+        .selected {
+            background-color: #e1e1e1 !important;
+        }
+
+        .selectable_row {
+            cursor: pointer;
+        }
+
     </style>
 {% endblock %}
 
@@ -69,11 +77,12 @@
     <h3 class="h3">Choose to Accept or Reject</h3>
     <h3 class="h3"><small>Note clicking accept will immediately send sample info to ENA/Biosamples</small></h3>
 
+    <hr/>
 
     <div class="row">
 
-        <div class="col-lg-3 col-md-3 col-sm-3" style="border:1px black solid">
-            <table id="profile_titles" class="ui selectable celled table">
+        <div class="col-lg-3 col-md-3 col-sm-3">
+            <table id="profile_titles" class="table table-hover table-condensed">
                 <thead>
                 <tr>
                     <th>Profile Title</th>
@@ -82,7 +91,9 @@
                 <tbody></tbody>
             </table>
         </div>
-        <div class="col-lg-9 col-md-9 col-sm-9" style="border:1px black solid">HERE</div>
+        <div class="col-lg-9 col-md-9 col-sm-9" id="sample_panel">
+            <h4 class="h4"><small>Click a Profile on the left to see Samples.</small></h4>
+        </div>
 
 
     </div>

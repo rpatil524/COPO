@@ -212,7 +212,10 @@ class DAComponent:
 
         # if True, then the database action (to save/update) is never performed, but validated 'fields' are returned
         validate_only = kwargs.pop("validate_only", False)
-
+        fields["date_modified"] = datetime.now()
+        # check if there is attached profile then update date modified
+        if "profile_id" in fields:
+            self.update_profile_modified(fields["profile_id"])
         if validate_only is True:
             return fields
         else:
@@ -228,6 +231,9 @@ class DAComponent:
             rec = self.get_record(target_id)
 
             return rec
+
+    def update_profile_modified(self, profile_id):
+        handle_dict["profile"].update_one({"_id": ObjectId(profile_id)}, {"$set":{"date_modified": datetime.now()}})
 
     def get_all_records(self, sort_by='_id', sort_direction=-1, **kwargs):
         doc = dict(deleted=data_utils.get_not_deleted_flag())
@@ -1150,7 +1156,7 @@ class Profile(DAComponent):
                 return p['dataverse']['datasets']
 
     def get_dtol_profiles(self):
-        p = self.get_collection_handle().find({"type": "Darwin Tree of Life"})
+        p = self.get_collection_handle().find({"type": "Darwin Tree of Life"}).sort("date_modified",  pymongo.DESCENDING)
         return cursor_to_list(p)
 
 class CopoGroup(DAComponent):

@@ -2,6 +2,8 @@ $(document).ready(function () {
 
     update_pending_samples_table()
 
+    $(document).on("click", ".selectable_row", row_select)
+
     $(document).on("change", "#dtol_type_select", function (e) {
         $.ajax({
             url: "/copo/get_subsample_stages",
@@ -97,6 +99,33 @@ $(document).ready(function () {
 
 })
 
+function row_select(ev){
+    var row = $(ev.currentTarget)
+    $(".selected").removeClass("selected")
+    $(row).addClass("selected")
+    var d = {"profile_id": $(row).find("td").data("sample_id")}
+    $.ajax({
+        url: "/copo/get_samples_for_profile",
+        data: d,
+        method: "GET",
+        dataType: "json"
+    }).error(function(data){
+        console.error("ERROR: " + data)
+    }).done(function(data){
+        if (data.length){
+            $("#sample_panel").html("samples go here mang")
+        }
+        else{
+            var no_data = $("<h4/>", {
+                html: "No Samples Found"
+            })
+            $("#sample_panel").html(
+                no_data
+            )
+        }
+    })
+}
+
 
 function delay(fn, ms) {
     let timer = 0
@@ -115,8 +144,8 @@ function update_pending_samples_table() {
         console.error(e)
     }).done(function (data) {
         $(data).each(function(d){
-            $("#profile_titles thead").append("<tr><td data-sample_id='" + data[d]._id.$oid + "'>" + data[d].title + "</td></tr>")
-            console.log(data[d])
+            $("#profile_titles").find("tbody").append("<tr class='selectable_row'><td data-sample_id='" + data[d]._id.$oid + "'>" + data[d].title + "</td></tr>")
+
         })
     })
 }
