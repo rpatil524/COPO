@@ -207,12 +207,8 @@ class DAComponent:
             elif v_id in system_fields:
                 fields[f_id] = system_fields.get(v_id)
 
-
-
             if not target_id and f_id not in fields:
                 fields[f_id] = data_utils.default_jsontype(f["type"])
-
-
 
         # if True, then the database action (to save/update) is never performed, but validated 'fields' are returned
         validate_only = kwargs.pop("validate_only", False)
@@ -549,7 +545,9 @@ class Sample(DAComponent):
         return self.get_collection_handle().find({'profile_id': profile_id})
 
     def get_unregistered_dtol_samples(self):
-        return self.get_collection_handle().find({"sample_type": "dtol", "biosample_accession": ""})
+        s = self.get_collection_handle().find({"sample_type": "dtol", "biosample_accession": ""})
+        l = cursor_to_list(s)
+        return l
 
 
 class Submission(DAComponent):
@@ -939,7 +937,8 @@ class Submission(DAComponent):
                 {'_id': ObjectId(submission_id)}, {'$set': {'destination_repo': 'default'}}
             )
         r = Repository().get_record(ObjectId(repo_id))
-        dest = {"url": r.get('url'), 'apikey': r.get('apikey', ""), "isCG": r.get('isCG', ""), "repo_id": repo_id, "name": r.get('name', ""),
+        dest = {"url": r.get('url'), 'apikey': r.get('apikey', ""), "isCG": r.get('isCG', ""), "repo_id": repo_id,
+                "name": r.get('name', ""),
                 "type": r.get('type', ""), "username": r.get('username', ""), "password": r.get('password', "")}
         self.get_collection_handle().update(
             {'_id': ObjectId(submission_id)},
@@ -1150,6 +1149,9 @@ class Profile(DAComponent):
             if 'datasets' in p['dataverse']:
                 return p['dataverse']['datasets']
 
+    def get_dtol_profiles(self):
+        p = self.get_collection_handle().find({"type": "Darwin Tree of Life"})
+        return cursor_to_list(p)
 
 class CopoGroup(DAComponent):
     def __init__(self):
@@ -1284,7 +1286,9 @@ class Repository(DAComponent):
 
     def add_personal_dataverse(self, url, name, apikey, type, username, password):
         u = ThreadLocal.get_current_user()
-        doc = self.get_collection_handle().insert({"isCG": False, "url": url, "name": name, "apikey": apikey, "personal": True, "uid": u.id, "type": type, "username": username, "password": password})
+        doc = self.get_collection_handle().insert(
+            {"isCG": False, "url": url, "name": name, "apikey": apikey, "personal": True, "uid": u.id, "type": type,
+             "username": username, "password": password})
         udetails = u.userdetails
         udetails.repo_submitter.append(str(doc))
         udetails.save()

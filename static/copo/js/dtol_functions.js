@@ -110,11 +110,14 @@ function update_pending_samples_table() {
     $.ajax({
         url: "/copo/update_pending_samples_table",
         method: "GET",
-        dataType: "application/json"
+        dataType: "json"
     }).error(function (e) {
-        console.log(e)
+        console.error(e)
     }).done(function (data) {
-
+        $(data).each(function(d){
+            $("#profile_titles thead").append("<tr><td data-sample_id='" + data[d]._id.$oid + "'>" + data[d].title + "</td></tr>")
+            console.log(data[d])
+        })
     })
 }
 

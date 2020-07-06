@@ -11,15 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}COPO - Collaborative Open Plant Omics{% endblock %}</title>
 
-    <!-- Semantic UI -->
-    <link rel="stylesheet" media="print" onload="this.media='all'"
-          href="{% static 'copo/semantic_ui/semantic.min.css' %}">
-    <link rel="stylesheet" media="print" onload="this.media='all'"
-          href="{% static 'copo/semantic_ui/components/icon.min.css' %}">
-    <link rel="stylesheet" media="print" onload="this.media='all'"
-          href="{% static 'copo/semantic_ui/components/dropdown.min.css' %}">
-    <link rel="stylesheet" media="print" onload="this.media='all'"
-          href="{% static 'copo/semantic_ui/components/popup.min.css' %}">
+
 
 
     <!-- Bootstrap -->
@@ -129,6 +121,15 @@
     <script src="{% static 'copo/semantic_ui/components/popup.min.js' %}"></script>
     <script src="{% static 'copo/reconnecting-websocket-master/reconnecting-websocket.min.js' %}"></script>
 
+ <!-- Semantic UI -->
+    <link rel="stylesheet" media="print" onload="this.media='all'"
+          href="{% static 'copo/semantic_ui/semantic.min.css' %}">
+    <link rel="stylesheet" media="print" onload="this.media='all'"
+          href="{% static 'copo/semantic_ui/components/icon.min.css' %}">
+    <link rel="stylesheet" media="print" onload="this.media='all'"
+          href="{% static 'copo/semantic_ui/components/dropdown.min.css' %}">
+    <link rel="stylesheet" media="print" onload="this.media='all'"
+          href="{% static 'copo/semantic_ui/components/popup.min.css' %}">
 
     <!-- Additional javascripts -->
     {% block js_block %}{% endblock %}

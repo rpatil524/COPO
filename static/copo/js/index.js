@@ -71,9 +71,17 @@ $(document).ready(function () {
             result = $.grep(data, function (e) {
                 return e.key == "title";
             });
-
             if (result.length) {
                 title = result[0].data;
+            }
+
+            //get type
+            var type = '';
+            result = $.grep(data, function (e) {
+                return e.key == "type"
+            });
+            if(result.length){
+                type = result[0].data
             }
 
             //get shared
@@ -113,6 +121,7 @@ $(document).ready(function () {
                 option["profile_date"] = profile_date;
                 option["record_id"] = record_id;
                 option["shared"] = shared
+                option["type"] = type
                 dataSet.push(option);
             }
         }
@@ -181,11 +190,16 @@ $(document).ready(function () {
                                 .addClass("copo-records-panel");
 
                             //set heading
-                            if (!data.shared) {
-                                renderHTML.find(".panel-heading").find(".row-title").html('<span style="font-weight: bolder">' + data.title + '</span>');
+                            if (data.type == "Darwin Tree of Life") {
+                                renderHTML.find(".panel-heading").find(".row-title").html('<span style="">' + data.title + '&nbsp<small>(DTOL)</small></span>');
+                                renderHTML.find(".panel-heading").css("background-color", "rgb(38,80,59)")
                             } else {
-                                renderHTML.find(".panel-heading").find(".row-title").html('<span style="">' + data.title + '&nbsp<small>(Shared With Me)</small></span>');
-                                renderHTML.find(".panel-heading").css("background-color", "#007eff")
+                                if (!data.shared) {
+                                    renderHTML.find(".panel-heading").find(".row-title").html('<span style="font-weight: bolder">' + data.title + '</span>');
+                                } else {
+                                    renderHTML.find(".panel-heading").find(".row-title").html('<span style="">' + data.title + '&nbsp<small>(Shared With Me)</small></span>');
+                                    renderHTML.find(".panel-heading").css("background-color", "#007eff")
+                                }
                             }
                             //set body
                             var bodyRow = $('<div class="row"></div>');

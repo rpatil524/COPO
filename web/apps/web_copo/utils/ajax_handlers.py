@@ -1333,5 +1333,6 @@ def create_spreadsheet_samples(request):
     return HttpResponse(status=200)
 
 def update_pending_samples_table(request):
-    samples = Sample().get_unregistered_dtol_samples()
-    return HttpResponse(json_util.dumps(samples))
+    #samples = Sample().get_unregistered_dtol_samples()
+    profiles = Profile().get_dtol_profiles()
+    return HttpResponse(json_util.dumps(profiles))
