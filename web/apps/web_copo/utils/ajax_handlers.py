@@ -1,4 +1,5 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 01/12/2015'
+
 # this python file is for small utility functions which will be called from Javascript
 import json, os
 import time
@@ -1303,12 +1304,14 @@ def format_json_response(dict_obj):
     out = jsonpickle.encode(dict_obj, unpicklable=False)
     return HttpResponse(out, content_type='application/json')
 
+
 def get_subsample_stages(request):
     stage = request.GET["stage"]
     # here we should return a list of the stages which should be displayed for the given sample type
     with open(os.path.join(wf["dtol_manifests"], stage + ".json")) as f:
         sections = json.load(f)
     return HttpResponse(json.dumps(sections))
+
 
 def sample_spreadsheet(request):
     file = request.FILES["file"]
@@ -1317,14 +1320,15 @@ def sample_spreadsheet(request):
     if name.endswith("xlsx") or name.endswith("xls"):
         dtol.loadExcel()
         if dtol.validate():
-            
             dtol.collect()
         return HttpResponse()
     elif name.endswith("csv"):
         return dtol.loadCsv(file)
 
     else:
-        return HttpResponse(status=415,content="Only Excel or CSV files in the exact Darwin Core format are supported.")
+        return HttpResponse(status=415,
+                            content="Only Excel or CSV files in the exact Darwin Core format are supported.")
+
 
 def create_spreadsheet_samples(request):
     sample_data = request.session["sample_data"]
@@ -1332,12 +1336,15 @@ def create_spreadsheet_samples(request):
     dtol.save_records()
     return HttpResponse(status=200)
 
+
 def update_pending_samples_table(request):
-    #samples = Sample().get_unregistered_dtol_samples()
+    # samples = Sample().get_unregistered_dtol_samples()
     profiles = Profile().get_dtol_profiles()
     return HttpResponse(json_util.dumps(profiles))
+
 
 def get_samples_for_profile(request):
     profile_id = request.GET["profile_id"]
     samples = util.cursor_to_list(Sample().get_from_profile_id(profile_id))
+
     return HttpResponse(json_util.dumps(samples))

@@ -99,7 +99,7 @@ $(document).ready(function () {
 
 })
 
-function row_select(ev){
+function row_select(ev) {
     var row = $(ev.currentTarget)
     $(".selected").removeClass("selected")
     $(row).addClass("selected")
@@ -109,17 +109,66 @@ function row_select(ev){
         data: d,
         method: "GET",
         dataType: "json"
-    }).error(function(data){
+    }).error(function (data) {
         console.error("ERROR: " + data)
-    }).done(function(data){
-        if (data.length){
-            $("#sample_panel").html("samples go here mang")
-        }
-        else{
+    }).done(function (data) {
+        $("#sample_panel").find("thead").empty()
+        $("#sample_panel").find("tbody").empty()
+        if (data.length) {
+            var header = $("<h4/>", {
+                html: "Samples"
+            })
+            $("#sample_panel").find(".labelling").empty().append(header)
+
+
+            $(data).each(function (idx, row) {
+                var th_row = $("<tr/>")
+                var td_row = $("<tr/>")
+                if (idx == 0) {
+                    // do header and row
+                    for (el in row) {
+                        // make header
+                        var th = $("<th/>", {
+                            html: el
+                        })
+                        $(th_row).append(
+                            th
+                        )
+                        // and row
+                        var td = $("<td/>", {
+                            html: row[el]
+                        })
+                        $(td_row).append(
+                            td
+                        )
+                    }
+                    $("#profile_samples").find("thead").append(th_row)
+                    $("#profile_samples").find("tbody").append(td_row)
+                } else {
+
+                    for (el in row) {
+                        // just do row
+                        var td = $("<td/>", {
+                            html: row[el]
+                        })
+                        $(td_row).append(
+                            td
+                        )
+                    }
+                    $("#profile_samples").find("tbody").append(td_row)
+                }
+
+            })
+
+
+            console.log(data)
+
+
+        } else {
             var no_data = $("<h4/>", {
                 html: "No Samples Found"
             })
-            $("#sample_panel").html(
+            $("#sample_panel").find(".labelling").empty().html(
                 no_data
             )
         }
@@ -143,7 +192,7 @@ function update_pending_samples_table() {
     }).error(function (e) {
         console.error(e)
     }).done(function (data) {
-        $(data).each(function(d){
+        $(data).each(function (d) {
             $("#profile_titles").find("tbody").append("<tr class='selectable_row'><td data-sample_id='" + data[d]._id.$oid + "'>" + data[d].title + "</td></tr>")
 
         })
