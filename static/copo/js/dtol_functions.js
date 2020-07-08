@@ -123,11 +123,26 @@ function row_select(ev) {
                 html: "Samples"
             })
             $("#sample_panel").find(".labelling").empty().append(header)
+
+
+
             $(data).each(function (idx, row) {
                 var th_row = $("<tr/>")
                 var td_row = $("<tr/>")
                 if (idx == 0) {
                     // do header and row
+                    var empty_th = $("<th/>")
+                    $(th_row).append(empty_th)
+                    var td = $("<td/>", {
+                        class: "tickbox"
+                    })
+                    var tickbox = $("<input/>",
+                        {
+                            "type": "checkbox",
+                            class: "form-check-input"
+                        })
+                    $(td).append(tickbox)
+                    $(td_row).append(td)
                     for (el in row) {
                         if (!excluded_fields.includes(el)) {
                             // make header
@@ -138,7 +153,7 @@ function row_select(ev) {
                                 th
                             )
                             // and row
-                            var td = $("<td/>", {
+                            td = $("<td/>", {
                                 html: row[el]
                             })
                             if (row[el] == 'NA') {
@@ -154,10 +169,20 @@ function row_select(ev) {
                         }
                     }
                 } else {
+                    var td = $("<td/>", {
+                        class: "tickbox"
+                    })
+                    var tickbox = $("<input/>",
+                        {
+                            "type": "checkbox",
+                            class: "form-check-input tickbox"
+                        })
+                    $(td).append(tickbox)
+                    $(td_row).append(td)
                     for (el in row) {
                         if (!excluded_fields.includes(el)) {
                             // just do row
-                            var td = $("<td/>", {
+                            td = $("<td/>", {
                                 html: row[el]
                             })
                             if (row[el] == 'NA') {
