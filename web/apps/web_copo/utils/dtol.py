@@ -185,10 +185,8 @@ class DtolSpreadsheet:
     
                     result['message'] = result['message'] + error_text   '''
                 
-            # retrieve id and update record  #####
-            tree = ET.fromstring(receipt)
-            sampleinreceipt = tree.findall('SAMPLE')
-            print(sampleinreceipt)
+            # retrieve id and update record
+            self.get_biosampleId(receipt, object_id)
 
 
             #print(sample_id)
@@ -269,8 +267,18 @@ class DtolSpreadsheet:
         ET.dump(tree)
         tree.write(open("submission.xml", 'w'), encoding='unicode')  # overwriting at each run, i don't think we need to keep it
 
-    def get_biosampleId(self, sample_id): #####put this in a thread
+    def get_biosampleId(self, receipt, sample_id): #####todo: put this in a thread
         #raise NotImplementedError()
+        tree = ET.fromstring(receipt)
+        sampleinreceipt = tree.find('SAMPLE')
+        sra_accession = sampleinreceipt.get('accession')
+        #print(sra_accession)
+        biosample_accession = sampleinreceipt.find('EXT_ID').get('accession')
+        #print(biosample_accession)
+        submission_accession = tree.find('SUBMISSION').get('accession')
+        #print(submission_accession)
         s = Sample().get_record(sample_id)
-        s().add_accession() ######
+        print(s)
+        Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
+        s =  Sample().get_record(sample_id)
         print(s)

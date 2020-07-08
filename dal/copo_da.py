@@ -546,9 +546,16 @@ class Sample(DAComponent):
     def get_from_profile_id(self, profile_id):
         return self.get_collection_handle().find({'profile_id': profile_id})
 
-    ######placeholder function to update records
-    def add_accession(self, sample_id):
-        return self.get_collection_handle().update({}) #####add mongo expression in {}
+    def add_accession(self, biosample_accession, sra_accession, submission_accession, oid):
+        return self.get_collection_handle().update(
+            {
+                "_id": ObjectId(oid)
+            },
+            { "$set":
+                  {'biosampleAccession' : biosample_accession,
+                   'sraAccession' : sra_accession,
+                   'submissionAccession': submission_accession}
+              })
 
 
 class Submission(DAComponent):
