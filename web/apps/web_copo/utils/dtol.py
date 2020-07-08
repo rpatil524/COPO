@@ -173,7 +173,7 @@ class DtolSpreadsheet:
                 message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx")
                 print(message)
 
-            #print(receipt)
+            print(receipt)
             '''if root.get('success') == 'false':
                 result['status'] = False
                 result['message'] = "Couldn't register STUDY due to the following errors: "
@@ -272,11 +272,11 @@ class DtolSpreadsheet:
         tree = ET.fromstring(receipt)
         sampleinreceipt = tree.find('SAMPLE')
         sra_accession = sampleinreceipt.get('accession')
-        #print(sra_accession)
+        print(sra_accession)
         biosample_accession = sampleinreceipt.find('EXT_ID').get('accession')
-        #print(biosample_accession)
+        print(biosample_accession)
         submission_accession = tree.find('SUBMISSION').get('accession')
-        #print(submission_accession)
+        print(submission_accession)
         #s = Sample().get_record(sample_id)
         #print(s)
         Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
