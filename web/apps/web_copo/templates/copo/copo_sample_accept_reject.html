@@ -26,7 +26,12 @@
             position: -webkit-sticky;
             position: sticky;
             top: 0;
-            z-index: 2;
+            z-index: 9;
+            background-color: rgba(255,255,255,1);
+
+        }
+        td{
+            z-index: 1;
         }
 
         .confirm {
@@ -41,9 +46,20 @@
             background-color: #e1e1e1 !important;
         }
 
+        .na_color{
+            background-color: #eee;
+        }
+        .empty_color{
+            background-color: #f7eded;
+        }
+
         .selectable_row {
             cursor: pointer;
         }
+    .table_viewport{
+        max-height: 600px;
+        overflow: scroll;
+    }
 
     </style>
 {% endblock %}
@@ -92,13 +108,15 @@
             </table>
         </div>
         <div class="col-lg-9 col-md-9 col-sm-9" id="sample_panel">
-            <h4 class="h4"><small class="labelling">Click a Profile on the left to see Samples.</small></h4>
-            <table id="profile_samples" class="table table-hover table-condensed">
-                <thead>
+            <div class="table_viewport">
+                <h4 class="h4"><small class="labelling">Click a Profile on the left to see Samples.</small></h4>
+                <table id="profile_samples" class="table table-hover table-bordered">
+                    <thead>
 
-                </thead>
-                <tbody></tbody>
-            </table>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
 
 

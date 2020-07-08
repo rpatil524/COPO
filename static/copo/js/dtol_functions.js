@@ -1,5 +1,10 @@
 $(document).ready(function () {
+    // functions defined here are called from both copo_sample_accept_reject and copo_samples, all provide DTOL
+    // functionality
 
+    // add field names here which you don't want to appear in the supervisors table
+    excluded_fields = ["_id", "profile_id", "biosample_id"]
+    // populate profiles panel on left
     update_pending_samples_table()
 
     $(document).on("click", ".selectable_row", row_select)
@@ -95,11 +100,10 @@ $(document).ready(function () {
         }
 
     })
-
-
 })
 
 function row_select(ev) {
+    // get samples for profile clicked in the left hand panel and populate table on the right
     var row = $(ev.currentTarget)
     $(".selected").removeClass("selected")
     $(row).addClass("selected")
@@ -119,51 +123,56 @@ function row_select(ev) {
                 html: "Samples"
             })
             $("#sample_panel").find(".labelling").empty().append(header)
-
-
             $(data).each(function (idx, row) {
                 var th_row = $("<tr/>")
                 var td_row = $("<tr/>")
                 if (idx == 0) {
                     // do header and row
                     for (el in row) {
-                        // make header
-                        var th = $("<th/>", {
-                            html: el
-                        })
-                        $(th_row).append(
-                            th
-                        )
-                        // and row
-                        var td = $("<td/>", {
-                            html: row[el]
-                        })
-                        $(td_row).append(
-                            td
-                        )
+                        if (!excluded_fields.includes(el)) {
+                            // make header
+                            var th = $("<th/>", {
+                                html: el
+                            })
+                            $(th_row).append(
+                                th
+                            )
+                            // and row
+                            var td = $("<td/>", {
+                                html: row[el]
+                            })
+                            if (row[el] == 'NA') {
+                                $(td).addClass("na_color")
+                            } else if (row[el] == "") {
+                                $(td).addClass("empty_color")
+                            }
+                            $(td_row).append(
+                                td
+                            )
+                            $("#profile_samples").find("thead").append(th_row)
+                            $("#profile_samples").find("tbody").append(td_row)
+                        }
                     }
-                    $("#profile_samples").find("thead").append(th_row)
-                    $("#profile_samples").find("tbody").append(td_row)
                 } else {
-
                     for (el in row) {
-                        // just do row
-                        var td = $("<td/>", {
-                            html: row[el]
-                        })
-                        $(td_row).append(
-                            td
-                        )
+                        if (!excluded_fields.includes(el)) {
+                            // just do row
+                            var td = $("<td/>", {
+                                html: row[el]
+                            })
+                            if (row[el] == 'NA') {
+                                $(td).addClass("na_color")
+                            } else if (row[el] == "") {
+                                $(td).addClass("empty_color")
+                            }
+                            $(td_row).append(
+                                td
+                            )
+                        }
                     }
                     $("#profile_samples").find("tbody").append(td_row)
                 }
-
             })
-
-
-            console.log(data)
-
-
         } else {
             var no_data = $("<h4/>", {
                 html: "No Samples Found"
@@ -175,7 +184,6 @@ function row_select(ev) {
     })
 }
 
-
 function delay(fn, ms) {
     let timer = 0
     return function (...args) {
@@ -185,6 +193,7 @@ function delay(fn, ms) {
 }
 
 function update_pending_samples_table() {
+    // get profiles with samples needing looked at and populate left hand column
     $.ajax({
         url: "/copo/update_pending_samples_table",
         method: "GET",
@@ -194,7 +203,6 @@ function update_pending_samples_table() {
     }).done(function (data) {
         $(data).each(function (d) {
             $("#profile_titles").find("tbody").append("<tr class='selectable_row'><td data-sample_id='" + data[d]._id.$oid + "'>" + data[d].title + "</td></tr>")
-
         })
     })
 }
