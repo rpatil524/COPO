@@ -155,6 +155,7 @@ class DtolSpreadsheet:
             self.build_sample_xml(obj_id)
             object_id = str(obj_id['_id'])
             #print(object_id)
+            self.build_validate_xml(object_id)
             self.build_submission_xml(object_id)
 
             # register project to the ENA service
@@ -233,7 +234,7 @@ class DtolSpreadsheet:
         tree.write(open("sample.xml", 'w'), encoding='unicode') #overwriting at each run, i don't think we need to keep it
 
     def build_submission_xml(self, object_id):
-        # build sample XML
+        # build submission XML
         tree = ET.parse(SRA_SUBMISSION_TEMPLATE)
         root = tree.getroot()
         #print(root)
@@ -266,6 +267,28 @@ class DtolSpreadsheet:
         #            user_contact.set(role, k[0])
         ET.dump(tree)
         tree.write(open("submission.xml", 'w'), encoding='unicode')  # overwriting at each run, i don't think we need to keep it
+
+    def build_validate_xml(self, object_id):
+        # build submission XML
+        tree = ET.parse(SRA_SUBMISSION_TEMPLATE)
+        root = tree.getroot()
+        # set submission attributes
+        root.set("submission_date", datetime.utcnow().replace(tzinfo=d_utils.simple_utc()).isoformat())
+        # set SRA contacts
+        contacts = root.find('CONTACTS')
+        # set copo sra contacts
+        copo_contact = ET.SubElement(contacts, 'CONTACT')
+        copo_contact.set("name", self.sra_settings["sra_broker_contact_name"])
+        copo_contact.set("inform_on_error", self.sra_settings["sra_broker_inform_on_error"])
+        copo_contact.set("inform_on_status", self.sra_settings["sra_broker_inform_on_status"])
+        # set user contacts
+        sra_map = {"inform_on_error": "SRA Inform On Error", "inform_on_status": "SRA Inform On Status"}
+        #change ADD to VALIDATE
+        root.find('ACTIONS').find('ACTION').clear()
+        action = root.find('ACTIONS').find('ACTION')
+        ET.SubElement(action, 'VALIDATE')
+        ET.dump(tree)
+        tree.write(open("submission_validate.xml", 'w'), encoding='unicode')  # overwriting at each run, i don't think we need to keep it
 
     def get_biosampleId(self, receipt, sample_id): #####todo: put this in a thread
         #raise NotImplementedError()
