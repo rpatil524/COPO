@@ -154,7 +154,7 @@ class DtolSpreadsheet:
 
             self.build_sample_xml(obj_id)
             object_id = str(obj_id['_id'])
-            print(object_id)
+            #print(object_id)
             self.build_submission_xml(object_id)
 
             # register project to the ENA service
@@ -168,12 +168,12 @@ class DtolSpreadsheet:
 
             try:
                 receipt = subprocess.check_output(curl_cmd, shell=True)
-                print(receipt)
+                #print(receipt)
             except Exception as e:
                 message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx")
                 print(message)
 
-            print(receipt)
+            #print(receipt)
             '''if root.get('success') == 'false':
                 result['status'] = False
                 result['message'] = "Couldn't register STUDY due to the following errors: "
@@ -277,8 +277,8 @@ class DtolSpreadsheet:
         #print(biosample_accession)
         submission_accession = tree.find('SUBMISSION').get('accession')
         #print(submission_accession)
-        s = Sample().get_record(sample_id)
-        print(s)
+        #s = Sample().get_record(sample_id)
+        #print(s)
         Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
-        s =  Sample().get_record(sample_id)
-        print(s)
+        #s =  Sample().get_record(sample_id)
+        #print(s)
