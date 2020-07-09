@@ -29960,7 +29960,7 @@ return hooks;
             cultureData = numbro.cultureData(numbro.culture());
         }
 
-        //setup the delimiters and currency symbol based on culture
+        //setup.sh the delimiters and currency symbol based on culture
         _currSymbol = cultureData.currency.symbol;
         _abbrObj = cultureData.abbreviations;
         _decimalSep = cultureData.delimiters.decimal;
@@ -33604,7 +33604,7 @@ return hooks;
   };
   /**
  * Sets the current HTML object that the Flash object should overlay. This will put the global
- * Flash object on top of the current element; depending on the setup, this may also set the
+ * Flash object on top of the current element; depending on the setup.sh, this may also set the
  * pending clipboard text data as well as the Flash object's wrapping element's title attribute
  * based on the underlying HTML element and ZeroClipboard configuration.
  *
@@ -33616,7 +33616,7 @@ return hooks;
   };
   /**
  * Un-overlays the Flash object. This will put the global Flash object off-screen; depending on
- * the setup, this may also unset the Flash object's wrapping element's title attribute based on
+ * the setup.sh, this may also unset the Flash object's wrapping element's title attribute based on
  * the underlying HTML element and ZeroClipboard configuration.
  *
  * @returns `undefined`

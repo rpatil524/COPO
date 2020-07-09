@@ -87,6 +87,13 @@ $(document).ready(function () {
     if(groups.includes("dtol_users")){
         $(".new-samples-spreadsheet-template").show()
     }
+    if(groups.includes("dtol_sample_managers")){
+        $(".accept_reject_samples").show()
+    }
+
+    $(document).on("click", ".accept_reject_samples", function(evt){
+        document.location = "/copo/accept_reject_sample"
+    })
 
     $(document).on("change", "#number_of_samples", function (evt) {
         let count = parseInt($(evt.currentTarget).val())

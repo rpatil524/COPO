@@ -30,14 +30,13 @@ from pexpect import run
 import shutil
 from django.conf import settings
 from web.apps.web_copo.utils import group_functions
-
+from dal.copo_da import Sample
 LOGGER = settings.LOGGER
 
 
 @login_required
 def index(request):
     context = {'user': request.user}
-    request.META['test'] = 'test'
     return render(request, 'copo/index.html', context)
 
 
@@ -140,6 +139,9 @@ def copo_samples(request, profile_id):
     groups = group_functions.get_group_membership_asString()
     return render(request, 'copo/copo_sample.html', {'profile_id': profile_id, 'profile': profile, 'groups': groups})
 
+@login_required
+def copo_sample_accept_reject(request):
+    return render(request, 'copo/copo_sample_accept_reject.html', {})
 
 @login_required()
 def annotate_meta(request, file_id):

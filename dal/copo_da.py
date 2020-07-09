@@ -212,6 +212,8 @@ class DAComponent:
             if not target_id and f_id not in fields:
                 fields[f_id] = data_utils.default_jsontype(f["type"])
 
+
+
         # if True, then the database action (to save/update) is never performed, but validated 'fields' are returned
         validate_only = kwargs.pop("validate_only", False)
 
@@ -556,6 +558,9 @@ class Sample(DAComponent):
                    'sraAccession' : sra_accession,
                    'submissionAccession': submission_accession}
               })
+
+    def get_unregistered_dtol_samples(self):
+        return self.get_collection_handle().find({"sample_type": "dtol", "biosample_accession": ""})
 
 
 class Submission(DAComponent):

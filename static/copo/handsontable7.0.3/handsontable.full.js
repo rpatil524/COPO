@@ -41014,7 +41014,7 @@ function _templateObject3() {
 }
 
 function _templateObject2() {
-  var data = (0, _taggedTemplateLiteral2.default)(["The merged cell declared at [", ", ", "] is positioned (or positioned partially) \n       outside of the table range. It was not added to the table, please fix your setup."]);
+  var data = (0, _taggedTemplateLiteral2.default)(["The merged cell declared at [", ", ", "] is positioned (or positioned partially) \n       outside of the table range. It was not added to the table, please fix your setup.sh."]);
 
   _templateObject2 = function _templateObject2() {
     return data;
@@ -54808,7 +54808,7 @@ DefaultSettings.prototype = {
    * @description
    * Disable or enable the nested rows functionality - displaying nested structures in a two-dimensional data table.
    *
-   * See [quick setup of the Nested rows](https://docs.handsontable.kbudnik/pro/next/demo-nested-rows.html).
+   * See [quick setup.sh of the Nested rows](https://docs.handsontable.kbudnik/pro/next/demo-nested-rows.html).
    * @example
    * ```js
    * nestedRows: true,
@@ -89552,7 +89552,7 @@ var _utils = __webpack_require__(492);
 var _templateLiteralTag = __webpack_require__(67);
 
 function _templateObject() {
-  var data = (0, _taggedTemplateLiteral2.default)(["The merged cell declared at [", ", ", "], overlaps with the other declared merged \n    cell. The overlapping merged cell was not added to the table, please fix your setup."]);
+  var data = (0, _taggedTemplateLiteral2.default)(["The merged cell declared at [", ", ", "], overlaps with the other declared merged \n    cell. The overlapping merged cell was not added to the table, please fix your setup.sh."]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -95899,7 +95899,7 @@ function () {
       }
     }
     /**
-     * Resets the endpoint setup before the structure alteration (like inserting or removing rows/columns). Used for settings provided as a function.
+     * Resets the endpoint setup.sh before the structure alteration (like inserting or removing rows/columns). Used for settings provided as a function.
      *
      * @private
      * @param {String} action Type of the action performed.
@@ -107550,7 +107550,7 @@ var _ghostTable = _interopRequireDefault(__webpack_require__(757));
 __webpack_require__(758);
 
 function _templateObject2() {
-  var data = (0, _taggedTemplateLiteral2.default)(["Your Nested Headers plugin setup contains overlapping headers. This kind of configuration\n                is currently not supported and might result in glitches."]);
+  var data = (0, _taggedTemplateLiteral2.default)(["Your Nested Headers plugin setup.sh contains overlapping headers. This kind of configuration\n                is currently not supported and might result in glitches."]);
 
   _templateObject2 = function _templateObject2() {
     return data;

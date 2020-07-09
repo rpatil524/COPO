@@ -9,7 +9,7 @@ from web.apps.web_copo.models import Repository
 # The class must be named Command, and subclass BaseCommand
 class Command(BaseCommand):
     # Show this when the user types help
-    help = "Command to setup COPO groups"
+    help = "Command to setup.sh COPO groups"
 
     # A command must define handle()
     def handle(self, *args, **options):
@@ -17,6 +17,7 @@ class Command(BaseCommand):
 
         dm_group, created = Group.objects.get_or_create(name='data_managers')
         dtol_group, create = Group.objects.get_or_create(name='dtol_users')
+        dtol_managers, created = Group.objects.get_or_create(name='dtol_sample_managers')
         ct = ContentType.objects.get_for_model(Repository)
 
         Permission.objects.filter(codename="can_create_repo").delete()

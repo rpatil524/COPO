@@ -1128,7 +1128,7 @@
 		dir = computedStyle ? computedStyle.getPropertyValue('direction') : input.currentStyle && input.currentStyle.direction;
 		dir = dir || $input.parents('[dir]:first').attr('dir') || '';
 	
-		// setup default state
+		// setup.sh default state
 		$.extend(self, {
 			order            : 0,
 			settings         : settings,

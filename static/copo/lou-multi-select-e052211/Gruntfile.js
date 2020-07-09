@@ -73,7 +73,7 @@ module.exports = function(grunt) {
   });
 
 
-  //General setup ===============================
+  //General setup.sh ===============================
   grunt.initConfig(config);
 
 };

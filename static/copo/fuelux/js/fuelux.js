@@ -2418,7 +2418,7 @@
 
 
 				if ( Boolean( $( document ).find( 'html' ).hasClass( 'fuelux' ) ) ) {
-					// default behavior for fuel ux setup. means fuelux was a class on the html tag
+					// default behavior for fuel ux setup.sh. means fuelux was a class on the html tag
 					$( document.body ).append( sizer );
 				} else {
 					// fuelux is not a class on the html tag. So we'll look for the first one we find so the correct styles get applied to the sizer
@@ -5926,7 +5926,7 @@
 				}
 
 				if ( frozenTable.length < 1 ) {
-					//setup frozen column markup
+					//setup.sh frozen column markup
 					//main wrapper and remove unneeded columns
 					var $frozenColumnWrapper = $( '<div class="frozen-column-wrapper"></div>' ).insertBefore( $table );
 					var $frozenColumn = $table.clone().addClass( 'table-frozen' );

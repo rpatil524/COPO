@@ -145,10 +145,12 @@ class DtolSpreadsheet:
 
         for p in range(1, len(sample_data)):
 
-            to_mongo = (map_to_dict(sample_data[0], sample_data[p]))
-            notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + to_mongo["SPECIMEN_ID"], action="info",
+            s = (map_to_dict(sample_data[0], sample_data[p]))
+            s["sample_type"] = "dtol"
+            s["biosample_accession"] = []
+            notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + s["SPECIMEN_ID"], action="info",
                                  html_id="sample_info")
-            obj_id = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **to_mongo)
+            obj_id = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
             print("sample created: " + str(p))
             #obj = Sample(profile_id=self.profile_id).get_record(obj_id['_id']) #would retrieve same as 133
 
@@ -184,7 +186,7 @@ class DtolSpreadsheet:
                         error_text = error_text + " \n" + e.text
     
                     result['message'] = result['message'] + error_text   '''
-                
+
             # retrieve id and update record
             self.get_biosampleId(receipt, object_id)
 

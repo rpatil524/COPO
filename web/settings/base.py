@@ -22,8 +22,8 @@ LOGIN_URL = '/accounts/auth/'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if str(resolve_env.get_env('DEBUG')).lower() == 'true' else False
 
-ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0', 'copo-project.org', 'demo.copo-project.org']
+DEBUG_PROPAGATE_EXCEPTIONS = True
 # Django's base applications definition
 DJANGO_APPS = [
     'django.contrib.sites',
