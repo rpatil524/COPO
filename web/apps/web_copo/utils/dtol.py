@@ -139,6 +139,9 @@ class DtolSpreadsheet:
 
         notify_sample_status(profile_id=self.profile_id, msg=sample_data, action="make_table", html_id="sample_table")
 
+
+
+
     def save_records(self):
         sample_data = self.sample_data
 
@@ -175,8 +178,10 @@ class DtolSpreadsheet:
                 print(message)
 
             print(receipt)
-            '''if root.get('success') == 'false':
-                result['status'] = False
+            tree = ET.parse(receipt)
+            root = tree.getroot()
+            if root.get('success') == 'false': ####todo
+                '''result['status'] = False
                 result['message'] = "Couldn't register STUDY due to the following errors: "
                 errors = root.findall('.//ERROR')
                 if errors:
@@ -184,10 +189,11 @@ class DtolSpreadsheet:
                     for e in errors:
                         error_text = error_text + " \n" + e.text
     
-                    result['message'] = result['message'] + error_text   '''
-                
-            # retrieve id and update record
-            self.get_biosampleId(receipt, object_id)
+                    result['message'] = result['message'] + error_text '''
+                pass
+            else:
+                # retrieve id and update record
+                self.get_biosampleId(receipt, object_id)
 
 
             #print(sample_id)
