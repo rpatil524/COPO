@@ -139,6 +139,9 @@ class DtolSpreadsheet:
 
         notify_sample_status(profile_id=self.profile_id, msg=sample_data, action="make_table", html_id="sample_table")
 
+
+
+
     def save_records(self):
         sample_data = self.sample_data
 
@@ -157,6 +160,7 @@ class DtolSpreadsheet:
             self.build_sample_xml(obj_id)
             object_id = str(obj_id['_id'])
             #print(object_id)
+            self.build_validate_xml(object_id)
             self.build_submission_xml(object_id)
 
             # register project to the ENA service
@@ -175,9 +179,11 @@ class DtolSpreadsheet:
                 message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(self.pass_word, "xxxxxx")
                 print(message)
 
-            #print(receipt)
-            '''if root.get('success') == 'false':
-                result['status'] = False
+            print(receipt)
+            tree = ET.parse(receipt)
+            root = tree.getroot()
+            if root.get('success') == 'false': ####todo
+                '''result['status'] = False
                 result['message'] = "Couldn't register STUDY due to the following errors: "
                 errors = root.findall('.//ERROR')
                 if errors:
@@ -186,9 +192,10 @@ class DtolSpreadsheet:
                         error_text = error_text + " \n" + e.text
     
                     result['message'] = result['message'] + error_text   '''
-
-            # retrieve id and update record
-            self.get_biosampleId(receipt, object_id)
+pass
+            else:
+                # retrieve id and update record
+                self.get_biosampleId(receipt, object_id)
 
 
             #print(sample_id)
@@ -235,7 +242,7 @@ class DtolSpreadsheet:
         tree.write(open("sample.xml", 'w'), encoding='unicode') #overwriting at each run, i don't think we need to keep it
 
     def build_submission_xml(self, object_id):
-        # build sample XML
+        # build submission XML
         tree = ET.parse(SRA_SUBMISSION_TEMPLATE)
         root = tree.getroot()
         #print(root)
@@ -269,16 +276,38 @@ class DtolSpreadsheet:
         ET.dump(tree)
         tree.write(open("submission.xml", 'w'), encoding='unicode')  # overwriting at each run, i don't think we need to keep it
 
+    def build_validate_xml(self, object_id):
+        # build submission XML
+        tree = ET.parse(SRA_SUBMISSION_TEMPLATE)
+        root = tree.getroot()
+        # set submission attributes
+        root.set("submission_date", datetime.utcnow().replace(tzinfo=d_utils.simple_utc()).isoformat())
+        # set SRA contacts
+        contacts = root.find('CONTACTS')
+        # set copo sra contacts
+        copo_contact = ET.SubElement(contacts, 'CONTACT')
+        copo_contact.set("name", self.sra_settings["sra_broker_contact_name"])
+        copo_contact.set("inform_on_error", self.sra_settings["sra_broker_inform_on_error"])
+        copo_contact.set("inform_on_status", self.sra_settings["sra_broker_inform_on_status"])
+        # set user contacts
+        sra_map = {"inform_on_error": "SRA Inform On Error", "inform_on_status": "SRA Inform On Status"}
+        #change ADD to VALIDATE
+        root.find('ACTIONS').find('ACTION').clear()
+        action = root.find('ACTIONS').find('ACTION')
+        ET.SubElement(action, 'VALIDATE')
+        ET.dump(tree)
+        tree.write(open("submission_validate.xml", 'w'), encoding='unicode')  # overwriting at each run, i don't think we need to keep it
+
     def get_biosampleId(self, receipt, sample_id): #####todo: put this in a thread
         #raise NotImplementedError()
         tree = ET.fromstring(receipt)
         sampleinreceipt = tree.find('SAMPLE')
         sra_accession = sampleinreceipt.get('accession')
-        #print(sra_accession)
+        print(sra_accession)
         biosample_accession = sampleinreceipt.find('EXT_ID').get('accession')
-        #print(biosample_accession)
+        print(biosample_accession)
         submission_accession = tree.find('SUBMISSION').get('accession')
-        #print(submission_accession)
+        print(submission_accession)
         #s = Sample().get_record(sample_id)
         #print(s)
         Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
