@@ -180,9 +180,9 @@ class DtolSpreadsheet:
                 print(message)
 
             print(receipt)
-            tree = ET.parse(receipt)
-            root = tree.getroot()
-            if root.get('success') == 'false': ####todo
+            tree = ET.fromstring(receipt)
+            success_status = tree.get('success')
+            if success_status == 'false': ####todo
                 '''result['status'] = False
                 result['message'] = "Couldn't register STUDY due to the following errors: "
                 errors = root.findall('.//ERROR')
@@ -192,7 +192,11 @@ class DtolSpreadsheet:
                         error_text = error_text + " \n" + e.text
     
                     result['message'] = result['message'] + error_text   '''
-pass
+                print(receipt)
+                status = tree.find('MESSAGES').findtext('ERROR', default='Undefined error')
+                #print(status)
+                Sample().add_status(status, object_id)
+                print('error')
             else:
                 # retrieve id and update record
                 self.get_biosampleId(receipt, object_id)

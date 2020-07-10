@@ -559,6 +559,16 @@ class Sample(DAComponent):
                    'submissionAccession': submission_accession}
               })
 
+    def add_status(self, status, oid):
+        return self.get_collection_handle().update(
+            {
+                "_id": ObjectId(oid)
+            },
+            { "$set":
+                  {'errorStatus' : status}
+              }
+        )
+
     def get_unregistered_dtol_samples(self):
         return self.get_collection_handle().find({"sample_type": "dtol", "biosample_accession": ""})
 
