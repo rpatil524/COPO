@@ -5,7 +5,7 @@ from celery import Celery
 from celery.schedules import crontab
 from datetime import timedelta
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web.settings.local_settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web.settings.all')
 #crontab(minute="*/1")
 app = Celery('web')
 app.config_from_object('django.conf:settings', namespace='CELERY')

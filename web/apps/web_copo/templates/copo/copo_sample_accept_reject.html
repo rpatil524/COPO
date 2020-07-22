@@ -27,10 +27,11 @@
             position: sticky;
             top: 0;
             z-index: 9;
-            background-color: rgba(255,255,255,1);
+            background-color: rgba(255, 255, 255, 1);
 
         }
-        td{
+
+        td {
             z-index: 1;
         }
 
@@ -46,21 +47,24 @@
             background-color: #e1e1e1 !important;
         }
 
-        .na_color{
+        .na_color {
             background-color: #eee;
         }
-        .empty_color{
+
+        .empty_color {
             background-color: #f7eded;
         }
 
         .selectable_row {
             cursor: pointer;
         }
-        .table_viewport{
+
+        .table_viewport {
             max-height: 600px;
             overflow: scroll;
         }
-        .tickbox{
+
+        .tickbox {
             vertical-align: middle !important;
         }
 
@@ -111,7 +115,19 @@
             </table>
         </div>
         <div class="col-lg-9 col-md-9 col-sm-9" id="sample_panel">
+            <div class="ui buttons" id="accept_reject_button" style="margin-bottom: 10px">
+                    <button type="button" disabled="true" class="ui negative button">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Reject
+                    </button>
+                    <div class="or"></div>
+                    <button type="button" disabled="true" class="ui positive button">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Accept
+                    </button>
+                </div>
+
             <div class="table_viewport">
+
+
                 <h4 class="h4"><small class="labelling">Click a Profile on the left to see Samples.</small></h4>
                 <table id="profile_samples" class="table table-hover table-bordered">
                     <thead>

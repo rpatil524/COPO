@@ -550,10 +550,19 @@ class Sample(DAComponent):
     def get_from_profile_id(self, profile_id):
         return self.get_collection_handle().find({'profile_id': profile_id})
 
+    def get_dtol_from_profile_id(self, profile_id):
+        return self.get_collection_handle().find({'profile_id': profile_id, "status": {"$nin": ["rejected"]}})
+
     def get_unregistered_dtol_samples(self):
         s = self.get_collection_handle().find({"sample_type": "dtol", "biosample_accession": ""})
         l = cursor_to_list(s)
         return l
+
+    def mark_rejected(self, sample_id):
+        return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set":{"status": "rejected"}})
+
+
+
 
 
 class Submission(DAComponent):
@@ -976,6 +985,11 @@ class Submission(DAComponent):
         return self.get_collection_handle().update(
             {'_id': ObjectId(submission_id)}, {'$set': {'published': True}}
         )
+
+    def get_dtol_submission_for_profile(self, profile_id):
+        return self.get_collection_handle().find_one({
+            "profile_id": profile_id, "type": {"$in": ["dtol"]}
+        })
 
 
 class DataFile(DAComponent):

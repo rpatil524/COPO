@@ -1345,6 +1345,22 @@ def update_pending_samples_table(request):
 
 def get_samples_for_profile(request):
     profile_id = request.GET["profile_id"]
-    samples = util.cursor_to_list(Sample().get_from_profile_id(profile_id))
+    samples = util.cursor_to_list(Sample().get_dtol_from_profile_id(profile_id))
 
     return HttpResponse(json_util.dumps(samples))
+
+def mark_sample_rejected(request):
+    sample_id = request.GET.get("sample_id")
+    if sample_id:
+        doc = Sample().mark_rejected(sample_id)
+        if doc:
+            return HttpResponse(status=200)
+
+def add_sample_to_dtol_submission(request):
+     sample_id = request.GET.get("sample_id")
+     profile_id = request.GET.get("profile_id")
+     if sample_id and profile_id:
+         sub = Submission().get_dtol_submission_for_profile(profile_id)
+         if not sub:
+             sub = Submission(profile_id).save_record(dict(), **{"type": "dtol"})
+             Sample().add_to_submission(sample_id, profile_id)
