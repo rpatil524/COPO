@@ -24,6 +24,7 @@ from datetime import datetime
 from submission.helpers.ena_helper import SubmissionHelper
 from tools import resolve_env
 import subprocess
+from web.apps.web_copo.tasks import submit_biosample
 
 
 
@@ -163,7 +164,7 @@ class DtolSpreadsheet:
             self.build_validate_xml(object_id)
             self.build_submission_xml(object_id)
 
-            # register project to the ENA service
+            '''# register project to the ENA service
             curl_cmd = 'curl -u ' + self.user_token + ':' + self.pass_word \
                        + ' -F "SUBMISSION=@' \
                        + "submission.xml" \
@@ -183,15 +184,15 @@ class DtolSpreadsheet:
             tree = ET.fromstring(receipt)
             success_status = tree.get('success')
             if success_status == 'false': ####todo
-                '''result['status'] = False
-                result['message'] = "Couldn't register STUDY due to the following errors: "
-                errors = root.findall('.//ERROR')
-                if errors:
-                    error_text = str()
-                    for e in errors:
-                        error_text = error_text + " \n" + e.text
+                #result['status'] = False
+                #result['message'] = "Couldn't register STUDY due to the following errors: "
+                #errors = root.findall('.//ERROR')
+                #if errors:
+                #    error_text = str()
+                #    for e in errors:
+                #        error_text = error_text + " \n" + e.text
     
-                    result['message'] = result['message'] + error_text   '''
+                 #   result['message'] = result['message'] + error_text   
                 print(receipt)
                 status = tree.find('MESSAGES').findtext('ERROR', default='Undefined error')
                 #print(status)
@@ -199,8 +200,9 @@ class DtolSpreadsheet:
                 print('error')
             else:
                 # retrieve id and update record
-                self.get_biosampleId(receipt, object_id)
+                self.get_biosampleId(receipt, object_id)'''
 
+            submit_biosample(DtolSpreadsheet(), object_id, Sample())
 
             #print(sample_id)
 
