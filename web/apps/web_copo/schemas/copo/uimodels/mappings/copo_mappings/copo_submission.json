@@ -93,12 +93,50 @@
             "default_value": "",
             "control_meta": {},
             "versions": [
+                "dtol_samples"
+            ],
+            "description": "A list of samples which should be submitted to ENA",
+            "deprecated": false,
+            "hidden": "false",
+            "id": "copo.submission.dtol_samples",
+            "label": "DTOL Samples",
+            "show_in_form": false,
+            "ref": "",
+            "type": "array",
+            "show_in_table": false,
+            "control": "text"
+        },
+        {
+            "help_tip": "",
+            "required": "true",
+            "default_value": "",
+            "control_meta": {},
+            "versions": [
                 "type"
             ],
             "description": "Can be used to specify a particular submission type, e.g. DTOL.",
             "deprecated": false,
             "hidden": "true",
             "id": "copo.submission.type",
+            "label": "Type",
+            "show_in_form": false,
+            "ref": "",
+            "type": "string",
+            "show_in_table": false,
+            "control": "text"
+        },
+        {
+            "help_tip": "",
+            "required": "true",
+            "default_value": "",
+            "control_meta": {},
+            "versions": [
+                "dtol_status"
+            ],
+            "description": "status flag for dtol submission operations...[pending, complete, error]",
+            "deprecated": false,
+            "hidden": "true",
+            "id": "copo.submission.dtol_status",
             "label": "Type",
             "show_in_form": false,
             "ref": "",

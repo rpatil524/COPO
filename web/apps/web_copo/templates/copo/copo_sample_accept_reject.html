@@ -116,17 +116,28 @@
         </div>
         <div class="col-lg-9 col-md-9 col-sm-9" id="sample_panel">
             <div class="ui buttons" id="accept_reject_button" style="margin-bottom: 10px">
-                    <button type="button" disabled="true" class="ui negative button">
-                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Reject
-                    </button>
-                    <div class="or"></div>
-                    <button type="button" disabled="true" class="ui positive button">
-                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Accept
-                    </button>
-                </div>
+                <button type="button" disabled="true" class="ui negative button">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Reject
+                </button>
+                <div class="or"></div>
+                <button type="button" disabled="true" class="ui positive button">
+                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Accept
+                </button>
+            </div>
 
             <div class="table_viewport">
+                <ul class="nav nav-tabs" id="ss_sheets">
+                    <li class="hot_tab in active">
+                        <a data-toggle="tab" href="#table_Sheet1">Pending Samples</a>
+                    </li>
 
+                    <li class="hot_tab in active">
+                        <a data-toggle="tab" href="#table_Sheet1">Completed Samples</a>
+                    </li>
+                    <li class="hot_tab in active">
+                        <a data-toggle="tab" href="#table_Sheet1">Rejected Samples</a>
+                    </li>
+                </ul>
 
                 <h4 class="h4"><small class="labelling">Click a Profile on the left to see Samples.</small></h4>
                 <table id="profile_samples" class="table table-hover table-bordered">

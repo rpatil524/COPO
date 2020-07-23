@@ -551,7 +551,7 @@ class Sample(DAComponent):
         return self.get_collection_handle().find({'profile_id': profile_id})
 
     def get_dtol_from_profile_id(self, profile_id):
-        return self.get_collection_handle().find({'profile_id': profile_id, "status": {"$nin": ["rejected"]}})
+        return self.get_collection_handle().find({'profile_id': profile_id, "status": {"$nin": ["rejected", "accepted"]}})
 
     def get_unregistered_dtol_samples(self):
         s = self.get_collection_handle().find({"sample_type": "dtol", "biosample_accession": ""})
@@ -561,6 +561,8 @@ class Sample(DAComponent):
     def mark_rejected(self, sample_id):
         return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set":{"status": "rejected"}})
 
+    def mark_accepted(self, sample_id):
+        return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set": {"status": "accepted"}})
 
 
 
@@ -576,6 +578,9 @@ class Submission(DAComponent):
              "complete": "false"}
         )
         return doc
+
+    def make_dtol_status_pending(self, sub_id):
+        doc = self.get_collection_handle().update({"_id": ObjectId(sub_id)}, {"$set": {"dtol_status": "pending"}})
 
     def save_record(self, auto_fields=dict(), **kwargs):
         if not kwargs.get("target_id", str()):

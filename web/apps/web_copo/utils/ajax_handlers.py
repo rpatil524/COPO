@@ -1349,6 +1349,7 @@ def get_samples_for_profile(request):
 
     return HttpResponse(json_util.dumps(samples))
 
+
 def mark_sample_rejected(request):
     sample_id = request.GET.get("sample_id")
     if sample_id:
@@ -1356,11 +1357,18 @@ def mark_sample_rejected(request):
         if doc:
             return HttpResponse(status=200)
 
+
 def add_sample_to_dtol_submission(request):
-     sample_id = request.GET.get("sample_id")
-     profile_id = request.GET.get("profile_id")
-     if sample_id and profile_id:
-         sub = Submission().get_dtol_submission_for_profile(profile_id)
-         if not sub:
-             sub = Submission(profile_id).save_record(dict(), **{"type": "dtol"})
-             Sample().add_to_submission(sample_id, profile_id)
+    sample_id = request.GET.get("sample_id")
+    profile_id = request.GET.get("profile_id")
+    if sample_id and profile_id:
+        sub = Submission().get_dtol_submission_for_profile(profile_id)
+        if not sub:
+            sub = Submission(profile_id).save_record(dict(), **{"type": "dtol"})
+        sub["dtol_status"] = "pending"
+        sub["dtol_samples"].append(sample_id)
+        sub["target_id"] = sub.pop("_id")
+        if Submission().save_record(dict(), **sub):
+            Sample().mark_accepted(sample_id)
+            return HttpResponse(status=200)
+
