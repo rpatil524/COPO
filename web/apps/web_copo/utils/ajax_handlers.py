@@ -1351,24 +1351,36 @@ def get_samples_for_profile(request):
 
 
 def mark_sample_rejected(request):
-    sample_id = request.GET.get("sample_id")
-    if sample_id:
-        doc = Sample().mark_rejected(sample_id)
-        if doc:
-            return HttpResponse(status=200)
+    sample_ids = request.GET.get("sample_id")
+    if sample_ids:
+        for sample_id in sample_ids:
+            doc = Sample().mark_rejected(sample_id)
+            if not doc:
+                return HttpResponse(status=500)
+        return HttpResponse(status=200)
 
 
 def add_sample_to_dtol_submission(request):
-    sample_id = request.GET.get("sample_id")
+    sample_ids = request.GET.get("sample_ids")
+    sample_ids = json.loads(sample_ids)
     profile_id = request.GET.get("profile_id")
-    if sample_id and profile_id:
+    # check we have required params
+    if sample_ids and profile_id:
+        # check for submission object, and create if absent
         sub = Submission().get_dtol_submission_for_profile(profile_id)
         if not sub:
             sub = Submission(profile_id).save_record(dict(), **{"type": "dtol"})
         sub["dtol_status"] = "pending"
-        sub["dtol_samples"].append(sample_id)
         sub["target_id"] = sub.pop("_id")
-        if Submission().save_record(dict(), **sub):
+
+        for sample_id in sample_ids:
+            # iterate over samples and add to submission
+            sub["dtol_samples"].append(sample_id)
             Sample().mark_accepted(sample_id)
+        if Submission().save_record(dict(), **sub):
             return HttpResponse(status=200)
+        else:
+            return HttpResponse(status=500)
+    else:
+        return HttpResponse(status=500, content="Sample IDs or profile_id not provided")
 

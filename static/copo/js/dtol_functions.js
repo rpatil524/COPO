@@ -1,7 +1,7 @@
 $(document).ready(function () {
     // functions defined here are called from both copo_sample_accept_reject and copo_samples, all provide DTOL
     // functionality
-
+    $("#accept_reject_button").find("button").prop("disabled", true)
     // add field names here which you don't want to appear in the supervisors table
     excluded_fields = ["profile_id", "biosample_id"]
     // populate profiles panel on left
@@ -18,7 +18,7 @@ $(document).ready(function () {
 
     $(document).on("click", "#accept_reject_button button", handle_accept_reject)
 
-    $(document).on("click", ".selectable_row", row_select)
+    $(document).on("click", ".selectable_row, .hot_tab", row_select)
 
     $(document).on("change", "#dtol_type_select", function (e) {
         $.ajax({
@@ -116,9 +116,18 @@ $(document).ready(function () {
 function row_select(ev) {
     $("#accept_reject_button").find("button").prop("disabled", true)
     // get samples for profile clicked in the left hand panel and populate table on the right
-    var row = $(ev.currentTarget)
-    $(".selected").removeClass("selected")
-    $(row).addClass("selected")
+    var row;
+    if ($(ev.currentTarget).is("td") || $(ev.currentTarget).is("tr")) {
+        // we have clicked a profile on the left hand list
+        $(document).data("selected_row", $(ev.currentTarget))
+        row = $(document).data("selected_row")
+        $(".selected").removeClass("selected")
+        $(row).addClass("selected")
+    } else {
+        row = $(document).data("selected_row")
+    }
+
+
     var d = {"profile_id": $(row).find("td").data("profile_id")}
     $("#profile_id").val(d.profile_id)
     $.ajax({
@@ -254,36 +263,36 @@ function handle_accept_reject(el) {
     var checked = $(".form-check-input:checked").closest("tr")
     var button = $(el.currentTarget)
     var action
-    if(button.hasClass("positive")){
+    if (button.hasClass("positive")) {
         action = "accept"
-    }
-    else{
+    } else {
         action = "reject"
     }
-
-    $(checked).each(function (es) {
-        var sample_id = $(checked[es]).data("id")
-
-        if(action == "reject"){
-            // mark sample object as rejected
-            $.ajax({
-                url: "/copo/mark_sample_rejected",
-                method: "GET",
-                data: {"sample_id": sample_id}
-            }).done(function(){
-                $("#profile_titles").find(".selected").click()
-            })
-        }
-        else if(action == "accept"){
-            // create or update dtol submission record
-            var profile_id = $("#profile_id").val()
-            $.ajax({
-                url:"/copo/add_sample_to_dtol_submission",
-                method: "GET",
-                data:{"sample_id": sample_id, "profile_id": profile_id},
-            }).done(function(){
-                $("#profile_titles").find(".selected").click()
-            })
-        }
+    var sample_ids = new Array()
+    $(checked).each(function(it){
+        sample_ids.push($(checked[it]).data("id"))
     })
+
+
+    if (action == "reject") {
+        // mark sample object as rejected
+        $.ajax({
+            url: "/copo/mark_sample_rejected",
+            method: "GET",
+            data: {"sample_ids": JSON.stringify(sample_ids)}
+        }).done(function () {
+            $("#profile_titles").find(".selected").click()
+        })
+    } else if (action == "accept") {
+        // create or update dtol submission record
+        var profile_id = $("#profile_id").val()
+        $.ajax({
+            url: "/copo/add_sample_to_dtol_submission",
+            method: "GET",
+            data: {"sample_ids": JSON.stringify(sample_ids), "profile_id": profile_id},
+        }).done(function () {
+            $("#profile_titles").find(".selected").click()
+        })
+    }
+
 }

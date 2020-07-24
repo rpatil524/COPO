@@ -29,7 +29,7 @@ $(document).ready(function () {
 
         var url
         var handler
-        if (repo_type == "dataverse") {
+        if (repo_type === "dataverse") {
             url = "/copo/get_dataverse/"
             handler = build_dataverse_modal
         }
