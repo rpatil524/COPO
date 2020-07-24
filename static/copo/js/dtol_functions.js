@@ -127,8 +127,9 @@ function row_select(ev) {
         row = $(document).data("selected_row")
     }
 
+    var filter = $("#sample_filter").find(".active").find("a").attr("href")
 
-    var d = {"profile_id": $(row).find("td").data("profile_id")}
+    var d = {"profile_id": $(row).find("td").data("profile_id"), "filter": filter}
     $("#profile_id").val(d.profile_id)
     $.ajax({
         url: "/copo/get_samples_for_profile",

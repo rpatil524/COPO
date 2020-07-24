@@ -550,8 +550,11 @@ class Sample(DAComponent):
     def get_from_profile_id(self, profile_id):
         return self.get_collection_handle().find({'profile_id': profile_id})
 
-    def get_dtol_from_profile_id(self, profile_id):
-        return self.get_collection_handle().find({'profile_id': profile_id, "status": {"$nin": ["rejected", "accepted"]}})
+    def get_dtol_from_profile_id(self, profile_id, filter):
+        if filter == "pending":
+            return self.get_collection_handle().find({'profile_id': profile_id, "status": {"$nin": ["rejected", "accepted"]}})
+        else:
+            return self.get_collection_handle().find({'profile_id': profile_id, "status": filter})
 
     def get_unregistered_dtol_samples(self):
         s = self.get_collection_handle().find({"sample_type": "dtol", "biosample_accession": ""})
