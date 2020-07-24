@@ -18,6 +18,7 @@ $(document).ready(function () {
 
     $(document).on("click", "#accept_reject_button button", handle_accept_reject)
 
+    // handle clicks on both profiles (.selectable_row), and filter (.hot_tab)
     $(document).on("click", ".selectable_row, .hot_tab", row_select)
 
     $(document).on("change", "#dtol_type_select", function (e) {

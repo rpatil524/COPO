@@ -552,14 +552,11 @@ class Sample(DAComponent):
 
     def get_dtol_from_profile_id(self, profile_id, filter):
         if filter == "pending":
+            # $nin will return where status neq to values in array, or status is absent altogether
             return self.get_collection_handle().find({'profile_id': profile_id, "status": {"$nin": ["rejected", "accepted"]}})
         else:
+            # else return samples who's status simply mathes the filter
             return self.get_collection_handle().find({'profile_id': profile_id, "status": filter})
-
-    def get_unregistered_dtol_samples(self):
-        s = self.get_collection_handle().find({"sample_type": "dtol", "biosample_accession": ""})
-        l = cursor_to_list(s)
-        return l
 
     def mark_rejected(self, sample_id):
         return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set":{"status": "rejected"}})
