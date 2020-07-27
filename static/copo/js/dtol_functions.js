@@ -7,6 +7,17 @@ $(document).ready(function () {
     // populate profiles panel on left
     update_pending_samples_table()
 
+    $(document).on("click", ".select-all", function(){
+        $(".form-check-input:not(:checked)").each(function(idx, element){
+            $(element).click()
+        })
+    })
+    $(document).on("click", ".select-none", function(){
+        $(".form-check-input:checked").each(function(idx, element){
+            $(element).click()
+        })
+    })
+
     $(document).on("click", ".form-check-input", function (el) {
 
         if ($(".form-check-input:checked").length) {
@@ -112,6 +123,9 @@ $(document).ready(function () {
         }
 
     })
+
+
+
 })
 
 function row_select(ev) {
