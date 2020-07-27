@@ -167,4 +167,10 @@ urlpatterns = [
          name="create_spreadsheet_samples"),
     path('update_pending_samples_table/', ajax_handlers.update_pending_samples_table,
          name="update_pending_samples_table"),
+    path('get_samples_for_profile/', ajax_handlers.get_samples_for_profile,
+         name="get_samples_for_profile"),
+    path('mark_sample_rejected/', ajax_handlers.mark_sample_rejected,
+         name="mark_sample_rejected"),
+    path('add_sample_to_dtol_submission/', ajax_handlers.add_sample_to_dtol_submission,
+         name="add_sample_to_dtol_submission"),
 ]

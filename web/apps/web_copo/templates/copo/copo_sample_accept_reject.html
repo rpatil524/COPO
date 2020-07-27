@@ -26,7 +26,13 @@
             position: -webkit-sticky;
             position: sticky;
             top: 0;
-            z-index: 2;
+            z-index: 9;
+            background-color: rgba(255, 255, 255, 1);
+
+        }
+
+        td {
+            z-index: 1;
         }
 
         .confirm {
@@ -35,6 +41,31 @@
             padding: 10px;
             width: 400px;
             margin-bottom: 20px;
+        }
+
+        .selected {
+            background-color: #e1e1e1 !important;
+        }
+
+        .na_color {
+            background-color: #eee;
+        }
+
+        .empty_color {
+            background-color: #f7eded;
+        }
+
+        .selectable_row {
+            cursor: pointer;
+        }
+
+        .table_viewport {
+            max-height: 600px;
+            overflow: scroll;
+        }
+
+        .tickbox {
+            vertical-align: middle !important;
         }
 
     </style>
@@ -69,13 +100,57 @@
     <h3 class="h3">Choose to Accept or Reject</h3>
     <h3 class="h3"><small>Note clicking accept will immediately send sample info to ENA/Biosamples</small></h3>
 
+    <hr/>
 
     <div class="row">
 
-        <div class="col-lg-3 col-md-3 col-sm-3" style="border:1px black solid">
-
+        <div class="col-lg-3 col-md-3 col-sm-3">
+            <table id="profile_titles" class="table table-hover table-condensed">
+                <thead>
+                <tr>
+                    <th>Profile Title</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
-        <div class="col-lg-9 col-md-9 col-sm-9" style="border:1px black solid">HERE</div>
+        <div class="col-lg-9 col-md-9 col-sm-9" id="sample_panel">
+            <div class="ui buttons" id="accept_reject_button" style="margin-bottom: 10px">
+                <button type="button" disabled="true" class="ui negative button">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Reject
+                </button>
+                <div class="or"></div>
+                <button type="button" disabled="true" class="ui positive button">
+                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Accept
+                </button>
+            </div>
+            <span style="margin-left:20px">
+                <button class="select-all tiny ui basic button" tabindex="0" aria-controls="" type="button"><span>Select all</span></button>
+                <button class="select-none tiny ui basic button" tabindex="0" aria-controls="" type="button"><span>Select None</span></button>
+            </span>
+            <div class="table_viewport">
+                <ul class="nav nav-tabs" id="sample_filter">
+                    <li class="hot_tab in active">
+                        <a data-toggle="tab" href="pending">Pending Samples</a>
+                    </li>
+
+                    <li class="hot_tab in">
+                        <a data-toggle="tab" href="complete">Completed Samples</a>
+                    </li>
+                    <li class="hot_tab in">
+                        <a data-toggle="tab" href="rejected">Rejected Samples</a>
+                    </li>
+                </ul>
+
+                <h4 class="h4"><small class="labelling">Click a Profile on the left to see Samples.</small></h4>
+                <table id="profile_samples" class="table table-hover table-bordered">
+                    <thead>
+
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
 
 
     </div>
@@ -92,5 +167,6 @@
     <script src="{% static 'copo/js/copo_form_handlers.js' %}"></script>
     <script src="{% static 'copo/js/dtol_functions.js' %}"></script>
     <script src="{% static 'copo/js/copo_sample_parse_spreadsheet.js' %}"></script>
-    <script src="{% static 'copo/bootstrap-treeview-1.2.0/dist/bootstrap-treeview.min.js'%}"></script>
+
+
 {% endblock %}

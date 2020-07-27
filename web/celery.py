@@ -6,7 +6,7 @@ from celery.schedules import crontab
 from datetime import timedelta
 #from web.apps.web_copo.utils.dtol import DtolSpreadsheet
 
-#os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web.settings.local_settings')
+#os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web.settings.all')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web.settings.all')
 #crontab(minute="*/1")
 app = Celery('web')

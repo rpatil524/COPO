@@ -28,7 +28,7 @@ function upload_spreadsheet(file) {
 $(document).ready(function () {
     var profileId = $('#profile_id').val();
     var wsprotocol = 'ws://';
-    if (window.location.protocol == "https:") {
+    if (window.location.protocol === "https:") {
         wsprotocol = 'wss://';
     }
     var socket = new WebSocket(
@@ -46,17 +46,17 @@ $(document).ready(function () {
     socket.onmessage = function (e) {
         console.log("received message ", e)
         d = JSON.parse(e.data)
-        if (d.action == "close") {
+        if (d.action === "close") {
             $("#" + d.html_id).fadeOut("50")
-        } else if (d.action == "make_valid") {
+        } else if (d.action === "make_valid") {
             $("#" + d.html_id).html("Validated").removeClass("alert-info").addClass("alert-success")
-        } else if (d.action == "info") {
+        } else if (d.action === "info") {
             // check info div is visible
             if (!$("#" + d.html_id).is(":visible")) {
                 $("#" + d.html_id).fadeIn("50")
             }
             $("#" + d.html_id).html(d.message)
-        } else if (d.action == "make_table") {
+        } else if (d.action === "make_table") {
             var body = $("tbody")
             var count = 0
             for (r in d.message) {
@@ -65,7 +65,7 @@ $(document).ready(function () {
                 for (c in row) {
 
                     cell = row[c]
-                    if (count == 0) {
+                    if (count === 0) {
                         var td = $("<th/>", {
                             "html": cell
                         })

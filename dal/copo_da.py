@@ -207,16 +207,15 @@ class DAComponent:
             elif v_id in system_fields:
                 fields[f_id] = system_fields.get(v_id)
 
-
-
             if not target_id and f_id not in fields:
                 fields[f_id] = data_utils.default_jsontype(f["type"])
 
-
-
         # if True, then the database action (to save/update) is never performed, but validated 'fields' are returned
         validate_only = kwargs.pop("validate_only", False)
-
+        fields["date_modified"] = datetime.now()
+        # check if there is attached profile then update date modified
+        if "profile_id" in fields:
+            self.update_profile_modified(fields["profile_id"])
         if validate_only is True:
             return fields
         else:
@@ -232,6 +231,9 @@ class DAComponent:
             rec = self.get_record(target_id)
 
             return rec
+
+    def update_profile_modified(self, profile_id):
+        handle_dict["profile"].update_one({"_id": ObjectId(profile_id)}, {"$set":{"date_modified": datetime.now()}})
 
     def get_all_records(self, sort_by='_id', sort_direction=-1, **kwargs):
         doc = dict(deleted=data_utils.get_not_deleted_flag())
@@ -569,8 +571,20 @@ class Sample(DAComponent):
               }
         )
 
-    def get_unregistered_dtol_samples(self):
-        return self.get_collection_handle().find({"sample_type": "dtol", "biosample_accession": ""})
+    def get_dtol_from_profile_id(self, profile_id, filter):
+        if filter == "pending":
+            # $nin will return where status neq to values in array, or status is absent altogether
+            return self.get_collection_handle().find({'profile_id': profile_id, "status": {"$nin": ["rejected", "accepted"]}})
+        else:
+            # else return samples who's status simply mathes the filter
+            return self.get_collection_handle().find({'profile_id': profile_id, "status": filter})
+
+    def mark_rejected(self, sample_id):
+        return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set":{"status": "rejected"}})
+
+    def mark_accepted(self, sample_id):
+        return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set": {"status": "accepted"}})
+
 
 
 class Submission(DAComponent):
@@ -584,6 +598,9 @@ class Submission(DAComponent):
              "complete": "false"}
         )
         return doc
+
+    def make_dtol_status_pending(self, sub_id):
+        doc = self.get_collection_handle().update({"_id": ObjectId(sub_id)}, {"$set": {"dtol_status": "pending"}})
 
     def save_record(self, auto_fields=dict(), **kwargs):
         if not kwargs.get("target_id", str()):
@@ -960,7 +977,8 @@ class Submission(DAComponent):
                 {'_id': ObjectId(submission_id)}, {'$set': {'destination_repo': 'default'}}
             )
         r = Repository().get_record(ObjectId(repo_id))
-        dest = {"url": r.get('url'), 'apikey': r.get('apikey', ""), "isCG": r.get('isCG', ""), "repo_id": repo_id, "name": r.get('name', ""),
+        dest = {"url": r.get('url'), 'apikey': r.get('apikey', ""), "isCG": r.get('isCG', ""), "repo_id": repo_id,
+                "name": r.get('name', ""),
                 "type": r.get('type', ""), "username": r.get('username', ""), "password": r.get('password', "")}
         self.get_collection_handle().update(
             {'_id': ObjectId(submission_id)},
@@ -992,6 +1010,11 @@ class Submission(DAComponent):
         return self.get_collection_handle().update(
             {'_id': ObjectId(submission_id)}, {'$set': {'published': True}}
         )
+
+    def get_dtol_submission_for_profile(self, profile_id):
+        return self.get_collection_handle().find_one({
+            "profile_id": profile_id, "type": {"$in": ["dtol"]}
+        })
 
 
 class DataFile(DAComponent):
@@ -1171,6 +1194,9 @@ class Profile(DAComponent):
             if 'datasets' in p['dataverse']:
                 return p['dataverse']['datasets']
 
+    def get_dtol_profiles(self):
+        p = self.get_collection_handle().find({"type": "Darwin Tree of Life"}).sort("date_modified",  pymongo.DESCENDING)
+        return cursor_to_list(p)
 
 class CopoGroup(DAComponent):
     def __init__(self):
@@ -1305,7 +1331,9 @@ class Repository(DAComponent):
 
     def add_personal_dataverse(self, url, name, apikey, type, username, password):
         u = ThreadLocal.get_current_user()
-        doc = self.get_collection_handle().insert({"isCG": False, "url": url, "name": name, "apikey": apikey, "personal": True, "uid": u.id, "type": type, "username": username, "password": password})
+        doc = self.get_collection_handle().insert(
+            {"isCG": False, "url": url, "name": name, "apikey": apikey, "personal": True, "uid": u.id, "type": type,
+             "username": username, "password": password})
         udetails = u.userdetails
         udetails.repo_submitter.append(str(doc))
         udetails.save()
