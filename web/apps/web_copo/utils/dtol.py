@@ -161,6 +161,10 @@ class DtolSpreadsheet:
             self.build_sample_xml(obj_id)
             object_id = str(obj_id['_id'])
             #print(object_id)
+
+
+            #Todo - this code needs to be called from celery tasks so move out into separate method
+
             self.build_validate_xml(object_id)
             self.build_submission_xml(object_id)
 

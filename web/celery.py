@@ -23,6 +23,10 @@ app.conf.beat_schedule = {
     'process_ena_transfer': {
         'task': 'web.apps.web_copo.tasks.process_ena_transfer',
         'schedule': timedelta(seconds=5)  # execute every n minutes minute="*/n"
+    },
+    'process_dtol_sample_submission':{
+        'task': 'web.apps.web_copo.tasks.process_dtol_sample_submission',
+        'schedule': timedelta(seconds=5)
     }
 }
 
