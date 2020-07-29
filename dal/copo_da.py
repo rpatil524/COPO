@@ -594,6 +594,8 @@ class Submission(DAComponent):
         super(Submission, self).__init__(profile_id, "submission")
 
     def dtol_sample_processed(self, sub_id, sam_id):
+        # when dtol sample has succesfully gone to ENA, pull id from submission and check if there are remaining
+        # samples left to go. If not, make submission complete. This will stop celery processing the this submission.
         sub_handle = self.get_collection_handle()
         sub_handle.update({"_id": ObjectId(sub_id)}, {"$pull": {"dtol_samples": sam_id}})
         sub = sub_handle.find_one({"_id": ObjectId(sub_id)}, {"dtol_samples": 1})
@@ -602,6 +604,7 @@ class Submission(DAComponent):
             sub_handle.update({"_id": ObjectId(sub_id)}, {"$set": {"dtol_status": "complete"}})
 
     def get_pending_dtol_samples(self):
+        # called by celery to get samples the supeprvisor has set to be sent to ENA
         sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": "pending"}, {"dtol_samples": 1})
         sub = cursor_to_list(sub)
         return sub

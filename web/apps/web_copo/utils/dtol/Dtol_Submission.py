@@ -9,6 +9,7 @@ from tools import resolve_env
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
 from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE
 import uuid
+
 with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
 
@@ -21,6 +22,11 @@ user_token = resolve_env.get_env('WEBIN_USER').split("@")[0]
 
 
 def process_pending_dtol_samples():
+    '''
+    method called from celery to initiate transfers to ENA, see celery.py for timings
+    :return:
+    '''
+
     # get all pending dtol submissions
     sample_id_list = Submission().get_pending_dtol_samples()
     # send each to ENA for Biosample ids
@@ -32,7 +38,6 @@ def process_pending_dtol_samples():
                 Submission().dtol_sample_processed(sub_id=submission["_id"], sam_id=s_id)
 
 
-
 def build_xml(sample):
     build_sample_xml(sample)
     object_id = str(sample['_id'])
@@ -41,13 +46,12 @@ def build_xml(sample):
     return submit_biosample(object_id, Sample())
 
 
-
 def build_sample_xml(obj_id):
     # build sample XML
     tree = ET.parse(SRA_SAMPLE_TEMPLATE)
     root = tree.getroot()
     sample_alias = ET.SubElement(root, 'SAMPLE')
-    sample_alias.set('alias', str(uuid.uuid4())) # Todo this is for testing only
+    sample_alias.set('alias', str(uuid.uuid4()))  # Todo this is for testing only
     sample_alias.set('center_name', 'EarlhamInstitute')  ####mandatory for broker account
     title = str(obj_id['_id'])  ######for time being using COPO id as title
     title = str(uuid.uuid4())
@@ -88,24 +92,13 @@ def build_submission_xml(object_id):
     copo_contact.set("name", sra_settings["sra_broker_contact_name"])
     copo_contact.set("inform_on_error", sra_settings["sra_broker_inform_on_error"])
     copo_contact.set("inform_on_status", sra_settings["sra_broker_inform_on_status"])
-
-    # set user contacts
-    sra_map = {"inform_on_error": "SRA Inform On Error", "inform_on_status": "SRA Inform On Status"}
-    # submission_helper = SubmissionHelper(submission_id=object_id) #####what is it submission id? #self.submission_id)
-    # user_contacts = submission_helper.get_sra_contacts()
-    # for k, v in user_contacts.items():
-    #    user_sra_roles = [x for x in sra_map.keys() if sra_map[x].lower() in v]
-    #    if user_sra_roles:
-    #        user_contact = ET.SubElement(contacts, 'CONTACT')
-    #        user_contact.set("name", ' '.join(k[1:]))
-    #        for role in user_sra_roles:
-    #            user_contact.set(role, k[0])
     ET.dump(tree)
     tree.write(open("submission.xml", 'w'),
                encoding='unicode')  # overwriting at each run, i don't think we need to keep it
 
 
 def build_validate_xml(object_id):
+    # TODO do we need this method at all? Its never actually used right?
     # build submission XML
     tree = ET.parse(SRA_SUBMISSION_TEMPLATE)
     root = tree.getroot()
@@ -126,28 +119,11 @@ def build_validate_xml(object_id):
     ET.SubElement(action, 'VALIDATE')
     ET.dump(tree)
     tree.write(open("submission_validate.xml", 'w'),
-               encoding='unicode')  # overwriting at each run, i don't think we need to keep it
-
-
-def get_biosampleId(receipt, sample_id):  #####todo: put this in a thread
-    # raise NotImplementedError()
-    tree = ET.fromstring(receipt)
-    sampleinreceipt = tree.find('SAMPLE')
-    sra_accession = sampleinreceipt.get('accession')
-    print(sra_accession)
-    biosample_accession = sampleinreceipt.find('EXT_ID').get('accession')
-    print(biosample_accession)
-    submission_accession = tree.find('SUBMISSION').get('accession')
-    print(submission_accession)
-    # s = Sample().get_record(sample_id)
-    # print(s)
-    Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
-    # s =  Sample().get_record(sample_id)
-    # print(s)
+               encoding='unicode')  # overwriting at each run, i don't think we need to keep it - todo again I think these should have unique id attached, and then file deleted after submission
 
 
 def submit_biosample(object_id, sampleobj):
-    # register project to the ENA service
+    # register project to the ENA service using XML files previously created
     curl_cmd = 'curl -u ' + user_token + ':' + pass_word \
                + ' -F "SUBMISSION=@' \
                + "submission.xml" \
@@ -176,5 +152,19 @@ def submit_biosample(object_id, sampleobj):
         return False
     else:
         # retrieve id and update record
-        get_biosampleId(receipt, object_id)
-        return True
+        if get_biosampleId(receipt, object_id):
+            return True
+
+
+def get_biosampleId(receipt, sample_id):
+    # parsing ENA sample accessions from reciept and storing in sample object - todo these should be store in submission object
+    tree = ET.fromstring(receipt)
+    sampleinreceipt = tree.find('SAMPLE')
+    sra_accession = sampleinreceipt.get('accession')
+    #print(sra_accession)
+    biosample_accession = sampleinreceipt.find('EXT_ID').get('accession')
+    #print(biosample_accession)
+    submission_accession = tree.find('SUBMISSION').get('accession')
+    #print(submission_accession)
+    return Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
+
