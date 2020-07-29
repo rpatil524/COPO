@@ -233,7 +233,7 @@ class DAComponent:
             return rec
 
     def update_profile_modified(self, profile_id):
-        handle_dict["profile"].update_one({"_id": ObjectId(profile_id)}, {"$set":{"date_modified": datetime.now()}})
+        handle_dict["profile"].update_one({"_id": ObjectId(profile_id)}, {"$set": {"date_modified": datetime.now()}})
 
     def get_all_records(self, sort_by='_id', sort_direction=-1, **kwargs):
         doc = dict(deleted=data_utils.get_not_deleted_flag())
@@ -555,41 +555,56 @@ class Sample(DAComponent):
             {
                 "_id": ObjectId(oid)
             },
-            { "$set":
-                  {'biosampleAccession' : biosample_accession,
-                   'sraAccession' : sra_accession,
-                   'submissionAccession': submission_accession}
-              })
+            {"$set":
+                {
+                    'biosampleAccession': biosample_accession,
+                    'sraAccession': sra_accession,
+                    'submissionAccession': submission_accession,
+                    'status': 'accepted'}
+            })
 
     def add_status(self, status, oid):
         return self.get_collection_handle().update(
             {
                 "_id": ObjectId(oid)
             },
-            { "$set":
-                  {'errorStatus' : status}
-              }
+            {"$set":
+                 {'errorStatus': status}
+             }
         )
 
     def get_dtol_from_profile_id(self, profile_id, filter):
         if filter == "pending":
             # $nin will return where status neq to values in array, or status is absent altogether
-            return self.get_collection_handle().find({'profile_id': profile_id, "status": {"$nin": ["rejected", "accepted"]}})
+            return self.get_collection_handle().find(
+                {'profile_id': profile_id, "status": {"$nin": ["rejected", "accepted"]}})
         else:
             # else return samples who's status simply mathes the filter
             return self.get_collection_handle().find({'profile_id': profile_id, "status": filter})
 
     def mark_rejected(self, sample_id):
-        return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set":{"status": "rejected"}})
+        return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set": {"status": "rejected"}})
 
-    def mark_accepted(self, sample_id):
-        return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set": {"status": "accepted"}})
-
+    def mark_processing(self, sample_id):
+        return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set": {"status": "processing"}})
 
 
 class Submission(DAComponent):
     def __init__(self, profile_id=None):
         super(Submission, self).__init__(profile_id, "submission")
+
+    def dtol_sample_processed(self, sub_id, sam_id):
+        sub_handle = self.get_collection_handle()
+        sub_handle.update({"_id": ObjectId(sub_id)}, {"$pull": {"dtol_samples": sam_id}})
+        sub = sub_handle.find_one({"_id": ObjectId(sub_id)}, {"dtol_samples": 1})
+
+        if len(sub["dtol_samples"]) < 1:
+            sub_handle.update({"_id": ObjectId(sub_id)}, {"$set": {"dtol_status": "complete"}})
+
+    def get_pending_dtol_samples(self):
+        sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": "pending"}, {"dtol_samples": 1})
+        sub = cursor_to_list(sub)
+        return sub
 
     def get_incomplete_submissions_for_user(self, user_id, repo):
         doc = self.get_collection_handle().find(
@@ -1195,8 +1210,9 @@ class Profile(DAComponent):
                 return p['dataverse']['datasets']
 
     def get_dtol_profiles(self):
-        p = self.get_collection_handle().find({"type": "Darwin Tree of Life"}).sort("date_modified",  pymongo.DESCENDING)
+        p = self.get_collection_handle().find({"type": "Darwin Tree of Life"}).sort("date_modified", pymongo.DESCENDING)
         return cursor_to_list(p)
+
 
 class CopoGroup(DAComponent):
     def __init__(self):

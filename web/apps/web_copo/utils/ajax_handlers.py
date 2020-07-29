@@ -41,7 +41,7 @@ from web.apps.web_copo.models import UserDetails
 from web.apps.web_copo.schemas.utils import data_utils
 import web.apps.web_copo.templatetags.html_tags as htags
 from web.apps.web_copo.lookup.lookup import WIZARD_FILES as wf
-from web.apps.web_copo.utils.dtol import DtolSpreadsheet
+from web.apps.web_copo.utils.dtol.Dtol_Spreadsheet import DtolSpreadsheet
 
 DV_STRING = 'HARVARD_TEST_API'
 
@@ -1378,7 +1378,7 @@ def add_sample_to_dtol_submission(request):
         for sample_id in sample_ids:
             # iterate over samples and add to submission
             sub["dtol_samples"].append(sample_id)
-            Sample().mark_accepted(sample_id)
+            Sample().mark_processing(sample_id)
         if Submission().save_record(dict(), **sub):
             return HttpResponse(status=200)
         else:
