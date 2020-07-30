@@ -26,7 +26,7 @@ app.conf.beat_schedule = {
     },
     'process_dtol_sample_submission':{
         'task': 'web.apps.web_copo.tasks.process_dtol_sample_submission',
-        'schedule': timedelta(seconds=20)
+        'schedule': timedelta(seconds=10)
     }
 }
 

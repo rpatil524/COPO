@@ -9,6 +9,8 @@ from tools import resolve_env
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
 from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE
 import uuid
+from submission.helpers.generic_helper import notify_sample_status, notify_dtol_status
+import time
 
 with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
@@ -33,17 +35,24 @@ def process_pending_dtol_samples():
     for submission in sample_id_list:
         for s_id in submission["dtol_samples"]:
             sam = Sample().get_record(s_id)
-            if build_xml(sam):
-                # store accessions, remove sample id from bundle and on last removal, set status of submission
-                Submission().dtol_sample_processed(sub_id=submission["_id"], sam_id=s_id)
+            build_xml(sample=sam, sub_id=s_id, p_id=submission["profile_id"])
+            # store accessions, remove sample id from bundle and on last removal, set status of submission
+            Submission().dtol_sample_processed(sub_id=submission["_id"], sam_id=s_id)
 
 
-def build_xml(sample):
+def build_xml(sample, sub_id, p_id):
+    notify_dtol_status(msg="Creating Sample: " + sample["collectorSampleName"], action="info",
+                         html_id="dtol_sample_info")
     build_sample_xml(sample)
     object_id = str(sample['_id'])
     build_validate_xml(object_id)
     build_submission_xml(object_id)
-    return submit_biosample(object_id, Sample())
+    notify_dtol_status(msg="Communicating with ENA", action="info",
+                         html_id="dtol_sample_info")
+    submit_biosample(object_id, Sample())
+
+    notify_dtol_status(msg="Idle", action="info",
+                         html_id="dtol_sample_info")
 
 
 def build_sample_xml(obj_id):
@@ -53,14 +62,14 @@ def build_sample_xml(obj_id):
     sample_alias = ET.SubElement(root, 'SAMPLE')
     sample_alias.set('alias', str(uuid.uuid4()))  # Todo this is for testing only
     sample_alias.set('center_name', 'EarlhamInstitute')  ####mandatory for broker account
-    title = str(obj_id['_id'])  ######for time being using COPO id as title
+    # title = str(obj_id['_id'])  ######for time being using COPO id as title
     title = str(uuid.uuid4())
 
     title_block = ET.SubElement(sample_alias, 'TITLE')
     title_block.text = title
     sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
     taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
-    taxon_id.text = obj_id['taxonid']
+    taxon_id.text = obj_id.get('taxonid', "")
     sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
     ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
     for item in obj_id.items():
@@ -134,21 +143,21 @@ def submit_biosample(object_id, sampleobj):
 
     try:
         receipt = subprocess.check_output(curl_cmd, shell=True)
-        print(receipt)
+        #print(receipt)
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
             pass_word, "xxxxxx")
-        print(message)
+        #print(message)
 
     tree = ET.fromstring(receipt)
     success_status = tree.get('success')
     if success_status == 'false':  ####todo
 
-        print(receipt)
+        #print(receipt)
         status = tree.find('MESSAGES').findtext('ERROR', default='Undefined error')
         # print(status)
         sampleobj.add_status(status, object_id)
-        print('error')
+        #print('error')
         return False
     else:
         # retrieve id and update record
@@ -161,10 +170,9 @@ def get_biosampleId(receipt, sample_id):
     tree = ET.fromstring(receipt)
     sampleinreceipt = tree.find('SAMPLE')
     sra_accession = sampleinreceipt.get('accession')
-    #print(sra_accession)
+    # print(sra_accession)
     biosample_accession = sampleinreceipt.find('EXT_ID').get('accession')
-    #print(biosample_accession)
+    # print(biosample_accession)
     submission_accession = tree.find('SUBMISSION').get('accession')
-    #print(submission_accession)
+    # print(submission_accession)
     return Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
-

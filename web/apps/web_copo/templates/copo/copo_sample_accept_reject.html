@@ -128,25 +128,29 @@
                 <button class="select-all tiny ui basic button" tabindex="0" aria-controls="" type="button"><span>Select all</span></button>
                 <button class="select-none tiny ui basic button" tabindex="0" aria-controls="" type="button"><span>Select None</span></button>
             </span>
+
+             <span class="alert alert-info pull-right" style="min-width: 400px" role="alert">
+                <p id="dtol_sample_info">Idle</p>
+            </span>
+
+            <ul class="nav nav-tabs" id="sample_filter">
+                <li class="hot_tab in active">
+                    <a data-toggle="tab" href="pending">Pending Samples</a>
+                </li>
+                <li class="hot_tab in">
+                    <a data-toggle="tab" href="accepted">Accepted Samples</a>
+                </li>
+                <li class="hot_tab in">
+                    <a data-toggle="tab" href="rejected">Rejected Samples</a>
+                </li>
+            </ul>
+
+
+
             <div class="table_viewport">
-                <ul class="nav nav-tabs" id="sample_filter">
-                    <li class="hot_tab in active">
-                        <a data-toggle="tab" href="pending">Pending Samples</a>
-                    </li>
-
-                    <li class="hot_tab in">
-                        <a data-toggle="tab" href="accepted">Accepted Samples</a>
-                    </li>
-                    <li class="hot_tab in">
-                        <a data-toggle="tab" href="rejected">Rejected Samples</a>
-                    </li>
-                </ul>
-
                 <h4 class="h4"><small class="labelling">Click a Profile on the left to see Samples.</small></h4>
                 <table id="profile_samples" class="table table-hover table-bordered">
-                    <thead>
-
-                    </thead>
+                    <thead></thead>
                     <tbody></tbody>
                 </table>
             </div>

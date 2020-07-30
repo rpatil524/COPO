@@ -167,18 +167,20 @@ function row_select(ev) {
                 var td_row = $("<tr/>")
                 if (idx == 0) {
                     // do header and row
-                    var empty_th = $("<th/>")
-                    $(th_row).append(empty_th)
-                    var td = $("<td/>", {
-                        class: "tickbox"
-                    })
-                    var tickbox = $("<input/>",
-                        {
-                            "type": "checkbox",
-                            class: "form-check-input"
+                    if(filter === "pending") {
+                        var empty_th = $("<th/>")
+                        $(th_row).append(empty_th)
+                        var td = $("<td/>", {
+                            class: "tickbox"
                         })
-                    $(td).append(tickbox)
-                    $(td_row).append(td)
+                        var tickbox = $("<input/>",
+                            {
+                                "type": "checkbox",
+                                class: "form-check-input"
+                            })
+                        $(td).append(tickbox)
+                        $(td_row).append(td)
+                    }
                     for (el in row) {
                         if (el == "_id") {
                             $(td_row).data("id", row._id.$oid)
@@ -206,17 +208,19 @@ function row_select(ev) {
                             $("#profile_samples").find("tbody").append(td_row)
                         }
                     }
-                } else {
-                    var td = $("<td/>", {
-                        class: "tickbox"
-                    })
-                    var tickbox = $("<input/>",
-                        {
-                            "type": "checkbox",
-                            class: "form-check-input tickbox"
+                } else { // if not first element
+                    if(filter==="pending") {
+                        var td = $("<td/>", {
+                            class: "tickbox"
                         })
-                    $(td).append(tickbox)
-                    $(td_row).append(td)
+                        var tickbox = $("<input/>",
+                            {
+                                "type": "checkbox",
+                                class: "form-check-input tickbox"
+                            })
+                        $(td).append(tickbox)
+                        $(td_row).append(td)
+                    }
                     for (el in row) {
                         if (el == "_id") {
                             $(td_row).data("id", row._id.$oid)
@@ -271,6 +275,7 @@ function update_pending_samples_table() {
         $(data).each(function (d) {
             $("#profile_titles").find("tbody").append("<tr class='selectable_row'><td data-profile_id='" + data[d]._id.$oid + "'>" + data[d].title + "</td></tr>")
         })
+        $($("#profile_titles tr")[1]).click()
     })
 }
 

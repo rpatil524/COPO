@@ -28,12 +28,19 @@ function upload_spreadsheet(file) {
 $(document).ready(function () {
     var profileId = $('#profile_id').val();
     var wsprotocol = 'ws://';
+    var socket;
     if (window.location.protocol === "https:") {
         wsprotocol = 'wss://';
     }
-    var socket = new WebSocket(
+    if(window.location.href.includes('/copo/accept_reject_sample/')) {
+        socket = new WebSocket(
+            wsprotocol + window.location.host +
+            '/ws/dtol_status');
+    }else{
+        socket= new WebSocket(
         wsprotocol + window.location.host +
         '/ws/sample_status/' + profileId);
+    }
     socket.onerror = function (e) {
         console.log("error ", e)
     }

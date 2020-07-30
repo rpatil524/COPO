@@ -42,7 +42,7 @@ from web.apps.web_copo.schemas.utils import data_utils
 import web.apps.web_copo.templatetags.html_tags as htags
 from web.apps.web_copo.lookup.lookup import WIZARD_FILES as wf
 from web.apps.web_copo.utils.dtol.Dtol_Spreadsheet import DtolSpreadsheet
-
+from submission.helpers.generic_helper import notify_sample_status, notify_dtol_status
 DV_STRING = 'HARVARD_TEST_API'
 
 
@@ -1347,7 +1347,8 @@ def get_samples_for_profile(request):
     profile_id = request.GET["profile_id"]
     filter = request.GET["filter"]
     samples = util.cursor_to_list(Sample().get_dtol_from_profile_id(profile_id, filter))
-
+    #notify_dtol_status(msg="Creating Sample: " + "sprog", action="info",
+    #                     html_id="dtol_sample_info")
     return HttpResponse(json_util.dumps(samples))
 
 

@@ -569,7 +569,8 @@ class Sample(DAComponent):
                 "_id": ObjectId(oid)
             },
             {"$set":
-                 {'errorStatus': status}
+                 {'errorStatus': status,
+                  'status': "rejected"}
              }
         )
 
@@ -605,7 +606,7 @@ class Submission(DAComponent):
 
     def get_pending_dtol_samples(self):
         # called by celery to get samples the supeprvisor has set to be sent to ENA
-        sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": "pending"}, {"dtol_samples": 1})
+        sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": "pending"}, {"dtol_samples": 1, "profile_id": 1})
         sub = cursor_to_list(sub)
         return sub
 

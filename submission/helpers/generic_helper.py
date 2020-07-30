@@ -214,6 +214,24 @@ def notify_sample_status(profile_id=str(), action="message", msg=str(), data={},
     return True
 
 
+def notify_dtol_status(action="message", msg=str(), data={}, html_id=""):
+    """
+        function notifies client changes in Sample creation status
+        :param profile_id:
+        :param action:
+        :param msg:
+        :return:
+    """
+    # type points to the object type which will be passed to the socket and is a method defined in consumer.py
+    group_name = 'dtol_status'
+    event = {"type": "msg", "action": action, "message": msg, "data": data, "html_id": html_id}
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        group_name,
+        event
+    )
+    return True
+
 def notify_transfer_status(profile_id=str(), submission_id=str(), status_message=str()):
     """
     function notifies client of ENA file transfer status
