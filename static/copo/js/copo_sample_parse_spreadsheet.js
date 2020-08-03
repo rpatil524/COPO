@@ -63,6 +63,7 @@ $(document).ready(function () {
                 $("#" + d.html_id).fadeIn("50")
             }
             $("#" + d.html_id).html(d.message)
+            $("#spinner").fadeOut()
         } else if (d.action === "make_table") {
             var body = $("tbody")
             var count = 0

@@ -18,6 +18,11 @@ $(document).ready(function () {
         })
     })
 
+    $(document).ajaxStart(function(){
+
+    })
+
+
     $(document).on("click", ".form-check-input", function (el) {
 
         if ($(".form-check-input:checked").length) {
@@ -48,9 +53,7 @@ $(document).ready(function () {
                     el = el.replace(" ", "_")
                     el = "section_" + el
                     $("#" + el).show()
-
                 })
-
                 $("#accordion").fadeIn(function () {
                     $(document).find("[id^='section']:visible:first").find(".collapse").collapse('show')
                 })
@@ -108,7 +111,6 @@ $(document).ready(function () {
                 })
                 $("#resultsPanel").append(ul)
             })
-
         })
     )
 
@@ -121,11 +123,7 @@ $(document).ready(function () {
                 message: $('<div></div>').load("/static/copo/snippets/ncbitaxon_species_search.html")
             })
         }
-
     })
-
-
-
 })
 
 function row_select(ev) {
@@ -281,7 +279,14 @@ function update_pending_samples_table() {
 
 
 function handle_accept_reject(el) {
+    $("#spinner").fadeIn()
+    $("#dtol_sample_info").html("Processing")
+
     var checked = $(".form-check-input:checked").closest("tr")
+    $(checked).each(function(idx, row){
+        $(row).fadeOut()
+
+    })
     var button = $(el.currentTarget)
     var action
     if (button.hasClass("positive")) {
@@ -295,6 +300,7 @@ function handle_accept_reject(el) {
     })
 
 
+
     if (action == "reject") {
         // mark sample object as rejected
         $.ajax({
@@ -302,7 +308,9 @@ function handle_accept_reject(el) {
             method: "GET",
             data: {"sample_ids": JSON.stringify(sample_ids)}
         }).done(function () {
+
             $("#profile_titles").find(".selected").click()
+            $("#spinner").fadeOut()
         })
     } else if (action == "accept") {
         // create or update dtol submission record
@@ -312,7 +320,8 @@ function handle_accept_reject(el) {
             method: "GET",
             data: {"sample_ids": JSON.stringify(sample_ids), "profile_id": profile_id},
         }).done(function () {
-            $("#profile_titles").find(".selected").click()
+
+            //$("#profile_titles").find(".selected").click()
         })
     }
 

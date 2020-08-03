@@ -49,10 +49,16 @@ def build_xml(sample, sub_id, p_id):
     build_submission_xml(object_id)
     notify_dtol_status(msg="Communicating with ENA", action="info",
                          html_id="dtol_sample_info")
-    submit_biosample(object_id, Sample())
-
-    notify_dtol_status(msg="Idle", action="info",
-                         html_id="dtol_sample_info")
+    accessions = submit_biosample(object_id, Sample())
+    print(accessions)
+    if accessions:
+        msg = "Last Sample Submitted: " + sample["collectorSampleName"] + " - ENA ID: " + accessions["submission_accession"] + " - Biosample ID: " + accessions["biosample_accession"]
+        notify_dtol_status(msg=msg, action="info",
+                             html_id="dtol_sample_info")
+    else:
+        msg = "Submission Rejected: " + sample["collectorSampleName"] + "<p>" + sample["errorStatus"] + "</p>"
+        notify_dtol_status(msg=msg, action="info",
+                           html_id="dtol_sample_info")
 
 
 def build_sample_xml(obj_id):
@@ -161,8 +167,7 @@ def submit_biosample(object_id, sampleobj):
         return False
     else:
         # retrieve id and update record
-        if get_biosampleId(receipt, object_id):
-            return True
+        return get_biosampleId(receipt, object_id)
 
 
 def get_biosampleId(receipt, sample_id):
@@ -175,4 +180,6 @@ def get_biosampleId(receipt, sample_id):
     # print(biosample_accession)
     submission_accession = tree.find('SUBMISSION').get('accession')
     # print(submission_accession)
-    return Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
+    Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
+    accessions = {"sra_accession": sra_accession, "biosample_accession": biosample_accession, "submission_accession": submission_accession}
+    return accessions
