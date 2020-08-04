@@ -7,19 +7,25 @@ $(document).ready(function () {
     // populate profiles panel on left
     update_pending_samples_table()
 
-    $(document).on("click", ".select-all", function(){
-        $(".form-check-input:not(:checked)").each(function(idx, element){
+    $(document).on("click", ".select-all", function () {
+        $(".form-check-input:not(:checked)").each(function (idx, element) {
             $(element).click()
         })
     })
-    $(document).on("click", ".select-none", function(){
-        $(".form-check-input:checked").each(function(idx, element){
+    $(document).on("click", ".select-none", function () {
+        $(".form-check-input:checked").each(function (idx, element) {
             $(element).click()
         })
     })
 
-    $(document).ajaxStart(function(){
 
+    $(document).on("click", "tr.sample_table_row", function (e) {
+        var cb = $($(e.target).siblings(".tickbox").find("input"))
+        if (cb.prop("checked")) {
+            cb.click()
+        } else {
+            cb.click()
+        }
     })
 
 
@@ -125,6 +131,11 @@ $(document).ready(function () {
         }
     })
 })
+var fadeSpeed = 'fast'
+var dt_options = {
+    "scrollY": 400,
+    "scrollX": true
+}
 
 function row_select(ev) {
     $("#accept_reject_button").find("button").prop("disabled", true)
@@ -152,105 +163,120 @@ function row_select(ev) {
     }).error(function (data) {
         console.error("ERROR: " + data)
     }).done(function (data) {
-        $("#sample_panel").find("thead").empty()
-        $("#sample_panel").find("tbody").empty()
-        if (data.length) {
-            var header = $("<h4/>", {
-                html: "Samples"
-            })
-            $("#sample_panel").find(".labelling").empty().append(header)
+            if ($.fn.DataTable.isDataTable('#profile_samples')) {
+                $("#profile_samples").DataTable().clear().destroy();
 
-            $(data).each(function (idx, row) {
-                var th_row = $("<tr/>")
-                var td_row = $("<tr/>")
-                if (idx == 0) {
-                    // do header and row
-                    if(filter === "pending") {
-                        var empty_th = $("<th/>")
-                        $(th_row).append(empty_th)
-                        var td = $("<td/>", {
-                            class: "tickbox"
-                        })
-                        var tickbox = $("<input/>",
-                            {
-                                "type": "checkbox",
-                                class: "form-check-input"
-                            })
-                        $(td).append(tickbox)
-                        $(td_row).append(td)
-                    }
-                    for (el in row) {
-                        if (el == "_id") {
-                            $(td_row).data("id", row._id.$oid)
-                        } else if (!excluded_fields.includes(el)) {
-                            // make header
-                            var th = $("<th/>", {
-                                html: el
-                            })
-                            $(th_row).append(
-                                th
-                            )
-                            // and row
-                            td = $("<td/>", {
-                                html: row[el]
-                            })
-                            if (row[el] == 'NA') {
-                                $(td).addClass("na_color")
-                            } else if (row[el] == "") {
-                                $(td).addClass("empty_color")
-                            }
-                            $(td_row).append(
-                                td
-                            )
-                            $("#profile_samples").find("thead").append(th_row)
-                            $("#profile_samples").find("tbody").append(td_row)
-                        }
-                    }
-                } else { // if not first element
-                    if(filter==="pending") {
-                        var td = $("<td/>", {
-                            class: "tickbox"
-                        })
-                        var tickbox = $("<input/>",
-                            {
-                                "type": "checkbox",
-                                class: "form-check-input tickbox"
-                            })
-                        $(td).append(tickbox)
-                        $(td_row).append(td)
-                    }
-                    for (el in row) {
-                        if (el == "_id") {
-                            $(td_row).data("id", row._id.$oid)
-                        } else if (!excluded_fields.includes(el)) {
-                            // just do row
-                            td = $("<td/>", {
-                                html: row[el]
-                            })
-                            if (row[el] == 'NA') {
-                                $(td).addClass("na_color")
-                            } else if (row[el] == "") {
-                                $(td).addClass("empty_color")
-                            }
-                            $(td_row).append(
-                                td
-                            )
-                        }
+            }
+            $("#sample_panel").find("thead").empty()
+            $("#sample_panel").find("tbody").empty()
 
+            if (data.length) {
+                var header = $("<h4/>", {
+                    html: "Samples"
+                })
+                $("#sample_panel").find(".labelling").empty().append(header)
+
+                $(data).each(function (idx, row) {
+                    var th_row = $("<tr/>")
+                    var td_row = $("<tr/>")
+                    if (idx == 0) {
+                        // do header and row
+                        if (filter === "pending") {
+                            var empty_th = $("<th/>")
+                            $(th_row).append(empty_th)
+                            var td = $("<td/>", {
+                                class: "tickbox"
+                            })
+                            var tickbox = $("<input/>",
+                                {
+                                    "type": "checkbox",
+                                    class: "form-check-input"
+                                })
+                            $(td).append(tickbox)
+                            $(td_row).append(td)
+                        }
+                        for (el in row) {
+                            if (el == "_id") {
+                                $(td_row).data("id", row._id.$oid)
+                            } else if (!excluded_fields.includes(el)) {
+                                // make header
+                                var th = $("<th/>", {
+                                    html: el
+                                })
+                                $(th_row).append(
+                                    th
+                                )
+                                // and row
+                                td = $("<td/>", {
+                                    html: row[el]
+                                })
+                                if (row[el] == 'NA') {
+                                    $(td).addClass("na_color")
+                                } else if (row[el] == "") {
+                                    $(td).addClass("empty_color")
+                                }
+                                $(td_row).append(
+                                    td
+                                )
+                                $("#profile_samples").find("thead").append(th_row)
+                                $("#profile_samples").find("tbody").append(td_row)
+                            }
+                        }
+                    } else { // if not first element
+                        if (filter === "pending") {
+                            var td = $("<td/>", {
+                                class: "tickbox"
+                            })
+                            var tickbox = $("<input/>",
+                                {
+                                    "type": "checkbox",
+                                    class: "form-check-input tickbox"
+                                })
+                            $(td).append(tickbox)
+                            $(td_row).append(td)
+                        }
+                        for (el in row) {
+                            if (el == "_id") {
+                                $(td_row).data("id", row._id.$oid)
+                            } else if (!excluded_fields.includes(el)) {
+                                // just do row
+                                td = $("<td/>", {
+                                    html: row[el]
+                                })
+                                if (row[el] == 'NA') {
+                                    $(td).addClass("na_color")
+                                } else if (row[el] == "") {
+                                    $(td).addClass("empty_color")
+                                }
+                                $(td_row).append(
+                                    td
+                                )
+                            }
+
+                        }
+                        $("#profile_samples").find("tbody").append(td_row)
                     }
-                    $("#profile_samples").find("tbody").append(td_row)
+                })
+                console.log("data tables running")
+                $("#profile_samples").DataTable(dt_options);
+            } else {
+                if ($.fn.DataTable.isDataTable('#profile_samples')) {
+                    $("#profile_samples").DataTable().clear().destroy();
+                    $("#sample_panel").find("thead").empty()
+                    $("#sample_panel").find("tbody").empty()
                 }
-            })
-        } else {
-            var no_data = $("<h4/>", {
-                html: "No Samples Found"
-            })
-            $("#sample_panel").find(".labelling").empty().html(
-                no_data
-            )
-            $("#accept_reject_button").find("button").prop("disabled", true)
+                var no_data = $("<h4/>", {
+                    html: "No Samples Found"
+                })
+                $("#sample_panel").find(".labelling").empty().html(
+                    no_data
+                )
+                $("#accept_reject_button").find("button").prop("disabled", true)
+
+            }
+
         }
-    })
+    )
 }
 
 function delay(fn, ms) {
@@ -279,12 +305,12 @@ function update_pending_samples_table() {
 
 
 function handle_accept_reject(el) {
-    $("#spinner").fadeIn()
+    $("#spinner").fadeIn(fadeSpeed)
     $("#dtol_sample_info").html("Processing")
 
     var checked = $(".form-check-input:checked").closest("tr")
-    $(checked).each(function(idx, row){
-        $(row).fadeOut()
+    $(checked).each(function (idx, row) {
+        $(row).fadeOut(fadeSpeed)
 
     })
     var button = $(el.currentTarget)
@@ -295,10 +321,9 @@ function handle_accept_reject(el) {
         action = "reject"
     }
     var sample_ids = new Array()
-    $(checked).each(function(it){
+    $(checked).each(function (it) {
         sample_ids.push($(checked[it]).data("id"))
     })
-
 
 
     if (action == "reject") {
@@ -310,7 +335,8 @@ function handle_accept_reject(el) {
         }).done(function () {
 
             $("#profile_titles").find(".selected").click()
-            $("#spinner").fadeOut()
+            $("#spinner").fadeOut(fadeSpeed)
+            $("#dtol_sample_info").html("Idle")
         })
     } else if (action == "accept") {
         // create or update dtol submission record

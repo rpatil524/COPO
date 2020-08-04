@@ -563,14 +563,14 @@ class Sample(DAComponent):
                     'status': 'accepted'}
             })
 
-    def add_status(self, status, oid):
+    def  add_status(self, status, oid):
         return self.get_collection_handle().update(
             {
                 "_id": ObjectId(oid)
             },
             {"$set":
-                 {'errorStatus': status,
-                  'status': "rejected"}
+                 {'error': "rejected",
+                  'status': status}
              }
         )
 
@@ -583,8 +583,9 @@ class Sample(DAComponent):
             # else return samples who's status simply mathes the filter
             return self.get_collection_handle().find({'profile_id': profile_id, "status": filter})
 
-    def mark_rejected(self, sample_id):
-        return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set": {"status": "rejected"}})
+    def mark_rejected(self, sample_id, reason="Sample rejected by curator."):
+        return self.get_collection_handle().update({"_id": ObjectId(sample_id)},
+                                                   {"$set": {"status": "rejected", "error": reason}})
 
     def mark_processing(self, sample_id):
         return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set": {"status": "processing"}})
@@ -606,7 +607,8 @@ class Submission(DAComponent):
 
     def get_pending_dtol_samples(self):
         # called by celery to get samples the supeprvisor has set to be sent to ENA
-        sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": "pending"}, {"dtol_samples": 1, "profile_id": 1})
+        sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": "pending"},
+                                                {"dtol_samples": 1, "profile_id": 1})
         sub = cursor_to_list(sub)
         return sub
 
