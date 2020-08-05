@@ -569,10 +569,12 @@ class Sample(DAComponent):
                 "_id": ObjectId(oid)
             },
             {"$set":
-                 {'error': "rejected",
-                  'status': status}
+                 {'error': status["msg"],
+                  'status': "rejected"}
              }
         )
+
+
 
     def get_dtol_from_profile_id(self, profile_id, filter):
         if filter == "pending":
@@ -596,7 +598,7 @@ class Submission(DAComponent):
         super(Submission, self).__init__(profile_id, "submission")
 
     def dtol_sample_processed(self, sub_id, sam_id):
-        # when dtol sample has succesfully gone to ENA, pull id from submission and check if there are remaining
+        # when dtol sample has been processed, pull id from submission and check if there are remaining
         # samples left to go. If not, make submission complete. This will stop celery processing the this submission.
         sub_handle = self.get_collection_handle()
         sub_handle.update({"_id": ObjectId(sub_id)}, {"$pull": {"dtol_samples": sam_id}})
@@ -610,6 +612,8 @@ class Submission(DAComponent):
         sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": "pending"},
                                                 {"dtol_samples": 1, "profile_id": 1})
         sub = cursor_to_list(sub)
+        for s in sub:
+            self.get_collection_handle().update({"_id": ObjectId(s["_id"])}, {"$set": {"status": "sending"}})
         return sub
 
     def get_incomplete_submissions_for_user(self, user_id, repo):

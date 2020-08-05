@@ -21,11 +21,7 @@ $(document).ready(function () {
 
     $(document).on("click", "tr.sample_table_row", function (e) {
         var cb = $($(e.target).siblings(".tickbox").find("input"))
-        if (cb.prop("checked")) {
-            cb.click()
-        } else {
-            cb.click()
-        }
+        cb.click()
     })
 
 
@@ -36,6 +32,9 @@ $(document).ready(function () {
         } else {
             $("#accept_reject_button").find("button").prop("disabled", true)
         }
+        $(el.currentTarget).parent().siblings().addBack().each(function (idx, el) {
+            $(el).toggleClass("selected_row")
+        })
     })
 
     $(document).on("click", "#accept_reject_button button", handle_accept_reject)
@@ -178,7 +177,9 @@ function row_select(ev) {
 
                 $(data).each(function (idx, row) {
                     var th_row = $("<tr/>")
-                    var td_row = $("<tr/>")
+                    var td_row = $("<tr/>", {
+                        class: "sample_table_row"
+                    })
                     if (idx == 0) {
                         // do header and row
                         if (filter === "pending") {

@@ -22,6 +22,7 @@ ena_service = resolve_env.get_env('ENA_SERVICE')
 pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
 user_token = resolve_env.get_env('WEBIN_USER').split("@")[0]
 
+submission_id = ""
 
 def process_pending_dtol_samples():
     '''
@@ -49,14 +50,14 @@ def build_xml(sample, sub_id, p_id):
     build_submission_xml(object_id)
     notify_dtol_status(msg="Communicating with ENA", action="info",
                          html_id="dtol_sample_info")
-    accessions = submit_biosample(object_id, Sample())
+    accessions = submit_biosample(object_id, Sample(), sub_id)
     print(accessions)
-    if accessions:
+    if accessions["status"] == "ok":
         msg = "Last Sample Submitted: " + sample["collectorSampleName"] + " - ENA ID: " + accessions["submission_accession"] + " - Biosample ID: " + accessions["biosample_accession"]
         notify_dtol_status(msg=msg, action="info",
                              html_id="dtol_sample_info")
     else:
-        msg = "Submission Rejected: " + sample["collectorSampleName"] + "<p>" + sample["errorStatus"] + "</p>"
+        msg = "Submission Rejected: " + sample["collectorSampleName"] + "<p>" + accessions["msg"] + "</p>"
         notify_dtol_status(msg=msg, action="info",
                            html_id="dtol_sample_info")
 
@@ -137,7 +138,7 @@ def build_validate_xml(object_id):
                encoding='unicode')  # overwriting at each run, i don't think we need to keep it - todo again I think these should have unique id attached, and then file deleted after submission
 
 
-def submit_biosample(object_id, sampleobj):
+def submit_biosample(object_id, sampleobj, sub_id):
     # register project to the ENA service using XML files previously created
     curl_cmd = 'curl -u ' + user_token + ':' + pass_word \
                + ' -F "SUBMISSION=@' \
@@ -160,11 +161,13 @@ def submit_biosample(object_id, sampleobj):
     if success_status == 'false':  ####todo
 
         #print(receipt)
-        status = tree.find('MESSAGES').findtext('ERROR', default='Undefined error')
+        msg = tree.find('MESSAGES').findtext('ERROR', default='Undefined error')
+        status = {"status": "error","msg": msg}
         # print(status)
         sampleobj.add_status(status, object_id)
+
         #print('error')
-        return False
+        return status
     else:
         # retrieve id and update record
         return get_biosampleId(receipt, object_id)
@@ -181,5 +184,5 @@ def get_biosampleId(receipt, sample_id):
     submission_accession = tree.find('SUBMISSION').get('accession')
     # print(submission_accession)
     Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
-    accessions = {"sra_accession": sra_accession, "biosample_accession": biosample_accession, "submission_accession": submission_accession}
+    accessions = {"sra_accession": sra_accession, "biosample_accession": biosample_accession, "submission_accession": submission_accession, "status": "ok"}
     return accessions
