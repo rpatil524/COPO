@@ -118,7 +118,6 @@
       "specifications": [
         "dtol"
       ],
-      "default_value": "",
       "show_in_form": true,
       "label": "Collected By",
       "id": "copo.sample.collectedBy",
@@ -133,7 +132,7 @@
       "required": "true",
       "control_meta": {},
       "versions": [
-        "DATE_OF_SPECIMEN_COLLECTION"
+        "DATE_OF_COLLECTION"
       ],
       "ref": "",
       "deprecated": false,
@@ -142,8 +141,8 @@
         "dtol"
       ],
       "show_in_form": true,
-      "label": "Date of Specimen Collection",
-      "id": "copo.sample.dateOfSpecimenCollection",
+      "label": "Date of Collection",
+      "id": "copo.sample.dateOfCollection",
       "show_in_table": true,
       "control": "date-picker",
       "default_value": "",
@@ -175,7 +174,6 @@
     {
       "help_tip": "",
       "required": "true",
-      "default_value": "",
       "control_meta": {},
       "dwc": "http://rs.tdwg.org/dwc/terms/sex",
       "versions": [
@@ -203,7 +201,6 @@
     {
       "help_tip": "",
       "required": "true",
-      "default_value": "",
       "control_meta": {},
       "dwc": "http://rs.tdwg.org/dwc/terms/lifeStage",
       "versions": [
@@ -248,7 +245,6 @@
       "specifications": [
         "dtol"
       ],
-      "default_value": "",
       "show_in_form": true,
       "label": "Identified By",
       "id": "copo.sample.identifiedBy",
@@ -260,7 +256,7 @@
     },
     {
       "help_tip": "Public Name",
-      "required": "true",
+      "required": "false",
       "control_meta": {},
       "versions": [
         "PUBLIC_NAME"
@@ -271,7 +267,6 @@
       "specifications": [
         "dtol"
       ],
-      "default_value": "",
       "show_in_form": true,
       "label": "Public Name",
       "id": "copo.sample.publicName",
@@ -279,29 +274,6 @@
       "control": "text",
       "default_value": "",
       "dwc": "",
-      "type": "string"
-    },
-    {
-      "help_tip": "Separate multiple names with '|'",
-      "required": "true",
-      "control_meta": {},
-      "versions": [
-        "IDENTIFIED_HOW"
-      ],
-      "ref": "",
-      "deprecated": false,
-      "hidden": "false",
-      "specifications": [
-        "dtol"
-      ],
-      "default_value": "",
-      "show_in_form": true,
-      "label": "Identified How",
-      "id": "copo.sample.identifiedHow",
-      "show_in_table": true,
-      "control": "text",
-      "default_value": "",
-      "dwc": "http://rs.tdwg.org/dwc/terms/identifiedHow",
       "type": "string"
     },
     {
@@ -1111,29 +1083,6 @@
       "dwc": "http://rs.tdwg.org/dwc/terms/identificationReferences"
     },
     {
-      "help_tip": "Expressed as a Percentage",
-      "required": "false",
-      "default_value": "",
-      "show_as_attribute": true,
-      "control_meta": {},
-      "control": "text",
-      "versions": [
-        "IDENTIFICATION_CONFIDENCE"
-      ],
-      "ref": "",
-      "specifications": [
-        "dtol"
-      ],
-      "deprecated": false,
-      "hidden": "false",
-      "type": "string",
-      "show_in_form": true,
-      "id": "copo.sample.identificationConfidence",
-      "label": "Identification Confidence (%)",
-      "show_in_table": true,
-      "dwc": "http://rs.tdwg.org/dwc/terms/identificationRemarks"
-    },
-    {
       "help_tip": "Temperature in degrees Centigrade",
       "required": "false",
       "default_value": "",
@@ -1297,7 +1246,6 @@
     {
       "help_tip": "",
       "required": "false",
-      "default_value": "",
       "control_meta": {},
       "dwc": "",
       "versions": [
@@ -1344,13 +1292,11 @@
       "id": "copo.sample.genomeSize",
       "type": "string",
       "show_in_table": true,
-      "control": "text",
-      "default_value": "Common"
+      "control": "text"
     },
     {
       "help_tip": "",
       "required": "true",
-      "default_value": "",
       "control_meta": {},
       "dwc": "",
       "versions": [
@@ -1373,7 +1319,6 @@
     {
       "help_tip": "",
       "required": "true",
-      "default_value": "",
       "control_meta": {},
       "dwc": "",
       "versions": [
@@ -1396,7 +1341,6 @@
     {
       "help_tip": "",
       "required": "true",
-      "default_value": "",
       "control_meta": {},
       "dwc": "",
       "versions": [
@@ -1419,7 +1363,6 @@
     {
       "help_tip": "",
       "required": "true",
-      "default_value": "",
       "control_meta": {},
       "dwc": "",
       "versions": [
@@ -1442,7 +1385,6 @@
     {
       "help_tip": "",
       "required": "false",
-      "default_value": "",
       "control_meta": {},
       "dwc": "",
       "versions": [
@@ -1465,7 +1407,6 @@
     {
       "help_tip": "",
       "required": "true",
-      "default_value": "",
       "control_meta": {},
       "dwc": "",
       "versions": [
@@ -1484,10 +1425,10 @@
       "show_in_table": true,
       "control": "text",
       "default_value": ""
-    },{
+    },
+    {
       "help_tip": "",
       "required": "false",
-      "default_value": "",
       "control_meta": {},
       "dwc": "",
       "versions": [
@@ -1504,29 +1445,6 @@
       "id": "copo.sample.sequencingOrgSampleId",
       "type": "string",
       "show_in_table": false,
-      "control": "text",
-      "default_value": ""
-    },
-    {
-      "help_tip": "E.g. Direct to Sanger, NHM, both etc",
-      "required": "false",
-      "default_value": "",
-      "control_meta": {},
-      "dwc": "",
-      "versions": [
-        "PLANS_FOR_SAMPLE"
-      ],
-      "specifications": [
-        "dtol"
-      ],
-      "ref": "",
-      "deprecated": false,
-      "hidden": "false",
-      "label": "Plans for Sample",
-      "show_in_form": true,
-      "id": "copo.sample.plansForSample",
-      "type": "string",
-      "show_in_table": true,
       "control": "text",
       "default_value": ""
     },
@@ -1552,28 +1470,6 @@
       "label": "Characteristics",
       "show_in_table": false,
       "control": "copo-characteristics"
-    },
-    {
-      "help_tip": "",
-      "required": "false",
-      "default_value": "",
-      "show_as_attribute": true,
-      "control_meta": {},
-      "versions": [
-        "comments"
-      ],
-      "ref": "",
-      "specifications": [
-        "biosample"
-      ],
-      "deprecated": false,
-      "hidden": "false",
-      "type": "array",
-      "show_in_form": true,
-      "id": "copo.sample.comments",
-      "label": "Comments",
-      "show_in_table": false,
-      "control": "copo-comment"
     },
     {
       "help_tip": "Factors express treatments on the sample, e.g., compound, dose, duration",

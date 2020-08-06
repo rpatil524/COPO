@@ -32,14 +32,14 @@ $(document).ready(function () {
     if (window.location.protocol === "https:") {
         wsprotocol = 'wss://';
     }
-    if(window.location.href.includes('/copo/accept_reject_sample/')) {
+    if (window.location.href.includes('/copo/accept_reject_sample/')) {
         socket = new WebSocket(
             wsprotocol + window.location.host +
             '/ws/dtol_status');
-    }else{
-        socket= new WebSocket(
-        wsprotocol + window.location.host +
-        '/ws/sample_status/' + profileId);
+    } else {
+        socket = new WebSocket(
+            wsprotocol + window.location.host +
+            '/ws/sample_status/' + profileId);
     }
     socket.onerror = function (e) {
         console.log("error ", e)
@@ -94,6 +94,10 @@ $(document).ready(function () {
 
             }
             $("#sample_info").hide()
+            $("#sample_parse_table").DataTable({
+                "scrollY": 400,
+                "scrollX": true
+            })
             $("#table_div").fadeIn(1000)
             $("#confirm_info").fadeIn(1000)
         }
@@ -105,9 +109,9 @@ $(document).on("click", "#create_samples", function (event) {
     $.ajax({
         url: "/copo/create_spreadsheet_samples",
 
-    }).done(function(){
+    }).done(function () {
         location.reload()
-    }).error(function(){
+    }).error(function () {
         alert("something went wrong")
     })
 })

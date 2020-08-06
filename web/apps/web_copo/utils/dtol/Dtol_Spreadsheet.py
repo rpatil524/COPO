@@ -26,26 +26,17 @@ from tools import resolve_env
 import subprocess
 
 
-
-
-
-
 class DtolSpreadsheet:
-
-
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
     na_vals = ['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
                'NULL', 'NaN', 'n/a', 'nan', 'null']
     na_vals = ['N/A']
 
-
-
-    validation_msg_missing_data = "Missing data detected in column <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of 'NA' and 'none' are allowed."
+    validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of 'NA' and 'none' are allowed."
 
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
-
 
     def __init__(self, file=None):
         self.req = ThreadLocal.get_current_request()
@@ -56,8 +47,6 @@ class DtolSpreadsheet:
             self.file = file
         else:
             self.sample_data = self.req.session["sample_data"]
-
-
 
     def loadCsv(file):
         raise NotImplementedError
@@ -70,7 +59,7 @@ class DtolSpreadsheet:
                 # read excel and convert all to string
                 self.data = pandas.read_excel(self.file, keep_default_na=False, na_values=self.na_vals)
                 self.data = self.data.astype(str)
-            except :
+            except:
                 # if error notify via web socket
                 notify_sample_status(profile_id=self.profile_id, msg="Unable to load file.", action="info",
                                      html_id="sample_info")
@@ -83,29 +72,36 @@ class DtolSpreadsheet:
             try:
                 # get definitive list of DTOL fields from schema
                 s = json.load(json_data)
-                self.fields = jp.match('$.properties[?(@.specifications[*] == "dtol" & @.required=="true")].versions[0]', s)
+                self.fields = jp.match(
+                    '$.properties[?(@.specifications[*] == "dtol" & @.required=="true")].versions[0]', s)
                 columns = list(self.data.columns)
                 # check required fields are present in spreadsheet
                 for item in self.fields:
                     notify_sample_status(profile_id=self.profile_id, msg="Checking - " + item,
                                          action="info",
                                          html_id="sample_info")
-                    print(item)
-                    #time.sleep(0.1)
                     if item not in columns:
                         # invalid or missing field, inform user and return false
                         notify_sample_status(profile_id=self.profile_id, msg="Field not found - " + item,
                                              action="info",
                                              html_id="sample_info")
                         return False
-                    # if we have a required field and it has null data
-                    if self.data[item].isnull().values.any():
-                        # we have missing data in required cells
-                        notify_sample_status(profile_id=self.profile_id,
-                                             msg=(self.validation_msg_missing_data % item),
-                                             action="info",
-                                             html_id="sample_info")
-                        return False
+                # if we have a required fields, check that there are no missing values
+                for header, cells in self.data.iteritems():
+                    # here we need to check if the column is required, and if so, that there are not missinnng values in its cells
+                    if header in self.fields:
+                        print(header)
+                        cellcount = 0
+                        for c in cells:
+                            cellcount += 1
+                            if not c:
+                                # we have missing data in required cells
+                                notify_sample_status(profile_id=self.profile_id,
+                                                     msg=(self.validation_msg_missing_data % (header, str(cellcount + 1))),
+                                                     action="info",
+                                                     html_id="sample_info")
+                                return False
+
             except Exception as e:
                 print(e)
                 notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + str(e), action="info",
@@ -139,13 +135,12 @@ class DtolSpreadsheet:
     def save_records(self):
         sample_data = self.sample_data
         for p in range(1, len(sample_data)):
-
             s = (map_to_dict(sample_data[0], sample_data[p]))
             s["sample_type"] = "dtol"
             s["biosample_accession"] = []
-            notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + s["SPECIMEN_ID"], action="info",
+            notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + s["SPECIMEN_ID"],
+                                 action="info",
                                  html_id="sample_info")
             obj_id = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
             print("sample created: " + str(p))
-            #obj = Sample(profile_id=self.profile_id).get_record(obj_id['_id']) #would retrieve same as 133
-
+            # obj = Sample(profile_id=self.profile_id).get_record(obj_id['_id']) #would retrieve same as 133
