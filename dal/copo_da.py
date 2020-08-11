@@ -563,7 +563,7 @@ class Sample(DAComponent):
                     'status': 'accepted'}
             })
 
-    def  add_status(self, status, oid):
+    def  add_rejected_status(self, status, oid):
         return self.get_collection_handle().update(
             {
                 "_id": ObjectId(oid)
@@ -613,7 +613,7 @@ class Submission(DAComponent):
                                                 {"dtol_samples": 1, "profile_id": 1})
         sub = cursor_to_list(sub)
         for s in sub:
-            self.get_collection_handle().update({"_id": ObjectId(s["_id"])}, {"$set": {"status": "sending"}})
+            self.get_collection_handle().update({"_id": ObjectId(s["_id"])}, {"$set": {"dtol_status": "sending"}})
         return sub
 
     def get_incomplete_submissions_for_user(self, user_id, repo):

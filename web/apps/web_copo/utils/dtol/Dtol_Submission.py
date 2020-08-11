@@ -164,7 +164,7 @@ def submit_biosample(object_id, sampleobj, sub_id):
         msg = tree.find('MESSAGES').findtext('ERROR', default='Undefined error')
         status = {"status": "error","msg": msg}
         # print(status)
-        sampleobj.add_status(status, object_id)
+        sampleobj.add_rejected_status(status, object_id)
 
         #print('error')
         return status
