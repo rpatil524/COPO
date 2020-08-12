@@ -1,16 +1,17 @@
 import json
 import subprocess
+import uuid
 import xml.etree.ElementTree as ET
 from datetime import datetime
+
 from celery.utils.log import get_task_logger
+
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from dal.copo_da import Submission, Sample
+from submission.helpers.generic_helper import notify_dtol_status
 from tools import resolve_env
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
 from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE
-import uuid
-from submission.helpers.generic_helper import notify_sample_status, notify_dtol_status
-import time
 
 with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]

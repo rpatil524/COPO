@@ -1,29 +1,17 @@
 # Created by fshaw at 03/04/2020
-from django.http import HttpResponse
-import pandas, json
-from web.apps.web_copo.lookup import lookup
-import jsonpath_rw_ext as jp
-from submission.helpers.generic_helper import notify_sample_status
-from django_tools.middlewares import ThreadLocal
-from asgiref.sync import async_to_sync
 import math
-import time
-from dal.copo_da import Sample, Profile
-from bson.json_util import dumps, loads
-from numpy import datetime64
-from api.utils import map_to_dict
-from submission import enareadSubmission
-from lxml import etree
-import xml.etree.ElementTree as ET
-from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_EXPERIMENT_TEMPLATE, SRA_RUN_TEMPLATE, \
-    SRA_PROJECT_TEMPLATE, SRA_SAMPLE_TEMPLATE, \
-    SRA_SUBMISSION_MODIFY_TEMPLATE, ENA_CLI
-from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
+
+import json
+import jsonpath_rw_ext as jp
+import pandas
+from django_tools.middlewares import ThreadLocal
+
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
-from datetime import datetime
-from submission.helpers.ena_helper import SubmissionHelper
-from tools import resolve_env
-import subprocess
+from api.utils import map_to_dict
+from dal.copo_da import Sample
+from submission.helpers.generic_helper import notify_sample_status
+from web.apps.web_copo.lookup import lookup
+from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 
 
 class DtolSpreadsheet:

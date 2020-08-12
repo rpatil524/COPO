@@ -424,7 +424,7 @@ DROP_DOWNS = {
             'label': 'No'
         }
     ],
-    "REPOSITORIES": [ # !!! this is deprecated. moved to lookup/drop_downs/metadata_templates_types.json
+    "REPOSITORIES": [  # !!! this is deprecated. moved to lookup/drop_downs/metadata_templates_types.json
         {
             'value': 'cg_core',
             'label': 'CG Core',
@@ -492,7 +492,7 @@ DROP_DOWNS = {
             "description": "Use this option to submit Annotations of objects already submitted"
         }
     ],
-    "SAMPLE_TYPES": [ # !!! this is deprecated. moved to lookup/drop_downs/sample_types.json
+    "SAMPLE_TYPES": [  # !!! this is deprecated. moved to lookup/drop_downs/sample_types.json
         {
             "value": "biosample",
             "label": "Biosample Standard",
@@ -862,3 +862,87 @@ Here we are referencing json configs which are found in web/apps/web_copo/wizard
 adding here will make the schema importable as primer fields in a new experimatal template
 '''
 TEMPLATES_TO_APPEAR_IN_EDITOR = ["dc_stages", "miappe", "dcterms"]
+
+DTOL_ENUMS = {
+    "GAL": [
+        "SANGER INSTITUTE",
+        "UNIVERSITY OF OXFORD",
+        "MARINE BIOLOGICAL ASSOCIATION",
+        "UNIVERSITY OF CAMBRIDGE",
+        "UNIVERSITY OF EDINBURGH",
+        "ROYAL BOTANIC GARDENS KEW",
+        "ROYAL BOTANIC GARDEN EDINBURGH",
+        "EARLHAM INSTITUTE",
+        "NATURAL HISTORY MUSEUM"
+    ],
+    "SPECIMEN_ID_RISK": [
+        "Y",
+        "N"
+    ],
+    "SEX": [
+        "FEMALE"
+        "MALE"
+        "HERMAPHRODITE"
+        "UNKNOWN"
+    ],
+    "LIFESTAGE": [
+        "ADULT",
+        "EGG",
+        "JUVENILE",
+        "LARVA",
+        "PUPA",
+        "SPOROPHYTE",
+        "GAMETOPHYTE",
+        "EMBRYO",
+        "ZYGOTE",
+        "SPORE-BEARING STRUCTURE",
+        "VEGETATIVE STRUCTURE",
+        "MYCELIUM"
+    ],
+    "HAZARD_GROUP": [
+        "CL1",
+        "CL2",
+        "CL3",
+        "UNKNOWN"
+    ],
+    "REGULATORY_COMPLIANCE": [
+        "Y",
+        "N"
+    ],
+    "ORGANISM_PART": [
+        "BLOOD",
+        "WHOLE",
+        "HEAD",
+        "ABDOMEN",
+        "THORAX",
+        "CEPHALOTHORAX",
+        "LEG(S)",
+        "HEAD/THORAX",
+        "THORAX/ABDOMEN",
+        "MYCELIUM",
+        "MYCORRHIZA",
+        "SPORE-BEARING STRUCTURE",
+        "HOLDFAST",
+        "STIPE",
+        "CAP",
+        "GILLS",
+        "THALLUS",
+        "LEAF",
+        "FLOWER",
+        "BLADE"
+    ],
+    "EASE_OF_SPECIMEN_COLLECTION": [
+        "EASY",
+        "MODERATE",
+        "DIFFICULT",
+        "EASY BUT SEASONAL",
+        "MODERATE BUT SEASONAL",
+        "DIFFICULT AND SEASONAL"
+    ],
+    "TO_BE_USED_FOR": [
+        "RNAseq",
+        "REFERENCE GENOME",
+        "RESEQUENCING(POPGEN)",
+        "BARCODING ONLY"
+    ]
+}
