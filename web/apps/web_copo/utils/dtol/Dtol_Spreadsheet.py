@@ -21,6 +21,7 @@ class DtolSpreadsheet:
     na_vals = ['N/A']
 
     validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of 'NA' and 'none' are allowed."
+    validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
 
     fields = ""
 
@@ -78,10 +79,13 @@ class DtolSpreadsheet:
                 for header, cells in self.data.iteritems():
                     # here we need to check if the column is required, and if so, that there are not missinnng values in its cells
                     if header in self.fields:
-                        print(header)
+                        # check if there is an enum for this header
+                        allowed_vals = lookup.DTOL_ENUMS.get(header, "")
                         cellcount = 0
                         for c in cells:
                             cellcount += 1
+
+                            # check for missing data in cell
                             if not c:
                                 # we have missing data in required cells
                                 notify_sample_status(profile_id=self.profile_id,
@@ -89,6 +93,17 @@ class DtolSpreadsheet:
                                                      action="info",
                                                      html_id="sample_info")
                                 return False
+                            # check for allowed values in cell
+                            if allowed_vals:
+                                if c not in allowed_vals:
+                                    notify_sample_status(profile_id=self.profile_id,
+                                                         msg=(self.validation_msg_invalid_data % (
+                                                         c, header, str(cellcount + 1), allowed_vals)),
+                                                         action="info",
+                                                         html_id="sample_info")
+                                    return False
+
+
 
             except Exception as e:
                 print(e)

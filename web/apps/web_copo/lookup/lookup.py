@@ -880,9 +880,9 @@ DTOL_ENUMS = {
         "N"
     ],
     "SEX": [
-        "FEMALE"
-        "MALE"
-        "HERMAPHRODITE"
+        "FEMALE",
+        "MALE",
+        "HERMAPHRODITE",
         "UNKNOWN"
     ],
     "LIFESTAGE": [
