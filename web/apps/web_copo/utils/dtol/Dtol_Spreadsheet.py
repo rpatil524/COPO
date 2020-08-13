@@ -37,17 +37,18 @@ class DtolSpreadsheet:
         else:
             self.sample_data = self.req.session["sample_data"]
 
-    def loadCsv(file):
-        raise NotImplementedError
 
-    def loadExcel(self):
+    def loadManifest(self, type):
 
         if self.profile_id is not None:
             notify_sample_status(profile_id=self.profile_id, msg="Loading..", action="info", html_id="sample_info")
             try:
                 # read excel and convert all to string
-                self.data = pandas.read_excel(self.file, keep_default_na=False, na_values=self.na_vals)
-                self.data = self.data.astype(str)
+                if type == "xls":
+                    self.data = pandas.read_excel(self.file, keep_default_na=False, na_values=self.na_vals)
+                elif type == "csv":
+                    self.data = pandas.read_csv(self.file, keep_default_na=False, na_values=self.na_vals)
+                self.data = self.data.apply(lambda x: x.astype(str).str.upper())
             except:
                 # if error notify via web socket
                 notify_sample_status(profile_id=self.profile_id, msg="Unable to load file.", action="info",
@@ -72,7 +73,7 @@ class DtolSpreadsheet:
                     if item not in columns:
                         # invalid or missing field, inform user and return false
                         notify_sample_status(profile_id=self.profile_id, msg="Field not found - " + item,
-                                             action="info",
+                                             action="error",
                                              html_id="sample_info")
                         return False
                 # if we have a required fields, check that there are no missing values
@@ -90,7 +91,7 @@ class DtolSpreadsheet:
                                 # we have missing data in required cells
                                 notify_sample_status(profile_id=self.profile_id,
                                                      msg=(self.validation_msg_missing_data % (header, str(cellcount + 1))),
-                                                     action="info",
+                                                     action="error",
                                                      html_id="sample_info")
                                 return False
                             # check for allowed values in cell
@@ -99,7 +100,7 @@ class DtolSpreadsheet:
                                     notify_sample_status(profile_id=self.profile_id,
                                                          msg=(self.validation_msg_invalid_data % (
                                                          c, header, str(cellcount + 1), allowed_vals)),
-                                                         action="info",
+                                                         action="error",
                                                          html_id="sample_info")
                                     return False
 

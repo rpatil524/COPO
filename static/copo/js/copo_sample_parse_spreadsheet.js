@@ -56,12 +56,23 @@ $(document).ready(function () {
         if (d.action === "close") {
             $("#" + d.html_id).fadeOut("50")
         } else if (d.action === "make_valid") {
-            $("#" + d.html_id).html("Validated").removeClass("alert-info").addClass("alert-success")
+            $("#" + d.html_id).html("Validated").removeClass("alert-info, alert-danger").addClass("alert-success")
         } else if (d.action === "info") {
             // check info div is visible
             if (!$("#" + d.html_id).is(":visible")) {
                 $("#" + d.html_id).fadeIn("50")
+
             }
+            $("#" + d.html_id).removeClass("alert-danger").addClass("alert-info")
+            $("#" + d.html_id).html(d.message)
+            $("#spinner").fadeOut()
+        }else if (d.action === "error") {
+            // check info div is visible
+            if (!$("#" + d.html_id).is(":visible")) {
+                $("#" + d.html_id).fadeIn("50")
+
+            }
+            $("#" + d.html_id).removeClass("alert-info").addClass("alert-danger")
             $("#" + d.html_id).html(d.message)
             $("#spinner").fadeOut()
         } else if (d.action === "make_table") {

@@ -1318,17 +1318,18 @@ def sample_spreadsheet(request):
     name = file.name
     dtol = DtolSpreadsheet(file=file)
     if name.endswith("xlsx") or name.endswith("xls"):
-        dtol.loadExcel()
-        if dtol.validate():
-            dtol.collect()
-        return HttpResponse()
+        dtol.loadManifest(type="xls")
     elif name.endswith("csv"):
-        return dtol.loadCsv(file)
+        dtol.loadManifest(type="csv")
+    if dtol.validate():
+        dtol.collect()
+    return HttpResponse()
 
+    '''
     else:
         return HttpResponse(status=415,
                             content="Only Excel or CSV files in the exact Darwin Core format are supported.")
-
+    '''
 
 def create_spreadsheet_samples(request):
     sample_data = request.session["sample_data"]
