@@ -3,6 +3,7 @@ import subprocess
 import uuid
 import xml.etree.ElementTree as ET
 from datetime import datetime
+import os
 
 from celery.utils.log import get_task_logger
 
@@ -18,7 +19,7 @@ with open(settings, "r") as settings_stream:
 
 logger = get_task_logger(__name__)
 
-exclude_from_sample_xml = []  # list of keys that shouldn't end up in the sample.xml file
+exclude_from_sample_xml = []  #todo list of keys that shouldn't end up in the sample.xml file
 ena_service = resolve_env.get_env('ENA_SERVICE')
 pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
 user_token = resolve_env.get_env('WEBIN_USER').split("@")[0]
@@ -46,12 +47,12 @@ def build_xml(sample, sub_id, p_id):
     notify_dtol_status(msg="Creating Sample: " + sample["collectorSampleName"], action="info",
                          html_id="dtol_sample_info")
     build_sample_xml(sample)
-    object_id = str(sample['_id'])
-    build_validate_xml(object_id)
-    build_submission_xml(object_id)
+    sample_id = str(sample['_id'])
+    #build_validate_xml(sample_id)
+    build_submission_xml(sample_id)
     notify_dtol_status(msg="Communicating with ENA", action="info",
                          html_id="dtol_sample_info")
-    accessions = submit_biosample(object_id, Sample(), sub_id)
+    accessions = submit_biosample(sample_id, Sample(), sub_id)
     print(accessions)
     if accessions["status"] == "ok":
         msg = "Last Sample Submitted: " + sample["collectorSampleName"] + " - ENA ID: " + accessions["submission_accession"] + " - Biosample ID: " + accessions["biosample_accession"]
@@ -63,8 +64,9 @@ def build_xml(sample, sub_id, p_id):
                            html_id="dtol_sample_info")
 
 
-def build_sample_xml(obj_id):
+def build_sample_xml(sample):
     # build sample XML
+    print("building sample xml")
     tree = ET.parse(SRA_SAMPLE_TEMPLATE)
     root = tree.getroot()
     sample_alias = ET.SubElement(root, 'SAMPLE')
@@ -77,10 +79,10 @@ def build_sample_xml(obj_id):
     title_block.text = title
     sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
     taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
-    taxon_id.text = obj_id.get('taxonid', "")
+    taxon_id.text = sample.get('taxonid', "")
     sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
     ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
-    for item in obj_id.items():
+    for item in sample.items():
         if item[0] not in exclude_from_sample_xml:  #####this still miss the checklist validation
             sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
             tag = ET.SubElement(sample_attribute, 'TAG')
@@ -89,11 +91,13 @@ def build_sample_xml(obj_id):
             value.text = str(item[1])
 
     ET.dump(tree)
-    tree.write(open("sample.xml", 'w'),
+    samplefile = "sample_" + str(sample['_id']) + ".xml"
+    print(samplefile)
+    tree.write(open(samplefile, 'w'),
                encoding='unicode')  # overwriting at each run, i don't think we need to keep it TODO - what if there are multiple calls simultaneously?
 
 
-def build_submission_xml(object_id):
+def build_submission_xml(sample_id):
     # build submission XML
     tree = ET.parse(SRA_SUBMISSION_TEMPLATE)
     root = tree.getroot()
@@ -110,11 +114,12 @@ def build_submission_xml(object_id):
     copo_contact.set("inform_on_error", sra_settings["sra_broker_inform_on_error"])
     copo_contact.set("inform_on_status", sra_settings["sra_broker_inform_on_status"])
     ET.dump(tree)
-    tree.write(open("submission.xml", 'w'),
+    submissionfile = "submission_" + str(sample_id) + ".xml"
+    tree.write(open(submissionfile, 'w'),
                encoding='unicode')  # overwriting at each run, i don't think we need to keep it
 
 
-def build_validate_xml(object_id):
+def build_validate_xml(sample_id):
     # TODO do we need this method at all? Its never actually used right?
     # build submission XML
     tree = ET.parse(SRA_SUBMISSION_TEMPLATE)
@@ -135,17 +140,20 @@ def build_validate_xml(object_id):
     action = root.find('ACTIONS').find('ACTION')
     ET.SubElement(action, 'VALIDATE')
     ET.dump(tree)
-    tree.write(open("submission_validate.xml", 'w'),
+    submissionvalidatefile = "submission_validate_" + str(sample_id) + ".xml"
+    tree.write(open(submissionvalidatefile, 'w'),
                encoding='unicode')  # overwriting at each run, i don't think we need to keep it - todo again I think these should have unique id attached, and then file deleted after submission
 
 
-def submit_biosample(object_id, sampleobj, sub_id):
+def submit_biosample(sample_id, sampleobj, sub_id):
     # register project to the ENA service using XML files previously created
+    submissionfile = "submission_" + str(sample_id) + ".xml"
+    samplefile = "sample_" + str(sample_id) + ".xml"
     curl_cmd = 'curl -u ' + user_token + ':' + pass_word \
                + ' -F "SUBMISSION=@' \
-               + "submission.xml" \
+               + submissionfile \
                + '" -F "SAMPLE=@' \
-               + "sample.xml" \
+               + samplefile \
                + '" "' + ena_service \
                + '"'
 
@@ -158,6 +166,9 @@ def submit_biosample(object_id, sampleobj, sub_id):
         #print(message)
 
     tree = ET.fromstring(receipt)
+
+    os.remove(submissionfile)
+    os.remove(samplefile)
     success_status = tree.get('success')
     if success_status == 'false':  ####todo
 
@@ -165,13 +176,13 @@ def submit_biosample(object_id, sampleobj, sub_id):
         msg = tree.find('MESSAGES').findtext('ERROR', default='Undefined error')
         status = {"status": "error","msg": msg}
         # print(status)
-        sampleobj.add_rejected_status(status, object_id)
+        sampleobj.add_rejected_status(status, sample_id)
 
         #print('error')
         return status
     else:
         # retrieve id and update record
-        return get_biosampleId(receipt, object_id)
+        return get_biosampleId(receipt, sample_id)
 
 
 def get_biosampleId(receipt, sample_id):
