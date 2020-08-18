@@ -1041,6 +1041,22 @@ class Submission(DAComponent):
             "profile_id": profile_id, "type": {"$in": ["dtol"]}
         })
 
+    def add_accession(self, biosample_accession, sra_accession, submission_accession, oid, collection_id):
+        return self.get_collection_handle().update(
+            {
+                "_id": ObjectId(collection_id)
+            },
+            {"$set":
+                {
+                    'accessions.sample_accessions.'+str(oid): {
+                    'biosampleAccession': biosample_accession,
+                    'sraAccession': sra_accession,
+                    'submissionAccession': submission_accession,
+                    'status': 'accepted'}
+            }})
+
+
+
 
 class DataFile(DAComponent):
     def __init__(self, profile_id=None):

@@ -38,12 +38,12 @@ def process_pending_dtol_samples():
     for submission in sample_id_list:
         for s_id in submission["dtol_samples"]:
             sam = Sample().get_record(s_id)
-            build_xml(sample=sam, sub_id=s_id, p_id=submission["profile_id"])
+            build_xml(sample=sam, sub_id=s_id, p_id=submission["profile_id"], collection_id=submission['_id'])
             # store accessions, remove sample id from bundle and on last removal, set status of submission
             Submission().dtol_sample_processed(sub_id=submission["_id"], sam_id=s_id)
 
 
-def build_xml(sample, sub_id, p_id):
+def build_xml(sample, sub_id, p_id, collection_id):
     notify_dtol_status(msg="Creating Sample: " + sample["collectorSampleName"], action="info",
                          html_id="dtol_sample_info")
     build_sample_xml(sample)
@@ -52,7 +52,7 @@ def build_xml(sample, sub_id, p_id):
     build_submission_xml(sample_id)
     notify_dtol_status(msg="Communicating with ENA", action="info",
                          html_id="dtol_sample_info")
-    accessions = submit_biosample(sample_id, Sample(), sub_id)
+    accessions = submit_biosample(sample_id, Sample(), collection_id)
     print(accessions)
     if accessions["status"] == "ok":
         msg = "Last Sample Submitted: " + sample["collectorSampleName"] + " - ENA ID: " + accessions["submission_accession"] + " - Biosample ID: " + accessions["biosample_accession"]
@@ -145,7 +145,7 @@ def build_validate_xml(sample_id):
                encoding='unicode')  # overwriting at each run, i don't think we need to keep it - todo again I think these should have unique id attached, and then file deleted after submission
 
 
-def submit_biosample(sample_id, sampleobj, sub_id):
+def submit_biosample(sample_id, sampleobj, collection_id):
     # register project to the ENA service using XML files previously created
     submissionfile = "submission_" + str(sample_id) + ".xml"
     samplefile = "sample_" + str(sample_id) + ".xml"
@@ -182,10 +182,10 @@ def submit_biosample(sample_id, sampleobj, sub_id):
         return status
     else:
         # retrieve id and update record
-        return get_biosampleId(receipt, sample_id)
+        return get_biosampleId(receipt, sample_id, collection_id)
 
 
-def get_biosampleId(receipt, sample_id):
+def get_biosampleId(receipt, sample_id, collection_id):
     # parsing ENA sample accessions from reciept and storing in sample object - todo these should be store in submission object
     tree = ET.fromstring(receipt)
     sampleinreceipt = tree.find('SAMPLE')
@@ -196,5 +196,7 @@ def get_biosampleId(receipt, sample_id):
     submission_accession = tree.find('SUBMISSION').get('accession')
     # print(submission_accession)
     Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
+    Submission().add_accession(biosample_accession, sra_accession, submission_accession, sample_id, collection_id)
+    print('we are here')
     accessions = {"sra_accession": sra_accession, "biosample_accession": biosample_accession, "submission_accession": submission_accession, "status": "ok"}
     return accessions
