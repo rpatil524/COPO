@@ -12,7 +12,7 @@ from dal.copo_da import Submission, Sample
 from submission.helpers.generic_helper import notify_dtol_status
 from tools import resolve_env
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
-from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE
+from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE, SRA_PROJECT_TEMPLATE
 
 with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
@@ -38,6 +38,10 @@ def process_pending_dtol_samples():
     for submission in sample_id_list:
         for s_id in submission["dtol_samples"]:
             sam = Sample().get_record(s_id)
+            # check if study exist for this submission and/or create one
+            print(Submission().get_study(submission['_id']))
+            if not Submission().get_study(submission['_id']):
+                    create_study(submission['profile_id'])
             build_xml(sample=sam, sub_id=s_id, p_id=submission["profile_id"], collection_id=submission['_id'])
             # store accessions, remove sample id from bundle and on last removal, set status of submission
             Submission().dtol_sample_processed(sub_id=submission["_id"], sam_id=s_id)
@@ -97,7 +101,7 @@ def build_sample_xml(sample):
                encoding='unicode')  # overwriting at each run, i don't think we need to keep it TODO - what if there are multiple calls simultaneously?
 
 
-def build_submission_xml(sample_id):
+def build_submission_xml(sample_id, hold=False):
     # build submission XML
     tree = ET.parse(SRA_SUBMISSION_TEMPLATE)
     root = tree.getroot()
@@ -113,6 +117,11 @@ def build_submission_xml(sample_id):
     copo_contact.set("name", sra_settings["sra_broker_contact_name"])
     copo_contact.set("inform_on_error", sra_settings["sra_broker_inform_on_error"])
     copo_contact.set("inform_on_status", sra_settings["sra_broker_inform_on_status"])
+    if hold:
+        actions =  root.find('ACTIONS')
+        action = ET.SubElement(actions, 'ACTION')
+        hold_block = ET.SubElement(action, 'HOLD')
+        hold_block.set("HoldUntilDate", hold)
     ET.dump(tree)
     submissionfile = "submission_" + str(sample_id) + ".xml"
     tree.write(open(submissionfile, 'w'),
@@ -186,7 +195,7 @@ def submit_biosample(sample_id, sampleobj, collection_id):
 
 
 def get_biosampleId(receipt, sample_id, collection_id):
-    # parsing ENA sample accessions from reciept and storing in sample object - todo these should be store in submission object
+    # parsing ENA sample accessions from reciept and storing in sample and submission collection object
     tree = ET.fromstring(receipt)
     sampleinreceipt = tree.find('SAMPLE')
     sra_accession = sampleinreceipt.get('accession')
@@ -200,3 +209,61 @@ def get_biosampleId(receipt, sample_id, collection_id):
     print('we are here')
     accessions = {"sra_accession": sra_accession, "biosample_accession": biosample_accession, "submission_accession": submission_accession, "status": "ok"}
     return accessions
+
+def get_studyId(receipt):
+    # parsing ENA study accessions from receipt and storing in submission collection
+    tree = ET.fromstring(receipt)
+    project = tree.find('PROJECT')
+    bioproject_accession = project.get('accession')
+    submission = tree.find('SUBMISSION')
+    sra_study_accesssion = submission.get('accession')
+    print(bioproject_accession, sra_study_accesssion)
+
+def create_study(profile_id):
+    #build study XML
+    tree = ET.parse(SRA_PROJECT_TEMPLATE)
+    root = tree.getroot()
+    #set study attributes
+    project = root.find('PROJECT')
+    project.set('alias', str(uuid.uuid4())) ##### TODO change the alias in prod
+    project.set('center name', 'EarlhamInstitute')
+    title_block = ET.SubElement(project, 'TITLE')
+    title_block.text = str(uuid.uuid4())
+    project_description = ET.SubElement(project, 'DESCRIPTION') #maybe retrieve description of copo project for this
+    submission_project = ET.SubElement(project, 'SUBMISSION_PROJECT')
+    ET.dump(tree)
+    studyfile = "study_"+profile_id+".xml"
+    print(studyfile)
+    tree.write(open(studyfile, 'w'),
+               encoding='unicode')
+
+    submissionfile = "submission_"+profile_id+".xml"
+    build_submission_xml(hold=datetime.date.today())
+
+    curl_cmd = 'curl -u ' + user_token + ':' + pass_word \
+               + ' -F "SUBMISSION=@' \
+               + submissionfile \
+               + '" -F "SAMPLE=@' \
+               + studyfile \
+               + '" "' + ena_service \
+               + '"'
+    try:
+        receipt = subprocess.check_output(curl_cmd, shell=True)
+        #print(receipt)
+    except Exception as e:
+        message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
+            pass_word, "xxxxxx")
+
+    tree = ET.fromstring(receipt)
+    os.remove(submissionfile)
+    os.remove(studyfile)
+    success_status = tree.get('success')
+    if success_status == 'false':  ####todo
+        msg = tree.find('MESSAGES').findtext('ERROR', default='Undefined error')
+        status = {"status": "error", "msg": msg}
+        return status
+    else:
+        # retrieve id and update record
+        return get_studyId(receipt)
+
+    #if receipt success delete xml file

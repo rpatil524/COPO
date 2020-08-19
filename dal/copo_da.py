@@ -1055,6 +1055,11 @@ class Submission(DAComponent):
                     'status': 'accepted'}
             }})
 
+    def get_study(self, collection_id):
+        # return if study has been already submitted
+        return self.get_collection_handle().find(
+            {'$and': [{'_id': ObjectId(collection_id)}, {'accessions.study_accessions': {'$exists': 'true'}}]})
+
 
 
 
