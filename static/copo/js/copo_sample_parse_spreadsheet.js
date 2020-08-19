@@ -1,3 +1,33 @@
+function upload_image_files(file){
+    var csrftoken = $.cookie('csrftoken');
+
+    var fileList = $('#images').prop("files")
+    var f = file.files
+    var form = new FormData()
+    form.append("file", fileList)
+    jQuery.ajax({
+        url: '/copo/sample_images/',
+        data: form,
+        cache: false,
+        contentType: false,
+        processData: false,
+
+        type: 'POST', // For jQuery < 1.9
+        headers: {"X-CSRFToken": csrftoken},
+
+    }).error(function (data) {
+        $("#upload_controls").fadeIn()
+        console.log(data)
+        BootstrapDialog.show({
+            title: 'Error',
+            message: "Error " + data.status + ": " + data.responseText
+        });
+    }).done(function (data) {
+        console.log("IMAGES")
+        console.log(data)
+    })
+}
+
 function upload_spreadsheet(file) {
     var csrftoken = $.cookie('csrftoken');
     form = new FormData()
@@ -104,13 +134,14 @@ $(document).ready(function () {
                 count++
 
             }
-            $("#sample_info").hide()
+            //$("#sample_info").hide()
             $("#sample_parse_table").DataTable({
                 "scrollY": 400,
                 "scrollX": true
             })
             $("#table_div").fadeIn(1000)
-            $("#confirm_info").fadeIn(1000)
+            $("#files_label").removeAttr("disabled")
+            //$("#confirm_info").fadeIn(1000)
         }
     }
 })

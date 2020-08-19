@@ -163,6 +163,8 @@ urlpatterns = [
          name="get_subsample_stages"),
     path('sample_spreadsheet/', ajax_handlers.sample_spreadsheet,
          name="sample_spreadsheet"),
+    path('sample_images/', ajax_handlers.sample_images,
+         name="sample_images"),
     path('create_spreadsheet_samples/', ajax_handlers.create_spreadsheet_samples,
          name="create_spreadsheet_samples"),
     path('update_pending_samples_table/', ajax_handlers.update_pending_samples_table,

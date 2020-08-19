@@ -19,9 +19,9 @@ class DtolSpreadsheet:
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
     na_vals = ['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
                'NULL', 'NaN', 'n/a', 'nan', 'null']
-    na_vals = ['N/A']
+    na_vals = ['NOT COLLECTED', 'NOT PROVIDED', 'NOT APPLICABLE', 'N/A']
 
-    validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of 'NA' and 'none' are allowed."
+    validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(allowed=str(na_vals))
     validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
 
     fields = ""
@@ -122,7 +122,7 @@ class DtolSpreadsheet:
             return True
 
     def collect(self):
-
+        # create table data to show to the frontend from parsed manifest
         sample_data = []
         headers = list()
         for col in list(self.data.columns):
@@ -134,10 +134,12 @@ class DtolSpreadsheet:
                 if x is math.nan:
                     r[idx] = ""
             sample_data.append(r)
+        # store sample data in the session to be used to create mongo objects
         self.req.session["sample_data"] = sample_data
         notify_sample_status(profile_id=self.profile_id, msg=sample_data, action="make_table", html_id="sample_table")
 
     def save_records(self):
+        # create mongo sample objects from info parsed from manifest and saved to session variable
         sample_data = self.sample_data
         for p in range(1, len(sample_data)):
             s = (map_to_dict(sample_data[0], sample_data[p]))
