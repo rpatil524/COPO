@@ -1389,7 +1389,6 @@ def add_sample_to_dtol_submission(request):
         return HttpResponse(status=500, content="Sample IDs or profile_id not provided")
 
 def sample_images(request):
-     file = request.FILES["file"]
-     print(file)
-     name = file.name
+     files = request.FILES
+     print(files)
      return HttpResponse()

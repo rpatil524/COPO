@@ -1,13 +1,15 @@
-function upload_image_files(file){
+function upload_image_files(file) {
     var csrftoken = $.cookie('csrftoken');
 
-    var fileList = $('#images').prop("files")
-    var f = file.files
-    var form = new FormData()
-    form.append("file", fileList)
+    form = new FormData()
+    var count = 0
+    for (f in file) {
+        form.append(count.toString(), file[f])
+        count++
+    }
     jQuery.ajax({
         url: '/copo/sample_images/',
-        data: file,
+        data: form,
         cache: false,
         contentType: false,
         processData: false,
@@ -96,7 +98,7 @@ $(document).ready(function () {
             $("#" + d.html_id).removeClass("alert-danger").addClass("alert-info")
             $("#" + d.html_id).html(d.message)
             $("#spinner").fadeOut()
-        }else if (d.action === "error") {
+        } else if (d.action === "error") {
             // check info div is visible
             if (!$("#" + d.html_id).is(":visible")) {
                 $("#" + d.html_id).fadeIn("50")

@@ -276,7 +276,8 @@
                             Select Spreadsheet
                         </label>
                         <label class="btn btn-info" for="images" id="files_label" disabled>
-                            <input id="images" name="images[]" type="file" accept=".png,.jpg, .jpeg" multiple style="display:none"
+
+                            <input enctype='multipart/formdata' id="images" name="images" type="file" accept=".png,.jpg, .jpeg" multiple style="display:none"
                                    onchange="upload_image_files(this.files)">
                             Select Image Directory
                         </label>
