@@ -1390,5 +1390,6 @@ def add_sample_to_dtol_submission(request):
 
 def sample_images(request):
      file = request.FILES["file"]
+     print(file)
      name = file.name
      return HttpResponse()

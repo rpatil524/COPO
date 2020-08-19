@@ -7,7 +7,7 @@ function upload_image_files(file){
     form.append("file", fileList)
     jQuery.ajax({
         url: '/copo/sample_images/',
-        data: form,
+        data: file,
         cache: false,
         contentType: false,
         processData: false,
