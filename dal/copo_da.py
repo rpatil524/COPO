@@ -1055,9 +1055,24 @@ class Submission(DAComponent):
                     'status': 'accepted'}
             }})
 
+    def add_study_accession(self, bioproject_accession, sra_study_accession, study_accession, collection_id):
+        return self.get_collection_handle().update(
+            {
+                "_id": ObjectId(collection_id)
+            },
+            {"$set":
+                {
+                    'accessions.study_accessions' : {
+                        'bioProjectAccession': bioproject_accession,
+                        'sraStudyAccession': sra_study_accession,
+                        'submissionAccession': study_accession,
+                        'status': 'accepted'}
+                }}
+        )
+
     def get_study(self, collection_id):
         # return if study has been already submitted
-        return self.get_collection_handle().find(
+        return self.get_collection_handle().count(
             {'$and': [{'_id': ObjectId(collection_id)}, {'accessions.study_accessions': {'$exists': 'true'}}]})
 
 

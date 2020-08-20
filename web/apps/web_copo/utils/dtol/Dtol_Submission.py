@@ -2,7 +2,7 @@ import json
 import subprocess
 import uuid
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, date
 import os
 
 from celery.utils.log import get_task_logger
@@ -39,9 +39,9 @@ def process_pending_dtol_samples():
         for s_id in submission["dtol_samples"]:
             sam = Sample().get_record(s_id)
             # check if study exist for this submission and/or create one
-            print(Submission().get_study(submission['_id']))
+            #print(Submission().get_study(submission['_id']))
             if not Submission().get_study(submission['_id']):
-                    create_study(submission['profile_id'])
+                    create_study(submission['profile_id'], collection_id = submission['_id'])
             build_xml(sample=sam, sub_id=s_id, p_id=submission["profile_id"], collection_id=submission['_id'])
             # store accessions, remove sample id from bundle and on last removal, set status of submission
             Submission().dtol_sample_processed(sub_id=submission["_id"], sam_id=s_id)
@@ -101,7 +101,7 @@ def build_sample_xml(sample):
                encoding='unicode')  # overwriting at each run, i don't think we need to keep it TODO - what if there are multiple calls simultaneously?
 
 
-def build_submission_xml(sample_id, hold=False):
+def build_submission_xml(sample_id, hold=""):
     # build submission XML
     tree = ET.parse(SRA_SUBMISSION_TEMPLATE)
     root = tree.getroot()
@@ -206,31 +206,38 @@ def get_biosampleId(receipt, sample_id, collection_id):
     # print(submission_accession)
     Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
     Submission().add_accession(biosample_accession, sra_accession, submission_accession, sample_id, collection_id)
-    print('we are here')
+    #print('we are here')
     accessions = {"sra_accession": sra_accession, "biosample_accession": biosample_accession, "submission_accession": submission_accession, "status": "ok"}
     return accessions
 
-def get_studyId(receipt):
+def get_studyId(receipt, collection_id):
     # parsing ENA study accessions from receipt and storing in submission collection
     tree = ET.fromstring(receipt)
     project = tree.find('PROJECT')
     bioproject_accession = project.get('accession')
+    ext_id = project.find('EXT_ID')
+    sra_study_accession = ext_id.get('accession')
     submission = tree.find('SUBMISSION')
-    sra_study_accesssion = submission.get('accession')
-    print(bioproject_accession, sra_study_accesssion)
+    study_accession = submission.get('accession')
+    print(bioproject_accession, sra_study_accession, study_accession) ######
+    Submission().add_study_accession(bioproject_accession, sra_study_accession, study_accession, collection_id)
+    accessions = {"bioproject_accession": bioproject_accession, "sra_study_accession": sra_study_accession, "study_accession": study_accession, "status":  "ok"}
+    return accessions
 
-def create_study(profile_id):
+def create_study(profile_id, collection_id):
     #build study XML
     tree = ET.parse(SRA_PROJECT_TEMPLATE)
     root = tree.getroot()
     #set study attributes
     project = root.find('PROJECT')
     project.set('alias', str(uuid.uuid4())) ##### TODO change the alias in prod
-    project.set('center name', 'EarlhamInstitute')
+    project.set('center_name', 'EarlhamInstitute')
     title_block = ET.SubElement(project, 'TITLE')
     title_block.text = str(uuid.uuid4())
-    project_description = ET.SubElement(project, 'DESCRIPTION') #maybe retrieve description of copo project for this
+    project_description = ET.SubElement(project, 'DESCRIPTION')
+    project_description.text = "example secription" #TODO maybe retrieve description of copo project for this
     submission_project = ET.SubElement(project, 'SUBMISSION_PROJECT')
+    sequencing_project = ET.SubElement(submission_project, 'SEQUENCING_PROJECT')
     ET.dump(tree)
     studyfile = "study_"+profile_id+".xml"
     print(studyfile)
@@ -238,12 +245,12 @@ def create_study(profile_id):
                encoding='unicode')
 
     submissionfile = "submission_"+profile_id+".xml"
-    build_submission_xml(hold=datetime.date.today())
+    build_submission_xml(profile_id, hold=date.today().strftime("%Y-%m-%d"))
 
     curl_cmd = 'curl -u ' + user_token + ':' + pass_word \
                + ' -F "SUBMISSION=@' \
                + submissionfile \
-               + '" -F "SAMPLE=@' \
+               + '" -F "PROJECT=@' \
                + studyfile \
                + '" "' + ena_service \
                + '"'
@@ -254,6 +261,7 @@ def create_study(profile_id):
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
             pass_word, "xxxxxx")
 
+    print(receipt)
     tree = ET.fromstring(receipt)
     os.remove(submissionfile)
     os.remove(studyfile)
@@ -264,6 +272,13 @@ def create_study(profile_id):
         return status
     else:
         # retrieve id and update record
-        return get_studyId(receipt)
+        accessions = get_studyId(receipt, collection_id)
 
-    #if receipt success delete xml file
+    if accessions["status"] == "ok":
+        msg = "Study Submitted " + " - BioProject ID: " + accessions["bioproject_accession"] + " - SRA Study ID: " + accessions["sra_study_accession"]
+        notify_dtol_status(msg=msg, action="info",
+                             html_id="dtol_sample_info")
+    else:
+        msg = "Submission Rejected: " + sample["collectorSampleName"] + "<p>" + accessions["msg"] + "</p>"
+        notify_dtol_status(msg=msg, action="info",
+                           html_id="dtol_sample_info")
