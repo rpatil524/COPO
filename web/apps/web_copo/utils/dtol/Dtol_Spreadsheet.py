@@ -1,11 +1,13 @@
 # Created by fshaw at 03/04/2020
 import math
 import os
+from pathlib import Path
+from shutil import rmtree
 import json
 import jsonpath_rw_ext as jp
 import pandas
 from django_tools.middlewares import ThreadLocal
-
+from django.core.files.storage import default_storage
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from api.utils import map_to_dict
 from dal.copo_da import Sample
@@ -13,7 +15,7 @@ from submission.helpers.generic_helper import notify_sample_status
 from web.apps.web_copo.lookup import dtol_lookups as  lookup
 from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
-
+from django.conf import settings
 
 class DtolSpreadsheet:
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
@@ -31,6 +33,8 @@ class DtolSpreadsheet:
     def __init__(self, file=None):
         self.req = ThreadLocal.get_current_request()
         self.profile_id = self.req.session.get("profile_id", None)
+        sample_images = Path(settings.MEDIA_ROOT) / "sample_images"
+        self.these_images = sample_images / self.profile_id
         # if a file is passed in, then this is the first time we have seen the spreadsheet,
         # if not then we are looking at creating samples having previously validated
         if file:
@@ -131,9 +135,15 @@ class DtolSpreadsheet:
             if col_name == "SPECIMEN_ID":
                 specimen_id_column_index = num
                 break
+        if os.path.isdir(self.these_images):
+            rmtree(self.these_images)
+        self.these_images.mkdir(parents=True)
 
         for f in files:
             file = files[f]
+            with default_storage.open(Path(self.these_images) / file.name, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
             filename = os.path.splitext(file.name)[0].upper()
             #now iterate through samples data to see if there is a match between specimen_id and image name
             found = False
@@ -147,6 +157,9 @@ class DtolSpreadsheet:
                             break
             if not found:
                 output.append({file.name: "Specimen not Found"})
+            # save to session
+            request = ThreadLocal.get_current_request()
+            request.session["image_specimen_match"] = output
         return output
 
 

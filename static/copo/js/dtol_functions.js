@@ -310,10 +310,7 @@ function handle_accept_reject(el) {
     $("#dtol_sample_info").html("Processing")
 
     var checked = $(".form-check-input:checked").closest("tr")
-    $(checked).each(function (idx, row) {
-        $(row).fadeOut(fadeSpeed)
 
-    })
     var button = $(el.currentTarget)
     var action
     if (button.hasClass("positive")) {
@@ -325,7 +322,10 @@ function handle_accept_reject(el) {
     $(checked).each(function (it) {
         sample_ids.push($(checked[it]).data("id"))
     })
-
+    $(checked).each(function (idx, row) {
+        $(row).fadeOut(fadeSpeed)
+        $(row).remove()
+    })
 
     if (action == "reject") {
         // mark sample object as rejected
