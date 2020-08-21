@@ -1,14 +1,14 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 01/12/2015'
 
 # this python file is for small utility functions which will be called from Javascript
-import json, os
+import json
+import os
 import time
-import jsonpickle
-import pandas as pd
 import urllib.parse
 from datetime import datetime
 
 import jsonpickle
+import pandas as pd
 import requests
 from bson import json_util, ObjectId
 from django.contrib.auth.models import Group
@@ -18,18 +18,12 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from jsonpickle import encode
 
 import web.apps.web_copo.lookup.lookup as ol
+import web.apps.web_copo.templatetags.html_tags as htags
 from dal import mongo_util as util
 from dal.copo_da import Profile
 from dal.copo_da import ProfileInfo, Submission, DataFile, Sample, Source, CopoGroup, Annotation, \
     Repository, Person
 from dal.figshare_da import Figshare
-from dal import mongo_util as util
-from pandas import read_excel
-from django.contrib.auth.models import User
-from web.apps.web_copo.models import UserDetails
-from django.db.models import Q
-from django.contrib.auth.models import Group
-from django.core import serializers
 from dal.orcid_da import Orcid
 from submission.ckanSubmission import CkanSubmit as ckan
 from submission.dataverseSubmission import DataverseSubmit as ds
@@ -37,12 +31,11 @@ from submission.dspaceSubmission import DspaceSubmit as dspace
 from submission.figshareSubmission import FigshareSubmit
 from submission.helpers import generic_helper as ghlper
 from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
+from web.apps.web_copo.lookup.lookup import WIZARD_FILES as wf
 from web.apps.web_copo.models import UserDetails
 from web.apps.web_copo.schemas.utils import data_utils
-import web.apps.web_copo.templatetags.html_tags as htags
-from web.apps.web_copo.lookup.lookup import WIZARD_FILES as wf
 from web.apps.web_copo.utils.dtol.Dtol_Spreadsheet import DtolSpreadsheet
-from submission.helpers.generic_helper import notify_sample_status, notify_dtol_status
+
 DV_STRING = 'HARVARD_TEST_API'
 
 
@@ -1331,8 +1324,10 @@ def sample_spreadsheet(request):
                             content="Only Excel or CSV files in the exact Darwin Core format are supported.")
     '''
 
+
 def create_spreadsheet_samples(request):
     sample_data = request.session["sample_data"]
+    # note calling DtolSpreadsheet without a spreadsheet object will attempt to load one from the session
     dtol = DtolSpreadsheet()
     dtol.save_records()
     return HttpResponse(status=200)
@@ -1348,7 +1343,7 @@ def get_samples_for_profile(request):
     profile_id = request.GET["profile_id"]
     filter = request.GET["filter"]
     samples = util.cursor_to_list(Sample().get_dtol_from_profile_id(profile_id, filter))
-    #notify_dtol_status(msg="Creating Sample: " + "sprog", action="info",
+    # notify_dtol_status(msg="Creating Sample: " + "sprog", action="info",
     #                     html_id="dtol_sample_info")
     return HttpResponse(json_util.dumps(samples))
 
@@ -1363,6 +1358,7 @@ def mark_sample_rejected(request):
                 return HttpResponse(status=500)
         return HttpResponse(status=200)
     return HttpResponse(status=500)
+
 
 def add_sample_to_dtol_submission(request):
     sample_ids = request.GET.get("sample_ids")
@@ -1388,7 +1384,10 @@ def add_sample_to_dtol_submission(request):
     else:
         return HttpResponse(status=500, content="Sample IDs or profile_id not provided")
 
+
 def sample_images(request):
-     files = request.FILES
-     print(files)
-     return HttpResponse()
+    files = request.FILES
+    dtol = DtolSpreadsheet()
+    matchings = dtol.check_image_names(files)
+
+    return HttpResponse(json.dumps(matchings))

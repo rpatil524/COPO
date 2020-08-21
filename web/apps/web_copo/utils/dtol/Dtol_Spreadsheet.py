@@ -1,6 +1,6 @@
 # Created by fshaw at 03/04/2020
 import math
-
+import os
 import json
 import jsonpath_rw_ext as jp
 import pandas
@@ -120,6 +120,36 @@ class DtolSpreadsheet:
             notify_sample_status(profile_id=self.profile_id, msg="", action="make_valid", html_id="sample_info")
 
             return True
+
+    def check_image_names(self, files):
+        # compare list of sample names with specimen ids already uploaded
+        samples = self.sample_data
+        # get list of specimen_ids in sample
+        specimen_id_column_index = 0
+        output = list()
+        for num, col_name in enumerate(samples[0]):
+            if col_name == "SPECIMEN_ID":
+                specimen_id_column_index = num
+                break
+
+        for f in files:
+            file = files[f]
+            filename = os.path.splitext(file.name)[0].upper()
+            #now iterate through samples data to see if there is a match between specimen_id and image name
+            found = False
+            for num, sample in enumerate(samples):
+                    if num != 0:
+                        specimen_id = sample[specimen_id_column_index].upper()
+                        if specimen_id == filename:
+                            #we have a match
+                            output.append({file.name: specimen_id})
+                            found = True
+                            break
+            if not found:
+                output.append({file.name: "Specimen not Found"})
+        return output
+
+
 
     def collect(self):
         # create table data to show to the frontend from parsed manifest
