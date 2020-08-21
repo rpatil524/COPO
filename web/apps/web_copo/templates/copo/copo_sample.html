@@ -66,7 +66,8 @@
 
 {% block content %}
     <script>
-        var groups = {{ groups|safe }}
+        var groups =
+        {{ groups|safe }}
     </script>
     <!--test ends -->
     <!--test ends -->
@@ -277,7 +278,8 @@
                         </label>
                         <label class="btn btn-info" for="images" id="files_label" disabled>
 
-                            <input enctype='multipart/formdata' id="images" name="images" type="file" accept=".png,.jpg, .jpeg" multiple style="display:none"
+                            <input enctype='multipart/formdata' id="images" name="images" type="file"
+                                   accept=".png,.jpg, .jpeg" multiple style="display:none"
                                    onchange="upload_image_files(this.files)">
                             Select Image Directory
                         </label>
@@ -285,6 +287,9 @@
 
 
                     </div>
+
+
+
                     <div id="upload_controls">
 
                     </div>
@@ -299,18 +304,33 @@
                     <div style="display:none; margin-top: 10px;" id="confirm_info" class="confirm">
                         The following samples will be created. Click OK to continue.
 
-                            <button id="create_samples" class="btn btn-success">OK</button>
+                        <button id="create_samples" class="btn btn-success">OK</button>
 
                     </div>
 
-                    <div id="table_div" style="display: none;width:100%; max-height: 100%; padding-left: 30px">
-                        <table id="sample_parse_table" class="ui celled padded table">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a data-toggle="tab" href="#meta">Sample Metadata</a>
+                        </li>
+                        <li>
+                            <a data-toggle="tab" href="#image">Sample Images</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="meta">
+                            <div id="table_div" style="display: none;width:100%; max-height: 100%; padding-left: 30px">
+                                <table id="sample_parse_table" class="ui celled padded table">
 
-                            <thead></thead>
-                            <tbody></tbody>
+                                    <thead></thead>
+                                    <tbody></tbody>
 
 
-                        </table>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="image">
+                            HERE
+                        </div>
                     </div>
                 </div>
 
