@@ -1,6 +1,7 @@
 # Created by fshaw at 03/04/2020
 import math
 import os
+from os.path import join, isfile
 from pathlib import Path
 from shutil import rmtree
 import json
@@ -17,13 +18,15 @@ from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from django.conf import settings
 
+
 class DtolSpreadsheet:
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
     na_vals = ['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
                'NULL', 'NaN', 'n/a', 'nan', 'null']
     na_vals = ['NOT COLLECTED', 'NOT PROVIDED', 'NOT APPLICABLE', 'N/A']
 
-    validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(allowed=str(na_vals))
+    validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
+        allowed=str(na_vals))
     validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
 
     fields = ""
@@ -34,14 +37,15 @@ class DtolSpreadsheet:
         self.req = ThreadLocal.get_current_request()
         self.profile_id = self.req.session.get("profile_id", None)
         sample_images = Path(settings.MEDIA_ROOT) / "sample_images"
+        display_images = Path(settings.MEDIA_ROOT) / "img" / "sample_images"
         self.these_images = sample_images / self.profile_id
+        self.display_images = display_images / self.profile_id
         # if a file is passed in, then this is the first time we have seen the spreadsheet,
         # if not then we are looking at creating samples having previously validated
         if file:
             self.file = file
         else:
             self.sample_data = self.req.session["sample_data"]
-
 
     def loadManifest(self, type):
 
@@ -95,7 +99,8 @@ class DtolSpreadsheet:
                             if not c:
                                 # we have missing data in required cells
                                 notify_sample_status(profile_id=self.profile_id,
-                                                     msg=(self.validation_msg_missing_data % (header, str(cellcount + 1))),
+                                                     msg=(self.validation_msg_missing_data % (
+                                                         header, str(cellcount + 1))),
                                                      action="error",
                                                      html_id="sample_info")
                                 return False
@@ -104,7 +109,7 @@ class DtolSpreadsheet:
                                 if c not in allowed_vals:
                                     notify_sample_status(profile_id=self.profile_id,
                                                          msg=(self.validation_msg_invalid_data % (
-                                                         c, header, str(cellcount + 1), allowed_vals)),
+                                                             c, header, str(cellcount + 1), allowed_vals)),
                                                          action="error",
                                                          html_id="sample_info")
                                     return False
@@ -139,30 +144,42 @@ class DtolSpreadsheet:
             rmtree(self.these_images)
         self.these_images.mkdir(parents=True)
 
+        write_path = Path(self.these_images)
+        display_write_path = Path(self.display_images)
         for f in files:
             file = files[f]
-            with default_storage.open(Path(self.these_images) / file.name, 'wb+') as destination:
+
+            file_path = write_path / file.name
+            # write full sized image to large storage
+            file_path = Path(settings.MEDIA_ROOT) / "sample_images" / self.profile_id / file.name
+            with default_storage.open(file_path, 'wb+') as destination:
                 for chunk in file.chunks():
                     destination.write(chunk)
+
             filename = os.path.splitext(file.name)[0].upper()
-            #now iterate through samples data to see if there is a match between specimen_id and image name
+            # now iterate through samples data to see if there is a match between specimen_id and image name
+        image_path = Path(settings.MEDIA_ROOT) / "sample_images" / self.profile_id
+        for num, sample in enumerate(samples):
             found = False
-            for num, sample in enumerate(samples):
-                    if num != 0:
-                        specimen_id = sample[specimen_id_column_index].upper()
-                        if specimen_id == filename:
-                            #we have a match
-                            output.append({file.name: specimen_id})
-                            found = True
-                            break
-            if not found:
-                output.append({file.name: "Specimen not Found"})
-            # save to session
-            request = ThreadLocal.get_current_request()
-            request.session["image_specimen_match"] = output
+            if num != 0:
+                specimen_id = sample[specimen_id_column_index].upper()
+
+                file_list = [f for f in os.listdir(image_path) if isfile(join(image_path, f))]
+                for filename in file_list:
+                    if specimen_id in filename.upper():
+                        # we have a match
+                        p = Path(settings.MEDIA_URL) / "sample_images" / self.profile_id / filename
+
+                        output.append({"file_name": str(p), "specimen_id": sample[specimen_id_column_index]})
+                        found = True
+                        break
+                if not found:
+                    output.append({"file_name": "None", "specimen_id": "No Image found for <strong>"+ sample[specimen_id_column_index] +"</strong>"})
+        # save to session
+        request = ThreadLocal.get_current_request()
+        request.session["image_specimen_match"] = output
+        notify_sample_status(profile_id=self.profile_id, msg=output, action="make_images_table", html_id="images")
         return output
-
-
 
     def collect(self):
         # create table data to show to the frontend from parsed manifest

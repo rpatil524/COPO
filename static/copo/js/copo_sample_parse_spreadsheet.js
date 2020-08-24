@@ -25,8 +25,7 @@ function upload_image_files(file) {
             message: "Error " + data.status + ": " + data.responseText
         });
     }).done(function (data) {
-        console.log("IMAGES")
-        console.log(data)
+
     })
 }
 
@@ -52,8 +51,7 @@ function upload_spreadsheet(file) {
             message: "Error " + data.status + ": " + data.responseText
         });
     }).done(function (data) {
-        console.log("WELL DONE")
-        console.log(data)
+
     })
 }
 
@@ -83,13 +81,15 @@ $(document).ready(function () {
         console.log("opened ", e)
     }
     socket.onmessage = function (e) {
-        console.log("received message ", e)
+        console.log("received message")
+        //handlers for channels messages sent from backend
         d = JSON.parse(e.data)
         if (d.action === "close") {
             $("#" + d.html_id).fadeOut("50")
         } else if (d.action === "make_valid") {
             $("#" + d.html_id).html("Validated").removeClass("alert-info, alert-danger").addClass("alert-success")
         } else if (d.action === "info") {
+            // show something on the info div
             // check info div is visible
             if (!$("#" + d.html_id).is(":visible")) {
                 $("#" + d.html_id).fadeIn("50")
@@ -107,7 +107,26 @@ $(document).ready(function () {
             $("#" + d.html_id).removeClass("alert-info").addClass("alert-danger")
             $("#" + d.html_id).html(d.message)
             $("#spinner").fadeOut()
+        } else if (d.action === "make_images_table") {
+            // make table of images matched to
+            // headers
+            var headers = $("<tr><th>Specimen ID</th><th>Image File</th></th><th>Image</th></tr>")
+            $("#image_table").find("thead").empty().append(headers)
+            $("#image_table").find("tbody").empty()
+            var table_row
+            for (r in d.message){
+                row = d.message[r]
+                if(row.file_name === "None"){
+                    var img_tag = "Sample images must be named using the same Specimen ID as the manifest"
+                }
+                else {
+                    var img_tag = "<img src=" + row.file_name + "/>"
+                }
+                    table_row = ("<tr><td>" + row.specimen_id + "</td><td>" + row.file_name + "</td><td>" + img_tag + "</td></tr>")
+                $("#image_table").append(table_row)
+            }
         } else if (d.action === "make_table") {
+            // make table of metadata parsed from spreadsheet
             var body = $("tbody")
             var count = 0
             for (r in d.message) {
