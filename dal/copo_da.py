@@ -550,6 +550,16 @@ class Sample(DAComponent):
     def get_from_profile_id(self, profile_id):
         return self.get_collection_handle().find({'profile_id': profile_id})
 
+    def timestamp_dtol_sample_created(self, sample_id):
+        email = ThreadLocal.get_current_user().email
+        sample = self.get_collection_handle().update({"_id": ObjectId(sample_id)},
+                                                   {"$set": {"time_created": datetime.now(), "created_by": email}})
+
+    def timestamp_dtol_sample_verified(self, sample_id):
+        email = ThreadLocal.get_current_user().email
+        sample = self.get_collection_handle().update({"_id": ObjectId(sample_id)},
+                                                   {"$set": {"time_verified": datetime.now(), "verified_by": email}})
+
     def add_accession(self, biosample_accession, sra_accession, submission_accession, oid):
         return self.get_collection_handle().update(
             {
@@ -563,7 +573,7 @@ class Sample(DAComponent):
                     'status': 'accepted'}
             })
 
-    def  add_rejected_status(self, status, oid):
+    def add_rejected_status(self, status, oid):
         return self.get_collection_handle().update(
             {
                 "_id": ObjectId(oid)
@@ -573,8 +583,6 @@ class Sample(DAComponent):
                   'status': "rejected"}
              }
         )
-
-
 
     def get_dtol_from_profile_id(self, profile_id, filter):
         if filter == "pending":

@@ -1,4 +1,5 @@
 function upload_image_files(file) {
+    alert("wank")
     var csrftoken = $.cookie('csrftoken');
 
     form = new FormData()
@@ -122,9 +123,10 @@ $(document).ready(function () {
                 else {
                     var img_tag = "<img src=" + row.file_name + "/>"
                 }
-                    table_row = ("<tr><td>" + row.specimen_id + "</td><td>" + row.file_name + "</td><td>" + img_tag + "</td></tr>")
+                    table_row = ("<tr><td>" + row.specimen_id + "</td><td>" + row.file_name.split('\\').pop().split('/').pop() + "</td><td>" + img_tag + "</td></tr>") // split-pop thing is to get filename from full path
                 $("#image_table").append(table_row)
             }
+            $("#image").click()
         } else if (d.action === "make_table") {
             // make table of metadata parsed from spreadsheet
             var body = $("tbody")

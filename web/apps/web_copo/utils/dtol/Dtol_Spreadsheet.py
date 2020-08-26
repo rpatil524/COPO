@@ -209,5 +209,6 @@ class DtolSpreadsheet:
                                  action="info",
                                  html_id="sample_info")
             obj_id = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
+            Sample().timestamp_dtol_sample_created(obj_id["_id"])
             print("sample created: " + str(p))
             # obj = Sample(profile_id=self.profile_id).get_record(obj_id['_id']) #would retrieve same as 133
