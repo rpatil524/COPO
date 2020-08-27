@@ -208,6 +208,7 @@ $(document).ready(function () {
             $("#files_label").find("input").removeAttr("disabled")
             //$("#confirm_info").fadeIn(1000)
             $("#tabs").fadeIn()
+            $("#finish_button").fadeIn()
         }
     }
 })
