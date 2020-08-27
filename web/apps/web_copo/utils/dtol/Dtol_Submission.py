@@ -4,6 +4,7 @@ import uuid
 import xml.etree.ElementTree as ET
 from datetime import datetime, date
 import os
+import shutil
 
 from celery.utils.log import get_task_logger
 
@@ -36,21 +37,71 @@ def process_pending_dtol_samples():
     sample_id_list = Submission().get_pending_dtol_samples()
     # send each to ENA for Biosample ids
     for submission in sample_id_list:
+        # check if study exist for this submission and/or create one
+        # print(Submission().get_study(submission['_id']))
+        if not Submission().get_study(submission['_id']):
+            create_study(submission['profile_id'], collection_id=submission['_id'])
+        file_subfix = str(uuid.uuid4()) #use this to recover buundle sample file
+        build_bundle_sample_xml(file_subfix)
         for s_id in submission["dtol_samples"]:
             sam = Sample().get_record(s_id)
-            # check if study exist for this submission and/or create one
-            #print(Submission().get_study(submission['_id']))
-            if not Submission().get_study(submission['_id']):
-                    create_study(submission['profile_id'], collection_id = submission['_id'])
-            build_xml(sample=sam, sub_id=s_id, p_id=submission["profile_id"], collection_id=submission['_id'])
+            notify_dtol_status(msg="Adding to Set Sample: " + sam["collectorSampleName"], action="info",
+                               html_id="dtol_sample_info")
+            update_bundle_sample_xml(sam, "bundle_"+file_subfix+".xml")
+            #build_xml(sample=sam, sub_id=s_id, p_id=submission["profile_id"], collection_id=submission['_id'], file_subfix = file_subfix)
             # store accessions, remove sample id from bundle and on last removal, set status of submission
-            Submission().dtol_sample_processed(sub_id=submission["_id"], sam_id=s_id)
+        build_submission_xml(file_subfix)
+        accessions = submit_biosample(file_subfix, Sample(), submission['_id'])
+        '''print(accessions)
+        if accessions["status"] == "ok":
+            msg = "Last Sample Submitted: " + sample["collectorSampleName"] + " - ENA ID: " + accessions[
+                "submission_accession"] + " - Biosample ID: " + accessions["biosample_accession"]
+            notify_dtol_status(msg=msg, action="info",
+                               html_id="dtol_sample_info")
+        else:
+            msg = "Submission Rejected: " + sample["collectorSampleName"] + "<p>" + accessions["msg"] + "</p>"
+            notify_dtol_status(msg=msg, action="info",
+                               html_id="dtol_sample_info")'''
+        Submission().dtol_sample_processed(sub_id=submission["_id"], sam_id=s_id)
 
+def build_bundle_sample_xml(file_subfix):
+    '''build structure and save to file bundle_file_subfix.xml'''
+    shutil.copy(SRA_SAMPLE_TEMPLATE, "bundle_"+file_subfix+".xml")
 
-def build_xml(sample, sub_id, p_id, collection_id):
+def update_bundle_sample_xml(sample, bundlefile):
+    '''update the sample with submission alias alias adding a new sample'''
+    print("adding sample to bundle sample xml")
+    tree = ET.parse(bundlefile)
+    root = tree.getroot()
+    sample_alias = ET.SubElement(root, 'SAMPLE')
+    sample_alias.set('alias', str(uuid.uuid4()))  # Todo this is for testing only
+    sample_alias.set('center_name', 'EarlhamInstitute')  #mandatory for broker account
+    title = str(uuid.uuid4())
+
+    title_block = ET.SubElement(sample_alias, 'TITLE')
+    title_block.text = title
+    sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
+    taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
+    taxon_id.text = sample.get('taxonid', "")
+    sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
+    ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
+    for item in sample.items():
+        if item[0] not in exclude_from_sample_xml:  #####this still miss the checklist validation
+            sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+            tag = ET.SubElement(sample_attribute, 'TAG')
+            tag.text = item[0]
+            value = ET.SubElement(sample_attribute, 'VALUE')
+            value.text = str(item[1])
+
+    ET.dump(tree)
+    tree.write(open(bundlefile, 'w'),
+               encoding='unicode')
+
+def build_xml(sample, sub_id, p_id, collection_id, file_subfix):
     notify_dtol_status(msg="Creating Sample: " + sample["collectorSampleName"], action="info",
                          html_id="dtol_sample_info")
-    build_sample_xml(sample)
+    #build_sample_xml(sample)
+    update_bundle_sample_xml(sample, "bundle_"+file_subfix+".xml")
     sample_id = str(sample['_id'])
     #build_validate_xml(sample_id)
     build_submission_xml(sample_id)
@@ -157,7 +208,7 @@ def build_validate_xml(sample_id):
 def submit_biosample(sample_id, sampleobj, collection_id):
     # register project to the ENA service using XML files previously created
     submissionfile = "submission_" + str(sample_id) + ".xml"
-    samplefile = "sample_" + str(sample_id) + ".xml"
+    samplefile = "bundle_" + str(sample_id) + ".xml"
     curl_cmd = 'curl -u ' + user_token + ':' + pass_word \
                + ' -F "SUBMISSION=@' \
                + submissionfile \
