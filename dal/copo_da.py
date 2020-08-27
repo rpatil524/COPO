@@ -550,6 +550,16 @@ class Sample(DAComponent):
     def get_from_profile_id(self, profile_id):
         return self.get_collection_handle().find({'profile_id': profile_id})
 
+    def timestamp_dtol_sample_created(self, sample_id):
+        email = ThreadLocal.get_current_user().email
+        sample = self.get_collection_handle().update({"_id": ObjectId(sample_id)},
+                                                     {"$set": {"time_created": datetime.now(), "created_by": email}})
+
+    def timestamp_dtol_sample_verified(self, sample_id):
+        email = ThreadLocal.get_current_user().email
+        sample = self.get_collection_handle().update({"_id": ObjectId(sample_id)},
+                                                     {"$set": {"time_verified": datetime.now(), "verified_by": email}})
+
     def add_accession(self, biosample_accession, sra_accession, submission_accession, oid):
         return self.get_collection_handle().update(
             {
@@ -563,7 +573,7 @@ class Sample(DAComponent):
                     'status': 'accepted'}
             })
 
-    def  add_rejected_status(self, status, oid):
+    def add_rejected_status(self, status, oid):
         return self.get_collection_handle().update(
             {
                 "_id": ObjectId(oid)
@@ -573,8 +583,6 @@ class Sample(DAComponent):
                   'status': "rejected"}
              }
         )
-
-
 
     def get_dtol_from_profile_id(self, profile_id, filter):
         if filter == "pending":
@@ -1157,6 +1165,9 @@ class DataFile(DAComponent):
     def update_file_level_metadata(self, file_id, data):
         self.get_collection_handle().update({"_id": ObjectId(file_id)}, {"$push": {"file_level_annotation": data}})
         return self.get_file_level_metadata_for_sheet(file_id, data["sheet_name"])
+
+    def insert_sample_id(self, file_id, sample_id):
+        self.get_collection_handle().update({"_id": ObjectId(file_id)}, {"$push": {"description.attributes.attach_samples.study_samples": sample_id}})
 
     def get_file_level_metadata_for_sheet(self, file_id, sheetname):
 

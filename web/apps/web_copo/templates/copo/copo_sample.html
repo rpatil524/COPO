@@ -35,7 +35,9 @@
             width: 400px;
             margin-bottom: 20px;
         }
-
+        #image_table img{
+            height: 100px
+        }
     </style>
 {% endblock %}
 
@@ -66,7 +68,8 @@
 
 {% block content %}
     <script>
-        var groups = {{ groups|safe }}
+        var groups =
+        {{ groups|safe }}
     </script>
     <!--test ends -->
     <!--test ends -->
@@ -276,15 +279,22 @@
                             Select Spreadsheet
                         </label>
                         <label class="btn btn-info" for="images" id="files_label" disabled>
-                            <input id="images" name="images[]" type="file" accept=".png,.jpg, .jpeg" multiple style="display:none"
-                                   onchange="upload_image_files(this)">
+
+                            <input enctype='multipart/formdata' id="images" name="images" type="file"
+                                   accept=".png,.jpg, .jpeg" multiple style="display:none"
+                                   onchange="upload_image_files(this.files)" disabled>
                             Select Image Directory
                         </label>
-                        <button class="btn btn-primary" disabled>Finish</button>
+                        <button class="btn btn-primary" id="finish_button" style="display:none">Finish</button>
 
 
                     </div>
-                    <div id="upload_controls"></div>
+
+
+
+                    <div id="upload_controls">
+
+                    </div>
                     <div style="display:none; margin-top: 30px; " id="sample_info" class="alert alert-info"
                          role="alert"></div>
                     <div style="display:none; margin-top: 30px; " id="sample_valid" class="alert alert-info"
@@ -293,21 +303,37 @@
                     <div style="display:none; margin-top: 10px; " id="parse_info" class="alert alert-info" role="alert">
                         ...
                     </div>
-                    <div style="display:none; margin-top: 10px;" id="confirm_info" class="confirm">
-                        The following samples will be created. Click OK to continue.
-
-                            <button id="create_samples" class="btn btn-success">OK</button>
-
-                    </div>
-
-                    <div id="table_div" style="display: none;width:100%; max-height: 100%; padding-left: 30px">
-                        <table id="sample_parse_table" class="ui celled padded table">
-
-                            <thead></thead>
-                            <tbody></tbody>
 
 
-                        </table>
+                    <ul class="nav nav-tabs" id="tabs" style="display:none">
+                        <li class="active">
+                            <a data-toggle="tab" id="meta_table_nav_tab" href="#meta">Sample Metadata</a>
+                        </li>
+                        <li>
+                            <a data-toggle="tab" id="image_table_nav_tab" href="#image">Sample Images</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" >
+                        <div class="tab-pane active" id="meta">
+                            <div id="table_div" style="display: none;width:100%; max-height: 100%; padding-left: 30px">
+                                <table id="sample_parse_table" class="ui celled padded table">
+
+                                    <thead></thead>
+                                    <tbody></tbody>
+
+
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="image">
+                            <table id="image_table" class="ui celled padded table">
+
+                                    <thead></thead>
+                                    <tbody></tbody>
+
+
+                                </table>
+                        </div>
                     </div>
                 </div>
 
