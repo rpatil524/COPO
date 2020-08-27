@@ -10,7 +10,8 @@ import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from api.utils import map_to_dict
 from dal.copo_da import Sample
 from submission.helpers.generic_helper import notify_sample_status
-from web.apps.web_copo.lookup import lookup
+from web.apps.web_copo.lookup import dtol_lookups as  lookup
+from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 
 
@@ -57,7 +58,7 @@ class DtolSpreadsheet:
 
     def validate(self):
         # need to load validation field set
-        with open(lookup.WIZARD_FILES["sample_details"]) as json_data:
+        with open(lk.WIZARD_FILES["sample_details"]) as json_data:
 
             try:
                 # get definitive list of DTOL fields from schema
