@@ -11,7 +11,7 @@ from django_tools.middlewares import ThreadLocal
 from django.core.files.storage import default_storage
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from api.utils import map_to_dict
-from dal.copo_da import Sample
+from dal.copo_da import Sample, DataFile
 from submission.helpers.generic_helper import notify_sample_status
 from web.apps.web_copo.lookup import dtol_lookups as  lookup
 from web.apps.web_copo.lookup import lookup as lk
@@ -201,6 +201,8 @@ class DtolSpreadsheet:
     def save_records(self):
         # create mongo sample objects from info parsed from manifest and saved to session variable
         sample_data = self.sample_data
+        request = ThreadLocal.get_current_request()
+        image_data = request.session["image_specimen_match"]
         for p in range(1, len(sample_data)):
             s = (map_to_dict(sample_data[0], sample_data[p]))
             s["sample_type"] = "dtol"
@@ -208,7 +210,13 @@ class DtolSpreadsheet:
             notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + s["SPECIMEN_ID"],
                                  action="info",
                                  html_id="sample_info")
-            obj_id = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
-            Sample().timestamp_dtol_sample_created(obj_id["_id"])
+            sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
+            for im in image_data:
+                if s["SPECIMEN_ID"] in im["specimen_id"]:
+                    fields = {"file_location":im["file_name"]}
+                    df = DataFile().save_record({}, **fields)
+                    DataFile().insert_sample_id(df["_id"], sampl["_id"])
+                    break;
+            Sample().timestamp_dtol_sample_created(sampl["_id"])
             print("sample created: " + str(p))
             # obj = Sample(profile_id=self.profile_id).get_record(obj_id['_id']) #would retrieve same as 133
