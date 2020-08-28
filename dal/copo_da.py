@@ -597,11 +597,12 @@ class Submission(DAComponent):
     def __init__(self, profile_id=None):
         super(Submission, self).__init__(profile_id, "submission")
 
-    def dtol_sample_processed(self, sub_id, sam_id):
+    def dtol_sample_processed(self, sub_id, sam_ids):
         # when dtol sample has been processed, pull id from submission and check if there are remaining
         # samples left to go. If not, make submission complete. This will stop celery processing the this submission.
         sub_handle = self.get_collection_handle()
-        sub_handle.update({"_id": ObjectId(sub_id)}, {"$pull": {"dtol_samples": sam_id}})
+        for sam_id in sam_ids:
+            sub_handle.update({"_id": ObjectId(sub_id)}, {"$pull": {"dtol_samples": sam_id}})
         sub = sub_handle.find_one({"_id": ObjectId(sub_id)}, {"dtol_samples": 1})
 
         if len(sub["dtol_samples"]) < 1:

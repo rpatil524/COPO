@@ -41,9 +41,11 @@ def process_pending_dtol_samples():
         # print(Submission().get_study(submission['_id']))
         if not Submission().get_study(submission['_id']):
             create_study(submission['profile_id'], collection_id=submission['_id'])
-        file_subfix = str(uuid.uuid4()) #use this to recover buundle sample file
+        file_subfix = str(uuid.uuid4()) #use this to recover bundle sample file
         build_bundle_sample_xml(file_subfix)
+        s_ids=[]
         for s_id in submission["dtol_samples"]:
+            s_ids.append(s_id)
             sam = Sample().get_record(s_id)
             notify_dtol_status(msg="Adding to Set Sample: " + sam["collectorSampleName"], action="info",
                                html_id="dtol_sample_info")
@@ -62,7 +64,7 @@ def process_pending_dtol_samples():
             msg = "Submission Rejected: " + sam["collectorSampleName"] + "<p>" + accessions["msg"] + "</p>"
             notify_dtol_status(msg=msg, action="info",
                                html_id="dtol_sample_info")
-        Submission().dtol_sample_processed(sub_id=submission["_id"], sam_id=s_id)
+        Submission().dtol_sample_processed(sub_id=submission["_id"], sam_ids=s_ids)
 
 def build_bundle_sample_xml(file_subfix):
     '''build structure and save to file bundle_file_subfix.xml'''
