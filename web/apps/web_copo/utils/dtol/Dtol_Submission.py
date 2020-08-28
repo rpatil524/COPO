@@ -52,16 +52,16 @@ def process_pending_dtol_samples():
             # store accessions, remove sample id from bundle and on last removal, set status of submission
         build_submission_xml(file_subfix)
         accessions = submit_biosample(file_subfix, Sample(), submission['_id'])
-        '''print(accessions)
+        print(accessions)
         if accessions["status"] == "ok":
-            msg = "Last Sample Submitted: " + sample["collectorSampleName"] + " - ENA ID: " + accessions[
-                "submission_accession"] + " - Biosample ID: " + accessions["biosample_accession"]
+            msg = "Last Sample Submitted: " + sam["collectorSampleName"] + " - ENA Submission ID: " + accessions[
+                "submission_accession"] #+ " - Biosample ID: " + accessions["biosample_accession"]
             notify_dtol_status(msg=msg, action="info",
                                html_id="dtol_sample_info")
         else:
-            msg = "Submission Rejected: " + sample["collectorSampleName"] + "<p>" + accessions["msg"] + "</p>"
+            msg = "Submission Rejected: " + sam["collectorSampleName"] + "<p>" + accessions["msg"] + "</p>"
             notify_dtol_status(msg=msg, action="info",
-                               html_id="dtol_sample_info")'''
+                               html_id="dtol_sample_info")
         Submission().dtol_sample_processed(sub_id=submission["_id"], sam_id=s_id)
 
 def build_bundle_sample_xml(file_subfix):
@@ -74,7 +74,7 @@ def update_bundle_sample_xml(sample, bundlefile):
     tree = ET.parse(bundlefile)
     root = tree.getroot()
     sample_alias = ET.SubElement(root, 'SAMPLE')
-    sample_alias.set('alias', str(uuid.uuid4()))  # Todo this is for testing only
+    sample_alias.set('alias', str(sample['_id']))  # updated to copo id to retrieve it when getting accessions
     sample_alias.set('center_name', 'EarlhamInstitute')  #mandatory for broker account
     title = str(uuid.uuid4())
 
@@ -205,10 +205,10 @@ def build_validate_xml(sample_id):
                encoding='unicode')  # overwriting at each run, i don't think we need to keep it - todo again I think these should have unique id attached, and then file deleted after submission
 
 
-def submit_biosample(sample_id, sampleobj, collection_id):
+def submit_biosample(subfix, sampleobj, collection_id):
     # register project to the ENA service using XML files previously created
-    submissionfile = "submission_" + str(sample_id) + ".xml"
-    samplefile = "bundle_" + str(sample_id) + ".xml"
+    submissionfile = "submission_" + str(subfix) + ".xml"
+    samplefile = "bundle_" + str(subfix) + ".xml"
     curl_cmd = 'curl -u ' + user_token + ':' + pass_word \
                + ' -F "SUBMISSION=@' \
                + submissionfile \
@@ -236,13 +236,17 @@ def submit_biosample(sample_id, sampleobj, collection_id):
         msg = tree.find('MESSAGES').findtext('ERROR', default='Undefined error')
         status = {"status": "error","msg": msg}
         # print(status)
-        sampleobj.add_rejected_status(status, sample_id)
+        for child in tree.iter():
+            if child.tag == 'SAMPLE':
+                sample_id = child.get('alias')
+                sampleobj.add_rejected_status(status, sample_id)
 
         #print('error')
         return status
     else:
         # retrieve id and update record
-        return get_biosampleId(receipt, sample_id, collection_id)
+        #return get_biosampleId(receipt, sample_id, collection_id)
+        return get_bundle_biosampleId(receipt, collection_id)
 
 
 def get_biosampleId(receipt, sample_id, collection_id):
@@ -260,6 +264,23 @@ def get_biosampleId(receipt, sample_id, collection_id):
     #print('we are here')
     accessions = {"sra_accession": sra_accession, "biosample_accession": biosample_accession, "submission_accession": submission_accession, "status": "ok"}
     return accessions
+
+def get_bundle_biosampleId(receipt, collection_id):
+    '''parsing ENA sample bundle accessions from receipt and
+    storing in sample and submission collection object'''
+    tree = ET.fromstring(receipt)
+    submission_accession = tree.find('SUBMISSION').get('accession')
+    for child in tree.iter():
+        if child.tag == 'SAMPLE':
+            sample_id = child.get('alias')
+            sra_accession = child.get('accession')
+            biosample_accession = child.find('EXT_ID').get('accession')
+            Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
+            Submission().add_accession(biosample_accession, sra_accession, submission_accession, sample_id,
+                                       collection_id)
+    accessions = {"submission_accession": submission_accession, "status": "ok"}
+    return accessions
+
 
 def get_studyId(receipt, collection_id):
     # parsing ENA study accessions from receipt and storing in submission collection
