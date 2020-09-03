@@ -1539,6 +1539,24 @@
     {
       "help_tip": "",
       "required": "true",
+      "default_value": "na",
+      "control_meta": {},
+      "versions": [
+        "manifest_id"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "true",
+      "label": "Manifest ID",
+      "show_in_form": false,
+      "id": "copo.sample.manifest_id",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
       "default_value": "",
       "control_meta": {},
       "versions": [

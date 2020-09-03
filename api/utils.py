@@ -1,7 +1,7 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 20/01/2016'
 
 import json
-
+import bson.json_util as jsonb
 import jsonpickle
 from django.http import HttpResponse
 
@@ -44,16 +44,22 @@ def finish_request(template=None, error=None):
     """
     wrapper = get_return_template('WRAPPER')
     if error is None:
-        wrapper['number_found'] = len(template)
-        wrapper['items'] = template
-        wrapper['status']['error'] = False
+        if template == None:
+            wrapper["number_found"] = 0
+        if type(template) == type(list()):
+            wrapper['number_found'] = len(template)
+        else:
+            wrapper['number_found'] = 1
+        wrapper['data'] = template
+        wrapper['status'] = "OK"
     else:
         wrapper['status']['error'] = True
         wrapper['status']['error_detail'] = error
         wrapper['number_found'] = None
-        wrapper['items'] = None
-
-    return HttpResponse(jsonpickle.encode(wrapper))
+        wrapper['data'] = None
+    output = jsonb.dumps(wrapper)
+    print(output)
+    return HttpResponse(output)
 
 def map_to_dict(x, y):
     # method to make output dict using keys from array x and values from array y

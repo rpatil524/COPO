@@ -24,7 +24,7 @@ from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 from web.apps.web_copo.models import UserDetails
 from django.db.models import Q
 from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
-
+from bson.errors import InvalidId
 lg = settings.LOGGER
 
 PubCollection = 'PublicationCollection'
@@ -107,9 +107,13 @@ class DAComponent:
         """
         doc = None
         if self.get_collection_handle():
-            doc = self.get_collection_handle().find_one({"_id": ObjectId(oid)})
+            try:
+                doc = self.get_collection_handle().find_one({"_id": ObjectId(oid)})
+            except InvalidId as e:
+                return e
         if not doc:
             pass
+
         return doc
 
     def get_component_count(self):
@@ -546,6 +550,9 @@ class Source(DAComponent):
 class Sample(DAComponent):
     def __init__(self, profile_id=None):
         super(Sample, self).__init__(profile_id, "sample")
+
+    def get_dtol_type(self, id):
+        return self.get_collection_handle().find_one({"$or":[{"biosampleAccession": id}, {"sraAccession": id}, {"biosampleAccession": id}]})
 
     def get_from_profile_id(self, profile_id):
         return self.get_collection_handle().find({'profile_id': profile_id})

@@ -17,6 +17,7 @@ from web.apps.web_copo.lookup import dtol_lookups as  lookup
 from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from django.conf import settings
+import uuid
 
 
 class DtolSpreadsheet:
@@ -201,17 +202,20 @@ class DtolSpreadsheet:
     def save_records(self):
         # create mongo sample objects from info parsed from manifest and saved to session variable
         sample_data = self.sample_data
+        manifest_id = str(uuid.uuid4())
         request = ThreadLocal.get_current_request()
         image_data = request.session["image_specimen_match"]
         for p in range(1, len(sample_data)):
             s = (map_to_dict(sample_data[0], sample_data[p]))
             s["sample_type"] = "dtol"
             s["biosample_accession"] = []
+            s["manifest_id"] = manifest_id
             notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + s["SPECIMEN_ID"],
                                  action="info",
                                  html_id="sample_info")
             sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
             for im in image_data:
+                # create matching DataFile object for image is provided
                 if s["SPECIMEN_ID"] in im["specimen_id"]:
                     fields = {"file_location":im["file_name"]}
                     df = DataFile().save_record({}, **fields)

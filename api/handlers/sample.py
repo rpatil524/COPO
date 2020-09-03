@@ -16,9 +16,18 @@ def get(request, id):
     :return: an HttpResponse object embedded with the completed return template for Sample
     """
 
-    # get sample and source objects
+    # farm request to appropriate sample type handler
     try:
-        ss = Sample().get_sample_and_source(id)
+        ss = Sample().get_record(id)
+        if type(ss) is not InvalidId:
+            return do_standard_sample(ss)
+        else:
+            # if user supplied an ENA accession
+            ss = Sample().get_dtol_type(id)
+            if ss:
+                return do_dtol_sample(ss)
+            else:
+                return finish_request()
     except TypeError as e:
         print(e)
         return finish_request(error=API_ERRORS['NOT_FOUND'])
@@ -29,7 +38,12 @@ def get(request, id):
         print("Unexpected error:", sys.exc_info()[0])
         raise
 
+def do_dtol_sample(ss):
+    resp = finish_request(ss)
+    return resp
 
+
+def do_standard_sample(ss):
     source = ss['source']
     sample = ss['sample']
 
@@ -46,7 +60,6 @@ def get(request, id):
     out_list.append(tmp_sample)
 
     return finish_request(out_list)
-
 
 def get_all(request):
     """
