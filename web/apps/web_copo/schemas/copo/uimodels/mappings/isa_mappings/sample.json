@@ -343,32 +343,6 @@
       "control_meta": {},
       "control": "text",
       "versions": [
-        "SPECIFIC_EPITHET"
-      ],
-      "ref": "",
-      "specifications": [
-        "dtol"
-      ],
-      "deprecated": false,
-      "hidden": "false",
-      "type": "string",
-      "show_in_form": true,
-      "id": "copo.sample.species",
-      "label": "Specific Epiphet",
-      "show_in_table": false,
-      "ontology_names": [
-        "ncbitaxon"
-      ],
-      "dwc": "http://rs.tdwg.org/dwc/terms/scientificName"
-    },
-    {
-      "help_tip": "The full scientific name of the species in which the species is classified.",
-      "required": "true",
-      "default_value": "",
-      "show_as_attribute": true,
-      "control_meta": {},
-      "control": "text",
-      "versions": [
         "SCIENTIFIC_NAME"
       ],
       "ref": "",
