@@ -94,6 +94,7 @@ class EnaSubmit(object):
 
             f_str = ' '.join(file_path)
             cmd = "./ascp -d -QT -l700M -L- {f_str!s} {user_name!s}:{remote_path!s}".format(**locals())
+            print(cmd)
             lg.log(cmd, level=Loglvl.INFO, type=Logtype.FILE)
             os.chdir(path2library)
 
