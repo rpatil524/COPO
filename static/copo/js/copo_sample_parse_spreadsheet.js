@@ -166,6 +166,7 @@ $(document).ready(function () {
                 table_row = ("<tr><td>" + row.specimen_id + "</td><td>" + row.file_name.split('\\').pop().split('/').pop() + "</td><td>" + img_tag + "</td></tr>") // split-pop thing is to get filename from full path
                 $("#image_table").append(table_row)
             }
+            $("#image_table").DataTable()
             $("#image_table_nav_tab").click()
             $("#finish_button").fadeIn()
         } else if (d.action === "make_table") {
@@ -190,20 +191,21 @@ $(document).ready(function () {
 
                     tr.append(td)
                 }
-                if (count == 0) {
-                    $("#sample_parse_table thead").append(tr)
+                if (count === 0) {
+                    $("#sample_parse_table").find("thead").append(tr)
                 } else {
-                    $("#sample_parse_table tbody").append(tr)
+                    $("#sample_parse_table").find("tbody").append(tr)
                 }
                 count++
 
             }
-            //$("#sample_info").hide()
+            $("#sample_info").hide()
             $("#sample_parse_table").DataTable({
-                "scrollY": 400,
-                "scrollX": true
+                "scrollY": "400px",
+                "scrollX": true,
             })
             $("#table_div").fadeIn(1000)
+            $("#sample_parse_table").DataTable().draw()
             $("#files_label").removeAttr("disabled")
             $("#files_label").find("input").removeAttr("disabled")
             //$("#confirm_info").fadeIn(1000)

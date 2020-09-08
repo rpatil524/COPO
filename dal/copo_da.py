@@ -3,7 +3,6 @@ __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 import copy
 import os
 from datetime import datetime
-
 import pandas as pd
 import pymongo
 import pymongo.errors as pymongo_errors
@@ -22,9 +21,11 @@ from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
 from web.apps.web_copo.models import UserDetails
+
 from django.db.models import Q
 from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
 from bson.errors import InvalidId
+
 lg = settings.LOGGER
 
 PubCollection = 'PublicationCollection'
@@ -552,7 +553,8 @@ class Sample(DAComponent):
         super(Sample, self).__init__(profile_id, "sample")
 
     def get_dtol_type(self, id):
-        return self.get_collection_handle().find_one({"$or":[{"biosampleAccession": id}, {"sraAccession": id}, {"biosampleAccession": id}]})
+        return self.get_collection_handle().find_one(
+            {"$or": [{"biosampleAccession": id}, {"sraAccession": id}, {"biosampleAccession": id}]})
 
     def get_from_profile_id(self, profile_id):
         return self.get_collection_handle().find({'profile_id': profile_id})
@@ -594,11 +596,26 @@ class Sample(DAComponent):
     def get_dtol_from_profile_id(self, profile_id, filter):
         if filter == "pending":
             # $nin will return where status neq to values in array, or status is absent altogether
-            return self.get_collection_handle().find(
+            cursor = self.get_collection_handle().find(
                 {'profile_id': profile_id, "status": {"$nin": ["rejected", "accepted"]}})
         else:
             # else return samples who's status simply mathes the filter
-            return self.get_collection_handle().find({'profile_id': profile_id, "status": filter})
+            cursor = self.get_collection_handle().find({'profile_id': profile_id, "status": filter})
+        out = list()
+        # get schema
+        sc = self.get_component_schema()
+        out = list()
+        for i in cursor_to_list(cursor):
+            sam = dict()
+            for cell in i:
+                for field in sc:
+                    if cell == field.get("id", "").split(".")[-1] or cell == "_id":
+                        if "dtol" in field.get("specifications", ""):
+                            if field.get("show_in_table", ""):
+                                print(field.get("show_in_table"))
+                                sam[cell] = i[cell]
+            out.append(sam)
+        return out
 
     def mark_rejected(self, sample_id, reason="Sample rejected by curator."):
         return self.get_collection_handle().update({"_id": ObjectId(sample_id)},
@@ -1063,12 +1080,12 @@ class Submission(DAComponent):
             },
             {"$set":
                 {
-                    'accessions.sample_accessions.'+str(oid): {
-                    'biosampleAccession': biosample_accession,
-                    'sraAccession': sra_accession,
-                    'submissionAccession': submission_accession,
-                    'status': 'accepted'}
-            }})
+                    'accessions.sample_accessions.' + str(oid): {
+                        'biosampleAccession': biosample_accession,
+                        'sraAccession': sra_accession,
+                        'submissionAccession': submission_accession,
+                        'status': 'accepted'}
+                }})
 
     def add_study_accession(self, bioproject_accession, sra_study_accession, study_accession, collection_id):
         return self.get_collection_handle().update(
@@ -1077,7 +1094,7 @@ class Submission(DAComponent):
             },
             {"$set":
                 {
-                    'accessions.study_accessions' : {
+                    'accessions.study_accessions': {
                         'bioProjectAccession': bioproject_accession,
                         'sraStudyAccession': sra_study_accession,
                         'submissionAccession': study_accession,
@@ -1089,8 +1106,6 @@ class Submission(DAComponent):
         # return if study has been already submitted
         return self.get_collection_handle().count(
             {'$and': [{'_id': ObjectId(collection_id)}, {'accessions.study_accessions': {'$exists': 'true'}}]})
-
-
 
 
 class DataFile(DAComponent):
@@ -1174,7 +1189,8 @@ class DataFile(DAComponent):
         return self.get_file_level_metadata_for_sheet(file_id, data["sheet_name"])
 
     def insert_sample_id(self, file_id, sample_id):
-        self.get_collection_handle().update({"_id": ObjectId(file_id)}, {"$push": {"description.attributes.attach_samples.study_samples": sample_id}})
+        self.get_collection_handle().update({"_id": ObjectId(file_id)}, {
+            "$push": {"description.attributes.attach_samples.study_samples": sample_id}})
 
     def get_file_level_metadata_for_sheet(self, file_id, sheetname):
 

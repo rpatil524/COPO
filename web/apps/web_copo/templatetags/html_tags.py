@@ -741,7 +741,10 @@ def get_record_data(record_object=dict(), component=str()):
 
     for f in schema:
         if f.get("show_in_table", True):
-            row.append(resolve_control_output(record_object, f))
+            if "dtol" in f["specifications"]:
+                row.append(record_object[(f.id.split(".")[-1])])
+            else:
+                row.append(resolve_control_output(record_object, f))
 
     row.append(str(record_object["_id"]))  # last element in a row exposes the id of the record
 

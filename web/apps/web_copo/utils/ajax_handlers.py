@@ -1342,7 +1342,7 @@ def update_pending_samples_table(request):
 def get_samples_for_profile(request):
     profile_id = request.GET["profile_id"]
     filter = request.GET["filter"]
-    samples = util.cursor_to_list(Sample().get_dtol_from_profile_id(profile_id, filter))
+    samples = Sample().get_dtol_from_profile_id(profile_id, filter)
     # notify_dtol_status(msg="Creating Sample: " + "sprog", action="info",
     #                     html_id="dtol_sample_info")
     return HttpResponse(json_util.dumps(samples))

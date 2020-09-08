@@ -48,7 +48,7 @@ def process_pending_dtol_samples():
 
 
 def build_xml(sample, sub_id, p_id, collection_id):
-    notify_dtol_status(msg="Creating Sample: " + sample["collectorSampleName"], action="info",
+    notify_dtol_status(msg="Creating Sample: " + sample.get("SPECIMEN_ID", ""), action="info",
                          html_id="dtol_sample_info")
     build_sample_xml(sample)
     sample_id = str(sample['_id'])
@@ -59,11 +59,11 @@ def build_xml(sample, sub_id, p_id, collection_id):
     accessions = submit_biosample(sample_id, Sample(), collection_id)
     print(accessions)
     if accessions["status"] == "ok":
-        msg = "Last Sample Submitted: " + sample["collectorSampleName"] + " - ENA ID: " + accessions["submission_accession"] + " - Biosample ID: " + accessions["biosample_accession"]
+        msg = "Last Sample Submitted: " + sample["SPECIMEN_ID"] + " - ENA ID: " + accessions["submission_accession"] + " - Biosample ID: " + accessions["biosample_accession"]
         notify_dtol_status(msg=msg, action="info",
                              html_id="dtol_sample_info")
     else:
-        msg = "Submission Rejected: " + sample["collectorSampleName"] + "<p>" + accessions["msg"] + "</p>"
+        msg = "Submission Rejected: " + sample["SPECIMEN_ID"] + "<p>" + accessions["msg"] + "</p>"
         notify_dtol_status(msg=msg, action="info",
                            html_id="dtol_sample_info")
 
@@ -279,6 +279,6 @@ def create_study(profile_id, collection_id):
         notify_dtol_status(msg=msg, action="info",
                              html_id="dtol_sample_info")
     else:
-        msg = "Submission Rejected: " + sample["collectorSampleName"] + "<p>" + accessions["msg"] + "</p>"
+        msg = "Submission Rejected: " + "<p>" + accessions["msg"] + "</p>"
         notify_dtol_status(msg=msg, action="info",
                            html_id="dtol_sample_info")
