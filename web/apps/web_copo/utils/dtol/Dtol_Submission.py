@@ -83,7 +83,7 @@ def build_sample_xml(sample):
     title_block.text = title
     sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
     taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
-    taxon_id.text = sample.get('taxonid', "")
+    taxon_id.text = sample.get('TAXON_ID', "")
     sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
     ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
     for item in sample.items():
