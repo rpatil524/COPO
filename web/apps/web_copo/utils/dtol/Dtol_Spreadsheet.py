@@ -204,7 +204,7 @@ class DtolSpreadsheet:
         sample_data = self.sample_data
         manifest_id = str(uuid.uuid4())
         request = ThreadLocal.get_current_request()
-        image_data = request.session["image_specimen_match"]
+        image_data = request.session.get("image_specimen_match", [])
         for p in range(1, len(sample_data)):
             s = (map_to_dict(sample_data[0], sample_data[p]))
             s["sample_type"] = "dtol"
