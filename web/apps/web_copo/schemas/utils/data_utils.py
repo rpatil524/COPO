@@ -621,6 +621,8 @@ def get_args_from_parameter(parameter, param_value_dict):
 def san_check(val):
     return val if val is not None else ''
 
+def get_unqualified_id(qual):
+    return qual.split(".")[-1]
 
 class DecoupleFormSubmission:
     def __init__(self, auto_fields, schema):

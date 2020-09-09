@@ -85,29 +85,6 @@
     {
       "help_tip": "",
       "required": "true",
-      "default_value": "",
-      "control_meta": {},
-      "dwc": "http://rs.tdwg.org/dwc/terms/measurementID",
-      "versions": [
-        "COLLECTOR_SAMPLE_NAME"
-      ],
-      "specifications": [
-        "dtol"
-      ],
-      "ref": "",
-      "deprecated": false,
-      "hidden": "false",
-      "label": "Collector Sample Name",
-      "show_in_form": true,
-      "id": "copo.sample.collectorSampleName",
-      "type": "string",
-      "show_in_table": true,
-      "control": "text",
-      "show_as_attribute": true
-    },
-    {
-      "help_tip": "",
-      "required": "true",
       "control_meta": {},
       "versions": [
         "COLLECTED_BY"
@@ -120,7 +97,7 @@
       ],
       "show_in_form": true,
       "label": "Collected By",
-      "id": "copo.sample.collectedBy",
+      "id": "copo.sample.COLLECTED_BY",
       "show_in_table": true,
       "control": "text",
       "default_value": "",
@@ -142,33 +119,11 @@
       ],
       "show_in_form": true,
       "label": "Date of Collection",
-      "id": "copo.sample.dateOfCollection",
+      "id": "copo.sample.DATE_OF_COLLECTION",
       "show_in_table": true,
       "control": "date-picker",
       "default_value": "",
       "dwc": "http://rs.tdwg.org/dwc/terms/verbatimEventDate",
-      "type": "string"
-    },
-    {
-      "help_tip": "",
-      "required": "true",
-      "control_meta": {},
-      "versions": [
-        "DATE_OF_SPECIMEN_IDENTIFICATION"
-      ],
-      "ref": "",
-      "deprecated": false,
-      "hidden": "false",
-      "specifications": [
-        "dtol"
-      ],
-      "show_in_form": true,
-      "label": "Date of Specimen Identification",
-      "id": "copo.sample.dateOfSpecimenIdentification",
-      "show_in_table": true,
-      "control": "date-picker",
-      "default_value": "",
-      "dwc": "http://rs.tdwg.org/dwc/terms/eventDate",
       "type": "string"
     },
     {
@@ -187,7 +142,7 @@
       "hidden": "false",
       "label": "Sex",
       "show_in_form": true,
-      "id": "copo.sample.sex",
+      "id": "copo.sample.SEX",
       "type": "string",
       "show_in_table": true,
       "control": "select",
@@ -214,7 +169,7 @@
       "hidden": "false",
       "label": "Lifestage",
       "show_in_form": true,
-      "id": "copo.sample.lifeStage",
+      "id": "copo.sample.LIFESTAGE",
       "type": "string",
       "show_in_table": true,
       "control": "select",
@@ -247,7 +202,7 @@
       ],
       "show_in_form": true,
       "label": "Identified By",
-      "id": "copo.sample.identifiedBy",
+      "id": "copo.sample.IDENTIFIED_BY",
       "show_in_table": true,
       "control": "text",
       "default_value": "",
@@ -255,11 +210,11 @@
       "type": "string"
     },
     {
-      "help_tip": "Public Name",
-      "required": "false",
+      "help_tip": "Separate multiple names with '|'",
+      "required": "true",
       "control_meta": {},
       "versions": [
-        "PUBLIC_NAME"
+        "IDENTIFIER_AFFLIATION"
       ],
       "ref": "",
       "deprecated": false,
@@ -268,12 +223,12 @@
         "dtol"
       ],
       "show_in_form": true,
-      "label": "Public Name",
-      "id": "copo.sample.publicName",
+      "label": "Identifier Affiliation",
+      "id": "copo.sample.IDENTIFIER_AFFLIATION",
       "show_in_table": true,
       "control": "text",
       "default_value": "",
-      "dwc": "",
+      "dwc": "http://rs.tdwg.org/dwc/terms/identifiedBy",
       "type": "string"
     },
     {
@@ -294,7 +249,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.taxonid",
+      "id": "copo.sample.TAXON_ID",
       "label": "Taxon ID",
       "show_in_table": false,
       "ontology_names": [
@@ -320,7 +275,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.order",
+      "id": "copo.sample.ORDER_OR_GROUP",
       "label": "Order",
       "show_in_table": false,
       "ontology_names": [
@@ -346,7 +301,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.family",
+      "id": "copo.sample.FAMILY",
       "label": "Family",
       "show_in_table": false,
       "ontology_names": [
@@ -372,39 +327,13 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.genus",
+      "id": "copo.sample.GENUS",
       "label": "Genus",
       "show_in_table": false,
       "ontology_names": [
         "ncbitaxon"
       ],
       "dwc": "http://rs.tdwg.org/dwc/terms/genus"
-    },
-    {
-      "help_tip": "The full scientific name of the species in which the species is classified.",
-      "required": "true",
-      "default_value": "",
-      "show_as_attribute": true,
-      "control_meta": {},
-      "control": "text",
-      "versions": [
-        "SPECIFIC_EPITHET"
-      ],
-      "ref": "",
-      "specifications": [
-        "dtol"
-      ],
-      "deprecated": false,
-      "hidden": "false",
-      "type": "string",
-      "show_in_form": true,
-      "id": "copo.sample.species",
-      "label": "Specific Epiphet",
-      "show_in_table": false,
-      "ontology_names": [
-        "ncbitaxon"
-      ],
-      "dwc": "http://rs.tdwg.org/dwc/terms/scientificName"
     },
     {
       "help_tip": "The full scientific name of the species in which the species is classified.",
@@ -424,7 +353,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.scientificName",
+      "id": "copo.sample.SCIENTIFIC_NAME",
       "label": "Specific Epiphet",
       "show_in_table": false,
       "ontology_names": [
@@ -450,11 +379,37 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.infraspecificEpiphet",
+      "id": "copo.sample.INFRASPECIFIC_EPITHET",
       "label": "Infraspecific Epiphet",
       "show_in_table": false,
       "ontology_names": [
         "ncbitaxon"
+      ],
+      "dwc": "http://rs.tdwg.org/dwc/terms/scientificName"
+    },
+    {
+      "help_tip": "Culture of Strain ID",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "CULTURE_OR_STRAIN_ID"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.CULTURE_OR_STRAIN_ID",
+      "label": "Culture of Strain ID",
+      "show_in_table": false,
+      "ontology_names": [
+        ""
       ],
       "dwc": "http://rs.tdwg.org/dwc/terms/scientificName"
     },
@@ -476,7 +431,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.commonName",
+      "id": "copo.sample.COMMON_NAME",
       "label": "Common Name",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/vernacularName"
@@ -499,7 +454,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.specimenId",
+      "id": "copo.sample.SPECIMEN_ID",
       "label": "Specimen Id",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/recordNumber"
@@ -522,7 +477,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.collectorAffiliation",
+      "id": "copo.sample.COLLECTOR_AFFILIATION",
       "label": "Collector Affiliation",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/institutionCode"
@@ -545,7 +500,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.taxonRemarks",
+      "id": "copo.sample.TAXON_REMARKS",
       "label": "Taxon Remarks",
       "show_in_table": true,
       "dwc": ""
@@ -568,7 +523,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.hazardGroup",
+      "id": "copo.sample.HAZARD_GROUP",
       "label": "Hazard Group",
       "show_in_table": true,
       "dwc": ""
@@ -591,7 +546,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.regulatoryCompliance",
+      "id": "copo.sample.REGULATORY_COMPLIANCE",
       "label": "Regulatory Compliance",
       "show_in_table": true,
       "dwc": ""
@@ -614,7 +569,7 @@
       "hidden": "false",
       "type": "array",
       "show_in_form": true,
-      "id": "copo.sample.collectionLocation",
+      "id": "copo.sample.COLLECTION_LOCATION",
       "label": "Collection Location",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/higherGeography",
@@ -640,7 +595,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.lat",
+      "id": "copo.sample.DECIMAL_LATITUDE",
       "label": "decimalLatitude",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/decimalLatitude"
@@ -663,7 +618,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.long",
+      "id": "copo.sample.DECIMAL_LONGITUDE",
       "label": "Longitude",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/decimalLongitude"
@@ -686,7 +641,7 @@
       "hidden": "false",
       "type": "array",
       "show_in_form": true,
-      "id": "copo.sample.gridReference",
+      "id": "copo.sample.GRID_REFERENCE",
       "label": "Grid Reference",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/georeferenceSources"
@@ -709,7 +664,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.habitat",
+      "id": "copo.sample.HABITAT",
       "label": "Habitat Remarks",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/locationRemarks"
@@ -732,7 +687,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.depth",
+      "id": "copo.sample.DEPTH",
       "label": "Depth (in meters)",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/verbatimDepth"
@@ -755,7 +710,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.elevation",
+      "id": "copo.sample.ELEVATION",
       "label": "Elevation (in meters)",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/verbatimElevation"
@@ -778,7 +733,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.descriptionOfCollectionMethod",
+      "id": "copo.sample.DESCRIPTION_OF_COLLECTION_METHOD",
       "label": "Description of Collection Method",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/samplingProtocol"
@@ -801,7 +756,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.easeOfSpecimenCollection",
+      "id": "copo.sample.EASE_OF_SPECIMEN_COLLECTION",
       "label": "Ease of Specimen Collection",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/samplingEffort"
@@ -824,7 +779,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.dateOfPreservation",
+      "id": "copo.sample.DATE_OF_PRESERVATION",
       "label": "Date of Preservation",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/eventDate"
@@ -847,7 +802,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.timeOfCollection",
+      "id": "copo.sample.TIME_OF_COLLECTION",
       "label": "Time of Collection",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/eventTime"
@@ -870,7 +825,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.timeElapsedFromCollectionToPreservation",
+      "id": "copo.sample.TIME_ELAPSED_FROM_COLLECTION_TO_PRESERVATION",
       "label": "Time Elapsed From Collection To Preservation (in Hours)",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/eventTime"
@@ -893,7 +848,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.preservationApproach",
+      "id": "copo.sample.PRESERVATION_APPROACH",
       "label": "Preservation Approach",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
@@ -916,7 +871,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.preservativeSolution",
+      "id": "copo.sample.PRESERVATIVE_SOLUTION",
       "label": "Preservative Solution",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
@@ -939,7 +894,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.rackOrPlateId",
+      "id": "copo.sample.RACK_OR_PLATE_ID",
       "label": "Rack or Plate Id",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementID"
@@ -962,7 +917,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.tubeOrWellId",
+      "id": "copo.sample.TUBE_OR_WELL_ID",
       "label": "Tube or Well Id",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementID"
@@ -985,8 +940,54 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.gal",
+      "id": "copo.sample.GAL",
       "label": "GAL (Genome Acquision Laboratory)",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/measurementID"
+    },
+    {
+      "help_tip": "Genome Acquision Laboratory Sample ID",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "GAL_SAMPLE_ID"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.GAL_SAMPLE_ID",
+      "label": "GAL (Genome Acquision Laboratory) Identifier",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/measurementID"
+    },
+    {
+      "help_tip": "Collector Sample ID",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "COLLECTOR_SAMPLE_ID"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.COLLECTOR_SAMPLE_ID",
+      "label": "Collector Sample Identifier",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementID"
     },
@@ -1008,7 +1009,30 @@
       "hidden": "false",
       "type": "array",
       "show_in_form": true,
-      "id": "copo.sample.preservedBy",
+      "id": "copo.sample.PRESERVED_BY",
+      "label": "Preserved By",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
+    },
+    {
+      "help_tip": "A list of affiliations separated by '|'",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "ontology term",
+      "versions": [
+        "PRESERVER_AFFILIATION"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "array",
+      "show_in_form": true,
+      "id": "copo.sample.PRESERVER_AFFILIATION",
       "label": "Preserved By",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
@@ -1031,7 +1055,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.organismPart",
+      "id": "copo.sample.ORGANISM_PART",
       "label": "Organism Part",
       "show_in_table": true,
       "dwc": ""
@@ -1054,8 +1078,31 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.symbiont",
+      "id": "copo.sample.SYMBIONT",
       "label": "Symbiont",
+      "show_in_table": true,
+      "dwc": ""
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "RELATIONSHIP"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.RELATIONSHIP",
+      "label": "Relationship",
       "show_in_table": true,
       "dwc": ""
     },
@@ -1077,8 +1124,31 @@
       "hidden": "true",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.identifiedHow",
+      "id": "copo.sample.IDENTIFIED_HOW",
       "label": "Species Determination Method",
+      "show_in_table": true,
+      "dwc": "http://rs.tdwg.org/dwc/terms/identificationReferences"
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "SPECIMEN_ID_RISK"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "true",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.SPECIMEN_ID_RISK",
+      "label": "Specimen Identification Risk",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/identificationReferences"
     },
@@ -1100,7 +1170,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.temperature",
+      "id": "copo.sample.TEMPERATURE",
       "label": "Temperature",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementType"
@@ -1123,7 +1193,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.salinity",
+      "id": "copo.sample.SALINITY",
       "label": "Salinity in g/Kg",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementType"
@@ -1146,7 +1216,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.ph",
+      "id": "copo.sample.PH",
       "label": "pH",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementType"
@@ -1169,7 +1239,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.chlA",
+      "id": "copo.sample.CHLA",
       "label": "Chlorophyll a mg/Litre",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementType"
@@ -1192,7 +1262,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.lightIntensity",
+      "id": "copo.sample.LIGHT_INTENSITY",
       "label": "Light Intensity (Lux)",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementType"
@@ -1215,7 +1285,7 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.dissolvedOxygen",
+      "id": "copo.sample.DISOLVED_OXYGEN",
       "label": "Dissolved Oxygen (%)",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/measurementType"
@@ -1238,7 +1308,7 @@
       "hidden": "false",
       "type": "array",
       "show_in_form": true,
-      "id": "copo.sample.otherInformation",
+      "id": "copo.sample.OTHER_INFORMATION",
       "label": "Other Information",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/dynamicProperties"
@@ -1259,7 +1329,7 @@
       "hidden": "false",
       "label": "Species Rarity",
       "show_in_form": true,
-      "id": "copo.sample.speciesRarity",
+      "id": "copo.sample.SPECIES_RARITY",
       "type": "string",
       "show_in_table": true,
       "control": "select",
@@ -1289,7 +1359,7 @@
       "hidden": "false",
       "label": "Genome Size (In Gigabases)",
       "show_in_form": true,
-      "id": "copo.sample.genomeSize",
+      "id": "copo.sample.GENOME_SIZE",
       "type": "string",
       "show_in_table": true,
       "control": "text"
@@ -1310,7 +1380,7 @@
       "hidden": "false",
       "label": "Size Of Tissue In Tube",
       "show_in_form": true,
-      "id": "copo.sample.sizeOfTissueInTube",
+      "id": "copo.sample.SIZE_OF_TISSUE_IN_TUBE",
       "type": "string",
       "show_in_table": true,
       "control": "text",
@@ -1332,7 +1402,7 @@
       "hidden": "false",
       "label": "Tissue Removed for Barcoding",
       "show_in_form": true,
-      "id": "copo.sample.tissueRemovedForBarcoding",
+      "id": "copo.sample.TISSUE_REMOVED_FOR_BARCODING",
       "type": "string",
       "show_in_table": true,
       "control": "text",
@@ -1344,7 +1414,7 @@
       "control_meta": {},
       "dwc": "",
       "versions": [
-        "SPECIMEN_VOUCHER_ID"
+        "PLATE_ID_FOR_BARCODING"
       ],
       "specifications": [
         "dtol"
@@ -1352,9 +1422,9 @@
       "ref": "",
       "deprecated": false,
       "hidden": "false",
-      "label": "Specimen Voucher ID",
+      "label": "Plate ID for Barcoding",
       "show_in_form": true,
-      "id": "copo.sample.specimenVoucherId",
+      "id": "copo.sample.PLATE_ID_FOR_BARCODING",
       "type": "string",
       "show_in_table": true,
       "control": "text",
@@ -1366,7 +1436,7 @@
       "control_meta": {},
       "dwc": "",
       "versions": [
-        "SPECIMEN_VOUCHER_COLLECTION"
+        "TUBE_OR_WELL_ID_FOR_BARCODING"
       ],
       "specifications": [
         "dtol"
@@ -1374,9 +1444,9 @@
       "ref": "",
       "deprecated": false,
       "hidden": "false",
-      "label": "Specimen Voucher Collection",
+      "label": "Tube or Well ID for Barcoding",
       "show_in_form": true,
-      "id": "copo.sample.specimenVoucherCollection",
+      "id": "copo.sample.TUBE_OR_WELL_ID_FOR_BARCODING",
       "type": "string",
       "show_in_table": true,
       "control": "text",
@@ -1384,11 +1454,11 @@
     },
     {
       "help_tip": "",
-      "required": "false",
+      "required": "true",
       "control_meta": {},
       "dwc": "",
       "versions": [
-        "EVIDENCE_FOR_GENOME_SIZE"
+        "TISSUE_FOR_BARCODING"
       ],
       "specifications": [
         "dtol"
@@ -1396,9 +1466,31 @@
       "ref": "",
       "deprecated": false,
       "hidden": "false",
-      "label": "Evidence for Genome Size",
+      "label": "Tissue for Barcoding",
       "show_in_form": true,
-      "id": "copo.sample.evidenceForGenomeSize",
+      "id": "copo.sample.TISSUE_FOR_BARCODING",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "BARCODE_PLATE_PRESERVATIVE"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Barcode Plate Preservative",
+      "show_in_form": true,
+      "id": "copo.sample.BARCODE_PLATE_PRESERVATIVE",
       "type": "string",
       "show_in_table": true,
       "control": "text",
@@ -1420,31 +1512,9 @@
       "hidden": "false",
       "label": "Purpose Of Specimen",
       "show_in_form": true,
-      "id": "copo.sample.purposeOfSpecimen",
+      "id": "copo.sample.PURPOSE_OF_SPECIMEN",
       "type": "string",
       "show_in_table": true,
-      "control": "text",
-      "default_value": ""
-    },
-    {
-      "help_tip": "",
-      "required": "false",
-      "control_meta": {},
-      "dwc": "",
-      "versions": [
-        "SEQUENCING_ORG_SAMPLE_ID"
-      ],
-      "specifications": [
-        "dtol"
-      ],
-      "ref": "",
-      "deprecated": false,
-      "hidden": "false",
-      "label": "Sequencing Org Sample Id",
-      "show_in_form": false,
-      "id": "copo.sample.sequencingOrgSampleId",
-      "type": "string",
-      "show_in_table": false,
       "control": "text",
       "default_value": ""
     },
@@ -1532,6 +1602,24 @@
       "label": "Profile ID",
       "show_in_form": false,
       "id": "copo.sample.profile_id",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "na",
+      "control_meta": {},
+      "versions": [
+        "manifest_id"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "true",
+      "label": "Manifest ID",
+      "show_in_form": false,
+      "id": "copo.sample.manifest_id",
       "type": "string",
       "show_in_table": false,
       "control": "text"

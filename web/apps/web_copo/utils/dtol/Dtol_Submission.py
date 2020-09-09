@@ -100,7 +100,7 @@ def update_bundle_sample_xml(sample, bundlefile):
                encoding='unicode')
 
 def build_xml(sample, sub_id, p_id, collection_id, file_subfix):
-    notify_dtol_status(msg="Creating Sample: " + sample["collectorSampleName"], action="info",
+    notify_dtol_status(msg="Creating Sample: " + sample.get("SPECIMEN_ID", ""), action="info",
                          html_id="dtol_sample_info")
     #build_sample_xml(sample)
     update_bundle_sample_xml(sample, "bundle_"+file_subfix+".xml")
@@ -112,11 +112,11 @@ def build_xml(sample, sub_id, p_id, collection_id, file_subfix):
     accessions = submit_biosample(sample_id, Sample(), collection_id)
     print(accessions)
     if accessions["status"] == "ok":
-        msg = "Last Sample Submitted: " + sample["collectorSampleName"] + " - ENA ID: " + accessions["submission_accession"] + " - Biosample ID: " + accessions["biosample_accession"]
+        msg = "Last Sample Submitted: " + sample["SPECIMEN_ID"] + " - ENA ID: " + accessions["submission_accession"] + " - Biosample ID: " + accessions["biosample_accession"]
         notify_dtol_status(msg=msg, action="info",
                              html_id="dtol_sample_info")
     else:
-        msg = "Submission Rejected: " + sample["collectorSampleName"] + "<p>" + accessions["msg"] + "</p>"
+        msg = "Submission Rejected: " + sample["SPECIMEN_ID"] + "<p>" + accessions["msg"] + "</p>"
         notify_dtol_status(msg=msg, action="info",
                            html_id="dtol_sample_info")
 
@@ -136,7 +136,7 @@ def build_sample_xml(sample):
     title_block.text = title
     sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
     taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
-    taxon_id.text = sample.get('taxonid', "")
+    taxon_id.text = sample.get('TAXON_ID', "")
     sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
     ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
     for item in sample.items():
@@ -353,6 +353,6 @@ def create_study(profile_id, collection_id):
         notify_dtol_status(msg=msg, action="info",
                              html_id="dtol_sample_info")
     else:
-        msg = "Submission Rejected: " + sample["collectorSampleName"] + "<p>" + accessions["msg"] + "</p>"
+        msg = "Submission Rejected: " + "<p>" + accessions["msg"] + "</p>"
         notify_dtol_status(msg=msg, action="info",
                            html_id="dtol_sample_info")

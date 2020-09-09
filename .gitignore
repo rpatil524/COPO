@@ -134,6 +134,6 @@ web/src/submission/data/.gitignore
 submission/data/.gitignore
 web/src/tools/reposit/aspera/AsperaConnect.app/Contents/Resources/aspera_mac_plugin/
 tools/reposit/aspera/AsperaConnect.app/Contents/Resources/aspera_mac_plugin/
-
+celerybeat-schedule.dat
 
 

@@ -36,6 +36,9 @@
             margin-bottom: 20px;
         }
 
+        #image_table img {
+            height: 100px
+        }
     </style>
 {% endblock %}
 
@@ -66,7 +69,8 @@
 
 {% block content %}
     <script>
-        var groups = {{ groups|safe }}
+        var groups =
+        {{ groups|safe }}
     </script>
     <!--test ends -->
     <!--test ends -->
@@ -269,13 +273,27 @@
                     <h4 class="modal-title">Upload Spreadsheet</h4>
                 </div>
                 <div class="modal-body" style="width: 100%">
-                    <div id="upload_controls">
+                    <div id="upload_buttons">
                         <label class="btn btn-success" for="file">
                             <input id="file" type="file" style="display:none"
-                                   onchange="$('#upload-file-info').html(this.files[0].name); upload_spreadsheet(this.files[0])">
+                                   onchange="upload_spreadsheet(this.files[0])">
                             Select Spreadsheet
                         </label>
-                        <span class='label label-primary' id="upload-file-info"></span>
+                        <label class="btn btn-info" for="images" id="files_label" disabled>
+
+                            <input enctype='multipart/formdata' id="images" name="images" type="file"
+                                   accept=".png,.jpg, .jpeg" multiple style="display:none"
+                                   onchange="upload_image_files(this.files)" disabled>
+                            Select Image Directory
+                        </label>
+                        <button class="btn btn-primary" id="finish_button" style="display:none">Finish</button>
+
+
+                    </div>
+
+
+                    <div id="upload_controls">
+
                     </div>
                     <div style="display:none; margin-top: 30px; " id="sample_info" class="alert alert-info"
                          role="alert"></div>
@@ -285,21 +303,37 @@
                     <div style="display:none; margin-top: 10px; " id="parse_info" class="alert alert-info" role="alert">
                         ...
                     </div>
-                    <div style="display:none; margin-top: 10px;" id="confirm_info" class="confirm">
-                        The following samples will be created. Click OK to continue.
-
-                            <button id="create_samples" class="btn btn-success">OK</button>
-
-                    </div>
-
-                    <div id="table_div" style="display: none;width:100%; max-height: 400px">
-                        <table id="sample_parse_table" class="ui celled padded table">
-
-                            <thead></thead>
-                            <tbody></tbody>
 
 
-                        </table>
+                    <ul class="nav nav-tabs" id="tabs" style="display:none">
+                        <li class="active">
+                            <a data-toggle="tab" id="meta_table_nav_tab" href="#meta">Sample Metadata</a>
+                        </li>
+                        <li>
+                            <a data-toggle="tab" id="image_table_nav_tab" href="#image">Sample Images</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" style="padding:30px">
+                        <div class="tab-pane active" id="meta">
+
+                            <table id="sample_parse_table" class="table table-striped table-bordered">
+
+                                <thead></thead>
+                                <tbody></tbody>
+
+
+                            </table>
+
+                        </div>
+                        <div class="tab-pane" id="image">
+                            <table id="image_table" class="table table-striped table-bordered"dataTable>
+
+                                <thead></thead>
+                                <tbody></tbody>
+
+
+                            </table>
+                        </div>
                     </div>
                 </div>
 

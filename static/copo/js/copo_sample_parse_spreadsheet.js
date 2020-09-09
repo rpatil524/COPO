@@ -1,3 +1,34 @@
+function upload_image_files(file) {
+    var csrftoken = $.cookie('csrftoken');
+
+    form = new FormData()
+    var count = 0
+    for (f in file) {
+        form.append(count.toString(), file[f])
+        count++
+    }
+    jQuery.ajax({
+        url: '/copo/sample_images/',
+        data: form,
+        cache: false,
+        contentType: false,
+        processData: false,
+
+        type: 'POST', // For jQuery < 1.9
+        headers: {"X-CSRFToken": csrftoken},
+
+    }).error(function (data) {
+        $("#upload_controls").fadeIn()
+        console.log(data)
+        BootstrapDialog.show({
+            title: 'Error',
+            message: "Error " + data.status + ": " + data.responseText
+        });
+    }).done(function (data) {
+
+    })
+}
+
 function upload_spreadsheet(file) {
     var csrftoken = $.cookie('csrftoken');
     form = new FormData()
@@ -20,12 +51,53 @@ function upload_spreadsheet(file) {
             message: "Error " + data.status + ": " + data.responseText
         });
     }).done(function (data) {
-        console.log("WELL DONE")
-        console.log(data)
+
     })
 }
 
 $(document).ready(function () {
+
+    $(document).on("click", "#finish_button", function (el) {
+        if($(el.currentTarget).hasOwnProperty("disabled")) {
+            return false
+        }
+        BootstrapDialog.show({
+
+            title: "Submit Samples",
+            message: "Do you really want to submit these samples? They will be sent to a Darwin Tree of Life curator for checking",
+            cssClass: "copo-modal1",
+            closable: true,
+            animate: true,
+            type: BootstrapDialog.TYPE_INFO,
+            buttons: [
+                {
+                    label: "Cancel",
+                    cssClass: "tiny ui basic button",
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                    }
+                },
+                {
+                    label: "Submit",
+                    cssClass: "tiny ui basic button",
+                    action: function (dialogRef) {
+                        $.ajax({
+                            url: "/copo/create_spreadsheet_samples",
+
+                        }).done(function () {
+                            location.reload()
+                        }).error(function () {
+                            alert("something went wrong")
+                        })
+                        dialogRef.close();
+                    }
+                }
+            ]
+
+        })
+    })
+
+
     var profileId = $('#profile_id').val();
     var wsprotocol = 'ws://';
     var socket;
@@ -51,13 +123,15 @@ $(document).ready(function () {
         console.log("opened ", e)
     }
     socket.onmessage = function (e) {
-        console.log("received message ", e)
+        console.log("received message")
+        //handlers for channels messages sent from backend
         d = JSON.parse(e.data)
         if (d.action === "close") {
             $("#" + d.html_id).fadeOut("50")
         } else if (d.action === "make_valid") {
             $("#" + d.html_id).html("Validated").removeClass("alert-info, alert-danger").addClass("alert-success")
         } else if (d.action === "info") {
+            // show something on the info div
             // check info div is visible
             if (!$("#" + d.html_id).is(":visible")) {
                 $("#" + d.html_id).fadeIn("50")
@@ -66,7 +140,7 @@ $(document).ready(function () {
             $("#" + d.html_id).removeClass("alert-danger").addClass("alert-info")
             $("#" + d.html_id).html(d.message)
             $("#spinner").fadeOut()
-        }else if (d.action === "error") {
+        } else if (d.action === "error") {
             // check info div is visible
             if (!$("#" + d.html_id).is(":visible")) {
                 $("#" + d.html_id).fadeIn("50")
@@ -75,7 +149,28 @@ $(document).ready(function () {
             $("#" + d.html_id).removeClass("alert-info").addClass("alert-danger")
             $("#" + d.html_id).html(d.message)
             $("#spinner").fadeOut()
+        } else if (d.action === "make_images_table") {
+            // make table of images matched to
+            // headers
+            var headers = $("<tr><th>Specimen ID</th><th>Image File</th></th><th>Image</th></tr>")
+            $("#image_table").find("thead").empty().append(headers)
+            $("#image_table").find("tbody").empty()
+            var table_row
+            for (r in d.message) {
+                row = d.message[r]
+                if (row.file_name === "None") {
+                    var img_tag = "Sample images must be named using the same Specimen ID as the manifest"
+                } else {
+                    var img_tag = "<img src=" + row.file_name + "/>"
+                }
+                table_row = ("<tr><td>" + row.specimen_id + "</td><td>" + row.file_name.split('\\').pop().split('/').pop() + "</td><td>" + img_tag + "</td></tr>") // split-pop thing is to get filename from full path
+                $("#image_table").append(table_row)
+            }
+            $("#image_table").DataTable()
+            $("#image_table_nav_tab").click()
+            $("#finish_button").fadeIn()
         } else if (d.action === "make_table") {
+            // make table of metadata parsed from spreadsheet
             var body = $("tbody")
             var count = 0
             for (r in d.message) {
@@ -96,36 +191,31 @@ $(document).ready(function () {
 
                     tr.append(td)
                 }
-                if (count == 0) {
-                    $("#sample_parse_table thead").append(tr)
+                if (count === 0) {
+                    $("#sample_parse_table").find("thead").append(tr)
                 } else {
-                    $("#sample_parse_table tbody").append(tr)
+                    $("#sample_parse_table").find("tbody").append(tr)
                 }
                 count++
 
             }
             $("#sample_info").hide()
             $("#sample_parse_table").DataTable({
-                "scrollY": 400,
-                "scrollX": true
+                "scrollY": "400px",
+                "scrollX": true,
             })
             $("#table_div").fadeIn(1000)
-            $("#confirm_info").fadeIn(1000)
+            $("#sample_parse_table").DataTable().draw()
+            $("#files_label").removeAttr("disabled")
+            $("#files_label").find("input").removeAttr("disabled")
+            //$("#confirm_info").fadeIn(1000)
+            $("#tabs").fadeIn()
+            $("#finish_button").fadeIn()
         }
     }
 })
 
 
-$(document).on("click", "#create_samples", function (event) {
-    $.ajax({
-        url: "/copo/create_spreadsheet_samples",
-
-    }).done(function () {
-        location.reload()
-    }).error(function () {
-        alert("something went wrong")
-    })
-})
 
 $(document).on("click", ".new-samples-spreadsheet-template", function (event) {
     $("#sample_spreadsheet_modal").modal("show")
