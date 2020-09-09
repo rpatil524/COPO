@@ -47,7 +47,7 @@ def process_pending_dtol_samples():
         for s_id in submission["dtol_samples"]:
             s_ids.append(s_id)
             sam = Sample().get_record(s_id)
-            notify_dtol_status(msg="Adding to Set Sample: " + sam["collectorSampleName"], action="info",
+            notify_dtol_status(msg="Adding to Set Sample: " + sam["SPECIMEN_ID"], action="info",
                                html_id="dtol_sample_info")
             update_bundle_sample_xml(sam, "bundle_"+file_subfix+".xml")
             #build_xml(sample=sam, sub_id=s_id, p_id=submission["profile_id"], collection_id=submission['_id'], file_subfix = file_subfix)
@@ -56,12 +56,12 @@ def process_pending_dtol_samples():
         accessions = submit_biosample(file_subfix, Sample(), submission['_id'])
         print(accessions)
         if accessions["status"] == "ok":
-            msg = "Last Sample Submitted: " + sam["collectorSampleName"] + " - ENA Submission ID: " + accessions[
+            msg = "Last Sample Submitted: " + sam["SPECIMEN_ID"] + " - ENA Submission ID: " + accessions[
                 "submission_accession"] #+ " - Biosample ID: " + accessions["biosample_accession"]
             notify_dtol_status(msg=msg, action="info",
                                html_id="dtol_sample_info")
         else:
-            msg = "Submission Rejected: " + sam["collectorSampleName"] + "<p>" + accessions["msg"] + "</p>"
+            msg = "Submission Rejected: " + sam["SPECIMEN_ID"] + "<p>" + accessions["msg"] + "</p>"
             notify_dtol_status(msg=msg, action="info",
                                html_id="dtol_sample_info")
         Submission().dtol_sample_processed(sub_id=submission["_id"], sam_ids=s_ids)
@@ -84,7 +84,7 @@ def update_bundle_sample_xml(sample, bundlefile):
     title_block.text = title
     sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
     taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
-    taxon_id.text = sample.get('taxonid', "")
+    taxon_id.text = sample.get('TAXON_ID', "")
     sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
     ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
     for item in sample.items():
