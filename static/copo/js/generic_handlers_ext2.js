@@ -591,9 +591,11 @@ function do_render_component_table(data, componentMeta) {
             data: dataSet,
             select: true,
             searchHighlight: true,
+            fixedHeader: true,
             ordering: true,
             lengthChange: true,
             scrollX: true,
+            scrollY: 350,
             buttons: [
                 'selectAll',
                 {
@@ -637,6 +639,14 @@ function do_render_component_table(data, componentMeta) {
                 var event = jQuery.Event("posttablerefresh"); //individual compnents can trap and handle this event as they so wish
                 $('body').trigger(event);
             },
+            "columnDefs": [{
+                "targets": "_all",
+                "createdCell": function (td, cellData, rowData, row, col) {
+                    if (cellData == "") {
+                        $(td).addClass("cell-no-content")
+                    }
+                }
+            }],
             createdRow: function (row, data, index) {
                 //add class to row for ease of selection later
                 var recordId = index;
@@ -647,6 +657,7 @@ function do_render_component_table(data, componentMeta) {
 
                 $(row).addClass(tableID + recordId);
             },
+
             dom: 'Bfr<"row"><"row info-rw" i>tlp'
         });
 

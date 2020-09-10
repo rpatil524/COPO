@@ -1937,3 +1937,7 @@ div.shown span.side-help-trigger:before {
     background-position:right center;
     background-repeat: no-repeat;
 }
+
+.cell-no-content{
+    background-color: #fff3f3 !important;
+}

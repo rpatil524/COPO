@@ -1621,8 +1621,74 @@
       "show_in_form": false,
       "id": "copo.sample.manifest_id",
       "type": "string",
-      "show_in_table": false,
+      "show_in_table": true,
       "control": "text"
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "biosampleAccession"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Biosample Accession",
+      "show_in_form": true,
+      "id": "copo.sample.biosampleAccession",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "sraAccession"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "SRA Accession",
+      "show_in_form": true,
+      "id": "copo.sample.sraAccession",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "submissionAccession"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Submission Accession",
+      "show_in_form": true,
+      "id": "copo.sample.submissionAccession",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
     },
     {
       "help_tip": "",
