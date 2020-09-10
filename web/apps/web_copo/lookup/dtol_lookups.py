@@ -1,6 +1,51 @@
 # FS - 18/8/2020
 # this module contains lookups and mappings pertaining to DTOL functionality
 # such as validation enumerations and mappings between different field names
+DTOL_MANDATORY_FIELDS = {
+    "SERIES",
+    "RACK_OR_PLATE_ID",
+    "TUBE_OR_WELL_ID",
+    "SPECIMEN_ID",
+    "ORDER_OR_GROUP",
+    "FAMILY",
+    "GENUS",
+    "TAXON_ID",
+    "SCIENTIFIC_NAME",
+    "LIFESTAGE",
+    "SEX",
+    "ORGANISM_PART",
+    "GAL",
+    "GAL_SAMPLE_ID",
+    "COLLECTOR_SAMPLE_ID",
+    "COLLECTED_BY",
+    "COLLECTOR_AFFILIATION",
+    "DATE_OF_COLLECTION",
+    "COLLECTION_LOCATION",
+    "DECIMAL_LATITUDE",
+    "DECIMAL_LONGITUDE",
+    "HABITAT",
+    "DESCRIPTION_OF_COLLECTION_METHOD",
+    "EASE_OF_SPECIMEN_COLLECTION",
+    "IDENTIFIED_BY",
+    "IDENTIFIER_AFFILIATION",
+    "IDENTIFIED_HOW",
+    "SPECIMEN_ID_RISK",
+    "PRESERVED_BY",
+    "PRESERVER_AFFILIATION",
+    "PRESERVATION_APPROACH",
+    "TIME_ELAPSED_FROM_COLLECTION_TO_PRESERVATION",
+    "DATE_OF_PRESERVATION",
+    "SIZE_OF_TISSUES_IN_TUBE",
+    "TISSUE_REMOVED_FROM_BARCODING",
+    "PLATE_ID_FOR_BARCODING",
+    "TUBE_OR_WELL_ID_FOR_BARCODING",
+    "TISSUE_FOR_BARCODING",
+    "BARCODE_PLATE_PRESERVATIVE",
+    "PURPOSE_OF_SPECIMEN",
+    "HAZARD_GROUP",
+    "REGULATORY_COMPLIANCE",
+    "VOUCHER_ID"
+}
 DTOL_ENUMS = {
     "GAL": [
         "SANGER INSTITUTE",
@@ -364,6 +409,23 @@ DTOL_ENUMS = {
         "NOT PROVIDED",
         "RESTRICTED ACCESS"
     ]
+}
+DTOL_RULES = {
+    "DATE_OF_COLLECTION": {
+        "regex" : "(^[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?(/[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?)?$)|(^not collected$)|(^not provided$)|(^restricted access$)"
+    },
+    "DECIMAL_LATITUDE": {
+        "regex" : "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)"
+    },
+    "DECIMAL_LONGITUDE": {
+        "regex" : "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)"
+    },
+    "DEPTH": {
+        "regex" : "(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?"
+    },
+    "ELEVATION": {
+        "regex" : "[+-]?(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?"
+    }
 }
 DTOL_ENA_MAPPINGS = {
     "ORGANISM_PART": {
