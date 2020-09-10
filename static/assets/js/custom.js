@@ -62,7 +62,7 @@
 
     $(document).ready(function () {
         mainApp.main_fun();
-        var images = ['img3.jpg']
+        var images = ['img3.jpg', 'img1.jpg', 'img2.jpg', 'img4.jpg', 'img5.jpg', 'img6.jpg', 'img7.jpg']
         var idx = Math.round((Math.random() * images.length) + 1)
         var str = "assets/img/" + images[idx]
 
@@ -73,18 +73,19 @@
             'share your data with fellow researchers',
             'get credit for your research objects',
             'painless data annotation',
-            'easily deposit to public repositories'
-        ]
+            'easily deposit to public repositories',
+           ]
 
         $("#myCarousel").on('slide.bs.carousel', function () {
             var count = $('#myCarousel').data('carousel_counter')
-
+            count = count + 1
+            console.log(count)
             var idx = count % carousel_text.length
-            var image_idx = Math.round((Math.random() * images.length) + 1)
+            //var image_idx = Math.round((Math.random() * images.length) + 1)
 
-            console.log(image_idx)
-            $('#carousel_text').html(carousel_text[idx++])
-            $('#myCarousel').data('carousel_counter', image_idx)
+            //console.log(image_idx)
+            $('#carousel_text').html(carousel_text[idx])
+            $('#myCarousel').data('carousel_counter', count++)
         });
 
         // $('#email_submit').on('click', submit_email)
