@@ -14,6 +14,7 @@ from submission.helpers.generic_helper import notify_dtol_status
 from tools import resolve_env
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
 from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE, SRA_PROJECT_TEMPLATE
+from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS
 
 with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
@@ -86,14 +87,40 @@ def update_bundle_sample_xml(sample, bundlefile):
     taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
     taxon_id.text = sample.get('TAXON_ID', "")
     sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
+    #validating against DTOL checklist
+    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+    tag = ET.SubElement(sample_attribute, 'TAG')
+    tag.text = 'ENA-CHECKLIST'
+    value = ET.SubElement(sample_attribute, 'VALUE')
+    value.text = 'ERC000053'
     ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
     for item in sample.items():
-        if item[0] not in exclude_from_sample_xml:  #####this still miss the checklist validation
-            sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
-            tag = ET.SubElement(sample_attribute, 'TAG')
-            tag.text = item[0]
-            value = ET.SubElement(sample_attribute, 'VALUE')
-            value.text = str(item[1])
+        try:
+        #if item[0] not in exclude_from_sample_xml:  #####this still miss the checklist validation
+            #exceptional handling of COLLECTION_LOCATION
+            if item[0] == 'COLLECTION_LOCATION':
+                attribute_name = DTOL_ENA_MAPPINGS['COLLECTION_LOCATION_1']['ena']
+                sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                tag = ET.SubElement(sample_attribute, 'TAG')
+                tag.text = attribute_name
+                value = ET.SubElement(sample_attribute, 'VALUE')
+                value.text = str(item[1]).split('|')[0]
+                attribute_name = DTOL_ENA_MAPPINGS['COLLECTION_LOCATION_2']['ena']
+                sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                tag = ET.SubElement(sample_attribute, 'TAG')
+                tag.text = attribute_name
+                value = ET.SubElement(sample_attribute, 'VALUE')
+                value.text = '|'.join(str(item[1]).split('|')[1:])
+            else:
+                attribute_name =  DTOL_ENA_MAPPINGS[item[0]]['ena']
+                sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                tag = ET.SubElement(sample_attribute, 'TAG')
+                tag.text = attribute_name
+                value = ET.SubElement(sample_attribute, 'VALUE')
+                value.text = str(item[1])
+        except KeyError:
+            #pass, item is not supposed to be submitted to ENA
+            pass
 
     ET.dump(tree)
     tree.write(open(bundlefile, 'w'),
@@ -140,12 +167,17 @@ def build_sample_xml(sample):
     sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
     ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
     for item in sample.items():
-        if item[0] not in exclude_from_sample_xml:  #####this still miss the checklist validation
+        try:
+        #if item[0] not in exclude_from_sample_xml:  #####this still miss the checklist validation
+            attribute_name = DTOL_ENA_MAPPINGS[item[0]]['ena']
             sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
             tag = ET.SubElement(sample_attribute, 'TAG')
-            tag.text = item[0]
+            tag.text = attribute_name
             value = ET.SubElement(sample_attribute, 'VALUE')
             value.text = str(item[1])
+        except KeyError:
+            #pass, item is not supposed to be submitted to ENA
+            pass
 
     ET.dump(tree)
     samplefile = "sample_" + str(sample['_id']) + ".xml"
