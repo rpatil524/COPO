@@ -217,7 +217,9 @@ nav {
     width: 100%;
     background: #fff;
     z-index: 99;
-    padding-right: 50px
+    padding-right: 50px;
+    font-size: x-large !important;
+    font-weight: bolder !important;
 }
 
 nav li {
@@ -313,19 +315,19 @@ nav li {
 }
 
 .carousel .one {
-    background: url(../img/img1.jpg);
+    background: url(../img/img7.jpg);
     background-size: cover;
     -moz-background-size: cover;
 }
 
 .carousel .two {
-    background: url(../img/img2.jpg);
+    background: url(../img/img6.jpg);
     background-size: cover;
     -moz-background-size: cover;
 }
 
 .carousel .three {
-    background: url(../img/img3.jpg);
+    background: url(../img/img5.jpg);
     background-size: cover;
     -moz-background-size: cover;
 }
@@ -337,19 +339,19 @@ nav li {
 }
 
 .carousel .five {
-    background: url(../img/img5.jpg);
+    background: url(../img/img3.jpg);
     background-size: cover;
     -moz-background-size: cover;
 }
 
 .carousel .six {
-    background: url(../img/img6.jpg);
+    background: url(../img/img2.jpg);
     background-size: cover;
     -moz-background-size: cover;
 }
 
 .carousel .seven {
-    background: url(../img/img7.jpg);
+    background: url(../img/img1.jpg);
     background-size: cover;
     -moz-background-size: cover;
 }
