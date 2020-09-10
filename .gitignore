@@ -1,6 +1,6 @@
 COPO/.idea/workspace.xml
 **/.idea/
-**celerybeat-schedule.dat
+celerybeat-schedule*
 .idea/*
 
 # Byte-compiled / optimized / DLL files
