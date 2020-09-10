@@ -97,14 +97,15 @@ class DtolSpreadsheet:
                             cellcount += 1
 
                             # check for missing data in cell
-                            if not c:
-                                # we have missing data in required cells
-                                notify_sample_status(profile_id=self.profile_id,
-                                                     msg=(self.validation_msg_missing_data % (
-                                                         header, str(cellcount + 1))),
-                                                     action="error",
-                                                     html_id="sample_info")
-                                return False
+                            if header in lookup.DTOL_MANDATORY_FIELDS:
+                                if not c:
+                                    # we have missing data in required cells
+                                    notify_sample_status(profile_id=self.profile_id,
+                                                         msg=(self.validation_msg_missing_data % (
+                                                             header, str(cellcount + 1))),
+                                                         action="error",
+                                                         html_id="sample_info")
+                                    return False
                             # check for allowed values in cell
                             if allowed_vals:
                                 if c not in allowed_vals:
