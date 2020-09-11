@@ -412,19 +412,33 @@ DTOL_ENUMS = {
 }
 DTOL_RULES = {
     "DATE_OF_COLLECTION": {
-        "regex" : "(^[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?(/[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?)?$)|(^not collected$)|(^not provided$)|(^restricted access$)"
+        "ena_regex" : "(^[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?(/[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?)?$)|(^not collected$)|(^not provided$)|(^restricted access$)"
     },
     "DECIMAL_LATITUDE": {
-        "regex" : "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)"
+        "ena_regex" : "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)"
     },
     "DECIMAL_LONGITUDE": {
-        "regex" : "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)"
+        "ena_regex" : "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)"
     },
     "DEPTH": {
-        "regex" : "(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?"
+        "ena_regex" : "(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?"
     },
     "ELEVATION": {
-        "regex" : "[+-]?(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?"
+        "ena_regex" : "[+-]?(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?"
+    }
+}
+DTOL_UNITS  = {
+    "DECIMAL_LATITUDE" : {
+        "ena_unit" : "DD"
+    },
+    "DECIMAL_LONGITUDE" : {
+        "ena_unit" : "DD"
+    },
+    "DEPTH" : {
+        "ena_unit" : "m"
+    },
+    "ELEVATION" : {
+        "ena_unit" : "m"
     }
 }
 DTOL_ENA_MAPPINGS = {
