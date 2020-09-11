@@ -152,45 +152,6 @@ def build_xml(sample, sub_id, p_id, collection_id, file_subfix):
         notify_dtol_status(msg=msg, action="info",
                            html_id="dtol_sample_info")
 
-
-def build_sample_xml(sample):
-    # build sample XML
-    print("building sample xml")
-    tree = ET.parse(SRA_SAMPLE_TEMPLATE)
-    root = tree.getroot()
-    sample_alias = ET.SubElement(root, 'SAMPLE')
-    sample_alias.set('alias', str(uuid.uuid4()))  # Todo this is for testing only
-    sample_alias.set('center_name', 'EarlhamInstitute')  ####mandatory for broker account
-    # title = str(obj_id['_id'])  ######for time being using COPO id as title
-    title = str(uuid.uuid4())
-
-    title_block = ET.SubElement(sample_alias, 'TITLE')
-    title_block.text = title
-    sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
-    taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
-    taxon_id.text = sample.get('TAXON_ID', "")
-    sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
-    ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
-    for item in sample.items():
-        if item[1]:
-            try:
-                attribute_name = DTOL_ENA_MAPPINGS[item[0]]['ena']
-                sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
-                tag = ET.SubElement(sample_attribute, 'TAG')
-                tag.text = attribute_name
-                value = ET.SubElement(sample_attribute, 'VALUE')
-                value.text = str(item[1])
-            except KeyError:
-                #pass, item is not supposed to be submitted to ENA
-                pass
-
-    ET.dump(tree)
-    samplefile = "sample_" + str(sample['_id']) + ".xml"
-    print(samplefile)
-    tree.write(open(samplefile, 'w'),
-               encoding='unicode')  # overwriting at each run, i don't think we need to keep it TODO - what if there are multiple calls simultaneously?
-
-
 def build_submission_xml(sample_id, hold=""):
     # build submission XML
     tree = ET.parse(SRA_SUBMISSION_TEMPLATE)
@@ -286,23 +247,6 @@ def submit_biosample(subfix, sampleobj, collection_id):
         # retrieve id and update record
         #return get_biosampleId(receipt, sample_id, collection_id)
         return get_bundle_biosampleId(receipt, collection_id)
-
-
-def get_biosampleId(receipt, sample_id, collection_id):
-    # parsing ENA sample accessions from reciept and storing in sample and submission collection object
-    tree = ET.fromstring(receipt)
-    sampleinreceipt = tree.find('SAMPLE')
-    sra_accession = sampleinreceipt.get('accession')
-    # print(sra_accession)
-    biosample_accession = sampleinreceipt.find('EXT_ID').get('accession')
-    # print(biosample_accession)
-    submission_accession = tree.find('SUBMISSION').get('accession')
-    # print(submission_accession)
-    Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
-    Submission().add_accession(biosample_accession, sra_accession, submission_accession, sample_id, collection_id)
-    #print('we are here')
-    accessions = {"sra_accession": sra_accession, "biosample_accession": biosample_accession, "submission_accession": submission_accession, "status": "ok"}
-    return accessions
 
 def get_bundle_biosampleId(receipt, collection_id):
     '''parsing ENA sample bundle accessions from receipt and
