@@ -18,6 +18,7 @@ from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from django.conf import settings
 import uuid
+import re
 
 
 class DtolSpreadsheet:
@@ -126,8 +127,13 @@ class DtolSpreadsheet:
                                                          html_id="sample_info")
                                     return False
                             if regex_rule:
-                                #TODO check that string matches rule
-                                pass
+                                if c and not re.match(regex_rule, c):
+                                    notify_sample_status( profile_id=self.profile_id,
+                                                          msg=(self.validation_msg_invalid_data % (
+                                                              c, header, str(cellcount+1), regex_rule)),
+                                                          action="error",
+                                                          html_id="sample_info")
+                                    return False
 
 
 
