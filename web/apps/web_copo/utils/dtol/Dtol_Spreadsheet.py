@@ -88,15 +88,22 @@ class DtolSpreadsheet:
                         return False
                 # if we have a required fields, check that there are no missing values
                 for header, cells in self.data.iteritems():
-                    # here we need to check if the column is required, and if so, that there are not missinnng values in its cells
+                    # here we need to check if the column is required, and if so, that there are not missing values in its cells
                     if header in self.fields:
                         # check if there is an enum for this header
                         allowed_vals = lookup.DTOL_ENUMS.get(header, "")
+                        if header == "COLLECTION_LOCATION":
+                            allowed_vals = lookup.DTOL_ENUMS.get('COUNTRIES',"")
+                        #check if there's a regex rule for the header and exceptional handling
+                        if lookup.DTOL_RULES.get(header, ""):
+                            regex_rule = lookup.DTOL_RULES[header].get("ena_regex", "")
+                        else:
+                            regex_rule = ""
                         cellcount = 0
                         for c in cells:
                             cellcount += 1
 
-                            # check for missing data in cell
+                            # check for missing data in mandatory cells
                             if header in lookup.DTOL_MANDATORY_FIELDS:
                                 if not c:
                                     # we have missing data in required cells
@@ -107,14 +114,20 @@ class DtolSpreadsheet:
                                                          html_id="sample_info")
                                     return False
                             # check for allowed values in cell
+                            c_value = c
                             if allowed_vals:
-                                if c not in allowed_vals:
+                                if header == "COLLECTION_LOCATION":
+                                        c_value = str(c).split('|')[0].strip()
+                                if c_value not in allowed_vals:
                                     notify_sample_status(profile_id=self.profile_id,
                                                          msg=(self.validation_msg_invalid_data % (
-                                                             c, header, str(cellcount + 1), allowed_vals)),
+                                                             c_value, header, str(cellcount + 1), allowed_vals)),
                                                          action="error",
                                                          html_id="sample_info")
                                     return False
+                            if regex_rule:
+                                #TODO check that string matches rule
+                                pass
 
 
 
