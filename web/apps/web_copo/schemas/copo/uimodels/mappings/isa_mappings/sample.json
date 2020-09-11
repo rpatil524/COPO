@@ -1519,6 +1519,28 @@
       "default_value": ""
     },
     {
+      "help_tip": "",
+      "required": "true",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "VOUCHER_ID"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Voucher ID",
+      "show_in_form": true,
+      "id": "copo.sample.VOUCHER_ID",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
+    },
+    {
       "help_tip": "Characteristics of the sample e.g., height, sex",
       "required": "false",
       "default_value": "",
