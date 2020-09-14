@@ -140,6 +140,16 @@ class DtolSpreadsheet:
                                                           action="error",
                                                           html_id="sample_info")
                                     return False
+                            elif header == "SERIES":
+                                try:
+                                    int(c)
+                                except ValueError:
+                                    notify_sample_status(profile_id=self.profile_id,
+                                                         msg=(self.validation_msg_invalid_data % (
+                                                             c, header, str(cellcount + 1), "integers")),
+                                                         action="error",
+                                                         html_id="sample_info")
+                                    return False
 
 
 
