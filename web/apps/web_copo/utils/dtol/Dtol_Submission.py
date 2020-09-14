@@ -149,7 +149,7 @@ def build_xml(sample, sub_id, p_id, collection_id, file_subfix):
     notify_dtol_status(msg="Communicating with ENA", action="info",
                          html_id="dtol_sample_info")
     accessions = submit_biosample(sample_id, Sample(), collection_id)
-    print(accessions)
+    #print(accessions)
     if accessions["status"] == "ok":
         msg = "Last Sample Submitted: " + sample["SPECIMEN_ID"] + " - ENA ID: " + accessions["submission_accession"] + " - Biosample ID: " + accessions["biosample_accession"]
         notify_dtol_status(msg=msg, action="info",
@@ -281,7 +281,7 @@ def get_studyId(receipt, collection_id):
     sra_study_accession = ext_id.get('accession')
     submission = tree.find('SUBMISSION')
     study_accession = submission.get('accession')
-    print(bioproject_accession, sra_study_accession, study_accession) ######
+    #print(bioproject_accession, sra_study_accession, study_accession) ######
     Submission().add_study_accession(bioproject_accession, sra_study_accession, study_accession, collection_id)
     accessions = {"bioproject_accession": bioproject_accession, "sra_study_accession": sra_study_accession, "study_accession": study_accession, "status":  "ok"}
     return accessions
@@ -302,7 +302,7 @@ def create_study(profile_id, collection_id):
     sequencing_project = ET.SubElement(submission_project, 'SEQUENCING_PROJECT')
     ET.dump(tree)
     studyfile = "study_"+profile_id+".xml"
-    print(studyfile)
+    #print(studyfile)
     tree.write(open(studyfile, 'w'),
                encoding='unicode')
 
@@ -323,7 +323,7 @@ def create_study(profile_id, collection_id):
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
             pass_word, "xxxxxx")
 
-    print(receipt)
+    #print(receipt)
     tree = ET.fromstring(receipt)
     os.remove(submissionfile)
     os.remove(studyfile)

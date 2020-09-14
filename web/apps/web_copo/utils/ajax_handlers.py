@@ -57,7 +57,7 @@ def search_ontology_ebi(request, ontology_names, wrap_in_response=True):
     ontologies = ontology_names
     fields = ol.ONTOLOGY_LKUPS['fields_to_search']
     query = ol.ONTOLOGY_LKUPS['ebi_ols_autocomplete'].format(**locals())
-    print(query)
+
     data = requests.get(query, timeout=2).text
     # TODO - add return here for when OLS is down
     if wrap_in_response == True:
