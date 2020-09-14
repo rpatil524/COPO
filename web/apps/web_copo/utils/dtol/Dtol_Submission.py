@@ -9,7 +9,7 @@ import shutil
 from celery.utils.log import get_task_logger
 
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
-from dal.copo_da import Submission, Sample
+from dal.copo_da import Submission, Sample, Profile
 from submission.helpers.generic_helper import notify_dtol_status
 from tools import resolve_env
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
@@ -93,6 +93,13 @@ def update_bundle_sample_xml(sample, bundlefile):
     tag.text = 'ENA-CHECKLIST'
     value = ET.SubElement(sample_attribute, 'VALUE')
     value.text = 'ERC000053'
+    #adding project name field (ie copo profile name)
+    # validating against DTOL checklist
+    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+    tag = ET.SubElement(sample_attribute, 'TAG')
+    tag.text = 'project name'
+    value = ET.SubElement(sample_attribute, 'VALUE')
+    value.text = Profile().get_record(sample["profile_id"])["title"]
     ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
     for item in sample.items():
         if item[1]:
