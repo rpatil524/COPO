@@ -625,7 +625,7 @@
     },
     {
       "help_tip": "A list of maps, gazetteers, or other resources used to georeference the Location, described specifically enough to allow anyone in the future to use the same resources.",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
