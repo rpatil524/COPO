@@ -363,7 +363,7 @@
     },
     {
       "help_tip": "Infraspecific Epiphet or Variety",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -389,7 +389,7 @@
     },
     {
       "help_tip": "Culture of Strain ID",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -415,7 +415,7 @@
     },
     {
       "help_tip": "A common or vernacular name.",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -484,7 +484,7 @@
     },
     {
       "help_tip": "Taxon Remarks",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -671,7 +671,7 @@
     },
     {
       "help_tip": "The original description of the depth below the local surface.",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -694,7 +694,7 @@
     },
     {
       "help_tip": "The original description of the elevation (altitude, usually above sea level) of the Location.",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -786,7 +786,7 @@
     },
     {
       "help_tip": "Time of Collection",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -855,7 +855,7 @@
     },
     {
       "help_tip": "Specific preservative solution used in preparation",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -1062,7 +1062,7 @@
     },
     {
       "help_tip": "",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -1085,7 +1085,7 @@
     },
     {
       "help_tip": "",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -1108,7 +1108,7 @@
     },
     {
       "help_tip": "Comment if chance of misidentification, reference text used to identify, etc",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -1131,7 +1131,7 @@
     },
     {
       "help_tip": "",
-      "required": "false",
+      "required": "true",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -1292,7 +1292,7 @@
     },
     {
       "help_tip": "Other Information",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -1312,6 +1312,29 @@
       "label": "Other Information",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/dynamicProperties"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "SERIES"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.SERIES",
+      "label": "",
+      "show_in_table": true,
+      "dwc": ""
     },
     {
       "help_tip": "",
@@ -1513,6 +1536,28 @@
       "label": "Purpose Of Specimen",
       "show_in_form": true,
       "id": "copo.sample.PURPOSE_OF_SPECIMEN",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "VOUCHER_ID"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Voucher ID",
+      "show_in_form": true,
+      "id": "copo.sample.VOUCHER_ID",
       "type": "string",
       "show_in_table": true,
       "control": "text",

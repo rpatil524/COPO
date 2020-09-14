@@ -18,13 +18,14 @@ from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from django.conf import settings
 import uuid
+import re
 
 
 class DtolSpreadsheet:
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
-    na_vals = ['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
-               'NULL', 'NaN', 'n/a', 'nan', 'null']
-    na_vals = ['NOT COLLECTED', 'NOT PROVIDED', 'NOT APPLICABLE', 'N/A']
+    #na_vals = ['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
+    #           'NULL', 'NaN', 'n/a', 'nan', 'null']
+    na_vals = ['NOT COLLECTED', 'NOT PROVIDED', 'NOT APPLICABLE']
 
     validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
         allowed=str(na_vals))
@@ -70,7 +71,7 @@ class DtolSpreadsheet:
         with open(lk.WIZARD_FILES["sample_details"]) as json_data:
 
             try:
-                # get definitive list of DTOL fields from schema
+                # get definitive list of mandatory DTOL fields from schema
                 s = json.load(json_data)
                 self.fields = jp.match(
                     '$.properties[?(@.specifications[*] == "dtol" & @.required=="true")].versions[0]', s)
@@ -86,32 +87,66 @@ class DtolSpreadsheet:
                                              action="error",
                                              html_id="sample_info")
                         return False
-                # if we have a required fields, check that there are no missing values
+                        # if we have a required fields, check that there are no missing values
+                    for header, cells in self.data.iteritems():
+                        # here we need to check if there are not missing values in its cells
+                        if header in self.fields:
+                            cellcount = 0
+                            for c in cells:
+                                cellcount += 1
+                                if not c:
+                                    # we have missing data in required cells
+                                    notify_sample_status(profile_id=self.profile_id,
+                                                         msg=(self.validation_msg_missing_data % (
+                                                             header, str(cellcount + 1))),
+                                                         action="error",
+                                                         html_id="sample_info")
+                                    return False
+
+                # get list of DTOL fields from schemas
+                self.fields = jp.match(
+                    '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
                 for header, cells in self.data.iteritems():
-                    # here we need to check if the column is required, and if so, that there are not missing values in its cells
                     if header in self.fields:
                         # check if there is an enum for this header
                         allowed_vals = lookup.DTOL_ENUMS.get(header, "")
+                        if header == "COLLECTION_LOCATION":
+                            allowed_vals = lookup.DTOL_ENUMS.get('COUNTRIES',"")
+                        #check if there's a regex rule for the header and exceptional handling
+                        if lookup.DTOL_RULES.get(header, ""):
+                            regex_rule = lookup.DTOL_RULES[header].get("ena_regex", "")
+                        else:
+                            regex_rule = ""
                         cellcount = 0
                         for c in cells:
                             cellcount += 1
-
-                            # check for missing data in cell
-
-                            if not c:
-                                # we have missing data in required cells
-                                notify_sample_status(profile_id=self.profile_id,
-                                                     msg=(self.validation_msg_missing_data % (
-                                                         header, str(cellcount + 1))),
-                                                     action="error",
-                                                     html_id="sample_info")
-                                return False
                             # check for allowed values in cell
+                            c_value = c
                             if allowed_vals:
-                                if c not in allowed_vals:
+                                if header == "COLLECTION_LOCATION":
+                                        c_value = str(c).split('|')[0].strip()
+                                if c_value not in allowed_vals:
                                     notify_sample_status(profile_id=self.profile_id,
                                                          msg=(self.validation_msg_invalid_data % (
-                                                             c, header, str(cellcount + 1), allowed_vals)),
+                                                             c_value, header, str(cellcount + 1), allowed_vals)),
+                                                         action="error",
+                                                         html_id="sample_info")
+                                    return False
+                            if regex_rule:
+                                if c and not re.match(regex_rule, c):
+                                    notify_sample_status( profile_id=self.profile_id,
+                                                          msg=(self.validation_msg_invalid_data % (
+                                                              c, header, str(cellcount+1), regex_rule)),
+                                                          action="error",
+                                                          html_id="sample_info")
+                                    return False
+                            elif header == "SERIES":
+                                try:
+                                    int(c)
+                                except ValueError:
+                                    notify_sample_status(profile_id=self.profile_id,
+                                                         msg=(self.validation_msg_invalid_data % (
+                                                             c, header, str(cellcount + 1), "integers")),
                                                          action="error",
                                                          html_id="sample_info")
                                     return False

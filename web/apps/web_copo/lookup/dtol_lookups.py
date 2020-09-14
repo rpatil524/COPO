@@ -75,8 +75,12 @@ DTOL_ENUMS = {
     "SEX": [
         "FEMALE",
         "MALE",
-        "HERMAPHRODITE",
-        "UNKNOWN"
+        "HERMAPHRODITE/MONOECIOUS",
+        "NOT COLLECTED",
+        "NOT APPLICABLE",
+        "NOT PROVIDED",
+        "ASEXUAL MORPH",
+        "SEXUAL MORPH"
     ],
     "LIFESTAGE": [
         "ADULT",
@@ -90,53 +94,192 @@ DTOL_ENUMS = {
         "ZYGOTE",
         "SPORE-BEARING STRUCTURE",
         "VEGETATIVE STRUCTURE",
-        "MYCELIUM"
+        "VEGETATIVE CELL",
+        "NOT COLLECTED",
+        "NOT APPLICABLE",
+        "NOT PROVIDED"
     ],
     "HAZARD_GROUP": [
-        "CL1",
-        "CL2",
-        "CL3",
-        "UNKNOWN"
+        "HG1",
+        "HG2",
+        "HG3"
     ],
     "REGULATORY_COMPLIANCE": [
         "Y",
         "N"
     ],
     "ORGANISM_PART": [
-        "BLOOD",
-        "WHOLE",
-        "HEAD",
+        "**OTHER FUNGAL TISSUE**",
+        "**OTHER PLANT TISSUE**",
+        "**OTHER REPRODUCTIVE ANIMAL TISSUE**",
+        "**OTHER SOMATIC ANIMAL TISSUE**",
         "ABDOMEN",
-        "THORAX",
+        "ANTERIOR_BODY",
+        "BLADE",
+        "BLOOD",
+        "BODYWALL",
+        "BRACT",
+        "BRAIN",
+        "BUD",
+        "CAP",
         "CEPHALOTHORAX",
-        "LEG(S)",
+        "EGGS",
+        "EGGSHELL",
+        "ENDOCRINE TISSUE",
+        "EYE(S)",
+        "FAT_BODY",
+        "FIN",
+        "FLOWER",
+        "GILLS",
+        "GONAD",
+        "HAIR",
+        "HEAD",
         "HEAD/THORAX",
-        "THORAX/ABDOMEN",
+        "HEART",
+        "HEPATOPANCREAS",
+        "HOLDFAST",
+        "KIDNEY",
+        "INTESTINE",
+        "LEAF",
+        "LEG(S)",
+        "LIVER",
+        "LUNG",
+        "MID_BODY",
+        "MODULAR_COLONY",
+        "MUSCLE",
         "MYCELIUM",
         "MYCORRHIZA",
+        "NOT COLLECTED",
+        "NOT APPLICABLE",
+        "NOT PROVIDED",
+        "OVARY",
+        "OVIDUCT",
+        "PANCREAS",
+        "PETIOLE",
+        "POSTERIOR_BODY",
+        "SCALES",
+        "SCAT",
+        "SEEDLING",
+        "SEED(S)",
+        "SHOOT",
+        "SKIN",
+        "SPERM/SEMINAL_FLUID",
+        "SPLEEN",
+        "SPORE(S)",
         "SPORE-BEARING STRUCTURE",
-        "HOLDFAST",
+        "STEM",
         "STIPE",
-        "CAP",
-        "GILLS",
-        "THALLUS",
-        "LEAF",
-        "FLOWER",
-        "BLADE"
+        "STOMACH",
+        "TENTACLE",
+        "TERMINAL_BODY",
+        "TESTIS",
+        "THALLUS (FUNGI)",
+        "THALLUS (PLANT)",
+        "THORAX",
+        "THORAX/ABDOMEN",
+        "WHOLE ORGANISM"
     ],
     "EASE_OF_SPECIMEN_COLLECTION": [
         "EASY",
         "MODERATE",
-        "DIFFICULT",
-        "EASY BUT SEASONAL",
-        "MODERATE BUT SEASONAL",
-        "DIFFICULT AND SEASONAL"
+        "DIFFICULT"
     ],
     "TO_BE_USED_FOR": [
         "RNAseq",
         "REFERENCE GENOME",
         "RESEQUENCING(POPGEN)",
         "BARCODING ONLY"
+    ],
+    "PURPOSE_OF_SPECIMEN" : [
+        "REFERENCE GENOME",
+        "RESEQUENCING(POPGEN)",
+        "DNA BARCODING ONLY",
+        "RNA-SEQUENCING"
+    ],
+    "SIZE_OF_TISSUE_IN_TUBE": [
+        "VS",
+        "S",
+        "M",
+        "L",
+        "SINGLE CELL(S)",
+        "NOT APPLICABLE"
+    ],
+    "TISSUE_FOR_BARCODING" : [
+        "**OTHER FUNGAL TISSUE**",
+        "**OTHER PLANT TISSUE**",
+        "**OTHER REPRODUCTIVE ANIMAL TISSUE**",
+        "**OTHER SOMATIC ANIMAL TISSUE**",
+        "ABDOMEN",
+        "ANTERIOR_BODY",
+        "BLADE",
+        "BLOOD",
+        "BODYWALL",
+        "BRACT",
+        "BRAIN",
+        "BUD",
+        "CAP",
+        "CEPHALOTHORAX",
+        "EGGS",
+        "EGGSHELL",
+        "ENDOCRINE TISSUE",
+        "EYE(S)",
+        "FAT_BODY",
+        "FIN",
+        "FLOWER",
+        "FUNGAL DNA EXTRACT (barcoding only)",
+        "GILLS",
+        "GONAD",
+        "HAIR",
+        "HEAD",
+        "HEAD/THORAX",
+        "HEART",
+        "HEPATOPANCREAS",
+        "HOLDFAST",
+        "KIDNEY",
+        "INTESTINE",
+        "LEAF",
+        "LEG(S)",
+        "LIVER",
+        "LUNG",
+        "MID_BODY",
+        "MODULAR_COLONY",
+        "MUSCLE",
+        "MYCELIUM",
+        "MYCORRHIZA",
+        "NOT COLLECTED",
+        "NOT APPLICABLE",
+        "NOT PROVIDED",
+        "OVARY",
+        "OVIDUCT",
+        "PANCREAS",
+        "PETIOLE",
+        "POSTERIOR_BODY",
+        "SCALES",
+        "SCAT",
+        "SEEDLING",
+        "SEED(S)",
+        "SHOOT",
+        "SKIN",
+        "SPERM/SEMINAL_FLUID",
+        "SPLEEN",
+        "SPORE(S)",
+        "SPORE-BEARING STRUCTURE",
+        "STEM",
+        "STIPE",
+        "STOMACH",
+        "TENTACLE",
+        "TERMINAL_BODY",
+        "TESTIS",
+        "THALLUS (FUNGI)",
+        "THALLUS (PLANT)",
+        "THORAX",
+        "THORAX/ABDOMEN",
+        "WHOLE ORGANISM"
+    ],
+    "TISSUE_REMOVED_FOR_BARCODING" : [
+        "Y",
+        "N",
+        "NOT APPLICABLE"
     ],
     "COUNTRIES": [
         "AFGHANISTAN",
@@ -422,19 +565,33 @@ DTOL_ENUMS = {
 }
 DTOL_RULES = {
     "DATE_OF_COLLECTION": {
-        "regex" : "(^[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?(/[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?)?$)|(^not collected$)|(^not provided$)|(^restricted access$)"
+        "ena_regex" : "(^[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?(/[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?)?$)|(^not collected$)|(^not provided$)|(^restricted access$)"
     },
     "DECIMAL_LATITUDE": {
-        "regex" : "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)"
+        "ena_regex" : "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)"
     },
     "DECIMAL_LONGITUDE": {
-        "regex" : "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)"
+        "ena_regex" : "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)"
     },
     "DEPTH": {
-        "regex" : "(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?"
+        "ena_regex" : "(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?"
     },
     "ELEVATION": {
-        "regex" : "[+-]?(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?"
+        "ena_regex" : "[+-]?(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?"
+    }
+}
+DTOL_UNITS  = {
+    "DECIMAL_LATITUDE" : {
+        "ena_unit" : "DD"
+    },
+    "DECIMAL_LONGITUDE" : {
+        "ena_unit" : "DD"
+    },
+    "DEPTH" : {
+        "ena_unit" : "m"
+    },
+    "ELEVATION" : {
+        "ena_unit" : "m"
     }
 }
 DTOL_ENA_MAPPINGS = {

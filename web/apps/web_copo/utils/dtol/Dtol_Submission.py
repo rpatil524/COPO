@@ -9,12 +9,12 @@ import shutil
 from celery.utils.log import get_task_logger
 
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
-from dal.copo_da import Submission, Sample
+from dal.copo_da import Submission, Sample, Profile
 from submission.helpers.generic_helper import notify_dtol_status
 from tools import resolve_env
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
 from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE, SRA_PROJECT_TEMPLATE
-from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS
+from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS, DTOL_UNITS
 
 with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
@@ -93,34 +93,46 @@ def update_bundle_sample_xml(sample, bundlefile):
     tag.text = 'ENA-CHECKLIST'
     value = ET.SubElement(sample_attribute, 'VALUE')
     value.text = 'ERC000053'
+    #adding project name field (ie copo profile name)
+    # validating against DTOL checklist
+    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+    tag = ET.SubElement(sample_attribute, 'TAG')
+    tag.text = 'project name'
+    value = ET.SubElement(sample_attribute, 'VALUE')
+    value.text = Profile().get_record(sample["profile_id"])["title"]
     ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
     for item in sample.items():
-        try:
-        #if item[0] not in exclude_from_sample_xml:  #####this still miss the checklist validation
-            #exceptional handling of COLLECTION_LOCATION
-            if item[0] == 'COLLECTION_LOCATION':
-                attribute_name = DTOL_ENA_MAPPINGS['COLLECTION_LOCATION_1']['ena']
-                sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
-                tag = ET.SubElement(sample_attribute, 'TAG')
-                tag.text = attribute_name
-                value = ET.SubElement(sample_attribute, 'VALUE')
-                value.text = str(item[1]).split('|')[0]
-                attribute_name = DTOL_ENA_MAPPINGS['COLLECTION_LOCATION_2']['ena']
-                sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
-                tag = ET.SubElement(sample_attribute, 'TAG')
-                tag.text = attribute_name
-                value = ET.SubElement(sample_attribute, 'VALUE')
-                value.text = '|'.join(str(item[1]).split('|')[1:])
-            else:
-                attribute_name =  DTOL_ENA_MAPPINGS[item[0]]['ena']
-                sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
-                tag = ET.SubElement(sample_attribute, 'TAG')
-                tag.text = attribute_name
-                value = ET.SubElement(sample_attribute, 'VALUE')
-                value.text = str(item[1])
-        except KeyError:
-            #pass, item is not supposed to be submitted to ENA
-            pass
+        if item[1]:
+            try:
+                #exceptional handling of COLLECTION_LOCATION
+                if item[0] == 'COLLECTION_LOCATION':
+                    attribute_name = DTOL_ENA_MAPPINGS['COLLECTION_LOCATION_1']['ena']
+                    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                    tag = ET.SubElement(sample_attribute, 'TAG')
+                    tag.text = attribute_name
+                    value = ET.SubElement(sample_attribute, 'VALUE')
+                    value.text = str(item[1]).split('|')[0]
+                    attribute_name = DTOL_ENA_MAPPINGS['COLLECTION_LOCATION_2']['ena']
+                    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                    tag = ET.SubElement(sample_attribute, 'TAG')
+                    tag.text = attribute_name
+                    value = ET.SubElement(sample_attribute, 'VALUE')
+                    value.text = '|'.join(str(item[1]).split('|')[1:])
+                else:
+                    attribute_name =  DTOL_ENA_MAPPINGS[item[0]]['ena']
+                    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                    tag = ET.SubElement(sample_attribute, 'TAG')
+                    tag.text = attribute_name
+                    value = ET.SubElement(sample_attribute, 'VALUE')
+                    value.text = str(item[1])
+                #add ena units where necessary
+                if DTOL_UNITS.get(item[0], ""):
+                    if DTOL_UNITS[item[0]].get('ena_unit', ""):
+                        unit = ET.SubElement(sample_attribute, 'UNITS')
+                        unit.text = DTOL_UNITS[item[0]]['ena_unit']
+            except KeyError:
+                #pass, item is not supposed to be submitted to ENA
+                pass
 
     ET.dump(tree)
     tree.write(open(bundlefile, 'w'),
@@ -146,45 +158,6 @@ def build_xml(sample, sub_id, p_id, collection_id, file_subfix):
         msg = "Submission Rejected: " + sample["SPECIMEN_ID"] + "<p>" + accessions["msg"] + "</p>"
         notify_dtol_status(msg=msg, action="info",
                            html_id="dtol_sample_info")
-
-
-def build_sample_xml(sample):
-    # build sample XML
-    print("building sample xml")
-    tree = ET.parse(SRA_SAMPLE_TEMPLATE)
-    root = tree.getroot()
-    sample_alias = ET.SubElement(root, 'SAMPLE')
-    sample_alias.set('alias', str(uuid.uuid4()))  # Todo this is for testing only
-    sample_alias.set('center_name', 'EarlhamInstitute')  ####mandatory for broker account
-    # title = str(obj_id['_id'])  ######for time being using COPO id as title
-    title = str(uuid.uuid4())
-
-    title_block = ET.SubElement(sample_alias, 'TITLE')
-    title_block.text = title
-    sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
-    taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
-    taxon_id.text = sample.get('TAXON_ID', "")
-    sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
-    ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
-    for item in sample.items():
-        try:
-        #if item[0] not in exclude_from_sample_xml:  #####this still miss the checklist validation
-            attribute_name = DTOL_ENA_MAPPINGS[item[0]]['ena']
-            sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
-            tag = ET.SubElement(sample_attribute, 'TAG')
-            tag.text = attribute_name
-            value = ET.SubElement(sample_attribute, 'VALUE')
-            value.text = str(item[1])
-        except KeyError:
-            #pass, item is not supposed to be submitted to ENA
-            pass
-
-    ET.dump(tree)
-    samplefile = "sample_" + str(sample['_id']) + ".xml"
-    print(samplefile)
-    tree.write(open(samplefile, 'w'),
-               encoding='unicode')  # overwriting at each run, i don't think we need to keep it TODO - what if there are multiple calls simultaneously?
-
 
 def build_submission_xml(sample_id, hold=""):
     # build submission XML
@@ -281,23 +254,6 @@ def submit_biosample(subfix, sampleobj, collection_id):
         # retrieve id and update record
         #return get_biosampleId(receipt, sample_id, collection_id)
         return get_bundle_biosampleId(receipt, collection_id)
-
-
-def get_biosampleId(receipt, sample_id, collection_id):
-    # parsing ENA sample accessions from reciept and storing in sample and submission collection object
-    tree = ET.fromstring(receipt)
-    sampleinreceipt = tree.find('SAMPLE')
-    sra_accession = sampleinreceipt.get('accession')
-    # print(sra_accession)
-    biosample_accession = sampleinreceipt.find('EXT_ID').get('accession')
-    # print(biosample_accession)
-    submission_accession = tree.find('SUBMISSION').get('accession')
-    # print(submission_accession)
-    Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
-    Submission().add_accession(biosample_accession, sra_accession, submission_accession, sample_id, collection_id)
-    #print('we are here')
-    accessions = {"sra_accession": sra_accession, "biosample_accession": biosample_accession, "submission_accession": submission_accession, "status": "ok"}
-    return accessions
 
 def get_bundle_biosampleId(receipt, collection_id):
     '''parsing ENA sample bundle accessions from receipt and
