@@ -1038,29 +1038,6 @@
       "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
     },
     {
-      "help_tip": "",
-      "required": "true",
-      "default_value": "",
-      "show_as_attribute": true,
-      "control_meta": {},
-      "control": "text",
-      "versions": [
-        "PRESERVATION_APPROACH"
-      ],
-      "ref": "",
-      "specifications": [
-        "dtol"
-      ],
-      "deprecated": false,
-      "hidden": "false",
-      "type": "array",
-      "show_in_form": true,
-      "id": "copo.sample.PRESERVATION_APPROACH",
-      "label": "Preservation Approach",
-      "show_in_table": true,
-      "dwc": ""
-    },
-    {
       "help_tip": "e.g. Leg removed from complete organism",
       "required": "true",
       "default_value": "",
@@ -1335,6 +1312,29 @@
       "label": "Other Information",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/dynamicProperties"
+    },
+    {
+      "help_tip": "",
+      "required": "true",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "SERIES"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": true,
+      "id": "copo.sample.SERIES",
+      "label": "",
+      "show_in_table": true,
+      "dwc": ""
     },
     {
       "help_tip": "",
