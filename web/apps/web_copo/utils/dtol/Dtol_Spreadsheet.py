@@ -88,7 +88,7 @@ class DtolSpreadsheet:
                         return False
                 # if we have a required fields, check that there are no missing values
                 for header, cells in self.data.iteritems():
-                    # here we need to check if the column is required, and if so, that there are not missinnng values in its cells
+                    # here we need to check if the column is required, and if so, that there are not missing values in its cells
                     if header in self.fields:
                         # check if there is an enum for this header
                         allowed_vals = lookup.DTOL_ENUMS.get(header, "")
@@ -97,15 +97,15 @@ class DtolSpreadsheet:
                             cellcount += 1
 
                             # check for missing data in cell
-                            if header in lookup.DTOL_MANDATORY_FIELDS:
-                                if not c:
-                                    # we have missing data in required cells
-                                    notify_sample_status(profile_id=self.profile_id,
-                                                         msg=(self.validation_msg_missing_data % (
-                                                             header, str(cellcount + 1))),
-                                                         action="error",
-                                                         html_id="sample_info")
-                                    return False
+
+                            if not c:
+                                # we have missing data in required cells
+                                notify_sample_status(profile_id=self.profile_id,
+                                                     msg=(self.validation_msg_missing_data % (
+                                                         header, str(cellcount + 1))),
+                                                     action="error",
+                                                     html_id="sample_info")
+                                return False
                             # check for allowed values in cell
                             if allowed_vals:
                                 if c not in allowed_vals:

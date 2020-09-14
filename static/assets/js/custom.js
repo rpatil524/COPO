@@ -66,7 +66,7 @@
         var idx = Math.round((Math.random() * images.length) + 1)
         var str = "assets/img/" + images[idx]
 
-        $('.carousel').carousel({interval: 2000});
+        $('.carousel').carousel({interval: 6000});
 
         $('#myCarousel').data('carousel_counter', idx)
         var carousel_text = [

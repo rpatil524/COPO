@@ -1,7 +1,7 @@
 # FS - 18/8/2020
 # this module contains lookups and mappings pertaining to DTOL functionality
 # such as validation enumerations and mappings between different field names
-DTOL_MANDATORY_FIELDS = {
+DTOL_EXPORT_TO_STS_FIELDS = {
     "SERIES",
     "RACK_OR_PLATE_ID",
     "TUBE_OR_WELL_ID",
@@ -44,7 +44,17 @@ DTOL_MANDATORY_FIELDS = {
     "PURPOSE_OF_SPECIMEN",
     "HAZARD_GROUP",
     "REGULATORY_COMPLIANCE",
-    "VOUCHER_ID"
+    "VOUCHER_ID",
+    "biosampleAccession",
+    "created_by",
+    "time_created",
+    "submissionAccession",
+    "sraAccession",
+    "manifest_id",
+    "time_verified",
+    "verified_by",
+    "status"
+
 }
 DTOL_ENUMS = {
     "GAL": [

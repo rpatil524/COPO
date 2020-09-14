@@ -624,6 +624,14 @@ class Sample(DAComponent):
     def mark_processing(self, sample_id):
         return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set": {"status": "processing"}})
 
+    def get_by_manifest_id(self, manifest_id):
+        return cursor_to_list(self.get_collection_handle().find({"manifest_id": manifest_id}))
+
+    def get_by_biosample_id(self, biosample_id):
+        return self.get_collection_handle().find_one({"biosampleAccession": biosample_id})
+
+    def get_by_dtol_field(self, dtol_field, value):
+        return cursor_to_list(self.get_collection_handle().find({dtol_field: value}))
 
 class Submission(DAComponent):
     def __init__(self, profile_id=None):
