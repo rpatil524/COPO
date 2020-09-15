@@ -1737,6 +1737,28 @@
     },
     {
       "help_tip": "",
+      "required": "false",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "status"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Status",
+      "show_in_form": true,
+      "id": "copo.sample.status",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text",
+      "default_value": "pending"
+    },
+    {
+      "help_tip": "",
       "required": "true",
       "default_value": "",
       "control_meta": {},
