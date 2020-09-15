@@ -612,7 +612,6 @@ class Sample(DAComponent):
                     if cell == field.get("id", "").split(".")[-1] or cell == "_id":
                         if "dtol" in field.get("specifications", ""):
                             if field.get("show_in_table", ""):
-                                print(field.get("show_in_table"))
                                 sam[cell] = i[cell]
             out.append(sam)
         return out

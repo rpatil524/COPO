@@ -24,10 +24,11 @@ import numpy as np
 
 class DtolSpreadsheet:
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
-    # na_vals = ['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
-    #           'NULL', 'NaN', 'n/a', 'nan', 'null']
-    na_vals = ['NOT COLLECTED', 'NOT PROVIDED', 'NOT APPLICABLE']
-    allowed_empty = ["ELEVATION", "DEPTH"]
+    na_vals = ['#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
+               'NULL', 'NaN', 'n/a', 'nan', 'null']
+    # na_vals = ['NOT COLLECTED', 'NOT PROVIDED', 'NOT APPLICABLE']
+    # fields which are allowed to be empty should be here....if not and they are parsed whilst empty, they will produce NAN in pandas
+    # allowed_empty = ["ELEVATION", "DEPTH", "TAXON_REMARKS", "INFRASPECIFIC_EPITHET", "CULTURE_OR_STRAIN_ID", "SYMBIONT", "PRESERVATIVE_SOLUTION", "RELATIONSHIP"]
     validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
         allowed=str(na_vals))
     validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
@@ -57,9 +58,13 @@ class DtolSpreadsheet:
             try:
                 # read excel and convert all to string
                 if type == "xls":
-                    self.data = pandas.read_excel(self.file, keep_default_na=True)
+                    self.data = pandas.read_excel(self.file, keep_default_na=False, na_values=self.na_vals)
                 elif type == "csv":
-                    self.data = pandas.read_csv(self.file, keep_default_na=True)
+                    self.data = pandas.read_csv(self.file, keep_default_na=False, na_values=self.na_vals)
+                '''
+                for column in self.allowed_empty:
+                    self.data[column] = self.data[column].fillna("")
+                '''
                 self.data = self.data.apply(lambda x: x.astype(str).str.upper())
             except:
                 # if error notify via web socket
@@ -109,9 +114,7 @@ class DtolSpreadsheet:
                     '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
                 for header, cells in self.data.iteritems():
                     if header in self.fields:
-                        # check if this field is allowed empty strings
-                        if header in self.allowed_empty:
-                            cells = cells.replace("NAN", "")
+
                         # check if there is an enum for this header
                         allowed_vals = lookup.DTOL_ENUMS.get(header, "")
 
@@ -124,7 +127,6 @@ class DtolSpreadsheet:
                         cellcount = 0
                         for c in cells:
                             cellcount += 1
-
 
                             c_value = c
                             if allowed_vals:

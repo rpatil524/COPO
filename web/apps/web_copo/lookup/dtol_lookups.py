@@ -57,6 +57,7 @@ DTOL_EXPORT_TO_STS_FIELDS = {
 
 }
 DTOL_ENUMS = {
+
     "GAL": [
         "SANGER INSTITUTE",
         "UNIVERSITY OF OXFORD",

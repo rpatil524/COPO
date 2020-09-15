@@ -226,7 +226,7 @@ def submit_biosample(subfix, sampleobj, collection_id):
 
     try:
         receipt = subprocess.check_output(curl_cmd, shell=True)
-        #print(receipt)
+        print(receipt)
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
             pass_word, "xxxxxx")
