@@ -322,7 +322,6 @@ def create_study(profile_id, collection_id):
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
             pass_word, "xxxxxx")
-
     #print(receipt)
     tree = ET.fromstring(receipt)
     os.remove(submissionfile)

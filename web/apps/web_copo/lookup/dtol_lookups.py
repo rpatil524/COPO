@@ -190,7 +190,7 @@ DTOL_ENUMS = {
         "RESEQUENCING(POPGEN)",
         "BARCODING ONLY"
     ],
-    "PURPOSE_OF_SPECIMEN" : [
+    "PURPOSE_OF_SPECIMEN": [
         "REFERENCE GENOME",
         "RESEQUENCING(POPGEN)",
         "DNA BARCODING ONLY",
@@ -204,7 +204,7 @@ DTOL_ENUMS = {
         "SINGLE CELL(S)",
         "NOT APPLICABLE"
     ],
-    "TISSUE_FOR_BARCODING" : [
+    "TISSUE_FOR_BARCODING": [
         "**OTHER FUNGAL TISSUE**",
         "**OTHER PLANT TISSUE**",
         "**OTHER REPRODUCTIVE ANIMAL TISSUE**",
@@ -276,12 +276,12 @@ DTOL_ENUMS = {
         "THORAX/ABDOMEN",
         "WHOLE ORGANISM"
     ],
-    "TISSUE_REMOVED_FOR_BARCODING" : [
+    "TISSUE_REMOVED_FOR_BARCODING": [
         "Y",
         "N",
         "NOT APPLICABLE"
     ],
-    "COUNTRIES": [
+    "COLLECTION_LOCATION": [
         "AFGHANISTAN",
         "ALBANIA",
         "ALGERIA",
@@ -565,33 +565,40 @@ DTOL_ENUMS = {
 }
 DTOL_RULES = {
     "DATE_OF_COLLECTION": {
-        "ena_regex" : "(^[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?(/[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?)?$)|(^not collected$)|(^not provided$)|(^restricted access$)"
+        "ena_regex": "(^[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?(/[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?)?$)|(^not collected$)|(^not provided$)|(^restricted access$)",
+        "human_readable": "YYYY-MM-DD, NOT COLLECTED, NOT PROVIDED or RESTRICTED ACCESS"
     },
     "DECIMAL_LATITUDE": {
-        "ena_regex" : "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)"
+        "ena_regex": "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)",
+        "human_readable": "numeric, NOT COLLECTED, NOT PROVIDED or RESTRICTED ACCESS"
     },
     "DECIMAL_LONGITUDE": {
-        "ena_regex" : "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)"
+        "ena_regex": "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)|(^restricted access$)",
+        "human_readable": "numeric, NOT COLLECTED, NOT PROVIDED or RESTRICTED ACCESS"
+
     },
     "DEPTH": {
-        "ena_regex" : "(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?"
+        "ena_regex": "(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?",
+        "human_readable": "numeric, or empty string"
+
     },
     "ELEVATION": {
-        "ena_regex" : "[+-]?(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?"
+        "ena_regex": "[+-]?(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?",
+        "human_readable": "numeric, or empty string"
     }
 }
-DTOL_UNITS  = {
-    "DECIMAL_LATITUDE" : {
-        "ena_unit" : "DD"
+DTOL_UNITS = {
+    "DECIMAL_LATITUDE": {
+        "ena_unit": "DD"
     },
-    "DECIMAL_LONGITUDE" : {
-        "ena_unit" : "DD"
+    "DECIMAL_LONGITUDE": {
+        "ena_unit": "DD"
     },
-    "DEPTH" : {
-        "ena_unit" : "m"
+    "DEPTH": {
+        "ena_unit": "m"
     },
-    "ELEVATION" : {
-        "ena_unit" : "m"
+    "ELEVATION": {
+        "ena_unit": "m"
     }
 }
 DTOL_ENA_MAPPINGS = {

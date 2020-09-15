@@ -19,18 +19,19 @@ from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from django.conf import settings
 import uuid
 import re
+import numpy as np
 
 
 class DtolSpreadsheet:
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
-    #na_vals = ['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
+    # na_vals = ['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
     #           'NULL', 'NaN', 'n/a', 'nan', 'null']
     na_vals = ['NOT COLLECTED', 'NOT PROVIDED', 'NOT APPLICABLE']
-
+    allowed_empty = ["ELEVATION", "DEPTH"]
     validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
         allowed=str(na_vals))
     validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
-
+    validation_msg_invalid_list = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. If this is a location, start with the Country, adding more specific details separated with '|'."
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -56,9 +57,9 @@ class DtolSpreadsheet:
             try:
                 # read excel and convert all to string
                 if type == "xls":
-                    self.data = pandas.read_excel(self.file, keep_default_na=False, na_values=self.na_vals)
+                    self.data = pandas.read_excel(self.file, keep_default_na=True)
                 elif type == "csv":
-                    self.data = pandas.read_csv(self.file, keep_default_na=False, na_values=self.na_vals)
+                    self.data = pandas.read_csv(self.file, keep_default_na=True)
                 self.data = self.data.apply(lambda x: x.astype(str).str.upper())
             except:
                 # if error notify via web socket
@@ -108,24 +109,37 @@ class DtolSpreadsheet:
                     '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
                 for header, cells in self.data.iteritems():
                     if header in self.fields:
+                        # check if this field is allowed empty strings
+                        if header in self.allowed_empty:
+                            cells = cells.replace("NAN", "")
                         # check if there is an enum for this header
                         allowed_vals = lookup.DTOL_ENUMS.get(header, "")
-                        if header == "COLLECTION_LOCATION":
-                            allowed_vals = lookup.DTOL_ENUMS.get('COUNTRIES',"")
-                        #check if there's a regex rule for the header and exceptional handling
+
+                        # check if there's a regex rule for the header and exceptional handling
                         if lookup.DTOL_RULES.get(header, ""):
                             regex_rule = lookup.DTOL_RULES[header].get("ena_regex", "")
+                            regex_human_readable = lookup.DTOL_RULES[header].get("human_readable", "")
                         else:
                             regex_rule = ""
                         cellcount = 0
                         for c in cells:
                             cellcount += 1
-                            # check for allowed values in cell
+
+
                             c_value = c
                             if allowed_vals:
                                 if header == "COLLECTION_LOCATION":
-                                        c_value = str(c).split('|')[0].strip()
+                                    # special check for COLLETION_LOCATION as this needs invalid list error for feedback
+                                    c_value = str(c).split('|')[0].strip()
+                                    if c_value not in allowed_vals:
+                                        notify_sample_status(profile_id=self.profile_id,
+                                                             msg=(self.validation_msg_invalid_list % (
+                                                                 c_value, header, str(cellcount + 1))),
+                                                             action="error",
+                                                             html_id="sample_info")
+                                        return False
                                 if c_value not in allowed_vals:
+                                    # check value is in allowed enum
                                     notify_sample_status(profile_id=self.profile_id,
                                                          msg=(self.validation_msg_invalid_data % (
                                                              c_value, header, str(cellcount + 1), allowed_vals)),
@@ -133,12 +147,14 @@ class DtolSpreadsheet:
                                                          html_id="sample_info")
                                     return False
                             if regex_rule:
+                                # handle any regular expressions provided for valiation
+
                                 if c and not re.match(regex_rule, c):
-                                    notify_sample_status( profile_id=self.profile_id,
-                                                          msg=(self.validation_msg_invalid_data % (
-                                                              c, header, str(cellcount+1), regex_rule)),
-                                                          action="error",
-                                                          html_id="sample_info")
+                                    notify_sample_status(profile_id=self.profile_id,
+                                                         msg=(self.validation_msg_invalid_data % (
+                                                             c, header, str(cellcount + 1), regex_human_readable)),
+                                                         action="error",
+                                                         html_id="sample_info")
                                     return False
                             elif header == "SERIES":
                                 try:
@@ -211,7 +227,8 @@ class DtolSpreadsheet:
                         found = True
                         break
                 if not found:
-                    output.append({"file_name": "None", "specimen_id": "No Image found for <strong>"+ sample[specimen_id_column_index] +"</strong>"})
+                    output.append({"file_name": "None", "specimen_id": "No Image found for <strong>" + sample[
+                        specimen_id_column_index] + "</strong>"})
         # save to session
         request = ThreadLocal.get_current_request()
         request.session["image_specimen_match"] = output
@@ -253,7 +270,7 @@ class DtolSpreadsheet:
             for im in image_data:
                 # create matching DataFile object for image is provided
                 if s["SPECIMEN_ID"] in im["specimen_id"]:
-                    fields = {"file_location":im["file_name"]}
+                    fields = {"file_location": im["file_name"]}
                     df = DataFile().save_record({}, **fields)
                     DataFile().insert_sample_id(df["_id"], sampl["_id"])
                     break;
