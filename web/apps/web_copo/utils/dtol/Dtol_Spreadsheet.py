@@ -263,6 +263,7 @@ class DtolSpreadsheet:
             s["sample_type"] = "dtol"
             s["biosample_accession"] = []
             s["manifest_id"] = manifest_id
+            s["status"] = "pending"
             notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + s["SPECIMEN_ID"],
                                  action="info",
                                  html_id="sample_info")

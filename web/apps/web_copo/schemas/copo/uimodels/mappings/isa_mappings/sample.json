@@ -625,7 +625,7 @@
     },
     {
       "help_tip": "A list of maps, gazetteers, or other resources used to georeference the Location, described specifically enough to allow anyone in the future to use the same resources.",
-      "required": "true",
+      "required": "false",
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
@@ -1734,6 +1734,28 @@
       "show_in_table": true,
       "control": "text",
       "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "status"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Status",
+      "show_in_form": true,
+      "id": "copo.sample.status",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text",
+      "default_value": "pending"
     },
     {
       "help_tip": "",
