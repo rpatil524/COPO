@@ -632,6 +632,7 @@ class Sample(DAComponent):
     def get_by_dtol_field(self, dtol_field, value):
         return cursor_to_list(self.get_collection_handle().find({dtol_field: value}))
 
+
 class Submission(DAComponent):
     def __init__(self, profile_id=None):
         super(Submission, self).__init__(profile_id, "submission")
@@ -648,13 +649,26 @@ class Submission(DAComponent):
             sub_handle.update({"_id": ObjectId(sub_id)}, {"$set": {"dtol_status": "complete"}})
 
     def get_pending_dtol_samples(self):
+        REFRESH_THRESHOLD = 60  # time in seconds to retry stuck submission
         # called by celery to get samples the supeprvisor has set to be sent to ENA
-        sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": "pending"},
-                                                {"dtol_samples": 1, "profile_id": 1})
+        sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": {"$in": ["sending", "pending"]}},
+                                                {"dtol_samples": 1, "dtol_status": 1, "profile_id": 1,
+                                                 "date_modified": 1})
         sub = cursor_to_list(sub)
+        out = list()
         for s in sub:
-            self.get_collection_handle().update({"_id": ObjectId(s["_id"])}, {"$set": {"dtol_status": "sending"}})
-        return sub
+            recorded_time = s.get("date_modified", datetime.now())
+            current_time = datetime.now()
+            diff = time_difference = current_time - recorded_time
+            if s.get("dtol_status", "") == "sending" and time_difference.seconds > (REFRESH_THRESHOLD):
+                # submission retry time has elapsed to readd to list
+                out.append(s)
+                self.update_profile_modified(s["_id"])
+            elif s.get("dtol_status", "") == "pending":
+                out.append(s)
+                self.update_profile_modified(s["_id"])
+                self.get_collection_handle().update({"_id": ObjectId(s["_id"])}, {"$set": {"dtol_status": "sending"}})
+        return out
 
     def get_incomplete_submissions_for_user(self, user_id, repo):
         doc = self.get_collection_handle().find(
@@ -1114,6 +1128,11 @@ class Submission(DAComponent):
         # return if study has been already submitted
         return self.get_collection_handle().count(
             {'$and': [{'_id': ObjectId(collection_id)}, {'accessions.study_accessions': {'$exists': 'true'}}]})
+
+    def update_modified_timestamp(self, sub_id):
+        return self.get_collection_handle().update(
+            {"_id": ObjectId(sub_id)}, {"set": {"modified": datetime.now()}}
+        )
 
 
 class DataFile(DAComponent):
