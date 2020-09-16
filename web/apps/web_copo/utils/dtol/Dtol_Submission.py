@@ -240,7 +240,12 @@ def submit_biosample(subfix, sampleobj, collection_id):
     if success_status == 'false':  ####todo
 
         #print(receipt)
-        msg = tree.find('MESSAGES').findtext('ERROR', default='Undefined error')
+        msg = ""
+        error_blocks = tree.find('MESSAGES').findall('ERROR')
+        for error in error_blocks:
+            msg += error.text+"<br>"
+        if not msg:
+            msg = "Undefined error"
         status = {"status": "error","msg": msg}
         # print(status)
         for child in tree.iter():
