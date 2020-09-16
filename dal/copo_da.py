@@ -649,7 +649,7 @@ class Submission(DAComponent):
             sub_handle.update({"_id": ObjectId(sub_id)}, {"$set": {"dtol_status": "complete"}})
 
     def get_pending_dtol_samples(self):
-        REFRESH_THRESHOLD = 60  # time in seconds to retry stuck submission
+        REFRESH_THRESHOLD = 60 * 10 # time in seconds to retry stuck submission
         # called by celery to get samples the supeprvisor has set to be sent to ENA
         sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": {"$in": ["sending", "pending"]}},
                                                 {"dtol_samples": 1, "dtol_status": 1, "profile_id": 1,
