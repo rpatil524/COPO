@@ -59,6 +59,8 @@ def filter_for_STS(sample_list):
     export = lookup.DTOL_EXPORT_TO_STS_FIELDS
     out = list()
     for s in sample_list:
+        if isinstance(s, InvalidId):
+            break
         s_out = dict()
         for k, v in s.items():
             # always export copo id
@@ -84,20 +86,27 @@ def get_for_manifest(request, manifest_id):
 def get_by_biosample_id(request, biosample_id):
     # get sample associated with given biosample_id. This will return nothing if ENA submission has not yet occured
     sample = Sample().get_by_biosample_id(biosample_id)
-    out = filter_for_STS([sample])
+    out = list()
+    if sample:
+        out = filter_for_STS([sample])
     return finish_request(out)
 
 
 def get_by_copo_id(request, copo_id):
     # get sample by COPO id if known
     sample = Sample().get_record(copo_id)
-    out = filter_for_STS([sample])
+    out = list()
+    if sample:
+        if not isinstance(sample, InvalidId):
+            out = filter_for_STS([sample])
     return finish_request(out)
 
 def get_by_dtol_field(request, dtol_field, value):
     # generic method to return all samples where given "dtol_field" matches "value"
+    out = list()
     sample_list = Sample().get_by_dtol_field(dtol_field, value)
-    out = filter_for_STS(sample_list)
+    if sample_list:
+        out = filter_for_STS(sample_list)
     return finish_request(out)
 
 
