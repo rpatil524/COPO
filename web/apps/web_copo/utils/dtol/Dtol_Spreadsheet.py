@@ -32,7 +32,7 @@ class DtolSpreadsheet:
     validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
         allowed=str(na_vals))
     validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
-    validation_msg_invalid_list = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. If this is a location, start with the Country, adding more specific details separated with '|'."
+    validation_msg_invalid_list = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. If this is a location, start with the Country, adding more specific details separated with '|'. See list of allowed Country entries at https://www.ebi.ac.uk/ena/browser/view/ERC000053"
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -133,7 +133,8 @@ class DtolSpreadsheet:
                                 if header == "COLLECTION_LOCATION":
                                     # special check for COLLETION_LOCATION as this needs invalid list error for feedback
                                     c_value = str(c).split('|')[0].strip()
-                                    if c_value not in allowed_vals:
+                                    location_2part = str(c).split('|')[1:]
+                                    if c_value not in allowed_vals or not  location_2part:
                                         notify_sample_status(profile_id=self.profile_id,
                                                              msg=(self.validation_msg_invalid_list % (
                                                                  c_value, header, str(cellcount + 1))),
