@@ -345,12 +345,11 @@ function handle_accept_reject(el) {
         // create or update dtol submission record
         var profile_id = $("#profile_id").val()
         $.ajax({
-            url: "/copo/add_sample_to_dtol_submission",
+            url: "/copo/add_sample_to_dtol_submission/",
             method: "GET",
             data: {"sample_ids": JSON.stringify(sample_ids), "profile_id": profile_id},
         }).done(function () {
-
-            //$("#profile_titles").find(".selected").click()
+            $("#profile_titles").find(".selected").click()
         })
     }
 
