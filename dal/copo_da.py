@@ -63,6 +63,10 @@ handle_dict = dict(publication=get_collection_ref(PubCollection),
                    )
 
 
+def to_object_id(id):
+    return ObjectId(id)
+
+
 class ProfileInfo:
     def __init__(self, profile_id=None):
         self.profile_id = profile_id
@@ -116,6 +120,22 @@ class DAComponent:
             pass
 
         return doc
+
+    def get_records(self, oids: list) -> list:
+
+        # return list of objects from the given oids list
+        if not isinstance(oids, list):
+            raise TypeError("Method requires a list")
+        # make sure we have ObjectIds
+        try:
+            oids = list(map(lambda x: ObjectId(x), oids))
+        except InvalidId as e:
+            return e
+        handle = self.get_collection_handle()
+        if handle:
+            cursor = self.get_collection_handle().find({"_id": {"$in": oids}})
+
+        return cursor_to_list(cursor)
 
     def get_component_count(self):
         count = 0
@@ -626,11 +646,11 @@ class Sample(DAComponent):
     def get_by_manifest_id(self, manifest_id):
         return cursor_to_list(self.get_collection_handle().find({"manifest_id": manifest_id}))
 
-    def get_by_biosample_id(self, biosample_id):
-        return self.get_collection_handle().find_one({"biosampleAccession": biosample_id})
+    def get_by_biosample_ids(self, biosample_ids):
+        return cursor_to_list(self.get_collection_handle().find({"biosampleAccession": {"$in": biosample_ids}}))
 
-    def get_by_dtol_field(self, dtol_field, value):
-        return cursor_to_list(self.get_collection_handle().find({dtol_field: value}))
+    def get_by_field(self, dtol_field, value):
+        return cursor_to_list(self.get_collection_handle().find({dtol_field: {"$in": value}}))
 
 
 class Submission(DAComponent):
@@ -649,24 +669,27 @@ class Submission(DAComponent):
             sub_handle.update({"_id": ObjectId(sub_id)}, {"$set": {"dtol_status": "complete"}})
 
     def get_pending_dtol_samples(self):
-        REFRESH_THRESHOLD = 60 * 10 # time in seconds to retry stuck submission
+        REFRESH_THRESHOLD = 100  # time in seconds to retry stuck submission
         # called by celery to get samples the supeprvisor has set to be sent to ENA
+        # those not yet sent should be in pending state. Occasionally there will be
+        # stuck submissions in sending state, so get both types
         sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": {"$in": ["sending", "pending"]}},
                                                 {"dtol_samples": 1, "dtol_status": 1, "profile_id": 1,
                                                  "date_modified": 1})
         sub = cursor_to_list(sub)
         out = list()
         for s in sub:
+            # calculate whether a submission is an old one
             recorded_time = s.get("date_modified", datetime.now())
             current_time = datetime.now()
             diff = time_difference = current_time - recorded_time
             if s.get("dtol_status", "") == "sending" and time_difference.seconds > (REFRESH_THRESHOLD):
-                # submission retry time has elapsed to readd to list
+                # submission retry time has elapsed to re-add to list
                 out.append(s)
-                self.update_profile_modified(s["_id"])
+                self.update_submission_modified_timestamp(s["_id"])
             elif s.get("dtol_status", "") == "pending":
                 out.append(s)
-                self.update_profile_modified(s["_id"])
+                self.update_submission_modified_timestamp(s["_id"])
                 self.get_collection_handle().update({"_id": ObjectId(s["_id"])}, {"$set": {"dtol_status": "sending"}})
         return out
 
@@ -1129,9 +1152,9 @@ class Submission(DAComponent):
         return self.get_collection_handle().count(
             {'$and': [{'_id': ObjectId(collection_id)}, {'accessions.study_accessions': {'$exists': 'true'}}]})
 
-    def update_modified_timestamp(self, sub_id):
+    def update_submission_modified_timestamp(self, sub_id):
         return self.get_collection_handle().update(
-            {"_id": ObjectId(sub_id)}, {"set": {"modified": datetime.now()}}
+            {"_id": ObjectId(sub_id)}, {"$set": {"modified": datetime.now()}}
         )
 
 

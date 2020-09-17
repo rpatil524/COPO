@@ -48,7 +48,7 @@ def process_pending_dtol_samples():
         for s_id in submission["dtol_samples"]:
             s_ids.append(s_id)
             sam = Sample().get_record(s_id)
-            notify_dtol_status(msg="Adding to Set Sample: " + sam["SPECIMEN_ID"], action="info",
+            notify_dtol_status(msg="Adding to Sample Batch: " + sam["SPECIMEN_ID"], action="info",
                                html_id="dtol_sample_info")
             update_bundle_sample_xml(sam, "bundle_"+file_subfix+".xml")
             #build_xml(sample=sam, sub_id=s_id, p_id=submission["profile_id"], collection_id=submission['_id'], file_subfix = file_subfix)

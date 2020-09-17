@@ -8,6 +8,7 @@ from api.utils import get_return_template, extract_to_template, finish_request
 from dal.copo_da import Sample, Source
 from web.apps.web_copo.lookup.lookup import API_ERRORS
 from web.apps.web_copo.lookup import dtol_lookups as  lookup
+from django.http import HttpResponse
 
 
 def get(request, id):
@@ -83,28 +84,45 @@ def get_for_manifest(request, manifest_id):
     return finish_request(out)
 
 
-def get_by_biosample_id(request, biosample_id):
+def get_by_biosample_ids(request, biosample_ids):
     # get sample associated with given biosample_id. This will return nothing if ENA submission has not yet occured
-    sample = Sample().get_by_biosample_id(biosample_id)
+    ids = biosample_ids.split(",")
+    # strip white space
+    ids = list(map(lambda x: x.strip(), ids))
+    # remove any empty elements in the list (e.g. where 2 or more comas have been typed in error
+    ids[:] = [x for x in ids if x]
+    sample = Sample().get_by_biosample_ids(ids)
     out = list()
     if sample:
-        out = filter_for_STS([sample])
+        out = filter_for_STS(sample)
     return finish_request(out)
 
 
-def get_by_copo_id(request, copo_id):
+def get_by_copo_ids(request, copo_ids):
     # get sample by COPO id if known
-    sample = Sample().get_record(copo_id)
+    ids = copo_ids.split(",")
+    # strip white space
+    ids = list(map(lambda x: x.strip(), ids))
+    # remove any empty elements in the list (e.g. where 2 or more comas have been typed in error
+    ids[:] = [x for x in ids if x]
+    samples = Sample().get_records(ids)
     out = list()
-    if sample:
-        if not isinstance(sample, InvalidId):
-            out = filter_for_STS([sample])
+    if samples:
+        if not type(samples) == InvalidId:
+            out = filter_for_STS(samples)
+        else:
+            return HttpResponse(status=400, content="InvalidId found in request")
     return finish_request(out)
 
-def get_by_dtol_field(request, dtol_field, value):
+def get_by_field(request, dtol_field, value):
     # generic method to return all samples where given "dtol_field" matches "value"
+    vals = value.split(",")
+    # strip white space
+    vals = list(map(lambda x: x.strip(), vals))
+    # remove any empty elements in the list (e.g. where 2 or more comas have been typed in error
+    vals[:] = [x for x in vals if x]
     out = list()
-    sample_list = Sample().get_by_dtol_field(dtol_field, value)
+    sample_list = Sample().get_by_field(dtol_field, vals)
     if sample_list:
         out = filter_for_STS(sample_list)
     return finish_request(out)
