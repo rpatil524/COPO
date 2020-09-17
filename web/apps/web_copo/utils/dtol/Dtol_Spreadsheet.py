@@ -32,7 +32,7 @@ class DtolSpreadsheet:
     validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
         allowed=str(na_vals))
     validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
-    validation_msg_invalid_list = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. If this is a location, start with the Country, adding more specific details separated with '|'. See list of allowed Country entries at https://www.ebi.ac.uk/ena/browser/view/ERC000053"
+    validation_msg_invalid_list = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. If this is a location, start with the Country, adding more specific details separated with '|'. See list of allowed Country entries at <a href='https://www.ebi.ac.uk/ena/browser/view/ERC000053'>https://www.ebi.ac.uk/ena/browser/view/ERC000053</a>"
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -73,6 +73,8 @@ class DtolSpreadsheet:
                 return False
 
     def validate(self):
+        flag=True
+        errors = []
         # need to load validation field set
         with open(lk.WIZARD_FILES["sample_details"]) as json_data:
 
@@ -89,10 +91,8 @@ class DtolSpreadsheet:
                                          html_id="sample_info")
                     if item not in columns:
                         # invalid or missing field, inform user and return false
-                        notify_sample_status(profile_id=self.profile_id, msg="Field not found - " + item,
-                                             action="error",
-                                             html_id="sample_info")
-                        return False
+                        errors.append("Field not found - " + item)
+                        flag = False
                         # if we have a required fields, check that there are no missing values
                     for header, cells in self.data.iteritems():
                         # here we need to check if there are not missing values in its cells
@@ -102,12 +102,9 @@ class DtolSpreadsheet:
                                 cellcount += 1
                                 if not c:
                                     # we have missing data in required cells
-                                    notify_sample_status(profile_id=self.profile_id,
-                                                         msg=(self.validation_msg_missing_data % (
-                                                             header, str(cellcount + 1))),
-                                                         action="error",
-                                                         html_id="sample_info")
-                                    return False
+                                    errors.append(self.validation_msg_missing_data % (
+                                                             header, str(cellcount + 1)))
+                                    flag = False
 
                 # get list of DTOL fields from schemas
                 self.fields = jp.match(
@@ -135,40 +132,35 @@ class DtolSpreadsheet:
                                     c_value = str(c).split('|')[0].strip()
                                     location_2part = str(c).split('|')[1:]
                                     if c_value not in allowed_vals or not  location_2part:
-                                        notify_sample_status(profile_id=self.profile_id,
-                                                             msg=(self.validation_msg_invalid_list % (
-                                                                 c_value, header, str(cellcount + 1))),
-                                                             action="error",
-                                                             html_id="sample_info")
-                                        return False
-                                if c_value not in allowed_vals:
+                                        errors.append(self.validation_msg_invalid_list % (
+                                                                 c_value, header, str(cellcount + 1)))
+                                        flag = False
+                                elif c_value not in allowed_vals:
                                     # check value is in allowed enum
-                                    notify_sample_status(profile_id=self.profile_id,
-                                                         msg=(self.validation_msg_invalid_data % (
-                                                             c_value, header, str(cellcount + 1), allowed_vals)),
-                                                         action="error",
-                                                         html_id="sample_info")
-                                    return False
+                                    errors.append(self.validation_msg_invalid_data % (
+                                                             c_value, header, str(cellcount + 1), allowed_vals))
+                                    flag = False
                             if regex_rule:
                                 # handle any regular expressions provided for valiation
 
                                 if c and not re.match(regex_rule, c):
-                                    notify_sample_status(profile_id=self.profile_id,
-                                                         msg=(self.validation_msg_invalid_data % (
-                                                             c, header, str(cellcount + 1), regex_human_readable)),
-                                                         action="error",
-                                                         html_id="sample_info")
-                                    return False
+                                    errors.append(self.validation_msg_invalid_data % (
+                                                             c, header, str(cellcount + 1), regex_human_readable))
+                                    flag = False
                             elif header == "SERIES":
                                 try:
                                     int(c)
                                 except ValueError:
-                                    notify_sample_status(profile_id=self.profile_id,
-                                                         msg=(self.validation_msg_invalid_data % (
-                                                             c, header, str(cellcount + 1), "integers")),
-                                                         action="error",
-                                                         html_id="sample_info")
-                                    return False
+                                    errors.append(self.validation_msg_invalid_data % (
+                                                             c, header, str(cellcount + 1), "integers"))
+                                    flag = False
+
+                if not flag:
+                    notify_sample_status(profile_id=self.profile_id,
+                                         msg="<br>".join(errors),
+                                         action="error",
+                                         html_id="sample_info")
+                    return False
 
 
 
