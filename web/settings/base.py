@@ -22,7 +22,8 @@ LOGIN_URL = '/accounts/auth/'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if str(resolve_env.get_env('DEBUG')).lower() == 'true' else False
 
-ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0', 'copo-project.org', 'demo.copo-project.org']
+ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0', 'copo-project.org', 'demo.copo-project.org', 'localhost']
+
 DEBUG_PROPAGATE_EXCEPTIONS = True
 # Django's base applications definition
 DJANGO_APPS = [
@@ -47,7 +48,8 @@ PROJECT_APPS = [
     'rest_framework',
     'chunked_upload',
     'compressor',
-    'django_extensions'
+    'django_extensions',
+    'corsheaders'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS
@@ -78,6 +80,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware',
     'django_brotli.middleware.BrotliMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
     # 'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth',
     # 'web.apps.web_copo.copo_middleware.OrcidMiddleware.OrcidOAuth',
 ]
@@ -96,9 +99,10 @@ REST_FRAMEWORK = {
 
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:8000',
+    'http://0.0.0.0:8001',
     'http://127.0.0.1:8000'
 )
-
+#CORS_ORIGIN_ALLOW_ALL = True
 ACCOUNT_LOGOUT_REDIRECT_URL = '/copo/login'
 
 ROOT_URLCONF = 'web.urls'
