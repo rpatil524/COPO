@@ -1,0 +1,189 @@
+openapi: 3.0.0
+info:
+  title: Sample API
+  description: Swagger documentation of COPO/DTOL sample API.
+  version: 0.1.1
+servers:
+  - url: http://0.0.0.0:8000/api
+    description: Host Server
+paths:
+  /sample/copo_id/{copo_ids}:
+    get:
+      parameters:
+        - name: copo_ids
+          in: path
+          required: true
+          description: hexadecimal sample ids, separated by commas
+          schema:
+            type: string
+            minimum: 1
+
+      responses:
+        "200": # status code
+          description: A JSON array sample objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sample'
+        "400":
+            description: InvalidId found in request
+
+  /sample/biosample_id/{biosample_ids}:
+    get:
+      parameters:
+        - name: biosample_ids
+          in: path
+          required: true
+          description: biosample accessions created by ENA, separated by commas
+          schema:
+            type: string
+            minimum: 1
+
+      responses:
+        "200": # status code
+          description: A JSON array sample objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sample'
+
+  /sample/sample_field/{field}/{values}:
+    get:
+      parameters:
+        - name: field
+          in: path
+          required: true
+          description: a known sample field to search for
+          schema:
+            type: string
+            minimum: 1
+            maximum: 1
+        - name: values
+          in: path
+          required: true
+          description: a comma separated list of values to look for
+          schema:
+            type: string
+            minimum: 1
+
+
+      responses:
+        "200": # status code
+          description: A JSON array sample objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sample'
+
+
+
+
+components:
+  schemas:
+    Sample:
+      type: object
+      properties:
+        SERIES:
+          type: string
+        RACK_OR_PLATE_ID:
+          type: string
+        TUBE_OR_WELL_ID:
+          type: string
+        SPECIMEN_ID:
+          type: string
+        ORDER_OR_GROUP:
+          type: string
+        FAMILY:
+          type: string
+        GENUS:
+          type: string
+        TAXON_ID:
+          type: string
+        SCIENTIFIC_NAME:
+          type: string
+        LIFESTAGE:
+          type: string
+        SEX:
+          type: string
+        ORGANISM_PART:
+          type: string
+        GAL:
+          type: string
+        GAL_SAMPLE_ID:
+          type: string
+        COLLECTOR_SAMPLE_ID:
+          type: string
+        COLLECTED_BY:
+          type: string
+        COLLECTOR_AFFILIATION:
+          type: string
+        DATE_OF_COLLECTION:
+          type: string
+        COLLECTION_LOCATION:
+          type: string
+        DECIMAL_LATITUDE:
+          type: string
+        HABITAT:
+          type: string
+        DESCRIPTION_OF_COLLECTION_METHOD:
+          type: string
+        EASE_OF_SPECIMEN_COLLECTION:
+          type: string
+        IDENTIFIED_BY:
+          type: string
+        IDENTIFIER_AFFILIATION:
+          type: string
+        IDENTIFIED_HOW:
+          type: string
+        SPECIMEN_ID_RISK:
+          type: string
+        PRESERVED_BY:
+          type: string
+        PRESERVER_AFFILIATION:
+          type: string
+        PRESERVATION_APPROACH:
+          type: string
+        TIME_ELAPSED_FROM_COLLECTION_TO_PRESERVATION:
+          type: string
+        DATE_OF_PRESERVATION:
+          type: string
+        SIZE_OF_TISSUES_IN_TUBE:
+          type: string
+        TISSUE_REMOVED_FROM_BARCODING:
+          type: string
+        PLATE_ID_FOR_BARCODING:
+          type: string
+        TUBE_OR_WELL_ID_FOR_BARCODING:
+          type: string
+        TISSUE_FOR_BARCODING:
+          type: string
+        BARCODE_PLATE_PRESERVATIVE:
+          type: string
+        PURPOSE_OF_SPECIMEN:
+          type: string
+        HAZARD_GROUP:
+          type: string
+        REGULATORY_COMPLIANCE:
+          type: string
+        VOUCHER_ID:
+          type: string
+        biosampleAccession:
+          type: string
+        created_by:
+          type: string
+        time_created:
+          type: string
+        submissionAccession:
+          type: string
+        sraAccession:
+          type: string
+        manifest_id:
+          type: string
+        time_verified:
+          type: string
+        verified_by:
+          type: string
+        copo_id:
+          type: string
+        status:
+          type: string

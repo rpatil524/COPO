@@ -11,8 +11,14 @@ from api.doi_metadata import DOI2Metadata
 from dal.copo_base_da import Collection_Head
 from dal.ena_da import EnaCollection
 from django.conf import settings
-from web.apps.web_copo.schemas.utils.data_formats import DataFormats
 
+from web.apps.web_copo.schemas.utils.data_formats import DataFormats
+from django.shortcuts import redirect
+
+
+def forward_to_swagger(request):
+    response = redirect('/static/swagger/apidocs_index.html')
+    return response
 
 def upload_to_figshare_profile(request):
     if request.method == 'POST':

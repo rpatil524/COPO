@@ -116,9 +116,10 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             # insert your TEMPLATE_DIRS here
-
+            #
             os.path.join(BASE_DIR, 'web', 'landing'),
             os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'templates', 'copo'),
+os.path.join(BASE_DIR, 'static', 'swagger'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -164,9 +165,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATICFILES_DIRS = (
-#     '/copo/static/',
-# )
+STATICFILES_DIRS = (
+     '/copo/static/',
+)
 # print(STATICFILES_DIRS)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # MEDIA_ROOT = STATIC_ROOT

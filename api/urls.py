@@ -2,7 +2,9 @@ __author__ = 'felix.shaw@tgac.ac.uk - 20/01/2016'
 
 from .annotate_views import search_all, post_annotations, handle_upload
 from django.urls import path, re_path
-from .handlers import sample, person
+from .handlers import sample, person, general
+from django.shortcuts import redirect
+
 
 app_name = 'api'
 
@@ -16,6 +18,8 @@ generic_api_patterns = [
 ]
 
 dtol_api_patterns = [
+    #re_path(r'', general.forward_to_swagger, name='swagger'),
+    path('', general.forward_to_swagger),
     re_path(r'sample/get/(?P<id>[A-Za-z0-9]+)', sample.get, name='sample/get'),
     re_path(r'manifest/(?P<manifest_id>[A-Z0-9a-f-]+)', sample.get_for_manifest, name='get_for_manifest'),
     re_path(r'sample/biosample_id/(?P<biosample_ids>[A-Z0-9, ]+)', sample.get_by_biosample_ids,

@@ -1,11 +1,12 @@
 from django.urls import path, re_path
 from . import views
 from web.apps.web_copo.utils import ajax_handlers, annotation_handlers, template_handlers
-
+from django.views.generic import TemplateView
 app_name = 'web_copo'
 
 urlpatterns = [
     path('', views.index, name='index'),
+
     path('accept_reject_sample/', views.copo_sample_accept_reject, name="accept_reject"),
     path('dataverse_submit/', views.test_dataverse_submit, name='test_dataverse_submit'),
     path('test_submission/', views.test_submission, name='test_submission'),
