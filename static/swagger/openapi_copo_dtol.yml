@@ -5,12 +5,42 @@ info:
   version: 0.1.1
 servers:
   - url: http://0.0.0.0:8000/api
-    description: Local Server
-  - url: http://0.0.0.0:80/api
-    description: Live Server
+    description: This Server
 paths:
   /sample/manifest/{manifest_id}:
     get:
+      tags:
+        - Manifest
+      summary:
+        Get samples in manifest
+      description: >
+        Get full sample information for each sample contained in the given {manifest_id}
+      parameters:
+        - name: manifest_id
+          in: path
+          required: true
+          description: uuid of the manifest in question
+          schema:
+            type: string
+            minimum: 1
+      responses:
+        "200": # status code
+          description: A JSON array sample objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SampleList'
+        "400":
+          description: invalid manifest_id
+
+  /sample/manifest/{manifest_id}/sample_statuses:
+    get:
+      tags:
+        - Manifest
+      summary:
+        Get sample statuses in manifest
+      description: >
+        Get minimal sample status information for each sample contained in the given {manifest_id}
       parameters:
         - name: manifest_id
           in: path
@@ -22,37 +52,22 @@ paths:
 
       responses:
         "200": # status code
-          description: A JSON array sample objects
+          description: A JSON array of sample status objects
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Sample'
+                $ref: '#/components/schemas/SampleStatus'
         "400":
           description: invalid manifest_id
 
-  /sample/manifest/{manifest_id}/sample_statuses:
-    get:
-      parameters:
-        - name: manifest_id
-          in: path
-          required: true
-          description: uuid of the manifest in question
-          schema:
-            type: string
-            minimum: 1
-
-    responses:
-      "200": # status code
-        description: A JSON array sample objects
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Sample'
-      "400":
-        description: invalid manifest_id
-
   /sample/copo_id/{copo_ids}:
     get:
+      tags:
+        - Sample
+      summary:
+        Get Sample
+      description: >
+        Get full sample information for the samples returned from the given {copo_ids}
       parameters:
         - name: copo_ids
           in: path
@@ -68,12 +83,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Sample'
+                $ref: '#/components/schemas/SampleList'
         "400":
           description: InvalidId found in request
 
   /sample/biosample_id/{biosample_ids}:
     get:
+      tags:
+      - Sample
+      summary:
+        Get Sample
+      description: >
+        Get full sample information for the samples returned from the given {biosample_ids}
       parameters:
         - name: biosample_ids
           in: path
@@ -89,10 +110,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Sample'
+                $ref: '#/components/schemas/SampleList'
 
   /sample/sample_field/{field}/{values}:
     get:
+      tags:
+        - Sample
+      summary:
+        Get Sample
+      description: >
+        Get full sample information for the samples returned from the given {field} / {values}
       parameters:
         - name: field
           in: path
@@ -115,7 +142,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Sample'
+                $ref: '#/components/schemas/SampleList'
 
 
 
@@ -125,19 +152,48 @@ components:
     SampleStatus:
       type: object
       properties:
+        status:
+          type: string
+          enum: ["OK", "Error"]
+        number_found:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sample_short'
+
+    SampleList:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["OK", "Error"]
+        number_found:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sample_long'
+
+    Sample_short:
+      type: object
+      properties:
         copo_id:
           type: string
           description: unique COPO identifier for this sample
         manifest_id:
           type: string
+          format: uuid
           description: unique identifier for manifest in which this sample appears
         status:
           type: string
-          description: status of this sample. PENDING means waiting for supervisor approval, ACCEPTED means supervisor approval gained, REJECTED means supervisor rejected
+          description: status of this sample. "pending" means waiting for supervisor approval, "accepted" means supervisor approval gained, "rejected" means supervisor rejected
         time_verified:
           type: string
+          format: date-time
           description: when was this sample approved by the dtol_manager
-    Sample:
+
+    Sample_long:
       type: object
       properties:
         SERIES:
@@ -204,6 +260,7 @@ components:
           type: string
         DATE_OF_PRESERVATION:
           type: string
+          format: date
         SIZE_OF_TISSUES_IN_TUBE:
           type: string
         TISSUE_REMOVED_FROM_BARCODING:
@@ -224,22 +281,55 @@ components:
           type: string
         VOUCHER_ID:
           type: string
+        TAXON_REMARKS:
+          type: string
+        INFRASPECIFIC_EPITHET:
+          type: string
+        CULTURE_OR_STRAIN_ID:
+          type: string
+        COMMON_NAME:
+          type: string
+        SYMBIONT:
+          type: string
+        RELATIONSHIP:
+          type: string
+        GRID_REFERENCE:
+          type: string
+        DEPTH:
+          type: string
+        ELEVATION:
+          type: string
+        TIME_OF_COLLECTION:
+          type: string
+        PRESERVATIVE_SOLUTION:
+          type: string
+        SIZE_OF_TISSUE_IN_TUBE:
+          type: string
+        TISSUE_REMOVED_FOR_BARCODING:
+          type: string
+        OTHER_INFORMATION:
+          type: string
         biosampleAccession:
           type: string
         created_by:
           type: string
+          format: email
         time_created:
           type: string
+          format: date-time
         submissionAccession:
           type: string
         sraAccession:
           type: string
         manifest_id:
           type: string
+          format: uuid
         time_verified:
           type: string
+          format: date-time
         verified_by:
           type: string
+          format: email
         copo_id:
           type: string
         status:
