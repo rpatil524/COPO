@@ -2,7 +2,6 @@
 import os
 from tools import resolve_env
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 SCHEMA_DIR = os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'schemas')
@@ -16,14 +15,19 @@ PROFILE_LOG_BASE = os.path.join(BASE_DIR, 'profiler')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = resolve_env.get_env('SECRET_KEY')
 
-
 LOGIN_URL = '/accounts/auth/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if str(resolve_env.get_env('DEBUG')).lower() == 'true' else False
 
 ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0', 'copo-project.org', 'demo.copo-project.org', 'localhost']
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://0.0.0.0:8000",
+    "http://127.0.0.1:8000",
+    "https://copo-project.org",
+    "http://demo.copo-project.org"
+]
 DEBUG_PROPAGATE_EXCEPTIONS = True
 # Django's base applications definition
 DJANGO_APPS = [
@@ -72,6 +76,7 @@ SOCIALACCOUNT_PROVIDERS = \
           'AUTH_PARAMS': {'access_type': 'online'}}}
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -80,7 +85,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware',
     'django_brotli.middleware.BrotliMiddleware',
-    'corsheaders.middleware.CorsMiddleware'
+
     # 'web.apps.web_copo.copo_middleware.FigshareMiddleware.SetFigshareOauth',
     # 'web.apps.web_copo.copo_middleware.OrcidMiddleware.OrcidOAuth',
 ]
@@ -102,7 +107,7 @@ CORS_ORIGIN_WHITELIST = (
     'http://0.0.0.0:8001',
     'http://127.0.0.1:8000'
 )
-#CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
 ACCOUNT_LOGOUT_REDIRECT_URL = '/copo/login'
 
 ROOT_URLCONF = 'web.urls'
@@ -119,7 +124,7 @@ TEMPLATES = [
             #
             os.path.join(BASE_DIR, 'web', 'landing'),
             os.path.join(BASE_DIR, 'web', 'apps', 'web_copo', 'templates', 'copo'),
-os.path.join(BASE_DIR, 'static', 'swagger'),
+            os.path.join(BASE_DIR, 'static', 'swagger'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
