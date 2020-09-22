@@ -214,7 +214,7 @@
       "required": "true",
       "control_meta": {},
       "versions": [
-        "IDENTIFIER_AFFLIATION"
+        "IDENTIFIER_AFFILIATION"
       ],
       "ref": "",
       "deprecated": false,
@@ -224,11 +224,11 @@
       ],
       "show_in_form": true,
       "label": "Identifier Affiliation",
-      "id": "copo.sample.IDENTIFIER_AFFLIATION",
+      "id": "copo.sample.IDENTIFIER_AFFILIATION",
       "show_in_table": true,
       "control": "text",
       "default_value": "",
-      "dwc": "http://rs.tdwg.org/dwc/terms/identifiedBy",
+      "dwc": "http://rs.tdwg.org/dwc/terms/identifierAffiliation",
       "type": "string"
     },
     {

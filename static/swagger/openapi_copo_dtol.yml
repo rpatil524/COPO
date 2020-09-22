@@ -5,8 +5,52 @@ info:
   version: 0.1.1
 servers:
   - url: http://0.0.0.0:8000/api
-    description: Host Server
+    description: Local Server
+  - url: http://0.0.0.0:80/api
+    description: Live Server
 paths:
+  /sample/manifest/{manifest_id}:
+    get:
+      parameters:
+        - name: manifest_id
+          in: path
+          required: true
+          description: uuid of the manifest in question
+          schema:
+            type: string
+            minimum: 1
+
+      responses:
+        "200": # status code
+          description: A JSON array sample objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sample'
+        "400":
+          description: invalid manifest_id
+
+  /sample/manifest/{manifest_id}/sample_statuses:
+    get:
+      parameters:
+        - name: manifest_id
+          in: path
+          required: true
+          description: uuid of the manifest in question
+          schema:
+            type: string
+            minimum: 1
+
+    responses:
+      "200": # status code
+        description: A JSON array sample objects
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sample'
+      "400":
+        description: invalid manifest_id
+
   /sample/copo_id/{copo_ids}:
     get:
       parameters:
@@ -26,7 +70,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Sample'
         "400":
-            description: InvalidId found in request
+          description: InvalidId found in request
 
   /sample/biosample_id/{biosample_ids}:
     get:
@@ -65,8 +109,6 @@ paths:
           schema:
             type: string
             minimum: 1
-
-
       responses:
         "200": # status code
           description: A JSON array sample objects
@@ -80,6 +122,21 @@ paths:
 
 components:
   schemas:
+    SampleStatus:
+      type: object
+      properties:
+        copo_id:
+          type: string
+          description: unique COPO identifier for this sample
+        manifest_id:
+          type: string
+          description: unique identifier for manifest in which this sample appears
+        status:
+          type: string
+          description: status of this sample. PENDING means waiting for supervisor approval, ACCEPTED means supervisor approval gained, REJECTED means supervisor rejected
+        time_verified:
+          type: string
+          description: when was this sample approved by the dtol_manager
     Sample:
       type: object
       properties:

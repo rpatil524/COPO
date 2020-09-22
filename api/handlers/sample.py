@@ -83,6 +83,8 @@ def get_for_manifest(request, manifest_id):
     out = filter_for_STS(sample_list)
     return finish_request(out)
 
+def get_sample_statuses_for_manifest(request, manifest_id):
+    sample_list = Sample().get_by_manifest_id(manifest_id)
 
 def get_by_biosample_ids(request, biosample_ids):
     # get sample associated with given biosample_id. This will return nothing if ENA submission has not yet occured

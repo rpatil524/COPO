@@ -9,7 +9,7 @@ urlpatterns = [
 
     path('accept_reject_sample/', views.copo_sample_accept_reject, name="accept_reject"),
     path('dataverse_submit/', views.test_dataverse_submit, name='test_dataverse_submit'),
-    path('test_submission/', views.test_submission, name='test_submission'),
+    #path('test_submission/', views.test_submission, name='test_submission'),
     path('test/', views.test_view, name='test_view'),
     path('login/', views.login, name='auth'),
     path('logout/', views.copo_logout, name='logout'),

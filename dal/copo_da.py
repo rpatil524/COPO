@@ -587,7 +587,8 @@ class Sample(DAComponent):
     def timestamp_dtol_sample_verified(self, sample_id):
         email = ThreadLocal.get_current_user().email
         sample = self.get_collection_handle().update({"_id": ObjectId(sample_id)},
-                                                     {"$set": {"time_verified": datetime.utcnow(), "verified_by": email}})
+                                                     {"$set": {"time_verified": datetime.utcnow(),
+                                                               "verified_by": email}})
 
     def add_accession(self, biosample_accession, sra_accession, submission_accession, oid):
         return self.get_collection_handle().update(
@@ -601,6 +602,8 @@ class Sample(DAComponent):
                     'submissionAccession': submission_accession,
                     'status': 'accepted'}
             })
+
+
 
     def add_rejected_status(self, status, oid):
         return self.get_collection_handle().update(
@@ -617,7 +620,7 @@ class Sample(DAComponent):
         if filter == "pending":
             # $nin will return where status neq to values in array, or status is absent altogether
             cursor = self.get_collection_handle().find(
-                {'profile_id': profile_id, "status": {"$nin": ["rejected", "accepted"]}})
+                {'profile_id': profile_id, "status": {"$nin": ["rejected", "accepted", "processing"]}})
         else:
             # else return samples who's status simply mathes the filter
             cursor = self.get_collection_handle().find({'profile_id': profile_id, "status": filter})
@@ -645,6 +648,11 @@ class Sample(DAComponent):
 
     def get_by_manifest_id(self, manifest_id):
         return cursor_to_list(self.get_collection_handle().find({"manifest_id": manifest_id}))
+
+    def get_statuses_by_manifest_id(self, manifest_id):
+        return cursor_to_list(self.get_collection_handle().find({"manifest_id": manifest_id},
+                                                                {"status": 1, "copo_id": 1, "manifest_id": 1,
+                                                                 "time_created": 1, "time_updated": 1}))
 
     def get_by_biosample_ids(self, biosample_ids):
         return cursor_to_list(self.get_collection_handle().find({"biosampleAccession": {"$in": biosample_ids}}))

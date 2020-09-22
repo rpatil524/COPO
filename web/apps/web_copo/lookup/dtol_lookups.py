@@ -45,6 +45,21 @@ DTOL_EXPORT_TO_STS_FIELDS = {
     "HAZARD_GROUP",
     "REGULATORY_COMPLIANCE",
     "VOUCHER_ID",
+    "TAXON_REMARKS",
+    "INFRASPECIFIC_EPITHET",
+    "CULTURE_OR_STRAIN_ID",
+    "COMMON_NAME",
+    "SYMBIONT",
+    "RELATIONSHIP",
+    "GRID_REFERENCE",
+    "DEPTH",
+    "ELEVATION",
+    "TIME_OF_COLLECTION",
+    "IDENTIFIER_AFFILIATION",
+    "PRESERVATIVE_SOLUTION",
+    "SIZE_OF_TISSUE_IN_TUBE",
+    "TISSUE_REMOVED_FOR_BARCODING",
+    "OTHER_INFORMATION",
     "biosampleAccession",
     "created_by",
     "time_created",
@@ -644,7 +659,7 @@ DTOL_ENA_MAPPINGS = {
     "HABITAT": {
         "ena": "habitat"
     },
-    "IDENTIFIER_AFFLIATION": {
+    "IDENTIFIER_AFFILIATION": {
         "ena": "identifier_affiliation"
     },
     "SEX": {

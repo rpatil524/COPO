@@ -49,10 +49,11 @@ def login(request):
 def test_view(request):
     return render(request, "copo/test_1.html")
 
+'''
 def test_submission(request):
     delegate_submission(request)
     return render(request, 'copo/copo_annotate_pdf.html', {})
-
+'''
 
 @login_required
 def copo_repository(request, profile_id):
@@ -71,6 +72,7 @@ def authenticate_figshare(request):
                   {'message': 'COPO needs permission to submit to Figshare on your behalf.<br/>' +
                               'Please sign into Figshare and try again.',
                    'control': HTML_TAGS['oauth_required']})
+
 
 
 def test_dataverse_submit(request):
