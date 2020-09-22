@@ -172,10 +172,10 @@ def annotate_meta(request, file_id):
             os.makedirs(full_path)
             run("ebook-convert  " + df[
                 "file_location"] + " " + full_path + " --no-images --pretty-print --insert-blank-line")
-            with open(os.path.join(full_path, "apidocs_index.html"), 'r') as f:
+            with open(os.path.join(full_path, "index.html"), 'r') as f:
                 html = f.read()
             shutil.rmtree(full_path)
-            request.session["annotation_html"] = html
+            #request.session["annotation_html"] = html
         else:
             print("using session text data")
             html = request.session["annotation_html"]
