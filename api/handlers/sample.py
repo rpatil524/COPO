@@ -9,6 +9,7 @@ from dal.copo_da import Sample, Source
 from web.apps.web_copo.lookup.lookup import API_ERRORS
 from web.apps.web_copo.lookup import dtol_lookups as  lookup
 from django.http import HttpResponse
+import datetime
 
 
 def get(request, id):
@@ -78,16 +79,34 @@ def filter_for_STS(sample_list):
     return out
 
 
+def get_dtol_manifests(request):
+    # get all manifests of dtol samples
+    manifest_ids = Sample().get_manifests()
+    return finish_request(manifest_ids)
+
+
+def get_dtol_manifests_between_dates(request, d_from, d_to):
+    # get all manifests between d_from and d_to
+    d_from = datetime.datetime.strptime(d_from, '%Y-%m-%d %H:%M:%S.%f')
+    d_to = datetime.datetime.strptime(d_to, '%Y-%m-%d %H:%M:%S.%f')
+    if d_from > d_to:
+        return HttpResponse(status=400, content="'from' must be earlier than'to'")
+    manifest_ids = Sample().get_manifests_by_date(d_from, d_to)
+    return finish_request(manifest_ids)
+
+
 def get_for_manifest(request, manifest_id):
     # get all samples tagged with the given manifest_id
     sample_list = Sample().get_by_manifest_id(manifest_id)
     out = filter_for_STS(sample_list)
     return finish_request(out)
 
+
 def get_sample_statuses_for_manifest(request, manifest_id):
     sample_list = Sample().get_statuses_by_manifest_id(manifest_id)
     out = filter_for_STS(sample_list)
     return finish_request(out)
+
 
 def get_by_biosample_ids(request, biosample_ids):
     # get sample associated with given biosample_id. This will return nothing if ENA submission has not yet occured
@@ -118,6 +137,7 @@ def get_by_copo_ids(request, copo_ids):
         else:
             return HttpResponse(status=400, content="InvalidId found in request")
     return finish_request(out)
+
 
 def get_by_field(request, dtol_field, value):
     # generic method to return all samples where given "dtol_field" matches "value"

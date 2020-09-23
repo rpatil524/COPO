@@ -2,12 +2,29 @@ openapi: 3.0.0
 info:
   title: Sample API
   description: Swagger documentation of COPO/DTOL sample API.
-  version: 0.1.1
+  version: 1.1.8
 servers:
   - url: http://0.0.0.0:8000/api
     description: This Server
+
 paths:
-  /sample/manifest/{manifest_id}:
+  /manifest:
+    get:
+      tags:
+        - Manifest
+      summary:
+        Get all manifests
+      description: >
+        If no manifest ID is provided, COPO simply returns a list of all manifest ids
+      responses:
+        200:
+          description: A JSON array sample objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManifestList'
+
+  /manifest/{manifest_id}:
     get:
       tags:
         - Manifest
@@ -33,7 +50,42 @@ paths:
         "400":
           description: invalid manifest_id
 
-  /sample/manifest/{manifest_id}/sample_statuses:
+  /manifest/{from}/{to}:
+    get:
+      tags:
+        - Manifest
+      summary:
+        Get manifest ids between dates
+      description: >
+        Returns an array of manifest ids for samples submitted between dates {from} / {to}
+      parameters:
+        - name: from
+          in: path
+          required: true
+          description: ISO 8601 formatted full date-time, manifests greater than or equal to this will be matched, e.g. 2020-09-16 16:26:30.851090
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: path
+          required: true
+          description: ISO 8601 formatted full date-time, manifests less than this will be matched, e.g. 2020-09-22 16:26:30.851090
+          schema:
+            type: string
+            format: date-time
+
+      responses:
+        "200": # status code
+          description: A JSON array of sample manifest uuid objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManifestList'
+        "400":
+          description: \'from\' must be earlier than \'to\'
+
+
+  /manifest/{manifest_id}/sample_statuses:
     get:
       tags:
         - Manifest
@@ -161,7 +213,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Sample_short'
-
+    ManifestList:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["OK", "Error"]
+        number_found:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManifestId'
     SampleList:
       type: object
       properties:
@@ -196,6 +259,10 @@ components:
           type: string
           format: date-time
           description: when was this sample uploaded to COPO
+
+    ManifestId:
+      type: string
+      format: uuid
 
     Sample_long:
       type: object

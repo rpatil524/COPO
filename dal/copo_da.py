@@ -603,8 +603,6 @@ class Sample(DAComponent):
                     'status': 'accepted'}
             })
 
-
-
     def add_rejected_status(self, status, oid):
         return self.get_collection_handle().update(
             {
@@ -659,6 +657,20 @@ class Sample(DAComponent):
 
     def get_by_field(self, dtol_field, value):
         return cursor_to_list(self.get_collection_handle().find({dtol_field: {"$in": value}}))
+
+    def get_manifests(self):
+        return cursor_to_list(self.get_collection_handle().distinct("manifest_id", {"sample_type": "dtol"}))
+
+    def get_manifests_by_date(self, d_from, d_to):
+        print("from: " + str(d_from))
+        print("to: " + str(d_to))
+
+        ids = self.get_collection_handle().distinct(
+            "manifest_id",
+            {"sample_type": "dtol", "time_created": {"$gte": d_from, "$lt": d_to}}
+        )
+        out = cursor_to_list(ids)
+        return ids
 
 
 class Submission(DAComponent):
