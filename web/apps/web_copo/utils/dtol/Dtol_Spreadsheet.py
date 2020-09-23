@@ -20,6 +20,7 @@ from django.conf import settings
 import uuid
 import re
 import numpy as np
+from Bio import Entrez
 
 
 class DtolSpreadsheet:
@@ -33,9 +34,12 @@ class DtolSpreadsheet:
         allowed=str(na_vals))
     validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
     validation_msg_invalid_list = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. If this is a location, start with the Country, adding more specific details separated with '|'. See list of allowed Country entries at <a href='https://www.ebi.ac.uk/ena/browser/view/ERC000053'>https://www.ebi.ac.uk/ena/browser/view/ERC000053</a>"
+    validation_msg_invalid_taxonomy = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Expected value is <strong>%s</strong>"
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
+
+    #Entrez.email = "copo@earlham.ac.uk"
 
     def __init__(self, file=None):
         self.req = ThreadLocal.get_current_request()
@@ -177,6 +181,68 @@ class DtolSpreadsheet:
             notify_sample_status(profile_id=self.profile_id, msg="", action="make_valid", html_id="sample_info")
 
             return True
+
+    def validate_taxonomy(self):
+        ''' check if provided scientific name, TAXON ID,
+        family and order are consistent with each other in known taxonomy'''
+        errors = []
+        flag = True
+        with open(lk.WIZARD_FILES["sample_details"]) as json_data:
+
+            try:
+                s = json.load(json_data)
+                # get list of DTOL fields from schemas
+                #self.fields = jp.match(
+#                    '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
+                #rows = list(self.data.rows)
+                for index, row in self.data[['ORDER_OR_GROUP','FAMILY', 'GENUS', 'TAXON_ID', 'SCIENTIFIC_NAME']] .iterrows():
+                    print('validating row ', str(index))
+                    notify_sample_status(profile_id=self.profile_id,
+                                         msg="Checking taxonomy information at row " + str(index+2),
+                                         action="info",
+                                         html_id="sample_info")
+                    scientific_name = row['SCIENTIFIC_NAME']
+                    taxon_id = row['TAXON_ID']
+                    handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
+                    records = Entrez.read(handle)
+                    print(records['IdList'])
+                    #print(type(records['IdList']))
+                    if taxon_id not in records['IdList']:
+                        errors.append(self.validation_msg_invalid_taxonomy % ("TAXON_ID", str(index+2), str(records['IdList'])))
+                        flag = False
+                        continue
+                    handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
+                    records = Entrez.read(handle)
+                    for element in records[0]['LineageEx']:
+                        print('checking lineage')
+                        rank = element.get('Rank')
+                        if rank == 'genus':
+                            if row['GENUS'].upper() != element.get('ScientificName').upper():
+                                errors.append(self.validation_msg_invalid_taxonomy % (row['GENUS'], "GENUS", str(index+2), element.get('ScientificName').upper()))
+                                flag = False
+                        elif rank == 'family':
+                            if row['FAMILY'].upper() != element.get('ScientificName').upper():
+                                errors.append(self.validation_msg_invalid_taxonomy % (row['FAMILY'], "FAMILY", str(index+2), element.get('ScientificName').upper()))
+                                flag = False
+                        elif rank == 'order':
+                            if row['ORDER_OR_GROUP'].upper() != element.get('ScientificName').upper():
+                                errors.append(self.validation_msg_invalid_taxonomy % (row['ORDER_OR_GROUP'], "ORDER_OR_GROUP", str(index+2), element.get('ScientificName').upper()))
+                                flag = False
+
+                if not flag:
+                    notify_sample_status(profile_id=self.profile_id,
+                                         msg="<br>".join(errors),
+                                         action="error",
+                                         html_id="sample_info")
+                    return False
+
+
+            except Exception as e:
+                print(e)
+                notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + str(e), action="info",
+                                     html_id="sample_info")
+                return False
+
 
     def check_image_names(self, files):
         # compare list of sample names with specimen ids already uploaded

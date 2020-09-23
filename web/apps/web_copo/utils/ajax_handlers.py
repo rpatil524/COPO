@@ -1314,7 +1314,7 @@ def sample_spreadsheet(request):
         dtol.loadManifest(type="xls")
     elif name.endswith("csv"):
         dtol.loadManifest(type="csv")
-    if dtol.validate():
+    if dtol.validate() and dtol.validate_taxonomy():
         dtol.collect()
     return HttpResponse()
 
