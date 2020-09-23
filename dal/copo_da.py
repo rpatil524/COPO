@@ -662,9 +662,6 @@ class Sample(DAComponent):
         return cursor_to_list(self.get_collection_handle().distinct("manifest_id", {"sample_type": "dtol"}))
 
     def get_manifests_by_date(self, d_from, d_to):
-        print("from: " + str(d_from))
-        print("to: " + str(d_to))
-
         ids = self.get_collection_handle().distinct(
             "manifest_id",
             {"sample_type": "dtol", "time_created": {"$gte": d_from, "$lt": d_to}}

@@ -87,6 +87,7 @@ def get_dtol_manifests(request):
 
 def get_dtol_manifests_between_dates(request, d_from, d_to):
     # get all manifests between d_from and d_to
+    # dates must be ISO 8601 formatted
     d_from = datetime.datetime.strptime(d_from, '%Y-%m-%d %H:%M:%S.%f')
     d_to = datetime.datetime.strptime(d_to, '%Y-%m-%d %H:%M:%S.%f')
     if d_from > d_to:
