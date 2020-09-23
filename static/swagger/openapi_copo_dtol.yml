@@ -5,7 +5,9 @@ info:
   version: 1.1.8
 servers:
   - url: http://0.0.0.0:8000/api
-    description: This Server
+    description: Local Server
+  - url: http://demo.copo-project.org/api
+    description: Demo Server
 
 paths:
   /manifest:
