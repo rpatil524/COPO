@@ -56,7 +56,7 @@ def format_date(input_date):
 
 def filter_for_STS(sample_list):
     # add field here which should be time formatted
-    time_fields = ["time_created", "time_verified"]
+    time_fields = ["time_created", "time_updated"]
     export = lookup.DTOL_EXPORT_TO_STS_FIELDS
     out = list()
     for s in sample_list:
@@ -68,6 +68,7 @@ def filter_for_STS(sample_list):
             if k == "_id":
                 s_out["copo_id"] = str(v)
             # check if field is listed to be exported to STS
+            print(k)
             if k in export:
                 if k in time_fields:
                     s_out[k] = format_date(v)

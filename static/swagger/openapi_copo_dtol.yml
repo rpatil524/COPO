@@ -188,10 +188,14 @@ components:
         status:
           type: string
           description: status of this sample. "pending" means waiting for supervisor approval, "accepted" means supervisor approval gained, "rejected" means supervisor rejected
-        time_verified:
+        time_created:
           type: string
           format: date-time
-          description: when was this sample approved by the dtol_manager
+          description: when was this sample uploaded to COPO
+        time_updated:
+          type: string
+          format: date-time
+          description: when was this sample uploaded to COPO
 
     Sample_long:
       type: object
@@ -324,10 +328,10 @@ components:
         manifest_id:
           type: string
           format: uuid
-        time_verified:
+        time_updated:
           type: string
           format: date-time
-        verified_by:
+        updated_by:
           type: string
           format: email
         copo_id:

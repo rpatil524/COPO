@@ -1354,7 +1354,7 @@ def mark_sample_rejected(request):
     if sample_ids:
         for sample_id in sample_ids:
             d1 = Sample().mark_rejected(sample_id)
-            d2 = Sample().timestamp_dtol_sample_verified(sample_id)
+            d2 = Sample().timestamp_dtol_sample_updated(sample_id)
             if not d1 and d2:
                 return HttpResponse(status=500)
         return HttpResponse(status=200)
@@ -1378,7 +1378,7 @@ def add_sample_to_dtol_submission(request):
             # iterate over samples and add to submission
             sub["dtol_samples"].append(sample_id)
             Sample().mark_processing(sample_id)
-            Sample().timestamp_dtol_sample_verified(sample_id)
+            Sample().timestamp_dtol_sample_updated(sample_id)
         if Submission().save_record(dict(), **sub):
             return HttpResponse(status=200)
         else:

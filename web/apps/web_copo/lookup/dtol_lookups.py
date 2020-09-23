@@ -66,8 +66,8 @@ DTOL_EXPORT_TO_STS_FIELDS = {
     "submissionAccession",
     "sraAccession",
     "manifest_id",
-    "time_verified",
-    "verified_by",
+    "time_updated",
+    "updated_by",
     "status"
 
 }

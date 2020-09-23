@@ -584,11 +584,11 @@ class Sample(DAComponent):
         sample = self.get_collection_handle().update({"_id": ObjectId(sample_id)},
                                                      {"$set": {"time_created": datetime.utcnow(), "created_by": email}})
 
-    def timestamp_dtol_sample_verified(self, sample_id):
+    def timestamp_dtol_sample_updated(self, sample_id):
         email = ThreadLocal.get_current_user().email
         sample = self.get_collection_handle().update({"_id": ObjectId(sample_id)},
-                                                     {"$set": {"time_verified": datetime.utcnow(),
-                                                               "verified_by": email}})
+                                                     {"$set": {"time_updated": datetime.utcnow(),
+                                                               "updated_by": email}})
 
     def add_accession(self, biosample_accession, sra_accession, submission_accession, oid):
         return self.get_collection_handle().update(

@@ -24,6 +24,7 @@ ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0', 'copo-project.org', 'demo.copo-project.
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://0.0.0.0:8000",
+    "http://0.0.0.0:80",
     "http://127.0.0.1:8000",
     "https://copo-project.org",
     "http://demo.copo-project.org"
