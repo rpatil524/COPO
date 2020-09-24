@@ -200,7 +200,7 @@ class DtolSpreadsheet:
                 for index, row in self.data[['ORDER_OR_GROUP','FAMILY', 'GENUS', 'TAXON_ID', 'SCIENTIFIC_NAME']] .iterrows():
                     #print('validating row ', str(index))
                     notify_sample_status(profile_id=self.profile_id,
-                                         msg="Checking taxonomy information at row " + str(index+2),
+                                         msg="Checking taxonomy information at row <strong>%s</strong> - <strong>%s</strong>" % (str(index+2), row['SCIENTIFIC_NAME']),
                                          action="info",
                                          html_id="sample_info")
                     scientific_name = row['SCIENTIFIC_NAME'].strip()
