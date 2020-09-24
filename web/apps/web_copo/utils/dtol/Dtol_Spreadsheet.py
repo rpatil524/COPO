@@ -35,6 +35,8 @@ class DtolSpreadsheet:
     validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
     validation_msg_invalid_list = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. If this is a location, start with the Country, adding more specific details separated with '|'. See list of allowed Country entries at <a href='https://www.ebi.ac.uk/ena/browser/view/ERC000053'>https://www.ebi.ac.uk/ena/browser/view/ERC000053</a>"
     validation_msg_invalid_taxonomy = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Expected value is <strong>%s</strong>"
+    validation_msg_synonym = "Invalid scientific name: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. Please provide the official scientific name."
+    validation_msg_missing_taxon = "Missing TAXON_ID at row <strong>%s</strong>. For <strong>%s</strong> TAXON_ID should be <strong>%s</strong>"
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -207,14 +209,24 @@ class DtolSpreadsheet:
                     records = Entrez.read(handle)
                     print(records['IdList'])
                     #print(type(records['IdList']))
-                    if taxon_id not in records['IdList']:
+                    #suggest TAXON_ID if not provided
+                    if not taxon_id:
+                        errors.append(self.validation_msg_missing_taxon % (str(index+2), scientific_name, records['IdList'][0]))
+                        flag = False
+                        continue
+                    elif taxon_id not in records['IdList']:
                         errors.append(self.validation_msg_invalid_taxonomy % ("TAXON_ID", str(index+2), str(records['IdList'])))
                         flag = False
                         continue
                     handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
                     records = Entrez.read(handle)
+                    #check the scientific name provided wasn't a synonym
+                    if records[0]['ScientificName'].upper() != scientific_name.upper():
+                        errors.append(self.validation_msg_synonym % (scientific_name, str(index+2), records[0]['ScientificName']))
+                        flag = False
+                        continue
                     for element in records[0]['LineageEx']:
-                        print('checking lineage')
+                        #print('checking lineage')
                         rank = element.get('Rank')
                         if rank == 'genus':
                             if row['GENUS'].upper() != element.get('ScientificName').upper():
@@ -235,6 +247,9 @@ class DtolSpreadsheet:
                                          action="error",
                                          html_id="sample_info")
                     return False
+
+                else:
+                    return True
 
 
             except Exception as e:
