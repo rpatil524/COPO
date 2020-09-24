@@ -52,7 +52,7 @@ def get(request, id):
 
 def format_date(input_date):
     # format of date fields exported to STS
-    return input_date.strftime("%Y-%m-%d, %H:%M:%S")
+    return input_date.strftime('%Y-%m-%d %H:%M:%S.%f')
 
 
 def filter_for_STS(sample_list):
