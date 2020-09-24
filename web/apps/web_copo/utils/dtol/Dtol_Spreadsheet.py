@@ -215,6 +215,10 @@ class DtolSpreadsheet:
                         flag = False
                         continue
                     elif taxon_id not in records['IdList']:
+                        if not records['IdList']:
+                            errors.append(self.validation_msg_invalid_taxonomy % (scientific_name, "SCIENTIFIC_NAME", str(index+2), "[please check taxonomy database]"))
+                            flag = False
+                            continue
                         errors.append(self.validation_msg_invalid_taxonomy % (taxon_id, "TAXON_ID", str(index+2), str(records['IdList'])))
                         flag = False
                         continue
