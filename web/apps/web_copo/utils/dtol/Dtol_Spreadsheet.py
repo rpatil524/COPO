@@ -198,16 +198,16 @@ class DtolSpreadsheet:
 #                    '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
                 #rows = list(self.data.rows)
                 for index, row in self.data[['ORDER_OR_GROUP','FAMILY', 'GENUS', 'TAXON_ID', 'SCIENTIFIC_NAME']] .iterrows():
-                    print('validating row ', str(index))
+                    #print('validating row ', str(index))
                     notify_sample_status(profile_id=self.profile_id,
                                          msg="Checking taxonomy information at row " + str(index+2),
                                          action="info",
                                          html_id="sample_info")
-                    scientific_name = row['SCIENTIFIC_NAME']
-                    taxon_id = row['TAXON_ID']
+                    scientific_name = row['SCIENTIFIC_NAME'].strip()
+                    taxon_id = row['TAXON_ID'].strip()
                     handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
                     records = Entrez.read(handle)
-                    print(records['IdList'])
+                    #print(records['IdList'])
                     #print(type(records['IdList']))
                     #suggest TAXON_ID if not provided
                     if not taxon_id:
@@ -225,7 +225,7 @@ class DtolSpreadsheet:
                     handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
                     records = Entrez.read(handle)
                     #check the scientific name provided wasn't a synonym
-                    if records[0]['ScientificName'].upper() != scientific_name.upper():
+                    if records[0]['ScientificName'].upper() != scientific_name.strip().upper():
                         errors.append(self.validation_msg_synonym % (scientific_name, str(index+2), records[0]['ScientificName']))
                         flag = False
                         continue
@@ -233,15 +233,15 @@ class DtolSpreadsheet:
                         #print('checking lineage')
                         rank = element.get('Rank')
                         if rank == 'genus':
-                            if row['GENUS'].upper() != element.get('ScientificName').upper():
+                            if row['GENUS'].strip().upper() != element.get('ScientificName').upper():
                                 errors.append(self.validation_msg_invalid_taxonomy % (row['GENUS'], "GENUS", str(index+2), element.get('ScientificName').upper()))
                                 flag = False
                         elif rank == 'family':
-                            if row['FAMILY'].upper() != element.get('ScientificName').upper():
+                            if row['FAMILY'].strip().upper() != element.get('ScientificName').upper():
                                 errors.append(self.validation_msg_invalid_taxonomy % (row['FAMILY'], "FAMILY", str(index+2), element.get('ScientificName').upper()))
                                 flag = False
                         elif rank == 'order':
-                            if row['ORDER_OR_GROUP'].upper() != element.get('ScientificName').upper():
+                            if row['ORDER_OR_GROUP'].strip().upper() != element.get('ScientificName').upper():
                                 errors.append(self.validation_msg_invalid_taxonomy % (row['ORDER_OR_GROUP'], "ORDER_OR_GROUP", str(index+2), element.get('ScientificName').upper()))
                                 flag = False
 
