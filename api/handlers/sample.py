@@ -10,6 +10,8 @@ from web.apps.web_copo.lookup.lookup import API_ERRORS
 from web.apps.web_copo.lookup import dtol_lookups as  lookup
 from django.http import HttpResponse
 import datetime
+import dateutil.parser as parser
+
 
 
 def get(request, id):
@@ -52,7 +54,7 @@ def get(request, id):
 
 def format_date(input_date):
     # format of date fields exported to STS
-    return input_date.strftime('%Y-%m-%d %H:%M:%S.%f')
+    return input_date.replace(tzinfo=datetime.timezone.utc).isoformat()
 
 
 def filter_for_STS(sample_list):
@@ -88,8 +90,8 @@ def get_dtol_manifests(request):
 def get_dtol_manifests_between_dates(request, d_from, d_to):
     # get all manifests between d_from and d_to
     # dates must be ISO 8601 formatted
-    d_from = datetime.datetime.strptime(d_from, '%Y-%m-%d %H:%M:%S.%f')
-    d_to = datetime.datetime.strptime(d_to, '%Y-%m-%d %H:%M:%S.%f')
+    d_from = parser.parse(d_from)
+    d_to = parser.parse(d_to)
     if d_from > d_to:
         return HttpResponse(status=400, content="'from' must be earlier than'to'")
     manifest_ids = Sample().get_manifests_by_date(d_from, d_to)

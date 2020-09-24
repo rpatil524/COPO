@@ -2,7 +2,7 @@ __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 
 import copy
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 import pandas as pd
 import pymongo
 import pymongo.errors as pymongo_errors
@@ -582,12 +582,14 @@ class Sample(DAComponent):
     def timestamp_dtol_sample_created(self, sample_id):
         email = ThreadLocal.get_current_user().email
         sample = self.get_collection_handle().update({"_id": ObjectId(sample_id)},
-                                                     {"$set": {"time_created": datetime.utcnow(), "created_by": email}})
+                                                     {"$set": {"time_created": datetime.now(timezone.utc).replace(
+                                                         microsecond=0), "created_by": email}})
 
     def timestamp_dtol_sample_updated(self, sample_id):
         email = ThreadLocal.get_current_user().email
         sample = self.get_collection_handle().update({"_id": ObjectId(sample_id)},
-                                                     {"$set": {"time_updated": datetime.utcnow(),
+                                                     {"$set": {"time_updated": datetime.now(timezone.utc).replace(
+                                                         microsecond=0),
                                                                "updated_by": email}})
 
     def add_accession(self, biosample_accession, sra_accession, submission_accession, oid):

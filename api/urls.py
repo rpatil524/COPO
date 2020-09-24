@@ -21,7 +21,7 @@ dtol_api_patterns = [
     re_path(r'sample/get/(?P<id>[A-Za-z0-9]+)', sample.get, name='sample/get'),
     re_path(r'manifest/(?P<manifest_id>[A-Z0-9a-f-]+)/sample_statuses', sample.get_sample_statuses_for_manifest,
             name='get_sample_statuses_for_manifest'),
-    re_path(r'manifest/(?P<d_from>[A-Z0-9a-f- .:]+)/(?P<d_to>[A-Z0-9a-f- .:]+)',
+    re_path(r'manifest/(?P<d_from>[A-Z0-9a-f- .:+]+)/(?P<d_to>[A-Z0-9a-f- .:+]+)',
             sample.get_dtol_manifests_between_dates, name='get_dtol_manifests_between_dates'), #dates must be ISO 8601 formatted
     re_path(r'manifest/(?P<manifest_id>[A-Z0-9a-f-]+)', sample.get_for_manifest, name='get_for_manifest'),
 

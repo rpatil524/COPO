@@ -64,14 +64,14 @@ paths:
         - name: from
           in: path
           required: true
-          description: ISO 8601 formatted full date-time, manifests greater than or equal to this will be matched, e.g. 2020-09-16 16:26:30.851090
+          description: ISO 8601 formatted full date-time, manifests greater than or equal to this will be matched, e.g. 2020-09-24T17:00:22+00:00
           schema:
             type: string
             format: date-time
         - name: to
           in: path
           required: true
-          description: ISO 8601 formatted full date-time, manifests less than this will be matched, e.g. 2020-09-22 16:26:30.851090
+          description: ISO 8601 formatted full date-time, manifests less than this will be matched, e.g. 2020-09-24T17:00:22+00:00
           schema:
             type: string
             format: date-time
