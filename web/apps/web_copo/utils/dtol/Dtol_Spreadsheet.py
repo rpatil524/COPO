@@ -215,7 +215,7 @@ class DtolSpreadsheet:
                         flag = False
                         continue
                     elif taxon_id not in records['IdList']:
-                        errors.append(self.validation_msg_invalid_taxonomy % ("TAXON_ID", str(index+2), str(records['IdList'])))
+                        errors.append(self.validation_msg_invalid_taxonomy % (taxon_id, "TAXON_ID", str(index+2), str(records['IdList'])))
                         flag = False
                         continue
                     handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
