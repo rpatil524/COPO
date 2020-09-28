@@ -58,7 +58,7 @@ function upload_spreadsheet(file) {
 $(document).ready(function () {
 
     $(document).on("click", "#finish_button", function (el) {
-        if($(el.currentTarget).hasOwnProperty("disabled")) {
+        if ($(el.currentTarget).hasOwnProperty("disabled")) {
             return false
         }
         BootstrapDialog.show({
@@ -101,6 +101,11 @@ $(document).ready(function () {
     var profileId = $('#profile_id').val();
     var wsprotocol = 'ws://';
     var socket;
+
+    window.addEventListener("beforeunload", function (event) {
+        socket.close()
+    });
+
     if (window.location.protocol === "https:") {
         wsprotocol = 'wss://';
     }
@@ -214,7 +219,6 @@ $(document).ready(function () {
         }
     }
 })
-
 
 
 $(document).on("click", ".new-samples-spreadsheet-template", function (event) {
