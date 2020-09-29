@@ -19,10 +19,10 @@ function upload_image_files(file) {
 
     }).error(function (data) {
         $("#upload_controls").fadeIn()
-        console.log(data)
+        console.error(data)
         BootstrapDialog.show({
             title: 'Error',
-            message: "Error " + data.status + ": " + data.responseText
+            message: "Error " + data
         });
     }).done(function (data) {
 
@@ -45,10 +45,10 @@ function upload_spreadsheet(file) {
 
     }).error(function (data) {
         $("#upload_controls").fadeIn()
-        console.log(data)
+        console.error(data)
         BootstrapDialog.show({
             title: 'Error',
-            message: "Error " + data.status + ": " + data.responseText
+            message: "Error " + data.status + ": " + data.statusText
         });
     }).done(function (data) {
 
@@ -86,8 +86,8 @@ $(document).ready(function () {
 
                         }).done(function () {
                             location.reload()
-                        }).error(function () {
-                            alert("something went wrong")
+                        }).error(function (data) {
+                            console.error(data)
                         })
                         dialogRef.close();
                     }

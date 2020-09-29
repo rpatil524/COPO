@@ -1,5 +1,6 @@
 # Created by fshaw at 03/04/2020
 import math
+
 import os
 from os.path import join, isfile
 from pathlib import Path
@@ -21,7 +22,7 @@ import uuid
 import re
 import numpy as np
 from Bio import Entrez
-
+from urllib.error import HTTPError
 
 class DtolSpreadsheet:
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
@@ -37,6 +38,7 @@ class DtolSpreadsheet:
     validation_msg_invalid_taxonomy = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Expected value is <strong>%s</strong>"
     validation_msg_synonym = "Invalid scientific name: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. Please provide the official scientific name."
     validation_msg_missing_taxon = "Missing TAXON_ID at row <strong>%s</strong>. For <strong>%s</strong> TAXON_ID should be <strong>%s</strong>"
+    validation_msg_duplicate_tube_or_well_id = "Duplicate TUBE_OR_WELL_IDs found: <strong>%s</strong>"
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -121,6 +123,12 @@ class DtolSpreadsheet:
                                          action="info",
                                          html_id="sample_info")
                     if header in self.fields:
+                        # check for uniqueness of TUBE_OR_WELL_ID
+                        if header == "TUBE_OR_WELL_ID":
+                            # duplicated returns a boolean array, false for not duplicate, true for duplicate
+                            u = list(cells[cells.duplicated()])
+                            errors.append(self.validation_msg_duplicate_tube_or_well_id % (u))
+                            flag = False
 
                         # check if there is an enum for this header
                         allowed_vals = lookup.DTOL_ENUMS.get(header, "")
@@ -175,8 +183,8 @@ class DtolSpreadsheet:
 
 
             except Exception as e:
-                print(e)
-                notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + str(e), action="info",
+                error_message = str(e).replace("<", "").replace(">", "")
+                notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + error_message, action="info",
                                      html_id="sample_info")
                 return False
 
@@ -189,6 +197,7 @@ class DtolSpreadsheet:
             return True
 
     def validate_taxonomy(self):
+        #return True
         ''' check if provided scientific name, TAXON ID,
         family and order are consistent with each other in known taxonomy'''
         errors = []
@@ -237,6 +246,7 @@ class DtolSpreadsheet:
                         errors.append(self.validation_msg_invalid_taxonomy % (taxon_id, "TAXON_ID", str(index+2), str(records['IdList'])))
                         flag = False
                         continue
+
                     handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
                     records = Entrez.read(handle)
                     #check the scientific name provided wasn't a synonym
@@ -270,10 +280,14 @@ class DtolSpreadsheet:
                 else:
                     return True
 
+            except HTTPError as e:
 
+                error_message = str(e).replace("<", "").replace(">", "")
+                notify_sample_status(profile_id=self.profile_id, msg="Service Error - Entrez may be down, please try again later.", action="error",
+                                     html_id="sample_info")
             except Exception as e:
-                print(e)
-                notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + str(e), action="error",
+                error_message = str(e).replace("<", "").replace(">", "")
+                notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + error_message, action="error",
                                      html_id="sample_info")
                 return False
 
