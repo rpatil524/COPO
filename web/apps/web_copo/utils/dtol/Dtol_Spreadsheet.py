@@ -72,6 +72,7 @@ class DtolSpreadsheet:
                     self.data[column] = self.data[column].fillna("")
                 '''
                 self.data = self.data.apply(lambda x: x.astype(str).str.upper())
+                #print(self.data.size)
             except:
                 # if error notify via web socket
                 notify_sample_status(profile_id=self.profile_id, msg="Unable to load file.", action="info",
@@ -116,6 +117,9 @@ class DtolSpreadsheet:
                 self.fields = jp.match(
                     '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
                 for header, cells in self.data.iteritems():
+                    notify_sample_status(profile_id=self.profile_id, msg="Checking - " + header,
+                                         action="info",
+                                         html_id="sample_info")
                     if header in self.fields:
 
                         # check if there is an enum for this header
@@ -198,7 +202,12 @@ class DtolSpreadsheet:
 #                    '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
                 #rows = list(self.data.rows)
                 for index, row in self.data[['ORDER_OR_GROUP','FAMILY', 'GENUS', 'TAXON_ID', 'SCIENTIFIC_NAME']] .iterrows():
-                    #print('validating row ', str(index))
+                    print('validating row ', str(index+2))
+                    if all(row[header].strip() == "" for header in ['TAXON_ID', 'SCIENTIFIC_NAME']):
+                        #print("row is empty")
+                        errors.append("Missing data: both TAXON_ID and SCIENTIFIC_NAME missing from row <strong>%s</strong>. Provide at least one" % (str(index+2)))
+                        flag = False
+                        continue
                     notify_sample_status(profile_id=self.profile_id,
                                          msg="Checking taxonomy information at row <strong>%s</strong> - <strong>%s</strong>" % (str(index+2), row['SCIENTIFIC_NAME']),
                                          action="info",
@@ -264,7 +273,7 @@ class DtolSpreadsheet:
 
             except Exception as e:
                 print(e)
-                notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + str(e), action="info",
+                notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + str(e), action="error",
                                      html_id="sample_info")
                 return False
 
