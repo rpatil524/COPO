@@ -201,6 +201,10 @@ class DtolSpreadsheet:
                 #self.fields = jp.match(
 #                    '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
                 #rows = list(self.data.rows)
+                '''notify_sample_status(profile_id=self.profile_id,
+                                     msg="hello",
+                                     action="warning",
+                                     html_id="warning_info")'''
                 for index, row in self.data[['ORDER_OR_GROUP','FAMILY', 'GENUS', 'TAXON_ID', 'SCIENTIFIC_NAME']] .iterrows():
                     print('validating row ', str(index+2))
                     if all(row[header].strip() == "" for header in ['TAXON_ID', 'SCIENTIFIC_NAME']):

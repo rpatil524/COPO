@@ -140,6 +140,16 @@ $(document).ready(function () {
             $("#" + d.html_id).removeClass("alert-danger").addClass("alert-info")
             $("#" + d.html_id).html(d.message)
             $("#spinner").fadeOut()
+        } else if (d.action === "warning") {
+            // show something on the info div
+            // check info div is visible
+            if (!$("#" + d.html_id).is(":visible")) {
+                $("#" + d.html_id).fadeIn("50")
+
+            }
+            $("#" + d.html_id).removeClass("alert-info").addClass("alert-warning")
+            $("#" + d.html_id).html(d.message)
+            $("#spinner").fadeOut()
         } else if (d.action === "error") {
             // check info div is visible
             if (!$("#" + d.html_id).is(":visible")) {
