@@ -198,7 +198,6 @@ class DtolSpreadsheet:
             return True
 
     def validate_taxonomy(self):
-        return True
         ''' check if provided scientific name, TAXON ID,
         family and order are consistent with each other in known taxonomy'''
         errors = []
