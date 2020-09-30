@@ -38,6 +38,8 @@ class DtolSpreadsheet:
     validation_msg_invalid_taxonomy = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Expected value is <strong>%s</strong>"
     validation_msg_synonym = "Invalid scientific name: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. Please provide the official scientific name."
     validation_msg_missing_taxon = "Missing TAXON_ID at row <strong>%s</strong>. For <strong>%s</strong> TAXON_ID should be <strong>%s</strong>"
+    validation_warning_synonym = "Synonym warning: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. COPO will substitute the official scientific name."
+    validation_warning_field ="Missing <strong>%s</strong>: row <strong>%s</strong> - <strong>%s</strong> for <strong>%s</strong> will be filled with <strong>%s</strong>"
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -193,6 +195,7 @@ class DtolSpreadsheet:
         ''' check if provided scientific name, TAXON ID,
         family and order are consistent with each other in known taxonomy'''
         errors = []
+        warnings =[]
         flag = True
         taxonomy_dict = {}
         with open(lk.WIZARD_FILES["sample_details"]) as json_data:
@@ -244,6 +247,7 @@ class DtolSpreadsheet:
                         handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
                         records = Entrez.read(handle)
                         errors.append(self.validation_msg_missing_taxon % (str(index+2), scientific_name, records['IdList'][0]))
+                        warnings.append(self.validation_warning_field % ( "TAXON_ID", str(index+2), "TAXON_ID", scientific_name, records['IdList'][0]))
                         flag = False
                         continue
 
@@ -257,6 +261,9 @@ class DtolSpreadsheet:
                                 errors.append(self.validation_msg_synonym % (scientific_name, str(index + 2),
                                                                              taxonomy_dict[taxon_id][
                                                                                  'ScientificName']))  ###records[0]['ScientificName']))
+                                warnings.append(self.validation_warning_synonym % (scientific_name, str(index + 2),
+                                                                             taxonomy_dict[taxon_id][
+                                                                                 'ScientificName']))
                                 flag = False
                                 continue
                             elif not records['IdList']:
@@ -298,6 +305,13 @@ class DtolSpreadsheet:
                         errors.append("Invalid data: couldn't retrieve TAXON_ID <strong>%s</strong> at row <strong>%s<strong>" % (
                         row['TAXON_ID'], str(index+2)))
                         flag = False
+
+                #send warnings
+                if warnings:
+                    notify_sample_status(profile_id=self.profile_id,
+                                                         msg="<br>".join(warnings),
+                                                         action="warning",
+                                                         html_id="warning_info")
 
                 if not flag:
                     notify_sample_status(profile_id=self.profile_id,
