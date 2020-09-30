@@ -175,8 +175,11 @@ class DtolSpreadsheet:
                                     flag = False
 
                 if not flag:
+                    errors = list(map(lambda x: "<li>" + x + "</li>", errors))
+                    errors = "".join(errors)
+
                     notify_sample_status(profile_id=self.profile_id,
-                                         msg="<br>".join(errors),
+                                         msg="<ol>" + errors + "</ol>",
                                          action="error",
                                          html_id="sample_info")
                     return False
@@ -200,6 +203,7 @@ class DtolSpreadsheet:
     def validate_taxonomy(self):
         ''' check if provided scientific name, TAXON ID,
         family and order are consistent with each other in known taxonomy'''
+
         errors = []
         flag = True
         with open(lk.WIZARD_FILES["sample_details"]) as json_data:
@@ -272,7 +276,7 @@ class DtolSpreadsheet:
 
                 if not flag:
                     notify_sample_status(profile_id=self.profile_id,
-                                         msg="<br>".join(errors),
+                                         msg="<li>".join(errors),
                                          action="error",
                                          html_id="sample_info")
                     return False

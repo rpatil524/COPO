@@ -153,6 +153,7 @@ $(document).ready(function () {
             }
             $("#" + d.html_id).removeClass("alert-info").addClass("alert-danger")
             $("#" + d.html_id).html(d.message)
+            $("#export_errors_button").fadeIn()
             $("#spinner").fadeOut()
         } else if (d.action === "make_images_table") {
             // make table of images matched to
@@ -218,15 +219,31 @@ $(document).ready(function () {
             $("#finish_button").fadeIn()
         }
     }
+
 })
 
 
 $(document).on("click", ".new-samples-spreadsheet-template", function (event) {
     $("#sample_spreadsheet_modal").modal("show")
 })
+$(document).on("click", "#export_errors_button", function (event) {
+    var data = $("#sample_info").html()
+    //data = data.replace("<br>", "\r\n")
+    //data = data.replace(/<[^>]*>/g, '');
+    download("errors.html", data)
+})
 
+function download(filename, text) {
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(text));
+    pom.setAttribute('download', filename);
 
-
-
-
-
+    if (document.createEvent) {
+        var event = document.createEvent('MouseEvents');
+        event.initEvent('click', true, true);
+        pom.dispatchEvent(event);
+    }
+    else {
+        pom.click();
+    }
+}
