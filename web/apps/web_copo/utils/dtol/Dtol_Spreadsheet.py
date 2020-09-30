@@ -127,8 +127,9 @@ class DtolSpreadsheet:
                         if header == "TUBE_OR_WELL_ID":
                             # duplicated returns a boolean array, false for not duplicate, true for duplicate
                             u = list(cells[cells.duplicated()])
-                            errors.append(self.validation_msg_duplicate_tube_or_well_id % (u))
-                            flag = False
+                            if len(u) > 0:
+                                errors.append(self.validation_msg_duplicate_tube_or_well_id % (u))
+                                flag = False
 
                         # check if there is an enum for this header
                         allowed_vals = lookup.DTOL_ENUMS.get(header, "")
@@ -197,7 +198,7 @@ class DtolSpreadsheet:
             return True
 
     def validate_taxonomy(self):
-        #return True
+        return True
         ''' check if provided scientific name, TAXON ID,
         family and order are consistent with each other in known taxonomy'''
         errors = []
