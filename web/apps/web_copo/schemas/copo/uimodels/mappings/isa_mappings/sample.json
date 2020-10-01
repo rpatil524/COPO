@@ -1653,11 +1653,14 @@
     },
     {
       "help_tip": "",
-      "required": "true",
+      "required": "false",
       "default_value": "na",
       "control_meta": {},
       "versions": [
         "manifest_id"
+      ],
+      "specifications": [
+        "dtol"
       ],
       "ref": "",
       "deprecated": false,

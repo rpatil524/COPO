@@ -154,6 +154,8 @@ function row_select(ev) {
 
     var d = {"profile_id": $(row).find("td").data("profile_id"), "filter": filter}
     $("#profile_id").val(d.profile_id)
+    $("#spinner").show()
+    $("#dtol_sample_info").text("Fetching")
     $.ajax({
         url: "/copo/get_samples_for_profile",
         data: d,
@@ -275,7 +277,8 @@ function row_select(ev) {
                 $("#accept_reject_button").find("button").prop("disabled", true)
 
             }
-
+            $("#spinner").fadeOut("fast")
+            $("#dtol_sample_info").text("")
         }
     )
 }
