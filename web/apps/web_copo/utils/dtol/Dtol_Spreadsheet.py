@@ -40,6 +40,7 @@ class DtolSpreadsheet:
     validation_msg_missing_taxon = "Missing TAXON_ID at row <strong>%s</strong>. For <strong>%s</strong> TAXON_ID should be <strong>%s</strong>"
     validation_warning_synonym = "Synonym warning: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. COPO will substitute the official scientific name."
     validation_warning_field ="Missing <strong>%s</strong>: row <strong>%s</strong> - <strong>%s</strong> for <strong>%s</strong> will be filled with <strong>%s</strong>"
+    validation_msg_invalid_rank = "Invalid scientific name or taxon ID: row <strong>%s</strong> - rank of scientific name and taxon id should be species."
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -53,6 +54,7 @@ class DtolSpreadsheet:
         display_images = Path(settings.MEDIA_ROOT) / "img" / "sample_images"
         self.these_images = sample_images / self.profile_id
         self.display_images = display_images / self.profile_id
+        self.taxonomy_dict = {}
         # if a file is passed in, then this is the first time we have seen the spreadsheet,
         # if not then we are looking at creating samples having previously validated
         if file:
@@ -197,7 +199,7 @@ class DtolSpreadsheet:
         errors = []
         warnings =[]
         flag = True
-        taxonomy_dict = {}
+
         with open(lk.WIZARD_FILES["sample_details"]) as json_data:
 
             try:
@@ -226,7 +228,7 @@ class DtolSpreadsheet:
                         handle = Entrez.efetch(db="Taxonomy", id=window_list, retmode="xml")
                         records = Entrez.read(handle)
                         for element in records:
-                            taxonomy_dict[element['TaxId']] = element
+                            self.taxonomy_dict[element['TaxId']] = element
                 for index, row in self.data[['ORDER_OR_GROUP','FAMILY', 'GENUS', 'TAXON_ID', 'SCIENTIFIC_NAME']] .iterrows():
                     print('validating row ', str(index+2))
                     if all(row[header].strip() == "" for header in ['TAXON_ID', 'SCIENTIFIC_NAME']):
@@ -252,17 +254,17 @@ class DtolSpreadsheet:
                         continue
 
                     ###elif taxon_id not in records['IdList']:
-                    elif taxonomy_dict.get(taxon_id):
-                        if scientific_name.upper() != taxonomy_dict[taxon_id]['ScientificName'].upper():
+                    elif self.taxonomy_dict.get(taxon_id):
+                        if scientific_name.upper() != self.taxonomy_dict[taxon_id]['ScientificName'].upper():
                             handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
                             records = Entrez.read(handle)
                             #check if the scientific name provided is a synonim
                             if taxon_id in records['IdList']:
                                 errors.append(self.validation_msg_synonym % (scientific_name, str(index + 2),
-                                                                             taxonomy_dict[taxon_id][
+                                                                             self.taxonomy_dict[taxon_id][
                                                                                  'ScientificName']))  ###records[0]['ScientificName']))
                                 warnings.append(self.validation_warning_synonym % (scientific_name, str(index + 2),
-                                                                             taxonomy_dict[taxon_id][
+                                                                             self.taxonomy_dict[taxon_id][
                                                                                  'ScientificName']))
                                 flag = False
                                 continue
@@ -270,7 +272,7 @@ class DtolSpreadsheet:
                                 handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
                                 records = Entrez.read(handle)
                                 if records:
-                                    taxonomy_dict[records[0]['TaxId']] = records[0]
+                                    self.taxonomy_dict[records[0]['TaxId']] = records[0]
                                     expected_name = records[0].get('ScientificName', '[unknown]')
                                     errors.append(self.validation_msg_invalid_taxonomy % (scientific_name, "SCIENTIFIC_NAME", str(index+2), expected_name))
                                 else:
@@ -282,8 +284,12 @@ class DtolSpreadsheet:
                             continue
                         ###handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
                         ###records = Entrez.read(handle)
+                        if self.taxonomy_dict[taxon_id]['Rank'] != 'species':
+                            errors.append(self.validation_msg_invalid_rank % (str(index+2)))
+                            flag = False
+                            continue
                         ###for element in records[0]['LineageEx']:
-                        for element in taxonomy_dict[taxon_id]['LineageEx']:
+                        for element in self.taxonomy_dict[taxon_id]['LineageEx']:
                             #print('checking lineage')
                             rank = element.get('Rank')
                             if rank == 'genus':
@@ -325,7 +331,6 @@ class DtolSpreadsheet:
 
 
             except HTTPError as e:
-                error_message = str(e).replace("<", "").replace(">", "")
                 notify_sample_status(profile_id=self.profile_id, msg="Service Error - Entrez may be down, please try again later.", action="error",
                                      html_id="sample_info")
                 return False
@@ -390,6 +395,7 @@ class DtolSpreadsheet:
 
     def collect(self):
         # create table data to show to the frontend from parsed manifest
+        #TODO fill in here taxonoy entries if needed
         sample_data = []
         headers = list()
         for col in list(self.data.columns):
