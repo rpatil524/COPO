@@ -106,17 +106,17 @@ class DtolSpreadsheet:
                         errors.append("Field not found - " + item)
                         flag = False
                         # if we have a required fields, check that there are no missing values
-                    for header, cells in self.data.iteritems():
-                        # here we need to check if there are not missing values in its cells
-                        if header in self.fields:
-                            cellcount = 0
-                            for c in cells:
-                                cellcount += 1
-                                if not c:
-                                    # we have missing data in required cells
-                                    errors.append(self.validation_msg_missing_data % (
-                                                             header, str(cellcount + 1)))
-                                    flag = False
+                for header, cells in self.data.iteritems():
+                    # here we need to check if there are not missing values in its cells
+                    if header in self.fields:
+                        cellcount = 0
+                        for c in cells:
+                            cellcount += 1
+                            if not c:
+                                # we have missing data in required cells
+                                errors.append(self.validation_msg_missing_data % (
+                                                         header, str(cellcount + 1)))
+                                flag = False
 
                 # get list of DTOL fields from schemas
                 self.fields = jp.match(
@@ -229,7 +229,7 @@ class DtolSpreadsheet:
                         records = Entrez.read(handle)
                         for element in records:
                             self.taxonomy_dict[element['TaxId']] = element
-                for index, row in self.data[['ORDER_OR_GROUP','FAMILY', 'GENUS', 'TAXON_ID', 'SCIENTIFIC_NAME']] .iterrows():
+                for index, row in self.data[['ORDER_OR_GROUP','FAMILY', 'GENUS', 'TAXON_ID', 'SCIENTIFIC_NAME']].iterrows():
                     print('validating row ', str(index+2))
                     if all(row[header].strip() == "" for header in ['TAXON_ID', 'SCIENTIFIC_NAME']):
                         #print("row is empty")
@@ -248,26 +248,33 @@ class DtolSpreadsheet:
                     if not taxon_id:
                         handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
                         records = Entrez.read(handle)
-                        errors.append(self.validation_msg_missing_taxon % (str(index+2), scientific_name, records['IdList'][0]))
+                        #errors.append(self.validation_msg_missing_taxon % (str(index+2), scientific_name, records['IdList'][0]))
                         warnings.append(self.validation_warning_field % ( "TAXON_ID", str(index+2), "TAXON_ID", scientific_name, records['IdList'][0]))
-                        flag = False
-                        continue
+                        self.data.at[index, "TAXON_ID"] = records['IdList'][0]
+                        taxon_id = records['IdList'][0]
+                        #flag = False
+                        #continue
+                        handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
+                        records = Entrez.read(handle)
+                        if records:
+                            self.taxonomy_dict[records[0]['TaxId']] = records[0]
 
                     ###elif taxon_id not in records['IdList']:
-                    elif self.taxonomy_dict.get(taxon_id):
+                    if self.taxonomy_dict.get(taxon_id):
                         if scientific_name.upper() != self.taxonomy_dict[taxon_id]['ScientificName'].upper():
                             handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
                             records = Entrez.read(handle)
                             #check if the scientific name provided is a synonim
                             if taxon_id in records['IdList']:
-                                errors.append(self.validation_msg_synonym % (scientific_name, str(index + 2),
-                                                                             self.taxonomy_dict[taxon_id][
-                                                                                 'ScientificName']))  ###records[0]['ScientificName']))
+                                #errors.append(self.validation_msg_synonym % (scientific_name, str(index + 2),
+                                #                                             self.taxonomy_dict[taxon_id][
+                                #                                                 'ScientificName']))  ###records[0]['ScientificName']))
                                 warnings.append(self.validation_warning_synonym % (scientific_name, str(index + 2),
                                                                              self.taxonomy_dict[taxon_id][
                                                                                  'ScientificName']))
-                                flag = False
-                                continue
+                                self.data.at[index, "SCIENTIFIC_NAME"] = self.taxonomy_dict[taxon_id]['ScientificName']
+                                #flag = False
+                                #continue
                             elif not records['IdList']:
                                 handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
                                 records = Entrez.read(handle)
@@ -279,9 +286,10 @@ class DtolSpreadsheet:
                                     errors.append("Invalid data: couldn't resolve SCIENTIFIC_NAME nor TAXON_ID at row <strong>%s</strong>" % str(index+2))
                                 flag = False
                                 continue
-                            errors.append(self.validation_msg_invalid_taxonomy % (taxon_id, "TAXON_ID", str(index+2), str(records['IdList'])))
-                            flag = False
-                            continue
+                            else:
+                                errors.append(self.validation_msg_invalid_taxonomy % (taxon_id, "TAXON_ID", str(index+2), str(records['IdList'])))
+                                flag = False
+                                continue
                         ###handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
                         ###records = Entrez.read(handle)
                         if self.taxonomy_dict[taxon_id]['Rank'] != 'species':
@@ -293,20 +301,33 @@ class DtolSpreadsheet:
                             #print('checking lineage')
                             rank = element.get('Rank')
                             if rank == 'genus':
-                                if row['GENUS'].strip().upper() != element.get('ScientificName').upper():
-                                    errors.append(self.validation_msg_invalid_taxonomy % (row['GENUS'], "GENUS", str(index+2), element.get('ScientificName').upper()))
+                                if not row['GENUS'].strip():
+                                    warnings.append(self.validation_warning_field % (
+                                        "GENUS", str(index + 2), "GENUS", scientific_name, element.get('ScientificName').upper()))
+                                    self.data.at[index, "GENUS"] = element.get('ScientificName').upper()
+                                elif row['GENUS'].strip().upper() != element.get('ScientificName').upper():
+                                    errors.append(self.validation_msg_invalid_taxonomy % (
+                                        row['GENUS'], "GENUS", str(index+2), element.get('ScientificName').upper()))
                                     flag = False
                             elif rank == 'family':
-                                if row['FAMILY'].strip().upper() != element.get('ScientificName').upper():
+                                if not row['FAMILY'].strip():
+                                    warnings.append(self.validation_warning_field % (
+                                        "FAMILY", str(index + 2), "FAMILY", scientific_name, element.get('ScientificName').upper()))
+                                    self.data.at[index, "FAMILY"] = element.get('ScientificName').upper()
+                                elif row['FAMILY'].strip().upper() != element.get('ScientificName').upper():
                                     errors.append(self.validation_msg_invalid_taxonomy % (row['FAMILY'], "FAMILY", str(index+2), element.get('ScientificName').upper()))
                                     flag = False
                             elif rank == 'order':
-                                if row['ORDER_OR_GROUP'].strip().upper() != element.get('ScientificName').upper():
+                                if not row['ORDER_OR_GROUP'].strip():
+                                    warnings.append(self.validation_warning_field % (
+                                        "ORDER_OR_GROUP", str(index + 2), "ORDER_OR_GROUP", scientific_name, element.get('ScientificName').upper()))
+                                    self.data.at[index, "ORDER_OR_GROUP"] = element.get('ScientificName').upper()
+                                elif row['ORDER_OR_GROUP'].strip().upper() != element.get('ScientificName').upper():
                                     errors.append(self.validation_msg_invalid_taxonomy % (row['ORDER_OR_GROUP'], "ORDER_OR_GROUP", str(index+2), element.get('ScientificName').upper()))
                                     flag = False
                     else:
-                        handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
-                        records = Entrez.read(handle)
+                        #handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
+                        #records = Entrez.read(handle)
 
                         errors.append("Invalid data: couldn't retrieve TAXON_ID <strong>%s</strong> at row <strong>%s<strong>" % (
                         row['TAXON_ID'], str(index+2)))
@@ -395,7 +416,6 @@ class DtolSpreadsheet:
 
     def collect(self):
         # create table data to show to the frontend from parsed manifest
-        #TODO fill in here taxonoy entries if needed
         sample_data = []
         headers = list()
         for col in list(self.data.columns):
