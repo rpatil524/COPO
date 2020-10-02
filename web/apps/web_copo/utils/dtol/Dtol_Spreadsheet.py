@@ -39,6 +39,9 @@ class DtolSpreadsheet:
     validation_msg_synonym = "Invalid scientific name: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. Please provide the official scientific name."
     validation_msg_missing_taxon = "Missing TAXON_ID at row <strong>%s</strong>. For <strong>%s</strong> TAXON_ID should be <strong>%s</strong>"
     validation_msg_duplicate_tube_or_well_id = "Duplicate TUBE_OR_WELL_IDs found: <strong>%s</strong>"
+    validation_warning_synonym = "Synonym warning: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. COPO will substitute the official scientific name."
+    validation_warning_field ="Missing <strong>%s</strong>: row <strong>%s</strong> - <strong>%s</strong> for <strong>%s</strong> will be filled with <strong>%s</strong>"
+    validation_msg_invalid_rank = "Invalid scientific name or taxon ID: row <strong>%s</strong> - rank of scientific name and taxon id should be species."
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -52,6 +55,7 @@ class DtolSpreadsheet:
         display_images = Path(settings.MEDIA_ROOT) / "img" / "sample_images"
         self.these_images = sample_images / self.profile_id
         self.display_images = display_images / self.profile_id
+        self.taxonomy_dict = {}
         # if a file is passed in, then this is the first time we have seen the spreadsheet,
         # if not then we are looking at creating samples having previously validated
         if file:
@@ -205,7 +209,9 @@ class DtolSpreadsheet:
         family and order are consistent with each other in known taxonomy'''
 
         errors = []
+        warnings =[]
         flag = True
+
         with open(lk.WIZARD_FILES["sample_details"]) as json_data:
 
             try:
@@ -214,7 +220,28 @@ class DtolSpreadsheet:
                 #self.fields = jp.match(
 #                    '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
                 #rows = list(self.data.rows)
-                for index, row in self.data[['ORDER_OR_GROUP','FAMILY', 'GENUS', 'TAXON_ID', 'SCIENTIFIC_NAME']] .iterrows():
+                '''notify_sample_status(profile_id=self.profile_id,
+                                     msg="hello",
+                                     action="warning",
+                                     html_id="warning_info")'''
+                #build dictioanry of species in this manifest  max 200 IDs per query
+                taxon_id_set = set(self.data['TAXON_ID'].tolist())
+                notify_sample_status(profile_id=self.profile_id,
+                                     msg="Querying Ensembl for TAXON_IDs in manifest ",
+                                     action="info",
+                                     html_id="sample_info")
+                taxon_id_list = list(taxon_id_set)
+                if any(id for id in taxon_id_list):
+                    i = 0
+                    while i<len(taxon_id_list):
+                        print("window starting at ", i, "ending at ", i+200)
+                        window_list = taxon_id_list[i: i+200]
+                        i = + 200
+                        handle = Entrez.efetch(db="Taxonomy", id=window_list, retmode="xml")
+                        records = Entrez.read(handle)
+                        for element in records:
+                            self.taxonomy_dict[element['TaxId']] = element
+                for index, row in self.data[['ORDER_OR_GROUP','FAMILY', 'GENUS', 'TAXON_ID', 'SCIENTIFIC_NAME']].iterrows():
                     print('validating row ', str(index+2))
                     if all(row[header].strip() == "" for header in ['TAXON_ID', 'SCIENTIFIC_NAME']):
                         #print("row is empty")
@@ -227,52 +254,103 @@ class DtolSpreadsheet:
                                          html_id="sample_info")
                     scientific_name = row['SCIENTIFIC_NAME'].strip()
                     taxon_id = row['TAXON_ID'].strip()
-                    handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
-                    records = Entrez.read(handle)
                     #print(records['IdList'])
                     #print(type(records['IdList']))
                     #suggest TAXON_ID if not provided
                     if not taxon_id:
-                        errors.append(self.validation_msg_missing_taxon % (str(index+2), scientific_name, records['IdList'][0]))
-                        flag = False
-                        continue
-                    elif taxon_id not in records['IdList']:
-                        if not records['IdList']:
-                            handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
+                        handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
+                        records = Entrez.read(handle)
+                        #errors.append(self.validation_msg_missing_taxon % (str(index+2), scientific_name, records['IdList'][0]))
+                        warnings.append(self.validation_warning_field % ( "TAXON_ID", str(index+2), "TAXON_ID", scientific_name, records['IdList'][0]))
+                        self.data.at[index, "TAXON_ID"] = records['IdList'][0]
+                        taxon_id = records['IdList'][0]
+                        #flag = False
+                        #continue
+                        handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
+                        records = Entrez.read(handle)
+                        if records:
+                            self.taxonomy_dict[records[0]['TaxId']] = records[0]
+
+                    ###elif taxon_id not in records['IdList']:
+                    if self.taxonomy_dict.get(taxon_id):
+                        if scientific_name.upper() != self.taxonomy_dict[taxon_id]['ScientificName'].upper():
+                            handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
                             records = Entrez.read(handle)
-                            if records:
-                                expected_name = records[0].get('ScientificName', '[unknown]')
+                            #check if the scientific name provided is a synonim
+                            if taxon_id in records['IdList']:
+                                #errors.append(self.validation_msg_synonym % (scientific_name, str(index + 2),
+                                #                                             self.taxonomy_dict[taxon_id][
+                                #                                                 'ScientificName']))  ###records[0]['ScientificName']))
+                                warnings.append(self.validation_warning_synonym % (scientific_name, str(index + 2),
+                                                                             self.taxonomy_dict[taxon_id][
+                                                                                 'ScientificName']))
+                                self.data.at[index, "SCIENTIFIC_NAME"] = self.taxonomy_dict[taxon_id]['ScientificName']
+                                #flag = False
+                                #continue
+                            elif not records['IdList']:
+                                #handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
+                                #records = Entrez.read(handle)
+                                #if records:
+                                    #self.taxonomy_dict[records[0]['TaxId']] = records[0]
+                                expected_name = self.taxonomy_dict[taxon_id].get('ScientificName', '[unknown]')
                                 errors.append(self.validation_msg_invalid_taxonomy % (scientific_name, "SCIENTIFIC_NAME", str(index+2), expected_name))
-                            else:
-                                errors.append("Invalid data: couldn't resolve SCIENTIFIC_NAME nor TAXON_ID at row <strong>%s</strong>" % str(index+2))
-                            flag = False
-                            continue
-                        errors.append(self.validation_msg_invalid_taxonomy % (taxon_id, "TAXON_ID", str(index+2), str(records['IdList'])))
+                                #else:
+                                #   errors.append("Invalid data: couldn't resolve SCIENTIFIC_NAME nor TAXON_ID at row <strong>%s</strong>" % str(index+2))
+                                flag = False
+                                continue
+                            else:errors.append(self.validation_msg_invalid_taxonomy % (taxon_id, "TAXON_ID", str(index+2), str(records['IdList'])))
                         flag = False
                         continue
 
-                    handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
-                    records = Entrez.read(handle)
-                    #check the scientific name provided wasn't a synonym
-                    if records[0]['ScientificName'].upper() != scientific_name.strip().upper():
-                        errors.append(self.validation_msg_synonym % (scientific_name, str(index+2), records[0]['ScientificName']))
+                    ###handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
+                        ###records = Entrez.read(handle)
+                        if self.taxonomy_dict[taxon_id]['Rank'] != 'species':
+                            errors.append(self.validation_msg_invalid_rank % (str(index+2)))
+                            flag = False
+                            continue
+                        ###for element in records[0]['LineageEx']:
+                        for element in self.taxonomy_dict[taxon_id]['LineageEx']:
+                            #print('checking lineage')
+                            rank = element.get('Rank')
+                            if rank == 'genus':
+                                if not row['GENUS'].strip():
+                                    warnings.append(self.validation_warning_field % (
+                                        "GENUS", str(index + 2), "GENUS", scientific_name, element.get('ScientificName').upper()))
+                                    self.data.at[index, "GENUS"] = element.get('ScientificName').upper()
+                                elif row['GENUS'].strip().upper() != element.get('ScientificName').upper():
+                                    errors.append(self.validation_msg_invalid_taxonomy % (
+                                        row['GENUS'], "GENUS", str(index+2), element.get('ScientificName').upper()))
+                                    flag = False
+                            elif rank == 'family':
+                                if not row['FAMILY'].strip():
+                                    warnings.append(self.validation_warning_field % (
+                                        "FAMILY", str(index + 2), "FAMILY", scientific_name, element.get('ScientificName').upper()))
+                                    self.data.at[index, "FAMILY"] = element.get('ScientificName').upper()
+                                elif row['FAMILY'].strip().upper() != element.get('ScientificName').upper():
+                                    errors.append(self.validation_msg_invalid_taxonomy % (row['FAMILY'], "FAMILY", str(index+2), element.get('ScientificName').upper()))
+                                    flag = False
+                            elif rank == 'order':
+                                if not row['ORDER_OR_GROUP'].strip():
+                                    warnings.append(self.validation_warning_field % (
+                                        "ORDER_OR_GROUP", str(index + 2), "ORDER_OR_GROUP", scientific_name, element.get('ScientificName').upper()))
+                                    self.data.at[index, "ORDER_OR_GROUP"] = element.get('ScientificName').upper()
+                                elif row['ORDER_OR_GROUP'].strip().upper() != element.get('ScientificName').upper():
+                                    errors.append(self.validation_msg_invalid_taxonomy % (row['ORDER_OR_GROUP'], "ORDER_OR_GROUP", str(index+2), element.get('ScientificName').upper()))
+                                    flag = False
+                    else:
+                        #handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
+                        #records = Entrez.read(handle)
+
+                        errors.append("Invalid data: couldn't retrieve TAXON_ID <strong>%s</strong> at row <strong>%s</strong>" % (
+                        row['TAXON_ID'], str(index+2)))
                         flag = False
-                        continue
-                    for element in records[0]['LineageEx']:
-                        #print('checking lineage')
-                        rank = element.get('Rank')
-                        if rank == 'genus':
-                            if row['GENUS'].strip().upper() != element.get('ScientificName').upper():
-                                errors.append(self.validation_msg_invalid_taxonomy % (row['GENUS'], "GENUS", str(index+2), element.get('ScientificName').upper()))
-                                flag = False
-                        elif rank == 'family':
-                            if row['FAMILY'].strip().upper() != element.get('ScientificName').upper():
-                                errors.append(self.validation_msg_invalid_taxonomy % (row['FAMILY'], "FAMILY", str(index+2), element.get('ScientificName').upper()))
-                                flag = False
-                        elif rank == 'order':
-                            if row['ORDER_OR_GROUP'].strip().upper() != element.get('ScientificName').upper():
-                                errors.append(self.validation_msg_invalid_taxonomy % (row['ORDER_OR_GROUP'], "ORDER_OR_GROUP", str(index+2), element.get('ScientificName').upper()))
-                                flag = False
+
+                #send warnings
+                if warnings:
+                    notify_sample_status(profile_id=self.profile_id,
+                                                         msg="<br>".join(warnings),
+                                                         action="warning",
+                                                         html_id="warning_info")
 
                 if not flag:
                     notify_sample_status(profile_id=self.profile_id,
@@ -289,6 +367,7 @@ class DtolSpreadsheet:
                 error_message = str(e).replace("<", "").replace(">", "")
                 notify_sample_status(profile_id=self.profile_id, msg="Service Error - The NCBI Taxonomy service may be down, please try again later.", action="error",
                                      html_id="sample_info")
+                return False
             except Exception as e:
                 error_message = str(e).replace("<", "").replace(">", "")
                 notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + error_message, action="error",

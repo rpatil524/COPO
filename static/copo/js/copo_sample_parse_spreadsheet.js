@@ -30,6 +30,7 @@ function upload_image_files(file) {
 }
 
 function upload_spreadsheet(file) {
+    $("#warning_info").fadeOut("fast")
     var csrftoken = $.cookie('csrftoken');
     form = new FormData()
     form.append("file", file)
@@ -145,6 +146,16 @@ $(document).ready(function () {
             $("#" + d.html_id).removeClass("alert-danger").addClass("alert-info")
             $("#" + d.html_id).html(d.message)
             $("#spinner").fadeOut()
+        } else if (d.action === "warning") {
+            // show something on the info div
+            // check info div is visible
+            if (!$("#" + d.html_id).is(":visible")) {
+                $("#" + d.html_id).fadeIn("50")
+
+            }
+            $("#" + d.html_id).removeClass("alert-info").addClass("alert-warning")
+            $("#" + d.html_id).html(d.message)
+            $("#spinner").fadeOut()
         } else if (d.action === "error") {
             // check info div is visible
             if (!$("#" + d.html_id).is(":visible")) {
@@ -177,6 +188,11 @@ $(document).ready(function () {
             $("#finish_button").fadeIn()
         } else if (d.action === "make_table") {
             // make table of metadata parsed from spreadsheet
+            if ($.fn.DataTable.isDataTable('#sample_parse_table')) {
+                $("#sample_parse_table").DataTable().clear().destroy();
+            }
+            $("#sample_parse_table").find("thead").empty()
+            $("#sample_parse_table").find("tbody").empty()
             var body = $("tbody")
             var count = 0
             for (r in d.message) {
