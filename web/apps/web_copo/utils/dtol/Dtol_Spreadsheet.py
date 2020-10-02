@@ -329,7 +329,7 @@ class DtolSpreadsheet:
                         #handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
                         #records = Entrez.read(handle)
 
-                        errors.append("Invalid data: couldn't retrieve TAXON_ID <strong>%s</strong> at row <strong>%s<strong>" % (
+                        errors.append("Invalid data: couldn't retrieve TAXON_ID <strong>%s</strong> at row <strong>%s</strong>" % (
                         row['TAXON_ID'], str(index+2)))
                         flag = False
 
