@@ -276,14 +276,14 @@ class DtolSpreadsheet:
                                 #flag = False
                                 #continue
                             elif not records['IdList']:
-                                handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
-                                records = Entrez.read(handle)
-                                if records:
-                                    self.taxonomy_dict[records[0]['TaxId']] = records[0]
-                                    expected_name = records[0].get('ScientificName', '[unknown]')
-                                    errors.append(self.validation_msg_invalid_taxonomy % (scientific_name, "SCIENTIFIC_NAME", str(index+2), expected_name))
-                                else:
-                                    errors.append("Invalid data: couldn't resolve SCIENTIFIC_NAME nor TAXON_ID at row <strong>%s</strong>" % str(index+2))
+                                #handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
+                                #records = Entrez.read(handle)
+                                #if records:
+                                    #self.taxonomy_dict[records[0]['TaxId']] = records[0]
+                                expected_name = self.taxonomy_dict[taxon_id].get('ScientificName', '[unknown]')
+                                errors.append(self.validation_msg_invalid_taxonomy % (scientific_name, "SCIENTIFIC_NAME", str(index+2), expected_name))
+                                #else:
+                                #   errors.append("Invalid data: couldn't resolve SCIENTIFIC_NAME nor TAXON_ID at row <strong>%s</strong>" % str(index+2))
                                 flag = False
                                 continue
                             else:
