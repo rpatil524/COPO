@@ -557,7 +557,7 @@
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
-      "control": "ontology term",
+      "control": "text",
       "versions": [
         "COLLECTION_LOCATION"
       ],
@@ -567,7 +567,7 @@
       ],
       "deprecated": false,
       "hidden": "false",
-      "type": "array",
+      "type": "string",
       "show_in_form": true,
       "id": "copo.sample.COLLECTION_LOCATION",
       "label": "Collection Location",
@@ -639,7 +639,7 @@
       ],
       "deprecated": false,
       "hidden": "false",
-      "type": "array",
+      "type": "string",
       "show_in_form": true,
       "id": "copo.sample.GRID_REFERENCE",
       "label": "Grid Reference",
@@ -997,7 +997,7 @@
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
-      "control": "ontology term",
+      "control": "text",
       "versions": [
         "PRESERVED_BY"
       ],
@@ -1020,7 +1020,7 @@
       "default_value": "",
       "show_as_attribute": true,
       "control_meta": {},
-      "control": "ontology term",
+      "control": "text",
       "versions": [
         "PRESERVER_AFFILIATION"
       ],
@@ -1030,10 +1030,10 @@
       ],
       "deprecated": false,
       "hidden": "false",
-      "type": "array",
+      "type": "string",
       "show_in_form": true,
       "id": "copo.sample.PRESERVER_AFFILIATION",
-      "label": "Preserved By",
+      "label": "Preserver Affiliation",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/preparations"
     },
@@ -1315,29 +1315,6 @@
     },
     {
       "help_tip": "",
-      "required": "true",
-      "default_value": "",
-      "show_as_attribute": true,
-      "control_meta": {},
-      "control": "text",
-      "versions": [
-        "SERIES"
-      ],
-      "ref": "",
-      "specifications": [
-        "dtol"
-      ],
-      "deprecated": false,
-      "hidden": "false",
-      "type": "string",
-      "show_in_form": true,
-      "id": "copo.sample.SERIES",
-      "label": "",
-      "show_in_table": true,
-      "dwc": ""
-    },
-    {
-      "help_tip": "",
       "required": "false",
       "control_meta": {},
       "dwc": "",
@@ -1470,6 +1447,28 @@
       "label": "Tube or Well ID for Barcoding",
       "show_in_form": true,
       "id": "copo.sample.TUBE_OR_WELL_ID_FOR_BARCODING",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "SERIES"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Series",
+      "show_in_form": true,
+      "id": "copo.sample.SERIES",
       "type": "string",
       "show_in_table": true,
       "control": "text",
@@ -1624,7 +1623,7 @@
       "show_in_form": false,
       "ref": "",
       "type": "string",
-      "show_in_table": true,
+      "show_in_table": false,
       "show_as_attribute": true,
       "option_values": {
         "callback": {
@@ -1687,7 +1686,7 @@
       "deprecated": false,
       "hidden": "false",
       "label": "Biosample Accession",
-      "show_in_form": true,
+      "show_in_form": false,
       "id": "copo.sample.biosampleAccession",
       "type": "string",
       "show_in_table": true,
@@ -1709,7 +1708,7 @@
       "deprecated": false,
       "hidden": "false",
       "label": "SRA Accession",
-      "show_in_form": true,
+      "show_in_form": false,
       "id": "copo.sample.sraAccession",
       "type": "string",
       "show_in_table": true,
@@ -1731,7 +1730,7 @@
       "deprecated": false,
       "hidden": "false",
       "label": "Submission Accession",
-      "show_in_form": true,
+      "show_in_form": false,
       "id": "copo.sample.submissionAccession",
       "type": "string",
       "show_in_table": true,
@@ -1753,10 +1752,10 @@
       "deprecated": false,
       "hidden": "false",
       "label": "Status",
-      "show_in_form": true,
+      "show_in_form": false,
       "id": "copo.sample.status",
       "type": "string",
-      "show_in_table": false,
+      "show_in_table": true,
       "control": "text",
       "default_value": "pending"
     },
@@ -1795,24 +1794,6 @@
       "type": "string",
       "show_in_table": true,
       "control": "date-picker"
-    },
-    {
-      "help_tip": "",
-      "required": "true",
-      "default_value": "",
-      "control_meta": {},
-      "versions": [
-        "biosample_id"
-      ],
-      "ref": "",
-      "deprecated": false,
-      "hidden": "true",
-      "label": "Date Modified",
-      "show_in_form": false,
-      "id": "copo.sample.biosample_id",
-      "type": "string",
-      "show_in_table": false,
-      "control": "text"
     }
   ],
   "description": "Mappings of attribute in the Sample schema to a UI configuration source.",

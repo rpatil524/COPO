@@ -572,6 +572,12 @@ class Sample(DAComponent):
     def __init__(self, profile_id=None):
         super(Sample, self).__init__(profile_id, "sample")
 
+    def get_all_dtol_samples(self):
+        return cursor_to_list(self.get_collection_handle().find(
+            {"sample_type": "dtol"},
+            {"_id": 1}
+        ))
+
     def get_dtol_type(self, id):
         return self.get_collection_handle().find_one(
             {"$or": [{"biosampleAccession": id}, {"sraAccession": id}, {"biosampleAccession": id}]})
@@ -590,7 +596,7 @@ class Sample(DAComponent):
         sample = self.get_collection_handle().update({"_id": ObjectId(sample_id)},
                                                      {"$set": {"time_updated": datetime.now(timezone.utc).replace(
                                                          microsecond=0),
-                                                               "updated_by": email}})
+                                                         "updated_by": email}})
 
     def add_accession(self, biosample_accession, sra_accession, submission_accession, oid):
         return self.get_collection_handle().update(

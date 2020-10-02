@@ -28,11 +28,11 @@ class DtolSpreadsheet:
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
     na_vals = ['#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
                'NULL', 'NaN', 'n/a', 'nan', 'null']
-    # na_vals = ['NOT COLLECTED', 'NOT PROVIDED', 'NOT APPLICABLE']
+    blank_vals = ['NOT COLLECTED', 'NOT PROVIDED', 'NOT APPLICABLE']
     # fields which are allowed to be empty should be here....if not and they are parsed whilst empty, they will produce NAN in pandas
     # allowed_empty = ["ELEVATION", "DEPTH", "TAXON_REMARKS", "INFRASPECIFIC_EPITHET", "CULTURE_OR_STRAIN_ID", "SYMBIONT", "PRESERVATIVE_SOLUTION", "RELATIONSHIP"]
     validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
-        allowed=str(na_vals))
+        allowed=str(blank_vals))
     validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
     validation_msg_invalid_list = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. If this is a location, start with the Country, adding more specific details separated with '|'. See list of allowed Country entries at <a href='https://www.ebi.ac.uk/ena/browser/view/ERC000053'>https://www.ebi.ac.uk/ena/browser/view/ERC000053</a>"
     validation_msg_invalid_taxonomy = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Expected value is <strong>%s</strong>"
@@ -179,7 +179,7 @@ class DtolSpreadsheet:
                     errors = "".join(errors)
 
                     notify_sample_status(profile_id=self.profile_id,
-                                         msg="<ol>" + errors + "</ol>",
+                                         msg="<h4>" + self.file.name + "</h4><ol>" + errors + "</ol>",
                                          action="error",
                                          html_id="sample_info")
                     return False
@@ -287,7 +287,7 @@ class DtolSpreadsheet:
             except HTTPError as e:
 
                 error_message = str(e).replace("<", "").replace(">", "")
-                notify_sample_status(profile_id=self.profile_id, msg="Service Error - Entrez may be down, please try again later.", action="error",
+                notify_sample_status(profile_id=self.profile_id, msg="Service Error - The NCBI Taxonomy service may be down, please try again later.", action="error",
                                      html_id="sample_info")
             except Exception as e:
                 error_message = str(e).replace("<", "").replace(">", "")

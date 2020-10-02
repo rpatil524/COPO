@@ -234,9 +234,11 @@ $(document).on("click", "#export_errors_button", function (event) {
 })
 
 function download(filename, text) {
+    // make filename
+    f = $("#sample_info").find("h4").html().replace(/\.[^/.]+$/, "_errors.html")
     var pom = document.createElement('a');
     pom.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(text));
-    pom.setAttribute('download', filename);
+    pom.setAttribute('download', f);
 
     if (document.createEvent) {
         var event = document.createEvent('MouseEvents');

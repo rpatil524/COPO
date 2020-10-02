@@ -31,6 +31,7 @@ dtol_api_patterns = [
     re_path(r'sample/copo_id/(?P<copo_ids>[A-Za-z0-9, ]+)', sample.get_by_copo_ids, name='get_by_biosample_ids'),
     re_path(r'sample/sample_field/(?P<dtol_field>[A-Za-z0-9-_]+)/(?P<value>[A-Za-z0-9-_ ,.@]+)', sample.get_by_field,
             name='get_by_dtol_field'),
+    re_path(r'sample/dtol/', sample.get_dtol_samples, name='get_manifests'),
 ]
 
 urlpatterns = generic_api_patterns + dtol_api_patterns

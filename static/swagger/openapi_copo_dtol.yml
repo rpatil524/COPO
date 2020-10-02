@@ -114,6 +114,25 @@ paths:
         "400":
           description: invalid manifest_id
 
+  /sample/dtol:
+    get:
+      tags:
+        - Sample
+      summary:
+        Get all DTOL Samples
+      description: >
+        Get a list of all the DTOL samples in COPO
+
+      responses:
+        "200": # status code
+          description: A JSON array sample copo_ids
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SampleListShort'
+        "400":
+          description: InvalidId found in request
+
   /sample/copo_id/{copo_ids}:
     get:
       tags:
@@ -240,6 +259,19 @@ components:
           items:
             $ref: '#/components/schemas/Sample_long'
 
+    SampleListShort:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["OK", "Error"]
+        number_found:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sample_very_short'
+
     Sample_short:
       type: object
       properties:
@@ -261,6 +293,14 @@ components:
           type: string
           format: date-time
           description: when was this sample uploaded to COPO
+
+    Sample_very_short:
+      type: object
+      properties:
+        copo_id:
+          type: string
+          description: unique COPO identifier for this sample
+
 
     ManifestId:
       type: string
