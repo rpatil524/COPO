@@ -103,17 +103,17 @@ class DtolSpreadsheet:
                         errors.append("Field not found - " + item)
                         flag = False
                         # if we have a required fields, check that there are no missing values
-                    for header, cells in self.data.iteritems():
-                        # here we need to check if there are not missing values in its cells
-                        if header in self.fields:
-                            cellcount = 0
-                            for c in cells:
-                                cellcount += 1
-                                if not c:
-                                    # we have missing data in required cells
-                                    errors.append(self.validation_msg_missing_data % (
-                                                             header, str(cellcount + 1)))
-                                    flag = False
+                for header, cells in self.data.iteritems():
+                    # here we need to check if there are not missing values in its cells
+                    if header in self.fields:
+                        cellcount = 0
+                        for c in cells:
+                            cellcount += 1
+                            if not c:
+                                # we have missing data in required cells
+                                errors.append(self.validation_msg_missing_data % (
+                                                         header, str(cellcount + 1)))
+                                flag = False
 
                 # get list of DTOL fields from schemas
                 self.fields = jp.match(
