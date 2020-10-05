@@ -298,9 +298,10 @@ class DtolSpreadsheet:
                                 #   errors.append("Invalid data: couldn't resolve SCIENTIFIC_NAME nor TAXON_ID at row <strong>%s</strong>" % str(index+2))
                                 flag = False
                                 continue
-                            else:errors.append(self.validation_msg_invalid_taxonomy % (taxon_id, "TAXON_ID", str(index+2), str(records['IdList'])))
-                        flag = False
-                        continue
+                            else:
+                                errors.append(self.validation_msg_invalid_taxonomy % (taxon_id, "TAXON_ID", str(index+2), str(records['IdList'])))
+                                flag = False
+                                continue
 
                     ###handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
                         ###records = Entrez.read(handle)
