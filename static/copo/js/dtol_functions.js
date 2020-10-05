@@ -154,7 +154,10 @@ function row_select(ev) {
 
     var d = {"profile_id": $(row).find("td").data("profile_id"), "filter": filter}
     $("#profile_id").val(d.profile_id)
+    var spinner_state = $("#spinner").is(":visible")
     $("#spinner").show()
+    var saved_text = $("#dtol_sample_info").text()
+    var show_spinner =
     $("#dtol_sample_info").text("Fetching")
     $.ajax({
         url: "/copo/get_samples_for_profile",
@@ -277,8 +280,10 @@ function row_select(ev) {
                 $("#accept_reject_button").find("button").prop("disabled", true)
 
             }
-            $("#spinner").fadeOut("fast")
-            $("#dtol_sample_info").text("")
+            if (!spinner_state) {
+                $("#spinner").fadeOut("fast")
+            }
+            $("#dtol_sample_info").text(saved_text)
         }
     )
 }

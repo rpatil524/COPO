@@ -66,7 +66,7 @@
         var idx = Math.round((Math.random() * images.length) + 1)
         var str = "assets/img/" + images[idx]
 
-        $('.carousel').carousel({interval: 6000});
+        $('.carousel').carousel({interval: 3000});
 
         $('#myCarousel').data('carousel_counter', idx)
         var carousel_text = [
@@ -92,3 +92,12 @@
     });
 }(jQuery));
 
+$(document).ready(function(){
+    var num_images = $(".carousel-inner").children().length
+    var random = getRandomInt(num_images)
+    $($(".carousel-inner").children()[random]).addClass("active")
+})
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
