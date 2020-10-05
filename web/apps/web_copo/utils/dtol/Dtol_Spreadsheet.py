@@ -290,7 +290,12 @@ class DtolSpreadsheet:
                                 warnings.append(self.validation_warning_synonym % (scientific_name, str(index + 2),
                                                                                    self.taxonomy_dict[taxon_id][
                                                                                        'ScientificName']))
-                                self.data.at[index, "SCIENTIFIC_NAME"] = self.taxonomy_dict[taxon_id]['ScientificName']
+                                self.data.at[index, "SCIENTIFIC_NAME"] = self.taxonomy_dict[taxon_id]['ScientificName'].upper()
+                                other_info = ""
+                                if self.data.at[index, "OTHER_INFORMATION"].strip():
+                                    other_info = self.data.at[index, "OTHER_INFORMATION"] + " | "
+                                self.data.at[index, "OTHER_INFORMATION"] = other_info + \
+                                                                           "COPO substituted the scientific name synonym %s with %s" % (scientific_name, self.taxonomy_dict[taxon_id]['ScientificName'].upper())
                                 # flag = False
                                 # continue
                             elif not records['IdList']:
