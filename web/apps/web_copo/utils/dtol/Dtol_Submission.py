@@ -293,16 +293,17 @@ def get_studyId(receipt, collection_id):
 
 def create_study(profile_id, collection_id):
     #build study XML
+    profile = Profile().get_record(profile_id)
     tree = ET.parse(SRA_PROJECT_TEMPLATE)
     root = tree.getroot()
     #set study attributes
     project = root.find('PROJECT')
-    project.set('alias', str(uuid.uuid4())) ##### TODO change the alias in prod
+    project.set('alias', str(profile['copo_id']))
     project.set('center_name', 'EarlhamInstitute')
     title_block = ET.SubElement(project, 'TITLE')
-    title_block.text = str(uuid.uuid4())
+    title_block.text = profile['title']
     project_description = ET.SubElement(project, 'DESCRIPTION')
-    project_description.text = "example secription" #TODO maybe retrieve description of copo project for this
+    project_description.text = profile['description']
     submission_project = ET.SubElement(project, 'SUBMISSION_PROJECT')
     sequencing_project = ET.SubElement(submission_project, 'SEQUENCING_PROJECT')
     ET.dump(tree)
