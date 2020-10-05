@@ -40,6 +40,7 @@ class DtolSpreadsheet:
     validation_msg_synonym = "Invalid scientific name: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. Please provide the official scientific name."
     validation_msg_missing_taxon = "Missing TAXON_ID at row <strong>%s</strong>. For <strong>%s</strong> TAXON_ID should be <strong>%s</strong>"
     validation_msg_duplicate_tube_or_well_id = "Duplicate TUBE_OR_WELL_IDs found: <strong>%s</strong>"
+    validation_msg_used_whole_organism = "Duplicate SPECIMEN_ID and ORGANISM_PART <strong>'WHOLE ORGANISM'</strong> pair found for specimen: <strong>%s</strong>"
     validation_warning_synonym = "Synonym warning: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. COPO will substitute the official scientific name."
     validation_warning_field = "Missing <strong>%s</strong>: row <strong>%s</strong> - <strong>%s</strong> for <strong>%s</strong> will be filled with <strong>%s</strong>"
     validation_msg_invalid_rank = "Invalid scientific name or taxon ID: row <strong>%s</strong> - rank of scientific name and taxon id should be species."
@@ -57,6 +58,7 @@ class DtolSpreadsheet:
         self.these_images = sample_images / self.profile_id
         self.display_images = display_images / self.profile_id
         self.taxonomy_dict = {}
+        self.whole_used_specimens = set()
         # if a file is passed in, then this is the first time we have seen the spreadsheet,
         # if not then we are looking at creating samples having previously validated
         if file:
@@ -164,6 +166,16 @@ class DtolSpreadsheet:
                                     errors.append(self.validation_msg_invalid_data % (
                                         c_value, header, str(cellcount + 1), allowed_vals))
                                     flag = False
+                                if header == "ORGANISM_PART" and c_value == "WHOLE ORGANISM":
+                                    #send specimen in used whole specimens set
+                                    print(c_value)
+                                    current_specimen = self.data.at[cellcount-1, "SPECIMEN_ID"]
+                                    print(current_specimen)
+                                    if current_specimen in self.whole_used_specimens:
+                                        errors.append(self.validation_msg_used_whole_organism % (current_specimen))
+                                        flag = False
+                                    else:
+                                        self.whole_used_specimens.add(current_specimen)
                             if regex_rule:
                                 # handle any regular expressions provided for valiation
 
