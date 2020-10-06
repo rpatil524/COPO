@@ -572,6 +572,14 @@ class Sample(DAComponent):
     def __init__(self, profile_id=None):
         super(Sample, self).__init__(profile_id, "sample")
 
+    def check_dtol_unique(self, rack_tube):
+        rt = list(rack_tube)
+        return cursor_to_list(self.get_collection_handle().find(
+            {"rack_tube": {"$in": rt}},
+            {"RACK_OR_PLATE_ID": 1, "TUBE_OR_WELL_ID": 1}
+        ))
+
+
     def get_all_dtol_samples(self):
         return cursor_to_list(self.get_collection_handle().find(
             {"sample_type": "dtol"},

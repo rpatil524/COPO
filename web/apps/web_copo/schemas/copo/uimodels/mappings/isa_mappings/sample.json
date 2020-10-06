@@ -1314,6 +1314,29 @@
       "dwc": "http://rs.tdwg.org/dwc/terms/dynamicProperties"
     },
     {
+      "help_tip": "rack_tube",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": false,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "rack_tube"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "true",
+      "type": "string",
+      "show_in_form": false,
+      "id": "copo.sample.rack_tube",
+      "label": "",
+      "show_in_table": false,
+      "dwc": "http://rs.tdwg.org/dwc/terms/dynamicProperties"
+    },
+    {
       "help_tip": "",
       "required": "false",
       "control_meta": {},

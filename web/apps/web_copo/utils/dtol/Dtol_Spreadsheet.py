@@ -39,11 +39,12 @@ class DtolSpreadsheet:
     validation_msg_invalid_taxonomy = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Expected value is <strong>%s</strong>"
     validation_msg_synonym = "Invalid scientific name: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. Please provide the official scientific name."
     validation_msg_missing_taxon = "Missing TAXON_ID at row <strong>%s</strong>. For <strong>%s</strong> TAXON_ID should be <strong>%s</strong>"
-    validation_msg_duplicate_tube_or_well_id = "Duplicate TUBE_OR_WELL_IDs found: <strong>%s</strong>"
+    validation_msg_duplicate_tube_or_well_id = "Duplicate RACK_OR_PLATE_ID and TUBE_OR_WELL_ID found in this Manifest: <strong>%s</strong>"
     validation_msg_used_whole_organism = "Duplicate SPECIMEN_ID and ORGANISM_PART <strong>'WHOLE ORGANISM'</strong> pair found for specimen: <strong>%s</strong>"
     validation_warning_synonym = "Synonym warning: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. COPO will substitute the official scientific name."
     validation_warning_field = "Missing <strong>%s</strong>: row <strong>%s</strong> - <strong>%s</strong> for <strong>%s</strong> will be filled with <strong>%s</strong>"
     validation_msg_invalid_rank = "Invalid scientific name or taxon ID: row <strong>%s</strong> - rank of scientific name and taxon id should be species."
+    validation_msg_duplicate_tube_or_well_id_in_copo = "Duplicate RACK_OR_PLATE_ID and TUBE_OR_WELL_ID already in COPO: <strong>%s</strong>"
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -122,6 +123,23 @@ class DtolSpreadsheet:
                                     header, str(cellcount + 1)))
                                 flag = False
 
+                # check for uniqueness of RACK_OR_PLATE_ID and TUBE_OR_WELL_ID in this manifest
+                rack_tube = self.data["RACK_OR_PLATE_ID"] + "/" + self.data["TUBE_OR_WELL_ID"]
+
+
+                # duplicated returns a boolean array, false for not duplicate, true for duplicate
+                u = list(rack_tube[rack_tube.duplicated()])
+                if len(u) > 0:
+                    errors.append(self.validation_msg_duplicate_tube_or_well_id % (u))
+                    flag = False
+
+                # now check for uniqueness across all Samples
+                dup = Sample().check_dtol_unique(rack_tube)
+                if len(dup) > 0:
+                    #errors = list(map(lambda x: "<li>" + x + "</li>", errors))
+                    err = list(map(lambda x: x["RACK_OR_PLATE_ID"] + "/" + x["TUBE_OR_WELL_ID"], dup))
+                    errors.append(self.validation_msg_duplicate_tube_or_well_id_in_copo % (err))
+                    flag = False
                 # get list of DTOL fields from schemas
                 self.fields = jp.match(
                     '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
@@ -130,14 +148,6 @@ class DtolSpreadsheet:
                                          action="info",
                                          html_id="sample_info")
                     if header in self.fields:
-                        # check for uniqueness of TUBE_OR_WELL_ID
-                        if header == "TUBE_OR_WELL_ID":
-                            # duplicated returns a boolean array, false for not duplicate, true for duplicate
-                            u = list(cells[cells.duplicated()])
-                            if len(u) > 0:
-                                errors.append(self.validation_msg_duplicate_tube_or_well_id % (u))
-                                flag = False
-
                         # check if there is an enum for this header
                         allowed_vals = lookup.DTOL_ENUMS.get(header, "")
 
@@ -492,6 +502,7 @@ class DtolSpreadsheet:
             s["biosample_accession"] = []
             s["manifest_id"] = manifest_id
             s["status"] = "pending"
+            s["rack_tube"] = s["RACK_OR_PLATE_ID"] + "/" + s["TUBE_OR_WELL_ID"]
             notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + s["SPECIMEN_ID"],
                                  action="info",
                                  html_id="sample_info")
