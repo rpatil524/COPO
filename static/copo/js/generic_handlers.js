@@ -938,8 +938,16 @@ function refresh_tool_tips() {
 } //end of func
 
 function setup_datepicker() {
+    var format_string
+    // dtol date format and ENA date formats are sadly different, so check if we are dealing with a dtol sample
+    if ($(document).data("isDtolSamplePage")){
+        format_string = "yyyy-mm-dd"
+    }
+    else{
+        format_string = "dd/mm/yyyy"
+    }
     $('.date-picker').datepicker({
-        format: "dd/mm/yyyy"
+        format: format_string
     });
 }
 

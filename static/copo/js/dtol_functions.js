@@ -1,6 +1,7 @@
 $(document).ready(function () {
     // functions defined here are called from both copo_sample_accept_reject and copo_samples, all provide DTOL
     // functionality
+    $(document).data("isDtolSamplePage", true)
     $("#accept_reject_button").find("button").prop("disabled", true)
     // add field names here which you don't want to appear in the supervisors table
     excluded_fields = ["profile_id", "biosample_id"]

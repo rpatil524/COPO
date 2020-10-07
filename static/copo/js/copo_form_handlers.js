@@ -84,6 +84,7 @@ var controlsMapping = {
     "copo-button-list": "do_copo_button_list_ctrl",
     "copo-item-count": "do_copo_item_count_ctrl",
     "date-picker": "do_date_picker_ctrl",
+    "date-picker-dtol": "do_date_picker_dtol_ctrl",
     "copo-duration": "do_copo_duration_ctrl",
     "text-percent": "do_percent_text_box",
     "copo-resolver": "do_copo_resolver_ctrl",

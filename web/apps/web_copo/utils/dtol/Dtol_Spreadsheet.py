@@ -20,7 +20,7 @@ from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from django.conf import settings
 import uuid
 import re
-import numpy as np
+import datetime
 from Bio import Entrez
 from urllib.error import HTTPError
 
@@ -30,8 +30,7 @@ class DtolSpreadsheet:
     na_vals = ['#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
                'NULL', 'NaN', 'n/a', 'nan', 'null']
     blank_vals = ['NOT COLLECTED', 'NOT PROVIDED', 'NOT APPLICABLE']
-    # fields which are allowed to be empty should be here....if not and they are parsed whilst empty, they will produce NAN in pandas
-    # allowed_empty = ["ELEVATION", "DEPTH", "TAXON_REMARKS", "INFRASPECIFIC_EPITHET", "CULTURE_OR_STRAIN_ID", "SYMBIONT", "PRESERVATIVE_SOLUTION", "RELATIONSHIP"]
+
     validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
         allowed=str(blank_vals))
     validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
@@ -45,6 +44,8 @@ class DtolSpreadsheet:
     validation_warning_field = "Missing <strong>%s</strong>: row <strong>%s</strong> - <strong>%s</strong> for <strong>%s</strong> will be filled with <strong>%s</strong>"
     validation_msg_invalid_rank = "Invalid scientific name or taxon ID: row <strong>%s</strong> - rank of scientific name and taxon id should be species."
     validation_msg_duplicate_tube_or_well_id_in_copo = "Duplicate RACK_OR_PLATE_ID and TUBE_OR_WELL_ID already in COPO: <strong>%s</strong>"
+    validation_msg_invalid_date = "Invalid date: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Dates should be in format YYYY-MM-DD"
+
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -60,6 +61,8 @@ class DtolSpreadsheet:
         self.display_images = display_images / self.profile_id
         self.taxonomy_dict = {}
         self.whole_used_specimens = set()
+        self.date_fields = ["DATE_OF_COLLECTION", "DATE_OF_PRESERVATION"]
+
         # if a file is passed in, then this is the first time we have seen the spreadsheet,
         # if not then we are looking at creating samples having previously validated
         if file:
@@ -125,14 +128,11 @@ class DtolSpreadsheet:
 
                 # check for uniqueness of RACK_OR_PLATE_ID and TUBE_OR_WELL_ID in this manifest
                 rack_tube = self.data["RACK_OR_PLATE_ID"] + "/" + self.data["TUBE_OR_WELL_ID"]
-
-
                 # duplicated returns a boolean array, false for not duplicate, true for duplicate
                 u = list(rack_tube[rack_tube.duplicated()])
                 if len(u) > 0:
                     errors.append(self.validation_msg_duplicate_tube_or_well_id % (u))
                     flag = False
-
                 # now check for uniqueness across all Samples
                 dup = Sample().check_dtol_unique(rack_tube)
                 if len(dup) > 0:
@@ -140,6 +140,7 @@ class DtolSpreadsheet:
                     err = list(map(lambda x: x["RACK_OR_PLATE_ID"] + "/" + x["TUBE_OR_WELL_ID"], dup))
                     errors.append(self.validation_msg_duplicate_tube_or_well_id_in_copo % (err))
                     flag = False
+
                 # get list of DTOL fields from schemas
                 self.fields = jp.match(
                     '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
@@ -193,12 +194,20 @@ class DtolSpreadsheet:
                                     errors.append(self.validation_msg_invalid_data % (
                                         c, header, str(cellcount + 1), regex_human_readable))
                                     flag = False
-                            elif header == "SERIES":
+                            # validation checks for SERIES
+                            if header == "SERIES":
                                 try:
                                     int(c)
                                 except ValueError:
                                     errors.append(self.validation_msg_invalid_data % (
                                         c, header, str(cellcount + 1), "integers"))
+                                    flag = False
+                            # validation checks for date types
+                            if header in self.date_fields:
+                                try:
+                                    validate_date(c)
+                                except ValueError as e:
+                                    errors.append(self.validation_msg_invalid_date % (c, str(cellcount + 1), header))
                                     flag = False
 
                 if not flag:
@@ -516,3 +525,9 @@ class DtolSpreadsheet:
                     break;
             Sample().timestamp_dtol_sample_created(sampl["_id"])
             # obj = Sample(profile_id=self.profile_id).get_record(obj_id['_id']) #would retrieve same as 133
+
+def validate_date(date_text):
+    try:
+        datetime.datetime.strptime(date_text, '%Y-%m-%d')
+    except ValueError:
+        raise ValueError("Incorrect data format, should be YYYY-MM-DD")

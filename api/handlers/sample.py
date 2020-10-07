@@ -13,7 +13,6 @@ import datetime
 import dateutil.parser as parser
 
 
-
 def get(request, id):
     """
     Method to handle a request for a single sample object from the API
@@ -124,12 +123,14 @@ def get_by_biosample_ids(request, biosample_ids):
         out = filter_for_STS(sample)
     return finish_request(out)
 
+
 def get_dtol_samples(request):
     samples = Sample().get_all_dtol_samples()
     out = list()
     if samples:
         out = filter_for_STS(samples)
     return finish_request(out)
+
 
 def get_by_copo_ids(request, copo_ids):
     # get sample by COPO id if known
