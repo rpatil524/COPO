@@ -297,6 +297,12 @@ class DtolSpreadsheet:
                         handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
                         records = Entrez.read(handle)
                         # errors.append(self.validation_msg_missing_taxon % (str(index+2), scientific_name, records['IdList'][0]))
+                        if not records['IdList']:
+                            errors.append(
+                                "Invalid data: couldn't resolve SCIENTIFIC_NAME <strong>%s</strong> at row <strong>%s</strong>" % (
+                                    scientific_name, str(index + 2)))
+                            flag = False
+                            continue
                         warnings.append(self.validation_warning_field % (
                         "TAXON_ID", str(index + 2), "TAXON_ID", scientific_name, records['IdList'][0]))
                         self.data.at[index, "TAXON_ID"] = records['IdList'][0]
