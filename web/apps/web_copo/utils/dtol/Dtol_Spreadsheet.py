@@ -268,7 +268,7 @@ class DtolSpreadsheet:
                     while i < len(taxon_id_list):
                         print("window starting at ", i, "ending at ", i + 200)
                         window_list = taxon_id_list[i: i + 200]
-                        i = + 200
+                        i += 200
                         handle = Entrez.efetch(db="Taxonomy", id=window_list, retmode="xml")
                         records = Entrez.read(handle)
                         for element in records:
