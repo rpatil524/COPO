@@ -118,6 +118,13 @@ def update_bundle_sample_xml(sample, bundlefile):
                     tag.text = attribute_name
                     value = ET.SubElement(sample_attribute, 'VALUE')
                     value.text = '|'.join(str(item[1]).split('|')[1:])
+                elif item[0] in ["DATE_OF_COLLECTION", "DECIMAL_LATITUDE", "DECIMAL_LONGITUDE"]:
+                    attribute_name = DTOL_ENA_MAPPINGS[item[0]]['ena']
+                    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                    tag = ET.SubElement(sample_attribute, 'TAG')
+                    tag.text = attribute_name
+                    value = ET.SubElement(sample_attribute, 'VALUE')
+                    value.text = str(item[1]).lower()
                 else:
                     attribute_name =  DTOL_ENA_MAPPINGS[item[0]]['ena']
                     sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
