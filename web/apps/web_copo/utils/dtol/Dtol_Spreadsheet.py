@@ -259,7 +259,7 @@ class DtolSpreadsheet:
                 # build dictioanry of species in this manifest  max 200 IDs per query
                 taxon_id_set = set(self.data['TAXON_ID'].tolist())
                 notify_sample_status(profile_id=self.profile_id,
-                                     msg="Querying Ensembl for TAXON_IDs in manifest ",
+                                     msg="Querying NCBI for TAXON_IDs in manifest ",
                                      action="info",
                                      html_id="sample_info")
                 taxon_id_list = list(taxon_id_set)
