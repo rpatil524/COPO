@@ -123,6 +123,10 @@ def get_by_biosample_ids(request, biosample_ids):
         out = filter_for_STS(sample)
     return finish_request(out)
 
+def get_num_dtol_samples(request):
+    samples = Sample().get_all_dtol_samples()
+    number = len(samples)
+    return HttpResponse(str(number))
 
 def get_dtol_samples(request):
     samples = Sample().get_all_dtol_samples()

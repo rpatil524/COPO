@@ -327,7 +327,7 @@ nav li {
 }
 .carousel .eight {
     background: url(../img/img3.jpg);
-    background-size: auto;
+    background-size: cover;
     -moz-background-size: cover;
 }
 .carousel .three {

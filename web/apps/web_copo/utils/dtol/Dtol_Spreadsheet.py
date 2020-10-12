@@ -28,7 +28,7 @@ from urllib.error import HTTPError
 class DtolSpreadsheet:
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
     na_vals = ['#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
-               'NULL', 'NaN', 'n/a', 'nan', 'null']
+               'NULL', 'NaN', 'n/a', 'nan']
     blank_vals = ['NOT COLLECTED', 'NOT PROVIDED', 'NOT APPLICABLE']
 
     validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
@@ -84,6 +84,7 @@ class DtolSpreadsheet:
                 for column in self.allowed_empty:
                     self.data[column] = self.data[column].fillna("")
                 '''
+                #self.data.fillna(value="")
                 self.data = self.data.apply(lambda x: x.astype(str).str.upper())
                 # print(self.data.size)
             except:
