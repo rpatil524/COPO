@@ -202,6 +202,17 @@ class DtolSpreadsheet:
                                     errors.append(self.validation_msg_invalid_data % (
                                         c, header, str(cellcount + 1), "integers"))
                                     flag = False
+                            elif header == "TIME_ELAPSED_FROM_COLLECTION_TO_PRESERVATION":
+                                # check this is either a NOT_* or an integer
+                                if c_value not in self.blank_vals:
+                                    try:
+                                        float(c_value)
+                                    except ValueError:
+                                        errors.append(self.validation_msg_invalid_data % (
+                                            c_value, header, str(cellcount + 1),
+                                            "integer or " + " ".join(self.blank_vals)
+                                        ))
+                                        flag = False
                             # validation checks for date types
                             if header in self.date_fields:
                                 try:
