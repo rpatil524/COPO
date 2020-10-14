@@ -215,7 +215,7 @@ class DtolSpreadsheet:
                                         ))
                                         flag = False
                             # validation checks for date types
-                            if header in self.date_fields:
+                            if header in self.date_fields and c not in self.blank_vals:
                                 try:
                                     validate_date(c)
                                 except ValueError as e:
