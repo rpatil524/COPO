@@ -31,6 +31,7 @@ import shutil
 from django.conf import settings
 from web.apps.web_copo.utils import group_functions
 from dal.copo_da import Sample
+from web.apps.web_copo.email import CopoEmail
 LOGGER = settings.LOGGER
 
 
@@ -47,6 +48,7 @@ def login(request):
     return render(request, 'copo/auth/login.html', context)
 
 def test_view(request):
+    CopoEmail().send("felix.shaw@earlham.ac.uk", "test subject", "<h4>Crappy old HTML</h4>", html=True)
     return render(request, "copo/test_1.html")
 
 '''
