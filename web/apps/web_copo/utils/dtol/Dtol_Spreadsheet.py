@@ -329,7 +329,11 @@ class DtolSpreadsheet:
 
                     ###elif taxon_id not in records['IdList']:
                     if self.taxonomy_dict.get(taxon_id):
-                        if scientific_name.upper() != self.taxonomy_dict[taxon_id]['ScientificName'].upper():
+                        if not scientific_name:
+                            errors.append(self.validation_msg_missing_data % ("SCIENTIFIC_NAME", str(index + 2),))
+                            flag = False
+                            continue
+                        elif scientific_name.upper() != self.taxonomy_dict[taxon_id]['ScientificName'].upper():
                             handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
                             records = Entrez.read(handle)
                             # check if the scientific name provided is a synonim
