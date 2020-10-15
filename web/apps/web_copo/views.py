@@ -48,7 +48,7 @@ def login(request):
     return render(request, 'copo/auth/login.html', context)
 
 def test_view(request):
-    CopoEmail().send("felix.shaw@earlham.ac.uk", "test subject", "<h4>Crappy old HTML</h4>", html=True)
+    CopoEmail().send(["felix.shaw@earlham.ac.uk", "robert.davey@earlham.ac.uk", "martin.ayling@earlham.ac.uk", "shaw2thefloor@gmail.com", "bayoxe7436@pastortips.com", "felixoshaw@gmail.com", "alice.minotto@earlham.ac.uk"], "test subject", "<h4>BADGER!</h4><img src='https://pyxis.nymag.com/v1/imgs/1c7/716/ffb0c2f967b192f6531310527adb8c6589-18-honey-badger-teeth.rsquare.w700.jpg'/>", html=True)
     return render(request, "copo/test_1.html")
 
 '''

@@ -18,6 +18,7 @@ class Command(BaseCommand):
         dm_group, created = Group.objects.get_or_create(name='data_managers')
         dtol_group, create = Group.objects.get_or_create(name='dtol_users')
         dtol_managers, created = Group.objects.get_or_create(name='dtol_sample_managers')
+        dtol_notifiers, created = Group.objects.get_or_create(name='dtol_sample_notifiers')
         ct = ContentType.objects.get_for_model(Repository)
 
         Permission.objects.filter(codename="can_create_repo").delete()

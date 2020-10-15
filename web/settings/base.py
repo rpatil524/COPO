@@ -32,8 +32,9 @@ CORS_ALLOWED_ORIGINS = [
 DEBUG_PROPAGATE_EXCEPTIONS = True
 # Django's base applications definition
 DJANGO_APPS = [
-    'django.contrib.sites',
     'django.contrib.admin',
+    'django.contrib.sites',
+
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -146,7 +147,7 @@ TEMPLATES = [
 
                 'django.contrib.auth.context_processors.auth',
             ],
-            'debug': True,
+            'debug': DEBUG,
         },
     },
 ]

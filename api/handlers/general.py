@@ -18,6 +18,7 @@ from django.shortcuts import redirect
 
 def forward_to_swagger(request):
     response = redirect('/static/swagger/apidocs_index.html')
+
     return response
 
 def upload_to_figshare_profile(request):
