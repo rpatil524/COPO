@@ -6,7 +6,7 @@ import web.apps.web_copo.views as views
 from django.views.static import serve
 
 urlpatterns = [
-    path('shadmin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('copo/', include('web.apps.web_copo.urls', namespace='copo')),
 
     path('rest/', include('web.apps.web_copo.rest_urls', namespace='rest')),

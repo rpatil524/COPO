@@ -23,7 +23,8 @@ import re
 import datetime
 from Bio import Entrez
 from urllib.error import HTTPError
-
+from web.apps.web_copo.email import CopoEmail
+import socket
 
 class DtolSpreadsheet:
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
@@ -542,7 +543,10 @@ class DtolSpreadsheet:
                     DataFile().insert_sample_id(df["_id"], sampl["_id"])
                     break;
             Sample().timestamp_dtol_sample_created(sampl["_id"])
-            # obj = Sample(profile_id=self.profile_id).get_record(obj_id['_id']) #would retrieve same as 133
+            uri = request.build_absolute_uri('/')
+
+        CopoEmail().notify_new_manifest(uri + 'copo/accept_reject_sample/')
+
 
 def validate_date(date_text):
     try:
