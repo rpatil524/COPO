@@ -674,6 +674,10 @@ class Sample(DAComponent):
     def get_by_field(self, dtol_field, value):
         return cursor_to_list(self.get_collection_handle().find({dtol_field: {"$in": value}}))
 
+    def get_specimen_biosample(self, value):
+        return cursor_to_list(self.get_collection_handle().find({"sample_type": "dtol_specimen",
+                                                                     "SPECIMEN_ID": value}))
+
     def get_manifests(self):
         return cursor_to_list(self.get_collection_handle().distinct("manifest_id", {"sample_type": "dtol"}))
 

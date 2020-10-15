@@ -48,6 +48,20 @@ def process_pending_dtol_samples():
         for s_id in submission["dtol_samples"]:
             s_ids.append(s_id)
             sam = Sample().get_record(s_id)
+            #check if specimen ID biosample was already registered, if not do it
+            specimen_sample = Sample().get_specimen_biosample(sam["SPECIMEN_ID"])
+            assert len(specimen_sample) <= 1
+            if not specimen_sample:
+                #create sample object and submit
+                notify_dtol_status(msg="Creating Sample for SPECIMEN_ID "+ sam["SPECIMEN_ID"], action="info",
+                                   html_id="dtol_sample_info")
+                specimen_obj_fields = { "SPECIMEN_ID" : sam["SPECIMEN_ID"], "sample_type" : "dtol_specimen"}
+                Sample().save_record(auto_fields={},**specimen_obj_fields)
+                #todo create xmls and submit
+            else:
+                specimen_accession = specimen_sample[0].get("biosampleAccession", "")
+
+
             notify_dtol_status(msg="Adding to Sample Batch: " + sam["SPECIMEN_ID"], action="info",
                                html_id="dtol_sample_info")
             update_bundle_sample_xml(sam, "bundle_"+file_subfix+".xml")
@@ -93,6 +107,12 @@ def update_bundle_sample_xml(sample, bundlefile):
     tag.text = 'ENA-CHECKLIST'
     value = ET.SubElement(sample_attribute, 'VALUE')
     value.text = 'ERC000053'
+    #adding reference to parent specimen biosample
+    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+    tag = ET.SubElement(sample_attribute, 'TAG')
+    tag.text = 'sample derived from'
+    value = ET.SubElement(sample_attribute, 'VALUE')
+    value.text = '' #TODO retrieve ID from db
     #adding project name field (ie copo profile name)
     # validating against DTOL checklist
     sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
@@ -144,6 +164,28 @@ def update_bundle_sample_xml(sample, bundlefile):
     ET.dump(tree)
     tree.write(open(bundlefile, 'w'),
                encoding='unicode')
+
+def build_specimen_sample_xml(sample):
+    # build specimen sample XML
+    tree = ET.parse(SRA_SAMPLE_TEMPLATE)
+    root = tree.getroot()
+    # from toni's code below
+    # set sample attributes
+    sample_alias = ET.SubElement(root, 'SAMPLE')
+    sample_alias.set('alias', str(sample['_id']))  # updated to copo id to retrieve it when getting accessions
+    sample_alias.set('center_name', 'EarlhamInstitute')  # mandatory for broker account
+    title = str(uuid.uuid4())
+
+    title_block = ET.SubElement(sample_alias, 'TITLE')
+    title_block.text = title
+    sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
+    taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
+    taxon_id.text = sample.get('TAXON_ID', "")
+    ET.dump(tree)
+    sample_id = str(sample['_id'])
+    samplefile = "submission_" + str(sample_id) + ".xml"
+    tree.write(open(samplefile, 'w'),
+               encoding='unicode')  #TODO make sure to delete this file after submission
 
 def build_xml(sample, sub_id, p_id, collection_id, file_subfix):
     notify_dtol_status(msg="Creating Sample: " + sample.get("SPECIMEN_ID", ""), action="info",
