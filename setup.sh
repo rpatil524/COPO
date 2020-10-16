@@ -38,8 +38,8 @@ export ORCID_REDIRECT=http://127.0.0.1/accounts/orcid/login/callback/
 export MEDIA_PATH=media/
 
 # settings for ENA
-export WEBIN_USER=Webin-39233@webin.ebi.ac.uk
-export WEBIN_USER_PASSWORD=vnZB4gxU7
+export WEBIN_USER=
+export WEBIN_USER_PASSWORD=
 # note this is the test service....url for live service can be found at
 # https://www.ebi.ac.uk/ena/submit/programmatic-submission....USE WITH CAUTION!
 export ENA_SERVICE=https://www-test.ebi.ac.uk
