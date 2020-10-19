@@ -1,4 +1,5 @@
 __author__ = 'felixshaw'
+
 import pymongo
 from bson import ObjectId
 
@@ -10,7 +11,8 @@ def get_collection_ref(collection_name):
 
 
 def get_mongo_client():
-    MONGO_CLIENT = pymongo.MongoClient(host=settings.MONGO_HOST, maxPoolSize=settings.MONGO_MAX_POOL_SIZE, )[settings.MONGO_DB]
+    MONGO_CLIENT = pymongo.MongoClient(host=settings.MONGO_HOST, maxPoolSize=settings.MONGO_MAX_POOL_SIZE, )[
+        settings.MONGO_DB]
     MONGO_CLIENT.authenticate(settings.MONGO_USER, settings.MONGO_USER_PASSWORD, source='admin')
     return MONGO_CLIENT
 
@@ -32,6 +34,29 @@ def cursor_to_list(cursor):
     records = []
     for r in cursor:
         records.append(r)
+    return records
+
+
+def cursor_to_list_no_ids(cursor):
+    '''
+    return list with ids remove e.g.
+    [
+        {
+            "_id": "0233b5ba-9133-4e54-856e-089194ec6b26"
+        },
+        {
+            "_id": "bbed622a-3771-41f5-b8b8-217ff3bd9b5e"
+        }
+    ]
+    becomes
+    [
+        "0233b5ba-9133-4e54-856e-089194ec6b26",
+        "bbed622a-3771-41f5-b8b8-217ff3bd9b5e"
+    ]
+    '''
+    records = []
+    for r in cursor:
+        records.append(r["_id"])
     return records
 
 

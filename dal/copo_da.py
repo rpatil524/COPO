@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django_tools.middlewares import ThreadLocal
 import web.apps.web_copo.utils.EnaUtils as u
-from dal import cursor_to_list, cursor_to_list_str
+from dal import cursor_to_list, cursor_to_list_str, cursor_to_list_no_ids
 from dal.copo_base_da import DataSchemas
 from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.lookup.lookup import DB_TEMPLATES
@@ -579,7 +579,6 @@ class Sample(DAComponent):
             {"RACK_OR_PLATE_ID": 1, "TUBE_OR_WELL_ID": 1}
         ))
 
-
     def get_all_dtol_samples(self):
         return cursor_to_list(self.get_collection_handle().find(
             {"sample_type": "dtol"},
@@ -675,15 +674,24 @@ class Sample(DAComponent):
         return cursor_to_list(self.get_collection_handle().find({dtol_field: {"$in": value}}))
 
     def get_manifests(self):
-        return cursor_to_list(self.get_collection_handle().distinct("manifest_id", {"sample_type": "dtol"}))
+        cursor = self.get_collection_handle().aggregate(
+            [
+                {"$match": {"sample_type": "dtol"}},
+                {"$sort": {"time_created": -1}},
+                {"$group": {"_id": "$manifest_id"}}
+
+            ])
+        return cursor_to_list_no_ids(cursor)
 
     def get_manifests_by_date(self, d_from, d_to):
-        ids = self.get_collection_handle().distinct(
-            "manifest_id",
-            {"sample_type": "dtol", "time_created": {"$gte": d_from, "$lt": d_to}}
-        )
-        out = cursor_to_list(ids)
-        return ids
+        ids = self.get_collection_handle().aggregate(
+            [
+                {"$match": {"sample_type": "dtol", "time_created": {"$gte": d_from, "$lt": d_to}}},
+                {"$sort": {"time_created": -1}},
+                {"$group": {"_id": "$manifest_id"}}
+            ])
+        out = cursor_to_list_no_ids(ids)
+        return out
 
 
 class Submission(DAComponent):
@@ -701,7 +709,7 @@ class Submission(DAComponent):
         if len(sub["dtol_samples"]) < 1:
             sub_handle.update({"_id": ObjectId(sub_id)}, {"$set": {"dtol_status": "complete"}})
 
-    def  get_pending_dtol_samples(self):
+    def get_pending_dtol_samples(self):
         REFRESH_THRESHOLD = 100  # time in seconds to retry stuck submission
         # called by celery to get samples the supeprvisor has set to be sent to ENA
         # those not yet sent should be in pending state. Occasionally there will be

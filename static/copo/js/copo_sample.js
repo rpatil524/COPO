@@ -45,7 +45,16 @@ $(document).ready(function () {
         initiate_description({});
     });
 
+    $(document).on("show.bs.modal", "#sample_spreadsheet_modal", function (event) {
+        $("#upload_label").show()
+        $("#tabs").hide()
+        if ($.fn.DataTable.isDataTable('#sample_parse_table')) {
+            $("#sample_parse_table").DataTable().clear().destroy();
+        }
+        $("#sample_spreadsheet_modal").find("thead").empty()
+        $("#sample_spreadsheet_modal").find("tbody").empty()
 
+    })
 
     //details button hover
     $(document).on("mouseover", ".detail-hover-message", function (event) {
@@ -84,14 +93,14 @@ $(document).ready(function () {
     });
 
     //var groups = $("#groups").val().split(",")
-    if(groups.includes("dtol_users")){
+    if (groups.includes("dtol_users")) {
         $(".new-samples-spreadsheet-template").show()
     }
-    if(groups.includes("dtol_sample_managers")){
+    if (groups.includes("dtol_sample_managers")) {
         $(".accept_reject_samples").show()
     }
 
-    $(document).on("click", ".accept_reject_samples", function(evt){
+    $(document).on("click", ".accept_reject_samples", function (evt) {
         document.location = "/copo/accept_reject_sample"
     })
 

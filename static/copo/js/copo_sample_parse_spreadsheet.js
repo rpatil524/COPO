@@ -30,6 +30,8 @@ function upload_image_files(file) {
 }
 
 function upload_spreadsheet(file) {
+    $("#upload_label").fadeOut("fast")
+
     $("#warning_info").fadeOut("fast")
     var csrftoken = $.cookie('csrftoken');
     form = new FormData()
@@ -260,8 +262,7 @@ function download(filename, text) {
         var event = document.createEvent('MouseEvents');
         event.initEvent('click', true, true);
         pom.dispatchEvent(event);
-    }
-    else {
+    } else {
         pom.click();
     }
 }
