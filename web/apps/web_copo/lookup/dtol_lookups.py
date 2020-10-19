@@ -601,6 +601,10 @@ DTOL_RULES = {
     "ELEVATION": {
         "ena_regex": "[+-]?(0|((0\.)|([1-9][0-9]*\.?))[0-9]*)([Ee][+-]?[0-9]+)?",
         "human_readable": "numeric, or empty string"
+    },
+    "SAMPLE_DERIVED_FROM" : {
+        "ena_regex": "(^[ESD]R[SR]\d{6,}(,[ESD]R[SR]\d{6,})*$)|(^SAM[END][AG]?\d+(,SAM[END][AG]?\d+)*$)|(^EGA[NR]\d{11}(,EGA[NR]\d{11})*$)|(^[ESD]R[SR]\d{6,}-[ESD]R[SR]\d{6,}$)|(^SAM[END][AG]?\d+-SAM[END][AG]?\d+$)|(^EGA[NR]\d{11}-EGA[NR]\d{11}$)",
+        "human_readable": "Specimen accession"
     }
 }
 DTOL_UNITS = {
@@ -685,5 +689,8 @@ DTOL_ENA_MAPPINGS = {
     },
     "CULTURE_OR_STRAIN_ID": {
         "ena": "culture_or_strain_id"
+    },
+    "SAMPLE_DERIVED_FROM": {
+        "ena": "sample derived from"
     }
 }
