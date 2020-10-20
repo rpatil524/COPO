@@ -58,10 +58,12 @@ def process_pending_dtol_samples():
                 specimen_obj_fields = { "SPECIMEN_ID" : sam["SPECIMEN_ID"], "TAXON_ID" : sam["TAXON_ID"],
                                         "sample_type" : "dtol_specimen", "profile_id" : sam['profile_id']}
                 Source().save_record(auto_fields={},**specimen_obj_fields)
-                #todo create xmls and submit
-                build_specimen_sample_xml(sam)
-                build_submission_xml(str(sam['_id']))
-                accessions = submit_biosample(str(sam['_id']), Source(), submission['_id'], type="source")
+                sour = Source().get_by_specimen(sam["SPECIMEN_ID"])
+                assert len(sour) == 1
+                sour = sour[0]
+                build_specimen_sample_xml(sour)
+                build_submission_xml(str(sour['_id']))
+                accessions = submit_biosample(str(sour['_id']), Source(), submission['_id'], type="source")
                 print(accessions)
 
             else:

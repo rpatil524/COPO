@@ -584,6 +584,9 @@ class Source(DAComponent):
                     'status': 'accepted'}
             })
 
+    def get_by_specimen(self, value):
+        return cursor_to_list(self.get_collection_handle().find({"SPECIMEN_ID": value})) #todo can this be find one
+
 class Sample(DAComponent):
     def __init__(self, profile_id=None):
         super(Sample, self).__init__(profile_id, "sample")
