@@ -572,6 +572,10 @@ class Sample(DAComponent):
     def __init__(self, profile_id=None):
         super(Sample, self).__init__(profile_id, "sample")
 
+    def update_public_name(self, name):
+        self.get_collection_handle().update_many({"SPECIMEN_ID": name["specimenId"], "TAXON_ID": str(name["taxonomyId"])},
+                                            {"$set": {"public_name": name["publicName"]}})
+
     def check_dtol_unique(self, rack_tube):
         rt = list(rack_tube)
         return cursor_to_list(self.get_collection_handle().find(

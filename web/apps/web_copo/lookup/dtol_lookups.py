@@ -60,6 +60,7 @@ DTOL_EXPORT_TO_STS_FIELDS = {
     "SIZE_OF_TISSUE_IN_TUBE",
     "TISSUE_REMOVED_FOR_BARCODING",
     "OTHER_INFORMATION",
+    "public_name",
     "biosampleAccession",
     "created_by",
     "time_created",
@@ -687,3 +688,5 @@ DTOL_ENA_MAPPINGS = {
         "ena": "culture_or_strain_id"
     }
 }
+PUBLIC_NAME_SERVICE = "http://sanger-sts-uat-232662972.eu-west-2.elb.amazonaws.com/public_name_api/ui"
+PUBLIC_NAME_SERVICE_API_KEY = "e387f414-39c6-418d-9f4f-b50520512ff4"
