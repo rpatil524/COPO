@@ -65,11 +65,13 @@ def process_pending_dtol_samples():
                 build_submission_xml(str(sour['_id']))
                 accessions = submit_biosample(str(sour['_id']), Source(), submission['_id'], type="source")
                 print(accessions)
+                specimen_accession = Source().get_specimen_biosample(sam["SPECIMEN_ID"])[0].get("biosampleAccession", "")
 
             else:
                 specimen_accession = specimen_sample[0].get("biosampleAccession", "")
 
-
+            Sample().add_field("sampleDerivedFrom", specimen_accession, sam['_id'])
+            sam["sampleDerivedFrom"] = specimen_accession
             notify_dtol_status(msg="Adding to Sample Batch: " + sam["SPECIMEN_ID"], action="info",
                                html_id="dtol_sample_info")
             update_bundle_sample_xml(sam, "bundle_"+file_subfix+".xml")
@@ -120,7 +122,7 @@ def update_bundle_sample_xml(sample, bundlefile):
     tag = ET.SubElement(sample_attribute, 'TAG')
     tag.text = 'sample derived from'
     value = ET.SubElement(sample_attribute, 'VALUE')
-    value.text = '' #TODO retrieve ID from db
+    value.text = sample.get("sampleDerivedFrom", "")
     #adding project name field (ie copo profile name)
     # validating against DTOL checklist
     sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
@@ -193,7 +195,7 @@ def build_specimen_sample_xml(sample):
     sample_id = str(sample['_id'])
     samplefile = "bundle_" + str(sample_id) + ".xml"
     tree.write(open(samplefile, 'w'),
-               encoding='unicode')  #TODO make sure to delete this file after submission
+               encoding='unicode')
 
 def build_xml(sample, sub_id, p_id, collection_id, file_subfix):
     notify_dtol_status(msg="Creating Sample: " + sample.get("SPECIMEN_ID", ""), action="info",

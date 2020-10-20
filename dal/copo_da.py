@@ -638,6 +638,16 @@ class Sample(DAComponent):
                     'status': 'accepted'}
             })
 
+    def add_field(self, field, value, oid):
+        return self.get_collection_handle().update(
+            {
+                "_id": ObjectId(oid)
+            },
+            {"$set":
+                {
+                    field : value}
+            })
+
     def add_rejected_status(self, status, oid):
         return self.get_collection_handle().update(
             {
