@@ -1,6 +1,7 @@
 # FS - 18/8/2020
 # this module contains lookups and mappings pertaining to DTOL functionality
 # such as validation enumerations and mappings between different field names
+from tools import resolve_env
 DTOL_EXPORT_TO_STS_FIELDS = {
     "SERIES",
     "RACK_OR_PLATE_ID",
@@ -689,4 +690,4 @@ DTOL_ENA_MAPPINGS = {
     }
 }
 PUBLIC_NAME_SERVICE = "http://sanger-sts-uat-232662972.eu-west-2.elb.amazonaws.com/public_name_api/ui"
-PUBLIC_NAME_SERVICE_API_KEY = "e387f414-39c6-418d-9f4f-b50520512ff4"
+API_KEY=resolve_env.get_env("PUBLIC_NAME_SERVICE_API_KEY")

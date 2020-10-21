@@ -15,7 +15,7 @@ from tools import resolve_env
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
 from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE, SRA_PROJECT_TEMPLATE
 from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS, DTOL_UNITS, PUBLIC_NAME_SERVICE, \
-    PUBLIC_NAME_SERVICE_API_KEY
+    API_KEY
 
 with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
@@ -57,6 +57,7 @@ def process_pending_dtol_samples():
                 notify_dtol_status(msg="Invalid Taxon ID found", action="info",
                                    html_id="dtol_sample_info")
                 return False
+
             s_ids.append(s_id)
 
             notify_dtol_status(msg="Adding to Sample Batch: " + sam["SPECIMEN_ID"], action="info",
@@ -387,9 +388,9 @@ def create_study(profile_id, collection_id):
 
 
 def query_public_name_service(sample_list):
+    headers = {"api-key":API_KEY}
     url = urljoin(PUBLIC_NAME_SERVICE, 'public-name')
-    data = {"dataRows": sample_list}
-    r = requests.post(url=url, json=data)
+    r = requests.post(url=url, json=sample_list, headers=headers, verify=False)
     if r.status_code == 200:
         resp = json.loads(r.content)
     else:
