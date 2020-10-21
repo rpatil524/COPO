@@ -9,7 +9,7 @@ import requests
 from celery.utils.log import get_task_logger
 from urllib.parse import urljoin
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
-from dal.copo_da import Submission, Sample, Profile
+from dal.copo_da import Submission, Sample, Profile, Source
 from submission.helpers.generic_helper import notify_dtol_status
 from tools import resolve_env
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
@@ -60,6 +60,30 @@ def process_pending_dtol_samples():
 
             s_ids.append(s_id)
 
+            #check if specimen ID biosample was already registered, if not do it
+            specimen_sample = Source().get_specimen_biosample(sam["SPECIMEN_ID"])
+            assert len(specimen_sample) <= 1
+            if not specimen_sample:
+                #create sample object and submit
+                notify_dtol_status(msg="Creating Sample for SPECIMEN_ID "+ sam["SPECIMEN_ID"], action="info",
+                                   html_id="dtol_sample_info")
+                specimen_obj_fields = { "SPECIMEN_ID" : sam["SPECIMEN_ID"], "TAXON_ID" : sam["TAXON_ID"],
+                                        "sample_type" : "dtol_specimen", "profile_id" : sam['profile_id']}
+                Source().save_record(auto_fields={},**specimen_obj_fields)
+                sour = Source().get_by_specimen(sam["SPECIMEN_ID"])
+                assert len(sour) == 1
+                sour = sour[0]
+                build_specimen_sample_xml(sour)
+                build_submission_xml(str(sour['_id']))
+                accessions = submit_biosample(str(sour['_id']), Source(), submission['_id'], type="source")
+                print(accessions)
+                specimen_accession = Source().get_specimen_biosample(sam["SPECIMEN_ID"])[0].get("biosampleAccession", "")
+
+            else:
+                specimen_accession = specimen_sample[0].get("biosampleAccession", "")
+
+            Sample().add_field("sampleDerivedFrom", specimen_accession, sam['_id'])
+            sam["sampleDerivedFrom"] = specimen_accession
             notify_dtol_status(msg="Adding to Sample Batch: " + sam["SPECIMEN_ID"], action="info",
                                html_id="dtol_sample_info")
             update_bundle_sample_xml(sam, "bundle_" + file_subfix + ".xml")
@@ -116,6 +140,13 @@ def update_bundle_sample_xml(sample, bundlefile):
     value = ET.SubElement(sample_attribute, 'VALUE')
     value.text = 'ERC000053'
     # adding project name field (ie copo profile name)
+    #adding reference to parent specimen biosample
+    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+    tag = ET.SubElement(sample_attribute, 'TAG')
+    tag.text = 'sample derived from'
+    value = ET.SubElement(sample_attribute, 'VALUE')
+    value.text = sample.get("sampleDerivedFrom", "")
+    #adding project name field (ie copo profile name)
     # validating against DTOL checklist
     sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
     tag = ET.SubElement(sample_attribute, 'TAG')
@@ -165,6 +196,28 @@ def update_bundle_sample_xml(sample, bundlefile):
 
     ET.dump(tree)
     tree.write(open(bundlefile, 'w'),
+               encoding='unicode')
+
+def build_specimen_sample_xml(sample):
+    # build specimen sample XML
+    tree = ET.parse(SRA_SAMPLE_TEMPLATE)
+    root = tree.getroot()
+    # from toni's code below
+    # set sample attributes
+    sample_alias = ET.SubElement(root, 'SAMPLE')
+    sample_alias.set('alias', str(sample['_id']))  # updated to copo id to retrieve it when getting accessions
+    sample_alias.set('center_name', 'EarlhamInstitute')  # mandatory for broker account
+    title = str(uuid.uuid4())
+
+    title_block = ET.SubElement(sample_alias, 'TITLE')
+    title_block.text = title
+    sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
+    taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
+    taxon_id.text = sample.get('TAXON_ID', "")
+    ET.dump(tree)
+    sample_id = str(sample['_id'])
+    samplefile = "bundle_" + str(sample_id) + ".xml"
+    tree.write(open(samplefile, 'w'),
                encoding='unicode')
 
 
@@ -244,7 +297,7 @@ def build_validate_xml(sample_id):
                encoding='unicode')  # overwriting at each run, i don't think we need to keep it - todo again I think these should have unique id attached, and then file deleted after submission
 
 
-def submit_biosample(subfix, sampleobj, collection_id):
+def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
     # register project to the ENA service using XML files previously created
     submissionfile = "submission_" + str(subfix) + ".xml"
     samplefile = "bundle_" + str(subfix) + ".xml"
@@ -289,11 +342,10 @@ def submit_biosample(subfix, sampleobj, collection_id):
         return status
     else:
         # retrieve id and update record
-        # return get_biosampleId(receipt, sample_id, collection_id)
-        return get_bundle_biosampleId(receipt, collection_id)
+        #return get_biosampleId(receipt, sample_id, collection_id)
+        return get_bundle_biosampleId(receipt, collection_id, type)
 
-
-def get_bundle_biosampleId(receipt, collection_id):
+def get_bundle_biosampleId(receipt, collection_id, type="sample"):
     '''parsing ENA sample bundle accessions from receipt and
     storing in sample and submission collection object'''
     tree = ET.fromstring(receipt)
@@ -303,9 +355,12 @@ def get_bundle_biosampleId(receipt, collection_id):
             sample_id = child.get('alias')
             sra_accession = child.get('accession')
             biosample_accession = child.find('EXT_ID').get('accession')
-            Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
-            Submission().add_accession(biosample_accession, sra_accession, submission_accession, sample_id,
+            if type=="sample":
+                Sample().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
+                Submission().add_accession(biosample_accession, sra_accession, submission_accession, sample_id,
                                        collection_id)
+            elif type=="source":
+                Source().add_accession(biosample_accession, sra_accession, submission_accession, sample_id)
     accessions = {"submission_accession": submission_accession, "status": "ok"}
     return accessions
 

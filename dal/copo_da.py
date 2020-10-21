@@ -567,6 +567,25 @@ class Source(DAComponent):
     def get_from_profile_id(self, profile_id):
         return self.get_collection_handle().find({'profile_id': profile_id})
 
+    def get_specimen_biosample(self, value):
+        return cursor_to_list(self.get_collection_handle().find({"sample_type": "dtol_specimen",
+                                                                     "SPECIMEN_ID": value}))
+
+    def add_accession(self, biosample_accession, sra_accession, submission_accession, oid):
+        return self.get_collection_handle().update(
+            {
+                "_id": ObjectId(oid)
+            },
+            {"$set":
+                {
+                    'biosampleAccession': biosample_accession,
+                    'sraAccession': sra_accession,
+                    'submissionAccession': submission_accession,
+                    'status': 'accepted'}
+            })
+
+    def get_by_specimen(self, value):
+        return cursor_to_list(self.get_collection_handle().find({"SPECIMEN_ID": value})) #todo can this be find one
 
 class Sample(DAComponent):
     def __init__(self, profile_id=None):
@@ -620,6 +639,16 @@ class Sample(DAComponent):
                     'sraAccession': sra_accession,
                     'submissionAccession': submission_accession,
                     'status': 'accepted'}
+            })
+
+    def add_field(self, field, value, oid):
+        return self.get_collection_handle().update(
+            {
+                "_id": ObjectId(oid)
+            },
+            {"$set":
+                {
+                    field : value}
             })
 
     def add_rejected_status(self, status, oid):
@@ -676,6 +705,10 @@ class Sample(DAComponent):
 
     def get_by_field(self, dtol_field, value):
         return cursor_to_list(self.get_collection_handle().find({dtol_field: {"$in": value}}))
+
+    def get_specimen_biosample(self, value):
+        return cursor_to_list(self.get_collection_handle().find({"sample_type": "dtol_specimen",
+                                                                     "SPECIMEN_ID": value}))
 
     def get_manifests(self):
         cursor = self.get_collection_handle().aggregate(

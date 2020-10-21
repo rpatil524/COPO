@@ -139,6 +139,168 @@
       "type": "string",
       "show_in_table": true,
       "control": "datetime"
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": false,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "SPECIMEN_ID"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "true",
+      "type": "string",
+      "show_in_form": false,
+      "id": "copo.source.SPECIMEN_ID",
+      "label": "Specimen Id",
+      "show_in_table": false,
+      "dwc": "http://rs.tdwg.org/dwc/terms/recordNumber"
+    },
+    {
+      "help_tip": "A taxonomic determination (e.g., the assignment to a taxon).",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": false,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "TAXON_ID"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": false,
+      "id": "copo.source.TAXON_ID",
+      "label": "Taxon ID",
+      "show_in_table": false,
+      "ontology_names": [
+        "ncbitaxon"
+      ],
+      "dwc": "http://rs.tdwg.org/dwc/terms/taxonID"
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "control_meta": {},
+      "control": "select",
+      "versions": [
+        "sample_type"
+      ],
+      "deprecated": false,
+      "hidden": "true",
+      "id": "copo.source.sample_type",
+      "label": "Sample Type",
+      "show_in_form": false,
+      "ref": "",
+      "type": "string",
+      "show_in_table": false,
+      "show_as_attribute": false,
+      "option_values": {
+        "callback": {
+          "parameter": "",
+          "function": "get_sample_type_options"
+        }
+      }
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "status"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Status",
+      "show_in_form": false,
+      "id": "copo.source.status",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text",
+      "default_value": "pending"
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "biosampleAccession"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Biosample Accession",
+      "show_in_form": false,
+      "id": "copo.source.biosampleAccession",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text",
+      "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "sraAccession"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "SRA Accession",
+      "show_in_form": false,
+      "id": "copo.source.sraAccession",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text",
+      "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
+        "submissionAccession"
+      ],
+      "specifications": [
+        "dtol"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "Submission Accession",
+      "show_in_form": false,
+      "id": "copo.source.submissionAccession",
+      "type": "string",
+      "show_in_table": false,
+      "control": "text",
+      "default_value": ""
     }
   ],
   "description": "Mappings of attribute in the Source schema to a UI configuration source.",
