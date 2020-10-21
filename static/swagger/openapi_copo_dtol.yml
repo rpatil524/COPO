@@ -4,7 +4,7 @@ info:
   description: Swagger documentation of COPO/DTOL sample API.
   version: 1.1.8
 servers:
-  - url: http://0.0.0.0:8000/api
+  - url: http://localhost:8000/api
     description: Local Server
   - url: http://demo.copo-project.org/api
     description: Demo Server
@@ -447,6 +447,7 @@ components:
           format: email
         copo_id:
           type: string
-
+        sampleDerivedFrom:
+          type: string
         status:
           type: string

@@ -70,8 +70,8 @@ DTOL_EXPORT_TO_STS_FIELDS = {
     "manifest_id",
     "time_updated",
     "updated_by",
-    "status"
-
+    "status",
+    "sampleDerivedFrom"
 }
 DTOL_ENUMS = {
 

@@ -12,7 +12,7 @@ from django_tools.middlewares import ThreadLocal
 from django.core.files.storage import default_storage
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from api.utils import map_to_dict
-from dal.copo_da import Sample, DataFile
+from dal.copo_da import Sample, DataFile, Profile
 from submission.helpers.generic_helper import notify_sample_status
 from web.apps.web_copo.lookup import dtol_lookups as  lookup
 from web.apps.web_copo.lookup import lookup as lk
@@ -548,8 +548,11 @@ class DtolSpreadsheet:
                     break;
             Sample().timestamp_dtol_sample_created(sampl["_id"])
             uri = request.build_absolute_uri('/')
-
-        CopoEmail().notify_new_manifest(uri + 'copo/accept_reject_sample/')
+        profile_id = request.session["profile_id"]
+        profile = Profile().get_record(profile_id)
+        title = profile["title"]
+        description = profile["description"]
+        CopoEmail().notify_new_manifest(uri + 'copo/accept_reject_sample/', title=title, description=description)
 
 
 def validate_date(date_text):

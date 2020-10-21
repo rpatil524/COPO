@@ -11,6 +11,7 @@ class CopoEmail:
             "new_manifest":
                 "<h4>New Manifest Available</h4>" +
                 "<p>A new manifest has been uploaded for approval. Please follow the link to proceed</p>" +
+                "<h5>{} - {}</h5>" +
                 "<p><a href='{}'>{}</a></p>"
         }
 
@@ -37,11 +38,12 @@ class CopoEmail:
         self.mailserver.sendmail(email_settings.mail_address, to, msg.as_string())
         self.mailserver.quit()
 
-    def notify_new_manifest(self, data):
+    def notify_new_manifest(self, data, **kwargs):
         # get users in group
         users = User.objects.filter(groups__name='dtol_sample_notifiers')
         email_addresses = list()
-        for u in users:
-            email_addresses.append(u.email)
-        msg = self.messages["new_manifest"].format(data, data)
-        self.send(to=email_addresses, sub="New DToL Manifest", content=msg, html=True)
+        if len(users) > 0:
+            for u in users:
+                email_addresses.append(u.email)
+            msg = self.messages["new_manifest"].format(kwargs["title"], kwargs["description"], data, data)
+            self.send(to=email_addresses, sub="New DToL Manifest - " + kwargs["title"], content=msg, html=True)

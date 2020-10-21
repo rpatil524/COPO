@@ -48,6 +48,7 @@ $(document).ready(function () {
     $(document).on("show.bs.modal", "#sample_spreadsheet_modal", function (event) {
         $("#upload_label").show()
         $("#tabs").hide()
+        $("#sample_info").hide()
         if ($.fn.DataTable.isDataTable('#sample_parse_table')) {
             $("#sample_parse_table").DataTable().clear().destroy();
         }
@@ -93,11 +94,13 @@ $(document).ready(function () {
     });
 
     //var groups = $("#groups").val().split(",")
-    if (groups.includes("dtol_users")) {
-        $(".new-samples-spreadsheet-template").show()
-    }
-    if (groups.includes("dtol_sample_managers")) {
-        $(".accept_reject_samples").show()
+    if($("#profile_type").val().includes("Darwin")) {
+        if (groups.includes("dtol_users")) {
+            $(".new-samples-spreadsheet-template").show()
+        }
+        if (groups.includes("dtol_sample_managers")) {
+            $(".accept_reject_samples").show()
+        }
     }
 
     $(document).on("click", ".accept_reject_samples", function (evt) {

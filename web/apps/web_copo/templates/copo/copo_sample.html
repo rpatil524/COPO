@@ -59,6 +59,7 @@
         <input type="hidden" id="profile_title" value="{{ profile.title }}"/>
         <input type="hidden" value="{% url 'copo:copo_submissions' profile_id=profile_id %}" name="submission_url"
                id="submission_url"/>
+        <input type="hidden" value="{{ profile.type }}" id="profile_type"/>
     </div>
 {% endblock browse_header_block %}
 
