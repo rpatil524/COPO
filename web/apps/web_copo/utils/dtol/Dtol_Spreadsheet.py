@@ -14,7 +14,7 @@ import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from api.utils import map_to_dict
 from dal.copo_da import Sample, DataFile, Profile
 from submission.helpers.generic_helper import notify_sample_status
-from web.apps.web_copo.lookup import dtol_lookups as  lookup
+from web.apps.web_copo.lookup import dtol_lookups as lookup
 from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from django.conf import settings
@@ -50,8 +50,6 @@ class DtolSpreadsheet:
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
-
-    # Entrez.email = "copo@earlham.ac.uk"
 
     def __init__(self, file=None):
         self.req = ThreadLocal.get_current_request()
@@ -252,6 +250,7 @@ class DtolSpreadsheet:
     def validate_taxonomy(self):
         ''' check if provided scientific name, TAXON ID,
         family and order are consistent with each other in known taxonomy'''
+        Entrez.api_key = lookup.NIH_API_KEY
 
         errors = []
         warnings = []
