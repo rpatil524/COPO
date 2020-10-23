@@ -101,7 +101,9 @@ def process_pending_dtol_samples():
         # store accessions, remove sample id from bundle and on last removal, set status of submission
         accessions = submit_biosample(file_subfix, Sample(), submission['_id'])
         print(accessions)
-        if accessions["status"] == "ok":
+        if not accessions:
+            continue
+        elif accessions["status"] == "ok":
             msg = "Last Sample Submitted: " + sam["SPECIMEN_ID"] + " - ENA Submission ID: " + accessions[
                 "submission_accession"]  # + " - Biosample ID: " + accessions["biosample_accession"]
             notify_dtol_status(msg=msg, action="info",
@@ -316,9 +318,22 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
             pass_word, "xxxxxx")
+        notify_dtol_status(msg=message, action="error",
+                           html_id="dtol_sample_info")
+        os.remove(submissionfile)
+        os.remove(samplefile)
+        return False
         # print(message)
 
-    tree = ET.fromstring(receipt)
+    try:
+        tree = ET.fromstring(receipt)
+    except ET.ParseError as e:
+        message = " Unrecognized response from ENA - " + str(receipt) + " Please try again later, if it persists contact admins"
+        notify_dtol_status(msg=message, action="error",
+                           html_id="dtol_sample_info")
+        os.remove(submissionfile)
+        os.remove(samplefile)
+        return False
 
     os.remove(submissionfile)
     os.remove(samplefile)
@@ -418,8 +433,21 @@ def create_study(profile_id, collection_id):
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
             pass_word, "xxxxxx")
+        notify_dtol_status(msg=message, action="error",
+                           html_id="dtol_sample_info")
+        os.remove(submissionfile)
+        os.remove(studyfile)
+        return False
     # print(receipt)
-    tree = ET.fromstring(receipt)
+    try:
+        tree = ET.fromstring(receipt)
+    except ET.ParseError as e:
+        message = " Unrecognized response from ENA - " + str(receipt) + " Please try again later, if it persists contact admins"
+        notify_dtol_status(msg=message, action="error",
+                           html_id="dtol_sample_info")
+        os.remove(submissionfile)
+        os.remove(studyfile)
+        return False
     os.remove(submissionfile)
     os.remove(studyfile)
     success_status = tree.get('success')
