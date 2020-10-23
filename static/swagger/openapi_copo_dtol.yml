@@ -8,6 +8,8 @@ servers:
     description: Local Server
   - url: http://demo.copo-project.org/api
     description: Demo Server
+  - url: http://copo-project.org/api
+    description: Demo Server
 
 paths:
   /manifest:

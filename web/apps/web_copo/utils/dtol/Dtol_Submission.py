@@ -325,7 +325,6 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
     success_status = tree.get('success')
     if success_status == 'false':  ####todo
 
-        print(receipt)
         msg = ""
         error_blocks = tree.find('MESSAGES').findall('ERROR')
         for error in error_blocks:

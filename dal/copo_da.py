@@ -762,9 +762,10 @@ class Submission(DAComponent):
             current_time = datetime.now()
             diff = time_difference = current_time - recorded_time
             if s.get("dtol_status", "") == "sending" and time_difference.seconds > (REFRESH_THRESHOLD):
-                # submission retry time has elapsed to re-add to list
+                # submission retry time has elapsed so re-add to list
                 out.append(s)
                 self.update_submission_modified_timestamp(s["_id"])
+                # no need to change status
             elif s.get("dtol_status", "") == "pending":
                 out.append(s)
                 self.update_submission_modified_timestamp(s["_id"])
