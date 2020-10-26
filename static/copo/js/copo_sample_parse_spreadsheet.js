@@ -243,6 +243,9 @@ $(document).ready(function () {
 
 $(document).on("click", ".new-samples-spreadsheet-template", function (event) {
     $("#sample_spreadsheet_modal").modal("show")
+
+    $("#warning_info").fadeOut("fast")
+
 })
 $(document).on("click", "#export_errors_button", function (event) {
     var data = $("#sample_info").html()
