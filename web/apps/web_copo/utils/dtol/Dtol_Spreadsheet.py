@@ -198,7 +198,7 @@ class DtolSpreadsheet:
                             if regex_rule:
                                 # handle any regular expressions provided for valiation
 
-                                if c.replace("_", " ") and not re.match(regex_rule, c, re.IGNORECASE):
+                                if c and not re.match(regex_rule, c.replace("_", " "), re.IGNORECASE):
                                     errors.append(self.validation_msg_invalid_data % (
                                         c, header, str(cellcount + 1), regex_human_readable))
                                     flag = False
