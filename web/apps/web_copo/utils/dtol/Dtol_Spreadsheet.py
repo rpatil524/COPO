@@ -26,6 +26,7 @@ from urllib.error import HTTPError
 from web.apps.web_copo.email import CopoEmail
 import socket
 
+
 class DtolSpreadsheet:
     # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
     na_vals = ['#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
@@ -67,7 +68,7 @@ class DtolSpreadsheet:
         if file:
             self.file = file
         else:
-            self.sample_data = self.req.session["sample_data"]
+            self.sample_data = self.req.session.get("sample_data", "")
 
     def loadManifest(self, type):
 
@@ -83,7 +84,7 @@ class DtolSpreadsheet:
                 for column in self.allowed_empty:
                     self.data[column] = self.data[column].fillna("")
                 '''
-                #self.data.fillna(value="")
+                # self.data.fillna(value="")
                 self.data = self.data.apply(lambda x: x.astype(str))
                 # print(self.data.size)
             except:
@@ -136,7 +137,7 @@ class DtolSpreadsheet:
                 # now check for uniqueness across all Samples
                 dup = Sample().check_dtol_unique(rack_tube)
                 if len(dup) > 0:
-                    #errors = list(map(lambda x: "<li>" + x + "</li>", errors))
+                    # errors = list(map(lambda x: "<li>" + x + "</li>", errors))
                     err = list(map(lambda x: x["RACK_OR_PLATE_ID"] + "/" + x["TUBE_OR_WELL_ID"], dup))
                     errors.append(self.validation_msg_duplicate_tube_or_well_id_in_copo % (err))
                     flag = False
@@ -186,9 +187,9 @@ class DtolSpreadsheet:
                                         c_value, header, str(cellcount + 1), allowed_vals))
                                     flag = False
                                 if header == "ORGANISM_PART" and c_value == "WHOLE ORGANISM":
-                                    #send specimen in used whole specimens set
+                                    # send specimen in used whole specimens set
                                     print(c_value)
-                                    current_specimen = self.data.at[cellcount-1, "SPECIMEN_ID"]
+                                    current_specimen = self.data.at[cellcount - 1, "SPECIMEN_ID"]
                                     print(current_specimen)
                                     if current_specimen in self.whole_used_specimens:
                                         errors.append(self.validation_msg_used_whole_organism % (current_specimen))
@@ -305,7 +306,7 @@ class DtolSpreadsheet:
                         continue
                     notify_sample_status(profile_id=self.profile_id,
                                          msg="Checking taxonomy information at row <strong>%s</strong> - <strong>%s</strong>" % (
-                                         str(index + 2), row['SCIENTIFIC_NAME']),
+                                             str(index + 2), row['SCIENTIFIC_NAME']),
                                          action="info",
                                          html_id="sample_info")
                     scientific_name = row['SCIENTIFIC_NAME'].strip()
@@ -324,7 +325,7 @@ class DtolSpreadsheet:
                             flag = False
                             continue
                         warnings.append(self.validation_warning_field % (
-                        "TAXON_ID", str(index + 2), "TAXON_ID", scientific_name, records['IdList'][0]))
+                            "TAXON_ID", str(index + 2), "TAXON_ID", scientific_name, records['IdList'][0]))
                         self.data.at[index, "TAXON_ID"] = records['IdList'][0]
                         taxon_id = records['IdList'][0]
                         # flag = False
@@ -351,12 +352,16 @@ class DtolSpreadsheet:
                                 warnings.append(self.validation_warning_synonym % (scientific_name, str(index + 2),
                                                                                    self.taxonomy_dict[taxon_id][
                                                                                        'ScientificName']))
-                                self.data.at[index, "SCIENTIFIC_NAME"] = self.taxonomy_dict[taxon_id]['ScientificName'].upper()
+                                self.data.at[index, "SCIENTIFIC_NAME"] = self.taxonomy_dict[taxon_id][
+                                    'ScientificName'].upper()
                                 other_info = ""
                                 if self.data.at[index, "OTHER_INFORMATION"].strip():
                                     other_info = self.data.at[index, "OTHER_INFORMATION"] + " | "
                                 self.data.at[index, "OTHER_INFORMATION"] = other_info + \
-                                                                           "COPO substituted the scientific name synonym %s with %s" % (scientific_name, self.taxonomy_dict[taxon_id]['ScientificName'].upper())
+                                                                           "COPO substituted the scientific name synonym %s with %s" % (
+                                                                           scientific_name,
+                                                                           self.taxonomy_dict[taxon_id][
+                                                                               'ScientificName'].upper())
                                 # flag = False
                                 # continue
                             elif not records['IdList']:
@@ -366,14 +371,14 @@ class DtolSpreadsheet:
                                 # self.taxonomy_dict[records[0]['TaxId']] = records[0]
                                 expected_name = self.taxonomy_dict[taxon_id].get('ScientificName', '[unknown]')
                                 errors.append(self.validation_msg_invalid_taxonomy % (
-                                scientific_name, "SCIENTIFIC_NAME", str(index + 2), expected_name))
+                                    scientific_name, "SCIENTIFIC_NAME", str(index + 2), expected_name))
                                 # else:
                                 #   errors.append("Invalid data: couldn't resolve SCIENTIFIC_NAME nor TAXON_ID at row <strong>%s</strong>" % str(index+2))
                                 flag = False
                                 continue
                             else:
                                 errors.append(self.validation_msg_invalid_taxonomy % (
-                                taxon_id, "TAXON_ID", str(index + 2), str(records['IdList'])))
+                                    taxon_id, "TAXON_ID", str(index + 2), str(records['IdList'])))
                                 flag = False
                                 continue
 
@@ -405,7 +410,7 @@ class DtolSpreadsheet:
                                     self.data.at[index, "FAMILY"] = element.get('ScientificName').upper()
                                 elif row['FAMILY'].strip().upper() != element.get('ScientificName').upper():
                                     errors.append(self.validation_msg_invalid_taxonomy % (
-                                    row['FAMILY'], "FAMILY", str(index + 2), element.get('ScientificName').upper()))
+                                        row['FAMILY'], "FAMILY", str(index + 2), element.get('ScientificName').upper()))
                                     flag = False
                             elif rank == 'order':
                                 if not row['ORDER_OR_GROUP'].strip():
@@ -415,8 +420,8 @@ class DtolSpreadsheet:
                                     self.data.at[index, "ORDER_OR_GROUP"] = element.get('ScientificName').upper()
                                 elif row['ORDER_OR_GROUP'].strip().upper() != element.get('ScientificName').upper():
                                     errors.append(self.validation_msg_invalid_taxonomy % (
-                                    row['ORDER_OR_GROUP'], "ORDER_OR_GROUP", str(index + 2),
-                                    element.get('ScientificName').upper()))
+                                        row['ORDER_OR_GROUP'], "ORDER_OR_GROUP", str(index + 2),
+                                        element.get('ScientificName').upper()))
                                     flag = False
                     else:
                         # handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
@@ -560,6 +565,16 @@ class DtolSpreadsheet:
         title = profile["title"]
         description = profile["description"]
         CopoEmail().notify_new_manifest(uri + 'copo/accept_reject_sample/', title=title, description=description)
+
+    def delete_sample(self, sample_ids):
+        # accept a list of ids, try to delete creating report
+        report = list()
+        for s in sample_ids:
+            r = Sample().delete_sample(s)
+            report.append(r)
+        notify_sample_status(profile_id=self.profile_id, msg=report,
+                             action="info",
+                             html_id="sample_info")
 
 
 def validate_date(date_text):

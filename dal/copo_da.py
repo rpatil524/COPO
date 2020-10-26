@@ -569,7 +569,7 @@ class Source(DAComponent):
 
     def get_specimen_biosample(self, value):
         return cursor_to_list(self.get_collection_handle().find({"sample_type": "dtol_specimen",
-                                                                     "SPECIMEN_ID": value}))
+                                                                 "SPECIMEN_ID": value}))
 
     def add_accession(self, biosample_accession, sra_accession, submission_accession, oid):
         return self.get_collection_handle().update(
@@ -585,15 +585,33 @@ class Source(DAComponent):
             })
 
     def get_by_specimen(self, value):
-        return cursor_to_list(self.get_collection_handle().find({"SPECIMEN_ID": value})) #todo can this be find one
+        return cursor_to_list(self.get_collection_handle().find({"SPECIMEN_ID": value}))  # todo can this be find one
+
 
 class Sample(DAComponent):
     def __init__(self, profile_id=None):
         super(Sample, self).__init__(profile_id, "sample")
 
     def update_public_name(self, name):
-        self.get_collection_handle().update_many({"SPECIMEN_ID": name["specimenId"], "TAXON_ID": str(name["taxonomyId"])},
-                                            {"$set": {"public_name": name["publicName"]}})
+        self.get_collection_handle().update_many(
+            {"SPECIMEN_ID": name["specimenId"], "TAXON_ID": str(name["taxonomyId"])},
+            {"$set": {"public_name": name["publicName"]}})
+
+    def delete_sample(self, sample_id):
+        sample = self.get_record(sample_id)
+        # check if sample has already been accepted
+        if sample["status"] in ["accepted", "processing"]:
+            return "Sample {} with accession {} cannot be deleted as it has already been submitted to ENA.".format(
+                sample.get("SPECIMEN_ID", ""), sample.get("biosampleAccession", "X"))
+        else:
+            # delete sample from mongo
+            self.get_collection_handle().remove({"_id": ObjectId(sample_id)})
+            message = "Sample {} was deleted".format(sample.get("SPECIMEN_ID", ""))
+            # check if the parent source to see if it can also be delete
+            if self.get_collection_handle().count({"SPECIMEN_ID": sample.get("SPECIMEN_ID", "")}) < 1:
+                handle_dict["source"].remove({"SPECIMEN_ID": sample.get("SPECIMEN_ID", "")})
+                message = message + "Specimen with id {} was deleted".format(sample.get("SPECIMEN_ID", ""))
+            return message
 
     def check_dtol_unique(self, rack_tube):
         rt = list(rack_tube)
@@ -648,7 +666,7 @@ class Sample(DAComponent):
             },
             {"$set":
                 {
-                    field : value}
+                    field: value}
             })
 
     def add_rejected_status(self, status, oid):
@@ -708,7 +726,7 @@ class Sample(DAComponent):
 
     def get_specimen_biosample(self, value):
         return cursor_to_list(self.get_collection_handle().find({"sample_type": "dtol_specimen",
-                                                                     "SPECIMEN_ID": value}))
+                                                                 "SPECIMEN_ID": value}))
 
     def get_manifests(self):
         cursor = self.get_collection_handle().aggregate(

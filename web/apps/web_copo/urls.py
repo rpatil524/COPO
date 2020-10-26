@@ -2,6 +2,7 @@ from django.urls import path, re_path
 from . import views
 from web.apps.web_copo.utils import ajax_handlers, annotation_handlers, template_handlers
 from django.views.generic import TemplateView
+
 app_name = 'web_copo'
 
 urlpatterns = [
@@ -9,7 +10,7 @@ urlpatterns = [
 
     path('accept_reject_sample/', views.copo_sample_accept_reject, name="accept_reject"),
     path('dataverse_submit/', views.test_dataverse_submit, name='test_dataverse_submit'),
-    #path('test_submission/', views.test_submission, name='test_submission'),
+    # path('test_submission/', views.test_submission, name='test_submission'),
     path('test/', views.test_view, name='test_view'),
     path('login/', views.login, name='auth'),
     path('logout/', views.copo_logout, name='logout'),
@@ -176,4 +177,6 @@ urlpatterns = [
          name="mark_sample_rejected"),
     path('add_sample_to_dtol_submission/', ajax_handlers.add_sample_to_dtol_submission,
          name="add_sample_to_dtol_submission"),
+    path('delete_dtol_samples/', ajax_handlers.delete_dtol_samples,
+         name="delete_dtol_samples"),
 ]
