@@ -590,15 +590,15 @@ DTOL_ENUMS = {
 DTOL_RULES = {
     "DATE_OF_COLLECTION": {
         "ena_regex": "(^[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?(/[0-9]{4}(-[0-9]{2}(-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?([+-][0-9]{1,2})?)?)?)?)?$)|(^not collected$)|(^not provided$)",
-        "human_readable": "YYYY-MM-DD, NOT COLLECTED or NOT PROVIDED"
+        "human_readable": "YYYY-MM-DD, NOT_COLLECTED or NOT_PROVIDED"
     },
     "DECIMAL_LATITUDE": {
         "ena_regex": "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)",
-        "human_readable": "numeric, NOT COLLECTED or NOT PROVIDED"
+        "human_readable": "numeric, NOT_COLLECTED or NOT_PROVIDED"
     },
     "DECIMAL_LONGITUDE": {
         "ena_regex": "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)",
-        "human_readable": "numeric, NOT COLLECTED or NOT PROVIDED"
+        "human_readable": "numeric, NOT_COLLECTED or NOT_PROVIDED"
 
     },
     "DEPTH": {
