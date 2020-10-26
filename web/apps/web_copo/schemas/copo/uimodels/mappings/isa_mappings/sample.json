@@ -746,7 +746,7 @@
       "control_meta": {},
       "control": "text",
       "versions": [
-        "EASE_OF_SPECIMEN_COLLECTION"
+        "DIFFICULT_OR_HIGH_PRIORITY_SAMPLE"
       ],
       "ref": "",
       "specifications": [
@@ -756,8 +756,8 @@
       "hidden": "false",
       "type": "string",
       "show_in_form": true,
-      "id": "copo.sample.EASE_OF_SPECIMEN_COLLECTION",
-      "label": "Ease of Specimen Collection",
+      "id": "copo.sample.DIFFICULT_OR_HIGH_PRIORITY_SAMPLE",
+      "label": "Difficult or High priority sample",
       "show_in_table": true,
       "dwc": "http://rs.tdwg.org/dwc/terms/samplingEffort"
     },
