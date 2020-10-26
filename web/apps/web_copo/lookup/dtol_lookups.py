@@ -302,7 +302,9 @@ DTOL_ENUMS = {
     "TISSUE_REMOVED_FOR_BARCODING": [
         "Y",
         "N",
-        "NOT APPLICABLE"
+        "NOT_APPLICABLE",
+        "NOT_COLLECTED",
+        "NOT_PROVIDED"
     ],
     "COLLECTION_LOCATION": [
         "AFGHANISTAN",
