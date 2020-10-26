@@ -180,14 +180,14 @@ def update_bundle_sample_xml(sample, bundlefile):
                     tag = ET.SubElement(sample_attribute, 'TAG')
                     tag.text = attribute_name
                     value = ET.SubElement(sample_attribute, 'VALUE')
-                    value.text = str(item[1]).lower()
+                    value.text = str(item[1]).lower().replace("_", " ")
                 else:
                     attribute_name = DTOL_ENA_MAPPINGS[item[0]]['ena']
                     sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
                     tag = ET.SubElement(sample_attribute, 'TAG')
                     tag.text = attribute_name
                     value = ET.SubElement(sample_attribute, 'VALUE')
-                    value.text = str(item[1])
+                    value.text = str(item[1]).replace("_", " ")
                 # add ena units where necessary
                 if DTOL_UNITS.get(item[0], ""):
                     if DTOL_UNITS[item[0]].get('ena_unit', ""):
