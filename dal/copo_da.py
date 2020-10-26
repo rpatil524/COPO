@@ -595,6 +595,18 @@ class Sample(DAComponent):
         self.get_collection_handle().update_many({"SPECIMEN_ID": name["specimenId"], "TAXON_ID": str(name["taxonomyId"])},
                                             {"$set": {"public_name": name["publicName"]}})
 
+    def delete_sample(self, sample_id):
+        sample = self.get_record(sample_id)
+        # check if sample has already been accepted
+        if sample["status"] in ["accepted", "processing"]:
+            return "Sample {} with accession {} cannot be deleted as it has already been submitted to ENA." % (sample.get("SPECIMEN_ID", ""), sample.get("biosampleAccession", "X"))
+        else:
+            # delete sample from mongo
+            self.get_collection_handle().remove({"_id": ObjectId(sample_id)})
+            # check if the parent source to see if it can also be deleted
+            if self.get_collection_handle().count({"SPECIMEN_ID": sample.get("SPECIMEN_ID", "")}) < 1:
+                handle_dict["source"].remove({"SPECIMEN_ID": sample.get("SPECIMEN_ID", "")})
+
     def check_dtol_unique(self, rack_tube):
         rt = list(rack_tube)
         return cursor_to_list(self.get_collection_handle().find(

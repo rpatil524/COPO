@@ -553,6 +553,10 @@ class DtolSpreadsheet:
         description = profile["description"]
         CopoEmail().notify_new_manifest(uri + 'copo/accept_reject_sample/', title=title, description=description)
 
+    def delete_sample(self, sample_ids):
+        # accept a list of ids, try to delete creating report
+        for s in sample_ids:
+            Sample().delete_sample(s)
 
 def validate_date(date_text):
     try:
