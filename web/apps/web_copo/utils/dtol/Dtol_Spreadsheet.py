@@ -172,6 +172,14 @@ class DtolSpreadsheet:
                                         errors.append(self.validation_msg_invalid_list % (
                                             c_value, header, str(cellcount + 1)))
                                         flag = False
+                                elif header == "ORGANISM_PART":
+                                    #special check for piped values
+                                    for part in str(c).split('|'):
+                                        if part.strip() not in allowed_vals:
+                                            errors.append(self.validation_msg_invalid_data % (
+                                                part, header, str(cellcount + 1), allowed_vals
+                                            ))
+                                            flag = False
                                 elif c_value not in allowed_vals:
                                     # check value is in allowed enum
                                     errors.append(self.validation_msg_invalid_data % (
