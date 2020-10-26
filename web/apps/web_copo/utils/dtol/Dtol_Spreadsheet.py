@@ -84,7 +84,7 @@ class DtolSpreadsheet:
                     self.data[column] = self.data[column].fillna("")
                 '''
                 #self.data.fillna(value="")
-                self.data = self.data.apply(lambda x: x.astype(str).str.upper())
+                self.data = self.data.apply(lambda x: x.astype(str))
                 # print(self.data.size)
             except:
                 # if error notify via web socket
@@ -168,7 +168,7 @@ class DtolSpreadsheet:
                                     # special check for COLLETION_LOCATION as this needs invalid list error for feedback
                                     c_value = str(c).split('|')[0].strip()
                                     location_2part = str(c).split('|')[1:]
-                                    if c_value not in allowed_vals or not location_2part:
+                                    if c_value.upper() not in allowed_vals or not location_2part:
                                         errors.append(self.validation_msg_invalid_list % (
                                             c_value, header, str(cellcount + 1)))
                                         flag = False

@@ -582,8 +582,7 @@ DTOL_ENUMS = {
         "ZIMBABWE",
         "NOT APPLICABLE",
         "NOT COLLECTED",
-        "NOT PROVIDED",
-        "RESTRICTED ACCESS"
+        "NOT PROVIDED"
     ]
 }
 DTOL_RULES = {
