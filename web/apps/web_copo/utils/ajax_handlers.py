@@ -1386,6 +1386,11 @@ def add_sample_to_dtol_submission(request):
     else:
         return HttpResponse(status=500, content="Sample IDs or profile_id not provided")
 
+def delete_dtol_samples(request):
+    ids = json.loads(request.POST.get("sample_ids"))
+    dtol = DtolSpreadsheet()
+    dtol.delete_sample(sample_ids=ids)
+    return HttpResponse(json.dumps({}))
 
 def sample_images(request):
     files = request.FILES

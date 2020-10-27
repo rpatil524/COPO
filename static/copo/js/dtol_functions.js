@@ -26,6 +26,60 @@ $(document).ready(function () {
     })
 
 
+    $(document).on("click", ".delete-selected", function (e) {
+
+        var saved_text = $("#dtol_sample_info").text()
+        BootstrapDialog.show({
+            title: "Delete Samples",
+            message: "Are you sure you want to delete?",
+            buttons: [{
+                label: 'Close',
+                action: function (dialogItself) {
+                    dialogItself.close();
+                }
+            },
+                {
+                    label: 'Delete',
+                    action: function (dialog) {
+                        var spinner_state = $("#spinner").is(":visible")
+                        $("#spinner").show()
+
+                        $("#dtol_sample_info").text("Deleting")
+
+                        var csrftoken = $.cookie('csrftoken');
+                        var checked = $(".form-check-input:checked").closest("tr")
+                        var sample_ids = new Array()
+                        $(checked).each(function (it) {
+                            sample_ids.push($(checked[it]).data("id"))
+                        })
+                        console.log(sample_ids)
+                        $.ajax({
+                            headers: {'X-CSRFToken': csrftoken},
+                            url: "/copo/delete_dtol_samples/",
+                            method: "POST",
+                            data: {
+                                sample_ids: JSON.stringify(sample_ids)
+                            }
+                        }).done(function (e) {
+
+                            if (!spinner_state) {
+                                $("#spinner").fadeOut("fast")
+                            }
+                            $("#dtol_sample_info").text(saved_text)
+                            $("#profile_titles").find(".selected").click()
+                            dialog.close()
+                        }).error(function (e) {
+                            console.error(e)
+                        })
+                    }
+                }
+            ]
+        })
+
+
+    })
+
+
     $(document).on("click", ".form-check-input", function (el) {
 
         if ($(".form-check-input:checked").length) {
@@ -159,7 +213,7 @@ function row_select(ev) {
     $("#spinner").show()
     var saved_text = $("#dtol_sample_info").text()
     var show_spinner =
-    $("#dtol_sample_info").text("Fetching")
+        $("#dtol_sample_info").text("Fetching")
     $.ajax({
         url: "/copo/get_samples_for_profile",
         data: d,
