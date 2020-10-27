@@ -218,7 +218,7 @@ class DtolSpreadsheet:
                                     except ValueError:
                                         errors.append(self.validation_msg_invalid_data % (
                                             c_value, header, str(cellcount + 1),
-                                            "integer or " + " ".join(self.blank_vals)
+                                            "integer or " + ", ".join(self.blank_vals)
                                         ))
                                         flag = False
                             # validation checks for date types
