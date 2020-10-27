@@ -181,6 +181,14 @@ def update_bundle_sample_xml(sample, bundlefile):
                     tag.text = attribute_name
                     value = ET.SubElement(sample_attribute, 'VALUE')
                     value.text = str(item[1]).lower().replace("_", " ")
+                #handling annoying edge case below
+                elif item[0] == "LIFESTAGE" and item[1] == "SPORE_BEARING_STRUCTURE":
+                    attribute_name = DTOL_ENA_MAPPINGS[item[0]]['ena']
+                    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                    tag = ET.SubElement(sample_attribute, 'TAG')
+                    tag.text = attribute_name
+                    value = ET.SubElement(sample_attribute, 'VALUE')
+                    value.text = "spore-bearing structure"
                 else:
                     attribute_name = DTOL_ENA_MAPPINGS[item[0]]['ena']
                     sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
