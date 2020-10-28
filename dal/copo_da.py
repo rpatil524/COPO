@@ -733,7 +733,10 @@ class Sample(DAComponent):
             [
                 {"$match": {"sample_type": "dtol"}},
                 {"$sort": {"time_created": -1}},
-                {"$group": {"_id": "$manifest_id"}}
+                {"$group": {
+                    "_id": "$manifest_id"},
+                    "created": {"$first": "$time_created"}
+                }
 
             ])
         return cursor_to_list_no_ids(cursor)
@@ -743,7 +746,10 @@ class Sample(DAComponent):
             [
                 {"$match": {"sample_type": "dtol", "time_created": {"$gte": d_from, "$lt": d_to}}},
                 {"$sort": {"time_created": -1}},
-                {"$group": {"_id": "$manifest_id"}}
+                {"$group": {
+                    "_id": "$manifest_id"},
+                    "created": {"$first": "$time_created"}
+                }
             ])
         out = cursor_to_list_no_ids(ids)
         return out
