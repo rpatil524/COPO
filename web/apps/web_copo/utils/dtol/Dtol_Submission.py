@@ -484,6 +484,8 @@ def query_public_name_service(sample_list):
     r = requests.post(url=url, json=sample_list, headers=headers, verify=False)
     if r.status_code == 200:
         resp = json.loads(r.content)
+
     else:
-        raise ConnectionError
+
+        resp = {}
     return resp
