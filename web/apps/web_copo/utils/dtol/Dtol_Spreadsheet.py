@@ -190,7 +190,7 @@ class DtolSpreadsheet:
                                     # send specimen in used whole specimens set
                                     #print(c_value)
                                     current_specimen = self.data.at[cellcount - 1, "SPECIMEN_ID"]
-                                    print(current_specimen)
+                                    #print(current_specimen)
                                     if current_specimen in self.whole_used_specimens:
                                         errors.append(self.validation_msg_used_whole_organism % (current_specimen))
                                         flag = False
@@ -287,7 +287,7 @@ class DtolSpreadsheet:
                 if any(id for id in taxon_id_list):
                     i = 0
                     while i < len(taxon_id_list):
-                        print("window starting at ", i, "ending at ", i + 200)
+                        #print("window starting at ", i, "ending at ", i + 200)
                         window_list = taxon_id_list[i: i + 200]
                         i += 200
                         handle = Entrez.efetch(db="Taxonomy", id=window_list, retmode="xml")
@@ -296,7 +296,7 @@ class DtolSpreadsheet:
                             self.taxonomy_dict[element['TaxId']] = element
                 for index, row in self.data[
                     ['ORDER_OR_GROUP', 'FAMILY', 'GENUS', 'TAXON_ID', 'SCIENTIFIC_NAME']].iterrows():
-                    print('validating row ', str(index + 2))
+                    #print('validating row ', str(index + 2))
                     if all(row[header].strip() == "" for header in ['TAXON_ID', 'SCIENTIFIC_NAME']):
                         # print("row is empty")
                         errors.append(

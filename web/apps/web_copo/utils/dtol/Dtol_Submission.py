@@ -100,7 +100,7 @@ def process_pending_dtol_samples():
 
         # store accessions, remove sample id from bundle and on last removal, set status of submission
         accessions = submit_biosample(file_subfix, Sample(), submission['_id'])
-        print(accessions)
+        #print(accessions)
         if not accessions:
             continue
         elif accessions["status"] == "ok":
@@ -122,7 +122,7 @@ def build_bundle_sample_xml(file_subfix):
 
 def update_bundle_sample_xml(sample, bundlefile):
     '''update the sample with submission alias alias adding a new sample'''
-    print("adding sample to bundle sample xml")
+    #print("adding sample to bundle sample xml")
     tree = ET.parse(bundlefile)
     root = tree.getroot()
     sample_alias = ET.SubElement(root, 'SAMPLE')

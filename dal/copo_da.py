@@ -592,6 +592,14 @@ class Sample(DAComponent):
     def __init__(self, profile_id=None):
         super(Sample, self).__init__(profile_id, "sample")
 
+    def find_incorrectly_rejected_samples(self):
+        # TODO - for some reason, some dtol samples end up rejected even though the have accessions, so find these and
+        # flip them to accepted
+        self.get_collection_handle().update_many(
+            {"biosampleAccession": {"$ne": ""}},
+            {"$set": {"status": "accepted"}}
+        )
+
     def update_public_name(self, name):
         self.get_collection_handle().update_many(
             {"SPECIMEN_ID": name["specimenId"], "TAXON_ID": str(name["taxonomyId"])},
@@ -640,10 +648,16 @@ class Sample(DAComponent):
                                                          microsecond=0), "created_by": email}})
 
     def timestamp_dtol_sample_updated(self, sample_id):
-        email = ThreadLocal.get_current_user().email
+
+        try:
+            email = ThreadLocal.get_current_user().email
+        except:
+            email = "copo@earlham.ac.uk"
         sample = self.get_collection_handle().update({"_id": ObjectId(sample_id)},
                                                      {"$set": {"time_updated": datetime.now(timezone.utc).replace(
                                                          microsecond=0),
+                                                         "date_modified": datetime.now(timezone.utc).replace(
+                                                             microsecond=0),
                                                          "updated_by": email}})
 
     def add_accession(self, biosample_accession, sra_accession, submission_accession, oid):
@@ -780,7 +794,7 @@ class Submission(DAComponent):
             sub_handle.update({"_id": ObjectId(sub_id)}, {"$set": {"dtol_status": "complete"}})
 
     def get_pending_dtol_samples(self):
-        REFRESH_THRESHOLD = 100  # time in seconds to retry stuck submission
+        REFRESH_THRESHOLD = 200  # time in seconds to retry stuck submission
         # called by celery to get samples the supeprvisor has set to be sent to ENA
         # those not yet sent should be in pending state. Occasionally there will be
         # stuck submissions in sending state, so get both types
@@ -789,15 +803,18 @@ class Submission(DAComponent):
                                                  "date_modified": 1})
         sub = cursor_to_list(sub)
         out = list()
+
+
         for s in sub:
             # calculate whether a submission is an old one
             recorded_time = s.get("date_modified", datetime.now())
             current_time = datetime.now()
-            diff = time_difference = current_time - recorded_time
+            time_difference = current_time - recorded_time
             if s.get("dtol_status", "") == "sending" and time_difference.seconds > (REFRESH_THRESHOLD):
                 # submission retry time has elapsed so re-add to list
                 out.append(s)
                 self.update_submission_modified_timestamp(s["_id"])
+                print("ADDING STALLED SUBMISSION BACK INTO QUEUE")
                 # no need to change status
             elif s.get("dtol_status", "") == "pending":
                 out.append(s)
@@ -814,7 +831,8 @@ class Submission(DAComponent):
         return doc
 
     def make_dtol_status_pending(self, sub_id):
-        doc = self.get_collection_handle().update({"_id": ObjectId(sub_id)}, {"$set": {"dtol_status": "pending"}})
+        doc = self.get_collection_handle().update({"_id": ObjectId(sub_id)}, {
+            "$set": {"dtol_status": "pending", "date_modified": data_utils.get_datetime()}})
 
     def save_record(self, auto_fields=dict(), **kwargs):
         if not kwargs.get("target_id", str()):
