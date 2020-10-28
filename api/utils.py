@@ -58,7 +58,7 @@ def finish_request(template=None, error=None):
         wrapper['number_found'] = None
         wrapper['data'] = None
     output = jsonb.dumps(wrapper)
-    print(output)
+    #print(output)
     return HttpResponse(output, content_type="application/json")
 
 def map_to_dict(x, y):

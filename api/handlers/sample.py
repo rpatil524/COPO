@@ -70,7 +70,7 @@ def filter_for_STS(sample_list):
             if k == "_id":
                 s_out["copo_id"] = str(v)
             # check if field is listed to be exported to STS
-            print(k)
+            #print(k)
             if k in export:
                 if k in time_fields:
                     s_out[k] = format_date(v)
@@ -180,13 +180,13 @@ def get_all(request):
     try:
         sample_list = Sample().get_samples_across_profiles()
     except TypeError as e:
-        print(e)
+        #print(e)
         return finish_request(error=API_ERRORS['NOT_FOUND'])
     except InvalidId as e:
-        print(e)
+        #print(e)
         return finish_request(error=API_ERRORS['INVALID_PARAMETER'])
     except:
-        print("Unexpected error:", sys.exc_info()[0])
+        #print("Unexpected error:", sys.exc_info()[0])
         raise
 
     for s in sample_list:
