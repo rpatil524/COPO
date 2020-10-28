@@ -121,7 +121,7 @@ class DtolSpreadsheet:
                         cellcount = 0
                         for c in cells:
                             cellcount += 1
-                            if not c:
+                            if not c.strip():
                                 # we have missing data in required cells
                                 errors.append(self.validation_msg_missing_data % (
                                     header, str(cellcount + 1)))
@@ -181,14 +181,14 @@ class DtolSpreadsheet:
                                                 part, header, str(cellcount + 1), allowed_vals
                                             ))
                                             flag = False
-                                elif c_value not in allowed_vals:
+                                elif c_value.strip() not in allowed_vals:
                                     # check value is in allowed enum
                                     errors.append(self.validation_msg_invalid_data % (
                                         c_value, header, str(cellcount + 1), allowed_vals))
                                     flag = False
-                                if header == "ORGANISM_PART" and c_value == "WHOLE ORGANISM":
+                                if header == "ORGANISM_PART" and c_value.strip() == "WHOLE ORGANISM":
                                     # send specimen in used whole specimens set
-                                    print(c_value)
+                                    #print(c_value)
                                     current_specimen = self.data.at[cellcount - 1, "SPECIMEN_ID"]
                                     print(current_specimen)
                                     if current_specimen in self.whole_used_specimens:
@@ -213,7 +213,7 @@ class DtolSpreadsheet:
                                     flag = False
                             elif header == "TIME_ELAPSED_FROM_COLLECTION_TO_PRESERVATION":
                                 # check this is either a NOT_* or an integer
-                                if c_value not in self.blank_vals:
+                                if c_value.strip() not in self.blank_vals:
                                     try:
                                         float(c_value)
                                     except ValueError:
@@ -223,7 +223,7 @@ class DtolSpreadsheet:
                                         ))
                                         flag = False
                             # validation checks for date types
-                            if header in self.date_fields and c_value not in self.blank_vals:
+                            if header in self.date_fields and c_value.strip() not in self.blank_vals:
                                 try:
                                     validate_date(c)
                                 except ValueError as e:
