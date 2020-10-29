@@ -24,7 +24,7 @@ logger = get_task_logger(__name__)
 
 exclude_from_sample_xml = []  # todo list of keys that shouldn't end up in the sample.xml file
 #ena_service = resolve_env.get_env('ENA_SERVICE')
-ena_service = resolve_env.get_env('ENA_TEST_SERVICE')
+ena_service = resolve_env.get_env('ENA_SERVICE')
 pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
 user_token = resolve_env.get_env('WEBIN_USER').split("@")[0]
 
