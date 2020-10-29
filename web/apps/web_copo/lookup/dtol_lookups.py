@@ -702,6 +702,6 @@ DTOL_ENA_MAPPINGS = {
         "ena": "sample derived from"
     }
 }
-PUBLIC_NAME_SERVICE = "http://sanger-sts-uat-232662972.eu-west-2.elb.amazonaws.com/public_name_api/ui"
+PUBLIC_NAME_SERVICE = " https://sanger-sts-prod-864969239.eu-west-2.elb.amazonaws.com/public_name_api/ui"
 API_KEY=resolve_env.get_env("PUBLIC_NAME_SERVICE_API_KEY")
 NIH_API_KEY=resolve_env.get_env("NIH_API_KEY")
