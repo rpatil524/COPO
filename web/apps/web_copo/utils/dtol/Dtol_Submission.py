@@ -23,8 +23,8 @@ with open(settings, "r") as settings_stream:
 logger = get_task_logger(__name__)
 
 exclude_from_sample_xml = []  # todo list of keys that shouldn't end up in the sample.xml file
-#ena_service = resolve_env.get_env('ENA_SERVICE')
 ena_service = resolve_env.get_env('ENA_SERVICE')
+#ena_service = resolve_env.get_env('ENA_TEST_SERVICE')
 pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
 user_token = resolve_env.get_env('WEBIN_USER').split("@")[0]
 
@@ -479,7 +479,8 @@ def create_study(profile_id, collection_id):
 
 
 def query_public_name_service(sample_list):
-    headers = {"api-key":API_KEY}
+    return {}
+    '''headers = {"api-key":API_KEY}
     url = urljoin(PUBLIC_NAME_SERVICE, 'public-name')
     r = requests.post(url=url, json=sample_list, headers=headers, verify=False)
     if r.status_code == 200:
@@ -488,4 +489,4 @@ def query_public_name_service(sample_list):
     else:
 
         resp = {}
-    return resp
+    return resp'''
