@@ -84,6 +84,7 @@ $(document).ready(function () {
                     label: "Submit",
                     cssClass: "tiny ui basic button",
                     action: function (dialogRef) {
+                        $("#finish_button").hide()
                         $.ajax({
                             url: "/copo/create_spreadsheet_samples",
 
