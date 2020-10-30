@@ -75,7 +75,7 @@ def process_pending_dtol_samples():
                 assert len(sour) == 1
                 sour = sour[0]
                 build_specimen_sample_xml(sour)
-                build_submission_xml(str(sour['_id']))
+                build_submission_xml(str(sour['_id']), release=True)
                 accessions = submit_biosample(str(sour['_id']), Source(), submission['_id'], type="source")
                 print(accessions)
                 specimen_accession = Source().get_specimen_biosample(sam["SPECIMEN_ID"])[0].get("biosampleAccession", "")
@@ -96,7 +96,7 @@ def process_pending_dtol_samples():
         for name in public_names:
             Sample().update_public_name(name)
 
-        build_submission_xml(file_subfix)
+        build_submission_xml(file_subfix, release=True)
 
         # store accessions, remove sample id from bundle and on last removal, set status of submission
         accessions = submit_biosample(file_subfix, Sample(), submission['_id'])
@@ -131,7 +131,7 @@ def update_bundle_sample_xml(sample_list, bundlefile):
         sample_alias = ET.SubElement(root, 'SAMPLE')
         sample_alias.set('alias', str(sample['_id']))  # updated to copo id to retrieve it when getting accessions
         sample_alias.set('center_name', 'EarlhamInstitute')  # mandatory for broker account
-        title = str(uuid.uuid4())
+        title = str(uuid.uuid4())+"-dtol"
 
         title_block = ET.SubElement(sample_alias, 'TITLE')
         title_block.text = title
@@ -158,7 +158,7 @@ def update_bundle_sample_xml(sample_list, bundlefile):
         tag = ET.SubElement(sample_attribute, 'TAG')
         tag.text = 'project name'
         value = ET.SubElement(sample_attribute, 'VALUE')
-        value.text = Profile().get_record(sample["profile_id"])["title"]
+        value.text = 'DTOL'#Profile().get_record(sample["profile_id"])["title"]
         ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
         for item in sample.items():
             if item[1]:
@@ -221,7 +221,7 @@ def build_specimen_sample_xml(sample):
     sample_alias = ET.SubElement(root, 'SAMPLE')
     sample_alias.set('alias', str(sample['_id']))  # updated to copo id to retrieve it when getting accessions
     sample_alias.set('center_name', 'EarlhamInstitute')  # mandatory for broker account
-    title = str(uuid.uuid4())
+    title = str(uuid.uuid4())+"-dtol-specimen"
 
     title_block = ET.SubElement(sample_alias, 'TITLE')
     title_block.text = title
@@ -242,7 +242,7 @@ def build_specimen_sample_xml(sample):
     update_bundle_sample_xml(sample, "bundle_" + file_subfix + ".xml") ###this now takes list instead of sample
     sample_id = str(sample['_id'])
     # build_validate_xml(sample_id)
-    build_submission_xml(sample_id)
+    build_submission_xml(sample_id, release=True)
     notify_dtol_status(msg="Communicating with ENA", action="info",
                        html_id="dtol_sample_info")
     accessions = submit_biosample(sample_id, Sample(), collection_id)
@@ -258,7 +258,7 @@ def build_specimen_sample_xml(sample):
                            html_id="dtol_sample_info")'''
 
 
-def build_submission_xml(sample_id, hold=""):
+def build_submission_xml(sample_id, hold="", release=False):
     # build submission XML
     tree = ET.parse(SRA_SUBMISSION_TEMPLATE)
     root = tree.getroot()
@@ -279,6 +279,10 @@ def build_submission_xml(sample_id, hold=""):
         action = ET.SubElement(actions, 'ACTION')
         hold_block = ET.SubElement(action, 'HOLD')
         hold_block.set("HoldUntilDate", hold)
+    if release:
+        actions = root.find('ACTIONS')
+        action = ET.SubElement(actions, 'ACTION')
+        release_block = ET.SubElement(action, 'RELEASE')
     ET.dump(tree)
     submissionfile = "submission_" + str(sample_id) + ".xml"
     tree.write(open(submissionfile, 'w'),
