@@ -179,4 +179,6 @@ urlpatterns = [
          name="add_sample_to_dtol_submission"),
     path('delete_dtol_samples/', ajax_handlers.delete_dtol_samples,
          name="delete_dtol_samples"),
+    path('do_red/', ajax_handlers.do_red,
+         name="do_red"),
 ]

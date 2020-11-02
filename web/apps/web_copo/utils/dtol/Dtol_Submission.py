@@ -16,6 +16,7 @@ from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
 from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE, SRA_PROJECT_TEMPLATE
 from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS, DTOL_UNITS, PUBLIC_NAME_SERVICE, \
     API_KEY
+from web.settings.all import DEBUG
 
 with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
@@ -479,9 +480,10 @@ def create_study(profile_id, collection_id):
 
 
 def query_public_name_service(sample_list):
-    return {}
-    '''headers = {"api-key":API_KEY}
+
+    headers = {"api-key":API_KEY}
     url = urljoin(PUBLIC_NAME_SERVICE, 'public-name')
+
     r = requests.post(url=url, json=sample_list, headers=headers, verify=False)
     if r.status_code == 200:
         resp = json.loads(r.content)
@@ -489,4 +491,4 @@ def query_public_name_service(sample_list):
     else:
 
         resp = {}
-    return resp'''
+    return resp

@@ -37,7 +37,7 @@ function upload_spreadsheet(file) {
     form = new FormData()
     form.append("file", file)
     jQuery.ajax({
-        url: '/copo/sample_spreadsheet/',
+        url: '/copo/sample_spreadsheet',
         data: form,
         cache: false,
         contentType: false,
@@ -59,6 +59,11 @@ function upload_spreadsheet(file) {
 }
 
 $(document).ready(function () {
+
+    $(document).on("click", ".test-red", function(evt){
+        $.get("/copo/do_red")
+    })
+
 
     $(document).on("click", "#finish_button", function (el) {
         if ($(el.currentTarget).hasOwnProperty("disabled")) {
@@ -169,6 +174,8 @@ $(document).ready(function () {
             $("#" + d.html_id).html(d.message)
             $("#export_errors_button").fadeIn()
             $("#spinner").fadeOut()
+        } else if (d.action === "delete_row") {
+            $("body").empty()
         } else if (d.action === "make_images_table") {
             // make table of images matched to
             // headers

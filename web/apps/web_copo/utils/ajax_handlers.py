@@ -35,6 +35,7 @@ from web.apps.web_copo.lookup.lookup import WIZARD_FILES as wf
 from web.apps.web_copo.models import UserDetails
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.utils.dtol.Dtol_Spreadsheet import DtolSpreadsheet
+from submission.helpers.generic_helper import notify_dtol_status
 
 DV_STRING = 'HARVARD_TEST_API'
 
@@ -1398,3 +1399,9 @@ def sample_images(request):
     matchings = dtol.check_image_names(files)
 
     return HttpResponse(json.dumps(matchings))
+
+def do_red(request):
+    notify_dtol_status(msg="Checking - ",
+                         action="delete_row",
+                         html_id="sample_info")
+    return HttpResponse()
