@@ -35,7 +35,7 @@ from web.apps.web_copo.lookup.lookup import WIZARD_FILES as wf
 from web.apps.web_copo.models import UserDetails
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.utils.dtol.Dtol_Spreadsheet import DtolSpreadsheet
-from submission.helpers.generic_helper import notify_dtol_status
+from submission.helpers.generic_helper import notify_sample_status, notify_dtol_status
 
 DV_STRING = 'HARVARD_TEST_API'
 
@@ -1377,6 +1377,7 @@ def add_sample_to_dtol_submission(request):
 
         for sample_id in sample_ids:
             # iterate over samples and add to submission
+            notify_dtol_status(action="delete_row", html_id=sample_id, data={})
             sub["dtol_samples"].append(sample_id)
             Sample().mark_processing(sample_id)
             Sample().timestamp_dtol_sample_updated(sample_id)
@@ -1400,8 +1401,3 @@ def sample_images(request):
 
     return HttpResponse(json.dumps(matchings))
 
-def do_red(request):
-    notify_dtol_status(msg="Checking - ",
-                         action="delete_row",
-                         html_id="sample_info")
-    return HttpResponse()

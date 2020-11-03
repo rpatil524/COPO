@@ -37,7 +37,7 @@ function upload_spreadsheet(file) {
     form = new FormData()
     form.append("file", file)
     jQuery.ajax({
-        url: '/copo/sample_spreadsheet',
+        url: '/copo/sample_spreadsheet/',
         data: form,
         cache: false,
         contentType: false,
@@ -59,10 +59,6 @@ function upload_spreadsheet(file) {
 }
 
 $(document).ready(function () {
-
-    $(document).on("click", ".test-red", function(evt){
-        $.get("/copo/do_red")
-    })
 
 
     $(document).on("click", "#finish_button", function (el) {
@@ -110,7 +106,7 @@ $(document).ready(function () {
     var profileId = $('#profile_id').val();
     var wsprotocol = 'ws://';
     var socket;
-
+    var socket2;
     window.addEventListener("beforeunload", function (event) {
         socket.close()
     });
@@ -118,15 +114,28 @@ $(document).ready(function () {
     if (window.location.protocol === "https:") {
         wsprotocol = 'wss://';
     }
-    if (window.location.href.includes('/copo/accept_reject_sample/')) {
-        socket = new WebSocket(
-            wsprotocol + window.location.host +
-            '/ws/dtol_status');
-    } else {
-        socket = new WebSocket(
-            wsprotocol + window.location.host +
-            '/ws/sample_status/' + profileId);
+
+    socket = new WebSocket(
+        wsprotocol + window.location.host +
+        '/ws/sample_status/' + profileId);
+    socket2 = new WebSocket(
+        wsprotocol + window.location.host +
+        '/ws/dtol_status');
+
+    socket2.onopen = function (e) {
+        console.log("opened ", e)
     }
+    socket2.onmessage = function (e) {
+        d = JSON.parse(e.data)
+        if (d.action === "delete_row") {
+            console.log("deleteing row")
+            s_id = d.html_id
+            //$('tr[sample_id=s_id]').fadeOut()
+            $('tr[sample_id="' + s_id + '"]').remove()
+        }
+    }
+
+
     socket.onerror = function (e) {
         console.log("error ", e)
     }
@@ -174,8 +183,6 @@ $(document).ready(function () {
             $("#" + d.html_id).html(d.message)
             $("#export_errors_button").fadeIn()
             $("#spinner").fadeOut()
-        } else if (d.action === "delete_row") {
-            $("body").empty()
         } else if (d.action === "make_images_table") {
             // make table of images matched to
             // headers
