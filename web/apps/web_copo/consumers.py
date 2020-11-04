@@ -121,7 +121,8 @@ class DtolConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'message': event["message"],
             'action': event["action"],
-            'html_id': event["html_id"]
+            'html_id': event["html_id"],
+            'data': event["data"]
         }))
 
     async def disconnect(self, close_code):

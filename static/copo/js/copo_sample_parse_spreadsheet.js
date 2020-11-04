@@ -126,13 +126,9 @@ $(document).ready(function () {
         console.log("opened ", e)
     }
     socket2.onmessage = function (e) {
-        d = JSON.parse(e.data)
-        if (d.action === "delete_row") {
-            console.log("deleteing row")
-            s_id = d.html_id
-            //$('tr[sample_id=s_id]').fadeOut()
-            $('tr[sample_id="' + s_id + '"]').remove()
-        }
+        //d = JSON.parse(e.data)
+        //console.log(d)
+
     }
 
 
@@ -145,112 +141,130 @@ $(document).ready(function () {
     socket.onopen = function (e) {
         console.log("opened ", e)
     }
-    socket.onmessage = function (e) {
+    socket2.onmessage = function (e) {
         console.log("received message")
         //handlers for channels messages sent from backend
         d = JSON.parse(e.data)
-        if (d.action === "close") {
-            $("#" + d.html_id).fadeOut("50")
-        } else if (d.action === "make_valid") {
-            $("#" + d.html_id).html("Validated").removeClass("alert-info, alert-danger").addClass("alert-success")
-        } else if (d.action === "info") {
-            // show something on the info div
-            // check info div is visible
-            if (!$("#" + d.html_id).is(":visible")) {
-                $("#" + d.html_id).fadeIn("50")
-
-            }
-            $("#" + d.html_id).removeClass("alert-danger").addClass("alert-info")
-            $("#" + d.html_id).html(d.message)
-            $("#spinner").fadeOut()
-        } else if (d.action === "warning") {
-            // show something on the info div
-            // check info div is visible
-            if (!$("#" + d.html_id).is(":visible")) {
-                $("#" + d.html_id).fadeIn("50")
-
-            }
-            $("#" + d.html_id).removeClass("alert-info").addClass("alert-warning")
-            $("#" + d.html_id).html(d.message)
-            $("#spinner").fadeOut()
-        } else if (d.action === "error") {
-            // check info div is visible
-            if (!$("#" + d.html_id).is(":visible")) {
-                $("#" + d.html_id).fadeIn("50")
-
-            }
-            $("#" + d.html_id).removeClass("alert-info").addClass("alert-danger")
-            $("#" + d.html_id).html(d.message)
-            $("#export_errors_button").fadeIn()
-            $("#spinner").fadeOut()
-        } else if (d.action === "make_images_table") {
-            // make table of images matched to
-            // headers
-            var headers = $("<tr><th>Specimen ID</th><th>Image File</th></th><th>Image</th></tr>")
-            $("#image_table").find("thead").empty().append(headers)
-            $("#image_table").find("tbody").empty()
-            var table_row
-            for (r in d.message) {
-                row = d.message[r]
-                if (row.file_name === "None") {
-                    var img_tag = "Sample images must be named using the same Specimen ID as the manifest"
-                } else {
-                    var img_tag = "<img src=" + row.file_name + "/>"
-                }
-                table_row = ("<tr><td>" + row.specimen_id + "</td><td>" + row.file_name.split('\\').pop().split('/').pop() + "</td><td>" + img_tag + "</td></tr>") // split-pop thing is to get filename from full path
-                $("#image_table").append(table_row)
-            }
-            $("#image_table").DataTable()
-            $("#image_table_nav_tab").click()
-            $("#finish_button").fadeIn()
-        } else if (d.action === "make_table") {
-            // make table of metadata parsed from spreadsheet
-            if ($.fn.DataTable.isDataTable('#sample_parse_table')) {
-                $("#sample_parse_table").DataTable().clear().destroy();
-            }
-            $("#sample_parse_table").find("thead").empty()
-            $("#sample_parse_table").find("tbody").empty()
-            var body = $("tbody")
-            var count = 0
-            for (r in d.message) {
-                row = d.message[r]
-                var tr = $("<tr/>")
-                for (c in row) {
-
-                    cell = row[c]
-                    if (count === 0) {
-                        var td = $("<th/>", {
-                            "html": cell
-                        })
-                    } else {
-                        var td = $("<td/>", {
-                            "html": cell
-                        })
-                    }
-
-                    tr.append(td)
-                }
-                if (count === 0) {
-                    $("#sample_parse_table").find("thead").append(tr)
-                } else {
-                    $("#sample_parse_table").find("tbody").append(tr)
-                }
-                count++
-
-            }
-            $("#sample_info").hide()
-            $("#sample_parse_table").DataTable({
-                "scrollY": "400px",
-                "scrollX": true,
-            })
-            $("#table_div").fadeIn(1000)
-            $("#sample_parse_table").DataTable().draw()
-            $("#files_label").removeAttr("disabled")
-            $("#files_label").find("input").removeAttr("disabled")
-            //$("#confirm_info").fadeIn(1000)
-            $("#tabs").fadeIn()
-            $("#finish_button").fadeIn()
+        //actions here should be performed regardeless of profile
+        if (d.action === "delete_row") {
+            console.log("deleteing row")
+            s_id = d.html_id
+            //$('tr[sample_id=s_id]').fadeOut()
+            $('tr[sample_id="' + s_id + '"]').remove()
         }
+
+        //actions here should only be performed by sockets with matching profile_id
+        if(d.data.hasOwnProperty("profile_id")) {
+            if ($("#profile_id").val() == d.data.profile_id) {
+
+
+                if (d.action === "close") {
+                    $("#" + d.html_id).fadeOut("50")
+                } else if (d.action === "make_valid") {
+                    $("#" + d.html_id).html("Validated").removeClass("alert-info, alert-danger").addClass("alert-success")
+                } else if (d.action === "info") {
+                    // show something on the info div
+                    // check info div is visible
+                    if (!$("#" + d.html_id).is(":visible")) {
+                        $("#" + d.html_id).fadeIn("50")
+
+                    }
+                    $("#" + d.html_id).removeClass("alert-danger").addClass("alert-info")
+                    console.log("here")
+                    $("#" + d.html_id).html(d.message)
+                    $("#spinner").fadeOut()
+                } else if (d.action === "warning") {
+                    // show something on the info div
+                    // check info div is visible
+                    if (!$("#" + d.html_id).is(":visible")) {
+                        $("#" + d.html_id).fadeIn("50")
+
+                    }
+                    $("#" + d.html_id).removeClass("alert-info").addClass("alert-warning")
+                    $("#" + d.html_id).html(d.message)
+                    $("#spinner").fadeOut()
+                } else if (d.action === "error") {
+                    // check info div is visible
+                    if (!$("#" + d.html_id).is(":visible")) {
+                        $("#" + d.html_id).fadeIn("50")
+
+                    }
+                    $("#" + d.html_id).removeClass("alert-info").addClass("alert-danger")
+                    $("#" + d.html_id).html(d.message)
+                    $("#export_errors_button").fadeIn()
+                    $("#spinner").fadeOut()
+                } else if (d.action === "make_images_table") {
+                    // make table of images matched to
+                    // headers
+                    var headers = $("<tr><th>Specimen ID</th><th>Image File</th></th><th>Image</th></tr>")
+                    $("#image_table").find("thead").empty().append(headers)
+                    $("#image_table").find("tbody").empty()
+                    var table_row
+                    for (r in d.message) {
+                        row = d.message[r]
+                        if (row.file_name === "None") {
+                            var img_tag = "Sample images must be named using the same Specimen ID as the manifest"
+                        } else {
+                            var img_tag = "<img src=" + row.file_name + "/>"
+                        }
+                        table_row = ("<tr><td>" + row.specimen_id + "</td><td>" + row.file_name.split('\\').pop().split('/').pop() + "</td><td>" + img_tag + "</td></tr>") // split-pop thing is to get filename from full path
+                        $("#image_table").append(table_row)
+                    }
+                    $("#image_table").DataTable()
+                    $("#image_table_nav_tab").click()
+                    $("#finish_button").fadeIn()
+                } else if (d.action === "make_table") {
+                    // make table of metadata parsed from spreadsheet
+                    if ($.fn.DataTable.isDataTable('#sample_parse_table')) {
+                        $("#sample_parse_table").DataTable().clear().destroy();
+                    }
+                    $("#sample_parse_table").find("thead").empty()
+                    $("#sample_parse_table").find("tbody").empty()
+                    var body = $("tbody")
+                    var count = 0
+                    for (r in d.message) {
+                        row = d.message[r]
+                        var tr = $("<tr/>")
+                        for (c in row) {
+
+                            cell = row[c]
+                            if (count === 0) {
+                                var td = $("<th/>", {
+                                    "html": cell
+                                })
+                            } else {
+                                var td = $("<td/>", {
+                                    "html": cell
+                                })
+                            }
+
+                            tr.append(td)
+                        }
+                        if (count === 0) {
+                            $("#sample_parse_table").find("thead").append(tr)
+                        } else {
+                            $("#sample_parse_table").find("tbody").append(tr)
+                        }
+                        count++
+
+                    }
+                    $("#sample_info").hide()
+                    $("#sample_parse_table").DataTable({
+                        "scrollY": "400px",
+                        "scrollX": true,
+                    })
+                    $("#table_div").fadeIn(1000)
+                    $("#sample_parse_table").DataTable().draw()
+                    $("#files_label").removeAttr("disabled")
+                    $("#files_label").find("input").removeAttr("disabled")
+                    //$("#confirm_info").fadeIn(1000)
+                    $("#tabs").fadeIn()
+                    $("#finish_button").fadeIn()
+
+                }
+            }
+        }
+
     }
 
 })

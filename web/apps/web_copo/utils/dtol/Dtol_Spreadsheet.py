@@ -13,7 +13,7 @@ from django.core.files.storage import default_storage
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from api.utils import map_to_dict
 from dal.copo_da import Sample, DataFile, Profile
-from submission.helpers.generic_helper import notify_sample_status
+from submission.helpers.generic_helper import notify_sample_status, notify_dtol_status
 from web.apps.web_copo.lookup import dtol_lookups as lookup
 from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
@@ -73,7 +73,7 @@ class DtolSpreadsheet:
     def loadManifest(self, type):
 
         if self.profile_id is not None:
-            notify_sample_status(profile_id=self.profile_id, msg="Loading..", action="info", html_id="sample_info")
+            notify_dtol_status(data={"profile_id":self.profile_id}, msg="Loading..", action="info", html_id="sample_info")
             try:
                 # read excel and convert all to string
                 if type == "xls":
@@ -89,7 +89,7 @@ class DtolSpreadsheet:
                 # print(self.data.size)
             except:
                 # if error notify via web socket
-                notify_sample_status(profile_id=self.profile_id, msg="Unable to load file.", action="info",
+                notify_dtol_status(data={"profile_id":self.profile_id}, msg="Unable to load file.", action="info",
                                      html_id="sample_info")
                 return False
 
@@ -107,7 +107,7 @@ class DtolSpreadsheet:
                 columns = list(self.data.columns)
                 # check required fields are present in spreadsheet
                 for item in self.fields:
-                    notify_sample_status(profile_id=self.profile_id, msg="Checking - " + item,
+                    notify_dtol_status(data={"profile_id":self.profile_id}, msg="Checking - " + item,
                                          action="info",
                                          html_id="sample_info")
                     if item not in columns:
@@ -146,7 +146,7 @@ class DtolSpreadsheet:
                 self.fields = jp.match(
                     '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
                 for header, cells in self.data.iteritems():
-                    notify_sample_status(profile_id=self.profile_id, msg="Checking - " + header,
+                    notify_dtol_status(data={"profile_id":self.profile_id}, msg="Checking - " + header,
                                          action="info",
                                          html_id="sample_info")
                     if header in self.fields:
@@ -234,7 +234,7 @@ class DtolSpreadsheet:
                     errors = list(map(lambda x: "<li>" + x + "</li>", errors))
                     errors = "".join(errors)
 
-                    notify_sample_status(profile_id=self.profile_id,
+                    notify_dtol_status(data={"profile_id":self.profile_id},
                                          msg="<h4>" + self.file.name + "</h4><ol>" + errors + "</ol>",
                                          action="error",
                                          html_id="sample_info")
@@ -244,15 +244,15 @@ class DtolSpreadsheet:
 
             except Exception as e:
                 error_message = str(e).replace("<", "").replace(">", "")
-                notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + error_message, action="info",
+                notify_dtol_status(data={"profile_id":self.profile_id}, msg="Server Error - " + error_message, action="info",
                                      html_id="sample_info")
                 return False
 
             # if we get here we have a valid spreadsheet
-            notify_sample_status(profile_id=self.profile_id, msg="Spreadsheet is Valid", action="info",
+            notify_dtol_status(data={"profile_id":self.profile_id}, msg="Spreadsheet is Valid", action="info",
                                  html_id="sample_info")
-            notify_sample_status(profile_id=self.profile_id, msg="", action="close", html_id="upload_controls")
-            notify_sample_status(profile_id=self.profile_id, msg="", action="make_valid", html_id="sample_info")
+            notify_dtol_status(data={"profile_id":self.profile_id}, msg="", action="close", html_id="upload_controls")
+            notify_dtol_status(data={"profile_id":self.profile_id}, msg="", action="make_valid", html_id="sample_info")
 
             return True
 
@@ -279,7 +279,7 @@ class DtolSpreadsheet:
                                      html_id="warning_info")'''
                 # build dictioanry of species in this manifest  max 200 IDs per query
                 taxon_id_set = set(self.data['TAXON_ID'].tolist())
-                notify_sample_status(profile_id=self.profile_id,
+                notify_dtol_status(data={"profile_id":self.profile_id},
                                      msg="Querying NCBI for TAXON_IDs in manifest ",
                                      action="info",
                                      html_id="sample_info")
@@ -304,7 +304,7 @@ class DtolSpreadsheet:
                                 str(index + 2)))
                         flag = False
                         continue
-                    notify_sample_status(profile_id=self.profile_id,
+                    notify_dtol_status(data={"profile_id":self.profile_id},
                                          msg="Checking taxonomy information at row <strong>%s</strong> - <strong>%s</strong>" % (
                                              str(index + 2), row['SCIENTIFIC_NAME']),
                                          action="info",
@@ -434,7 +434,7 @@ class DtolSpreadsheet:
 
                 # send warnings
                 if warnings:
-                    notify_sample_status(profile_id=self.profile_id,
+                    notify_dtol_status(data={"profile_id":self.profile_id},
                                          msg="<br>".join(warnings),
                                          action="warning",
                                          html_id="warning_info")
@@ -442,7 +442,7 @@ class DtolSpreadsheet:
                 if not flag:
                     errors = list(map(lambda x: "<li>" + x + "</li>", errors))
                     errors = "".join(errors)
-                    notify_sample_status(profile_id=self.profile_id,
+                    notify_dtol_status(data={"profile_id":self.profile_id},
                                          msg="<h4>" + self.file.name + "</h4><ol>" + errors + "</ol>",
                                          action="error",
                                          html_id="sample_info")
@@ -454,14 +454,14 @@ class DtolSpreadsheet:
             except HTTPError as e:
 
                 error_message = str(e).replace("<", "").replace(">", "")
-                notify_sample_status(profile_id=self.profile_id,
+                notify_dtol_status(data={"profile_id":self.profile_id},
                                      msg="Service Error - The NCBI Taxonomy service may be down, please try again later.",
                                      action="error",
                                      html_id="sample_info")
                 return False
             except Exception as e:
                 error_message = str(e).replace("<", "").replace(">", "")
-                notify_sample_status(profile_id=self.profile_id, msg="Server Error - " + error_message, action="error",
+                notify_dtol_status(data={"profile_id":self.profile_id}, msg="Server Error - " + error_message, action="error",
                                      html_id="sample_info")
                 return False
 
@@ -514,7 +514,7 @@ class DtolSpreadsheet:
         # save to session
         request = ThreadLocal.get_current_request()
         request.session["image_specimen_match"] = output
-        notify_sample_status(profile_id=self.profile_id, msg=output, action="make_images_table", html_id="images")
+        notify_dtol_status(data={"profile_id":self.profile_id}, msg=output, action="make_images_table", html_id="images")
         return output
 
     def collect(self):
@@ -532,7 +532,7 @@ class DtolSpreadsheet:
             sample_data.append(r)
         # store sample data in the session to be used to create mongo objects
         self.req.session["sample_data"] = sample_data
-        notify_sample_status(profile_id=self.profile_id, msg=sample_data, action="make_table", html_id="sample_table")
+        notify_dtol_status(data={"profile_id":self.profile_id}, msg=sample_data, action="make_table", html_id="sample_table")
 
     def save_records(self):
         # create mongo sample objects from info parsed from manifest and saved to session variable
@@ -547,7 +547,7 @@ class DtolSpreadsheet:
             s["manifest_id"] = manifest_id
             s["status"] = "pending"
             s["rack_tube"] = s["RACK_OR_PLATE_ID"] + "/" + s["TUBE_OR_WELL_ID"]
-            notify_sample_status(profile_id=self.profile_id, msg="Creating Sample with ID: " + s["SPECIMEN_ID"],
+            notify_dtol_status(data={"profile_id":self.profile_id}, msg="Creating Sample with ID: " + s["SPECIMEN_ID"],
                                  action="info",
                                  html_id="sample_info")
             sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
@@ -572,7 +572,7 @@ class DtolSpreadsheet:
         for s in sample_ids:
             r = Sample().delete_sample(s)
             report.append(r)
-        notify_sample_status(profile_id=self.profile_id, msg=report,
+        notify_dtol_status(data={"profile_id":self.profile_id}, msg=report,
                              action="info",
                              html_id="sample_info")
 

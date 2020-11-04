@@ -10,7 +10,7 @@ from celery.utils.log import get_task_logger
 from urllib.parse import urljoin
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from dal.copo_da import Submission, Sample, Profile, Source
-from submission.helpers.generic_helper import notify_sample_status
+from submission.helpers.generic_helper import notify_sample_status, notify_dtol_status
 from tools import resolve_env
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
 from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE, SRA_PROJECT_TEMPLATE
@@ -59,7 +59,7 @@ def process_pending_dtol_samples():
                     {"taxonomyId": int(sam["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
                      "sample_id": str(sam["_id"])})
             except ValueError:
-                notify_sample_status(profile_id=profile_id, msg="Invalid Taxon ID found", action="info",
+                notify_dtol_status(data={"profile_id":profile_id}, msg="Invalid Taxon ID found", action="info",
                                      html_id="dtol_sample_info")
                 return False
 
@@ -70,7 +70,7 @@ def process_pending_dtol_samples():
             assert len(specimen_sample) <= 1
             if not specimen_sample:
                 # create sample object and submit
-                notify_sample_status(profile_id=profile_id, msg="Creating Sample for SPECIMEN_ID " + sam["SPECIMEN_ID"],
+                notify_dtol_status(data={"profile_id":profile_id}, msg="Creating Sample for SPECIMEN_ID " + sam["SPECIMEN_ID"],
                                      action="info",
                                      html_id="dtol_sample_info")
                 specimen_obj_fields = {"SPECIMEN_ID": sam["SPECIMEN_ID"], "TAXON_ID": sam["TAXON_ID"],
@@ -91,13 +91,13 @@ def process_pending_dtol_samples():
 
             Sample().add_field("sampleDerivedFrom", specimen_accession, sam['_id'])
             sam["sampleDerivedFrom"] = specimen_accession
-            notify_sample_status(profile_id=profile_id, msg="Adding to Sample Batch: " + sam["SPECIMEN_ID"],
+            notify_dtol_status(data={"profile_id":profile_id}, msg="Adding to Sample Batch: " + sam["SPECIMEN_ID"],
                                  action="info",
                                  html_id="dtol_sample_info")
         update_bundle_sample_xml(s_ids, "bundle_" + file_subfix + ".xml")
 
         # query for public names and update
-        notify_sample_status(profile_id=profile_id, msg="Querying Public Naming Service", action="info",
+        notify_dtol_status(data={"profile_id":profile_id}, msg="Querying Public Naming Service", action="info",
                              html_id="dtol_sample_info")
         public_names = query_public_name_service(public_name_list)
         for name in public_names:
@@ -113,11 +113,11 @@ def process_pending_dtol_samples():
         elif accessions["status"] == "ok":
             msg = "Last Sample Submitted: " + sam["SPECIMEN_ID"] + " - ENA Submission ID: " + accessions[
                 "submission_accession"]  # + " - Biosample ID: " + accessions["biosample_accession"]
-            notify_sample_status(profile_id=profile_id, msg=msg, action="info",
+            notify_dtol_status(data={"profile_id":profile_id}, msg=msg, action="info",
                                  html_id="dtol_sample_info")
         else:
             msg = "Submission Rejected: " + sam["SPECIMEN_ID"] + "<p>" + accessions["msg"] + "</p>"
-            notify_sample_status(profile_id=profile_id, msg=msg, action="info",
+            notify_dtol_status(data={"profile_id":profile_id}, msg=msg, action="info",
                                  html_id="dtol_sample_info")
         Submission().dtol_sample_processed(sub_id=submission["_id"], sam_ids=s_ids)
 
@@ -341,7 +341,7 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
             pass_word, "xxxxxx")
-        notify_sample_status(profile_id=profile_id, msg=message, action="error",
+        notify_dtol_status(data={"profile_id":profile_id}, msg=message, action="error",
                              html_id="dtol_sample_info")
         os.remove(submissionfile)
         os.remove(samplefile)
@@ -353,7 +353,7 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
     except ET.ParseError as e:
         message = " Unrecognized response from ENA - " + str(
             receipt) + " Please try again later, if it persists contact admins"
-        notify_sample_status(profile_id=profile_id, msg=message, action="error",
+        notify_dtol_status(data={"profile_id":profile_id}, msg=message, action="error",
                              html_id="dtol_sample_info")
         os.remove(submissionfile)
         os.remove(samplefile)
@@ -458,7 +458,7 @@ def create_study(profile_id, collection_id):
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
             pass_word, "xxxxxx")
-        notify_sample_status(profile_id=profile_id, msg=message, action="error",
+        notify_dtol_status(data={"profile_id":profile_id}, msg=message, action="error",
                              html_id="dtol_sample_info")
         os.remove(submissionfile)
         os.remove(studyfile)
@@ -469,7 +469,7 @@ def create_study(profile_id, collection_id):
     except ET.ParseError as e:
         message = " Unrecognized response from ENA - " + str(
             receipt) + " Please try again later, if it persists contact admins"
-        notify_sample_status(profile_id=profile_id, msg=message, action="error",
+        notify_dtol_status(data={"profile_id":profile_id}, msg=message, action="error",
                              html_id="dtol_sample_info")
         os.remove(submissionfile)
         os.remove(studyfile)
@@ -488,11 +488,11 @@ def create_study(profile_id, collection_id):
     if accessions["status"] == "ok":
         msg = "Study Submitted " + " - BioProject ID: " + accessions["bioproject_accession"] + " - SRA Study ID: " + \
               accessions["sra_study_accession"]
-        notify_sample_status(profile_id=profile_id, msg=msg, action="info",
+        notify_dtol_status(data={"profile_id":profile_id}, msg=msg, action="info",
                              html_id="dtol_sample_info")
     else:
         msg = "Submission Rejected: " + "<p>" + accessions["msg"] + "</p>"
-        notify_sample_status(profile_id=profile_id, msg=msg, action="info",
+        notify_dtol_status(data={"profile_id":profile_id}, msg=msg, action="info",
                              html_id="dtol_sample_info")
 
 
