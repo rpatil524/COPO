@@ -60,6 +60,7 @@ function upload_spreadsheet(file) {
 
 $(document).ready(function () {
 
+
     $(document).on("click", "#finish_button", function (el) {
         if ($(el.currentTarget).hasOwnProperty("disabled")) {
             return false
@@ -105,7 +106,7 @@ $(document).ready(function () {
     var profileId = $('#profile_id').val();
     var wsprotocol = 'ws://';
     var socket;
-
+    var socket2;
     window.addEventListener("beforeunload", function (event) {
         socket.close()
     });
@@ -113,15 +114,28 @@ $(document).ready(function () {
     if (window.location.protocol === "https:") {
         wsprotocol = 'wss://';
     }
-    if (window.location.href.includes('/copo/accept_reject_sample/')) {
-        socket = new WebSocket(
-            wsprotocol + window.location.host +
-            '/ws/dtol_status');
-    } else {
-        socket = new WebSocket(
-            wsprotocol + window.location.host +
-            '/ws/sample_status/' + profileId);
+
+    socket = new WebSocket(
+        wsprotocol + window.location.host +
+        '/ws/sample_status/' + profileId);
+    socket2 = new WebSocket(
+        wsprotocol + window.location.host +
+        '/ws/dtol_status');
+
+    socket2.onopen = function (e) {
+        console.log("opened ", e)
     }
+    socket2.onmessage = function (e) {
+        d = JSON.parse(e.data)
+        if (d.action === "delete_row") {
+            console.log("deleteing row")
+            s_id = d.html_id
+            //$('tr[sample_id=s_id]').fadeOut()
+            $('tr[sample_id="' + s_id + '"]').remove()
+        }
+    }
+
+
     socket.onerror = function (e) {
         console.log("error ", e)
     }

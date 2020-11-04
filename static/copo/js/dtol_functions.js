@@ -209,6 +209,10 @@ function row_select(ev) {
 
     var d = {"profile_id": $(row).find("td").data("profile_id"), "filter": filter}
     $("#profile_id").val(d.profile_id)
+
+
+
+
     var spinner_state = $("#spinner").is(":visible")
     $("#spinner").show()
     var saved_text = $("#dtol_sample_info").text()
@@ -259,6 +263,7 @@ function row_select(ev) {
                         for (el in row) {
                             if (el == "_id") {
                                 $(td_row).data("id", row._id.$oid)
+                                $(td_row).attr("sample_id", row._id.$oid)
                             } else if (!excluded_fields.includes(el)) {
                                 // make header
                                 var th = $("<th/>", {
@@ -299,6 +304,7 @@ function row_select(ev) {
                         for (el in row) {
                             if (el == "_id") {
                                 $(td_row).data("id", row._id.$oid)
+                                $(td_row).attr("sample_id", row._id.$oid)
                             } else if (!excluded_fields.includes(el)) {
                                 // just do row
                                 td = $("<td/>", {

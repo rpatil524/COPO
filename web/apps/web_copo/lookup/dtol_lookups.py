@@ -2,6 +2,8 @@
 # this module contains lookups and mappings pertaining to DTOL functionality
 # such as validation enumerations and mappings between different field names
 from tools import resolve_env
+#from django.conf.global_settings import DEBUG
+from web.settings.all import DEBUG
 DTOL_EXPORT_TO_STS_FIELDS = {
     "SERIES",
     "RACK_OR_PLATE_ID",
@@ -702,6 +704,11 @@ DTOL_ENA_MAPPINGS = {
         "ena": "sample derived from"
     }
 }
-PUBLIC_NAME_SERVICE = "http://sanger-sts-uat-232662972.eu-west-2.elb.amazonaws.com/public_name_api/ui"
+
+if DEBUG:
+    PUBLIC_NAME_SERVICE = "http://sanger-sts-uat-232662972.eu-west-2.elb.amazonaws.com/public_name_api/"
+else:
+    PUBLIC_NAME_SERVICE = "https://sanger-sts-prod-864969239.eu-west-2.elb.amazonaws.com/public_name_api/"
+
 API_KEY=resolve_env.get_env("PUBLIC_NAME_SERVICE_API_KEY")
 NIH_API_KEY=resolve_env.get_env("NIH_API_KEY")
