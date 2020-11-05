@@ -41,8 +41,7 @@ $(document).ready(function () {
                 {
                     label: 'Delete',
                     action: function (dialog) {
-                        var spinner_state = $("#spinner").is(":visible")
-                        $("#spinner").show()
+
 
                         $("#dtol_sample_info").text("Deleting")
 
@@ -61,11 +60,6 @@ $(document).ready(function () {
                                 sample_ids: JSON.stringify(sample_ids)
                             }
                         }).done(function (e) {
-
-                            if (!spinner_state) {
-                                $("#spinner").fadeOut("fast")
-                            }
-                            $("#dtol_sample_info").text(saved_text)
                             $("#profile_titles").find(".selected").click()
                             dialog.close()
                         }).error(function (e) {
@@ -211,13 +205,8 @@ function row_select(ev) {
     $("#profile_id").val(d.profile_id)
 
 
-
-
-    var spinner_state = $("#spinner").is(":visible")
     $("#spinner").show()
-    var saved_text = $("#dtol_sample_info").text()
-    var show_spinner =
-        $("#dtol_sample_info").text("Fetching")
+
     $.ajax({
         url: "/copo/get_samples_for_profile",
         data: d,
@@ -341,10 +330,9 @@ function row_select(ev) {
                 $("#accept_reject_button").find("button").prop("disabled", true)
 
             }
-            if (!spinner_state) {
-                $("#spinner").fadeOut("fast")
-            }
-            $("#dtol_sample_info").text(saved_text)
+
+            $("#spinner").fadeOut("fast")
+
         }
     )
 }
@@ -376,7 +364,7 @@ function update_pending_samples_table() {
 
 function handle_accept_reject(el) {
     $("#spinner").fadeIn(fadeSpeed)
-    $("#dtol_sample_info").html("Processing")
+
 
     var checked = $(".form-check-input:checked").closest("tr")
 
@@ -408,17 +396,19 @@ function handle_accept_reject(el) {
 
             $("#profile_titles").find(".selected").click()
             $("#spinner").fadeOut(fadeSpeed)
-            $("#dtol_sample_info").html("Idle")
+
         })
     } else if (action == "accept") {
         // create or update dtol submission record
         var profile_id = $("#profile_id").val()
+        $("#sub_spinner").fadeIn(fadeSpeed)
         $.ajax({
             url: "/copo/add_sample_to_dtol_submission/",
             method: "GET",
             data: {"sample_ids": JSON.stringify(sample_ids), "profile_id": profile_id},
         }).done(function () {
             $("#profile_titles").find(".selected").click()
+            $("#spinner").fadeOut(fadeSpeed)
         })
     }
 

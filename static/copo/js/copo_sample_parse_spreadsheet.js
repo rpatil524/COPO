@@ -86,6 +86,7 @@ $(document).ready(function () {
                     cssClass: "tiny ui basic button",
                     action: function (dialogRef) {
                         $("#finish_button").hide()
+
                         $.ajax({
                             url: "/copo/create_spreadsheet_samples",
 
@@ -156,8 +157,9 @@ $(document).ready(function () {
         //actions here should only be performed by sockets with matching profile_id
         if(d.data.hasOwnProperty("profile_id")) {
             if ($("#profile_id").val() == d.data.profile_id) {
-
-
+                if(d.action == "hide_sub_spinner"){
+                    $("#sub_spinner").fadeOut(fadeSpeed)
+                }
                 if (d.action === "close") {
                     $("#" + d.html_id).fadeOut("50")
                 } else if (d.action === "make_valid") {
@@ -167,7 +169,6 @@ $(document).ready(function () {
                     // check info div is visible
                     if (!$("#" + d.html_id).is(":visible")) {
                         $("#" + d.html_id).fadeIn("50")
-
                     }
                     $("#" + d.html_id).removeClass("alert-danger").addClass("alert-info")
                     console.log("here")
@@ -178,7 +179,6 @@ $(document).ready(function () {
                     // check info div is visible
                     if (!$("#" + d.html_id).is(":visible")) {
                         $("#" + d.html_id).fadeIn("50")
-
                     }
                     $("#" + d.html_id).removeClass("alert-info").addClass("alert-warning")
                     $("#" + d.html_id).html(d.message)
@@ -187,7 +187,6 @@ $(document).ready(function () {
                     // check info div is visible
                     if (!$("#" + d.html_id).is(":visible")) {
                         $("#" + d.html_id).fadeIn("50")
-
                     }
                     $("#" + d.html_id).removeClass("alert-info").addClass("alert-danger")
                     $("#" + d.html_id).html(d.message)
@@ -226,7 +225,6 @@ $(document).ready(function () {
                         row = d.message[r]
                         var tr = $("<tr/>")
                         for (c in row) {
-
                             cell = row[c]
                             if (count === 0) {
                                 var td = $("<th/>", {
@@ -237,7 +235,6 @@ $(document).ready(function () {
                                     "html": cell
                                 })
                             }
-
                             tr.append(td)
                         }
                         if (count === 0) {
@@ -246,7 +243,6 @@ $(document).ready(function () {
                             $("#sample_parse_table").find("tbody").append(tr)
                         }
                         count++
-
                     }
                     $("#sample_info").hide()
                     $("#sample_parse_table").DataTable({
@@ -260,13 +256,10 @@ $(document).ready(function () {
                     //$("#confirm_info").fadeIn(1000)
                     $("#tabs").fadeIn()
                     $("#finish_button").fadeIn()
-
                 }
             }
         }
-
     }
-
 })
 
 

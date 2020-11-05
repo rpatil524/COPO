@@ -40,9 +40,9 @@ def process_pending_dtol_samples():
     '''
 
     # get all pending dtol submissions
-    sample_id_list = Submission().get_pending_dtol_samples()
+    sub_id_list = Submission().get_pending_dtol_samples()
     # send each to ENA for Biosample ids
-    for submission in sample_id_list:
+    for submission in sub_id_list:
         # check if study exist for this submission and/or create one
         profile_id = submission["profile_id"]
         if not Submission().get_study(submission['_id']):
@@ -59,8 +59,8 @@ def process_pending_dtol_samples():
                     {"taxonomyId": int(sam["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
                      "sample_id": str(sam["_id"])})
             except ValueError:
-                notify_dtol_status(data={"profile_id":profile_id}, msg="Invalid Taxon ID found", action="info",
-                                     html_id="dtol_sample_info")
+                notify_dtol_status(data={"profile_id": profile_id}, msg="Invalid Taxon ID found", action="info",
+                                   html_id="dtol_sample_info")
                 return False
 
             s_ids.append(s_id)
@@ -70,9 +70,10 @@ def process_pending_dtol_samples():
             assert len(specimen_sample) <= 1
             if not specimen_sample:
                 # create sample object and submit
-                notify_dtol_status(data={"profile_id":profile_id}, msg="Creating Sample for SPECIMEN_ID " + sam["SPECIMEN_ID"],
-                                     action="info",
-                                     html_id="dtol_sample_info")
+                notify_dtol_status(data={"profile_id": profile_id},
+                                   msg="Creating Sample for SPECIMEN_ID " + sam["SPECIMEN_ID"],
+                                   action="info",
+                                   html_id="dtol_sample_info")
                 specimen_obj_fields = {"SPECIMEN_ID": sam["SPECIMEN_ID"], "TAXON_ID": sam["TAXON_ID"],
                                        "sample_type": "dtol_specimen", "profile_id": sam['profile_id']}
                 Source().save_record(auto_fields={}, **specimen_obj_fields)
@@ -91,14 +92,14 @@ def process_pending_dtol_samples():
 
             Sample().add_field("sampleDerivedFrom", specimen_accession, sam['_id'])
             sam["sampleDerivedFrom"] = specimen_accession
-            notify_dtol_status(data={"profile_id":profile_id}, msg="Adding to Sample Batch: " + sam["SPECIMEN_ID"],
-                                 action="info",
-                                 html_id="dtol_sample_info")
+            notify_dtol_status(data={"profile_id": profile_id}, msg="Adding to Sample Batch: " + sam["SPECIMEN_ID"],
+                               action="info",
+                               html_id="dtol_sample_info")
         update_bundle_sample_xml(s_ids, "bundle_" + file_subfix + ".xml")
 
         # query for public names and update
-        notify_dtol_status(data={"profile_id":profile_id}, msg="Querying Public Naming Service", action="info",
-                             html_id="dtol_sample_info")
+        notify_dtol_status(data={"profile_id": profile_id}, msg="Querying Public Naming Service", action="info",
+                           html_id="dtol_sample_info")
         public_names = query_public_name_service(public_name_list)
         for name in public_names:
             Sample().update_public_name(name)
@@ -109,18 +110,22 @@ def process_pending_dtol_samples():
         accessions = submit_biosample(file_subfix, Sample(), submission['_id'])
         # print(accessions)
         if not accessions:
+            notify_dtol_status(data={"profile_id": profile_id}, msg="Error creating sample - no accessions found", action="info",
+                               html_id="dtol_sample_info")
             continue
         elif accessions["status"] == "ok":
             msg = "Last Sample Submitted: " + sam["SPECIMEN_ID"] + " - ENA Submission ID: " + accessions[
                 "submission_accession"]  # + " - Biosample ID: " + accessions["biosample_accession"]
-            notify_dtol_status(data={"profile_id":profile_id}, msg=msg, action="info",
-                                 html_id="dtol_sample_info")
+            notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
+                               html_id="dtol_sample_info")
         else:
             msg = "Submission Rejected: " + sam["SPECIMEN_ID"] + "<p>" + accessions["msg"] + "</p>"
-            notify_dtol_status(data={"profile_id":profile_id}, msg=msg, action="info",
-                                 html_id="dtol_sample_info")
+            notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
+                               html_id="dtol_sample_info")
         Submission().dtol_sample_processed(sub_id=submission["_id"], sam_ids=s_ids)
 
+    notify_dtol_status(data={"profile_id": profile_id}, msg="", action="hide_sub_spinner",
+                       html_id="dtol_sample_info")
 
 def build_bundle_sample_xml(file_subfix):
     '''build structure and save to file bundle_file_subfix.xml'''
@@ -128,7 +133,7 @@ def build_bundle_sample_xml(file_subfix):
 
 
 def update_bundle_sample_xml(sample_list, bundlefile):
-    '''update the sample with submission alias alias adding a new sample'''
+    '''update the sample with submission alias adding a new sample'''
     # print("adding sample to bundle sample xml")
     tree = ET.parse(bundlefile)
     root = tree.getroot()
@@ -138,7 +143,7 @@ def update_bundle_sample_xml(sample_list, bundlefile):
         sample_alias = ET.SubElement(root, 'SAMPLE')
         sample_alias.set('alias', str(sample['_id']))  # updated to copo id to retrieve it when getting accessions
         sample_alias.set('center_name', 'EarlhamInstitute')  # mandatory for broker account
-        title = str(uuid.uuid4())+"-dtol"
+        title = str(uuid.uuid4()) + "-dtol"
 
         title_block = ET.SubElement(sample_alias, 'TITLE')
         title_block.text = title
@@ -165,7 +170,7 @@ def update_bundle_sample_xml(sample_list, bundlefile):
         tag = ET.SubElement(sample_attribute, 'TAG')
         tag.text = 'project name'
         value = ET.SubElement(sample_attribute, 'VALUE')
-        value.text = 'DTOL'#Profile().get_record(sample["profile_id"])["title"]
+        value.text = 'DTOL'  # Profile().get_record(sample["profile_id"])["title"]
         ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
         for item in sample.items():
             if item[1]:
@@ -229,7 +234,7 @@ def build_specimen_sample_xml(sample):
     sample_alias = ET.SubElement(root, 'SAMPLE')
     sample_alias.set('alias', str(sample['_id']))  # updated to copo id to retrieve it when getting accessions
     sample_alias.set('center_name', 'EarlhamInstitute')  # mandatory for broker account
-    title = str(uuid.uuid4())+"-dtol-specimen"
+    title = str(uuid.uuid4()) + "-dtol-specimen"
 
     title_block = ET.SubElement(sample_alias, 'TITLE')
     title_block.text = title
@@ -241,29 +246,6 @@ def build_specimen_sample_xml(sample):
     samplefile = "bundle_" + str(sample_id) + ".xml"
     tree.write(open(samplefile, 'w'),
                encoding='unicode')
-
-
-'''def build_xml(sample, sub_id, p_id, collection_id, file_subfix):
-    notify_sample_status(profile_id=profile_id, msg="Creating Sample: " + sample.get("SPECIMEN_ID", ""), action="info",
-                         html_id="dtol_sample_info")
-    # build_sample_xml(sample)
-    update_bundle_sample_xml(sample, "bundle_" + file_subfix + ".xml") ###this now takes list instead of sample
-    sample_id = str(sample['_id'])
-    # build_validate_xml(sample_id)
-    build_submission_xml(sample_id, release=True)
-    notify_sample_status(profile_id=profile_id, msg="Communicating with ENA", action="info",
-                         html_id="dtol_sample_info")
-    accessions = submit_biosample(sample_id, Sample(), collection_id)
-    # print(accessions)
-    if accessions["status"] == "ok":
-        msg = "Last Sample Submitted: " + sample["SPECIMEN_ID"] + " - ENA ID: " + accessions[
-            "submission_accession"] + " - Biosample ID: " + accessions["biosample_accession"]
-        notify_sample_status(profile_id=profile_id, msg=msg, action="info",
-                             html_id="dtol_sample_info")
-    else:
-        msg = "Submission Rejected: " + sample["SPECIMEN_ID"] + "<p>" + accessions["msg"] + "</p>"
-        notify_sample_status(profile_id=profile_id, msg=msg, action="info",
-                             html_id="dtol_sample_info")'''
 
 
 def build_submission_xml(sample_id, hold="", release=False):
@@ -341,8 +323,8 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
             pass_word, "xxxxxx")
-        notify_dtol_status(data={"profile_id":profile_id}, msg=message, action="error",
-                             html_id="dtol_sample_info")
+        notify_dtol_status(data={"profile_id": profile_id}, msg=message, action="error",
+                           html_id="dtol_sample_info")
         os.remove(submissionfile)
         os.remove(samplefile)
         return False
@@ -353,8 +335,8 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
     except ET.ParseError as e:
         message = " Unrecognized response from ENA - " + str(
             receipt) + " Please try again later, if it persists contact admins"
-        notify_dtol_status(data={"profile_id":profile_id}, msg=message, action="error",
-                             html_id="dtol_sample_info")
+        notify_dtol_status(data={"profile_id": profile_id}, msg=message, action="error",
+                           html_id="dtol_sample_info")
         os.remove(submissionfile)
         os.remove(samplefile)
         return False
@@ -458,8 +440,8 @@ def create_study(profile_id, collection_id):
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
             pass_word, "xxxxxx")
-        notify_dtol_status(data={"profile_id":profile_id}, msg=message, action="error",
-                             html_id="dtol_sample_info")
+        notify_dtol_status(data={"profile_id": profile_id}, msg=message, action="error",
+                           html_id="dtol_sample_info")
         os.remove(submissionfile)
         os.remove(studyfile)
         return False
@@ -469,8 +451,8 @@ def create_study(profile_id, collection_id):
     except ET.ParseError as e:
         message = " Unrecognized response from ENA - " + str(
             receipt) + " Please try again later, if it persists contact admins"
-        notify_dtol_status(data={"profile_id":profile_id}, msg=message, action="error",
-                             html_id="dtol_sample_info")
+        notify_dtol_status(data={"profile_id": profile_id}, msg=message, action="error",
+                           html_id="dtol_sample_info")
         os.remove(submissionfile)
         os.remove(studyfile)
         return False
@@ -488,12 +470,12 @@ def create_study(profile_id, collection_id):
     if accessions["status"] == "ok":
         msg = "Study Submitted " + " - BioProject ID: " + accessions["bioproject_accession"] + " - SRA Study ID: " + \
               accessions["sra_study_accession"]
-        notify_dtol_status(data={"profile_id":profile_id}, msg=msg, action="info",
-                             html_id="dtol_sample_info")
+        notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
+                           html_id="dtol_sample_info")
     else:
         msg = "Submission Rejected: " + "<p>" + accessions["msg"] + "</p>"
-        notify_dtol_status(data={"profile_id":profile_id}, msg=msg, action="info",
-                             html_id="dtol_sample_info")
+        notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
+                           html_id="dtol_sample_info")
 
 
 def query_public_name_service(sample_list):

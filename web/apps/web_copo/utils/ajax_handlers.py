@@ -1378,7 +1378,8 @@ def add_sample_to_dtol_submission(request):
         for sample_id in sample_ids:
             # iterate over samples and add to submission
             notify_dtol_status(action="delete_row", html_id=sample_id, data={})
-            sub["dtol_samples"].append(sample_id)
+            if not sample_id in sub["dtol_samples"]:
+                sub["dtol_samples"].append(sample_id)
             Sample().mark_processing(sample_id)
             Sample().timestamp_dtol_sample_updated(sample_id)
         if Submission().save_record(dict(), **sub):
