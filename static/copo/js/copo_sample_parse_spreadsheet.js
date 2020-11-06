@@ -31,7 +31,7 @@ function upload_image_files(file) {
 
 function upload_spreadsheet(file) {
     $("#upload_label").fadeOut("fast")
-
+    $("#ss_upload_spinner").fadeIn("fast")
     $("#warning_info").fadeOut("fast")
     var csrftoken = $.cookie('csrftoken');
     form = new FormData()
@@ -54,7 +54,7 @@ function upload_spreadsheet(file) {
             message: "Error " + data.status + ": " + data.statusText
         });
     }).done(function (data) {
-
+        $("#ss_upload_spinner").fadeOut("fast")
     })
 }
 
