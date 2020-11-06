@@ -47,7 +47,7 @@ class DtolSpreadsheet:
     validation_msg_invalid_rank = "Invalid scientific name or taxon ID: row <strong>%s</strong> - rank of scientific name and taxon id should be species."
     validation_msg_duplicate_tube_or_well_id_in_copo = "Duplicate RACK_OR_PLATE_ID and TUBE_OR_WELL_ID already in COPO: <strong>%s</strong>"
     validation_msg_invalid_date = "Invalid date: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Dates should be in format YYYY-MM-DD"
-
+    validation_msg_rack_tube_both_na = "NOT_APPLICABLE, NOT_PROVIDED or NOT_COLLECTED found in both RACK_OR_PLATE_ID and TUBE_OR_WELL_ID at row <strong>%s</strong>."
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -127,8 +127,14 @@ class DtolSpreadsheet:
                                     header, str(cellcount + 1)))
                                 flag = False
 
+                for index, row in self.data.iterrows():
+                    if row["RACK_OR_PLATE_ID"] in self.blank_vals and row["TUBE_OR_WELL_ID"] in self.blank_vals:
+                        errors.append(self.validation_msg_rack_tube_both_na % (str(index+1)))
+                        flag = False
+
                 # check for uniqueness of RACK_OR_PLATE_ID and TUBE_OR_WELL_ID in this manifest
                 rack_tube = self.data["RACK_OR_PLATE_ID"] + "/" + self.data["TUBE_OR_WELL_ID"]
+
                 # duplicated returns a boolean array, false for not duplicate, true for duplicate
                 u = list(rack_tube[rack_tube.duplicated()])
                 if len(u) > 0:
@@ -146,6 +152,8 @@ class DtolSpreadsheet:
                 self.fields = jp.match(
                     '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
                 for header, cells in self.data.iteritems():
+
+
                     notify_dtol_status(data={"profile_id":self.profile_id}, msg="Checking - " + header,
                                          action="info",
                                          html_id="sample_info")
@@ -547,7 +555,7 @@ class DtolSpreadsheet:
             s["manifest_id"] = manifest_id
             s["status"] = "pending"
             s["rack_tube"] = s["RACK_OR_PLATE_ID"] + "/" + s["TUBE_OR_WELL_ID"]
-            notify_dtol_status(data={"profile_id":self.profile_id}, msg="Creating Sample with ID: " + s["SPECIMEN_ID"],
+            notify_dtol_status(data={"profile_id":self.profile_id}, msg="Creating Sample with ID: " + s["TUBE_OR_WELL_ID"] + "/" + s["SPECIMEN_ID"],
                                  action="info",
                                  html_id="sample_info")
             sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)

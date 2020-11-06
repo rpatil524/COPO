@@ -152,12 +152,16 @@ $(document).ready(function () {
             s_id = d.html_id
             //$('tr[sample_id=s_id]').fadeOut()
             $('tr[sample_id="' + s_id + '"]').remove()
+
+
+
+
         }
 
         //actions here should only be performed by sockets with matching profile_id
-        if(d.data.hasOwnProperty("profile_id")) {
+        if (d.data.hasOwnProperty("profile_id")) {
             if ($("#profile_id").val() == d.data.profile_id) {
-                if(d.action == "hide_sub_spinner"){
+                if (d.action == "hide_sub_spinner") {
                     $("#sub_spinner").fadeOut(fadeSpeed)
                 }
                 if (d.action === "close") {
@@ -171,7 +175,7 @@ $(document).ready(function () {
                         $("#" + d.html_id).fadeIn("50")
                     }
                     $("#" + d.html_id).removeClass("alert-danger").addClass("alert-info")
-                    console.log("here")
+
                     $("#" + d.html_id).html(d.message)
                     $("#spinner").fadeOut()
                 } else if (d.action === "warning") {

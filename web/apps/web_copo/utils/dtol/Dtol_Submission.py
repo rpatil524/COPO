@@ -71,7 +71,7 @@ def process_pending_dtol_samples():
             if not specimen_sample:
                 # create sample object and submit
                 notify_dtol_status(data={"profile_id": profile_id},
-                                   msg="Creating Sample for SPECIMEN_ID " + sam["SPECIMEN_ID"],
+                                   msg="Creating Sample for SPECIMEN_ID " + sam["RACK_OR_PLATE_ID"] + "/" + sam["SPECIMEN_ID"],
                                    action="info",
                                    html_id="dtol_sample_info")
                 specimen_obj_fields = {"SPECIMEN_ID": sam["SPECIMEN_ID"], "TAXON_ID": sam["TAXON_ID"],
