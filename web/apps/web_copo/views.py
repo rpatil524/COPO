@@ -2,6 +2,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
+from web.apps.web_copo.models import ViewLock
 from django.shortcuts import render, redirect
 from jsonpickle import encode
 from django.utils.safestring import mark_safe
@@ -145,7 +146,11 @@ def copo_samples(request, profile_id):
 
 @login_required
 def copo_sample_accept_reject(request):
-    return render(request, 'copo/copo_sample_accept_reject.html', {})
+    url = request.build_absolute_uri()
+    if not ViewLock().isViewLockedCreate(url=url):
+        return render(request, 'copo/copo_sample_accept_reject.html', {})
+    else:
+        return HttpResponse("PAGE LOCKED")
 
 @login_required()
 def annotate_meta(request, file_id):
