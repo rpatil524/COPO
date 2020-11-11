@@ -405,7 +405,24 @@ nav li {
     font-family: 'Open Sans', sans-serif;
     font-weight: bold;
     height: 100px;
-    margin-bottom: 100px;
+    margin-bottom: 0px;
+}
+
+.subsub-head {
+    color: black;
+    font-size: 46px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: bold;
+    margin-top: 0px;
+}
+
+#redirectbtn {
+    opacity: 0.8;
+    background-color: #fff;
+}
+
+#redirectbtn:over {
+    opacity: 1;
 }
 
 #carousel_text {
@@ -544,6 +561,11 @@ nav li {
     margin-bottom: 0px;
   }
 
+  .subsub-head {
+    font-size: 18px;
+    margin-bottom: 0px;
+  }
+
   #about .info-panel {
     min-height: 100%;
   }
@@ -573,6 +595,11 @@ nav li {
   .sub-head {
     font-size: 24px;
     margin-bottom: 0px;
+  }
+
+  .subsub-head {
+    font-size: 20px;
+    margin-bottom: 20px;
   }
 
   #about {
@@ -660,6 +687,11 @@ nav li {
     margin-bottom: 0px;
   }
 
+  .sub-head {
+    font-size: 30px;
+    margin-bottom: 0px;
+  }
+
   #about .info-panel {
     min-height: 100%;
   }
@@ -736,6 +768,11 @@ nav li {
 
   .sub-head {
     font-size: 40px;
+    margin-bottom: 0px;
+  }
+
+  .subsub-head {
+    font-size: 35px;
     margin-bottom: 50px;
   }
 
@@ -807,6 +844,11 @@ nav li {
 
   .sub-head {
     font-size: 56px;
+    margin-bottom: 0px;
+  }
+
+  .subsub-head {
+    font-size: 40px;
     margin-bottom: 80px;
   }
 
