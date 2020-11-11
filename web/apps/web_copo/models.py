@@ -57,7 +57,7 @@ class ViewLock(models.Model):
     url = models.URLField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     timeLocked = models.DateTimeField()
-    timeout = timedelta(seconds=10)
+    timeout = timedelta(seconds=30)
 
     def lockView(self, url):
         # method will throw error if lock already exists for url
@@ -69,6 +69,10 @@ class ViewLock(models.Model):
             return True
         except ViewLock.MultipleObjectsReturned:
             return False
+
+    def delete_self(self):
+        self.delete()
+        return True
 
     def unlockView(self, url):
         lock = ViewLock.objects.get(url=url)

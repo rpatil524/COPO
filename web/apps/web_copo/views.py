@@ -146,9 +146,7 @@ def copo_samples(request, profile_id):
 
 @login_required
 def copo_sample_accept_reject(request):
-    url = request.build_absolute_uri()
     return render(request, 'copo/copo_sample_accept_reject.html', {})
-
 
 @login_required()
 def annotate_meta(request, file_id):
