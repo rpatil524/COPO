@@ -55,6 +55,7 @@ class Repository(models.Model):
 
 class test_model(models.Model):
     url = models.URLField()
+    c = models.CharField(max_length=10, default="a")
 
 class ViewLock(models.Model):
     url = models.URLField()

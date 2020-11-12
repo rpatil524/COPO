@@ -123,7 +123,7 @@ mongo/mongodata
 .DS_Store
 .idea/workspace.xml
 workspace.xml
-# add ignore for migrations
+
 
 
 copo_env
