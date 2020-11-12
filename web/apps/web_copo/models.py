@@ -53,6 +53,9 @@ class Repository(models.Model):
         )
 
 
+class test_model(models.Model):
+    url = models.URLField()
+
 class ViewLock(models.Model):
     url = models.URLField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)

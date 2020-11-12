@@ -124,7 +124,7 @@ mongo/mongodata
 .idea/workspace.xml
 workspace.xml
 # add ignore for migrations
-0001_initial.py
+
 
 copo_env
 
