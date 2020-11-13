@@ -57,8 +57,7 @@ class test_model(models.Model):
     url = models.URLField()
     c = models.CharField(max_length=10, default="a")
 
-class publication(models.Model):
-    name = models.CharField(max_length=10, default="title")
+
 
 class ViewLock(models.Model):
     url = models.URLField()
