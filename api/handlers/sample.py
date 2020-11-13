@@ -204,3 +204,9 @@ def get_all(request):
         out_list.append(tmp_sample)
 
     return finish_request(out_list)
+
+def get_study_from_sample_accession(accession):
+    pass
+
+def get_sample_from_study_accession(accession):
+    pass
