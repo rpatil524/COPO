@@ -5,7 +5,7 @@ import sys
 from bson.errors import InvalidId
 
 from api.utils import get_return_template, extract_to_template, finish_request
-from dal.copo_da import Sample, Source
+from dal.copo_da import Sample, Source, Submission
 from web.apps.web_copo.lookup.lookup import API_ERRORS
 from web.apps.web_copo.lookup import dtol_lookups as  lookup
 from django.http import HttpResponse
@@ -205,8 +205,27 @@ def get_all(request):
 
     return finish_request(out_list)
 
-def get_study_from_sample_accession(accession):
-    pass
+def get_study_from_sample_accession(request, accessions):
+    ids = accessions.split(",")
+    # strip white space
+    ids = list(map(lambda x: x.strip(), ids))
+    # remove any empty elements in the list (e.g. where 2 or more comas have been typed in error
+    ids[:] = [x for x in ids if x]
+    # try to get sample from either sra or biosample id
+    samples = Sample().get_by_field(dtol_field="sraAccession", value=ids)
+    if not samples:
+        samples = Sample().get_by_field(dtol_field="biosampleAccession", value=ids)
+        if not samples:
+            return finish_request([])
+    # if record found, find associated submission record
+    out = []
+    for s in samples:
+        sub = Submission().get_submission_from_sample_id(str(s["_id"]))
+        d = sub[0]["accessions"]["study_accessions"]
+        d["sample_biosampleId"] = s["biosampleAccession"]
+        out.append(d)
+    return finish_request(out)
+
 
 def get_sample_from_study_accession(accession):
     pass

@@ -1287,6 +1287,10 @@ class Submission(DAComponent):
             {"_id": ObjectId(sub_id)}, {"$set": {"modified": datetime.utcnow()}}
         )
 
+    def get_submission_from_sample_id(self, s_id):
+        query = "accessions.sample_accessions." + s_id
+        projection = "accessions.study_accessions"
+        return cursor_to_list(self.get_collection_handle().find({query:{"$exists":True}}, {projection:1}))
 
 class DataFile(DAComponent):
     def __init__(self, profile_id=None):
