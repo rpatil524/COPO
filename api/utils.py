@@ -35,7 +35,7 @@ def extract_to_template(object=None, template=None):
     return template
 
 
-def finish_request(template=None, error=None):
+def finish_request(template=None, error=None, num_found=None):
     """
     Method to tidy up data before returning API caller
     :param template: completed template of resource data
@@ -44,12 +44,15 @@ def finish_request(template=None, error=None):
     """
     wrapper = get_return_template('WRAPPER')
     if error is None:
-        if template == None:
-            wrapper["number_found"] = 0
-        if type(template) == type(list()):
-            wrapper['number_found'] = len(template)
+        if num_found == None:
+            if template == None:
+                wrapper["number_found"] = 0
+            if type(template) == type(list()):
+                wrapper['number_found'] = len(template)
+            else:
+                wrapper['number_found'] = 1
         else:
-            wrapper['number_found'] = 1
+            wrapper['number_found'] = num_found
         wrapper['data'] = template
         wrapper['status'] = "OK"
     else:

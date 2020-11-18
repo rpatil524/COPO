@@ -34,8 +34,8 @@ dtol_api_patterns = [
             name='get_by_dtol_field'),
     re_path(r'sample/dtol/num_samples', sample.get_num_dtol_samples, name='get_num_dtol_samples'),
     re_path(r'sample/dtol/', sample.get_dtol_samples, name='get_manifests'),
-    re_path(r'sample/SampleFromStudyAccession/', sample.get_sample_from_study_accession,
-            name='get_sample_from_study_accession'),
+    re_path(r'sample/SampleFromStudyAccession/(?P<accessions>[A-Za-z0-9, ]+)', sample.get_samples_from_study_accessions,
+            name='get_samples_from_study_accession'),
     re_path(r'sample/StudyFromSampleAccession/(?P<accessions>[A-Za-z0-9, ]+)', sample.get_study_from_sample_accession,
             name='get_study_from_sample_accession'),
 ]

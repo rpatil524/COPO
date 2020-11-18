@@ -793,6 +793,13 @@ class Submission(DAComponent):
         if len(sub["dtol_samples"]) < 1:
             sub_handle.update({"_id": ObjectId(sub_id)}, {"$set": {"dtol_status": "complete"}})
 
+    def get_dtol_samples_in_biostudy(self, study_ids):
+        sub = self.get_collection_handle().find(
+            {"accessions.study_accessions.bioProjectAccession":{"$in":study_ids}},
+            {"accessions": 1, "_id": 0}
+        )
+        return cursor_to_list(sub)
+
     def get_pending_dtol_samples(self):
         REFRESH_THRESHOLD = 3600  # time in seconds to retry stuck submission
         # called by celery to get samples the supeprvisor has set to be sent to ENA

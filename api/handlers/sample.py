@@ -227,5 +227,23 @@ def get_study_from_sample_accession(request, accessions):
     return finish_request(out)
 
 
-def get_sample_from_study_accession(accession):
-    pass
+def get_samples_from_study_accessions(request, accessions):
+    ids = accessions.split(",")
+    # strip white space
+    ids = list(map(lambda x: x.strip(), ids))
+    # remove any empty elements in the list (e.g. where 2 or more comas have been typed in error
+    ids[:] = [x for x in ids if x]
+    subs = Submission().get_dtol_samples_in_biostudy(ids)
+    to_finish = list()
+    sample_count = 0
+    for s in subs:
+        out = dict()
+        out["study_accessions"] = s["accessions"]["study_accessions"]
+        out["sample_accessions"] = []
+        for sa in s["accessions"]["sample_accessions"]:
+            sample_count += 1
+            smpl_accessions = s["accessions"]["sample_accessions"][sa]
+            smpl_accessions["copo_sample_id"] = sa
+            out["sample_accessions"].append(smpl_accessions)
+        to_finish.append(out)
+    return finish_request(to_finish, num_found=sample_count)

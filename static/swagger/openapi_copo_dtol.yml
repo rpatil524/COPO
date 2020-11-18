@@ -220,32 +220,56 @@ paths:
                 $ref: '#/components/schemas/SampleList'
 
   /sample/StudyFromSampleAccession/{sample_ids}:
-      get:
-        tags:
-          - Sample
-        summary:
-          Get Sample
-        description: >
-          Get full sample information for the samples returned from the given {field} / {values}
-        parameters:
-          - name: sample_ids
-            in: path
-            required: true
-            description: a comma separated list of biosample accessions or ENA/SRA accessions
-            schema:
-              type: string
-              minimum: 1
-              maximum: 1
+    get:
+      tags:
+        - Sample
+      summary:
+        Get Sample
+      description: >
+        Get full sample information for the samples returned from the given {field} / {values}
+      parameters:
+        - name: sample_ids
+          in: path
+          required: true
+          description: a comma separated list of biosample accessions or ENA/SRA accessions
+          schema:
+            type: string
+            minimum: 1
+            maximum: 1
 
-        responses:
-          "200": # status code
-            description: A JSON array sample objects
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/AccessionListShort'
+      responses:
+        "200": # status code
+          description: A JSON array sample objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessionListShort'
 
+  /sample/SampleFromStudyAccession/{biostudyAccessions}:
+    get:
+      tags:
+        - Sample
+      summary:
+        Get Sample
+      description: >
+        Get full sample information for the samples returned from the given {field} / {values}
+      parameters:
+        - name: biostudyAccessions
+          in: path
+          required: true
+          description: a comma separated list of biostudy accessions
+          schema:
+            type: string
+            minimum: 1
+            maximum: 1
 
+      responses:
+        "200": # status code
+          description: A JSON array sample objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SampleAccessionList'
 
 
 components:
@@ -312,6 +336,54 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/StudyAccession'
+
+    SampleAccessionList:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["OK", "Error"]
+        number_found:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SampleAccession'
+
+    SampleAccession:
+      properties:
+        accessions:
+          type: object
+          properties:
+            study_accessions:
+              type: object
+              properties:
+                bioProjectAccession:
+                  type: string
+                sraStudyAccession:
+                  type: string
+                submissionAccession:
+                  type: string
+                status:
+                  type: string
+            sample_accessions:
+              type: array
+              items:
+                $ref: '#/components/schemas/SimpleSampleAccession'
+
+    SimpleSampleAccession:
+      type: object
+      properties:
+        biosampleAccession:
+          type: string
+        sraAccession:
+          type: string
+        submissionAccession:
+          type: string
+        status:
+          type: string
+        copo_sample_id:
+          type: string
 
     StudyAccession:
       type: object
