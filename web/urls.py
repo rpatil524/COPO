@@ -16,7 +16,8 @@ urlpatterns = [
     path('accounts/profile/', views.index),
     path('', TemplateView.as_view(template_name="index.html"), name='index'),
     path('people/', TemplateView.as_view(template_name="people.html"), name='people'),
-    path('dtol/', TemplateView.as_view(template_name="dtol.html"), name='dtol')
+    path('dtol/', TemplateView.as_view(template_name="dtol.html"), name='dtol'),
+    path('news/', TemplateView.as_view(template_name="news.html"), name='news')
 ]
 
 if settings.DEBUG is False:  # if DEBUG is True it will be served automatically
