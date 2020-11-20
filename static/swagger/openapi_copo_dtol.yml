@@ -260,9 +260,6 @@ paths:
           description: a comma separated list of biostudy accessions
           schema:
             type: string
-            minimum: 1
-            maximum: 1
-
       responses:
         "200": # status code
           description: A JSON array sample objects
@@ -272,8 +269,44 @@ paths:
                 $ref: '#/components/schemas/SampleAccessionList'
 
 
+  /stats/number_of_users/:
+    get:
+      tags:
+        - Stats
+      summary:
+        Get number of registered COPO users
+      responses:
+        "200": # status code
+          description: A JSON array sample objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsNumber'
+
+  /stats/number_of_dtol_samples/:
+    get:
+      tags:
+        - Stats
+      summary:
+        Get number of registered DTOL samples
+      responses:
+        "200": # status code
+          description: A JSON array sample objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsNumber'
+
+
+
 components:
   schemas:
+    StatsNumber:
+      type: object
+      properties:
+        number_found:
+          type: integer
+
     SampleStatus:
       type: object
       properties:
