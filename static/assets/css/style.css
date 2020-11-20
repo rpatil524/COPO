@@ -121,8 +121,13 @@ section {
 ==================================================*/
 .color-green {
     /*background-image: url('../img/wheat.jpg');*/
-    background-color: rgba(179, 151, 89, 0.8);
+    background-color: rgba(179, 151, 89, 0.4);
     color: white
+}
+
+.color-background {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
 }
 
 .color-white {
@@ -436,7 +441,10 @@ nav li {
 }
 
 #about {
-
+    height: 80vh;
+    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 .info-panel {
@@ -473,6 +481,10 @@ nav li {
 
 .border-right {
     border-right: 1px solid lightgrey;
+}
+
+.border-left {
+    border-left: 1px solid lightgrey;
 }
 
 #info-wrap {
