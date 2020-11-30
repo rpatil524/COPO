@@ -1,0 +1,178 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+    font-weight: bold;
+}
+
+.container-fluid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.nav {
+    padding-right: 15px;
+}
+
+.nav li a {
+    background-color: transparent !important;
+    color: white !important;
+    font-size: 2em;
+    font-weight: bolder;
+    margin: 10px 5px 0 5px;
+}
+
+#copo-icon {
+
+    width: 800px;
+    margin: 0 auto;
+}
+
+#copo-icon img {
+    margin-top: 40px !important;
+}
+
+.green-subtitle {
+    text-align: center;
+    font-size: 2.4em;
+    font-weight: bold;
+    padding: 10px;
+    width: 700px;
+    margin-top: 20px !important;
+    margin: 0 auto;
+    background-color: rgba(140, 198, 63, 1);
+    color: #414141
+}
+
+.green {
+    background-color: rgba(140, 198, 63, 1);
+    height: 100%;
+}
+
+.button_bar {
+    padding-left: 15px;
+    margin-top: 20px !important;
+    font-size: 1.8em;
+    text-align: center;
+}
+
+.big_button {
+    margin-top: 75px !important;
+    font-size: 2em !important;
+    background-color: rgba(65, 65, 65, 0.5) !important;
+    width: 500px
+}
+
+.big_button:hover {
+    color: rgba(140, 198, 63, 1) !important;
+}
+
+.content {
+    padding: 0;
+    width: 100% !important;
+    margin-top: 50px;
+    min-height: 1000px;
+    background-color: rgba(65, 65, 65, 1) !important;
+}
+
+section {
+    height: 100vh
+}
+
+.secondary-container {
+    padding: 50px 25px 0 50px
+}
+
+.secondary-h1 {
+    background-color: rgba(65, 65, 65, 1) !important;
+    color: white !important;
+    font-size: 4em;
+    font-weight: bold;
+
+    padding: 20px 7px 7px 7px;
+}
+
+.secondary-title-image img {
+    padding: 0;
+    height: 60px;
+    margin-left: 100px;
+    vertical-align: bottom;
+}
+
+p {
+    color: white;
+    font-size: 1.8em;
+    margin: 60px 0 15px 0
+}
+
+.ArticleCopy {
+    font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+    width: 80%;
+
+    padding: 3rem;
+}
+
+.ArticleCopy p {
+    text-rendering: optimizeLegibility;
+}
+
+.ArticleCopy blockquote {
+    font-size: 1.8em !important;
+    border-radius: 3px;
+    position: relative; /*  <--- */
+    font-style: italic;
+    text-align: center;
+    padding: 1rem 1.2rem;
+    width: 60%; /* create space for the quotes */
+    color: rgba(65, 65, 65, 1);
+    margin: 1rem auto 2rem;
+
+    background: #eaf0f0;
+}
+
+.author {
+    position: relative;
+    display: block;
+    text-align: right;
+    margin-top: 5px;
+    color: rgba(140, 198, 63, 1);
+    font-size: 0.8em !important;
+}
+
+.author.i {
+    position: relative;
+    background: #eee;
+    padding-left: 5px;
+    font-style: italic;
+    z-index: 5;
+
+}
+
+
+/* -- create the quotation marks -- */
+.ArticleCopy blockquote:before,
+.ArticleCopy blockquote:after {
+    font-family: FontAwesome;
+    position: absolute;
+    /* -- inside the relative position of blockquote -- */
+    top: 13px;
+    color: #eaf0f0;
+    font-size: 34px;
+
+}
+
+.ArticleCopy blockquote:before {
+    content: "\f10d";
+    margin-right: 13px;
+    right: 100%;
+}
+
+.ArticleCopy blockquote:after {
+    content: "\f10e";
+    margin-left: 13px;
+    left: 100%;
+    top: auto;
+    bottom: 13px;
+}

@@ -1,0 +1,43 @@
+{% extends "base1.html" %}
+{% load static %}
+
+{% block javascript_block %}
+    <script>
+        var image_pre = "/static/assets/img/"
+        var images = [image_pre + "fox_bw.jpg"]
+    </script>
+{% endblock %}
+
+{% block baseblock %}
+
+    <div class="container-fluid">
+        <section>
+
+            <!-- include navbar html -->
+            {% include "nav.html" %}
+
+            <div id="copo-icon">
+                <img src="{% static "assets/img/copo_white_800.png" %}">
+            </div>
+
+            <div class="green-subtitle">
+                share your data with fellow researchers
+            </div>
+
+            <div class="button_bar big">
+                <button class="ui big_button inverted button">Submit Data</button>
+                <button class="ui big_button inverted button">Try Demo</button>
+            </div>
+
+        </section>
+        <section>
+            <!-- main content block -->
+            {% block content %}
+            {% endblock %}
+
+        </section>
+
+    </div>
+
+
+{% endblock %}

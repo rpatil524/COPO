@@ -1,0 +1,29 @@
+{% extends "base1.html" %}
+{% block javascript_block %}
+    <script>
+        var image_pre = "/static/assets/img/"
+        var images = [image_pre + "bacteria.jpg", image_pre + "bacteria1.jpg", image_pre + "flowers.jpg", image_pre + "food.jpg"]
+    </script>
+{% endblock %}
+
+{% block baseblock %}
+    <div class="container-fluid">
+        <section>
+            <div class="row">
+
+                <div class="col-sm-8 col-md-8 col-lg-8 green">
+
+                    <div class="secondary-container">
+                        {% block content %}
+
+
+
+                        {% endblock %}
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </div>
+{% endblock %}
