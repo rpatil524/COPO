@@ -1,3 +1,8 @@
+* {
+margin: 0;
+padding: 0;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     background-repeat: no-repeat;
@@ -5,11 +10,13 @@ body {
     background-position: center;
     background-size: cover;
     font-weight: bold;
+
 }
 
 .container-fluid {
     padding-left: 0 !important;
     padding-right: 0 !important;
+
 }
 
 .nav {
@@ -48,7 +55,53 @@ body {
 
 .green {
     background-color: rgba(140, 198, 63, 1);
+
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+
+    min-height: 100vh !important;
+}
+
+.secondary-h1 {
+
+    background-color: rgba(65, 65, 65, 1) !important;
+    color: white !important;
+    font-size: 4em;
+    font-weight: bold;
+    padding: 20px 7px 7px 50px;
+
+}
+
+.zero-padding{
+    padding-left: 0;
     height: 100%;
+}
+
+.full-length{
+    height: 100%;
+}
+
+.secondary-top-right{
+    background-color: rgba(65, 65, 65, 0.5) !important;
+
+    position: relative;
+    padding-left: 0 !important;
+    height: 107px;
+
+}
+
+
+.secondary-top-right img{
+    max-height: 90%;
+
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
 }
 
 .button_bar {
@@ -73,7 +126,7 @@ body {
     padding: 0;
     width: 100% !important;
     margin-top: 50px;
-    min-height: 1000px;
+
     background-color: rgba(65, 65, 65, 1) !important;
 }
 
@@ -82,17 +135,11 @@ section {
 }
 
 .secondary-container {
-    padding: 50px 25px 0 50px
+    padding: 50px 25px 0 50px;
+
 }
 
-.secondary-h1 {
-    background-color: rgba(65, 65, 65, 1) !important;
-    color: white !important;
-    font-size: 4em;
-    font-weight: bold;
 
-    padding: 20px 7px 7px 7px;
-}
 
 .secondary-title-image img {
     padding: 0;
@@ -167,6 +214,7 @@ p {
     content: "\f10d";
     margin-right: 13px;
     right: 100%;
+    top: -20px
 }
 
 .ArticleCopy blockquote:after {
@@ -174,5 +222,5 @@ p {
     margin-left: 13px;
     left: 100%;
     top: auto;
-    bottom: 13px;
+    bottom: -20px;
 }

@@ -6,6 +6,8 @@ $(document).ready(function () {
     $('body').css("background-image", "url(" + images[index] + ")")
 
 
+
+
 })
 
 function getRandomInt(max) {

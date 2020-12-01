@@ -1,29 +1,41 @@
 {% extends "base1.html" %}
+{% load static %}
 {% block javascript_block %}
     <script>
         var image_pre = "/static/assets/img/"
-        var images = [image_pre + "bacteria.jpg", image_pre + "bacteria1.jpg", image_pre + "flowers.jpg", image_pre + "food.jpg"]
+        var images = [image_pre + "coast.jpg", image_pre + "countryside.jpg", image_pre + "cabbage.jpg",
+            image_pre + "redadmiral.jpg", image_pre + "ladybug.jpg",
+            image_pre + "ladybug1.jpg", image_pre + "hedgehog.jpg", image_pre + "otter.jpg",
+            image_pre + "mist.jpg", image_pre + "lavender.jpg", image_pre + "lavender1.jpg", image_pre + "drug.jpg"]
     </script>
 {% endblock %}
 
 {% block baseblock %}
-    <div class="container-fluid">
-        <section>
-            <div class="row">
-
-                <div class="col-sm-8 col-md-8 col-lg-8 green">
-
-                    <div class="secondary-container">
-                        {% block content %}
 
 
 
-                        {% endblock %}
-                    </div>
+    <section>
+        <div class="row">
 
+            <div class="col-sm-8 col-md-8 col-lg-8 green">
+                <div class="secondary-h1">{% block topbanner %}{% endblock %}</div>
+                <div class="secondary-container">
+                    {% block content %}
+
+
+
+                    {% endblock %}
+                </div>
+
+            </div>
+            <div class="col-sm-4 col-md-4 col-lg-4 zero-padding">
+                <div class="secondary-top-right">
+
+                    <img src="{% static "assets/img/copo_white_800.png" %}">
                 </div>
             </div>
-        </section>
+        </div>
 
-    </div>
+    </section>
+
 {% endblock %}
