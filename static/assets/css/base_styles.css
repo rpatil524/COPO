@@ -92,7 +92,7 @@ body {
 }
 
 .secondary-top-right {
-    background-color: rgba(65, 65, 65, 1) !important;
+    background-color: rgba(65, 65, 65, 0) !important;
     position: relative;
     padding-left: 0 !important;
     height: 107px;
