@@ -1,13 +1,22 @@
 {% extends "base1.html" %}
 {% load static %}
 {% block javascript_block %}
-    <script>
+
         var image_pre = "/static/assets/img/"
         var images = [image_pre + "coast.jpg", image_pre + "countryside.jpg", image_pre + "cabbage.jpg",
             image_pre + "redadmiral.jpg", image_pre + "ladybug.jpg",
             image_pre + "ladybug1.jpg", image_pre + "hedgehog.jpg", image_pre + "otter.jpg",
             image_pre + "mist.jpg", image_pre + "lavender.jpg", image_pre + "lavender1.jpg", image_pre + "drug.jpg"]
-    </script>
+
+{% endblock %}
+
+
+{%  block css_block %}
+
+    .dot-color{
+        color: #eaf0f0
+    }
+
 {% endblock %}
 
 {% block baseblock %}
@@ -30,8 +39,7 @@
             </div>
             <div class="col-sm-4 col-md-4 col-lg-4 zero-padding">
                 <div class="secondary-top-right">
-
-                    <img src="{% static "assets/img/copo_white_800.png" %}">
+                    {% include "nav_dropdown.html" %}
                 </div>
             </div>
         </div>

@@ -6,7 +6,8 @@ $(document).ready(function () {
     $('body').css("background-image", "url(" + images[index] + ")")
 
 
-
+    $('.ui.dropdown')
+        .dropdown();
 
 })
 

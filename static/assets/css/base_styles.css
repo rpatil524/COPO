@@ -1,22 +1,20 @@
 * {
-margin: 0;
-padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center;
     background-size: cover;
     font-weight: bold;
-
 }
 
 .container-fluid {
     padding-left: 0 !important;
     padding-right: 0 !important;
-
 }
 
 .nav {
@@ -32,7 +30,7 @@ body {
 }
 
 #copo-icon {
-
+    margin-top:50px;
     width: 800px;
     margin: 0 auto;
 }
@@ -55,45 +53,60 @@ body {
 
 .green {
     background-color: rgba(140, 198, 63, 1);
-
     padding-right: 0 !important;
     margin-right: 0 !important;
-
     min-height: 100vh !important;
 }
 
-.secondary-h1 {
 
+.gray {
+    background-color: rgba(65, 65, 65, 1);
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+    min-height: 100vh !important;
+}
+
+.secondary-h1-gray {
+    background-color: #eaf0f0 !important;
+    color: rgba(65, 65, 65 1) !important;
+    font-size: 4em;
+    font-weight: bold;
+    padding: 20px 7px 7px 50px;
+}
+
+.secondary-h1 {
     background-color: rgba(65, 65, 65, 1) !important;
     color: white !important;
     font-size: 4em;
     font-weight: bold;
     padding: 20px 7px 7px 50px;
-
 }
 
-.zero-padding{
+.zero-padding {
     padding-left: 0;
     height: 100%;
 }
 
-.full-length{
+.full-length {
     height: 100%;
 }
 
-.secondary-top-right{
-    background-color: rgba(65, 65, 65, 0.5) !important;
-
+.secondary-top-right {
+    background-color: rgba(65, 65, 65, 1) !important;
     position: relative;
     padding-left: 0 !important;
     height: 107px;
-
 }
 
+.secondary-top-right-gray {
+    background-color: #eaf0f0 !important;
+    position: relative;
+    padding-left: 0 !important;
+    height: 107px;
+}
 
-.secondary-top-right img{
+.secondary-top-right img {
     max-height: 90%;
-
     width: auto;
     height: auto;
     position: absolute;
@@ -126,7 +139,6 @@ body {
     padding: 0;
     width: 100% !important;
     margin-top: 50px;
-
     background-color: rgba(65, 65, 65, 1) !important;
 }
 
@@ -136,10 +148,7 @@ section {
 
 .secondary-container {
     padding: 50px 25px 0 50px;
-
 }
-
-
 
 .secondary-title-image img {
     padding: 0;
@@ -157,7 +166,6 @@ p {
 .ArticleCopy {
     font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
     width: 80%;
-
     padding: 3rem;
 }
 
@@ -175,7 +183,6 @@ p {
     width: 60%; /* create space for the quotes */
     color: rgba(65, 65, 65, 1);
     margin: 1rem auto 2rem;
-
     background: #eaf0f0;
 }
 
@@ -194,7 +201,6 @@ p {
     padding-left: 5px;
     font-style: italic;
     z-index: 5;
-
 }
 
 
@@ -223,4 +229,24 @@ p {
     left: 100%;
     top: auto;
     bottom: -20px;
+}
+
+.margin-30 {
+    margin: 30px
+}
+
+.item{
+    font-size: 2em !important;
+}
+
+.item a{
+    color: rgba(65, 65, 65, 1);
+    text-decoration: none;
+}
+
+#stats_bar{
+    width:100%;
+    height: 200px;
+    margin-top: 50px;
+    background-color: white;
 }

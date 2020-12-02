@@ -2,15 +2,24 @@
 {% load static %}
 
 {% block javascript_block %}
-    <script>
+
         var image_pre = "/static/assets/img/"
         var images = [image_pre + "fox_bw.jpg", image_pre + "flower_bw.jpg", image_pre + "hedgehog_bw.jpg", image_pre + "ladybug_bw.jpg",
-            image_pre + "animals_bw.jpg", image_pre + "blackbird_bw.jpg", image_pre + "cabbage_bw.jpg", image_pre + "coast_bw.jpg",
-            image_pre + "ladybug1_bw.jpg", image_pre + "lavender_bw.jpg", image_pre + "lavender1_bw.jpg", image_pre + "mist_bw.jpg",
-            image_pre + "otter_bw.jpg"
+            image_pre + "blackbird_bw.jpg", image_pre + "cabbage_bw.jpg", image_pre + "ladybug1_bw.jpg", image_pre + "lavender_bw.jpg",
+            image_pre + "lavender1_bw.jpg", image_pre + "mist_bw.jpg", image_pre + "otter_bw.jpg"
         ]
-    </script>
+
 {% endblock %}
+
+
+{%  block css_block %}
+
+    .dot-color{
+        color: #eaf0f0
+    }
+
+{% endblock %}
+
 
 {% block baseblock %}
 
@@ -18,7 +27,9 @@
         <section>
 
             <!-- include navbar html -->
-            {% include "nav.html" %}
+            <div class="pull-right">
+                {% include "nav_dropdown.html" %}
+            </div>
 
             <div id="copo-icon">
                 <img src="{% static "assets/img/copo_white_800.png" %}">
@@ -33,6 +44,11 @@
                 <button class="ui big_button inverted button">Try Demo</button>
             </div>
 
+<!--
+           <div id="stats_bar">
+
+           </div>
+-->
         </section>
         <section>
             <!-- main content block -->
