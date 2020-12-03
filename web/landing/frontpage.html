@@ -3,19 +3,21 @@
 
 {% block javascript_block %}
 
-        var image_pre = "/static/assets/img/"
-        var images = [image_pre + "fox_bw.jpg", image_pre + "flower_bw.jpg", image_pre + "hedgehog_bw.jpg", image_pre + "ladybug_bw.jpg",
-            image_pre + "blackbird_bw.jpg", image_pre + "cabbage_bw.jpg", image_pre + "ladybug1_bw.jpg", image_pre + "lavender_bw.jpg",
-            image_pre + "lavender1_bw.jpg", image_pre + "mist_bw.jpg", image_pre + "otter_bw.jpg"
-        ]
+    var image_pre = "/static/assets/img/"
+    var images = [image_pre + "fox_bw.jpg", image_pre + "flower_bw.jpg", image_pre + "hedgehog_bw.jpg", image_pre +
+    "ladybug_bw.jpg",
+    image_pre + "blackbird_bw.jpg", image_pre + "cabbage_bw.jpg", image_pre + "ladybug1_bw.jpg", image_pre +
+    "lavender_bw.jpg",
+    image_pre + "lavender1_bw.jpg", image_pre + "mist_bw.jpg", image_pre + "otter_bw.jpg"
+    ]
 
 {% endblock %}
 
 
-{%  block css_block %}
+{% block css_block %}
 
     .dot-color{
-        color: #eaf0f0
+    color: #eaf0f0
     }
 
 {% endblock %}
@@ -48,11 +50,10 @@
                 </a>
             </div>
 
-            <!--
-                       <div id="stats_bar">
+            <div id="stats_bar">
+                {% include "statistics.html" %}
+            </div>
 
-                       </div>
-            -->
         </section>
         <section class="shade">
             <!-- main content block -->

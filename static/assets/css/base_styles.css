@@ -58,22 +58,22 @@ body {
     min-height: 100vh !important;
 }
 
-.green {
+.green-theme {
     background-color: rgba(140, 198, 63, 1);
     color: rgba(65, 65, 65, 1) !important;
 }
 
-.gray {
+.gray-theme {
     background-color: rgba(65, 65, 65, 1);
     color: #eaf0f0;
 }
 
-.red {
+.red-theme {
     background-color: #c74b2c;
     color: #eaf0f0;
 }
 
-.blue {
+.blue-theme {
     background-color: #5174c7;
     color: #eaf0f0;
 }
@@ -139,13 +139,6 @@ body {
 
 .big_button:hover {
     color: rgba(140, 198, 63, 1) !important;
-}
-
-.content {
-    padding: 0;
-    width: 100% !important;
-    margin-top: 50px;
-    background-color: rgba(65, 65, 65, 1) !important;
 }
 
 section {
@@ -251,11 +244,15 @@ p {
 
 #stats_bar {
     width: 100%;
-    height: 200px;
-    margin-top: 50px;
-    background-color: white;
+    margin: 0 auto;
+    margin-top: 100px;
 }
 
 .shade {
     background-color: rgba(65, 65, 65, 0.5);
+}
+
+.statistic {
+    color: rgba(65, 65, 65, 1);
+    padding: 20px !important
 }
