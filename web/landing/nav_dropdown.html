@@ -1,7 +1,11 @@
-<div class="ui dropdown pull-right margin-30 dropdown-text">
+<div class="ui dropdown pull-right margin-30 dropdown-text floating">
     <input type="hidden" name="filters">
-    <i class="ellipsis vertical big icon dot-color"></i>
 
+    {% if request.path != "/" %}
+        <i class="ellipsis vertical big icon dot-color"></i>
+    {% else %}
+        <i class="bars big icon dot-color"></i>
+    {% endif %}
     <div class="menu">
 
         <div class="item">
@@ -17,10 +21,10 @@
             Darwin Tree of Life
         </div>
         <div class="item">
-            Try Demo
+            <a href="http://demo.copo-project.org/copo">Try Demo</a>
         </div>
         <div class="item">
-            Submit Data
+            <a href="https://copo-project.org/copo">Submit Data</a>
         </div>
     </div>
 </div>

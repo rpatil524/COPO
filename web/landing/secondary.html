@@ -8,13 +8,15 @@
     image_pre + "ladybug1.jpg", image_pre + "hedgehog.jpg", image_pre + "otter.jpg",
     image_pre + "mist.jpg", image_pre + "lavender.jpg", image_pre + "lavender1.jpg", image_pre + "drug.jpg"]
 
+    var content_classes = ["gray", "green", "blue", "red"]
+
 {% endblock %}
 
 
 {% block css_block %}
 
     .dot-color{
-    color: #414141 !important;
+    color: #eaf0f0 !important;
     }
 
 {% endblock %}
@@ -27,8 +29,8 @@
     <section>
         <div class="row">
 
-            <div class="col-sm-8 col-md-8 col-lg-8 gray">
-                <div class="secondary-h1-gray">{% block topbanner %}{% endblock %}</div>
+            <div id="main_banner" class="col-sm-8 col-md-8 col-lg-8 left-panel">
+                <div class="topbanner-light">{% block topbanner %}{% endblock %}</div>
                 <div class="secondary-container">
                     {% block content %}
 
@@ -39,7 +41,7 @@
 
             </div>
             <div class="col-sm-4 col-md-4 col-lg-4 zero-padding">
-                <div class="secondary-top-right-gray">
+                <div class="secondary-top-right">
                     {% include "nav_dropdown.html" %}
                 </div>
             </div>
