@@ -1,18 +1,18 @@
 $(document).ready(function () {
 
-
-    var index = getRandomInt(images.length)
-
-    $('body').css("background-image", "url(" + images[index] + ")")
+    $('.ui.dropdown').dropdown();
+    var image = getRandomInt(images.length)
+    $('body').css("background-image", "url(" + images[image] + ")")
 
     try {
         var color = getRandomInt(content_classes.length)
+        color = 1
         $("#main_banner").addClass(content_classes[color])
     } catch (err) {
 
     }
-    $('.ui.dropdown')
-        .dropdown();
+
+
 
 })
 
