@@ -1,9 +1,9 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 20/01/2016'
 
-from .annotate_views import search_all, post_annotations, handle_upload
 from django.urls import path, re_path
+
+from .annotate_views import search_all, post_annotations, handle_upload
 from .handlers import sample, person, general
-from django.shortcuts import redirect
 
 app_name = 'api'
 
@@ -14,6 +14,7 @@ generic_api_patterns = [
     path('search/', search_all, name='search_all'),
     path('annotations/', post_annotations, name='post_annotations'),
     path('upload_annotation_file/', handle_upload, name='handle_upload'),
+    re_path(r'stats/numbers', general.numbers, name='stats/numbers'),
 ]
 
 dtol_api_patterns = [

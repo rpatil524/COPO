@@ -3,17 +3,17 @@ __author__ = 'felix.shaw@tgac.ac.uk - 14/05/15'
 import json
 
 import jsonpickle
-import requests
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.http import HttpResponse
+from django.shortcuts import redirect
 
 import web.apps.web_copo.repos.figshare as f
 from api.doi_metadata import DOI2Metadata
 from dal.copo_base_da import Collection_Head
+from dal.copo_da import Profile, Sample, DataFile
 from dal.ena_da import EnaCollection
-from django.conf import settings
-
 from web.apps.web_copo.schemas.utils.data_formats import DataFormats
-from django.shortcuts import redirect
 
 
 def forward_to_swagger(request):
@@ -117,3 +117,29 @@ def refactor_collection_schema(request):
 
     out_dict = {"status": status}
     return HttpResponse(jsonpickle.encode(out_dict), content_type='json')
+
+
+def numbers(request):
+    profiles = number_of_profiles()
+    samples = number_of_samples()
+    users = number_of_users()
+    datafiles = number_of_datafiles()
+    out = {"profiles": profiles, "samples": samples, "users": users, "datafiles": datafiles}
+    return HttpResponse(json.dumps(out))
+
+
+def number_of_profiles():
+    return Profile().get_number()
+
+
+def number_of_samples():
+    # get total number of sample records in COPO instance
+    return Sample().get_number()
+
+
+def number_of_users():
+    return User.objects.all().count()
+
+
+def number_of_datafiles():
+    return DataFile().get_number()

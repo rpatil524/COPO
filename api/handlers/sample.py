@@ -1,16 +1,16 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 20/01/2016'
 
+import datetime
 import sys
 
+import dateutil.parser as parser
 from bson.errors import InvalidId
+from django.http import HttpResponse
 
 from api.utils import get_return_template, extract_to_template, finish_request
 from dal.copo_da import Sample, Source, Submission
-from web.apps.web_copo.lookup.lookup import API_ERRORS
 from web.apps.web_copo.lookup import dtol_lookups as  lookup
-from django.http import HttpResponse
-import datetime
-import dateutil.parser as parser
+from web.apps.web_copo.lookup.lookup import API_ERRORS
 
 
 def get(request, id):
@@ -70,7 +70,7 @@ def filter_for_STS(sample_list):
             if k == "_id":
                 s_out["copo_id"] = str(v)
             # check if field is listed to be exported to STS
-            #print(k)
+            # print(k)
             if k in export:
                 if k in time_fields:
                     s_out[k] = format_date(v)
@@ -123,10 +123,12 @@ def get_by_biosample_ids(request, biosample_ids):
         out = filter_for_STS(sample)
     return finish_request(out)
 
+
 def get_num_dtol_samples(request):
     samples = Sample().get_all_dtol_samples()
     number = len(samples)
     return HttpResponse(str(number))
+
 
 def get_dtol_samples(request):
     samples = Sample().get_all_dtol_samples()
@@ -180,13 +182,13 @@ def get_all(request):
     try:
         sample_list = Sample().get_samples_across_profiles()
     except TypeError as e:
-        #print(e)
+        # print(e)
         return finish_request(error=API_ERRORS['NOT_FOUND'])
     except InvalidId as e:
-        #print(e)
+        # print(e)
         return finish_request(error=API_ERRORS['INVALID_PARAMETER'])
     except:
-        #print("Unexpected error:", sys.exc_info()[0])
+        # print("Unexpected error:", sys.exc_info()[0])
         raise
 
     for s in sample_list:
@@ -204,6 +206,7 @@ def get_all(request):
         out_list.append(tmp_sample)
 
     return finish_request(out_list)
+
 
 def get_study_from_sample_accession(request, accessions):
     ids = accessions.split(",")

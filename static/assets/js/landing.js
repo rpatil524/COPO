@@ -6,13 +6,20 @@ $(document).ready(function () {
 
     try {
         var color = getRandomInt(content_classes.length)
-        color = 1
         $("#main_banner").addClass(content_classes[color])
     } catch (err) {
 
     }
 
-
+    $.getJSON("api/stats/numbers")
+        .done(function (data) {
+            $("#num_samples").html(data.samples)
+            $("#num_profiles").html(data.profiles)
+            $("#num_users").html(data.users)
+            $("#num_uploads").html(data.datafiles)
+        }).error(function (data) {
+        console.log(data)
+    })
 
 })
 

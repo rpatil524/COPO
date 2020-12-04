@@ -1,8 +1,10 @@
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
 import web.settings.email as email_settings
 from web.apps.web_copo.models import User
+
 
 class CopoEmail:
 
@@ -15,8 +17,6 @@ class CopoEmail:
                 "<p><a href='{}'>{}</a></p>"
         }
 
-    def __del__(self):
-        self.mailserver.quit()
 
     def send(self, to, sub, content, html=False):
         msg = MIMEMultipart()
