@@ -1,0 +1,69 @@
+{% extends "base1.html" %}
+{% load static %}
+
+{% block javascript_block %}
+
+    var image_pre = "/static/assets/img/"
+    var images = [image_pre + "fox_bw.jpg", image_pre + "flower_bw.jpg", image_pre +
+    "ladybug_bw.jpg",
+    image_pre + "blackbird_bw.jpg", image_pre + "ladybug1_bw.jpg", image_pre +
+    "lavender_bw.jpg",
+    image_pre + "lavender1_bw.jpg", image_pre + "mist_bw.jpg", image_pre + "otter_bw.jpg"
+    ]
+
+{% endblock %}
+
+
+{% block css_block %}
+
+    .dot-color{
+    color: #eaf0f0
+    }
+
+{% endblock %}
+
+
+{% block baseblock %}
+
+    <div class="container-fluid">
+        <section>
+
+            <!-- include navbar html -->
+            <div class="pull-right">
+                {% include "nav_dropdown.html" %}
+            </div>
+
+            <div id="copo-icon">
+                <img src="{% static "assets/img/copo_white_800.png" %}">
+            </div>
+
+            <div class="green-subtitle">
+                share your data with fellow researchers
+            </div>
+
+            <div class="button_bar big">
+                <a href="https://copo-project.org/copo">
+                    <button class="ui big_button inverted button">Submit Data</button>
+                </a>
+                <a href="http://demo.copo-project.org/copo">
+                    <button class="ui big_button inverted button">Try Demo</button>
+                </a>
+            </div>
+
+            <div id="stats_bar">
+                {% include "statistics.html" %}
+            </div>
+
+        </section>
+        <section class="shade">
+            <!-- main content block -->
+            {% block content %}
+            {% endblock %}
+
+        </section>
+
+
+    </div>
+
+
+{% endblock %}
