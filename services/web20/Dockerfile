@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.7.9-buster
 
 ENV PYTHONUNBUFFERED 1
 
@@ -19,12 +19,11 @@ RUN apt-get update && apt-get install -y \
     rubygems \
     poppler-utils
 
-
 RUN gem install sass
 RUN pip install --upgrade pip
 
 COPY ./requirements/ /tmp/requirements/
-RUN pip install -r /tmp/requirements/dev.txt
+RUN pip install --use-deprecated=legacy-resolver -r /tmp/requirements/dev.txt
 
 RUN mkdir /copo
 RUN mkdir /code
