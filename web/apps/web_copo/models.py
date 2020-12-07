@@ -1,11 +1,12 @@
-from django.db import models
+from datetime import datetime, timedelta
+
+import pytz
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django_tools.middlewares.ThreadLocal import get_current_user
-from datetime import datetime, timedelta
-import pytz
 
 
 class UserDetails(models.Model):
@@ -58,6 +59,10 @@ class test_model(models.Model):
     c = models.CharField(max_length=10, default="a")
 
 
+class banner_view(models.Model):
+    header_txt = models.TextField(max_length=100, blank=False, default="")
+    body_txt = models.TextField(max_length=2000, blank=False, default="")
+    active = models.BooleanField()
 
 class ViewLock(models.Model):
     url = models.URLField()

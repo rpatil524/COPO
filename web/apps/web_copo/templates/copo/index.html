@@ -37,11 +37,12 @@
         <input type="hidden" value="{% url 'copo:copo_repository' profile_id='999' %}" name="repository_url"
                id="repository_url"/>
     <input type="hidden" value="{% url 'copo:view_templates' profile_id='999' %}" name="metadata_template_url"
-               id="metadata_template_url"/>
+           id="metadata_template_url"/>
 
     </div>
 
     <style>
+
 
     </style>
 {% endblock browse_header_block %}
@@ -55,7 +56,15 @@
             </div>
         </div>
     </div>
+    {% if banner and banner.active %}
 
+        <div class="warning_banner">
+
+            <h1>{{ banner.header_txt }}</h1>
+            <p style="color:red">{{ banner.body_txt }}</p>
+        </div>
+
+    {% endif %}
     <div class="row" style="margin-bottom:70px;">
         <div class="col-sm-5 col-md-5 col-lg-5 copo-page-headers"></div>
         <div class="col-sm-7 col-md-7 col-lg-7 copo-page-icons"></div>
@@ -69,7 +78,9 @@
 
 
     <!-- getting started section -->
+
     <div class="row">
+
         <div class="col-sm-5 col-md-5 col-lg-5 col-xs-offset-0 page-welcome-message" style="display: none;">
             <div class="copo-webui-popover">
                 <div class="webui-popover-inner">

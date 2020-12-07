@@ -1,44 +1,47 @@
-from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.models import User
-from web.apps.web_copo.models import ViewLock
-from django.shortcuts import render, redirect
-from jsonpickle import encode
-from django.utils.safestring import mark_safe
-import uuid, os
-from submission.submissionDelegator import delegate_submission
-from api.handlers.general import *
-from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, CopoGroup, Repository, AnnotationReference, MetadataTemplate
-from dal.OAuthTokens import OAuthToken
-from dal.broker_da import BrokerDA, BrokerVisuals
-from dal import cursor_to_list
-from .lookup.lookup import HTML_TAGS
-from django.conf import settings
+import os
+import shutil
+import uuid
+
+import requests
 from allauth.account.forms import LoginForm
 from allauth.socialaccount.models import SocialAccount
-from bson import json_util as j
 from bson import ObjectId
-from web.apps.web_copo.lookup.lookup import REPO_NAME_LOOKUP
-import requests
-from rauth import OAuth2Service
-from web.apps.web_copo.utils import EnaImports as eimp
-from web.apps.web_copo.schemas.utils import data_utils
-from web.apps.web_copo.decorators import user_is_staff
-import web.apps.web_copo.templatetags.html_tags as htags
-from dal.copo_da import DataFile
-from pexpect import run
-import shutil
+from bson import json_util as j
 from django.conf import settings
-from web.apps.web_copo.utils import group_functions
-from dal.copo_da import Sample
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from jsonpickle import encode
+from pexpect import run
+from rauth import OAuth2Service
+
+import web.apps.web_copo.templatetags.html_tags as htags
+from api.handlers.general import *
+from dal import cursor_to_list
+from dal.OAuthTokens import OAuthToken
+from dal.broker_da import BrokerDA, BrokerVisuals
+from dal.copo_da import DataFile
+from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, CopoGroup, Repository, MetadataTemplate
+from web.apps.web_copo.decorators import user_is_staff
 from web.apps.web_copo.email import CopoEmail
+from web.apps.web_copo.lookup.lookup import REPO_NAME_LOOKUP
+from web.apps.web_copo.models import banner_view
+from web.apps.web_copo.schemas.utils import data_utils
+from web.apps.web_copo.utils import EnaImports as eimp
+from web.apps.web_copo.utils import group_functions
+from .lookup.lookup import HTML_TAGS
+
 LOGGER = settings.LOGGER
 
 
 @login_required
 def index(request):
-    context = {'user': request.user}
+    banner = banner_view.objects.all()
+    if len(banner) > 0:
+        context = {'user': request.user, "banner": banner[0]}
+    else:
+        context = {'user': request.user}
     return render(request, 'copo/index.html', context)
 
 

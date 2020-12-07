@@ -49,7 +49,7 @@
           href="{% static 'copo/selectize/selectize.bootstrap3.css' %}">
 
     <!-- DataTables components -->
-<!--
+    <!--
     <link rel="stylesheet" media="print" onload="this.media='all'"
           href="{% static 'copo/datatables/css/jquery.dataTables.min.css' %}">
     <link rel="stylesheet" media="print" onload="this.media='all'"
@@ -73,7 +73,8 @@
           href="{% static 'copo/css/copo/copo_annotation_spreadsheet.css' %}"/>
 
 -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.21/b-1.6.3/b-html5-1.6.3/kt-2.5.2/rg-1.1.2/sl-1.3.1/datatables.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.21/b-1.6.3/b-html5-1.6.3/kt-2.5.2/rg-1.1.2/sl-1.3.1/datatables.min.css"/>
     <!-- Google Fonts -->
     <link href={% static 'copo/css/copo/fonts.css' %} rel='stylesheet' type='text/css'>
 
@@ -116,7 +117,8 @@
     <script src="{% static 'copo/datatables/js/buttons.bootstrap.min.js' %}"></script>
     -->
 
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.21/b-1.6.3/b-html5-1.6.3/kt-2.5.2/rg-1.1.2/sl-1.3.1/datatables.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.21/b-1.6.3/b-html5-1.6.3/kt-2.5.2/rg-1.1.2/sl-1.3.1/datatables.min.js"></script>
     <script src="{% static 'copo/search_highlight/dataTables.searchHighlight.min.js' %}"></script>
     <script src="{% static 'copo/search_highlight/jquery.highlight.js' %}"></script>
     <script src="{% static 'copo/bootstrap-datepicker-1.6.4-dist/js/bootstrap-datepicker.min.js' %}"></script>
@@ -366,7 +368,8 @@
 <!-- end template components -->
 
 
-<nav id="copo-global-nav" class="navbar navbar-default navbar-fixed-top" style="background: rgba(38, 38, 38, 0.95);">
+<nav id="copo-global-nav" class="navbar navbar-default navbar-fixed-top"
+     style="background: rgba(38, 38, 38, 0.95);">
     <div class="container-fluid">
         <div class="navbar-header">
             <a class="navbar-brand" href="{% url 'copo:index' %}">
@@ -398,14 +401,16 @@
                 <a id="trigger-notifications" href="#" class="dropdown-toggle " data-toggle="dropdown" role="button"
                    aria-haspopup="true"
                    aria-expanded="false">
-                    <span data-copo-tour-id="notifications_button"><i class="fa fa-bell" aria-hidden="true"></i></span>
+                        <span data-copo-tour-id="notifications_button"><i class="fa fa-bell"
+                                                                          aria-hidden="true"></i></span>
                 </a>
             </li>
 
 
             <li class="dropdown" style="margin-left: 15px;" title="Documentation">
                 <a id="copo-documentation" href="http://copo-project.readthedocs.io/en/latest/" target="_blank">
-                    <span data-copo-tour-id="documentation_button"><i class="fa fa-book" aria-hidden="true"></i></span>
+                        <span data-copo-tour-id="documentation_button"><i class="fa fa-book"
+                                                                          aria-hidden="true"></i></span>
                 </a>
             </li>
             <li class="dropdown" title="Settings">

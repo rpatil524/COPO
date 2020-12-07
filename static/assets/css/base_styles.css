@@ -257,3 +257,21 @@ p {
     color: rgba(65, 65, 65, 1);
     padding: 20px !important
 }
+
+#contact-sec {
+    padding-top: 60px !important;
+    color: white;
+}
+
+.warning_banner {
+    background-color: white !important;
+}
+
+.warning_banner h1 {
+    margin: 0 40px 40px 40px;
+    text-decoration: underline;
+}
+
+.warning_banner p {
+    margin-top: 0
+}

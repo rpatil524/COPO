@@ -1,9 +1,11 @@
-from django.urls import include, path, re_path
 from django.conf import settings
 from django.contrib import admin
+from django.urls import include, path, re_path
 from django.views.generic import TemplateView
-import web.apps.web_copo.views as views
 from django.views.static import serve
+
+import web.apps.web_copo.views as views
+from web.landing import views as landing_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -14,7 +16,7 @@ urlpatterns = [
 
     path('accounts/', include('allauth.urls')),
     path('accounts/profile/', views.index),
-    path('', TemplateView.as_view(template_name="index.html"), name='index'),
+    path('', landing_views.index, name='index'),
     path('about/', TemplateView.as_view(template_name="about.html"), name='about'),
     path('people/', TemplateView.as_view(template_name="people.html"), name='people'),
     path('dtol/', TemplateView.as_view(template_name="dtol.html"), name='dtol'),
