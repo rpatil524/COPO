@@ -161,11 +161,12 @@ def update_bundle_sample_xml(sample_list, bundlefile):
         value.text = 'ERC000053'
         # adding project name field (ie copo profile name)
         # adding reference to parent specimen biosample
-        sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
-        tag = ET.SubElement(sample_attribute, 'TAG')
-        tag.text = 'sample derived from'
-        value = ET.SubElement(sample_attribute, 'VALUE')
-        value.text = sample.get("sampleDerivedFrom", "")
+        if sample.get("sampleDerivedFrom", ""):
+            sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+            tag = ET.SubElement(sample_attribute, 'TAG')
+            tag.text = 'sample derived from'
+            value = ET.SubElement(sample_attribute, 'VALUE')
+            value.text = sample.get("sampleDerivedFrom", "")
         # adding project name field (ie copo profile name)
         # validating against DTOL checklist
         sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
