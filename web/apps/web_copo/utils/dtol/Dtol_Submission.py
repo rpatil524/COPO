@@ -91,6 +91,12 @@ def process_pending_dtol_samples():
                 specimen_accession = Source().get_specimen_biosample(sam["SPECIMEN_ID"])[0].get("biosampleAccession",
                                                                                                 "")
 
+            if not specimen_accession:
+                Submission().make_dtol_status_pending(submission['_id'])
+                msg="Connection issue - please try resubmit later"
+                notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
+                                   html_id="dtol_sample_info")
+                break
 
             Sample().add_field("sampleDerivedFrom", specimen_accession, sam['_id'])
             sam["sampleDerivedFrom"] = specimen_accession
