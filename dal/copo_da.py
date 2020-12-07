@@ -3,28 +3,27 @@ __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 import copy
 import os
 from datetime import datetime, timezone
+
 import pandas as pd
 import pymongo
 import pymongo.errors as pymongo_errors
 from bson import ObjectId, json_util
+from bson.errors import InvalidId
 from chunked_upload.models import ChunkedUpload
 from django.conf import settings
 from django.contrib.auth.models import User
 from django_tools.middlewares import ThreadLocal
+
 import web.apps.web_copo.utils.EnaUtils as u
 from dal import cursor_to_list, cursor_to_list_str, cursor_to_list_no_ids
 from dal.copo_base_da import DataSchemas
 from dal.mongo_util import get_collection_ref
+from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
 from web.apps.web_copo.lookup.lookup import DB_TEMPLATES
 from web.apps.web_copo.models import UserDetails
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
-from web.apps.web_copo.models import UserDetails
-
-from django.db.models import Q
-from web.apps.web_copo.lookup.copo_enums import Loglvl, Logtype
-from bson.errors import InvalidId
 
 lg = settings.LOGGER
 
@@ -104,6 +103,9 @@ class DAComponent:
     def __init__(self, profile_id=None, component=str()):
         self.profile_id = profile_id
         self.component = component
+
+    def get_number(self):
+        return self.get_collection_handle().count({})
 
     def get_record(self, oid) -> object:
         """
@@ -800,7 +802,7 @@ class Submission(DAComponent):
 
     def get_dtol_samples_in_biostudy(self, study_ids):
         sub = self.get_collection_handle().find(
-            {"accessions.study_accessions.bioProjectAccession":{"$in":study_ids}},
+            {"accessions.study_accessions.bioProjectAccession": {"$in": study_ids}},
             {"accessions": 1, "_id": 0}
         )
         return cursor_to_list(sub)
@@ -815,7 +817,6 @@ class Submission(DAComponent):
                                                  "date_modified": 1})
         sub = cursor_to_list(sub)
         out = list()
-
 
         for s in sub:
             # calculate whether a submission is an old one
@@ -1302,7 +1303,8 @@ class Submission(DAComponent):
     def get_submission_from_sample_id(self, s_id):
         query = "accessions.sample_accessions." + s_id
         projection = "accessions.study_accessions"
-        return cursor_to_list(self.get_collection_handle().find({query:{"$exists":True}}, {projection:1}))
+        return cursor_to_list(self.get_collection_handle().find({query: {"$exists": True}}, {projection: 1}))
+
 
 class DataFile(DAComponent):
     def __init__(self, profile_id=None):
@@ -1410,6 +1412,9 @@ class DataFile(DAComponent):
 class Profile(DAComponent):
     def __init__(self, profile=None):
         super(Profile, self).__init__(None, "profile")
+
+    def get_num(self):
+        return self.get_collection_handle().count({})
 
     def get_all_profiles(self, user=None):
         mine = list(self.get_for_user(user))
