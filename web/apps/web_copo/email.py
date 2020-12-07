@@ -15,8 +15,8 @@ class CopoEmail:
                 "<p><a href='{}'>{}</a></p>"
         }
 
-    def __del__(self):
-        self.mailserver.quit()
+    #def __del__(self):
+     #   self.mailserver.quit()
 
     def send(self, to, sub, content, html=False):
         msg = MIMEMultipart()
@@ -42,6 +42,7 @@ class CopoEmail:
         # get users in group
         users = User.objects.filter(groups__name='dtol_sample_notifiers')
         email_addresses = list()
+        print("here")
         if len(users) > 0:
             for u in users:
                 email_addresses.append(u.email)

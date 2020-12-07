@@ -68,7 +68,10 @@ def process_pending_dtol_samples():
             # check if specimen ID biosample was already registered, if not do it
             specimen_sample = Source().get_specimen_biosample(sam["SPECIMEN_ID"])
             assert len(specimen_sample) <= 1
-            if not specimen_sample:
+            specimen_accession=""
+            if specimen_sample:
+                specimen_accession = specimen_sample[0].get("biosampleAccession", "")
+            else:
                 # create sample object and submit
                 notify_dtol_status(data={"profile_id": profile_id},
                                    msg="Creating Sample for SPECIMEN_ID " + sam["RACK_OR_PLATE_ID"] + "/" + sam["SPECIMEN_ID"],
@@ -77,6 +80,7 @@ def process_pending_dtol_samples():
                 specimen_obj_fields = {"SPECIMEN_ID": sam["SPECIMEN_ID"], "TAXON_ID": sam["TAXON_ID"],
                                        "sample_type": "dtol_specimen", "profile_id": sam['profile_id']}
                 Source().save_record(auto_fields={}, **specimen_obj_fields)
+            if not specimen_accession:
                 sour = Source().get_by_specimen(sam["SPECIMEN_ID"])
                 assert len(sour) == 1
                 sour = sour[0]
@@ -87,8 +91,6 @@ def process_pending_dtol_samples():
                 specimen_accession = Source().get_specimen_biosample(sam["SPECIMEN_ID"])[0].get("biosampleAccession",
                                                                                                 "")
 
-            else:
-                specimen_accession = specimen_sample[0].get("biosampleAccession", "")
 
             Sample().add_field("sampleDerivedFrom", specimen_accession, sam['_id'])
             sam["sampleDerivedFrom"] = specimen_accession
