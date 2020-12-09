@@ -73,7 +73,8 @@ DTOL_EXPORT_TO_STS_FIELDS = {
     "time_updated",
     "updated_by",
     "status",
-    "sampleDerivedFrom"
+    "sampleDerivedFrom",
+    "copo_profile_title"
 }
 DTOL_ENUMS = {
 

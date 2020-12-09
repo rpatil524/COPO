@@ -7,7 +7,6 @@ from allauth.account.forms import LoginForm
 from allauth.socialaccount.models import SocialAccount
 from bson import ObjectId
 from bson import json_util as j
-from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -23,8 +22,8 @@ from dal.OAuthTokens import OAuthToken
 from dal.broker_da import BrokerDA, BrokerVisuals
 from dal.copo_da import DataFile
 from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, CopoGroup, Repository, MetadataTemplate
+from web.apps.web_copo.copo_email import CopoEmail
 from web.apps.web_copo.decorators import user_is_staff
-from web.apps.web_copo.email import CopoEmail
 from web.apps.web_copo.lookup.lookup import REPO_NAME_LOOKUP
 from web.apps.web_copo.models import banner_view
 from web.apps.web_copo.schemas.utils import data_utils

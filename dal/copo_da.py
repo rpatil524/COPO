@@ -732,7 +732,10 @@ class Sample(DAComponent):
         return self.get_collection_handle().update({"_id": ObjectId(sample_id)}, {"$set": {"status": "processing"}})
 
     def get_by_manifest_id(self, manifest_id):
-        return cursor_to_list(self.get_collection_handle().find({"manifest_id": manifest_id}))
+        samples = cursor_to_list(self.get_collection_handle().find({"manifest_id": manifest_id}))
+        for s in samples:
+            s["copo_profile_title"] = Profile().get_name(s["profile_id"])
+        return samples
 
     def get_statuses_by_manifest_id(self, manifest_id):
         return cursor_to_list(self.get_collection_handle().find({"manifest_id": manifest_id},
@@ -1493,6 +1496,10 @@ class Profile(DAComponent):
     def get_dtol_profiles(self):
         p = self.get_collection_handle().find({"type": "Darwin Tree of Life"}).sort("date_modified", pymongo.DESCENDING)
         return cursor_to_list(p)
+
+    def get_name(self, profile_id):
+        p = self.get_record(ObjectId(profile_id))
+        return p["title"]
 
 
 class CopoGroup(DAComponent):

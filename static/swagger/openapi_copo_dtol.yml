@@ -617,3 +617,5 @@ components:
           type: string
         status:
           type: string
+        copo_profile_title:
+          type: string

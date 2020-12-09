@@ -1,30 +1,30 @@
 # Created by fshaw at 03/04/2020
+import datetime
+import json
 import math
-
 import os
+import re
+import uuid
 from os.path import join, isfile
 from pathlib import Path
 from shutil import rmtree
-import json
+from urllib.error import HTTPError
+
 import jsonpath_rw_ext as jp
 import pandas
-from django_tools.middlewares import ThreadLocal
+from Bio import Entrez
+from django.conf import settings
 from django.core.files.storage import default_storage
+from django_tools.middlewares import ThreadLocal
+
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from api.utils import map_to_dict
 from dal.copo_da import Sample, DataFile, Profile
-from submission.helpers.generic_helper import notify_sample_status, notify_dtol_status
+from submission.helpers.generic_helper import notify_dtol_status
+from web.apps.web_copo.copo_email import CopoEmail
 from web.apps.web_copo.lookup import dtol_lookups as lookup
 from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
-from django.conf import settings
-import uuid
-import re
-import datetime
-from Bio import Entrez
-from urllib.error import HTTPError
-from web.apps.web_copo.email import CopoEmail
-import socket
 
 
 class DtolSpreadsheet:
