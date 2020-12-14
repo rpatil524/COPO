@@ -86,6 +86,7 @@ class DtolSpreadsheet:
                 '''
                 # self.data.fillna(value="")
                 self.data = self.data.apply(lambda x: x.astype(str))
+                self.data = self.data.apply(lambda x: x.strip())
                 # print(self.data.size)
             except:
                 # if error notify via web socket

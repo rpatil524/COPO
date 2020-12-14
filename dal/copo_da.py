@@ -589,6 +589,27 @@ class Source(DAComponent):
     def get_by_specimen(self, value):
         return cursor_to_list(self.get_collection_handle().find({"SPECIMEN_ID": value}))  # todo can this be find one
 
+    def add_fields(self, fieldsdict, oid):
+        return self.get_collection_handle().update(
+            {
+                "_id" : ObjectId(oid)
+            },
+            {"$set":
+                    fieldsdict
+            }
+        )
+
+    def add_rejected_status(self, status, oid):
+        return self.get_collection_handle().update(
+            {
+                "_id": ObjectId(oid)
+            },
+            {"$set":
+                 {'error': status["msg"],
+                  'status': "rejected"}
+             }
+        )
+
 
 class Sample(DAComponent):
     def __init__(self, profile_id=None):
