@@ -78,8 +78,11 @@ def process_pending_dtol_samples():
                                    action="info",
                                    html_id="dtol_sample_info")
                 specimen_obj_fields = {"SPECIMEN_ID": sam["SPECIMEN_ID"], "TAXON_ID": sam["TAXON_ID"],
-                                       "sample_type": "dtol_specimen", "profile_id": sam['profile_id']}
+                                      "sample_type": "dtol_specimen", "profile_id": sam['profile_id']}
                 Source().save_record(auto_fields={}, **specimen_obj_fields)
+                specimen_obj_fields = populate_source_fields(sam)
+                sour = Source().get_by_specimen(sam["SPECIMEN_ID"])[0]
+                Source().add_fields(specimen_obj_fields, str(sour['_id']))
             if not specimen_accession:
                 sour = Source().get_by_specimen(sam["SPECIMEN_ID"])
                 assert len(sour) == 1
@@ -98,8 +101,13 @@ def process_pending_dtol_samples():
                                    html_id="dtol_sample_info")
                 break
 
-            Sample().add_field("sampleDerivedFrom", specimen_accession, sam['_id'])
-            sam["sampleDerivedFrom"] = specimen_accession
+            if sam.get('ORGANISM_PART', '')=="WHOLE_ORGANISM":
+                Sample().add_field("sampleSameAs", specimen_accession, sam['_id'])
+                sam["sampleSameAs"] = specimen_accession
+            else:
+                Sample().add_field("sampleDerivedFrom", specimen_accession, sam['_id'])
+                sam["sampleDerivedFrom"] = specimen_accession
+
             notify_dtol_status(data={"profile_id": profile_id}, msg="Adding to Sample Batch: " + sam["SPECIMEN_ID"],
                                action="info",
                                html_id="dtol_sample_info")
@@ -134,6 +142,27 @@ def process_pending_dtol_samples():
 
     notify_dtol_status(data={"profile_id": profile_id}, msg="", action="hide_sub_spinner",
                        html_id="dtol_sample_info")
+
+def populate_source_fields(sampleobj):
+    '''populate source in db to copy most of sample fields
+    but change organism part and gal sample_id'''
+    fields={"sample_type": "dtol_specimen", "profile_id": sampleobj['profile_id'],
+            "TAXON_ID": sampleobj["TAXON_ID"]}
+    for item in sampleobj.items():
+        #print(item)
+        try:
+            print(item[0])
+            if item[0]=="COLLECTION_LOCATION" or DTOL_ENA_MAPPINGS[item[0]]['ena']:
+                if item[0]=="GAL_SAMPLE_ID":
+                    fields[item[0]] = "NOT_PROVIDED"
+                elif item[0]=="ORGANISM_PART":
+                    fields[item[0]] = "WHOLE_ORGANISM"
+                else:
+                    fields[item[0]]=item[1]
+        except KeyError:
+            pass
+    return fields
+
 
 def build_bundle_sample_xml(file_subfix):
     '''build structure and save to file bundle_file_subfix.xml'''
@@ -173,6 +202,12 @@ def update_bundle_sample_xml(sample_list, bundlefile):
             tag.text = 'sample derived from'
             value = ET.SubElement(sample_attribute, 'VALUE')
             value.text = sample.get("sampleDerivedFrom", "")
+        elif sample.get("sampleSameAs", ""):
+            sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+            tag = ET.SubElement(sample_attribute, 'TAG')
+            tag.text = 'sample same as'
+            value = ET.SubElement(sample_attribute, 'VALUE')
+            value.text = sample.get("sampleSameAs", "")
         # adding project name field (ie copo profile name)
         # validating against DTOL checklist
         sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
@@ -250,6 +285,72 @@ def build_specimen_sample_xml(sample):
     sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
     taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
     taxon_id.text = sample.get('TAXON_ID', "")
+
+
+
+    sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
+    # validating against DTOL checklist
+    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+    tag = ET.SubElement(sample_attribute, 'TAG')
+    tag.text = 'ENA-CHECKLIST'
+    value = ET.SubElement(sample_attribute, 'VALUE')
+    value.text = 'ERC000053'
+    # adding project name field (ie copo profile name)
+    # validating against DTOL checklist
+    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+    tag = ET.SubElement(sample_attribute, 'TAG')
+    tag.text = 'project name'
+    value = ET.SubElement(sample_attribute, 'VALUE')
+    value.text = 'DTOL'
+    ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
+    for item in sample.items():
+        if item[1]:
+            try:
+                # exceptional handling of COLLECTION_LOCATION
+                if item[0] == 'COLLECTION_LOCATION':
+                    attribute_name = DTOL_ENA_MAPPINGS['COLLECTION_LOCATION_1']['ena']
+                    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                    tag = ET.SubElement(sample_attribute, 'TAG')
+                    tag.text = attribute_name
+                    value = ET.SubElement(sample_attribute, 'VALUE')
+                    value.text = str(item[1]).split('|')[0]
+                    attribute_name = DTOL_ENA_MAPPINGS['COLLECTION_LOCATION_2']['ena']
+                    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                    tag = ET.SubElement(sample_attribute, 'TAG')
+                    tag.text = attribute_name
+                    value = ET.SubElement(sample_attribute, 'VALUE')
+                    value.text = '|'.join(str(item[1]).split('|')[1:])
+                elif item[0] in ["DATE_OF_COLLECTION", "DECIMAL_LATITUDE", "DECIMAL_LONGITUDE"]:
+                    attribute_name = DTOL_ENA_MAPPINGS[item[0]]['ena']
+                    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                    tag = ET.SubElement(sample_attribute, 'TAG')
+                    tag.text = attribute_name
+                    value = ET.SubElement(sample_attribute, 'VALUE')
+                    value.text = str(item[1]).lower().replace("_", " ")
+                # handling annoying edge case below
+                elif item[0] == "LIFESTAGE" and item[1] == "SPORE_BEARING_STRUCTURE":
+                    attribute_name = DTOL_ENA_MAPPINGS[item[0]]['ena']
+                    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                    tag = ET.SubElement(sample_attribute, 'TAG')
+                    tag.text = attribute_name
+                    value = ET.SubElement(sample_attribute, 'VALUE')
+                    value.text = "spore-bearing structure"
+                else:
+                    attribute_name = DTOL_ENA_MAPPINGS[item[0]]['ena']
+                    sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+                    tag = ET.SubElement(sample_attribute, 'TAG')
+                    tag.text = attribute_name
+                    value = ET.SubElement(sample_attribute, 'VALUE')
+                    value.text = str(item[1]).replace("_", " ")
+                # add ena units where necessary
+                if DTOL_UNITS.get(item[0], ""):
+                    if DTOL_UNITS[item[0]].get('ena_unit', ""):
+                        unit = ET.SubElement(sample_attribute, 'UNITS')
+                        unit.text = DTOL_UNITS[item[0]]['ena_unit']
+            except KeyError:
+                # pass, item is not supposed to be submitted to ENA
+                pass
+
     ET.dump(tree)
     sample_id = str(sample['_id'])
     samplefile = "bundle_" + str(sample_id) + ".xml"
