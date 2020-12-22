@@ -1,22 +1,23 @@
 import json
+import os
+import shutil
 import subprocess
 import uuid
 import xml.etree.ElementTree as ET
 from datetime import datetime, date
-import os
-import shutil
+from urllib.parse import urljoin
+
 import requests
 from celery.utils.log import get_task_logger
-from urllib.parse import urljoin
+
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from dal.copo_da import Submission, Sample, Profile, Source
-from submission.helpers.generic_helper import notify_sample_status, notify_dtol_status
+from submission.helpers.generic_helper import notify_dtol_status
 from tools import resolve_env
-from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
-from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE, SRA_PROJECT_TEMPLATE
 from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS, DTOL_UNITS, PUBLIC_NAME_SERVICE, \
     API_KEY
-from web.settings.all import DEBUG
+from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
+from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE, SRA_PROJECT_TEMPLATE
 
 with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
@@ -56,7 +57,7 @@ def process_pending_dtol_samples():
             sam = Sample().get_record(s_id)
             try:
                 public_name_list.append(
-                    {"taxonomyId": int(sam["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
+                    {"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
                      "sample_id": str(sam["_id"])})
             except ValueError:
                 notify_dtol_status(data={"profile_id": profile_id}, msg="Invalid Taxon ID found", action="info",
@@ -77,8 +78,9 @@ def process_pending_dtol_samples():
                                    msg="Creating Sample for SPECIMEN_ID " + sam["RACK_OR_PLATE_ID"] + "/" + sam["SPECIMEN_ID"],
                                    action="info",
                                    html_id="dtol_sample_info")
-                specimen_obj_fields = {"SPECIMEN_ID": sam["SPECIMEN_ID"], "TAXON_ID": sam["TAXON_ID"],
-                                      "sample_type": "dtol_specimen", "profile_id": sam['profile_id']}
+                specimen_obj_fields = {"SPECIMEN_ID": sam["SPECIMEN_ID"],
+                                       "TAXON_ID": sam["species_list"][0]["TAXON_ID"],
+                                       "sample_type": "dtol_specimen", "profile_id": sam['profile_id']}
                 Source().save_record(auto_fields={}, **specimen_obj_fields)
                 specimen_obj_fields = populate_source_fields(sam)
                 sour = Source().get_by_specimen(sam["SPECIMEN_ID"])[0]
@@ -146,8 +148,8 @@ def process_pending_dtol_samples():
 def populate_source_fields(sampleobj):
     '''populate source in db to copy most of sample fields
     but change organism part and gal sample_id'''
-    fields={"sample_type": "dtol_specimen", "profile_id": sampleobj['profile_id'],
-            "TAXON_ID": sampleobj["TAXON_ID"]}
+    fields= {"sample_type": "dtol_specimen", "profile_id": sampleobj['profile_id'],
+             "TAXON_ID": sampleobj["species_list"][0]["TAXON_ID"]}
     for item in sampleobj.items():
         #print(item)
         try:
@@ -186,7 +188,7 @@ def update_bundle_sample_xml(sample_list, bundlefile):
         title_block.text = title
         sample_name = ET.SubElement(sample_alias, 'SAMPLE_NAME')
         taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
-        taxon_id.text = sample.get('TAXON_ID', "")
+        taxon_id.text = sample.get("species_list", [])[0].get('TAXON_ID', "")
         sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
         # validating against DTOL checklist
         sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')

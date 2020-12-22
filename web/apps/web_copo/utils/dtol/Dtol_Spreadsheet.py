@@ -258,12 +258,29 @@ class DtolSpreadsheet:
                 return False
 
             # if we get here we have a valid spreadsheet
-            notify_dtol_status(data={"profile_id":self.profile_id}, msg="Spreadsheet is Valid", action="info",
-                                 html_id="sample_info")
-            notify_dtol_status(data={"profile_id":self.profile_id}, msg="", action="close", html_id="upload_controls")
-            notify_dtol_status(data={"profile_id":self.profile_id}, msg="", action="make_valid", html_id="sample_info")
+            notify_dtol_status(data={"profile_id": self.profile_id}, msg="Spreadsheet is Valid", action="info",
+                               html_id="sample_info")
+            notify_dtol_status(data={"profile_id": self.profile_id}, msg="", action="close", html_id="upload_controls")
+            notify_dtol_status(data={"profile_id": self.profile_id}, msg="", action="make_valid", html_id="sample_info")
 
             return True
+
+    def make_target_sample(self, sample):
+        # need to pop taxon info, and add back into sample_list
+        if not "species_list" in sample:
+            sample["species_list"] = list()
+        out = dict()
+        out["TAXON_ID"] = sample.pop("TAXON_ID")
+        out["ORDER_OR_GROUP"] = sample.pop("ORDER_OR_GROUP")
+        out["FAMILY"] = sample.pop("FAMILY")
+        out["GENUS"] = sample.pop("GENUS")
+        out["SCIENTIFIC_NAME"] = sample.pop("SCIENTIFIC_NAME")
+        out["INFRASPECIFIC_EPITHET"] = sample.pop("INFRASPECIFIC_EPITHET")
+        out["CULTURE_OR_STRAIN_ID"] = sample.pop("CULTURE_OR_STRAIN_ID")
+        out["COMMON_NAME"] = sample.pop("COMMON_NAME")
+        out["TAXON_REMARKS"] = sample.pop("TAXON_REMARKS")
+        sample["species_list"].append(out)
+        return sample
 
     def validate_taxonomy(self):
         ''' check if provided scientific name, TAXON ID,
@@ -552,13 +569,22 @@ class DtolSpreadsheet:
         for p in range(1, len(sample_data)):
             s = (map_to_dict(sample_data[0], sample_data[p]))
             s["sample_type"] = "dtol"
+
+            # transform spieces info into species list format
+            if s["SYMBIONT"] == "target":
+                s = self.make_target_sample(s)
+                s = self.add_from_symbiont_list(s)
+            elif s["SYMBIONT"] == "symbiont":
+                self.check_for_target_or_add_to_symbiont_list(s)
+
             s["biosample_accession"] = []
             s["manifest_id"] = manifest_id
             s["status"] = "pending"
             s["rack_tube"] = s["RACK_OR_PLATE_ID"] + "/" + s["TUBE_OR_WELL_ID"]
-            notify_dtol_status(data={"profile_id":self.profile_id}, msg="Creating Sample with ID: " + s["TUBE_OR_WELL_ID"] + "/" + s["SPECIMEN_ID"],
-                                 action="info",
-                                 html_id="sample_info")
+            notify_dtol_status(data={"profile_id": self.profile_id},
+                               msg="Creating Sample with ID: " + s["TUBE_OR_WELL_ID"] + "/" + s["SPECIMEN_ID"],
+                               action="info",
+                               html_id="sample_info")
             sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
             for im in image_data:
                 # create matching DataFile object for image is provided
@@ -581,10 +607,15 @@ class DtolSpreadsheet:
         for s in sample_ids:
             r = Sample().delete_sample(s)
             report.append(r)
-        notify_dtol_status(data={"profile_id":self.profile_id}, msg=report,
-                             action="info",
-                             html_id="sample_info")
+        notify_dtol_status(data={"profile_id": self.profile_id}, msg=report,
+                           action="info",
+                           html_id="sample_info")
 
+    def add_from_symbiont_list(self, sample):
+        return sample
+
+    def check_for_target_or_add_to_symbiont_list(self, s):
+        pass
 
 def validate_date(date_text):
     try:

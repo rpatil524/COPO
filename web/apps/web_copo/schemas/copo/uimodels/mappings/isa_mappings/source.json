@@ -124,6 +124,29 @@
     },
     {
       "help_tip": "",
+      "required": "false",
+      "default_value": "",
+      "show_as_attribute": true,
+      "control_meta": {},
+      "control": "text",
+      "versions": [
+        "species_list"
+      ],
+      "ref": "",
+      "specifications": [
+        "dtol"
+      ],
+      "deprecated": false,
+      "hidden": "false",
+      "type": "string",
+      "show_in_form": false,
+      "id": "copo.source.species_list",
+      "label": "species_list",
+      "show_in_table": true,
+      "dwc": ""
+    },
+    {
+      "help_tip": "",
       "required": "true",
       "default_value": "",
       "control_meta": {},
