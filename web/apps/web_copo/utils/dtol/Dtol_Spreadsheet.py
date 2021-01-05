@@ -270,6 +270,7 @@ class DtolSpreadsheet:
         if not "species_list" in sample:
             sample["species_list"] = list()
         out = dict()
+        out["SYMBIONT"] = "target"
         out["TAXON_ID"] = sample.pop("TAXON_ID")
         out["ORDER_OR_GROUP"] = sample.pop("ORDER_OR_GROUP")
         out["FAMILY"] = sample.pop("FAMILY")

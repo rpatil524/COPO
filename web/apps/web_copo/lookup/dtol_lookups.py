@@ -9,11 +9,6 @@ DTOL_EXPORT_TO_STS_FIELDS = {
     "RACK_OR_PLATE_ID",
     "TUBE_OR_WELL_ID",
     "SPECIMEN_ID",
-    "ORDER_OR_GROUP",
-    "FAMILY",
-    "GENUS",
-    "TAXON_ID",
-    "SCIENTIFIC_NAME",
     "LIFESTAGE",
     "SEX",
     "ORGANISM_PART",
@@ -48,10 +43,6 @@ DTOL_EXPORT_TO_STS_FIELDS = {
     "HAZARD_GROUP",
     "REGULATORY_COMPLIANCE",
     "VOUCHER_ID",
-    "TAXON_REMARKS",
-    "INFRASPECIFIC_EPITHET",
-    "CULTURE_OR_STRAIN_ID",
-    "COMMON_NAME",
     "SYMBIONT",
     "RELATIONSHIP",
     "GRID_REFERENCE",
@@ -74,7 +65,8 @@ DTOL_EXPORT_TO_STS_FIELDS = {
     "updated_by",
     "status",
     "sampleDerivedFrom",
-    "copo_profile_title"
+    "copo_profile_title",
+    "species_list"
 }
 DTOL_ENUMS = {
 

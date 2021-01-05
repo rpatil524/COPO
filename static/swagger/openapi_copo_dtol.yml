@@ -472,6 +472,31 @@ components:
       type: string
       format: uuid
 
+    SpeciesList:
+      type: object
+      properties:
+        SYMBIONT:
+          type: string
+        TAXON_ID:
+          type: string
+        ORDER_OR_GROUP:
+          type: string
+        FAMILY:
+          type: string
+        GENUS:
+          type: string
+        SCIENTIFIC_NAME:
+          type: string
+        INFRASPECIFIC_EPITHET:
+          type: string
+        CULTURE_OR_STRAIN_ID:
+          type: string
+        COMMON_NAME:
+          type: string
+        TAXON_REMARKS:
+          type: string
+
+
     Sample_long:
       type: object
       properties:
@@ -482,16 +507,6 @@ components:
         TUBE_OR_WELL_ID:
           type: string
         SPECIMEN_ID:
-          type: string
-        ORDER_OR_GROUP:
-          type: string
-        FAMILY:
-          type: string
-        GENUS:
-          type: string
-        TAXON_ID:
-          type: string
-        SCIENTIFIC_NAME:
           type: string
         LIFESTAGE:
           type: string
@@ -560,16 +575,6 @@ components:
           type: string
         VOUCHER_ID:
           type: string
-        TAXON_REMARKS:
-          type: string
-        INFRASPECIFIC_EPITHET:
-          type: string
-        CULTURE_OR_STRAIN_ID:
-          type: string
-        COMMON_NAME:
-          type: string
-        SYMBIONT:
-          type: string
         RELATIONSHIP:
           type: string
         GRID_REFERENCE:
@@ -619,3 +624,7 @@ components:
           type: string
         copo_profile_title:
           type: string
+        species_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpeciesList'
