@@ -80,7 +80,7 @@ $(document).ready(function () {
             result = $.grep(data, function (e) {
                 return e.key == "type"
             });
-            if(result.length){
+            if (result.length) {
                 type = result[0].data
             }
 
@@ -190,15 +190,19 @@ $(document).ready(function () {
                                 .addClass("copo-records-panel");
 
                             //set heading
-                            if (data.type == "Darwin Tree of Life") {
+                            if (data.type.includes("DTOL")) {
                                 renderHTML.find(".panel-heading").find(".row-title").html('<span style="">' + data.title + '&nbsp<small>(DTOL)</small></span>');
-                                renderHTML.find(".panel-heading").css("background-color", "rgb(38,80,59)")
+                                renderHTML.find(".panel-heading").css("background-color", "#16ab39")
+                            } else if (data.type.includes("ASG")) {
+                                renderHTML.find(".panel-heading").find(".row-title").html('<span style="">' + data.title + '&nbsp<small>(ASG)</small></span>');
+                                renderHTML.find(".panel-heading").css("background-color", "#5829bb")
                             } else {
                                 if (!data.shared) {
-                                    renderHTML.find(".panel-heading").find(".row-title").html('<span style="font-weight: bolder">' + data.title + '</span>');
+                                    renderHTML.find(".panel-heading").find(".row-title").html('<span style="font-weight: bolder">' + data.title + '&nbsp<small>(Standalone)</small></span>');
+                                    renderHTML.find(".panel-heading").css("background-color", "#009c95")
                                 } else {
                                     renderHTML.find(".panel-heading").find(".row-title").html('<span style="">' + data.title + '&nbsp<small>(Shared With Me)</small></span>');
-                                    renderHTML.find(".panel-heading").css("background-color", "#007eff")
+                                    renderHTML.find(".panel-heading").css("background-color", "#f26202")
                                 }
                             }
                             //set body
