@@ -48,6 +48,7 @@ class DtolSpreadsheet:
     validation_msg_duplicate_tube_or_well_id_in_copo = "Duplicate RACK_OR_PLATE_ID and TUBE_OR_WELL_ID already in COPO: <strong>%s</strong>"
     validation_msg_invalid_date = "Invalid date: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Dates should be in format YYYY-MM-DD"
     validation_msg_rack_tube_both_na = "NOT_APPLICABLE, NOT_PROVIDED or NOT_COLLECTED found in both RACK_OR_PLATE_ID and TUBE_OR_WELL_ID at row <strong>%s</strong>."
+    validation_msg_duplicate_without_target = "Duplicate RACK_OR_PLATE_ID and TUBE_OR_WELL_ID <strong>%s</strong> found without TARGET in SYMBIONT field. One of these duplicates must be listed as TARGET"
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -98,13 +99,21 @@ class DtolSpreadsheet:
         flag = True
         errors = []
         # need to load validation field set
+
+        # get type of manifest
+        t = Profile().get_type(self.profile_id)
+        if "ASG" in t:
+            type = "asg"
+        else:
+            type = "dtol"
+
         with open(lk.WIZARD_FILES["sample_details"]) as json_data:
 
             try:
                 # get definitive list of mandatory DTOL fields from schema
                 s = json.load(json_data)
                 self.fields = jp.match(
-                    '$.properties[?(@.specifications[*] == "dtol" & @.required=="true")].versions[0]', s)
+                    '$.properties[?(@.specifications[*] == "' + type + '" & @.required=="true")].versions[0]', s)
                 columns = list(self.data.columns)
                 # check required fields are present in spreadsheet
                 for item in self.fields:
@@ -130,7 +139,7 @@ class DtolSpreadsheet:
 
                 for index, row in self.data.iterrows():
                     if row["RACK_OR_PLATE_ID"] in self.blank_vals and row["TUBE_OR_WELL_ID"] in self.blank_vals:
-                        errors.append(self.validation_msg_rack_tube_both_na % (str(index+1)))
+                        errors.append(self.validation_msg_rack_tube_both_na % (str(index + 1)))
                         flag = False
 
                 # check for uniqueness of RACK_OR_PLATE_ID and TUBE_OR_WELL_ID in this manifest
@@ -138,26 +147,34 @@ class DtolSpreadsheet:
 
                 # duplicated returns a boolean array, false for not duplicate, true for duplicate
                 u = list(rack_tube[rack_tube.duplicated()])
-                if len(u) > 0:
-                    errors.append(self.validation_msg_duplicate_tube_or_well_id % (u))
-                    flag = False
+
                 # now check for uniqueness across all Samples
-                dup = Sample().check_dtol_unique(rack_tube)
-                if len(dup) > 0:
-                    # errors = list(map(lambda x: "<li>" + x + "</li>", errors))
-                    err = list(map(lambda x: x["RACK_OR_PLATE_ID"] + "/" + x["TUBE_OR_WELL_ID"], dup))
-                    errors.append(self.validation_msg_duplicate_tube_or_well_id_in_copo % (err))
-                    flag = False
+                if type != "asg":
+                    dup = Sample().check_dtol_unique(rack_tube)
+                    if len(dup) > 0:
+                        # errors = list(map(lambda x: "<li>" + x + "</li>", errors))
+                        err = list(map(lambda x: x["RACK_OR_PLATE_ID"] + "/" + x["TUBE_OR_WELL_ID"], dup))
+                        errors.append(self.validation_msg_duplicate_tube_or_well_id_in_copo % (err))
+                        flag = False
+                else:
+                    # duplicates are allowed for asg but one element of duplicate set must have target in sybiont fields
+                    for i in u:
+                        rack, tube = i.split('/')
+                        rows = self.data.loc[
+                            (self.data["RACK_OR_PLATE_ID"] == rack) & (self.data["TUBE_OR_WELL_ID"] == tube)]
+                        if "TARGET" not in rows["SYMBIONT"].values:
+                            errors.append(self.validation_msg_duplicate_without_target % (
+                                        rows["RACK_OR_PLATE_ID"][0] + "/" + rows["TUBE_OR_WELL_ID"][0]))
+                            flag = False
 
                 # get list of DTOL fields from schemas
                 self.fields = jp.match(
                     '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
                 for header, cells in self.data.iteritems():
 
-
-                    notify_dtol_status(data={"profile_id":self.profile_id}, msg="Checking - " + header,
-                                         action="info",
-                                         html_id="sample_info")
+                    notify_dtol_status(data={"profile_id": self.profile_id}, msg="Checking - " + header,
+                                       action="info",
+                                       html_id="sample_info")
                     if header in self.fields:
                         # check if there is an enum for this header
                         allowed_vals = lookup.DTOL_ENUMS.get(header, "")
@@ -412,9 +429,10 @@ class DtolSpreadsheet:
                         ###handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
                         ###records = Entrez.read(handle)
                         if self.taxonomy_dict[taxon_id]['Rank'] != 'species':
-                            errors.append(self.validation_msg_invalid_rank % (str(index + 2)))
-                            flag = False
-                            continue
+                            if not "ASG" in Profile().get_type(self.profile_id):  # ASG is allowed rank level ids
+                                errors.append(self.validation_msg_invalid_rank % (str(index + 2)))
+                                flag = False
+                                continue
                         ###for element in records[0]['LineageEx']:
                         for element in self.taxonomy_dict[taxon_id]['LineageEx']:
                             # print('checking lineage')

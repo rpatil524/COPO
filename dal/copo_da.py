@@ -1445,6 +1445,13 @@ class Profile(DAComponent):
         shared = list(self.get_shared_for_user(user))
         return shared + mine
 
+    def get_type(self, profile_id):
+        p = self.get_collection_handle().find_one({"_id": ObjectId(profile_id)})
+        if p:
+            return p["type"]
+        else:
+            return False
+
     def get_for_user(self, user=None):
         if not user:
             user = data_utils.get_current_user().id

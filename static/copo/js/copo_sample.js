@@ -94,7 +94,7 @@ $(document).ready(function () {
     });
 
     //var groups = $("#groups").val().split(",")
-    if($("#profile_type").val().includes("Darwin")) {
+    if ($("#profile_type").val().includes("DTOL") || $("#profile_type").val().includes("ASG")) {
         if (groups.includes("dtol_users")) {
             $(".new-samples-spreadsheet-template").show()
         }
