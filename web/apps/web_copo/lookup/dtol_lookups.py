@@ -81,6 +81,16 @@ DTOL_ENUMS = {
         "EARLHAM INSTITUTE",
         "NATURAL HISTORY MUSEUM"
     ],
+    "PARTNER": [
+        "UNIVERSITY_OF_DERBY",
+        "DALHOUSIE_UNIVERSITY",
+        "GEOMAR_HELMHOLTZ_CENTRE",
+        "NOVA_SOUTHEASTERN_UNIVERSITY"
+    ],
+    "SYMBIONT": [
+        "TARGET",
+        "SYMBIONT"
+    ],
     "SPECIMEN_ID_RISK": [
         "Y",
         "N"
@@ -121,6 +131,10 @@ DTOL_ENUMS = {
         "Y",
         "N",
         "NOT_APPLICABLE"
+    ],
+    "SPECIMEN_ID_RISK": [
+        "Y",
+        "N"
     ],
     "ORGANISM_PART": [
         "**OTHER_FUNGAL_TISSUE**",

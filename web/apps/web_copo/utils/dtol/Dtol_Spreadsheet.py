@@ -32,9 +32,11 @@ class DtolSpreadsheet:
     na_vals = ['#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
                'NULL', 'NaN', 'n/a', 'nan']
     blank_vals = ['NOT_COLLECTED', 'NOT_PROVIDED', 'NOT_APPLICABLE']
-
+    symbiont_vals = ["TARGET", "SYMBIONT"]
     validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
         allowed=str(blank_vals))
+    validation_msg_missing_symbiont = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
+        allowed=str(symbiont_vals))
     validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
     validation_msg_invalid_list = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. If this is a location, start with the Country, adding more specific details separated with '|'. See list of allowed Country entries at <a href='https://www.ebi.ac.uk/ena/browser/view/ERC000053'>https://www.ebi.ac.uk/ena/browser/view/ERC000053</a>"
     validation_msg_invalid_taxonomy = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Expected value is <strong>%s</strong>"
@@ -49,6 +51,7 @@ class DtolSpreadsheet:
     validation_msg_invalid_date = "Invalid date: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Dates should be in format YYYY-MM-DD"
     validation_msg_rack_tube_both_na = "NOT_APPLICABLE, NOT_PROVIDED or NOT_COLLECTED found in both RACK_OR_PLATE_ID and TUBE_OR_WELL_ID at row <strong>%s</strong>."
     validation_msg_duplicate_without_target = "Duplicate RACK_OR_PLATE_ID and TUBE_OR_WELL_ID <strong>%s</strong> found without TARGET in SYMBIONT field. One of these duplicates must be listed as TARGET"
+
     fields = ""
 
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
@@ -128,13 +131,20 @@ class DtolSpreadsheet:
                 for header, cells in self.data.iteritems():
                     # here we need to check if there are not missing values in its cells
                     if header in self.fields:
+                        if header == "SYMBIONT" and type == "dtol":
+                            # dtol manifests are allowed to have blank field in SYMBIONT
+                            break;
                         cellcount = 0
                         for c in cells:
                             cellcount += 1
                             if not c.strip():
                                 # we have missing data in required cells
-                                errors.append(self.validation_msg_missing_data % (
-                                    header, str(cellcount + 1)))
+                                if header == "SYMBIONT":
+                                    errors.append(self.validation_msg_missing_symbiont % (
+                                        header, str(cellcount + 1)))
+                                else:
+                                    errors.append(self.validation_msg_missing_data % (
+                                        header, str(cellcount + 1)))
                                 flag = False
 
                 for index, row in self.data.iterrows():
@@ -169,7 +179,7 @@ class DtolSpreadsheet:
 
                 # get list of DTOL fields from schemas
                 self.fields = jp.match(
-                    '$.properties[?(@.specifications[*] == "dtol")].versions[0]', s)
+                    '$.properties[?(@.specifications[*] == ' + type + ')].versions[0]', s)
                 for header, cells in self.data.iteritems():
 
                     notify_dtol_status(data={"profile_id": self.profile_id}, msg="Checking - " + header,
@@ -428,6 +438,7 @@ class DtolSpreadsheet:
 
                         ###handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
                         ###records = Entrez.read(handle)
+
                         if self.taxonomy_dict[taxon_id]['Rank'] != 'species':
                             if not "ASG" in Profile().get_type(self.profile_id):  # ASG is allowed rank level ids
                                 errors.append(self.validation_msg_invalid_rank % (str(index + 2)))
