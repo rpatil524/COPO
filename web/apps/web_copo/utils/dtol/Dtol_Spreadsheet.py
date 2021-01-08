@@ -53,7 +53,6 @@ class DtolSpreadsheet:
     validation_msg_duplicate_without_target = "Duplicate RACK_OR_PLATE_ID and TUBE_OR_WELL_ID <strong>%s</strong> found without TARGET in SYMBIONT field. One of these duplicates must be listed as TARGET"
 
     fields = ""
-
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
 
     def __init__(self, file=None):
