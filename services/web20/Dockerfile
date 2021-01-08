@@ -2,13 +2,13 @@ FROM python:3.7.9-buster
 
 ENV PYTHONUNBUFFERED 1
 
-RUN apt-get update && apt-get install -y \
+RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -y \
     default-jre \
     rsync \
     git \
 	nano \
     libxml2-dev \
-    python \
+    python3.6 \
     build-essential \
     make \
     gcc \
