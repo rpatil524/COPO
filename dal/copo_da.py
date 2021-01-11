@@ -24,6 +24,7 @@ from web.apps.web_copo.models import UserDetails
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
 from web.apps.web_copo.schemas.utils.data_utils import DecoupleFormSubmission
+from web.apps.web_copo.utils.dtol.Dtol_Helpers import make_tax_from_sample
 
 lg = settings.LOGGER
 
@@ -592,11 +593,11 @@ class Source(DAComponent):
     def add_fields(self, fieldsdict, oid):
         return self.get_collection_handle().update(
             {
-                "_id" : ObjectId(oid)
+                "_id": ObjectId(oid)
             },
             {"$set":
-                    fieldsdict
-            }
+                 fieldsdict
+             }
         )
 
     def add_rejected_status(self, status, oid):
@@ -808,6 +809,21 @@ class Sample(DAComponent):
         out = cursor_to_list_no_ids(ids)
         return out
 
+    def check_and_add_symbiont(self, s):
+        sample = self.get_collection_handle().find_one(
+            {"RACK_OR_PLATE_ID": s["RACK_OR_PLATE_ID"], "TUBE_OR_WELL_ID": s["TUBE_OR_WELL_ID"]})
+        if sample:
+            out = make_tax_from_sample(s)
+            self.add_symbiont(sample, out)
+            return True
+        return False
+
+    def add_symbiont(self, s, out):
+        self.get_collection_handle().update(
+            {"RACK_OR_PLATE_ID": s["RACK_OR_PLATE_ID"], "TUBE_OR_WELL_ID": s["TUBE_OR_WELL_ID"]},
+            {"$push": {"species_list": out}}
+        )
+        return True
 
 class Submission(DAComponent):
     def __init__(self, profile_id=None):

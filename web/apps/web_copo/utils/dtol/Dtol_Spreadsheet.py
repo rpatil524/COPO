@@ -25,6 +25,7 @@ from web.apps.web_copo.copo_email import CopoEmail
 from web.apps.web_copo.lookup import dtol_lookups as lookup
 from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
+from .Dtol_Helpers import make_tax_from_sample
 
 
 class DtolSpreadsheet:
@@ -65,7 +66,7 @@ class DtolSpreadsheet:
         self.taxonomy_dict = {}
         self.whole_used_specimens = set()
         self.date_fields = ["DATE_OF_COLLECTION", "DATE_OF_PRESERVATION"]
-
+        self.symbiont_list = []
         # if a file is passed in, then this is the first time we have seen the spreadsheet,
         # if not then we are looking at creating samples having previously validated
         if file:
@@ -598,14 +599,6 @@ class DtolSpreadsheet:
         for p in range(1, len(sample_data)):
             s = (map_to_dict(sample_data[0], sample_data[p]))
             s["sample_type"] = "dtol"
-
-            # transform spieces info into species list format
-            if s["SYMBIONT"] == "target":
-                s = self.make_target_sample(s)
-                s = self.add_from_symbiont_list(s)
-            elif s["SYMBIONT"] == "symbiont":
-                self.check_for_target_or_add_to_symbiont_list(s)
-
             s["biosample_accession"] = []
             s["manifest_id"] = manifest_id
             s["status"] = "pending"
@@ -614,7 +607,15 @@ class DtolSpreadsheet:
                                msg="Creating Sample with ID: " + s["TUBE_OR_WELL_ID"] + "/" + s["SPECIMEN_ID"],
                                action="info",
                                html_id="sample_info")
-            sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
+
+            if s["SYMBIONT"].lower() == "target":
+                # transform spieces info into species list format
+                s = self.make_target_sample(s)
+                sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
+                self.add_from_symbiont_list(s)
+            elif s["SYMBIONT"].lower() == "symbiont":
+                self.check_for_target_or_add_to_symbiont_list(s)
+
             for im in image_data:
                 # create matching DataFile object for image is provided
                 if s["SPECIMEN_ID"] in im["specimen_id"]:
@@ -640,11 +641,21 @@ class DtolSpreadsheet:
                            action="info",
                            html_id="sample_info")
 
-    def add_from_symbiont_list(self, sample):
-        return sample
+    def add_from_symbiont_list(self, s):
+        for idx, el in enumerate(self.symbiont_list):
+            if el.get("RACK_OR_PLATE_ID", "") == s.get("RACK_OR_PLATE_ID", "") and el.get("TUBE_OR_WELL_ID",
+                                                                                          "") == s.get(
+                    "TUBE_OR_WELL_ID", ""):
+                out = self.symbiont_list.pop(idx)
+                Sample().add_symbiont(s, out)
 
     def check_for_target_or_add_to_symbiont_list(self, s):
-        pass
+        # method checks if there is an existing target sample to attach this symbiont to. If so we attach, if not,
+        # we create the tax data, and append to a list of use by a later sample
+        if not Sample().check_and_add_symbiont(s):
+            # add to list
+            out = make_tax_from_sample(s)
+            self.symbiont_list.append(out)
 
 def validate_date(date_text):
     try:
