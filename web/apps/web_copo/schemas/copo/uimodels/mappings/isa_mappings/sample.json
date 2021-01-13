@@ -1909,6 +1909,29 @@
       "control_meta": {},
       "dwc": "",
       "versions": [
+        "tol_project"
+      ],
+      "specifications": [
+        "dtol",
+        "asg"
+      ],
+      "ref": "",
+      "deprecated": false,
+      "hidden": "false",
+      "label": "TOL Project",
+      "show_in_form": false,
+      "id": "copo.sample.tol_project",
+      "type": "string",
+      "show_in_table": true,
+      "control": "text",
+      "default_value": ""
+    },
+    {
+      "help_tip": "",
+      "required": "false",
+      "control_meta": {},
+      "dwc": "",
+      "versions": [
         "public_name"
       ],
       "specifications": [

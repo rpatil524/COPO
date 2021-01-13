@@ -67,7 +67,7 @@ DTOL_EXPORT_TO_STS_FIELDS = {
     "sampleDerivedFrom",
     "copo_profile_title",
     "species_list",
-    "tol_type"
+    "tol_project"
 }
 DTOL_ENUMS = {
 

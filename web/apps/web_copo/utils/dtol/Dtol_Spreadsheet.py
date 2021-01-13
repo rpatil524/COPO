@@ -77,9 +77,9 @@ class DtolSpreadsheet:
         # get type of manifest
         t = Profile().get_type(self.profile_id)
         if "ASG" in t:
-            self.type = "asg"
+            self.type = "ASG"
         else:
-            self.type = "dtol"
+            self.type = "DTOL"
 
     def loadManifest(self, type):
 
@@ -119,7 +119,8 @@ class DtolSpreadsheet:
                 # get definitive list of mandatory DTOL fields from schema
                 s = json.load(json_data)
                 self.fields = jp.match(
-                    '$.properties[?(@.specifications[*] == "' + self.type + '" & @.required=="true")].versions[0]', s)
+                    '$.properties[?(@.specifications[*] == "' + self.type.lower() + '" & @.required=="true")].versions[0]',
+                    s)
                 columns = list(self.data.columns)
                 # check required fields are present in spreadsheet
                 for item in self.fields:
@@ -134,7 +135,7 @@ class DtolSpreadsheet:
                 for header, cells in self.data.iteritems():
                     # here we need to check if there are not missing values in its cells
                     if header in self.fields:
-                        if header == "SYMBIONT" and self.type == "dtol":
+                        if header == "SYMBIONT" and self.type == "DTOL":
                             # dtol manifests are allowed to have blank field in SYMBIONT
                             pass
                         else:
@@ -163,7 +164,7 @@ class DtolSpreadsheet:
                 u = list(rack_tube[rack_tube.duplicated()])
 
                 # now check for uniqueness across all Samples
-                if self.type != "asg":
+                if self.type != "ASG":
                     dup = Sample().check_dtol_unique(rack_tube)
                     if len(dup) > 0:
                         # errors = list(map(lambda x: "<li>" + x + "</li>", errors))
@@ -183,14 +184,14 @@ class DtolSpreadsheet:
 
                 # get list of DTOL fields from schemas
                 self.fields = jp.match(
-                    '$.properties[?(@.specifications[*] == ' + self.type + ')].versions[0]', s)
+                    '$.properties[?(@.specifications[*] == ' + self.type.lower() + ')].versions[0]', s)
                 for header, cells in self.data.iteritems():
 
                     notify_dtol_status(data={"profile_id": self.profile_id}, msg="Checking - " + header,
                                        action="info",
                                        html_id="sample_info")
                     if header in self.fields:
-                        if header == "SYMBIONT" and self.type == "dtol":
+                        if header == "SYMBIONT" and self.type == "DTOL":
                             # dtol manifests are allowed to have blank field in SYMBIONT
                             pass
                         else:
@@ -307,7 +308,6 @@ class DtolSpreadsheet:
         if not "species_list" in sample:
             sample["species_list"] = list()
         out = dict()
-        out["tol_type"] = self.type
         out["SYMBIONT"] = "target"
         out["TAXON_ID"] = sample.pop("TAXON_ID")
         out["ORDER_OR_GROUP"] = sample.pop("ORDER_OR_GROUP")
@@ -613,6 +613,7 @@ class DtolSpreadsheet:
         for p in range(1, len(sample_data)):
             s = (map_to_dict(sample_data[0], sample_data[p]))
             s["sample_type"] = "dtol"
+            s["tol_project"] = self.type
             s["biosample_accession"] = []
             s["manifest_id"] = manifest_id
             s["status"] = "pending"

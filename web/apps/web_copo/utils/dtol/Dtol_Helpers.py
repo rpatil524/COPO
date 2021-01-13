@@ -3,7 +3,6 @@
 def make_tax_from_sample(s):
     out = dict()
     out["SYMBIONT"] = "symbiont"
-    out["tol_type"] = "asg"
     out["TAXON_ID"] = s["TAXON_ID"]
     out["ORDER_OR_GROUP"] = s["ORDER_OR_GROUP"]
     out["FAMILY"] = s["FAMILY"]
