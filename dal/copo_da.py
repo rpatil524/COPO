@@ -825,6 +825,7 @@ class Sample(DAComponent):
         )
         return True
 
+
 class Submission(DAComponent):
     def __init__(self, profile_id=None):
         super(Submission, self).__init__(profile_id, "submission")
@@ -1538,7 +1539,9 @@ class Profile(DAComponent):
                 return p['dataverse']['datasets']
 
     def get_dtol_profiles(self):
-        p = self.get_collection_handle().find({"type": "Darwin Tree of Life"}).sort("date_modified", pymongo.DESCENDING)
+        p = self.get_collection_handle().find(
+            {"type": {"$in": ["Darwin Tree of Life (DTOL)", "Aquatic Symbiosis Genomics (ASG)"]}}).sort("date_modified",
+                                                                                                        pymongo.DESCENDING)
         return cursor_to_list(p)
 
     def get_name(self, profile_id):
