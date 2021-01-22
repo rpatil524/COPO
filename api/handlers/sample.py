@@ -59,7 +59,8 @@ def format_date(input_date):
 def filter_for_STS(sample_list):
     # add field here which should be time formatted
     time_fields = ["time_created", "time_updated"]
-    export = lookup.DTOL_EXPORT_TO_STS_FIELDS
+    profile_type = sample_list[0]["tol_project"].lower()
+    export = lookup.DTOL_EXPORT_TO_STS_FIELDS[profile_type]
     out = list()
     for s in sample_list:
         if isinstance(s, InvalidId):
