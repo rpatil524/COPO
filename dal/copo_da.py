@@ -718,9 +718,9 @@ class Sample(DAComponent):
                 "_id": ObjectId(oid)
             },
             {"$unset":
-                 {
-                     field: ""
-                 }}
+                {
+                    field: ""
+                }}
         )
 
     def add_rejected_status(self, status, oid):
