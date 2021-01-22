@@ -1,4 +1,3 @@
-# Created by fshaw at 25/06/2018
 
 from django.core.management import BaseCommand
 from django.contrib.auth.models import Group, Permission
