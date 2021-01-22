@@ -712,6 +712,17 @@ class Sample(DAComponent):
                     field: value}
             })
 
+    def remove_field(self, field, oid):
+        return self.get_collection_handle().update(
+            {
+                "_id": ObjectId(oid)
+            },
+            {"$unset":
+                 {
+                     field: ""
+                 }}
+        )
+
     def add_rejected_status(self, status, oid):
         return self.get_collection_handle().update(
             {
