@@ -779,10 +779,10 @@ DTOL_ENA_MAPPINGS = {
     }
 }
 
-if DEBUG:
-    PUBLIC_NAME_SERVICE = "https://sts.tol.sanger.ac.uk/public_name_api/"
-else:
-    PUBLIC_NAME_SERVICE = "https://sts.tol.sanger.ac.uk/public_name_api/"
+#if DEBUG:
+#    PUBLIC_NAME_SERVICE = "https://sts.tol.sanger.ac.uk/public_name_api/"
+#else:
+#    PUBLIC_NAME_SERVICE = "https://sts.tol.sanger.ac.uk/public_name_api/"
 
 API_KEY = resolve_env.get_env("PUBLIC_NAME_SERVICE_API_KEY")
 NIH_API_KEY = resolve_env.get_env("NIH_API_KEY")
