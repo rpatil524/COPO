@@ -9,6 +9,7 @@ from os.path import join, isfile
 from pathlib import Path
 from shutil import rmtree
 from urllib.error import HTTPError
+import subprocess
 
 import jsonpath_rw_ext as jp
 import pandas
@@ -321,6 +322,23 @@ class DtolSpreadsheet:
         sample["species_list"].append(out)
         return sample
 
+    def check_taxon_ena_submittable(self, taxon):
+        errors = []
+        curl_cmd = "curl " + "https://www.ebi.ac.uk/ena/taxonomy/rest/tax-id/" + taxon
+        try:
+            receipt = subprocess.check_output(curl_cmd, shell=True)
+            print(receipt)
+            taxinfo = json.loads(receipt.decode("utf-8"))
+            if taxinfo["submittable"] != 'true':
+                errors.append("TAXON_ID " + taxon + " is not submittable to ENA")
+        except Exception as e:
+            if receipt:
+                errors.append("ENA returned - " + receipt + " - for TAXON_ID " + taxon)
+            else:
+                errors.append("No response from ENA taxonomy for taxon " + taxon)
+        return errors
+
+
     def validate_taxonomy(self):
         ''' check if provided scientific name, TAXON ID,
         family and order are consistent with each other in known taxonomy'''
@@ -349,6 +367,14 @@ class DtolSpreadsheet:
                                    action="info",
                                    html_id="sample_info")
                 taxon_id_list = list(taxon_id_set)
+                if "ASG" in Profile().get_type(self.profile_id):
+                    for taxon in taxon_id_list:
+                        #check if taxon is submittable
+                        ena_taxon_errors = self.check_taxon_ena_submittable(taxon)
+                        if ena_taxon_errors:
+                            errors += ena_taxon_errors
+                            flag=False
+
                 if any(id for id in taxon_id_list):
                     i = 0
                     while i < len(taxon_id_list):
@@ -393,6 +419,12 @@ class DtolSpreadsheet:
                             "TAXON_ID", str(index + 2), "TAXON_ID", scientific_name, records['IdList'][0]))
                         self.data.at[index, "TAXON_ID"] = records['IdList'][0]
                         taxon_id = records['IdList'][0]
+                        if "ASG" in Profile().get_type(self.profile_id):
+                            # check if taxon is submittable
+                            ena_taxon_errors = self.check_taxon_ena_submittable(taxon_id)
+                            if ena_taxon_errors:
+                                errors += ena_taxon_errors
+                                flag = False
                         # flag = False
                         # continue
                         handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
