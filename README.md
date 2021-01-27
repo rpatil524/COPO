@@ -14,7 +14,9 @@ Featuring:
 
 For installation/deployment information see https://copo-project.readthedocs.io/en/latest/deployment-guide/copo-deployment.html
 
-[Check out the documentation!](http://copo-project.readthedocs.io/en/latest/)
+For other documentation see http://copo-project.readthedocs.io/en/latest/
+
+To report issues see https://github.com/collaborative-open-plant-omics/COPO/issues
 
 
 
