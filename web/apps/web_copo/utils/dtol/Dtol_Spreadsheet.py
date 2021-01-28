@@ -333,7 +333,11 @@ class DtolSpreadsheet:
                 errors.append("TAXON_ID " + taxon + " is not submittable to ENA")
         except Exception as e:
             if receipt:
-                errors.append("ENA returned - " + taxinfo.get("error", "no error returned") + " - for TAXON_ID " + taxon)
+                try:
+                    errors.append("ENA returned - " + taxinfo.get("error", "no error returned") + " - for TAXON_ID " + taxon)
+                except NameError:
+                    errors.append(
+                        "ENA returned - " + receipt.decode("utf-8") + " - for TAXON_ID " + taxon)
             else:
                 errors.append("No response from ENA taxonomy for taxon " + taxon)
         return errors
