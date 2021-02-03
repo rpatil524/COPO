@@ -4,12 +4,12 @@ import json
 import math
 import os
 import re
+import subprocess
 import uuid
 from os.path import join, isfile
 from pathlib import Path
 from shutil import rmtree
 from urllib.error import HTTPError
-import subprocess
 
 import jsonpath_rw_ext as jp
 import pandas
@@ -27,6 +27,7 @@ from web.apps.web_copo.lookup import dtol_lookups as lookup
 from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from .Dtol_Helpers import make_tax_from_sample
+from .tol_validators.column_validator import ColumnValdator
 
 
 class DtolSpreadsheet:
@@ -122,17 +123,10 @@ class DtolSpreadsheet:
                 self.fields = jp.match(
                     '$.properties[?(@.specifications[*] == "' + self.type.lower() + '" & @.required=="true")].versions[0]',
                     s)
-                columns = list(self.data.columns)
-                # check required fields are present in spreadsheet
-                for item in self.fields:
-                    notify_dtol_status(data={"profile_id": self.profile_id}, msg="Checking - " + item,
-                                       action="info",
-                                       html_id="sample_info")
-                    if item not in columns:
-                        # invalid or missing field, inform user and return false
-                        errors.append("Field not found - " + item)
-                        flag = False
-                        # if we have a required fields, check that there are no missing values
+
+                errors, flag = ColumnValdator().validate(profile_id=self.profile_id, fields=self.fields, data=self.data,
+                                                         errors=errors, flag=flag)
+
                 for header, cells in self.data.iteritems():
                     # here we need to check if there are not missing values in its cells
                     if header in self.fields:
