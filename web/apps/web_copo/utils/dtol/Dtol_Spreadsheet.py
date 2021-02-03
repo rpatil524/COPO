@@ -659,7 +659,7 @@ class DtolSpreadsheet:
                                action="info",
                                html_id="sample_info")
 
-            if s["SYMBIONT"].lower() == "target":
+            if s["SYMBIONT"].lower() == "target" or not s["SYMBIONT"].strip():
                 # transform spieces info into species list format
                 s = self.make_target_sample(s)
                 sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
