@@ -1,17 +1,19 @@
 """ module generates schemas and lookups used in dropdowns """
 __author__ = 'etuka'
+__updated__ = 'fshaw'
 
-from django.core.management.base import BaseCommand
-
-import os
 import glob
 import json
-import pandas as pd
+import os
 import xml.etree.ElementTree as ET
+
+import pandas as pd
+from django.core.management.base import BaseCommand
+
+import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from dal.copo_base_da import DataSchemas
 from dal.mongo_util import get_collection_ref
 from web.apps.web_copo.lookup.resolver import RESOLVER
-import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.data_formats import DataFormats
 
 Schemas = get_collection_ref("Schemas")
