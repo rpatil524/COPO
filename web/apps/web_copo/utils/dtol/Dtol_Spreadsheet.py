@@ -26,8 +26,9 @@ from web.apps.web_copo.copo_email import CopoEmail
 from web.apps.web_copo.lookup import dtol_lookups as lookup
 from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
+from web.apps.web_copo.schemas.utils.data_utils import json_to_pytype
 from .Dtol_Helpers import make_tax_from_sample
-from .tol_validators.column_validator import ColumnValdator
+from .tol_validators.dtol_validators import TolValidtor
 
 
 class DtolSpreadsheet:
@@ -69,6 +70,7 @@ class DtolSpreadsheet:
         self.whole_used_specimens = set()
         self.date_fields = ["DATE_OF_COLLECTION", "DATE_OF_PRESERVATION"]
         self.symbiont_list = []
+        self.validator_list = []
         # if a file is passed in, then this is the first time we have seen the spreadsheet,
         # if not then we are looking at creating samples having previously validated
         if file:
@@ -82,6 +84,8 @@ class DtolSpreadsheet:
             self.type = "ASG"
         else:
             self.type = "DTOL"
+
+        self.validator_classes = TolValidtor.__subclasses__()
 
     def loadManifest(self, type):
 
@@ -119,33 +123,15 @@ class DtolSpreadsheet:
 
             try:
                 # get definitive list of mandatory DTOL fields from schema
-                s = json.load(json_data)
+                s = json_to_pytype(lk.WIZARD_FILES["sample_details"])
                 self.fields = jp.match(
-                    '$.properties[?(@.specifications[*] == "' + self.type.lower() + '" & @.required=="true")].versions[0]',
+                    '$.properties[?(@.specifications[*] == "' + self.type.lower() + '" & '
+                                                                                    '@.required=="true")].versions[0]',
                     s)
 
-                errors, flag = ColumnValdator().validate(profile_id=self.profile_id, fields=self.fields, data=self.data,
-                                                         errors=errors, flag=flag)
-
-                for header, cells in self.data.iteritems():
-                    # here we need to check if there are not missing values in its cells
-                    if header in self.fields:
-                        if header == "SYMBIONT" and self.type == "DTOL":
-                            # dtol manifests are allowed to have blank field in SYMBIONT
-                            pass
-                        else:
-                            cellcount = 0
-                            for c in cells:
-                                cellcount += 1
-                                if not c.strip():
-                                    # we have missing data in required cells
-                                    if header == "SYMBIONT":
-                                        errors.append(self.validation_msg_missing_symbiont % (
-                                            header, str(cellcount + 1)))
-                                    else:
-                                        errors.append(self.validation_msg_missing_data % (
-                                            header, str(cellcount + 1)))
-                                    flag = False
+                for v in self.validator_classes:
+                    errors, flag = v().validate(profile_id=self.profile_id, fields=self.fields, data=self.data,
+                                                errors=errors, flag=flag)
 
                 for index, row in self.data.iterrows():
                     if row["RACK_OR_PLATE_ID"] in self.blank_vals and row["TUBE_OR_WELL_ID"] in self.blank_vals:
