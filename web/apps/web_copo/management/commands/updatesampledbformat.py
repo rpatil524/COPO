@@ -1,22 +1,8 @@
 from django.core.management import BaseCommand
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from web.apps.web_copo.models import Repository
-import os
-import subprocess
-import xml.etree.ElementTree as ET
-import sys
-import pymongo
-from pymongo import MongoClient
-import datetime
 
-import sys
 
 from dal.copo_da import Source, Sample
-from dal import cursor_to_list, cursor_to_list_str, cursor_to_list_no_ids
-from tools import resolve_env
-from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS, DTOL_UNITS, PUBLIC_NAME_SERVICE, \
-    API_KEY
+
 
 
 # The class must be named Command, and subclass BaseCommand
@@ -49,7 +35,6 @@ class Command(BaseCommand):
         then remove the same field from the root'''
         print(oid)
         sam = Sample().get_record(oid)
-        #Sample().add_field("species_list", [], oid)
         out = dict()
         out["SYMBIONT"] = "target"
         for field in self.TAXONOMY_FIELDS:
