@@ -55,6 +55,7 @@ DTOL_EXPORT_TO_STS_FIELDS = {
         "SIZE_OF_TISSUE_IN_TUBE",
         "TISSUE_REMOVED_FOR_BARCODING",
         "OTHER_INFORMATION",
+        "SYMBIONT",
         "public_name",
         "biosampleAccession",
         "created_by",

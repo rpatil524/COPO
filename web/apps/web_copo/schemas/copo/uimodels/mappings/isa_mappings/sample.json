@@ -326,12 +326,12 @@
       "control_meta": {},
       "control": "text",
       "versions": [
-        "GENUS",
-        "asg"
+        "GENUS"
       ],
       "ref": "",
       "specifications": [
-        "dtol"
+        "dtol",
+        "asg"
       ],
       "deprecated": false,
       "hidden": "false",
@@ -1184,7 +1184,7 @@
       ],
       "deprecated": false,
       "hidden": "false",
-      "type": "string",
+      "type": "list",
       "show_in_form": false,
       "id": "copo.sample.species_list",
       "label": "species_list",
