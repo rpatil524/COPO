@@ -9,7 +9,7 @@ import datetime
 from dal.copo_da import Source, Sample
 from dal import cursor_to_list, cursor_to_list_str, cursor_to_list_no_ids
 from tools import resolve_env
-from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS, DTOL_UNITS, PUBLIC_NAME_SERVICE, \
+from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS, DTOL_UNITS, \
     API_KEY
 
 
