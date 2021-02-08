@@ -1,17 +1,10 @@
 
 from django.core.management import BaseCommand
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from web.apps.web_copo.models import Repository
 import os
 import subprocess
 import xml.etree.ElementTree as ET
-import sys
-import pymongo
-from pymongo import MongoClient
-import datetime
 
-import sys
+import datetime
 
 from dal.copo_da import Source, Sample
 from dal import cursor_to_list, cursor_to_list_str, cursor_to_list_no_ids
@@ -90,8 +83,6 @@ class Command(BaseCommand):
         "COLLECTED_BY" :
             {$exists : false}
         }})'''
-        # formatteddate='ISODate("'+cutoff_date+'")'
-        # print(formatteddate)
         fromdb = Source().get_collection_handle().find({"date_created": {
             "$lt": cutoff_date
         },
@@ -100,7 +91,6 @@ class Command(BaseCommand):
                 {"$exists": False}
         })
         sub = cursor_to_list(fromdb)
-        # print(len(sub))
         list_to_update = list()
         for s in sub:
             list_to_update.append(s["biosampleAccession"])
@@ -112,7 +102,6 @@ class Command(BaseCommand):
         fields = {"sample_type": "dtol_specimen", "profile_id": sampleobj['profile_id'],
                   "TAXON_ID": sampleobj["species_list"][0]["TAXON_ID"]}
         for item in sampleobj.items():
-            # print(item)
             try:
                 print(item[0])
                 if item[0] == "COLLECTION_LOCATION" or DTOL_ENA_MAPPINGS[item[0]]['ena']:
@@ -136,7 +125,6 @@ class Command(BaseCommand):
             tags_block = attribute.find('TAG')
             existing_tags.append(tags_block.text)
         for item in object.items():
-            # print("header, item", header, item)
                 if item[1]:
                     #check attribute name
                     try:
@@ -233,8 +221,6 @@ class Command(BaseCommand):
         except Exception as e:
             message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
                 self.pass_word, "xxxxxx")
-            #notify_dtol_status(data={"profile_id": profile_id}, msg=message, action="error",
-            #                   html_id="dtol_sample_info")
             return False
 
         os.remove(accession + ".xml")
@@ -245,7 +231,7 @@ class Command(BaseCommand):
         attributes_block = tree.find('SAMPLE').find('SAMPLE_ATTRIBUTES')
 
         # modifying relationship
-        flag=False #only for testing
+        flag=False
         for attribute in attributes_block:
             if attribute.find('TAG').text == "sample same as":
                 flag = True
