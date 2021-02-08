@@ -27,6 +27,8 @@ from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from web.apps.web_copo.schemas.utils.data_utils import json_to_pytype
 from .Dtol_Helpers import make_tax_from_sample
+from .tol_validators import optional_field_dtol_validators as opt
+from .tol_validators import required_field_dtol_validators as req
 from .tol_validators.tol_validator import TolValidtor
 
 
@@ -45,6 +47,8 @@ class DtolSpreadsheet:
         self.data = None
         self.required_field_validators = list()
         self.optional_field_validators = list()
+        self.opt = opt
+        self.req = req
         self.symbiont_list = []
         self.validator_list = []
         # if a file is passed in, then this is the first time we have seen the spreadsheet,

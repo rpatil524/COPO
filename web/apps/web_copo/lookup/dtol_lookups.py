@@ -797,3 +797,4 @@ symbiont_vals = ["TARGET", "SYMBIONT"]
 na_vals = ['#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
            'NULL', 'NaN', 'n/a', 'nan']
 date_fields = ["DATE_OF_COLLECTION", "DATE_OF_PRESERVATION"]
+

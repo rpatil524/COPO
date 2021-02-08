@@ -10,7 +10,6 @@ from .validation_messages import MESSAGES as msg
 whole_used_specimens = set()
 regex_human_readable = ""
 
-
 class DtolEnumerationValidator(TolValidtor):
 
     def validate(self):
