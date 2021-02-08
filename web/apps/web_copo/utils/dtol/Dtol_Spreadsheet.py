@@ -1,9 +1,8 @@
 # Created by fshaw at 03/04/2020
-import datetime
+import inspect
 import json
 import math
 import os
-import re
 import subprocess
 import uuid
 from os.path import join, isfile
@@ -28,34 +27,10 @@ from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS
 from web.apps.web_copo.schemas.utils.data_utils import json_to_pytype
 from .Dtol_Helpers import make_tax_from_sample
-from .tol_validators.dtol_validators import TolValidtor
+from .tol_validators.tol_validator import TolValidtor
 
 
 class DtolSpreadsheet:
-    # list of strings in spreadsheet to be considered NaN by Pandas....N.B. "NA" is allowed
-    na_vals = ['#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A',
-               'NULL', 'NaN', 'n/a', 'nan']
-    blank_vals = ['NOT_COLLECTED', 'NOT_PROVIDED', 'NOT_APPLICABLE']
-    symbiont_vals = ["TARGET", "SYMBIONT"]
-    validation_msg_missing_data = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
-        allowed=str(blank_vals))
-    validation_msg_missing_symbiont = "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. All required fields must have a value. There must be no empty rows. Values of <strong>{allowed}</strong> are allowed.".format(
-        allowed=str(symbiont_vals))
-    validation_msg_invalid_data = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Allowed values are <strong>%s</strong>"
-    validation_msg_invalid_list = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. If this is a location, start with the Country, adding more specific details separated with '|'. See list of allowed Country entries at <a href='https://www.ebi.ac.uk/ena/browser/view/ERC000053'>https://www.ebi.ac.uk/ena/browser/view/ERC000053</a>"
-    validation_msg_invalid_taxonomy = "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Expected value is <strong>%s</strong>"
-    validation_msg_synonym = "Invalid scientific name: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. Please provide the official scientific name."
-    validation_msg_missing_taxon = "Missing TAXON_ID at row <strong>%s</strong>. For <strong>%s</strong> TAXON_ID should be <strong>%s</strong>"
-    validation_msg_duplicate_tube_or_well_id = "Duplicate RACK_OR_PLATE_ID and TUBE_OR_WELL_ID found in this Manifest: <strong>%s</strong>"
-    validation_msg_used_whole_organism = "Duplicate SPECIMEN_ID and ORGANISM_PART <strong>'WHOLE ORGANISM'</strong> pair found for specimen: <strong>%s</strong>"
-    validation_warning_synonym = "Synonym warning: <strong>%s</strong> at row <strong>%s</strong> is a synonym of <strong>%s</strong>. COPO will substitute the official scientific name."
-    validation_warning_field = "Missing <strong>%s</strong>: row <strong>%s</strong> - <strong>%s</strong> for <strong>%s</strong> will be filled with <strong>%s</strong>"
-    validation_msg_invalid_rank = "Invalid scientific name or taxon ID: row <strong>%s</strong> - rank of scientific name and taxon id should be species."
-    validation_msg_duplicate_tube_or_well_id_in_copo = "Duplicate RACK_OR_PLATE_ID and TUBE_OR_WELL_ID already in COPO: <strong>%s</strong>"
-    validation_msg_invalid_date = "Invalid date: <strong>%s</strong> in column <strong>%s</strong> at row <strong>%s</strong>. Dates should be in format YYYY-MM-DD"
-    validation_msg_rack_tube_both_na = "NOT_APPLICABLE, NOT_PROVIDED or NOT_COLLECTED found in both RACK_OR_PLATE_ID and TUBE_OR_WELL_ID at row <strong>%s</strong>."
-    validation_msg_duplicate_without_target = "Duplicate RACK_OR_PLATE_ID and TUBE_OR_WELL_ID <strong>%s</strong> found without TARGET in SYMBIONT field. One of these duplicates must be listed as TARGET"
-
     fields = ""
     sra_settings = d_utils.json_to_pytype(SRA_SETTINGS).get("properties", dict())
 
@@ -67,8 +42,9 @@ class DtolSpreadsheet:
         self.these_images = sample_images / self.profile_id
         self.display_images = display_images / self.profile_id
         self.taxonomy_dict = {}
-        self.whole_used_specimens = set()
-        self.date_fields = ["DATE_OF_COLLECTION", "DATE_OF_PRESERVATION"]
+        self.data = None
+        self.required_field_validators = list()
+        self.optional_field_validators = list()
         self.symbiont_list = []
         self.validator_list = []
         # if a file is passed in, then this is the first time we have seen the spreadsheet,
@@ -85,27 +61,36 @@ class DtolSpreadsheet:
         else:
             self.type = "DTOL"
 
-        self.validator_classes = TolValidtor.__subclasses__()
+        # create list of required validators
+        required = dict(globals().items())["req"]
+        for element_name in dir(required):
+            element = getattr(required, element_name)
+            if inspect.isclass(element) and issubclass(element, TolValidtor) and not element.__name__ == "TolValidtor":
+                self.required_field_validators.append(element)
+        # create list of optional validators
+        optional = dict(globals().items())["opt"]
+        for element_name in dir(optional):
+            element = getattr(optional, element_name)
+            if inspect.isclass(element) and issubclass(element, TolValidtor) and not element.__name__ == "TolValidtor":
+                self.optional_field_validators.append(element)
 
-    def loadManifest(self, type):
+    def loadManifest(self, m_format):
 
         if self.profile_id is not None:
             notify_dtol_status(data={"profile_id": self.profile_id}, msg="Loading..", action="info",
                                html_id="sample_info")
             try:
                 # read excel and convert all to string
-                if type == "xls":
-                    self.data = pandas.read_excel(self.file, keep_default_na=False, na_values=self.na_vals)
-                elif type == "csv":
-                    self.data = pandas.read_csv(self.file, keep_default_na=False, na_values=self.na_vals)
+                if m_format == "xls":
+                    self.data = pandas.read_excel(self.file, keep_default_na=False, na_values=lookup.na_vals)
+                elif m_format == "csv":
+                    self.data = pandas.read_csv(self.file, keep_default_na=False, na_values=lookup.na_vals)
                 '''
                 for column in self.allowed_empty:
                     self.data[column] = self.data[column].fillna("")
                 '''
-                # self.data.fillna(value="")
                 self.data = self.data.apply(lambda x: x.astype(str))
                 self.data = self.data.apply(lambda x: x.strip())
-                # print(self.data.size)
             except:
                 # if error notify via web socket
                 notify_dtol_status(data={"profile_id": self.profile_id}, msg="Unable to load file.", action="info",
@@ -115,174 +100,55 @@ class DtolSpreadsheet:
     def validate(self):
         flag = True
         errors = []
-        # need to load validation field set
 
+        try:
+            # get definitive list of mandatory DTOL fields from schema
+            s = json_to_pytype(lk.WIZARD_FILES["sample_details"])
+            self.fields = jp.match(
+                '$.properties[?(@.specifications[*] == "' + self.type.lower() + '" & @.required=="true")].versions[0]',
+                s)
 
+            # validate for required fields
+            for v in self.required_field_validators:
+                errors, flag = v(profile_id=self.profile_id, fields=self.fields, data=self.data,
+                                 errors=errors, flag=flag).validate()
 
-        with open(lk.WIZARD_FILES["sample_details"]) as json_data:
+            # get list of DTOL fields from schemas
+            self.fields = jp.match(
+                '$.properties[?(@.specifications[*] == ' + self.type.lower() + ')].versions[0]', s)
 
-            try:
-                # get definitive list of mandatory DTOL fields from schema
-                s = json_to_pytype(lk.WIZARD_FILES["sample_details"])
-                self.fields = jp.match(
-                    '$.properties[?(@.specifications[*] == "' + self.type.lower() + '" & '
-                                                                                    '@.required=="true")].versions[0]',
-                    s)
+            # validate for optional dtol fields
+            for v in self.optional_field_validators:
+                errors, flag = v(profile_id=self.profile_id, fields=self.fields, data=self.data,
+                                 errors=errors, flag=flag).validate()
 
-                for v in self.validator_classes:
-                    errors, flag = v().validate(profile_id=self.profile_id, fields=self.fields, data=self.data,
-                                                errors=errors, flag=flag)
+            # if flag is false, compile list of errors
+            if not flag:
+                errors = list(map(lambda x: "<li>" + x + "</li>", errors))
+                errors = "".join(errors)
 
-                for index, row in self.data.iterrows():
-                    if row["RACK_OR_PLATE_ID"] in self.blank_vals and row["TUBE_OR_WELL_ID"] in self.blank_vals:
-                        errors.append(self.validation_msg_rack_tube_both_na % (str(index + 1)))
-                        flag = False
-
-                # check for uniqueness of RACK_OR_PLATE_ID and TUBE_OR_WELL_ID in this manifest
-                rack_tube = self.data["RACK_OR_PLATE_ID"] + "/" + self.data["TUBE_OR_WELL_ID"]
-
-                # duplicated returns a boolean array, false for not duplicate, true for duplicate
-                u = list(rack_tube[rack_tube.duplicated()])
-
-                # now check for uniqueness across all Samples
-                if self.type != "ASG":
-                    dup = Sample().check_dtol_unique(rack_tube)
-                    if len(dup) > 0:
-                        # errors = list(map(lambda x: "<li>" + x + "</li>", errors))
-                        err = list(map(lambda x: x["RACK_OR_PLATE_ID"] + "/" + x["TUBE_OR_WELL_ID"], dup))
-                        errors.append(self.validation_msg_duplicate_tube_or_well_id_in_copo % (err))
-                        flag = False
-                else:
-                    # duplicates are allowed for asg but one element of duplicate set must have target in sybiont fields
-                    for i in u:
-                        rack, tube = i.split('/')
-                        rows = self.data.loc[
-                            (self.data["RACK_OR_PLATE_ID"] == rack) & (self.data["TUBE_OR_WELL_ID"] == tube)]
-                        if "TARGET" not in rows["SYMBIONT"].values:
-                            errors.append(self.validation_msg_duplicate_without_target % (
-                                    rows["RACK_OR_PLATE_ID"][0] + "/" + rows["TUBE_OR_WELL_ID"][0]))
-                            flag = False
-
-                # get list of DTOL fields from schemas
-                self.fields = jp.match(
-                    '$.properties[?(@.specifications[*] == ' + self.type.lower() + ')].versions[0]', s)
-                for header, cells in self.data.iteritems():
-
-                    notify_dtol_status(data={"profile_id": self.profile_id}, msg="Checking - " + header,
-                                       action="info",
-                                       html_id="sample_info")
-                    if header in self.fields:
-                        if header == "SYMBIONT" and self.type == "DTOL":
-                            # dtol manifests are allowed to have blank field in SYMBIONT
-                            pass
-                        else:
-                            # check if there is an enum for this header
-                            allowed_vals = lookup.DTOL_ENUMS.get(header, "")
-
-                            # check if there's a regex rule for the header and exceptional handling
-                            if lookup.DTOL_RULES.get(header, ""):
-                                regex_rule = lookup.DTOL_RULES[header].get("ena_regex", "")
-                                regex_human_readable = lookup.DTOL_RULES[header].get("human_readable", "")
-                            else:
-                                regex_rule = ""
-                            cellcount = 0
-                            for c in cells:
-                                cellcount += 1
-
-                                c_value = c
-                                if allowed_vals:
-                                    if header == "COLLECTION_LOCATION":
-                                        # special check for COLLETION_LOCATION as this needs invalid list error for feedback
-                                        c_value = str(c).split('|')[0].strip()
-                                        location_2part = str(c).split('|')[1:]
-                                        if c_value.upper() not in allowed_vals or not location_2part:
-                                            errors.append(self.validation_msg_invalid_list % (
-                                                c_value, header, str(cellcount + 1)))
-                                            flag = False
-                                    elif header == "ORGANISM_PART":
-                                        # special check for piped values
-                                        for part in str(c).split('|'):
-                                            if part.strip() not in allowed_vals:
-                                                errors.append(self.validation_msg_invalid_data % (
-                                                    part, header, str(cellcount + 1), allowed_vals
-                                                ))
-                                                flag = False
-                                    elif c_value.strip() not in allowed_vals:
-                                        # check value is in allowed enum
-                                        errors.append(self.validation_msg_invalid_data % (
-                                            c_value, header, str(cellcount + 1), allowed_vals))
-                                        flag = False
-                                    if header == "ORGANISM_PART" and c_value.strip() == "WHOLE_ORGANISM":
-                                        # send specimen in used whole specimens set
-                                        # print(c_value)
-                                        current_specimen = self.data.at[cellcount - 1, "SPECIMEN_ID"]
-                                        # print(current_specimen)
-                                        if current_specimen in self.whole_used_specimens:
-                                            errors.append(self.validation_msg_used_whole_organism % (current_specimen))
-                                            flag = False
-                                        else:
-                                            self.whole_used_specimens.add(current_specimen)
-                                if regex_rule:
-                                    # handle any regular expressions provided for valiation
-
-                                    if c and not re.match(regex_rule, c.replace("_", " "), re.IGNORECASE):
-                                        errors.append(self.validation_msg_invalid_data % (
-                                            c, header, str(cellcount + 1), regex_human_readable))
-                                        flag = False
-                                # validation checks for SERIES
-                                if header == "SERIES":
-                                    try:
-                                        int(c)
-                                    except ValueError:
-                                        errors.append(self.validation_msg_invalid_data % (
-                                            c, header, str(cellcount + 1), "integers"))
-                                        flag = False
-                                elif header == "TIME_ELAPSED_FROM_COLLECTION_TO_PRESERVATION":
-                                    # check this is either a NOT_* or an integer
-                                    if c_value.strip() not in self.blank_vals:
-                                        try:
-                                            float(c_value)
-                                        except ValueError:
-                                            errors.append(self.validation_msg_invalid_data % (
-                                                c_value, header, str(cellcount + 1),
-                                                "integer or " + ", ".join(self.blank_vals)
-                                            ))
-                                            flag = False
-                                # validation checks for date types
-                                if header in self.date_fields and c_value.strip() not in self.blank_vals:
-                                    try:
-                                        validate_date(c)
-                                    except ValueError as e:
-                                        errors.append(
-                                            self.validation_msg_invalid_date % (c, str(cellcount + 1), header))
-                                        flag = False
-
-                if not flag:
-                    errors = list(map(lambda x: "<li>" + x + "</li>", errors))
-                    errors = "".join(errors)
-
-                    notify_dtol_status(data={"profile_id": self.profile_id},
-                                       msg="<h4>" + self.file.name + "</h4><ol>" + errors + "</ol>",
-                                       action="error",
-                                       html_id="sample_info")
-                    return False
-
-
-
-            except Exception as e:
-                error_message = str(e).replace("<", "").replace(">", "")
-                notify_dtol_status(data={"profile_id": self.profile_id}, msg="Server Error - " + error_message,
-                                   action="info",
+                notify_dtol_status(data={"profile_id": self.profile_id},
+                                   msg="<h4>" + self.file.name + "</h4><ol>" + errors + "</ol>",
+                                   action="error",
                                    html_id="sample_info")
                 return False
 
-            # if we get here we have a valid spreadsheet
-            notify_dtol_status(data={"profile_id": self.profile_id}, msg="Spreadsheet is Valid", action="info",
-                               html_id="sample_info")
-            notify_dtol_status(data={"profile_id": self.profile_id}, msg="", action="close", html_id="upload_controls")
-            notify_dtol_status(data={"profile_id": self.profile_id}, msg="", action="make_valid", html_id="sample_info")
 
-            return True
+
+        except Exception as e:
+            error_message = str(e).replace("<", "").replace(">", "")
+            notify_dtol_status(data={"profile_id": self.profile_id}, msg="Server Error - " + error_message,
+                               action="info",
+                               html_id="sample_info")
+            return False
+
+        # if we get here we have a valid spreadsheet
+        notify_dtol_status(data={"profile_id": self.profile_id}, msg="Spreadsheet is Valid", action="info",
+                           html_id="sample_info")
+        notify_dtol_status(data={"profile_id": self.profile_id}, msg="", action="close", html_id="upload_controls")
+        notify_dtol_status(data={"profile_id": self.profile_id}, msg="", action="make_valid", html_id="sample_info")
+
+        return True
 
     def make_target_sample(self, sample):
         # need to pop taxon info, and add back into sample_list
@@ -314,14 +180,14 @@ class DtolSpreadsheet:
         except Exception as e:
             if receipt:
                 try:
-                    errors.append("ENA returned - " + taxinfo.get("error", "no error returned") + " - for TAXON_ID " + taxon)
+                    errors.append(
+                        "ENA returned - " + taxinfo.get("error", "no error returned") + " - for TAXON_ID " + taxon)
                 except NameError:
                     errors.append(
                         "ENA returned - " + receipt.decode("utf-8") + " - for TAXON_ID " + taxon)
             else:
                 errors.append("No response from ENA taxonomy for taxon " + taxon)
         return errors
-
 
     def validate_taxonomy(self):
         ''' check if provided scientific name, TAXON ID,
@@ -353,11 +219,11 @@ class DtolSpreadsheet:
                 taxon_id_list = list(taxon_id_set)
                 if "ASG" in Profile().get_type(self.profile_id):
                     for taxon in taxon_id_list:
-                        #check if taxon is submittable
+                        # check if taxon is submittable
                         ena_taxon_errors = self.check_taxon_ena_submittable(taxon)
                         if ena_taxon_errors:
                             errors += ena_taxon_errors
-                            flag=False
+                            flag = False
 
                 if any(id for id in taxon_id_list):
                     i = 0
@@ -375,13 +241,15 @@ class DtolSpreadsheet:
                     if all(row[header].strip() == "" for header in ['TAXON_ID', 'SCIENTIFIC_NAME']):
                         # print("row is empty")
                         errors.append(
-                            "Missing data: both TAXON_ID and SCIENTIFIC_NAME missing from row <strong>%s</strong>. Provide at least one" % (
+                            "Missing data: both TAXON_ID and SCIENTIFIC_NAME missing from row <strong>%s</strong>. "
+                            "Provide at least one" % (
                                 str(index + 2)))
                         flag = False
                         continue
                     notify_dtol_status(data={"profile_id": self.profile_id},
-                                       msg="Checking taxonomy information at row <strong>%s</strong> - <strong>%s</strong>" % (
-                                           str(index + 2), row['SCIENTIFIC_NAME']),
+                                       msg="Checking taxonomy information at row <strong>%s</strong> - "
+                                           "<strong>%s</strong>" % (
+                                               str(index + 2), row['SCIENTIFIC_NAME']),
                                        action="info",
                                        html_id="sample_info")
                     scientific_name = row['SCIENTIFIC_NAME'].strip()
@@ -392,10 +260,12 @@ class DtolSpreadsheet:
                     if not taxon_id:
                         handle = Entrez.esearch(db="Taxonomy", term=scientific_name)
                         records = Entrez.read(handle)
-                        # errors.append(self.validation_msg_missing_taxon % (str(index+2), scientific_name, records['IdList'][0]))
+                        # errors.append(self.validation_msg_missing_taxon % (str(index+2), scientific_name,
+                        # records['IdList'][0]))
                         if not records['IdList']:
                             errors.append(
-                                "Invalid data: couldn't resolve SCIENTIFIC_NAME <strong>%s</strong> at row <strong>%s</strong>" % (
+                                "Invalid data: couldn't resolve SCIENTIFIC_NAME <strong>%s</strong> at row "
+                                "<strong>%s</strong>" % (
                                     scientific_name, str(index + 2)))
                             flag = False
                             continue
@@ -429,7 +299,8 @@ class DtolSpreadsheet:
                             if taxon_id in records['IdList']:
                                 # errors.append(self.validation_msg_synonym % (scientific_name, str(index + 2),
                                 #                                             self.taxonomy_dict[taxon_id][
-                                #                                                 'ScientificName']))  ###records[0]['ScientificName']))
+                                #                                                 'ScientificName']))  ###records[0][
+                                #                                                 'ScientificName']))
                                 warnings.append(self.validation_warning_synonym % (scientific_name, str(index + 2),
                                                                                    self.taxonomy_dict[taxon_id][
                                                                                        'ScientificName']))
@@ -439,7 +310,8 @@ class DtolSpreadsheet:
                                 if self.data.at[index, "OTHER_INFORMATION"].strip():
                                     other_info = self.data.at[index, "OTHER_INFORMATION"] + " | "
                                 self.data.at[index, "OTHER_INFORMATION"] = other_info + \
-                                                                           "COPO substituted the scientific name synonym %s with %s" % (
+                                                                           "COPO substituted the scientific name " \
+                                                                           "synonym %s with %s" % (
                                                                                scientific_name,
                                                                                self.taxonomy_dict[taxon_id][
                                                                                    'ScientificName'].upper())
@@ -454,7 +326,8 @@ class DtolSpreadsheet:
                                 errors.append(self.validation_msg_invalid_taxonomy % (
                                     scientific_name, "SCIENTIFIC_NAME", str(index + 2), expected_name))
                                 # else:
-                                #   errors.append("Invalid data: couldn't resolve SCIENTIFIC_NAME nor TAXON_ID at row <strong>%s</strong>" % str(index+2))
+                                #   errors.append("Invalid data: couldn't resolve SCIENTIFIC_NAME nor TAXON_ID at row
+                                #   <strong>%s</strong>" % str(index+2))
                                 flag = False
                                 continue
                             else:
@@ -511,7 +384,8 @@ class DtolSpreadsheet:
                         # records = Entrez.read(handle)
 
                         errors.append(
-                            "Invalid data: couldn't retrieve TAXON_ID <strong>%s</strong> at row <strong>%s</strong>" % (
+                            "Invalid data: couldn't retrieve TAXON_ID <strong>%s</strong> at row <strong>%s</strong>"
+                            % (
                                 row['TAXON_ID'], str(index + 2)))
                         flag = False
 
@@ -593,8 +467,10 @@ class DtolSpreadsheet:
                         found = True
                         break
                 if not found:
-                    output.append({"file_name": "None", "specimen_id": "No Image found for <strong>" + sample[
-                        specimen_id_column_index] + "</strong>"})
+                    output.append({
+                        "file_name": "None", "specimen_id": "No Image found for <strong>" + sample[
+                            specimen_id_column_index] + "</strong>"
+                    })
         # save to session
         request = ThreadLocal.get_current_request()
         request.session["image_specimen_match"] = output
@@ -689,10 +565,3 @@ class DtolSpreadsheet:
             # add to list
             out = make_tax_from_sample(s)
             self.symbiont_list.append(out)
-
-
-def validate_date(date_text):
-    try:
-        datetime.datetime.strptime(date_text, '%Y-%m-%d')
-    except ValueError:
-        raise ValueError("Incorrect data format, should be YYYY-MM-DD")

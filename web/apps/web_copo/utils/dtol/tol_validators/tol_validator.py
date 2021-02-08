@@ -1,8 +1,12 @@
-import abc
+class TolValidtor:
 
+    def __init__(self, profile_id, fields, data, errors, flag, **kwargs):
+        self.profile_id = profile_id
+        self.fields = fields
+        self.data = data
+        self.errors = errors
+        self.flag = flag
+        self.kwargs = kwargs
 
-class TolValidtor(metaclass=abc.ABCMeta):
-
-    @abc.abstractmethod
-    def validate(self, profile_id, json_data, data, errors, flag):
+    def validate(self):
         raise NotImplemented
