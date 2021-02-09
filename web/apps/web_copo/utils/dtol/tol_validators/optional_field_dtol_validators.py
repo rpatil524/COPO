@@ -21,7 +21,7 @@ class DtolEnumerationValidator(TolValidtor):
                                action="info",
                                html_id="sample_info")
             if header in self.fields:
-                if header == "SYMBIONT" and p_type == "DTOL":
+                if header == "SYMBIONT" and "DTOL" in p_type:
                     # dtol manifests are allowed to have blank field in SYMBIONT
                     pass
                 else:

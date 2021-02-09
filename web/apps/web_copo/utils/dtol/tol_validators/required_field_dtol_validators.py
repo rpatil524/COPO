@@ -24,10 +24,11 @@ class ColumnValdator(TolValidtor):
 
 class CellMissingDataValidator(TolValidtor):
     def validate(self):
+        p_type = Profile().get_type(profile_id=self.profile_id)
         for header, cells in self.data.iteritems():
             # here we need to check if there are not missing values in its cells
             if header in self.fields:
-                if header == "SYMBIONT" and self.kwargs.get(type) == "DTOL":
+                if header == "SYMBIONT" and "DTOL" in p_type:
                     # dtol manifests are allowed to have blank field in SYMBIONT
                     pass
                 else:
