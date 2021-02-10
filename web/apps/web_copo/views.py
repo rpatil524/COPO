@@ -22,7 +22,6 @@ from dal.OAuthTokens import OAuthToken
 from dal.broker_da import BrokerDA, BrokerVisuals
 from dal.copo_da import DataFile
 from dal.copo_da import ProfileInfo, Profile, Submission, Annotation, CopoGroup, Repository, MetadataTemplate
-from web.apps.web_copo.copo_email import CopoEmail
 from web.apps.web_copo.decorators import user_is_staff
 from web.apps.web_copo.lookup.lookup import REPO_NAME_LOOKUP
 from web.apps.web_copo.models import banner_view
@@ -51,7 +50,7 @@ def login(request):
     return render(request, 'copo/auth/login.html', context)
 
 def test_view(request):
-    CopoEmail().send(["felix.shaw@earlham.ac.uk", "robert.davey@earlham.ac.uk", "martin.ayling@earlham.ac.uk", "shaw2thefloor@gmail.com", "bayoxe7436@pastortips.com", "felixoshaw@gmail.com", "alice.minotto@earlham.ac.uk"], "test subject", "<h4>BADGER!</h4><img src='https://pyxis.nymag.com/v1/imgs/1c7/716/ffb0c2f967b192f6531310527adb8c6589-18-honey-badger-teeth.rsquare.w700.jpg'/>", html=True)
+    Sample().save_record()
     return render(request, "copo/test_1.html")
 
 '''

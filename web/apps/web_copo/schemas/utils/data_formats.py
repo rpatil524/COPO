@@ -1,8 +1,9 @@
 __author__ = 'etuka'
 
+import json
 import os
 import re
-import json
+
 import web.apps.web_copo.lookup.lookup as lkup
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from web.apps.web_copo.schemas.utils.cg_core.cg_schema_generator import CgCoreSchemas
@@ -272,7 +273,9 @@ class DataFormats:
     def get_mapping_files(self):
         json_files = list()
 
+        exclude = set(['additional_attributes'])
         for root, dirs, files in os.walk(self.path_to_mappings):
+            dirs[:] = [d for d in dirs if d not in exclude]
             for name in files:
                 if name.endswith(".json"):
                     json_files.append(os.path.join(root, name))

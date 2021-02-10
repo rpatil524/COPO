@@ -1,3 +1,6 @@
+import datetime
+import json
+import subprocess
 
 
 def make_tax_from_sample(s):
@@ -15,3 +18,34 @@ def make_tax_from_sample(s):
     out["RACK_OR_PLATE_ID"] = s["RACK_OR_PLATE_ID"]
     out["TUBE_OR_WELL_ID"] = s["TUBE_OR_WELL_ID"]
     return out
+
+
+def validate_date(date_text):
+    try:
+        datetime.datetime.strptime(date_text, '%Y-%m-%d')
+    except ValueError:
+        raise ValueError("Incorrect data format, should be YYYY-MM-DD")
+
+
+def check_taxon_ena_submittable(self, taxon):
+    errors = []
+    receipt = None
+    taxinfo = None
+    curl_cmd = "curl " + "https://www.ebi.ac.uk/ena/taxonomy/rest/tax-id/" + taxon
+    try:
+        receipt = subprocess.check_output(curl_cmd, shell=True)
+        print(receipt)
+        taxinfo = json.loads(receipt.decode("utf-8"))
+        if taxinfo["submittable"] != 'true':
+            errors.append("TAXON_ID " + taxon + " is not submittable to ENA")
+    except Exception as e:
+        if receipt:
+            try:
+                errors.append(
+                    "ENA returned - " + taxinfo.get("error", "no error returned") + " - for TAXON_ID " + taxon)
+            except NameError:
+                errors.append(
+                    "ENA returned - " + receipt.decode("utf-8") + " - for TAXON_ID " + taxon)
+        else:
+            errors.append("No response from ENA taxonomy for taxon " + taxon)
+    return errors

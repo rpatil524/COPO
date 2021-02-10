@@ -2,9 +2,10 @@ __author__ = 'etuka'
 
 import copy
 import json
+import jsonref
 import os
 import xml.etree.ElementTree as ET
-from collections import namedtuple, OrderedDict
+from collections import namedtuple
 from datetime import datetime, tzinfo, timedelta
 
 import pandas as pd
@@ -96,8 +97,13 @@ def get_isajson_refactor_type(key):
 
 def json_to_pytype(path_to_json):
     with open(path_to_json, encoding='utf-8') as data_file:
-        data = json.loads(data_file.read())
-
+        data = jsonref.loads(data_file.read())
+        if "properties" in data and isinstance(data["properties"], list):
+            cp = list(data["properties"])
+            for idx, el in enumerate(data["properties"]):
+                if type(el) == jsonref.JsonRef:
+                    cp = cp + cp.pop(idx)
+            data["properties"] = cp
     return data
 
 

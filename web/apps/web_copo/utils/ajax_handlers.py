@@ -6,7 +6,7 @@ import os
 import time
 import urllib.parse
 from datetime import datetime
-from web.apps.web_copo.models import ViewLock
+
 import jsonpickle
 import pandas as pd
 import requests
@@ -30,12 +30,13 @@ from submission.dataverseSubmission import DataverseSubmit as ds
 from submission.dspaceSubmission import DspaceSubmit as dspace
 from submission.figshareSubmission import FigshareSubmit
 from submission.helpers import generic_helper as ghlper
+from submission.helpers.generic_helper import notify_dtol_status
 from web.apps.web_copo.lookup.copo_lookup_service import COPOLookup
 from web.apps.web_copo.lookup.lookup import WIZARD_FILES as wf
 from web.apps.web_copo.models import UserDetails
+from web.apps.web_copo.models import ViewLock
 from web.apps.web_copo.schemas.utils import data_utils
 from web.apps.web_copo.utils.dtol.Dtol_Spreadsheet import DtolSpreadsheet
-from submission.helpers.generic_helper import notify_sample_status, notify_dtol_status
 
 DV_STRING = 'HARVARD_TEST_API'
 
@@ -1312,9 +1313,9 @@ def sample_spreadsheet(request):
     name = file.name
     dtol = DtolSpreadsheet(file=file)
     if name.endswith("xlsx") or name.endswith("xls"):
-        dtol.loadManifest(type="xls")
+        dtol.loadManifest(m_format="xls")
     elif name.endswith("csv"):
-        dtol.loadManifest(type="csv")
+        dtol.loadManifest(m_format="csv")
     if dtol.validate_taxonomy() and dtol.validate():
         dtol.collect()
     return HttpResponse()
