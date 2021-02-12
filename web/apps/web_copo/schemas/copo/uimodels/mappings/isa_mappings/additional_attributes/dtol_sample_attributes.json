@@ -625,7 +625,8 @@
     "ref": "",
     "specifications": [
       "dtol",
-      "asg"
+      "asg",
+      "bc"
     ],
     "deprecated": false,
     "hidden": "false",

@@ -2,12 +2,12 @@ __author__ = 'etuka'
 
 import copy
 import json
-import jsonref
 import os
 import xml.etree.ElementTree as ET
 from collections import namedtuple
 from datetime import datetime, tzinfo, timedelta
 
+import jsonref
 import pandas as pd
 from bson.json_util import dumps
 from django.conf import settings
@@ -100,10 +100,17 @@ def json_to_pytype(path_to_json):
         data = jsonref.loads(data_file.read())
         if "properties" in data and isinstance(data["properties"], list):
             cp = list(data["properties"])
+            idxes = list()
+            # expand references
+            tmp = list()
             for idx, el in enumerate(data["properties"]):
                 if type(el) == jsonref.JsonRef:
-                    cp = cp + cp.pop(idx)
-            data["properties"] = cp
+                    tmp = tmp + data["properties"][idx]
+                else:
+                    tmp.append(el)
+                    # data["properties"] = data["properties"] + data["properties"][idx]
+            data["properties"] = tmp
+
     return data
 
 
