@@ -67,6 +67,7 @@ DTOL_EXPORT_TO_STS_FIELDS = {
         "updated_by",
         "status",
         "sampleDerivedFrom",
+        "sampleSameAs",
         "copo_profile_title",
         "species_list",
         "tol_project"
@@ -131,6 +132,7 @@ DTOL_EXPORT_TO_STS_FIELDS = {
         "updated_by",
         "status",
         "sampleDerivedFrom",
+        "sampleSameAs",
         "copo_profile_title",
         "species_list",
         "tol_project"
