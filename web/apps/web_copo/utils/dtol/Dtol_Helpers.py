@@ -2,6 +2,11 @@ import datetime
 import json
 import subprocess
 
+import jsonpath_rw_ext as jp
+
+from web.apps.web_copo.lookup import lookup as lk
+from web.apps.web_copo.schemas.utils.data_utils import json_to_pytype
+
 
 def make_tax_from_sample(s):
     out = dict()
@@ -27,7 +32,7 @@ def validate_date(date_text):
         raise ValueError("Incorrect data format, should be YYYY-MM-DD")
 
 
-def check_taxon_ena_submittable(self, taxon):
+def check_taxon_ena_submittable(taxon):
     errors = []
     receipt = None
     taxinfo = None
@@ -49,3 +54,26 @@ def check_taxon_ena_submittable(self, taxon):
         else:
             errors.append("No response from ENA taxonomy for taxon " + taxon)
     return errors
+
+
+def create_barcoding_spreadsheet():
+    # get barcoding fields
+    s = json_to_pytype(lk.WIZARD_FILES["sample_details"])
+
+    # to get all elements with version starting with bc
+    # fields = jp.match('$.properties[?(@.specifications[*]~".*bc.*" & @.required=="true")].versions[0]', s)
+
+    barcode_fields = jp.match(
+        '$.properties[?(@.specifications[*] == "bc" & @.required=="true")].versions['
+        '0]',
+        s)
+    amplicon_fields = jp.match(
+        '$.properties[?(@.specifications[*] == "bc_amp" & @.required=="true")].versions['
+        '0]',
+        s)
+    for f in barcode_fields:
+        print(f)
+
+    print("\n-------\n")
+    for f in amplicon_fields:
+        print(f)

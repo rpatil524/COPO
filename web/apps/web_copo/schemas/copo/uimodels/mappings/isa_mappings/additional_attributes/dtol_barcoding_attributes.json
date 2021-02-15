@@ -65,28 +65,7 @@
     "dwc": "",
     "type": "string"
   },
-  {
-    "help_tip": "",
-    "required": "true",
-    "control_meta": {},
-    "versions": [
-      "NUMBER_OF_AMPLICONS"
-    ],
-    "ref": "",
-    "deprecated": false,
-    "hidden": "false",
-    "specifications": [
-      "bc"
-    ],
-    "show_in_form": true,
-    "label": "Number of Amplicons",
-    "id": "copo.sample.NUMBER_OF_AMPLICONS",
-    "show_in_table": true,
-    "control": "text",
-    "default_value": "",
-    "dwc": "",
-    "type": "string"
-  },
+
   {
     "help_tip": "",
     "required": "true",
@@ -98,7 +77,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Sequencing Approach",
@@ -120,7 +99,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Barcode Rack Or Plate ID",
@@ -142,7 +121,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Tube Or Well ID",
@@ -164,7 +143,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Amplification Primer Forward",
@@ -186,7 +165,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Amplification Primer Reverse",
@@ -208,7 +187,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Sequencing Primer Forward",
@@ -230,7 +209,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Sequencing Primer Reverse",
@@ -252,7 +231,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Forward Sequence",
@@ -263,28 +242,7 @@
     "dwc": "",
     "type": "string"
   },
-  {
-    "help_tip": "",
-    "required": "true",
-    "control_meta": {},
-    "versions": [
-      "FORWARD_SEQUENCE"
-    ],
-    "ref": "",
-    "deprecated": false,
-    "hidden": "false",
-    "specifications": [
-      "bc"
-    ],
-    "show_in_form": true,
-    "label": "Forward Sequence",
-    "id": "copo.sample.FORWARD_SEQUENCE",
-    "show_in_table": true,
-    "control": "text",
-    "default_value": "",
-    "dwc": "",
-    "type": "string"
-  },
+
   {
     "help_tip": "",
     "required": "true",
@@ -296,7 +254,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Reverse Sequence",
@@ -318,7 +276,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Consensus Sequence",
@@ -340,7 +298,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Consensus Length",
@@ -362,7 +320,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Query Sequence",
@@ -384,7 +342,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "AGCTN Of Consensus",
@@ -406,7 +364,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Trace Forward Name",
@@ -428,7 +386,7 @@
     "deprecated": false,
     "hidden": "false",
     "specifications": [
-      "bc"
+      "bc_amp"
     ],
     "show_in_form": true,
     "label": "Trace Reverse Name",
