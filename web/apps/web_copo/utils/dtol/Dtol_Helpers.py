@@ -3,6 +3,8 @@ import json
 import subprocess
 
 import jsonpath_rw_ext as jp
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
 
 from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.schemas.utils.data_utils import json_to_pytype
@@ -22,6 +24,8 @@ def make_tax_from_sample(s):
     out["TAXON_REMARKS"] = s["TAXON_REMARKS"]
     out["RACK_OR_PLATE_ID"] = s["RACK_OR_PLATE_ID"]
     out["TUBE_OR_WELL_ID"] = s["TUBE_OR_WELL_ID"]
+    for el in out:
+        out[el] = str(out[el]).strip()
     return out
 
 
@@ -71,9 +75,24 @@ def create_barcoding_spreadsheet():
         '$.properties[?(@.specifications[*] == "bc_amp" & @.required=="true")].versions['
         '0]',
         s)
-    for f in barcode_fields:
-        print(f)
 
-    print("\n-------\n")
-    for f in amplicon_fields:
-        print(f)
+    wb = Workbook()
+    sheet_id = wb.get_sheet_by_name("Sheet")
+    wb.remove_sheet(sheet_id)
+    wb.create_sheet("Specimens")
+    wb.create_sheet("Amplicons")
+
+    spec = wb.worksheets[0]
+    for idx, f in enumerate(barcode_fields):
+        spec.cell(row=1, column=idx + 1).value = f
+
+    amp = wb.worksheets[1]
+    for idx, f in enumerate(amplicon_fields):
+        amp.cell(row=1, column=idx + 1).value = f
+
+    for sheet in wb.worksheets:
+        for idx, column in enumerate(sheet.columns):
+            cell = sheet.cell(column=idx + 1, row=1)
+            sheet.column_dimensions[get_column_letter(idx + 1)].width = len(cell.value) + 5
+
+    return wb
