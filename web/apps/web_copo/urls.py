@@ -1,7 +1,8 @@
 from django.urls import path, re_path
-from . import views
+
+from web.apps.web_copo.file_server import BaseFileDownloadView
 from web.apps.web_copo.utils import ajax_handlers, annotation_handlers, template_handlers
-from django.views.generic import TemplateView
+from . import views
 
 app_name = 'web_copo'
 
@@ -11,7 +12,7 @@ urlpatterns = [
     path('accept_reject_sample/', views.copo_sample_accept_reject, name="accept_reject"),
     path('dataverse_submit/', views.test_dataverse_submit, name='test_dataverse_submit'),
     # path('test_submission/', views.test_submission, name='test_submission'),
-    path('test/', views.test_view, name='test_view'),
+    re_path(r'^test/(?P<filename>[a-z0-9.]+)', BaseFileDownloadView.as_view(), name='somefile-download'),
     path('login/', views.login, name='auth'),
     path('logout/', views.copo_logout, name='logout'),
     path('register/', views.copo_register, name='register'),
