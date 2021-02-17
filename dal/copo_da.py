@@ -626,8 +626,9 @@ class Sample(DAComponent):
 
     def update_public_name(self, name):
         self.get_collection_handle().update_many(
-            {"SPECIMEN_ID": name["specimenId"], "TAXON_ID": str(name["taxonomyId"])},
-            {"$set": {"public_name": name["publicName"]}})
+            {"SPECIMEN_ID": name['specimen']["specimenId"], "species_list" : {
+                '$elemMatch' : {"TAXON_ID": str(name['species']["taxonomyId"]), "SYMBIONT": "target"}}},
+            {"$set": {"public_name": name["tolId"]}})
 
     def delete_sample(self, sample_id):
         sample = self.get_record(sample_id)

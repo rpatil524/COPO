@@ -67,6 +67,7 @@ DTOL_EXPORT_TO_STS_FIELDS = {
         "updated_by",
         "status",
         "sampleDerivedFrom",
+        "sampleSameAs",
         "copo_profile_title",
         "species_list",
         "tol_project"
@@ -131,6 +132,7 @@ DTOL_EXPORT_TO_STS_FIELDS = {
         "updated_by",
         "status",
         "sampleDerivedFrom",
+        "sampleSameAs",
         "copo_profile_title",
         "species_list",
         "tol_project"
@@ -785,10 +787,6 @@ DTOL_ENA_MAPPINGS = {
     }
 }
 
-if DEBUG:
-    PUBLIC_NAME_SERVICE = "https://id.tol.sanger.ac.uk/api/v2/"
-else:
-    PUBLIC_NAME_SERVICE = "https://id.tol.sanger.ac.uk/api/v2/"
 
 API_KEY = resolve_env.get_env("PUBLIC_NAME_SERVICE_API_KEY")
 NIH_API_KEY = resolve_env.get_env("NIH_API_KEY")

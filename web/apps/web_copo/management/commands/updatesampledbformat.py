@@ -25,7 +25,6 @@ class Command(BaseCommand):
         listtoupdate = []
         for dtolsample in Sample().get_all_dtol_samples():
             if "species_list" not in Sample().get_record(dtolsample['_id']):
-                #print("missing field")
                 listtoupdate.append(dtolsample['_id'])
         return listtoupdate
 

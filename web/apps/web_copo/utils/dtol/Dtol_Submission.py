@@ -14,7 +14,7 @@ import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from dal.copo_da import Submission, Sample, Profile, Source
 from submission.helpers.generic_helper import notify_dtol_status
 from tools import resolve_env
-from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS, DTOL_UNITS, PUBLIC_NAME_SERVICE, \
+from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS, DTOL_UNITS, \
     API_KEY
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
 from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE, SRA_PROJECT_TEMPLATE
@@ -26,6 +26,8 @@ logger = get_task_logger(__name__)
 
 exclude_from_sample_xml = []  # todo list of keys that shouldn't end up in the sample.xml file
 ena_service = resolve_env.get_env('ENA_SERVICE')
+
+public_name_service = resolve_env.get_env('PUBLIC_NAME_SERVICE')
 
 pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
 user_token = resolve_env.get_env('WEBIN_USER').split("@")[0]
@@ -592,7 +594,7 @@ def create_study(profile_id, collection_id):
 
 def query_public_name_service(sample_list):
     headers = {"api-key": API_KEY}
-    url = urljoin(PUBLIC_NAME_SERVICE, 'public-name')
+    url = urljoin(public_name_service, 'tol-ids') #public-name
 
     r = requests.post(url=url, json=sample_list, headers=headers, verify=False)
     if r.status_code == 200:
