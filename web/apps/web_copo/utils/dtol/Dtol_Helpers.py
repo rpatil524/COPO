@@ -14,4 +14,6 @@ def make_tax_from_sample(s):
     out["TAXON_REMARKS"] = s["TAXON_REMARKS"]
     out["RACK_OR_PLATE_ID"] = s["RACK_OR_PLATE_ID"]
     out["TUBE_OR_WELL_ID"] = s["TUBE_OR_WELL_ID"]
+    for el in out:
+        out[el] = str(out[el]).strip()
     return out
