@@ -594,12 +594,15 @@ def create_study(profile_id, collection_id):
 
 def query_public_name_service(sample_list):
     headers = {"api-key": API_KEY}
-    url = urljoin(public_name_service, 'tol-ids') #public-name
-
-    r = requests.post(url=url, json=sample_list, headers=headers, verify=False)
-    if r.status_code == 200:
-        resp = json.loads(r.content)
-    else:
-        # in the case there is a network issue, just return an empty dict
-        resp = {}
-    return resp
+    url = urljoin(public_name_service, 'tol-ids')  # public-name
+    try:
+        r = requests.post(url=url, json=sample_list, headers=headers, verify=False)
+        if r.status_code == 200:
+            resp = json.loads(r.content)
+        else:
+            # in the case there is a network issue, just return an empty dict
+            resp = {}
+        return resp
+    except Exception as e:
+        print("PUBLIC NAME SERVER ERROR: " + str(e))
+        return {}

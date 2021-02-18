@@ -110,20 +110,24 @@ class DtolSpreadsheet:
             try:
                 # read excel and convert all to string
                 if m_format == "xls":
-                    self.data = pandas.read_excel(self.file, keep_default_na=False, na_values=lookup.na_vals)
+                    self.data = pandas.read_excel(self.file, keep_default_na=False,
+                                                  na_values=lookup.na_vals)
                 elif m_format == "csv":
-                    self.data = pandas.read_csv(self.file, keep_default_na=False, na_values=lookup.na_vals)
+                    self.data = pandas.read_csv(self.file, keep_default_na=False,
+                                                na_values=lookup.na_vals)
                 '''
                 for column in self.allowed_empty:
                     self.data[column] = self.data[column].fillna("")
                 '''
                 self.data = self.data.apply(lambda x: x.astype(str))
-                self.data = self.data.apply(lambda x: x.strip())
-            except:
+                self.data = self.data.apply(lambda x: x.str.strip())
+            except Exception as e:
                 # if error notify via web socket
-                notify_dtol_status(data={"profile_id": self.profile_id}, msg="Unable to load file.", action="info",
+                notify_dtol_status(data={"profile_id": self.profile_id}, msg="Unable to load file. " + str(e),
+                                   action="info",
                                    html_id="sample_info")
                 return False
+            return True
 
     def validate(self):
         flag = True

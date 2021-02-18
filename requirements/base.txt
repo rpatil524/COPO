@@ -100,11 +100,11 @@ nbformat==4.4.0
 networkx==2.0
 notebook==6.0.1
 numexpr
-numpy
+numpy==1.20.0
 oauthlib==2.0.6
-openpyxl==2.4.9
 ordered-set==3.1.1
-pandas==1.1.5
+openpyxl==3.0.6
+pandas==1.2.2
 pandocfilters==1.4.2
 parso==0.5.1
 pexpect==4.4.0

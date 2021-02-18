@@ -92,7 +92,8 @@ class DtolEnumerationValidator(TolValidtor):
 
             if self.taxonomy_dict.get(taxon_id):
                 if not scientific_name:
-                    self.errors.append(msg["validation_msg_missing_data"] % ("SCIENTIFIC_NAME", str(index + 2),))
+                    self.errors.append(msg["validation_msg_missing_scientific_name"] % ("SCIENTIFIC_NAME", str(index +
+                                                                                                               2),))
                     self.flag = False
                     continue
                 elif scientific_name.upper() != self.taxonomy_dict[taxon_id]['ScientificName'].upper():

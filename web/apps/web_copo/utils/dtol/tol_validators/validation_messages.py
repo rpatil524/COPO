@@ -5,6 +5,9 @@ MESSAGES = {
     "validation_msg_missing_data": "Missing data detected in column <strong>%s</strong> at row <strong>%s</strong>. "
                                    "All required fields must have a value. There must be no empty rows. Values of "
                                    "<strong>%s</strong> are allowed.",
+    "validation_msg_missing_scientific_name": "Missing data detected in column <strong>%s</strong> at row "
+                                              "<strong>%s</strong>. "
+                                              "All required fields must have a value. There must be no empty rows.",
     "validation_msg_rack_tube_both_na": "NOT_APPLICABLE, NOT_PROVIDED or NOT_COLLECTED found in both RACK_OR_PLATE_ID "
                                         " and TUBE_OR_WELL_ID at row <strong>%s</strong>.",
     "validation_msg_duplicate_tube_or_well_id_in_copo": "Duplicate RACK_OR_PLATE_ID and TUBE_OR_WELL_ID already in "

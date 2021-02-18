@@ -1313,11 +1313,13 @@ def sample_spreadsheet(request):
     name = file.name
     dtol = DtolSpreadsheet(file=file)
     if name.endswith("xlsx") or name.endswith("xls"):
-        dtol.loadManifest(m_format="xls")
+        fmt = 'xls'
     elif name.endswith("csv"):
-        dtol.loadManifest(m_format="csv")
-    if dtol.validate_taxonomy() and dtol.validate():
-        dtol.collect()
+        fmt = 'csv'
+
+    if dtol.loadManifest(m_format=fmt):
+        if dtol.validate_taxonomy() and dtol.validate():
+            dtol.collect()
     return HttpResponse()
 
     '''
