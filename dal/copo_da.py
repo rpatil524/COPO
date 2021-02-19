@@ -664,6 +664,11 @@ class Sample(DAComponent):
             {"sample_type": "dtol"}
         )
 
+    def get_number_of_samples(self):
+        return self.get_collection_handle().count({
+
+        })
+
     def get_dtol_type(self, id):
         return self.get_collection_handle().find_one(
             {"$or": [{"biosampleAccession": id}, {"sraAccession": id}, {"biosampleAccession": id}]})

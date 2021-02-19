@@ -1,9 +1,9 @@
 __author__ = 'felix.shaw@tgac.ac.uk - 20/01/2016'
 
-from .annotate_views import search_all, post_annotations, handle_upload
 from django.urls import path, re_path
+
+from .annotate_views import search_all, post_annotations, handle_upload
 from .handlers import sample, person, general, stats
-from django.shortcuts import redirect
 
 app_name = 'api'
 
@@ -44,8 +44,12 @@ dtol_api_patterns = [
 stats_api_patterns = [
     re_path(r'stats/number_of_users', stats.get_number_of_users,
             name='get_number_of_users'),
-    re_path(r'stats/number_of_dtol_samples', stats.get_number_of_dtol_samples,
-            name='get_number_of_dtol_samples'),
+    re_path(r'stats/number_of_samples', stats.get_number_of_samples,
+            name='get_number_of_samples'),
+    re_path(r'stats/number_of_profiles', stats.get_number_of_profiles,
+            name='get_number_of_profiles'),
+    re_path(r'stats/number_of_datafiles', stats.get_number_of_datafiles,
+            name='get_number_of_datafiles'),
 ]
 
 urlpatterns = generic_api_patterns + dtol_api_patterns + stats_api_patterns
