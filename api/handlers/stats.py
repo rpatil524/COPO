@@ -1,3 +1,7 @@
+import tempfile
+
+import pandas
+import pymongo
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 
@@ -24,3 +28,11 @@ def get_number_of_profiles(request):
 def get_number_of_datafiles(request):
     number = da.handle_dict["datafile"].count({})
     return HttpResponse(number)
+
+
+def combined_stats_csv(request):
+    stats = da.cursor_to_list(da.handle_dict["stats"].find({}).sort('date', pymongo.DESCENDING))
+    with tempfile.NamedTemporaryFile() as f:
+        df = pandas.DataFrame(stats, index=None)
+
+        return HttpResponse(df.to_csv())

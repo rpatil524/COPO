@@ -1,9 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
-from celery import Celery
-from celery.schedules import crontab
 from datetime import timedelta
+
+from celery import Celery
 
 # from web.apps.web_copo.utils.dtol import DtolSpreadsheet
 
@@ -32,6 +32,10 @@ app.conf.beat_schedule = {
     'find_incorrectly_rejected_samples': {
         'task': 'web.apps.web_copo.tasks.find_incorrectly_rejected_samples',
         'schedule': timedelta(seconds=60)
+    },
+    'update_stats': {
+        'task': 'web.apps.web_copo.tasks.update_stats',
+        'schedule': timedelta(hours=24)
     }
 }
 

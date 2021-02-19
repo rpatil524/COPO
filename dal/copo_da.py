@@ -2,7 +2,7 @@ __author__ = 'felix.shaw@tgac.ac.uk - 22/10/15'
 
 import copy
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 
 import pandas as pd
 import pymongo
@@ -46,6 +46,7 @@ TextAnnotationCollection = 'TextAnnotationCollection'
 SubmissionQueueCollection = 'SubmissionQueueCollection'
 MetadataTemplateCollection = 'MetadataTemplateCollection'
 FileTransferQueueCollection = 'FileTransferQueueCollection'
+StatsCollection = 'StatsCollection'
 
 handle_dict = dict(publication=get_collection_ref(PubCollection),
                    person=get_collection_ref(PersonCollection),
@@ -59,7 +60,8 @@ handle_dict = dict(publication=get_collection_ref(PubCollection),
                    repository=get_collection_ref(RepositoryCollection),
                    cgcore=get_collection_ref(CGCoreCollection),
                    textannotation=get_collection_ref(TextAnnotationCollection),
-                   metadata_template=get_collection_ref(MetadataTemplateCollection)
+                   metadata_template=get_collection_ref(MetadataTemplateCollection),
+                   stats=get_collection_ref(StatsCollection)
                    )
 
 
@@ -1894,6 +1896,17 @@ class RemoteDataFile:
 
     def sanitise_remote_files(self):
         pass
+
+
+class Stats:
+    def update_stats(self):
+        datafiles = handle_dict["datafile"].count({})
+        profiles = handle_dict["profile"].count({})
+        samples = Sample().get_number_of_samples()
+        users = users = len(User.objects.all())
+        out = {"datafiles": datafiles, "profiles": profiles, "samples": samples, "users": users,
+               "date": str(date.today())}
+        get_collection_ref(StatsCollection).insert(out)
 
 
 class Description:

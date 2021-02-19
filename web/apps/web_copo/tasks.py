@@ -1,7 +1,7 @@
-from web.celery import app
-from submission import enareadSubmission
 import web.apps.web_copo.utils.dtol.Dtol_Submission as dtol
-from dal.copo_da import Sample
+from dal.copo_da import Sample, Stats
+from submission import enareadSubmission
+from web.celery import app
 
 
 @app.task
@@ -32,3 +32,8 @@ def find_incorrectly_rejected_samples(self):
     Sample().find_incorrectly_rejected_samples()
     return True
 
+
+@app.task(bind=True)
+def update_stats(self):
+    Stats().update_stats()
+    return True
