@@ -14,10 +14,10 @@ import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from dal.copo_da import Submission, Sample, Profile, Source
 from submission.helpers.generic_helper import notify_dtol_status
 from tools import resolve_env
-from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS, DTOL_UNITS, \
-    API_KEY
+from web.apps.web_copo.lookup.dtol_lookups import DTOL_ENA_MAPPINGS, DTOL_UNITS
 from web.apps.web_copo.lookup.lookup import SRA_SETTINGS as settings
 from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_TEMPLATE, SRA_PROJECT_TEMPLATE
+from web.apps.web_copo.utils.dtol.Dtol_Helpers import query_public_name_service
 
 with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
@@ -27,7 +27,7 @@ logger = get_task_logger(__name__)
 exclude_from_sample_xml = []  # todo list of keys that shouldn't end up in the sample.xml file
 ena_service = resolve_env.get_env('ENA_SERVICE')
 
-public_name_service = resolve_env.get_env('PUBLIC_NAME_SERVICE')
+#public_name_service = resolve_env.get_env('PUBLIC_NAME_SERVICE')
 
 pass_word = resolve_env.get_env('WEBIN_USER_PASSWORD')
 user_token = resolve_env.get_env('WEBIN_USER').split("@")[0]
@@ -57,14 +57,16 @@ def process_pending_dtol_samples():
         public_name_list = list()
         for s_id in submission["dtol_samples"]:
             sam = Sample().get_record(s_id)
-            try:
-                public_name_list.append(
-                    {"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
-                     "sample_id": str(sam["_id"])})
-            except ValueError:
-                notify_dtol_status(data={"profile_id": profile_id}, msg="Invalid Taxon ID found", action="info",
-                                   html_id="dtol_sample_info")
-                return False
+            print(type(sam['public_name']), sam['public_name'])
+            if not sam["public_name"]:
+                try:
+                    public_name_list.append(
+                        {"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
+                         "sample_id": str(sam["_id"])})
+                except ValueError:
+                    notify_dtol_status(data={"profile_id": profile_id}, msg="Invalid Taxon ID found", action="info",
+                                       html_id="dtol_sample_info")
+                    return False
 
             s_ids.append(s_id)
 
@@ -592,7 +594,7 @@ def create_study(profile_id, collection_id):
                            html_id="dtol_sample_info")
 
 
-def query_public_name_service(sample_list):
+'''def query_public_name_service(sample_list):
     headers = {"api-key": API_KEY}
     url = urljoin(public_name_service, 'tol-ids')  # public-name
     try:
@@ -605,4 +607,4 @@ def query_public_name_service(sample_list):
         return resp
     except Exception as e:
         print("PUBLIC NAME SERVER ERROR: " + str(e))
-        return {}
+        return {}'''
