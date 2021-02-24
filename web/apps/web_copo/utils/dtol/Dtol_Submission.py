@@ -123,6 +123,14 @@ def process_pending_dtol_samples():
         notify_dtol_status(data={"profile_id": profile_id}, msg="Querying Public Naming Service", action="info",
                            html_id="dtol_sample_info")
         public_names = query_public_name_service(public_name_list)
+        if public_name_list and not public_names:
+            #hadle failure to get public names and halt submission
+            #change dtol_status to "awaiting_tolids"
+            msg = "We couldn't retrieve one or more public names, a request for a new tolId has been sent, COPO will try again in 24 hours"
+            notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="error",
+                               html_id="dtol_sample_info")
+            Submission().make_dtol_status_awaiting_tolids(submission['_id'])
+            break
         for name in public_names:
             Sample().update_public_name(name)
 
@@ -148,6 +156,31 @@ def process_pending_dtol_samples():
 
     notify_dtol_status(data={"profile_id": profile_id}, msg="", action="hide_sub_spinner",
                        html_id="dtol_sample_info")
+
+def query_awaiting_tolids():
+    #get all submission awaiting for tolids
+    sub_id_list = Submission().get_awaiting_tolids()
+    for submission in sub_id_list:
+        public_name_list = list()
+        sam = Sample().get_record(s_id)
+        if not sam["public_name"]:
+            try:
+                public_name_list.append(
+                    {"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
+                     "sample_id": str(sam["_id"])})
+            except ValueError:
+                return False
+        assert len(public_name_list)>0
+        public_names = query_public_name_service(public_name_list)
+        #still no response, do nothing
+        #NOTE the query fails even if only one TAXON_ID can't be found
+        if not public_names:
+            pass
+        #update samples and set dtol_sattus to pending
+        else:
+            for name in public_names:
+                Sample().update_public_name(name)
+            Submission().make_dtol_status_pending()
 
 def populate_source_fields(sampleobj):
     '''populate source in db to copy most of sample fields
