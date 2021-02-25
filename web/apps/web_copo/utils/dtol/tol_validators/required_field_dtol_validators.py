@@ -84,6 +84,6 @@ class RackPlateUniquenessValidator(TolValidtor):
                     (self.data["RACK_OR_PLATE_ID"] == rack) & (self.data["TUBE_OR_WELL_ID"] == tube)]
                 if "TARGET" not in rows["SYMBIONT"].values:
                     self.errors.append(msg["validation_msg_duplicate_without_target"] % (
-                            rows["RACK_OR_PLATE_ID"][0] + "/" + rows["TUBE_OR_WELL_ID"][0]))
+                        str(rows["RACK_OR_PLATE_ID"] + "/" + rows["TUBE_OR_WELL_ID"])))
                     self.flag = False
         return self.errors, self.flag
