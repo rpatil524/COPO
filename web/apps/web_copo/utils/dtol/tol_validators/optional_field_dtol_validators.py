@@ -7,13 +7,12 @@ from web.apps.web_copo.utils.dtol.Dtol_Helpers import validate_date
 from .tol_validator import TolValidtor
 from .validation_messages import MESSAGES as msg
 
-whole_used_specimens = set()
-regex_human_readable = ""
 
 class DtolEnumerationValidator(TolValidtor):
 
     def validate(self):
-        global regex_human_readable
+        whole_used_specimens = set()
+        regex_human_readable = ""
         p_type = Profile().get_type(profile_id=self.profile_id)
         for header, cells in self.data.iteritems():
 
