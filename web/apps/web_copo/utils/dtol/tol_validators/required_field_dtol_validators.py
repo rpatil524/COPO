@@ -60,16 +60,17 @@ class RackPlateUniquenessValidator(TolValidtor):
     def validate(self):
         # check for uniqueness of RACK_OR_PLATE_ID and TUBE_OR_WELL_ID in this manifest
         rack_tube = self.data["RACK_OR_PLATE_ID"] + "/" + self.data["TUBE_OR_WELL_ID"]
-
+        # now check for uniqueness across all Samples
+        p_type = Profile().get_type(profile_id=self.profile_id)
+        dup = Sample().check_dtol_unique(rack_tube)
         # duplicated returns a boolean array, false for not duplicate, true for duplicate
         u = list(rack_tube[rack_tube.duplicated()])
-        if len(u) > 0:
-            self.errors.append(msg["validation_msg_duplicate_tube_or_well_id"] % (u))
-            self.flag = False
-        # now check for uniqueness across all Samples
-        type = Profile().get_type(profile_id=self.profile_id)
-        if "ASG" not in type:
-            dup = Sample().check_dtol_unique(rack_tube)
+        if "ASG" not in p_type:
+
+            if len(u) > 0:
+                self.errors.append(msg["validation_msg_duplicate_tube_or_well_id"] % (u))
+                self.flag = False
+
             if len(dup) > 0:
                 # errors = list(map(lambda x: "<li>" + x + "</li>", errors))
                 err = list(map(lambda x: x["RACK_OR_PLATE_ID"] + "/" + x["TUBE_OR_WELL_ID"], dup))
@@ -83,6 +84,6 @@ class RackPlateUniquenessValidator(TolValidtor):
                     (self.data["RACK_OR_PLATE_ID"] == rack) & (self.data["TUBE_OR_WELL_ID"] == tube)]
                 if "TARGET" not in rows["SYMBIONT"].values:
                     self.errors.append(msg["validation_msg_duplicate_without_target"] % (
-                            rows["RACK_OR_PLATE_ID"][0] + "/" + rows["TUBE_OR_WELL_ID"][0]))
+                        str(rows["RACK_OR_PLATE_ID"] + "/" + rows["TUBE_OR_WELL_ID"])))
                     self.flag = False
         return self.errors, self.flag
