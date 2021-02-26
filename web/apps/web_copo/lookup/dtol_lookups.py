@@ -697,6 +697,10 @@ DTOL_RULES = {
     "SAMPLE_DERIVED_FROM": {
         "ena_regex": "(^[ESD]R[SR]\d{6,}(,[ESD]R[SR]\d{6,})*$)|(^SAM[END][AG]?\d+(,SAM[END][AG]?\d+)*$)|(^EGA[NR]\d{11}(,EGA[NR]\d{11})*$)|(^[ESD]R[SR]\d{6,}-[ESD]R[SR]\d{6,}$)|(^SAM[END][AG]?\d+-SAM[END][AG]?\d+$)|(^EGA[NR]\d{11}-EGA[NR]\d{11}$)",
         "human_readable": "Specimen accession"
+    },
+    "public_name": {
+        "ena_regex": "(^[a-z]{1}[A-Z]{1}[a-z]{2}[A-Z]{1}[a-z]{2}[0-9]*$)|(^[a-z]{2}[A-Z]{1}[a-z]{2}[A-Z]{1}[a-z]{3}[0-9]*$)",
+        "human_readable": "Public name"
     }
 }
 DTOL_UNITS = {
@@ -784,6 +788,9 @@ DTOL_ENA_MAPPINGS = {
     },
     "SAMPLE_DERIVED_FROM": {
         "ena": "sample derived from"
+    },
+    "public_name": {
+        "ena": "tolid"
     }
 }
 

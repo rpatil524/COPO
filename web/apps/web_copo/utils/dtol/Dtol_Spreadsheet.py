@@ -350,8 +350,6 @@ class DtolSpreadsheet:
         public_names = query_public_name_service(public_name_list)
         for name in public_names:
             Sample().update_public_name(name)
-            #TODO handle lack of response
-
         profile_id = request.session["profile_id"]
         profile = Profile().get_record(profile_id)
         title = profile["title"]
