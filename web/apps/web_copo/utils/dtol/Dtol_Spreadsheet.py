@@ -328,14 +328,14 @@ class DtolSpreadsheet:
                                action="info",
                                html_id="sample_info")
 
-            if s["SYMBIONT"].lower() == "target" or not s["SYMBIONT"].strip():
-                # transform spieces info into species list format
+            if s["SYMBIONT"].lower() == "symbiont":
+                self.check_for_target_or_add_to_symbiont_list(s)
+            else:
+                #SOP 2.2 DTOL symbiont to be a scientific name
                 s = make_target_sample(s)
                 sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
                 Sample().timestamp_dtol_sample_created(sampl["_id"])
                 self.add_from_symbiont_list(s)
-            elif s["SYMBIONT"].lower() == "symbiont":
-                self.check_for_target_or_add_to_symbiont_list(s)
 
             for im in image_data:
                 # create matching DataFile object for image is provided
