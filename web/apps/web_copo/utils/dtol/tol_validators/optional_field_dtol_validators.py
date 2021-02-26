@@ -31,8 +31,10 @@ class DtolEnumerationValidator(TolValidtor):
                     if lookup.DTOL_RULES.get(header, ""):
                         regex_rule = lookup.DTOL_RULES[header].get("ena_regex", "")
                         regex_human_readable = lookup.DTOL_RULES[header].get("human_readable", "")
+                        optional_regex = lookup.DTOL_RULES[header].get("optional_regex", "")
                     else:
                         regex_rule = ""
+                        optional_regex = ""
                     cellcount = 0
                     for c in cells:
                         cellcount += 1
@@ -69,11 +71,21 @@ class DtolEnumerationValidator(TolValidtor):
                                 else:
                                     whole_used_specimens.add(current_specimen)
                         if regex_rule:
-                            # handle any regular expressions provided for valiation
+                            # handle any regular expressions provided for validation
                             if c and not re.match(regex_rule, c.replace("_", " "), re.IGNORECASE):
                                 self.errors.append(msg["validation_msg_invalid_data"] % (
                                     c, header, str(cellcount + 1), regex_human_readable))
                                 self.flag = False
+                        if optional_regex:
+                            #handle regular expression that will only trigger a warning
+                            if c and not re.match(optional_regex, c.replace("_", " "), re.IGNORECASE):
+                                if header in ['RACK_OR_PLATE_ID', 'TUBE_OR_WELL_ID']:
+                                    self.warnings.append(msg["validation_msg_warning_racktube_format"] % (
+                                        c, header, str(cellcount + 1)))
+                                else: #not in use atm, here in case we add more optional validations
+                                    self.warnings.append(msg["validation_msg_warning_racktube_format"] % (
+                                        c, header, str(cellcount + 1)))
+
                         # validation checks for SERIES
                         if header == "SERIES":
                             try:
@@ -101,4 +113,4 @@ class DtolEnumerationValidator(TolValidtor):
                                 self.errors.append(
                                     msg["validation_msg_invalid_date"] % (c, str(cellcount + 1), header))
                                 self.flag = False
-        return self.errors, self.flag
+        return self.errors, self.warnings, self.flag

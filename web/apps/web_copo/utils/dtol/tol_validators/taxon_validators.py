@@ -13,9 +13,9 @@ regex_human_readable = ""
 
 class DtolEnumerationValidator(TolValidtor):
 
-    def __init__(self, profile_id, fields, data, errors, flag, **kwargs):
-        super().__init__(profile_id, fields, data, errors, flag, **kwargs)
-        self.warnings = list()
+    def __init__(self, profile_id, fields, data, errors, warnings, flag, **kwargs):
+        super().__init__(profile_id, fields, data, errors, warnings, flag, **kwargs)
+        #self.warnings = list()
         self.taxonomy_dict = {}
 
     def validate(self):

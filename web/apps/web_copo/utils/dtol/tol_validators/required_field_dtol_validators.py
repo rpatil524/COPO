@@ -6,7 +6,7 @@ from .validation_messages import MESSAGES as msg
 blank_vals = ["NOT_COLLECTED", "NOT_PROVIDED", "NOT_APPLICABLE", "NA"]
 
 
-class ColumnValdator(TolValidtor):
+class ColumnValidator(TolValidtor):
     def validate(self):
         columns = list(self.data.columns)
         # check required fields are present in spreadsheet

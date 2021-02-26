@@ -697,6 +697,12 @@ DTOL_RULES = {
     "SAMPLE_DERIVED_FROM": {
         "ena_regex": "(^[ESD]R[SR]\d{6,}(,[ESD]R[SR]\d{6,})*$)|(^SAM[END][AG]?\d+(,SAM[END][AG]?\d+)*$)|(^EGA[NR]\d{11}(,EGA[NR]\d{11})*$)|(^[ESD]R[SR]\d{6,}-[ESD]R[SR]\d{6,}$)|(^SAM[END][AG]?\d+-SAM[END][AG]?\d+$)|(^EGA[NR]\d{11}-EGA[NR]\d{11}$)",
         "human_readable": "Specimen accession"
+    },
+    "RACK_OR_PLATE_ID": {
+        "optional_regex": "^[a-zA-Z]{2}\d{8}$"
+    },
+    "TUBE_OR_WELL_ID": {
+        "optional_regex": "^[a-zA-Z]{2}\d{8}$"
     }
 }
 DTOL_UNITS = {

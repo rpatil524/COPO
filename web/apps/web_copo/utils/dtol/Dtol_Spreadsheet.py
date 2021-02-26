@@ -132,6 +132,7 @@ class DtolSpreadsheet:
     def validate(self):
         flag = True
         errors = []
+        warnings = []
 
         try:
             # get definitive list of mandatory DTOL fields from schema
@@ -143,7 +144,7 @@ class DtolSpreadsheet:
             # validate for required fields
             for v in self.required_field_validators:
                 errors, flag = v(profile_id=self.profile_id, fields=self.fields, data=self.data,
-                                 errors=errors, flag=flag).validate()
+                                 errors=errors, warnings=warnings, flag=flag).validate()
 
             # get list of DTOL fields from schemas
             self.fields = jp.match(
@@ -151,9 +152,15 @@ class DtolSpreadsheet:
 
             # validate for optional dtol fields
             for v in self.optional_field_validators:
-                errors, flag = v(profile_id=self.profile_id, fields=self.fields, data=self.data,
-                                 errors=errors, flag=flag).validate()
+                errors, warnings, flag = v(profile_id=self.profile_id, fields=self.fields, data=self.data,
+                                 errors=errors, warnings=warnings, flag=flag).validate()
 
+            # send warnings
+            if warnings:
+                notify_dtol_status(data={"profile_id": self.profile_id},
+                                   msg="<br>".join(warnings),
+                                   action="warning",
+                                   html_id="warning_info2")
             # if flag is false, compile list of errors
             if not flag:
                 errors = list(map(lambda x: "<li>" + x + "</li>", errors))
@@ -193,7 +200,7 @@ class DtolSpreadsheet:
             # validate for optional dtol fields
             for v in self.taxon_field_validators:
                 errors, warnings, flag = v(profile_id=self.profile_id, fields=self.fields, data=self.data,
-                                           errors=errors, flag=flag).validate()
+                                           errors=errors, warnings=warnings, flag=flag).validate()
 
             # send warnings
             if warnings:

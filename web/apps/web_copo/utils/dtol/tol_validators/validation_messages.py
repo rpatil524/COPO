@@ -51,6 +51,11 @@ MESSAGES = {
                                             "'https://ena-docs.readthedocs.io/en/latest/faq/taxonomy_requests.html#creating-taxon-requests'>"
                                             "here</a> and contact ena-dtol@ebi.ac.uk or ena-asg@ebi.ac.uk to request an "
                                             "informal placeholder "
-                                            "species name. Please also refer to the DTOL/ASG SOP."
+                                            "species name. Please also refer to the DTOL/ASG SOP.",
+    "validation_msg_warning_racktube_format": "Warning: <strong>%s</strong> <strong>%s</strong> at row <strong>%s</strong> "
+                                              "does not look like  FluidX format. Please check this is "
+                                              "correct before clicking 'Finish'.",
+    "validation_msg_warning_regex_gen": "Warning: <strong>%s</strong> <strong>%s</strong> at row <strong>%s</strong> is "
+                                        "not in the expected format. Please check this is correct before clicking 'Finish'."
 
 }
