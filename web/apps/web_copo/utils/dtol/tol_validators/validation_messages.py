@@ -40,6 +40,17 @@ MESSAGES = {
                                    "name and taxon id should be species.",
 
     "validation_msg_invalid_date": "Invalid date: <strong>%s</strong> in column <strong>%s</strong> at row "
-                                   "<strong>%s</strong>. Dates should be in format YYYY-MM-DD"
+                                   "<strong>%s</strong>. Dates should be in format YYYY-MM-DD",
+    "validation_msg_invalid_taxon": "TAXON_ID <strong>%s</strong> at row <strong>%s</strong> is invalid. "
+                                            "Check SCIENTIFIC_NAME and TAXON_ID match at NCBI <a "
+                                            "href='https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi'>here</a> or "
+                                            "<a href='https://www.ncbi.nlm.nih.gov/Taxonomy/TaxIdentifier/tax_identifier.cgi'>"
+                                            "here</a>. Please refer to the DTOL/ASG SOP. Contact ena-dtol@ebi.ac.uk or "
+                                            "ena-asg@ebi.ac.uk for assistance.",
+    "validation_msg_not_submittable_taxon": "TAXON_ID <strong>%s</strong> is not 'submittable' to ENA. Please see <a href="
+                                            "'https://ena-docs.readthedocs.io/en/latest/faq/taxonomy_requests.html#creating-taxon-requests'>"
+                                            "here</a> and contact ena-dtol@ebi.ac.uk or ena-asg@ebi.ac.uk to request an "
+                                            "informal placeholder "
+                                            "species name. Please also refer to the DTOL/ASG SOP."
 
 }

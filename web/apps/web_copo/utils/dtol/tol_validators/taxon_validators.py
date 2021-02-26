@@ -168,7 +168,7 @@ class DtolEnumerationValidator(TolValidtor):
                             self.flag = False
             else:
                 self.errors.append(
-                    "Invalid data: couldn't retrieve TAXON_ID <strong>%s</strong> at row <strong>%s</strong>"
+                    msg['validation_msg_invalid_taxon']
                     % (
                         row['TAXON_ID'], str(index + 2)))
                 self.flag = False

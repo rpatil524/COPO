@@ -8,6 +8,7 @@ from openpyxl.utils import get_column_letter
 
 from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.schemas.utils.data_utils import json_to_pytype
+from web.apps.web_copo.utils.dtol.tol_validators.validation_messages import MESSAGES as msg
 
 
 def make_tax_from_sample(s):
@@ -56,7 +57,7 @@ def check_taxon_ena_submittable(taxon):
                 errors.append(
                     "ENA returned - " + receipt.decode("utf-8") + " - for TAXON_ID " + taxon)
         else:
-            errors.append("No response from ENA taxonomy for taxon " + taxon)
+            errors.append(msg['validation_msg_not_submittable_taxon'] % (taxon))
     return errors
 
 
