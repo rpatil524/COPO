@@ -31,8 +31,8 @@ def get_number_of_datafiles(request):
 
 
 def combined_stats_csv(request):
-    stats = da.cursor_to_list(da.handle_dict["stats"].find({}).sort('date', pymongo.DESCENDING))
+    stats = da.cursor_to_list(da.handle_dict["stats"].find({}, {"_id": 0}).sort('date', pymongo.DESCENDING))
     with tempfile.NamedTemporaryFile() as f:
         df = pandas.DataFrame(stats, index=None)
 
-        return HttpResponse(df.to_csv())
+        return HttpResponse(df.to_csv(index=False))
