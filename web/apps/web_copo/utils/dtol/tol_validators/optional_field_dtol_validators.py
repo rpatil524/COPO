@@ -105,6 +105,26 @@ class DtolEnumerationValidator(TolValidtor):
                                         "integer or " + ", ".join(lookup.blank_vals)
                                     ))
                                     self.flag = False
+                        #check SPECIMEN_ID has the right prefix
+                        elif header == "SPECIMEN_ID":
+                            if "DTOL" in p_type:
+                                current_gal = self.data.at[cellcount - 1, "GAL"]
+                                specimen_regex = re.compile(lookup.SPECIMEN_PREFIX["GAL"][current_gal]+'\d{7}')
+                                if not re.match(specimen_regex, c.strip()):
+                                    self.errors.append(msg["validation_msg_error_specimen_regex"] % (
+                                        c, header, str(cellcount + 1), "GAL", current_gal,
+                                        lookup.SPECIMEN_PREFIX["GAL"][current_gal]
+                                    ))
+                                    self.flag = False
+                            elif "ASG" in p_type:
+                                current_partner = self.data.at[cellcount - 1, "PARTNER"]
+                                specimen_regex = re.compile(lookup.SPECIMEN_PREFIX["PARTNER"][current_partner] + '\d{7}')
+                                if not re.match(specimen_regex, c.strip()):
+                                    self.errors.append(msg["validation_msg_error_specimen_regex"] % (
+                                        c, header, str(cellcount + 1), "PARTNER", current_partner,
+                                        lookup.SPECIMEN_PREFIX["GAL"][current_partner]
+                                    ))
+                                    self.flag = False
                         # validation checks for date types
                         if header in lookup.date_fields and c_value.strip() not in lookup.blank_vals:
                             try:
