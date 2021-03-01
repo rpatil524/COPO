@@ -58,7 +58,7 @@ MESSAGES = {
     "validation_msg_warning_regex_gen": "Warning: <strong>%s</strong> <strong>%s</strong> at row <strong>%s</strong> is "
                                         "not in the expected format. Please check this is correct before clicking 'Finish'.",
     "validation_msg_error_specimen_regex": "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row"
-                                           " <strong>%s</strong>. Expected prefix for %s <strong>%s</strong> is <strong>"
-                                           "%s</strong>."
+                                           " <strong>%s</strong>. Expected format for %s <strong>%s</strong> is <strong>"
+                                           "%s</strong> followed by 7 digits."
 
 }
