@@ -29,7 +29,11 @@ class DtolEnumerationValidator(TolValidtor):
 
                     # check if there's a regex rule for the header and exceptional handling
                     if lookup.DTOL_RULES.get(header, ""):
-                        regex_rule = lookup.DTOL_RULES[header].get("ena_regex", "")
+                        #control for when ENA regex is too permissive
+                        if lookup.DTOL_RULES[header].get("strict_regex", ""):
+                            regex_rule = lookup.DTOL_RULES[header].get("strict_regex", "")
+                        else:
+                            regex_rule = lookup.DTOL_RULES[header].get("ena_regex", "")
                         regex_human_readable = lookup.DTOL_RULES[header].get("human_readable", "")
                         optional_regex = lookup.DTOL_RULES[header].get("optional_regex", "")
                     else:

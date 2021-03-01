@@ -678,10 +678,12 @@ DTOL_RULES = {
     },
     "DECIMAL_LATITUDE": {
         "ena_regex": "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)",
+        "strict_regex": "(^[+-]?[0-9]+(.[0-9]+)*$)|(^not collected$)|(^not provided$)",
         "human_readable": "numeric, NOT_COLLECTED or NOT_PROVIDED"
     },
     "DECIMAL_LONGITUDE": {
         "ena_regex": "(^.*[+-]?[0-9]+.?[0-9]*.*$)|(^not collected$)|(^not provided$)",
+        "strict_regex": "(^[+-]?[0-9]+(.[0-9]+)*$)|(^not collected$)|(^not provided$)",
         "human_readable": "numeric, NOT_COLLECTED or NOT_PROVIDED"
 
     },
