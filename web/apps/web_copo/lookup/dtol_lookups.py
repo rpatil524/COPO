@@ -709,6 +709,10 @@ DTOL_RULES = {
     "TIME_OF_COLLECTION" : {
         "strict_regex" : "^([0-1][0-9]|2[0-4]):[0-5]\d$",
         "human_readable" : "24-hour format with hours and minutes separated by colon"
+    },
+    "public_name": {
+        "ena_regex": "(^[a-z]{1}[A-Z]{1}[a-z]{2}[A-Z]{1}[a-z]{2}[0-9]*$)|(^[a-z]{2}[A-Z]{1}[a-z]{2}[A-Z]{1}[a-z]{3}[0-9]*$)",
+        "human_readable": "Public name"
     }
 }
 DTOL_UNITS = {
@@ -796,6 +800,9 @@ DTOL_ENA_MAPPINGS = {
     },
     "SAMPLE_DERIVED_FROM": {
         "ena": "sample derived from"
+    },
+    "public_name": {
+        "ena": "tolid"
     }
 }
 

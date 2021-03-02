@@ -1,6 +1,8 @@
 import datetime
 import json
 import subprocess
+from urllib.parse import urljoin
+import requests
 
 import jsonpath_rw_ext as jp
 from openpyxl import Workbook
@@ -9,7 +11,11 @@ from openpyxl.utils import get_column_letter
 from web.apps.web_copo.lookup import lookup as lk
 from web.apps.web_copo.schemas.utils.data_utils import json_to_pytype
 from web.apps.web_copo.utils.dtol.tol_validators.validation_messages import MESSAGES as msg
+from tools import resolve_env
 
+from web.apps.web_copo.lookup.dtol_lookups import API_KEY
+
+public_name_service = resolve_env.get_env('PUBLIC_NAME_SERVICE')
 
 def make_tax_from_sample(s):
     out = dict()
@@ -97,3 +103,18 @@ def create_barcoding_spreadsheet():
             sheet.column_dimensions[get_column_letter(idx + 1)].width = len(cell.value) + 5
 
     return wb
+
+def query_public_name_service(sample_list):
+    headers = {"api-key": API_KEY}
+    url = urljoin(public_name_service, 'tol-ids')  # public-name
+    try:
+        r = requests.post(url=url, json=sample_list, headers=headers, verify=False)
+        if r.status_code == 200:
+            resp = json.loads(r.content)
+        else:
+            # in the case there is a network issue, just return an empty dict
+            resp = {}
+        return resp
+    except Exception as e:
+        print("PUBLIC NAME SERVER ERROR: " + str(e))
+        return {}

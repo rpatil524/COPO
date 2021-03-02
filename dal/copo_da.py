@@ -895,6 +895,17 @@ class Submission(DAComponent):
                 self.get_collection_handle().update({"_id": ObjectId(s["_id"])}, {"$set": {"dtol_status": "sending"}})
         return out
 
+
+    def get_awaiting_tolids(self):
+        sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": {"$in": ["awaiting_tolids"]}},
+                                                {"dtol_samples": 1, "dtol_status": 1, "profile_id": 1,
+                                                 "date_modified": 1})
+        sub = cursor_to_list(sub)
+        out=list()
+
+
+
+
     def get_incomplete_submissions_for_user(self, user_id, repo):
         doc = self.get_collection_handle().find(
             {"user_id": user_id,
@@ -906,6 +917,10 @@ class Submission(DAComponent):
     def make_dtol_status_pending(self, sub_id):
         doc = self.get_collection_handle().update({"_id": ObjectId(sub_id)}, {
             "$set": {"dtol_status": "pending", "date_modified": data_utils.get_datetime()}})
+
+    def make_dtol_status_awaiting_tolids(self, sub_id):
+        doc = self.get_collection_handle().update({"_id": ObjectId(sub_id)}, {
+            "$set": {"dtol_status": "awaiting_tolids", "date_modified": data_utils.get_datetime()}})
 
     def save_record(self, auto_fields=dict(), **kwargs):
         if not kwargs.get("target_id", str()):

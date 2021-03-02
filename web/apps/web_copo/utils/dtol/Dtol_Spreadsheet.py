@@ -28,6 +28,8 @@ from .tol_validators import optional_field_dtol_validators as optional_validator
 from .tol_validators import required_field_dtol_validators as required_validators
 from .tol_validators import taxon_validators
 from .tol_validators.tol_validator import TolValidtor
+from web.apps.web_copo.utils.dtol.Dtol_Helpers import query_public_name_service
+
 
 
 def make_target_sample(sample):
@@ -315,6 +317,7 @@ class DtolSpreadsheet:
         manifest_id = str(uuid.uuid4())
         request = ThreadLocal.get_current_request()
         image_data = request.session.get("image_specimen_match", [])
+        public_name_list = list()
         for p in range(1, len(sample_data)):
             s = (map_to_dict(sample_data[0], sample_data[p]))
             s["sample_type"] = "dtol"
@@ -337,6 +340,10 @@ class DtolSpreadsheet:
                 Sample().timestamp_dtol_sample_created(sampl["_id"])
                 self.add_from_symbiont_list(s)
 
+            public_name_list.append(
+                {"taxonomyId": int(s["species_list"][0]["TAXON_ID"]), "specimenId": s["SPECIMEN_ID"],
+                 "sample_id": str(sampl["_id"])})
+
             for im in image_data:
                 # create matching DataFile object for image is provided
                 if s["SPECIMEN_ID"] in im["specimen_id"]:
@@ -346,6 +353,10 @@ class DtolSpreadsheet:
                     break;
 
             uri = request.build_absolute_uri('/')
+        #query public service service a first time now to trigger request for public names that don't exist
+        public_names = query_public_name_service(public_name_list)
+        for name in public_names:
+            Sample().update_public_name(name)
         profile_id = request.session["profile_id"]
         profile = Profile().get_record(profile_id)
         title = profile["title"]
