@@ -14,6 +14,8 @@ class DtolEnumerationValidator(TolValidtor):
         whole_used_specimens = set()
         regex_human_readable = ""
         p_type = Profile().get_type(profile_id=self.profile_id)
+        barcoding_fields = ["PLATE_ID_FOR_BARCODING", "TUBE_OR_WELL_ID_FOR_BARCODING",
+                            "TISSUE_FOR_BARCODING", "BARCODE_PLATE_PRESERVATIVE"]
         for header, cells in self.data.iteritems():
 
             notify_dtol_status(data={"profile_id": self.profile_id}, msg="Checking - " + header,
@@ -44,6 +46,14 @@ class DtolEnumerationValidator(TolValidtor):
                         cellcount += 1
 
                         c_value = c
+
+                        #reformat time of collection to handle excel format
+                        if header == "TIME_OF_COLLECTION":
+                            csplit = c.split(":")
+                            if len(csplit) == 3 and csplit[2] == "00":
+                                c = ":".join(csplit[0:2])
+                                self.data.at[cellcount - 1, "TIME_OF_COLLECTION"] = c
+
                         if allowed_vals:
                             if header == "COLLECTION_LOCATION":
                                 # special check for COLLETION_LOCATION as this needs invalid list error for feedback
@@ -129,6 +139,17 @@ class DtolEnumerationValidator(TolValidtor):
                                         lookup.SPECIMEN_PREFIX["GAL"][current_partner]
                                     ))
                                     self.flag = False
+                        #if TISSUE_REMOVED_FOR_BARCODING is not YES, the barcoding columns will be overwritten
+                        if header == "TISSUE_REMOVED_FOR_BARCODING" and c.strip() != "Y":
+                            barcoding_flag = True
+                            for barfield in barcoding_fields:
+                                if self.data.at[cellcount-1, barfield] != "NOT_APPLICABLE":
+                                    self.data.at[cellcount - 1, barfield] = "NOT_APPLICABLE"
+                                    barcoding_flag = False
+                            if barcoding_flag == False:
+                                self.warnings.append(msg["validation_msg_warning_barcoding"] % (
+                                    str(cellcount+1), c
+                                ))
                         # validation checks for date types
                         if header in lookup.date_fields and c_value.strip() not in lookup.blank_vals:
                             try:

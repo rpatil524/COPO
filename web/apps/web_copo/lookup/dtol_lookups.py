@@ -705,6 +705,10 @@ DTOL_RULES = {
     },
     "TUBE_OR_WELL_ID": {
         "optional_regex": "^[a-zA-Z]{2}\d{8}$"
+    },
+    "TIME_OF_COLLECTION" : {
+        "strict_regex" : "^([0-1][0-9]|2[0-4]):[0-5]\d$",
+        "human_readable" : "24-hour format with hours and minutes separated by colon"
     }
 }
 DTOL_UNITS = {
