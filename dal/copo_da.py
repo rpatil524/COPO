@@ -592,6 +592,9 @@ class Source(DAComponent):
     def get_by_specimen(self, value):
         return cursor_to_list(self.get_collection_handle().find({"SPECIMEN_ID": value}))  # todo can this be find one
 
+    def get_by_field(self, field, value):
+        return cursor_to_list(self.get_collection_handle().find({field: value}))
+
     def add_fields(self, fieldsdict, oid):
         return self.get_collection_handle().update(
             {
