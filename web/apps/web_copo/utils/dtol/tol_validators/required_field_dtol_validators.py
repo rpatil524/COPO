@@ -11,7 +11,7 @@ class ColumnValdator(TolValidtor):
         columns = list(self.data.columns)
         # check required fields are present in spreadsheet
         for item in self.fields:
-            notify_dtol_status(data={"profile_id": self.profile_id}, msg="Checking - " + item,
+            notify_dtol_status(data={"profile_id": self.profile_id}, msg="Validating Column- " + item,
                                action="info",
                                html_id="sample_info")
             if item not in columns:

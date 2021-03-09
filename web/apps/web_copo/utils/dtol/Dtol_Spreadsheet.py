@@ -95,7 +95,7 @@ class DtolSpreadsheet:
             element = getattr(optional, element_name)
             if inspect.isclass(element) and issubclass(element, TolValidtor) and not element.__name__ == "TolValidtor":
                 self.optional_field_validators.append(element)
-        # create list of optional validators
+        # create list of taxon validators
         optional = dict(globals().items())["taxon_validators"]
         for element_name in dir(optional):
             element = getattr(optional, element_name)
@@ -115,6 +115,7 @@ class DtolSpreadsheet:
                 elif m_format == "csv":
                     self.data = pandas.read_csv(self.file, keep_default_na=False,
                                                 na_values=lookup.na_vals)
+                self.data = self.data.loc[:, ~self.data.columns.str.contains('^Unnamed')]
                 '''
                 for column in self.allowed_empty:
                     self.data[column] = self.data[column].fillna("")
@@ -145,7 +146,7 @@ class DtolSpreadsheet:
                 errors, flag = v(profile_id=self.profile_id, fields=self.fields, data=self.data,
                                  errors=errors, flag=flag).validate()
 
-            # get list of DTOL fields from schemas
+            # get list of all DTOL fields from schemas
             self.fields = jp.match(
                 '$.properties[?(@.specifications[*] == ' + self.type.lower() + ')].versions[0]', s)
 
@@ -310,7 +311,7 @@ class DtolSpreadsheet:
         image_data = request.session.get("image_specimen_match", [])
         for p in range(1, len(sample_data)):
             s = (map_to_dict(sample_data[0], sample_data[p]))
-            s["sample_type"] = "dtol"
+            s["sample_type"] = self.type.lower()
             s["tol_project"] = self.type
             s["biosample_accession"] = []
             s["manifest_id"] = manifest_id
@@ -338,7 +339,7 @@ class DtolSpreadsheet:
                     DataFile().insert_sample_id(df["_id"], sampl["_id"])
                     break;
 
-            uri = request.build_absolute_uri('/')
+        uri = request.build_absolute_uri('/')
         profile_id = request.session["profile_id"]
         profile = Profile().get_record(profile_id)
         title = profile["title"]
