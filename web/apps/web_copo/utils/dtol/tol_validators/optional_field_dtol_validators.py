@@ -8,6 +8,7 @@ from .tol_validator import TolValidtor
 from .validation_messages import MESSAGES as msg
 
 
+
 class DtolEnumerationValidator(TolValidtor):
 
     def validate(self):
