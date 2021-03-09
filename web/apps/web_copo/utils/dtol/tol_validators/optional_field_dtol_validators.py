@@ -120,7 +120,7 @@ class DtolEnumerationValidator(TolValidtor):
                                     ))
                                     self.flag = False
                         #check SPECIMEN_ID has the right prefix
-                        elif header == "SPECIMEN_ID":
+                        '''elif header == "SPECIMEN_ID":
                             if "DTOL" in p_type:
                                 current_gal = self.data.at[cellcount - 1, "GAL"]
                                 specimen_regex = re.compile(lookup.SPECIMEN_PREFIX["GAL"][current_gal]+'\d{7}')
@@ -138,7 +138,7 @@ class DtolEnumerationValidator(TolValidtor):
                                         c, header, str(cellcount + 1), "PARTNER", current_partner,
                                         lookup.SPECIMEN_PREFIX["GAL"][current_partner]
                                     ))
-                                    self.flag = False
+                                    self.flag = False'''
                         #if TISSUE_REMOVED_FOR_BARCODING is not YES, the barcoding columns will be overwritten
                         if header == "TISSUE_REMOVED_FOR_BARCODING" and c.strip() != "Y":
                             barcoding_flag = True
