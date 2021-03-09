@@ -28,6 +28,8 @@ from .tol_validators import optional_field_dtol_validators as optional_validator
 from .tol_validators import required_field_dtol_validators as required_validators
 from .tol_validators import taxon_validators
 from .tol_validators.tol_validator import TolValidtor
+from web.apps.web_copo.utils.dtol.Dtol_Helpers import query_public_name_service
+
 
 
 def make_target_sample(sample):
@@ -133,6 +135,7 @@ class DtolSpreadsheet:
     def validate(self):
         flag = True
         errors = []
+        warnings = []
 
         try:
             # get definitive list of mandatory DTOL fields from schema
@@ -144,7 +147,7 @@ class DtolSpreadsheet:
             # validate for required fields
             for v in self.required_field_validators:
                 errors, flag = v(profile_id=self.profile_id, fields=self.fields, data=self.data,
-                                 errors=errors, flag=flag).validate()
+                                 errors=errors, warnings=warnings, flag=flag).validate()
 
             # get list of all DTOL fields from schemas
             self.fields = jp.match(
@@ -152,9 +155,15 @@ class DtolSpreadsheet:
 
             # validate for optional dtol fields
             for v in self.optional_field_validators:
-                errors, flag = v(profile_id=self.profile_id, fields=self.fields, data=self.data,
-                                 errors=errors, flag=flag).validate()
+                errors, warnings, flag = v(profile_id=self.profile_id, fields=self.fields, data=self.data,
+                                 errors=errors, warnings=warnings, flag=flag).validate()
 
+            # send warnings
+            if warnings:
+                notify_dtol_status(data={"profile_id": self.profile_id},
+                                   msg="<br>".join(warnings),
+                                   action="warning",
+                                   html_id="warning_info2")
             # if flag is false, compile list of errors
             if not flag:
                 errors = list(map(lambda x: "<li>" + x + "</li>", errors))
@@ -194,7 +203,7 @@ class DtolSpreadsheet:
             # validate for optional dtol fields
             for v in self.taxon_field_validators:
                 errors, warnings, flag = v(profile_id=self.profile_id, fields=self.fields, data=self.data,
-                                           errors=errors, flag=flag).validate()
+                                           errors=errors, warnings=warnings, flag=flag).validate()
 
             # send warnings
             if warnings:
@@ -309,6 +318,7 @@ class DtolSpreadsheet:
         manifest_id = str(uuid.uuid4())
         request = ThreadLocal.get_current_request()
         image_data = request.session.get("image_specimen_match", [])
+        public_name_list = list()
         for p in range(1, len(sample_data)):
             s = (map_to_dict(sample_data[0], sample_data[p]))
             s["sample_type"] = self.type.lower()
@@ -331,6 +341,10 @@ class DtolSpreadsheet:
                 Sample().timestamp_dtol_sample_created(sampl["_id"])
                 self.add_from_symbiont_list(s)
 
+            public_name_list.append(
+                {"taxonomyId": int(s["species_list"][0]["TAXON_ID"]), "specimenId": s["SPECIMEN_ID"],
+                 "sample_id": str(sampl["_id"])})
+
             for im in image_data:
                 # create matching DataFile object for image is provided
                 if s["SPECIMEN_ID"] in im["specimen_id"]:
@@ -340,6 +354,10 @@ class DtolSpreadsheet:
                     break;
 
         uri = request.build_absolute_uri('/')
+        #query public service service a first time now to trigger request for public names that don't exist
+        public_names = query_public_name_service(public_name_list)
+        for name in public_names:
+            Sample().update_public_name(name)
         profile_id = request.session["profile_id"]
         profile = Profile().get_record(profile_id)
         title = profile["title"]

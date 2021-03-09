@@ -33,6 +33,7 @@ function upload_spreadsheet(file) {
     $("#upload_label").fadeOut("fast")
     $("#ss_upload_spinner").fadeIn("fast")
     $("#warning_info").fadeOut("fast")
+    $("#warning_info2").fadeOut("fast")
     var csrftoken = $.cookie('csrftoken');
     form = new FormData()
     form.append("file", file)
@@ -271,6 +272,7 @@ $(document).on("click", ".new-samples-spreadsheet-template", function (event) {
     $("#sample_spreadsheet_modal").modal("show")
 
     $("#warning_info").fadeOut("fast")
+    $("#warning_info2").fadeOut("fast")
 
 })
 $(document).on("click", "#export_errors_button", function (event) {
