@@ -8,7 +8,6 @@ from .tol_validator import TolValidtor
 from .validation_messages import MESSAGES as msg
 
 
-
 class DtolEnumerationValidator(TolValidtor):
 
     def validate(self):
@@ -17,7 +16,7 @@ class DtolEnumerationValidator(TolValidtor):
         p_type = Profile().get_type(profile_id=self.profile_id)
         for header, cells in self.data.iteritems():
 
-            notify_dtol_status(data={"profile_id": self.profile_id}, msg="Checking - " + header,
+            notify_dtol_status(data={"profile_id": self.profile_id}, msg="Validating Header- " + header,
                                action="info",
                                html_id="sample_info")
             if header in self.fields:

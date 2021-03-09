@@ -115,6 +115,7 @@ class DtolSpreadsheet:
                 elif m_format == "csv":
                     self.data = pandas.read_csv(self.file, keep_default_na=False,
                                                 na_values=lookup.na_vals)
+                self.data = self.data.loc[:, ~self.data.columns.str.contains('^Unnamed')]
                 '''
                 for column in self.allowed_empty:
                     self.data[column] = self.data[column].fillna("")
