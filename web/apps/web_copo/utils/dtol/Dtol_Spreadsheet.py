@@ -341,9 +341,9 @@ class DtolSpreadsheet:
                 Sample().timestamp_dtol_sample_created(sampl["_id"])
                 self.add_from_symbiont_list(s)
 
-            public_name_list.append(
-                {"taxonomyId": int(s["species_list"][0]["TAXON_ID"]), "specimenId": s["SPECIMEN_ID"],
-                 "sample_id": str(sampl["_id"])})
+                public_name_list.append(
+                    {"taxonomyId": int(s["species_list"][0]["TAXON_ID"]), "specimenId": s["SPECIMEN_ID"],
+                     "sample_id": str(sampl["_id"])})
 
             for im in image_data:
                 # create matching DataFile object for image is provided
