@@ -42,11 +42,12 @@ class Command(BaseCommand):
         print(updates_to_make)
         d_updates = {}
         for couple in updates_to_make:
-            sample = couple.split(":")[0]
-            scientific_name = couple.split(":")[1]
+            sample = couple.split(":")[0].strip()
+            scientific_name = couple.split(":")[1].strip()
             d_updates[sample] = scientific_name
         # retrieve sample from db
         print(type(list(d_updates.keys())))
+        print(list(d_updates.keys()))
         samplesindb = da.Sample().get_by_biosample_ids(list(d_updates.keys()))
         for sample in samplesindb:
             #retrieve new taxonomy information
@@ -149,7 +150,8 @@ class Command(BaseCommand):
         scname_block = tree.find('SAMPLE').find('SAMPLE_NAME').find('SCIENTIFIC_NAME')
         scname_block.text = " "
         comname_block = tree.find('SAMPLE').find('SAMPLE_NAME').find('COMMON_NAME')
-        comname_block.text = " "
+        if comname_block.text:
+            comname_block.text = " "
 
         ET.dump(tree)
         tree.write(open(accession + ".xml", 'w'), encoding='unicode')
