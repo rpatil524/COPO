@@ -5,6 +5,7 @@ from web.apps.web_copo.utils.dtol.Dtol_Submission import populate_source_fields,
 import xml.etree.ElementTree as ET
 import subprocess
 from tools import resolve_env
+import os
 
 
 import dal.copo_da as da
@@ -118,6 +119,8 @@ class Command(BaseCommand):
 
         self.update_samplexml(registered_specimen, updatedrecord['TAXON_ID'], updatedrecord['biosampleAccession'])
 
+
+
     def modify_sample(self, accession):
         curl_cmd = 'curl -u ' + self.user_token + ':' + self.pass_word \
                    + ' -F "SUBMISSION=@modifysubmission.xml' \
@@ -129,8 +132,9 @@ class Command(BaseCommand):
             receipt = subprocess.check_output(curl_cmd, shell=True)
             print(receipt)
         except Exception as e:
-            message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
+            message = 'API call error ' + "Submitting xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
                 self.pass_word, "xxxxxx")
+            print(message)
             return False
 
         os.remove(accession + ".xml")
@@ -142,6 +146,12 @@ class Command(BaseCommand):
         name_block = tree.find('SAMPLE').find('SAMPLE_NAME')
         taxon_block = tree.find('SAMPLE').find('SAMPLE_NAME').find('TAXON_ID')
         taxon_block.text = new_taxon
+        scname_block = tree.find('SAMPLE').find('SAMPLE_NAME').find('SCIENTIFIC_NAME')
+        scname_block.text = " "
+        comname_block = tree.find('SAMPLE').find('SAMPLE_NAME').find('COMMON_NAME')
+        comname_block.text = " "
 
         ET.dump(tree)
         tree.write(open(accession + ".xml", 'w'), encoding='unicode')
+
+        self.modify_sample(accession)
