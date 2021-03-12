@@ -77,16 +77,16 @@ class Command(BaseCommand):
     def update_sampletaxonomy(self, sample, taxonomy, taxon, name):
         #update db record
         out = dict()
-        for key, value in taxonomy.iteritems():
-            if value['Rank'] in self.rankdict:
-                out[self.rankdict[value['Rank']]] = value['ScientificName']
+        for item in taxonomy:
+            if item['Rank'] in self.rankdict:
+                out[self.rankdict[item['Rank']]] = item['ScientificName']
         out["COMMON_NAME"] = ""
         out["TAXON_REMARKS"] = ""
         out["INFRASPECIFIC_EPITHET"] = ""
         out["TAXON_ID"] = taxon
         out["SCIENTIFIC_NAME"] = name
 
-        da.Sample().add_field("species_list"[0], out, sample)
+        da.Sample().add_field("species_list.0", out, sample)
 
         #query public name (skip this for now)
 
@@ -106,9 +106,10 @@ class Command(BaseCommand):
     def update_specsampletaxonomy(self, accession, taxon):
         #update db record
         source = da.Source().get_by_field("biosampleAccession", accession)
-        da.Source().add_field("TAXON_ID", taxon, source['_id'])
+        assert len(source)==1
+        da.Source().add_field("TAXON_ID", taxon, source[0]['_id'])
         #update ENA record
-        updatedrecord = da.Source().get_record(source['_id'])
+        updatedrecord = da.Source().get_record(source[0]['_id'])
         # retrieve submitted XML for source
         curl_cmd = "curl -u " + self.user_token + \
                    ':' + self.pass_word + " " + self.ena_sample_retrieval \

@@ -616,6 +616,16 @@ class Source(DAComponent):
              }
         )
 
+    def add_field(self, field, value, oid):
+        return self.get_collection_handle().update(
+            {
+                "_id": ObjectId(oid)
+            },
+            {"$set":
+                {
+                    field: value}
+            })
+
 
 class Sample(DAComponent):
     def __init__(self, profile_id=None):
