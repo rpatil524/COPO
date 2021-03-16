@@ -5,6 +5,7 @@ from web.apps.web_copo.utils.dtol.Dtol_Submission import populate_source_fields,
 import xml.etree.ElementTree as ET
 import subprocess
 from tools import resolve_env
+import os
 
 
 import dal.copo_da as da
@@ -41,11 +42,12 @@ class Command(BaseCommand):
         print(updates_to_make)
         d_updates = {}
         for couple in updates_to_make:
-            sample = couple.split(":")[0]
-            scientific_name = couple.split(":")[1]
+            sample = couple.split(":")[0].strip()
+            scientific_name = couple.split(":")[1].strip()
             d_updates[sample] = scientific_name
         # retrieve sample from db
         print(type(list(d_updates.keys())))
+        print(list(d_updates.keys()))
         samplesindb = da.Sample().get_by_biosample_ids(list(d_updates.keys()))
         for sample in samplesindb:
             #retrieve new taxonomy information
@@ -77,16 +79,16 @@ class Command(BaseCommand):
     def update_sampletaxonomy(self, sample, taxonomy, taxon, name):
         #update db record
         out = dict()
-        for key, value in taxonomy.iteritems():
-            if value['Rank'] in self.rankdict:
-                out[self.rankdict[value['Rank']]] = value['ScientificName']
+        for item in taxonomy:
+            if item['Rank'] in self.rankdict:
+                out[self.rankdict[item['Rank']]] = item['ScientificName']
         out["COMMON_NAME"] = ""
         out["TAXON_REMARKS"] = ""
         out["INFRASPECIFIC_EPITHET"] = ""
         out["TAXON_ID"] = taxon
         out["SCIENTIFIC_NAME"] = name
 
-        da.Sample().add_field("species_list"[0], out, sample)
+        da.Sample().add_field("species_list.0", out, sample)
 
         #query public name (skip this for now)
 
@@ -106,9 +108,10 @@ class Command(BaseCommand):
     def update_specsampletaxonomy(self, accession, taxon):
         #update db record
         source = da.Source().get_by_field("biosampleAccession", accession)
-        da.Source().add_field("TAXON_ID", taxon, source['_id'])
+        assert len(source)==1
+        da.Source().add_field("TAXON_ID", taxon, source[0]['_id'])
         #update ENA record
-        updatedrecord = da.Source().get_record(source['_id'])
+        updatedrecord = da.Source().get_record(source[0]['_id'])
         # retrieve submitted XML for source
         curl_cmd = "curl -u " + self.user_token + \
                    ':' + self.pass_word + " " + self.ena_sample_retrieval \
@@ -116,6 +119,8 @@ class Command(BaseCommand):
         registered_specimen = subprocess.check_output(curl_cmd, shell=True)
 
         self.update_samplexml(registered_specimen, updatedrecord['TAXON_ID'], updatedrecord['biosampleAccession'])
+
+
 
     def modify_sample(self, accession):
         curl_cmd = 'curl -u ' + self.user_token + ':' + self.pass_word \
@@ -128,8 +133,9 @@ class Command(BaseCommand):
             receipt = subprocess.check_output(curl_cmd, shell=True)
             print(receipt)
         except Exception as e:
-            message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
+            message = 'API call error ' + "Submitting xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
                 self.pass_word, "xxxxxx")
+            print(message)
             return False
 
         os.remove(accession + ".xml")
@@ -141,6 +147,13 @@ class Command(BaseCommand):
         name_block = tree.find('SAMPLE').find('SAMPLE_NAME')
         taxon_block = tree.find('SAMPLE').find('SAMPLE_NAME').find('TAXON_ID')
         taxon_block.text = new_taxon
+        scname_block = tree.find('SAMPLE').find('SAMPLE_NAME').find('SCIENTIFIC_NAME')
+        scname_block.text = " "
+        comname_block = tree.find('SAMPLE').find('SAMPLE_NAME').find('COMMON_NAME')
+        if comname_block.text:
+            comname_block.text = " "
 
         ET.dump(tree)
         tree.write(open(accession + ".xml", 'w'), encoding='unicode')
+
+        self.modify_sample(accession)
