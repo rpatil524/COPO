@@ -788,6 +788,9 @@ DTOL_ENA_MAPPINGS = {
     "GAL": {
         "ena": "GAL"
     },
+    "PARTNER": {
+        "ena": "GAL"
+    },
     "VOUCHER_ID": {
         "ena": "specimen_voucher"
     },
@@ -795,6 +798,9 @@ DTOL_ENA_MAPPINGS = {
         "ena": "specimen_id"
     },
     "GAL_SAMPLE_ID": {
+        "ena": "GAL_sample_id"
+    },
+    "PARTNER_SAMPLE_ID": {
         "ena": "GAL_sample_id"
     },
     "CULTURE_OR_STRAIN_ID": {

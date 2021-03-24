@@ -49,6 +49,7 @@ def process_pending_dtol_samples():
     for submission in sub_id_list:
         # check if study exist for this submission and/or create one
         profile_id = submission["profile_id"]
+        type_submission = submission["type"]
         if not Submission().get_study(submission['_id']):
             create_study(submission['profile_id'], collection_id=submission['_id'])
         file_subfix = str(uuid.uuid4())  # use this to recover bundle sample file
@@ -59,11 +60,20 @@ def process_pending_dtol_samples():
         for s_id in submission["dtol_samples"]:
             sam = Sample().get_record(s_id)
             print(type(sam['public_name']), sam['public_name'])
+            #getting reference to target sample
+            if type_submission == "asg":
+                for x in range(len(sam["species_list"])):
+                    if sam["species_list"][x]["SYMBIONT"] == "target":
+                        index = x
+                        break
+            else:
+                index = 0
             if not sam["public_name"]:
                 try:
+
                     public_name_list.append(
-                        {"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
-                         "sample_id": str(sam["_id"])})
+                        {"taxonomyId": int(sam["species_list"][index]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
+                        "sample_id": str(sam["_id"])})
                 except ValueError:
                     notify_dtol_status(data={"profile_id": profile_id}, msg="Invalid Taxon ID found", action="info",
                                        html_id="dtol_sample_info")
@@ -83,9 +93,13 @@ def process_pending_dtol_samples():
                                    msg="Creating Sample for SPECIMEN_ID " + sam["RACK_OR_PLATE_ID"] + "/" + sam["SPECIMEN_ID"],
                                    action="info",
                                    html_id="dtol_sample_info")
+                if type_submission == "asg":
+                    sample_type = "asg_specimen"
+                else:
+                    sample_type = "dtol_specimen"
                 specimen_obj_fields = {"SPECIMEN_ID": sam["SPECIMEN_ID"],
-                                       "TAXON_ID": sam["species_list"][0]["TAXON_ID"],
-                                       "sample_type": "dtol_specimen", "profile_id": sam['profile_id']}
+                                       "TAXON_ID": sam["species_list"][index]["TAXON_ID"],
+                                       "sample_type": sample_type, "profile_id": sam['profile_id']}
                 Source().save_record(auto_fields={}, **specimen_obj_fields)
                 specimen_obj_fields = populate_source_fields(sam)
                 sour = Source().get_by_specimen(sam["SPECIMEN_ID"])[0]
@@ -96,8 +110,9 @@ def process_pending_dtol_samples():
                 sour = sour[0]
                 if not sour['public_name']:
                     #retrieve public name
-                    spec_tolid = query_public_name_service([{"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
-                             "sample_id": str(sam["_id"])}])
+                    spec_tolid = query_public_name_service([{"taxonomyId": int(sam["species_list"][index]["TAXON_ID"]),
+                                                             "specimenId": sam["SPECIMEN_ID"],
+                                                             "sample_id": str(sam["_id"])}])
                     assert len(spec_tolid) == 1
                     if not spec_tolid[0].get("tolId", ""):
                         # hadle failure to get public names and halt submission
@@ -110,7 +125,7 @@ def process_pending_dtol_samples():
                         break
                     Source().update_public_name(spec_tolid)
 
-                build_specimen_sample_xml(sour)
+                build_specimen_sample_xml(sour) #TODO
                 build_submission_xml(str(sour['_id']), release=True)
                 accessions = submit_biosample(str(sour['_id']), Source(), submission['_id'], type="source")
                 print(accessions)
@@ -209,14 +224,15 @@ def query_awaiting_tolids():
 def populate_source_fields(sampleobj):
     '''populate source in db to copy most of sample fields
     but change organism part and gal sample_id'''
-    fields= {"sample_type": "dtol_specimen", "profile_id": sampleobj['profile_id'],
-             "TAXON_ID": sampleobj["species_list"][0]["TAXON_ID"]}
+    #todo DELETE fields= {"sample_type": "dtol_specimen", "profile_id": sampleobj['profile_id'],
+             #"TAXON_ID": sampleobj["species_list"][0]["TAXON_ID"]}
+    fields = {}
     for item in sampleobj.items():
         #print(item)
         try:
             print(item[0])
             if item[0]=="COLLECTION_LOCATION" or DTOL_ENA_MAPPINGS[item[0]]['ena']:
-                if item[0]=="GAL_SAMPLE_ID":
+                if item[0]=="GAL_SAMPLE_ID" or item[0]=="PARTNER_SAMPLE_ID":
                     fields[item[0]] = "NOT_PROVIDED"
                 elif item[0]=="ORGANISM_PART":
                     fields[item[0]] = "WHOLE_ORGANISM"
@@ -364,7 +380,7 @@ def build_specimen_sample_xml(sample):
     tag = ET.SubElement(sample_attribute, 'TAG')
     tag.text = 'project name'
     value = ET.SubElement(sample_attribute, 'VALUE')
-    value.text = 'DTOL'
+    value.text = sample['tol_project'] #TODO add symbiont field for specimen level?
     ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
     for item in sample.items():
         if item[1]:

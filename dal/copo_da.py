@@ -890,9 +890,9 @@ class Submission(DAComponent):
         # called by celery to get samples the supeprvisor has set to be sent to ENA
         # those not yet sent should be in pending state. Occasionally there will be
         # stuck submissions in sending state, so get both types
-        sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": {"$in": ["sending", "pending"]}},
+        sub = self.get_collection_handle().find({"type": {"$in" : ["dtol", "asg"]}, "dtol_status": {"$in": ["sending", "pending"]}},
                                                 {"dtol_samples": 1, "dtol_status": 1, "profile_id": 1,
-                                                 "date_modified": 1})
+                                                 "date_modified": 1, "type": 1})
         sub = cursor_to_list(sub)
         out = list()
 
@@ -914,7 +914,7 @@ class Submission(DAComponent):
         return out
 
     def get_awaiting_tolids(self):
-        sub = self.get_collection_handle().find({"type": "dtol", "dtol_status": {"$in": ["awaiting_tolids"]}},
+        sub = self.get_collection_handle().find({"type": {"$in" : ["dtol", "asg"]}, "dtol_status": {"$in": ["awaiting_tolids"]}},
                                                 {"dtol_samples": 1, "dtol_status": 1, "profile_id": 1,
                                                  "date_modified": 1})
         sub = cursor_to_list(sub)
