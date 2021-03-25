@@ -31,7 +31,7 @@ class DtolEnumerationValidator(TolValidtor):
 
                     # check if there's a regex rule for the header and exceptional handling
                     if lookup.DTOL_RULES.get(header, ""):
-                        #control for when ENA regex is too permissive
+                        # control for when ENA regex is too permissive
                         if lookup.DTOL_RULES[header].get("strict_regex", ""):
                             regex_rule = lookup.DTOL_RULES[header].get("strict_regex", "")
                         else:
@@ -47,7 +47,7 @@ class DtolEnumerationValidator(TolValidtor):
 
                         c_value = c
 
-                        #reformat time of collection to handle excel format
+                        # reformat time of collection to handle excel format
                         if header == "TIME_OF_COLLECTION":
                             csplit = c.split(":")
                             if len(csplit) == 3 and csplit[2] == "00":
@@ -91,12 +91,12 @@ class DtolEnumerationValidator(TolValidtor):
                                     c, header, str(cellcount + 1), regex_human_readable))
                                 self.flag = False
                         if optional_regex:
-                            #handle regular expression that will only trigger a warning
+                            # handle regular expression that will only trigger a warning
                             if c and not re.match(optional_regex, c.replace("_", " "), re.IGNORECASE):
                                 if header in ['RACK_OR_PLATE_ID', 'TUBE_OR_WELL_ID']:
                                     self.warnings.append(msg["validation_msg_warning_racktube_format"] % (
                                         c, header, str(cellcount + 1)))
-                                else: #not in use atm, here in case we add more optional validations
+                                else:  # not in use atm, here in case we add more optional validations
                                     self.warnings.append(msg["validation_msg_warning_racktube_format"] % (
                                         c, header, str(cellcount + 1)))
 
@@ -119,36 +119,39 @@ class DtolEnumerationValidator(TolValidtor):
                                         "integer or " + ", ".join(lookup.blank_vals)
                                     ))
                                     self.flag = False
-                        #check SPECIMEN_ID has the right prefix
+                        # check SPECIMEN_ID has the right prefix
                         elif header == "SPECIMEN_ID":
                             if "DTOL" in p_type:
                                 current_gal = self.data.at[cellcount - 1, "GAL"]
-                                specimen_regex = re.compile(lookup.SPECIMEN_PREFIX["GAL"][current_gal]+'[\d\-_]') #TODO make this more specific for each gal
+                                specimen_regex = re.compile(lookup.SPECIMEN_PREFIX["GAL"].get(current_gal,
+                                                                                              "") + '[\d\-_]')
+                                # TODO make this more specific for each gal
                                 if not re.match(specimen_regex, c.strip()):
                                     self.errors.append(msg["validation_msg_error_specimen_regex"] % (
                                         c, header, str(cellcount + 1), "GAL", current_gal,
-                                        lookup.SPECIMEN_PREFIX["GAL"][current_gal]
+                                        lookup.SPECIMEN_PREFIX["GAL"].get(current_gal, "XXX")
                                     ))
                                     self.flag = False
                             elif "ASG" in p_type:
                                 current_partner = self.data.at[cellcount - 1, "PARTNER"]
-                                specimen_regex = re.compile(lookup.SPECIMEN_PREFIX["PARTNER"][current_partner] + '\d{7}')
+                                specimen_regex = re.compile(
+                                    lookup.SPECIMEN_PREFIX["PARTNER"].get(current_partner, "") + '\d{7}')
                                 if not re.match(specimen_regex, c.strip()):
                                     self.errors.append(msg["validation_msg_error_specimen_regex"] % (
                                         c, header, str(cellcount + 1), "PARTNER", current_partner,
-                                        lookup.SPECIMEN_PREFIX["GAL"][current_partner]
+                                        lookup.SPECIMEN_PREFIX["GAL"].get(current_partner, "XXX")
                                     ))
                                     self.flag = False
-                        #if TISSUE_REMOVED_FOR_BARCODING is not YES, the barcoding columns will be overwritten
+                        # if TISSUE_REMOVED_FOR_BARCODING is not YES, the barcoding columns will be overwritten
                         if header == "TISSUE_REMOVED_FOR_BARCODING" and c.strip() != "Y":
                             barcoding_flag = True
                             for barfield in barcoding_fields:
-                                if self.data.at[cellcount-1, barfield] != "NOT_APPLICABLE":
+                                if self.data.at[cellcount - 1, barfield] != "NOT_APPLICABLE":
                                     self.data.at[cellcount - 1, barfield] = "NOT_APPLICABLE"
                                     barcoding_flag = False
                             if barcoding_flag == False:
                                 self.warnings.append(msg["validation_msg_warning_barcoding"] % (
-                                    str(cellcount+1), c
+                                    str(cellcount + 1), c
                                 ))
                         # validation checks for date types
                         if header in lookup.date_fields and c_value.strip() not in lookup.blank_vals:
