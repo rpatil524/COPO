@@ -125,7 +125,7 @@ def process_pending_dtol_samples():
                         break
                     Source().update_public_name(spec_tolid)
 
-                build_specimen_sample_xml(sour) #TODO
+                build_specimen_sample_xml(sour)
                 build_submission_xml(str(sour['_id']), release=True)
                 accessions = submit_biosample(str(sour['_id']), Source(), submission['_id'], type="source")
                 print(accessions)
@@ -138,7 +138,7 @@ def process_pending_dtol_samples():
                 notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
                                    html_id="dtol_sample_info")
                 break
-
+            #TODO
             if sam.get('ORGANISM_PART', '')=="WHOLE_ORGANISM":
                 Sample().add_field("sampleSameAs", specimen_accession, sam['_id'])
                 sam["sampleSameAs"] = specimen_accession

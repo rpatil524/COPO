@@ -738,9 +738,6 @@ DTOL_ENA_MAPPINGS = {
     "LIFESTAGE": {
         "ena": "lifestage"
     },
-    "profile.title": {
-        "ena": "project name"
-    },
     "COLLECTED_BY": {
         "ena": "collected_by"
     },
