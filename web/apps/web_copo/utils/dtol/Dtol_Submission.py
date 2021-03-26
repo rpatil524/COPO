@@ -6,10 +6,10 @@ import uuid
 import xml.etree.ElementTree as ET
 from datetime import datetime, date
 from urllib.parse import urljoin
-
+from exceptions_and_logging import logger
 import requests
-from celery.utils.log import get_task_logger
-
+# from celery.utils.log import get_task_logger
+from web.apps.web_copo.lookup.copo_enums import *
 import web.apps.web_copo.schemas.utils.data_utils as d_utils
 from dal.copo_da import Submission, Sample, Profile, Source
 from submission.helpers.generic_helper import notify_dtol_status
@@ -22,7 +22,7 @@ from web.apps.web_copo.utils.dtol.Dtol_Helpers import query_public_name_service
 with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
 
-logger = get_task_logger(__name__)
+#logger = get_task_logger(__name__)
 
 exclude_from_sample_xml = []  # todo list of keys that shouldn't end up in the sample.xml file
 ena_service = resolve_env.get_env('ENA_SERVICE')
@@ -47,6 +47,7 @@ def process_pending_dtol_samples():
     tolidflag = True
     # send each to ENA for Biosample ids
     for submission in sub_id_list:
+
         # check if study exist for this submission and/or create one
         profile_id = submission["profile_id"]
         if not Submission().get_study(submission['_id']):
@@ -491,6 +492,8 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
 
     try:
         receipt = subprocess.check_output(curl_cmd, shell=True)
+        l = logger.Logger("exceptions_and_logging/logs")
+        l.log(receipt, type=Logtype.FILE)
         print(receipt)
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(

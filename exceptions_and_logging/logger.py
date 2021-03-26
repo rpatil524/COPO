@@ -44,14 +44,14 @@ class Logger():
 
 
 
-    def _log_to_file(self, msg, lvl=Loglvl.ERROR):
+    def _log_to_file(self, msg, lvl=Loglvl.WARNING):
         msg = str(msg)
         with open(os.path.join(self.logfile_path, str(datetime.now().date()) + '.log'), 'a+', encoding='utf-8') as file:
             time = datetime.now()
             time = str(time.hour) + "-" + str(time.minute) + "-" + str(time.second)
             if lvl.value == Loglvl.ERROR.value:
                 file.write("ERROR - [" + time + "]: " + msg + "\n")
-                raise CopoRuntimeError(message="Whoops! - Something went wrong.")
+                # raise CopoRuntimeError(message="Whoops! - Something went wrong.")
             elif lvl.value == Loglvl.WARNING.value:
                 file.write("WARNING - [" + time + "]: " + msg + "\n")
             elif lvl.value == Loglvl.INFO.value:
