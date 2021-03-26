@@ -65,7 +65,9 @@ class RackPlateUniquenessValidator(TolValidtor):
         dup = Sample().check_dtol_unique(rack_tube)
         # duplicated returns a boolean array, false for not duplicate, true for duplicate
         u = list(rack_tube[rack_tube.duplicated()])
-        if "ASG" not in p_type:
+        '''
+        TODO - 25/03/2021 - leaving this check in for the time being as status of DTOL symbiots is still not clear
+        if "ASG" not in p_type or "DTOL" not in p_type:
 
             if len(u) > 0:
                 self.errors.append(msg["validation_msg_duplicate_tube_or_well_id"] % (u))
@@ -77,13 +79,15 @@ class RackPlateUniquenessValidator(TolValidtor):
                 self.errors.append(msg["validation_msg_duplicate_tube_or_well_id_in_copo"] % (err))
                 self.flag = False
         else:
-            # duplicates are allowed for asg but one element of duplicate set must have target in sybiont fields
-            for i in u:
-                rack, tube = i.split('/')
-                rows = self.data.loc[
-                    (self.data["RACK_OR_PLATE_ID"] == rack) & (self.data["TUBE_OR_WELL_ID"] == tube)]
-                if "TARGET" not in rows["SYMBIONT"].values:
-                    self.errors.append(msg["validation_msg_duplicate_without_target"] % (
-                        str(rows["RACK_OR_PLATE_ID"] + "/" + rows["TUBE_OR_WELL_ID"])))
-                    self.flag = False
+        '''
+        # duplicates are allowed for asg (and possibily dtol) but one element of duplicate set must have target in
+        # sybiont fields
+        for i in u:
+            rack, tube = i.split('/')
+            rows = self.data.loc[
+                (self.data["RACK_OR_PLATE_ID"] == rack) & (self.data["TUBE_OR_WELL_ID"] == tube)]
+            if "TARGET" not in rows["SYMBIONT"].values:
+                self.errors.append(msg["validation_msg_duplicate_without_target"] % (
+                    str(rows["RACK_OR_PLATE_ID"] + "/" + rows["TUBE_OR_WELL_ID"])))
+                self.flag = False
         return self.errors, self.flag
