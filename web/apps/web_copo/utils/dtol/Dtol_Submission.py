@@ -24,7 +24,7 @@ with open(settings, "r") as settings_stream:
 
 logger = get_task_logger(__name__)
 
-exclude_from_sample_xml = []  # todo list of keys that shouldn't end up in the sample.xml file
+exclude_from_sample_xml = []
 ena_service = resolve_env.get_env('ENA_SERVICE')
 
 #public_name_service = resolve_env.get_env('PUBLIC_NAME_SERVICE')
@@ -60,19 +60,11 @@ def process_pending_dtol_samples():
         for s_id in submission["dtol_samples"]:
             sam = Sample().get_record(s_id)
             print(type(sam['public_name']), sam['public_name'])
-            #getting reference to target sample
-            if type_submission == "asg":
-                for x in range(len(sam["species_list"])):
-                    if sam["species_list"][x]["SYMBIONT"] == "target":
-                        index = x
-                        break
-            else:
-                index = 0
             if not sam["public_name"]:
                 try:
 
                     public_name_list.append(
-                        {"taxonomyId": int(sam["species_list"][index]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
+                        {"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
                         "sample_id": str(sam["_id"])})
                 except ValueError:
                     notify_dtol_status(data={"profile_id": profile_id}, msg="Invalid Taxon ID found", action="info",
@@ -88,7 +80,7 @@ def process_pending_dtol_samples():
             if specimen_sample:
                 specimen_accession = specimen_sample[0].get("biosampleAccession", "")
             else:
-                # create sample object and submit
+                # create sample object and submit #TODO only for targets
                 notify_dtol_status(data={"profile_id": profile_id},
                                    msg="Creating Sample for SPECIMEN_ID " + sam["RACK_OR_PLATE_ID"] + "/" + sam["SPECIMEN_ID"],
                                    action="info",
@@ -98,7 +90,7 @@ def process_pending_dtol_samples():
                 else:
                     sample_type = "dtol_specimen"
                 specimen_obj_fields = {"SPECIMEN_ID": sam["SPECIMEN_ID"],
-                                       "TAXON_ID": sam["species_list"][index]["TAXON_ID"],
+                                       "TAXON_ID": sam["species_list"][0]["TAXON_ID"],
                                        "sample_type": sample_type, "profile_id": sam['profile_id']}
                 Source().save_record(auto_fields={}, **specimen_obj_fields)
                 specimen_obj_fields = populate_source_fields(sam)
@@ -110,7 +102,7 @@ def process_pending_dtol_samples():
                 sour = sour[0]
                 if not sour['public_name']:
                     #retrieve public name
-                    spec_tolid = query_public_name_service([{"taxonomyId": int(sam["species_list"][index]["TAXON_ID"]),
+                    spec_tolid = query_public_name_service([{"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]),
                                                              "specimenId": sam["SPECIMEN_ID"],
                                                              "sample_id": str(sam["_id"])}])
                     assert len(spec_tolid) == 1
@@ -129,6 +121,12 @@ def process_pending_dtol_samples():
                 build_submission_xml(str(sour['_id']), release=True)
                 accessions = submit_biosample(str(sour['_id']), Source(), submission['_id'], type="source")
                 print(accessions)
+                if accessions.get("status", "") == "error":
+                    msg = "Submission Rejected: specimen level " + sam["SPECIMEN_ID"] + "<p>" + accessions[
+                        "msg"] + "</p>"
+                    notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
+                                       html_id="dtol_sample_info")
+                    break
                 specimen_accession = Source().get_specimen_biosample(sam["SPECIMEN_ID"])[0].get("biosampleAccession",
                                                                                                 "")
 
@@ -138,7 +136,7 @@ def process_pending_dtol_samples():
                 notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
                                    html_id="dtol_sample_info")
                 break
-            #TODO
+            #TODO add symbiont relationship
             if sam.get('ORGANISM_PART', '')=="WHOLE_ORGANISM":
                 Sample().add_field("sampleSameAs", specimen_accession, sam['_id'])
                 sam["sampleSameAs"] = specimen_accession
@@ -177,6 +175,7 @@ def process_pending_dtol_samples():
 
         # store accessions, remove sample id from bundle and on last removal, set status of submission
         accessions = submit_biosample(file_subfix, Sample(), submission['_id'])
+
         # print(accessions)
         if not accessions:
             notify_dtol_status(data={"profile_id": profile_id}, msg="Error creating sample - no accessions found", action="info",
@@ -224,12 +223,17 @@ def query_awaiting_tolids():
 def populate_source_fields(sampleobj):
     '''populate source in db to copy most of sample fields
     but change organism part and gal sample_id'''
-    #todo DELETE fields= {"sample_type": "dtol_specimen", "profile_id": sampleobj['profile_id'],
-             #"TAXON_ID": sampleobj["species_list"][0]["TAXON_ID"]}
     fields = {}
+    project = sampleobj["tol_project"]
     for item in sampleobj.items():
         #print(item)
         try:
+            if project == "DTOL":
+                if item[0] == "PARTNER" or item[0] == "PARTNER_SAMPLE_ID":
+                    continue
+            elif project == "ASG":
+                if item[0] == "GAL" or item[0] == "GAL_SAMPLE_ID":
+                    continue
             print(item[0])
             if item[0]=="COLLECTION_LOCATION" or DTOL_ENA_MAPPINGS[item[0]]['ena']:
                 if item[0]=="GAL_SAMPLE_ID" or item[0]=="PARTNER_SAMPLE_ID":
@@ -253,13 +257,14 @@ def update_bundle_sample_xml(sample_list, bundlefile):
     # print("adding sample to bundle sample xml")
     tree = ET.parse(bundlefile)
     root = tree.getroot()
+    project = sample_list[0]['tol_project']
     for sam in sample_list:
         sample = Sample().get_record(sam)
 
         sample_alias = ET.SubElement(root, 'SAMPLE')
         sample_alias.set('alias', str(sample['_id']))  # updated to copo id to retrieve it when getting accessions
         sample_alias.set('center_name', 'EarlhamInstitute')  # mandatory for broker account
-        title = str(uuid.uuid4()) + "-dtol"
+        title = str(uuid.uuid4()) + "-" + project.lower()
 
         title_block = ET.SubElement(sample_alias, 'TITLE')
         title_block.text = title
@@ -274,7 +279,7 @@ def update_bundle_sample_xml(sample_list, bundlefile):
         value = ET.SubElement(sample_attribute, 'VALUE')
         value.text = 'ERC000053'
         # adding project name field (ie copo profile name)
-        # adding reference to parent specimen biosample
+        # adding reference to parent specimen biosample #todo add samplesymbiontof in sample
         if sample.get("sampleDerivedFrom", ""):
             sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
             tag = ET.SubElement(sample_attribute, 'TAG')
@@ -287,17 +292,44 @@ def update_bundle_sample_xml(sample_list, bundlefile):
             tag.text = 'sample same as'
             value = ET.SubElement(sample_attribute, 'VALUE')
             value.text = sample.get("sampleSameAs", "")
+        elif sample.get("sampleSymbiontOf", ""):
+            sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+            tag = ET.SubElement(sample_attribute, 'TAG')
+            tag.text = 'sample symbiont of'
+            value = ET.SubElement(sample_attribute, 'VALUE')
+            value.text = sample.get("SampleSymbiontOf", "")
         # adding project name field (ie copo profile name)
         # validating against DTOL checklist
         sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
         tag = ET.SubElement(sample_attribute, 'TAG')
         tag.text = 'project name'
         value = ET.SubElement(sample_attribute, 'VALUE')
-        value.text = 'DTOL'  # Profile().get_record(sample["profile_id"])["title"]
+        value.text = project  # Profile().get_record(sample["profile_id"])["title"]
+        #if project is ASG add symbiont
+        if project == "ASG":
+            sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
+            tag = ET.SubElement(sample_attribute, 'TAG')
+            tag.text = 'SYMBIONT'
+            value = ET.SubElement(sample_attribute, 'VALUE')
+            if sample.get("species_list", [])[0].get('SYMBIONT', "")=="symbiont":
+                issymbiont = True
+            else:
+                issymbiont = False
+            if issymbiont:
+                value.text = "Y"
+            else:
+                value.text = "N"
         ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
         for item in sample.items():
             if item[1]:
                 try:
+                    #exceptional handling of fields that should only be present for certain projects
+                    if project == "DTOL":
+                        if item[0] == "PARTNER" or item[0] == "PARTNER_SAMPLE_ID" or item[0]=="SYMBIONT": #TODO CHANGE IN SOP2.3
+                            continue
+                    elif project == "ASG":
+                        if item[0] == "GAL" or item[0] == "GAL_SAMPLE_ID":
+                            continue
                     # exceptional handling of COLLECTION_LOCATION
                     if item[0] == 'COLLECTION_LOCATION':
                         attribute_name = DTOL_ENA_MAPPINGS['COLLECTION_LOCATION_1']['ena']
@@ -352,12 +384,13 @@ def build_specimen_sample_xml(sample):
     # build specimen sample XML
     tree = ET.parse(SRA_SAMPLE_TEMPLATE)
     root = tree.getroot()
+    project = sample['sample_type'].split("_")[0].upper()
     # from toni's code below
     # set sample attributes
     sample_alias = ET.SubElement(root, 'SAMPLE')
     sample_alias.set('alias', str(sample['_id']))  # updated to copo id to retrieve it when getting accessions
     sample_alias.set('center_name', 'EarlhamInstitute')  # mandatory for broker account
-    title = str(uuid.uuid4()) + "-dtol-specimen"
+    title = str(uuid.uuid4()) + "-"+ project +"-specimen"
 
     title_block = ET.SubElement(sample_alias, 'TITLE')
     title_block.text = title
@@ -380,11 +413,18 @@ def build_specimen_sample_xml(sample):
     tag = ET.SubElement(sample_attribute, 'TAG')
     tag.text = 'project name'
     value = ET.SubElement(sample_attribute, 'VALUE')
-    value.text = sample['tol_project'] #TODO add symbiont field for specimen level?
+    value.text = project
     ##### for item in obj_id: if item in checklist (or similar according to some criteria).....
     for item in sample.items():
         if item[1]:
             try:
+                #exceptional handling of fields that may be empty in different projects
+                if project == "ASG":
+                    if item[0] == 'GAL' or item[0] == "GAL_SAMPLE_ID":
+                        continue
+                elif project == "DTOL":
+                    if item[0] == "PARTNER" or item[0] == "PARTNER_SAMPLE_ID":
+                        continue
                 # exceptional handling of COLLECTION_LOCATION
                 if item[0] == 'COLLECTION_LOCATION':
                     attribute_name = DTOL_ENA_MAPPINGS['COLLECTION_LOCATION_1']['ena']
