@@ -21,18 +21,19 @@ class DtolEnumerationValidator(TolValidtor):
     def validate(self):
         Entrez.api_key = lookup.NIH_API_KEY
         # build dictioanry of species in this manifest  max 200 IDs per query
-        taxon_id_set = set(self.data['TAXON_ID'].tolist())
+        taxon_id_set = set([x for x in self.data['TAXON_ID'].tolist() if x])
         notify_dtol_status(data={"profile_id": self.profile_id},
                            msg="Querying NCBI for TAXON_IDs in manifest ",
                            action="info",
                            html_id="sample_info")
         taxon_id_list = list(taxon_id_set)
-        for taxon in taxon_id_list:
-            # check if taxon is submittable
-            ena_taxon_errors = check_taxon_ena_submittable(taxon)
-            if ena_taxon_errors:
-                self.errors += ena_taxon_errors
-                self.flag = False
+        if any(x for x in taxon_id_list):
+            for taxon in taxon_id_list:
+                # check if taxon is submittable
+                ena_taxon_errors = check_taxon_ena_submittable(taxon)
+                if ena_taxon_errors:
+                    self.errors += ena_taxon_errors
+                    self.flag = False
 
         if any(id for id in taxon_id_list):
             i = 0
@@ -78,12 +79,11 @@ class DtolEnumerationValidator(TolValidtor):
                     "TAXON_ID", str(index + 2), "TAXON_ID", scientific_name, records['IdList'][0]))
                 self.data.at[index, "TAXON_ID"] = records['IdList'][0]
                 taxon_id = records['IdList'][0]
-                if "ASG" in Profile().get_type(self.profile_id):
-                    # check if taxon is submittable
-                    ena_taxon_errors = check_taxon_ena_submittable(taxon_id)
-                    if ena_taxon_errors:
-                        self.errors += ena_taxon_errors
-                        self.flag = False
+                # check if taxon is submittable
+                ena_taxon_errors = check_taxon_ena_submittable(taxon_id)
+                if ena_taxon_errors:
+                    self.errors += ena_taxon_errors
+                    self.flag = False
                 handle = Entrez.efetch(db="Taxonomy", id=taxon_id, retmode="xml")
                 records = Entrez.read(handle)
                 if records:
