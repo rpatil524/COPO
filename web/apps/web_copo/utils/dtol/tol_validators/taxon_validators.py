@@ -27,13 +27,12 @@ class DtolEnumerationValidator(TolValidtor):
                            action="info",
                            html_id="sample_info")
         taxon_id_list = list(taxon_id_set)
-        if "ASG" in Profile().get_type(self.profile_id):
-            for taxon in taxon_id_list:
-                # check if taxon is submittable
-                ena_taxon_errors = check_taxon_ena_submittable(taxon)
-                if ena_taxon_errors:
-                    self.errors += ena_taxon_errors
-                    self.flag = False
+        for taxon in taxon_id_list:
+            # check if taxon is submittable
+            ena_taxon_errors = check_taxon_ena_submittable(taxon)
+            if ena_taxon_errors:
+                self.errors += ena_taxon_errors
+                self.flag = False
 
         if any(id for id in taxon_id_list):
             i = 0
