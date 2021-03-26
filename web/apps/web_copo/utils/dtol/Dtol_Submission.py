@@ -155,6 +155,7 @@ def process_pending_dtol_samples():
 
         #if tolid missing for specimen skip
         if not tolidflag:
+            os.remove("bundle_" + file_subfix + ".xml")
             break
 
         update_bundle_sample_xml(s_ids, "bundle_" + file_subfix + ".xml")
