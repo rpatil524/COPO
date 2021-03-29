@@ -36,7 +36,7 @@ def make_target_sample(sample):
     if not "species_list" in sample:
         sample["species_list"] = list()
     out = dict()
-    out["SYMBIONT"] = "target"
+    out["SYMBIONT"] = sample.pop("SYMBIONT")
     out["TAXON_ID"] = sample.pop("TAXON_ID")
     out["ORDER_OR_GROUP"] = sample.pop("ORDER_OR_GROUP")
     out["FAMILY"] = sample.pop("FAMILY")
@@ -331,15 +331,10 @@ class DtolSpreadsheet:
                                action="info",
                                html_id="sample_info")
 
-            if s["SYMBIONT"].lower() == "symbiont":
-                self.check_for_target_or_add_to_symbiont_list(s)
-            else:
-                # SOP 2.2 DTOL symbiont to be a scientific name
-                s = make_target_sample(s)
-                sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
-                Sample().timestamp_dtol_sample_created(sampl["_id"])
-                self.add_from_symbiont_list(s)
-
+            s = make_target_sample(s)
+            sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
+            Sample().timestamp_dtol_sample_created(sampl["_id"])
+            if s["species_list"][0]["SYMBIONT"] == "TARGET":
                 public_name_list.append(
                     {"taxonomyId": int(s["species_list"][0]["TAXON_ID"]), "specimenId": s["SPECIMEN_ID"],
                      "sample_id": str(sampl["_id"])})
