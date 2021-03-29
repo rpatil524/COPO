@@ -702,6 +702,14 @@ DTOL_RULES = {
         "ena_regex": "(^[ESD]R[SR]\d{6,}(,[ESD]R[SR]\d{6,})*$)|(^SAM[END][AG]?\d+(,SAM[END][AG]?\d+)*$)|(^EGA[NR]\d{11}(,EGA[NR]\d{11})*$)|(^[ESD]R[SR]\d{6,}-[ESD]R[SR]\d{6,}$)|(^SAM[END][AG]?\d+-SAM[END][AG]?\d+$)|(^EGA[NR]\d{11}-EGA[NR]\d{11}$)",
         "human_readable": "Specimen accession"
     },
+    "SAMPLE_SAME_AS": {
+        "ena_regex": "(^[ESD]R[SR]\d{6,}(,[ESD]R[SR]\d{6,})*$)|(^SAM[END][AG]?\d+(,SAM[END][AG]?\d+)*$)|(^EGA[NR]\d{11}(,EGA[NR]\d{11})*$)|(^[ESD]R[SR]\d{6,}-[ESD]R[SR]\d{6,}$)|(^SAM[END][AG]?\d+-SAM[END][AG]?\d+$)|(^EGA[NR]\d{11}-EGA[NR]\d{11}$)",
+        "human_readable": "Specimen accession"
+    },
+    "SAMPLE_SYMBIONT_OF": {
+        "ena_regex": "(^[ESD]R[SR]\d{6,}(,[ESD]R[SR]\d{6,})*$)|(^SAM[END][AG]?\d+(,SAM[END][AG]?\d+)*$)|(^EGA[NR]\d{11}(,EGA[NR]\d{11})*$)|(^[ESD]R[SR]\d{6,}-[ESD]R[SR]\d{6,}$)|(^SAM[END][AG]?\d+-SAM[END][AG]?\d+$)|(^EGA[NR]\d{11}-EGA[NR]\d{11}$)",
+        "human_readable": "Specimen accession"
+    },
     "RACK_OR_PLATE_ID": {
         "optional_regex": "^[a-zA-Z]{2}\d{8}$"
     },
@@ -803,8 +811,14 @@ DTOL_ENA_MAPPINGS = {
     "CULTURE_OR_STRAIN_ID": {
         "ena": "culture_or_strain_id"
     },
-    "SAMPLE_DERIVED_FROM": {
+    "sampleDerivedFrom": {
         "ena": "sample derived from"
+    },
+    "sampleSameAs": {
+        "ena": "sample same as"
+    },
+    "sampleSymbiontOf": {
+        "ena": "sample symbiont of"
     },
     "public_name": {
         "ena": "tolid"

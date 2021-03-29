@@ -61,15 +61,18 @@ def process_pending_dtol_samples():
         for s_id in submission["dtol_samples"]: #todo check tolid is requested for target only
             sam = Sample().get_record(s_id)
             issymbiont = sam["species_list"][0].get("SYMBIONT", "target")
-            if issymbiont == "symbiont":
+            if issymbiont == "SYMBIONT":
                 targetsam = Sample().get_target_by_specimen_id(sam["SPECIMEN_ID"])
                 assert targetsam
-                assert len(targetsam)==1
+                #todo ASSERT ALL TAXON ID ARE THE SAME
                 targetsam = targetsam[0]
+            else:
+                #this is to speed up source public id call
+                targetsam = sam
             print(type(sam['public_name']), sam['public_name'])
             if not sam["public_name"]:
                 try:
-                    if issymbiont == "target":
+                    if issymbiont == "TARGET":
                         public_name_list.append(
                             {"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
                             "sample_id": str(sam["_id"])})
@@ -100,7 +103,7 @@ def process_pending_dtol_samples():
                     sample_type = "asg_specimen"
                 else:
                     sample_type = "dtol_specimen"
-                if issymbiont == "target":
+                if issymbiont == "TARGET":
                     specimen_obj_fields = {"SPECIMEN_ID": sam["SPECIMEN_ID"],
                                            "TAXON_ID": sam["species_list"][0]["TAXON_ID"],
                                            "sample_type": sample_type, "profile_id": sam['profile_id']}
@@ -123,8 +126,8 @@ def process_pending_dtol_samples():
                 sour = sour[0]
                 if not sour['public_name']:
                     #retrieve public name
-                    spec_tolid = query_public_name_service([{"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]),
-                                                             "specimenId": sam["SPECIMEN_ID"],
+                    spec_tolid = query_public_name_service([{"taxonomyId": int(targetsam["species_list"][0]["TAXON_ID"]),
+                                                             "specimenId": targetsam["SPECIMEN_ID"],
                                                              "sample_id": str(sam["_id"])}])
                     assert len(spec_tolid) == 1
                     if not spec_tolid[0].get("tolId", ""):
@@ -159,7 +162,7 @@ def process_pending_dtol_samples():
                                    html_id="dtol_sample_info")
                 break
             #set appropriate relationship to specimen level sample
-            if issymbiont == "symbiont":
+            if issymbiont == "SYMBIONT":
                 Sample().add_field("sampleSymbiontOf", specimen_accession, sam['_id'])
                 sam["sampleSymbiontOf"] = specimen_accession
             elif sam.get('ORGANISM_PART', '')=="WHOLE_ORGANISM":
@@ -305,7 +308,8 @@ def update_bundle_sample_xml(sample_list, bundlefile):
         value.text = 'ERC000053'
         # adding project name field (ie copo profile name)
         # adding reference to parent specimen biosample
-        if sample.get("sampleDerivedFrom", ""):
+        #TODO remove comment below if reworking works
+        '''if sample.get("sampleDerivedFrom", ""):
             sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
             tag = ET.SubElement(sample_attribute, 'TAG')
             tag.text = 'sample derived from'
@@ -322,7 +326,7 @@ def update_bundle_sample_xml(sample_list, bundlefile):
             tag = ET.SubElement(sample_attribute, 'TAG')
             tag.text = 'sample symbiont of'
             value = ET.SubElement(sample_attribute, 'VALUE')
-            value.text = sample.get("SampleSymbiontOf", "")
+            value.text = sample.get("SampleSymbiontOf", "")'''
         # adding project name field (ie copo profile name)
         # validating against DTOL checklist
         sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
