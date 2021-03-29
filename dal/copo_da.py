@@ -573,7 +573,7 @@ class Source(DAComponent):
         return self.get_collection_handle().find({'profile_id': profile_id})
 
     def get_specimen_biosample(self, value):
-        return cursor_to_list(self.get_collection_handle().find({"sample_type": "dtol_specimen",
+        return cursor_to_list(self.get_collection_handle().find({"sample_type": {"$in" : ["dtol_specimen", "asg_specimen"]},
                                                                  "SPECIMEN_ID": value}))
 
     def add_accession(self, biosample_accession, sra_accession, submission_accession, oid):
@@ -808,8 +808,13 @@ class Sample(DAComponent):
         return cursor_to_list(self.get_collection_handle().find({dtol_field: {"$in": value}}))
 
     def get_specimen_biosample(self, value):
-        return cursor_to_list(self.get_collection_handle().find({"sample_type": "dtol_specimen",
+        return cursor_to_list(self.get_collection_handle().find({"sample_type": {"$in": ["dtol_specimen", "asg_specimen"]},
                                                                  "SPECIMEN_ID": value}))
+
+    def get_target_by_specimen_id(self, specimenid):
+        return cursor_to_list(self.get_collection_handle().find({"sample_type": {"$in": ["dtol_specimen", "asg_specimen"]},
+                                                                 "species_list": {'$elemMatch': {"SYMBIONT": "target"},
+                                                                 "SPECIMEN_ID" : specimenid}))
 
     def get_manifests(self):
         cursor = self.get_collection_handle().aggregate(

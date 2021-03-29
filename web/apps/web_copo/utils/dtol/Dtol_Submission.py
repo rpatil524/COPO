@@ -57,8 +57,9 @@ def process_pending_dtol_samples():
         s_ids = []
         # check for public name with Sanger Name Service
         public_name_list = list()
-        for s_id in submission["dtol_samples"]:
+        for s_id in submission["dtol_samples"]: #todo check tolid is requested for target only
             sam = Sample().get_record(s_id)
+            issymbiont = sam["species_list"][0].get("SYMBIONT", "target")
             print(type(sam['public_name']), sam['public_name'])
             if not sam["public_name"]:
                 try:
@@ -80,7 +81,7 @@ def process_pending_dtol_samples():
             if specimen_sample:
                 specimen_accession = specimen_sample[0].get("biosampleAccession", "")
             else:
-                # create sample object and submit #TODO only for targets
+                # create sample object and submit
                 notify_dtol_status(data={"profile_id": profile_id},
                                    msg="Creating Sample for SPECIMEN_ID " + sam["RACK_OR_PLATE_ID"] + "/" + sam["SPECIMEN_ID"],
                                    action="info",
@@ -89,13 +90,24 @@ def process_pending_dtol_samples():
                     sample_type = "asg_specimen"
                 else:
                     sample_type = "dtol_specimen"
-                specimen_obj_fields = {"SPECIMEN_ID": sam["SPECIMEN_ID"],
-                                       "TAXON_ID": sam["species_list"][0]["TAXON_ID"],
-                                       "sample_type": sample_type, "profile_id": sam['profile_id']}
-                Source().save_record(auto_fields={}, **specimen_obj_fields)
-                specimen_obj_fields = populate_source_fields(sam)
-                sour = Source().get_by_specimen(sam["SPECIMEN_ID"])[0]
-                Source().add_fields(specimen_obj_fields, str(sour['_id']))
+                if issymbiont == "target":
+                    specimen_obj_fields = {"SPECIMEN_ID": sam["SPECIMEN_ID"],
+                                           "TAXON_ID": sam["species_list"][0]["TAXON_ID"],
+                                           "sample_type": sample_type, "profile_id": sam['profile_id']}
+                    Source().save_record(auto_fields={}, **specimen_obj_fields)
+                    specimen_obj_fields = populate_source_fields(sam)
+                    sour = Source().get_by_specimen(sam["SPECIMEN_ID"])[0]
+                    Source().add_fields(specimen_obj_fields, str(sour['_id']))
+                else:
+                    #look for sample with same specimen ID which is target
+                    targetsam = Sample().get_target_by_specimen_id(sam["SPECIMEN_ID"])
+                    specimen_obj_fields = {"SPECIMEN_ID": targetsam["SPECIMEN_ID"],
+                                           "TAXON_ID": targetsam["species_list"][0]["TAXON_ID"],
+                                           "sample_type": sample_type, "profile_id": targetsam['profile_id']}
+                    Source().save_record(auto_fields={}, **specimen_obj_fields)
+                    specimen_obj_fields = populate_source_fields(targetsam)
+                    sour = Source().get_by_specimen(sam["SPECIMEN_ID"])[0]
+                    Source().add_fields(specimen_obj_fields, str(sour['_id']))
             if not specimen_accession:
                 sour = Source().get_by_specimen(sam["SPECIMEN_ID"])
                 assert len(sour) == 1
@@ -136,10 +148,13 @@ def process_pending_dtol_samples():
                 notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
                                    html_id="dtol_sample_info")
                 break
-            #TODO add symbiont relationship
             if sam.get('ORGANISM_PART', '')=="WHOLE_ORGANISM":
-                Sample().add_field("sampleSameAs", specimen_accession, sam['_id'])
-                sam["sampleSameAs"] = specimen_accession
+                if sam["species_list"].get["SYMBIONT"]=="target":
+                    Sample().add_field("sampleSameAs", specimen_accession, sam['_id'])
+                    sam["sampleSameAs"] = specimen_accession
+                else:
+                    Sample().add_field("sampleSameAs", specimen_accession, sam['_id'])
+                    sam["sampleSymbiontOf"] = specimen_accession
             else:
                 Sample().add_field("sampleDerivedFrom", specimen_accession, sam['_id'])
                 sam["sampleDerivedFrom"] = specimen_accession
@@ -257,7 +272,7 @@ def update_bundle_sample_xml(sample_list, bundlefile):
     # print("adding sample to bundle sample xml")
     tree = ET.parse(bundlefile)
     root = tree.getroot()
-    project = sample_list[0]['tol_project']
+    project = Sample().get_record(sample_list[0])['tol_project']
     for sam in sample_list:
         sample = Sample().get_record(sam)
 
@@ -279,7 +294,7 @@ def update_bundle_sample_xml(sample_list, bundlefile):
         value = ET.SubElement(sample_attribute, 'VALUE')
         value.text = 'ERC000053'
         # adding project name field (ie copo profile name)
-        # adding reference to parent specimen biosample #todo add samplesymbiontof in sample
+        # adding reference to parent specimen biosample
         if sample.get("sampleDerivedFrom", ""):
             sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
             tag = ET.SubElement(sample_attribute, 'TAG')
@@ -531,7 +546,7 @@ def build_validate_xml(sample_id):
     ET.dump(tree)
     submissionvalidatefile = "submission_validate_" + str(sample_id) + ".xml"
     tree.write(open(submissionvalidatefile, 'w'),
-               encoding='unicode')  # overwriting at each run, i don't think we need to keep it - todo again I think these should have unique id attached, and then file deleted after submission
+               encoding='unicode')
 
 
 def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
@@ -573,7 +588,7 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
     os.remove(submissionfile)
     os.remove(samplefile)
     success_status = tree.get('success')
-    if success_status == 'false':  ####todo
+    if success_status == 'false':
 
         msg = ""
         error_blocks = tree.find('MESSAGES').findall('ERROR')
@@ -688,7 +703,7 @@ def create_study(profile_id, collection_id):
     os.remove(submissionfile)
     os.remove(studyfile)
     success_status = tree.get('success')
-    if success_status == 'false':  ####todo
+    if success_status == 'false':
         msg = tree.find('MESSAGES').findtext('ERROR', default='Undefined error')
         status = {"status": "error", "msg": msg}
         return status
