@@ -812,8 +812,8 @@ class Sample(DAComponent):
                                                                  "SPECIMEN_ID": value}))
 
     def get_target_by_specimen_id(self, specimenid):
-        return cursor_to_list(self.get_collection_handle().find({"sample_type": {"$in": ["dtol_specimen", "asg_specimen"]},
-                                                                 "species_list": {'$elemMatch': {"SYMBIONT": "target"},
+        return cursor_to_list(self.get_collection_handle().find({"sample_type": {"$in": ["dtol", "asg"]},
+                                                                 "species_list": {'$elemMatch': {"SYMBIONT": "target"}},
                                                                  "SPECIMEN_ID" : specimenid}))
 
     def get_manifests(self):

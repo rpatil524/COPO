@@ -60,13 +60,22 @@ def process_pending_dtol_samples():
         for s_id in submission["dtol_samples"]: #todo check tolid is requested for target only
             sam = Sample().get_record(s_id)
             issymbiont = sam["species_list"][0].get("SYMBIONT", "target")
+            if issymbiont == "symbiont":
+                targetsam = Sample().get_target_by_specimen_id(sam["SPECIMEN_ID"])
+                assert targetsam
+                assert len(targetsam)==1
+                targetsam = targetsam[0]
             print(type(sam['public_name']), sam['public_name'])
             if not sam["public_name"]:
                 try:
-
-                    public_name_list.append(
-                        {"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
-                        "sample_id": str(sam["_id"])})
+                    if issymbiont == "target":
+                        public_name_list.append(
+                            {"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
+                            "sample_id": str(sam["_id"])})
+                    else:
+                        public_name_list.append(
+                            {"taxonomyId": int(targetsam["species_list"][0]["TAXON_ID"]), "specimenId": targetsam["SPECIMEN_ID"],
+                             "sample_id": str(sam["_id"])}) #todo is sampleid okay here?
                 except ValueError:
                     notify_dtol_status(data={"profile_id": profile_id}, msg="Invalid Taxon ID found", action="info",
                                        html_id="dtol_sample_info")
@@ -100,7 +109,6 @@ def process_pending_dtol_samples():
                     Source().add_fields(specimen_obj_fields, str(sour['_id']))
                 else:
                     #look for sample with same specimen ID which is target
-                    targetsam = Sample().get_target_by_specimen_id(sam["SPECIMEN_ID"])
                     specimen_obj_fields = {"SPECIMEN_ID": targetsam["SPECIMEN_ID"],
                                            "TAXON_ID": targetsam["species_list"][0]["TAXON_ID"],
                                            "sample_type": sample_type, "profile_id": targetsam['profile_id']}
@@ -127,7 +135,8 @@ def process_pending_dtol_samples():
                         Submission().make_dtol_status_awaiting_tolids(submission['_id'])
                         tolidflag = False
                         break
-                    Source().update_public_name(spec_tolid)
+                    Source().update_public_name(spec_tolid[0])
+                    sour = Source().get_by_specimen(sam["SPECIMEN_ID"])[0]
 
                 build_specimen_sample_xml(sour)
                 build_submission_xml(str(sour['_id']), release=True)
@@ -148,13 +157,13 @@ def process_pending_dtol_samples():
                 notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
                                    html_id="dtol_sample_info")
                 break
-            if sam.get('ORGANISM_PART', '')=="WHOLE_ORGANISM":
-                if sam["species_list"].get["SYMBIONT"]=="target":
-                    Sample().add_field("sampleSameAs", specimen_accession, sam['_id'])
-                    sam["sampleSameAs"] = specimen_accession
-                else:
-                    Sample().add_field("sampleSameAs", specimen_accession, sam['_id'])
-                    sam["sampleSymbiontOf"] = specimen_accession
+            #set appropriate relationship to specimen level sample
+            if issymbiont == "symbiont":
+                Sample().add_field("sampleSymbiontOf", specimen_accession, sam['_id'])
+                sam["sampleSymbiontOf"] = specimen_accession
+            elif sam.get('ORGANISM_PART', '')=="WHOLE_ORGANISM":
+                Sample().add_field("sampleSameAs", specimen_accession, sam['_id'])
+                sam["sampleSameAs"] = specimen_accession
             else:
                 Sample().add_field("sampleDerivedFrom", specimen_accession, sam['_id'])
                 sam["sampleDerivedFrom"] = specimen_accession
