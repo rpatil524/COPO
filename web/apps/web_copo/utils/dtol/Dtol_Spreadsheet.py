@@ -334,9 +334,9 @@ class DtolSpreadsheet:
             s = make_target_sample(s)
             sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
             Sample().timestamp_dtol_sample_created(sampl["_id"])
-            if s["species_list"][0]["SYMBIONT"] == "TARGET":
+            if not sampl["species_list"][0]["SYMBIONT"] or sampl["species_list"][0]["SYMBIONT"] == "TARGET":
                 public_name_list.append(
-                    {"taxonomyId": int(s["species_list"][0]["TAXON_ID"]), "specimenId": s["SPECIMEN_ID"],
+                    {"taxonomyId": int(sampl["species_list"][0]["TAXON_ID"]), "specimenId": sampl["SPECIMEN_ID"],
                      "sample_id": str(sampl["_id"])})
 
             for im in image_data:

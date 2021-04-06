@@ -1317,6 +1317,10 @@ def sample_spreadsheet(request):
     elif name.endswith("csv"):
         fmt = 'csv'
 
+    if format not in ["xls", "csv"]:
+        #TODO return sensible error here
+        pass
+
     if dtol.loadManifest(m_format=fmt):
         if dtol.validate_taxonomy() and dtol.validate():
             dtol.collect()
