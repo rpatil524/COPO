@@ -23,7 +23,7 @@ with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
 
 #logger = get_task_logger(__name__)
-
+l = logger.Logger("exceptions_and_logging/logs")
 exclude_from_sample_xml = []  # todo list of keys that shouldn't end up in the sample.xml file
 ena_service = resolve_env.get_env('ENA_SERVICE')
 
@@ -59,7 +59,7 @@ def process_pending_dtol_samples():
         public_name_list = list()
         for s_id in submission["dtol_samples"]:
             sam = Sample().get_record(s_id)
-            print(type(sam['public_name']), sam['public_name'])
+            l.log(sam)
             if not sam["public_name"]:
                 try:
                     public_name_list.append(
@@ -107,6 +107,7 @@ def process_pending_dtol_samples():
                         notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
                                            html_id="dtol_sample_info")
                         Submission().make_dtol_status_awaiting_tolids(submission['_id'])
+                        l.log("set tolid flag to false")
                         tolidflag = False
                         break
                     Source().update_public_name(spec_tolid)
@@ -493,7 +494,7 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
 
     try:
         receipt = subprocess.check_output(curl_cmd, shell=True)
-        l = logger.Logger("exceptions_and_logging/logs")
+
         l.log(receipt, type=Logtype.FILE)
         print(receipt)
     except Exception as e:

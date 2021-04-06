@@ -13,21 +13,14 @@ class Logger():
 
 
 
-    def __init__(self, logfile_path, system_level=Loglvl.ERROR, log_type=Logtype.FILE):
+    def __init__(self, logfile_path, system_level=Loglvl.INFO, log_type=Logtype.FILE):
         self.level = system_level
         self.log_type = log_type
         self.logfile_path = logfile_path
 
+    def log(self, msg, level=Loglvl.INFO, type=Logtype.CONSOLE):
 
-
-    def log(self, msg, level=Loglvl.ERROR, type=Logtype.CONSOLE):
-
-        if level.value >= self.level.value:
-            # pass to relevant logger handler
-            if type.value == Logtype.CONSOLE.value:
-                return self._log_to_console(msg, level)
-            elif type.value == Logtype.FILE.value:
-                return self._log_to_file(msg, level)
+        return self._log_to_file(msg, level)
 
 
 
