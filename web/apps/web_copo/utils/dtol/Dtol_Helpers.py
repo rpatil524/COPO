@@ -115,7 +115,7 @@ def query_public_name_service(sample_list):
         else:
             # in the case there is a network issue, just return an empty dict
             resp = {}
-        l.log("name service response: " + resp)
+        l.log("name service response: " + str(resp))
         return resp
     except Exception as e:
         l.log("PUBLIC NAME SERVER ERROR: " + str(e))
