@@ -118,5 +118,5 @@ def query_public_name_service(sample_list):
         l.log("name service response: " + resp)
         return resp
     except Exception as e:
-        print("PUBLIC NAME SERVER ERROR: " + str(e))
+        l.log("PUBLIC NAME SERVER ERROR: " + str(e))
         return {}
