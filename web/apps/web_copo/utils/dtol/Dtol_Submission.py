@@ -23,7 +23,7 @@ with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
 
 #logger = get_task_logger(__name__)
-
+l = logger.Logger("exceptions_and_logging/logs")
 exclude_from_sample_xml = []  # todo list of keys that shouldn't end up in the sample.xml file
 ena_service = resolve_env.get_env('ENA_SERVICE')
 
@@ -59,7 +59,7 @@ def process_pending_dtol_samples():
         public_name_list = list()
         for s_id in submission["dtol_samples"]:
             sam = Sample().get_record(s_id)
-            print(type(sam['public_name']), sam['public_name'])
+
             if not sam["public_name"]:
                 try:
                     public_name_list.append(
@@ -493,8 +493,8 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
 
     try:
         receipt = subprocess.check_output(curl_cmd, shell=True)
-        l = logger.Logger("exceptions_and_logging/logs")
-        l.log(receipt, type=Logtype.FILE)
+
+        l.log("ENA RECEIPT " + receipt, type=Logtype.FILE)
         print(receipt)
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
