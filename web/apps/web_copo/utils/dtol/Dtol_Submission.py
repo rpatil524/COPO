@@ -58,13 +58,14 @@ def process_pending_dtol_samples():
         s_ids = []
         # check for public name with Sanger Name Service
         public_name_list = list()
-        for s_id in submission["dtol_samples"]: #todo check tolid is requested for target only
+        for s_id in submission["dtol_samples"]:
             sam = Sample().get_record(s_id)
             issymbiont = sam["species_list"][0].get("SYMBIONT", "target")
             if issymbiont == "SYMBIONT":
                 targetsam = Sample().get_target_by_specimen_id(sam["SPECIMEN_ID"])
                 assert targetsam
-                #todo ASSERT ALL TAXON ID ARE THE SAME
+                #ASSERT ALL TAXON ID ARE THE SAME, they can only be associated to one specimen
+                assert all(x["species_list"][0]["TAXON_ID"] == targetsam[0]["species_list"][0]["TAXON_ID"] for x in targetsam)
                 targetsam = targetsam[0]
             else:
                 #this is to speed up source public id call
@@ -80,7 +81,7 @@ def process_pending_dtol_samples():
                     else:
                         public_name_list.append(
                             {"taxonomyId": int(targetsam["species_list"][0]["TAXON_ID"]), "specimenId": targetsam["SPECIMEN_ID"],
-                             "sample_id": str(sam["_id"])}) #todo is sampleid okay here?
+                             "sample_id": str(sam["_id"])})
                 except ValueError:
                     notify_dtol_status(data={"profile_id": profile_id}, msg="Invalid Taxon ID found", action="info",
                                        html_id="dtol_sample_info")
@@ -303,40 +304,18 @@ def update_bundle_sample_xml(sample_list, bundlefile):
         taxon_id = ET.SubElement(sample_name, 'TAXON_ID')
         taxon_id.text = sample.get("species_list", [])[0].get('TAXON_ID', "")
         sample_attributes = ET.SubElement(sample_alias, 'SAMPLE_ATTRIBUTES')
-        # validating against DTOL checklist
+        # validating against TOL checklist
         sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
         tag = ET.SubElement(sample_attribute, 'TAG')
         tag.text = 'ENA-CHECKLIST'
         value = ET.SubElement(sample_attribute, 'VALUE')
         value.text = 'ERC000053'
-        # adding project name field (ie copo profile name)
-        # adding reference to parent specimen biosample
-        #TODO remove comment below if reworking works
-        '''if sample.get("sampleDerivedFrom", ""):
-            sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
-            tag = ET.SubElement(sample_attribute, 'TAG')
-            tag.text = 'sample derived from'
-            value = ET.SubElement(sample_attribute, 'VALUE')
-            value.text = sample.get("sampleDerivedFrom", "")
-        elif sample.get("sampleSameAs", ""):
-            sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
-            tag = ET.SubElement(sample_attribute, 'TAG')
-            tag.text = 'sample same as'
-            value = ET.SubElement(sample_attribute, 'VALUE')
-            value.text = sample.get("sampleSameAs", "")
-        elif sample.get("sampleSymbiontOf", ""):
-            sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
-            tag = ET.SubElement(sample_attribute, 'TAG')
-            tag.text = 'sample symbiont of'
-            value = ET.SubElement(sample_attribute, 'VALUE')
-            value.text = sample.get("SampleSymbiontOf", "")'''
-        # adding project name field (ie copo profile name)
-        # validating against DTOL checklist
+
         sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
         tag = ET.SubElement(sample_attribute, 'TAG')
         tag.text = 'project name'
         value = ET.SubElement(sample_attribute, 'VALUE')
-        value.text = project  # Profile().get_record(sample["profile_id"])["title"]
+        value.text = project
         #if project is ASG add symbiont
         if project == "ASG":
             sample_attribute = ET.SubElement(sample_attributes, 'SAMPLE_ATTRIBUTE')
