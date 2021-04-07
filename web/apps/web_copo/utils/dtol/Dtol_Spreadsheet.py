@@ -331,6 +331,12 @@ class DtolSpreadsheet:
                                action="info",
                                html_id="sample_info")
 
+            #change fields for symbiont
+            if s["SYMBIONT"] == "SYMBIONT":
+                s["ORGANISM_PART"] = "WHOLE_ORGANISM"
+                #if ASG change also sex to not collected
+                if s["tol_project"] == "ASG":
+                    s["SEX"] = "NOT_COLLECTED"
             s = make_target_sample(s)
             sampl = Sample(profile_id=self.profile_id).save_record(auto_fields={}, **s)
             Sample().timestamp_dtol_sample_created(sampl["_id"])
