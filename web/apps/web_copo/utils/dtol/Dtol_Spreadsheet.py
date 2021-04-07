@@ -368,6 +368,7 @@ class DtolSpreadsheet:
                            action="info",
                            html_id="sample_info")
 
+    '''
     def add_from_symbiont_list(self, s):
         for idx, el in enumerate(self.symbiont_list):
             if el.get("RACK_OR_PLATE_ID", "") == s.get("RACK_OR_PLATE_ID", "") \
@@ -376,6 +377,7 @@ class DtolSpreadsheet:
                 out.pop("RACK_OR_PLATE_ID")
                 out.pop("TUBE_OR_WELL_ID")
                 Sample().add_symbiont(s, out)
+    '''
 
     def check_for_target_or_add_to_symbiont_list(self, s):
         # method checks if there is an existing target sample to attach this symbiont to. If so we attach, if not,
