@@ -110,6 +110,9 @@ def process_pending_dtol_samples():
                         tolidflag = False
                         break
                     Source().update_public_name(spec_tolid)
+                    sour = Source().get_by_specimen(sam["SPECIMEN_ID"])
+                    assert len(sour) == 1
+                    sour = sour[0]
 
                 build_specimen_sample_xml(sour)
                 build_submission_xml(str(sour['_id']), release=True)
@@ -494,7 +497,7 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
     try:
         receipt = subprocess.check_output(curl_cmd, shell=True)
 
-        #l.log("ENA RECEIPT " + receipt, type=Logtype.FILE)
+        l.log("ENA RECEIPT " + str(receipt), type=Logtype.FILE)
         print(receipt)
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
