@@ -37,12 +37,12 @@ def make_target_sample(sample):
         sample["species_list"] = list()
     out = dict()
     symbiont = sample.pop("SYMBIONT")
-    if symbiont not in ["SYMBIONT", "TARGET"]:
+    if symbiont.upper() not in ["SYMBIONT", "TARGET"]:
         if symbiont:
-            out["SYMBIONT_SOP2.2"] = symbiont
+            out["SYMBIONT_SOP2dot2"] = symbiont
         symbiont = "TARGET"
 
-    out["SYMBIONT"] = symbiont
+    out["SYMBIONT"] = symbiont.upper()
     out["TAXON_ID"] = sample.pop("TAXON_ID")
     out["ORDER_OR_GROUP"] = sample.pop("ORDER_OR_GROUP")
     out["FAMILY"] = sample.pop("FAMILY")
