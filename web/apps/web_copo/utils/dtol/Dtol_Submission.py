@@ -23,8 +23,8 @@ with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
 
 #logger = get_task_logger(__name__)
-
-exclude_from_sample_xml = []
+l = logger.Logger("exceptions_and_logging/logs")
+exclude_from_sample_xml = []  # todo list of keys that shouldn't end up in the sample.xml file
 ena_service = resolve_env.get_env('ENA_SERVICE')
 
 #public_name_service = resolve_env.get_env('PUBLIC_NAME_SERVICE')
@@ -70,6 +70,7 @@ def process_pending_dtol_samples():
                 #this is to speed up source public id call
                 targetsam = sam
             print(type(sam['public_name']), sam['public_name'])
+
             if not sam["public_name"]:
                 try:
                     if issymbiont == "TARGET":
@@ -140,7 +141,9 @@ def process_pending_dtol_samples():
                         tolidflag = False
                         break
                     Source().update_public_name(spec_tolid[0])
-                    sour = Source().get_by_specimen(sam["SPECIMEN_ID"])[0]
+                    sour = Source().get_by_specimen(sam["SPECIMEN_ID"])
+                    assert len(sour) == 1
+                    sour = sour[0]
 
                 build_specimen_sample_xml(sour)
                 build_submission_xml(str(sour['_id']), release=True)
@@ -577,8 +580,8 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
 
     try:
         receipt = subprocess.check_output(curl_cmd, shell=True)
-        l = logger.Logger("exceptions_and_logging/logs")
-        l.log(receipt, type=Logtype.FILE)
+
+        l.log("ENA RECEIPT " + str(receipt), type=Logtype.FILE)
         print(receipt)
     except Exception as e:
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(

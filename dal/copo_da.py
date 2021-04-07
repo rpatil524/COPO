@@ -626,10 +626,11 @@ class Source(DAComponent):
                     field: value}
             })
 
-    def update_public_name(self, name):
-        self.get_collection_handle().update_many(
-            {"SPECIMEN_ID": name['specimen']["specimenId"], "TAXON_ID": str(name['species']["taxonomyId"])},
-            {"$set": {"public_name": name.get("tolId", "")}})
+    def update_public_name(self, n):
+        for name in n:
+            self.get_collection_handle().update_many(
+                {"SPECIMEN_ID": name['specimen']["specimenId"], "TAXON_ID": str(name['species']["taxonomyId"])},
+                {"$set": {"public_name": name.get("tolId", "")}})
 
 
 class Sample(DAComponent):
