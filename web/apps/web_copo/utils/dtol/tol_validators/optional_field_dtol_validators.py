@@ -139,7 +139,7 @@ class DtolEnumerationValidator(TolValidtor):
                                 if not re.match(specimen_regex, c.strip()):
                                     self.errors.append(msg["validation_msg_error_specimen_regex"] % (
                                         c, header, str(cellcount + 1), "PARTNER", current_partner,
-                                        lookup.SPECIMEN_PREFIX["GAL"].get(current_partner, "XXX")
+                                        lookup.SPECIMEN_PREFIX["PARTNER"].get(current_partner, "XXX")
                                     ))
                                     self.flag = False
                         # if TISSUE_REMOVED_FOR_BARCODING is not YES, the barcoding columns will be overwritten
