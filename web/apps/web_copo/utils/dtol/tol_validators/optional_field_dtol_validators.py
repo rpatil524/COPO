@@ -125,11 +125,11 @@ class DtolEnumerationValidator(TolValidtor):
                                 current_gal = self.data.at[cellcount - 1, "GAL"]
                                 specimen_regex = re.compile(lookup.SPECIMEN_PREFIX["GAL"].get(current_gal,
                                                                                               "") + '[\d\-_]')
-                                # TODO make this more specific for each gal
                                 if not re.match(specimen_regex, c.strip()):
-                                    self.errors.append(msg["validation_msg_error_specimen_regex"] % (
+                                    self.errors.append(msg["validation_msg_error_specimen_regex_dtol"] % (
                                         c, header, str(cellcount + 1), "GAL", current_gal,
-                                        lookup.SPECIMEN_PREFIX["GAL"].get(current_gal, "XXX")
+                                        lookup.SPECIMEN_PREFIX["GAL"].get(current_gal, "XXX"),
+                                        lookup.SPECIMEN_SUFFIX["GAL"].get(current_gal, "XXX")
                                     ))
                                     self.flag = False
                             elif "ASG" in p_type:
