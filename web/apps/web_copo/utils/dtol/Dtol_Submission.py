@@ -60,7 +60,7 @@ def process_pending_dtol_samples():
         public_name_list = list()
         for s_id in submission["dtol_samples"]:
             sam = Sample().get_record(s_id)
-            issymbiont = sam["species_list"][0].get("SYMBIONT", "target")
+            issymbiont = sam["species_list"][0].get("SYMBIONT", "TARGET")
             if issymbiont == "SYMBIONT":
                 targetsam = Sample().get_target_by_specimen_id(sam["SPECIMEN_ID"])
                 assert targetsam
