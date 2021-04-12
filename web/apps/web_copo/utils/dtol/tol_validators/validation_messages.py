@@ -60,6 +60,9 @@ MESSAGES = {
     "validation_msg_error_specimen_regex": "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row"
                                            " <strong>%s</strong>. Expected format for %s <strong>%s</strong> is <strong>"
                                            "%s</strong> followed by 7 digits.",
+    "validation_msg_error_specimen_regex_dtol": "Invalid data: <strong>%s</strong> in column <strong>%s</strong> at row"
+                                           " <strong>%s</strong>. Expected format for %s <strong>%s</strong> is <strong>"
+                                           "%s</strong> followed by <strong>%s</strong>.",
     "validation_msg_warning_barcoding": "Warning: Overwriting PLATE_ID_FOR_BARCODING, "
                                         "TUBE_OR_WELL_ID_FOR_BARCODING, TISSUE_FOR_BARCODING and BARCODE_PLATE_PRESERVATIVE"
                                         "at row <strong>%s</strong> because TISSUE_REMOVED_FOR_BARCODING is <strong>%s</strong>"
