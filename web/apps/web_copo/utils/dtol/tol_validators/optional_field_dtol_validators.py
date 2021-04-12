@@ -1,6 +1,6 @@
 import re
 
-from dal.copo_da import Profile
+from dal.copo_da import Profile, Sample
 from submission.helpers.generic_helper import notify_dtol_status
 from web.apps.web_copo.lookup import dtol_lookups as lookup
 from web.apps.web_copo.utils.dtol.Dtol_Helpers import validate_date
@@ -142,8 +142,10 @@ class DtolEnumerationValidator(TolValidtor):
                                         lookup.SPECIMEN_PREFIX["PARTNER"].get(current_partner, "XXX")
                                     ))
                                     self.flag = False
+                            # TODO check if SPECIMEN_ID in db, if it is check it refers to the same TAXON_ID if target
+
                         # if TISSUE_REMOVED_FOR_BARCODING is not YES, the barcoding columns will be overwritten
-                        if header == "TISSUE_REMOVED_FOR_BARCODING" and c.strip() != "Y":
+                        elif header == "TISSUE_REMOVED_FOR_BARCODING" and c.strip() != "Y":
                             barcoding_flag = True
                             for barfield in barcoding_fields:
                                 if self.data.at[cellcount - 1, barfield] != "NOT_APPLICABLE":
