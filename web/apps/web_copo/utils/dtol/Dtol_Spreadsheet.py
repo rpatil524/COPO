@@ -326,6 +326,14 @@ class DtolSpreadsheet:
         public_name_list = list()
         for p in range(1, len(sample_data)):
             s = (map_to_dict(sample_data[0], sample_data[p]))
+            # store manifest version for posterity. If unknown store as 0
+            if "asg" in self.type.lower():
+                s["manifest_version"] = settings.CURRENT_ASG_VERSION
+            elif "dtol" in self.type.lower():
+                s["manifest_version"] = settings.CURRENT_DTOL_VERSION
+            else:
+                s["manifest_version"] = 0
+
             s["sample_type"] = self.type.lower()
             s["tol_project"] = self.type
             s["biosample_accession"] = []
@@ -380,6 +388,7 @@ class DtolSpreadsheet:
                            action="info",
                            html_id="sample_info")
 
+    '''
     def add_from_symbiont_list(self, s):
         for idx, el in enumerate(self.symbiont_list):
             if el.get("RACK_OR_PLATE_ID", "") == s.get("RACK_OR_PLATE_ID", "") \
@@ -388,6 +397,7 @@ class DtolSpreadsheet:
                 out.pop("RACK_OR_PLATE_ID")
                 out.pop("TUBE_OR_WELL_ID")
                 Sample().add_symbiont(s, out)
+    '''
 
     def check_for_target_or_add_to_symbiont_list(self, s):
         # method checks if there is an existing target sample to attach this symbiont to. If so we attach, if not,
