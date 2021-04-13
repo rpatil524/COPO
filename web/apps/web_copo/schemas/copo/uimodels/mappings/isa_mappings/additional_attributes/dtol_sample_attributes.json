@@ -1614,6 +1614,29 @@
     "control_meta": {},
     "dwc": "",
     "versions": [
+      "manifest_version"
+    ],
+    "specifications": [
+      "dtol",
+      "asg"
+    ],
+    "ref": "",
+    "deprecated": false,
+    "hidden": "true",
+    "label": "TOL Project",
+    "show_in_form": false,
+    "id": "copo.sample.manifest_version",
+    "type": "string",
+    "show_in_table": true,
+    "control": "text",
+    "default_value": ""
+  },
+  {
+    "help_tip": "",
+    "required": "false",
+    "control_meta": {},
+    "dwc": "",
+    "versions": [
       "public_name"
     ],
     "specifications": [
