@@ -326,6 +326,14 @@ class DtolSpreadsheet:
         public_name_list = list()
         for p in range(1, len(sample_data)):
             s = (map_to_dict(sample_data[0], sample_data[p]))
+            # store manifest version for posterity. If unknown store as 0
+            if "asg" in self.type.lower():
+                s["manifest_version"] = settings.CURRENT_ASG_VERSION
+            elif "dtol" in self.type.lower():
+                s["manifest_version"] = settings.CURRENT_DTOL_VERSION
+            else:
+                s["manifest_version"] = 0
+
             s["sample_type"] = self.type.lower()
             s["tol_project"] = self.type
             s["biosample_accession"] = []
