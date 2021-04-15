@@ -79,5 +79,9 @@ MESSAGES = {
     "validation_msg_multiple_targets_with_same_id": "Multiple Targets found for RACK_OR_PLATE_ID/TUBE_OR_WELL_ID: "
                                                     "<strong>%s</strong>",
     "validation_msg_orphaned_symbiont": "Sybiont(s) found with TUBE_OR_WELL_ID: <strong>%s</strong> has no associated "
-                                        "Target"
+                                        "Target",
+    "validation_message_wrong_specimen_taxon_pair" : "Invalid SPECIMEN_ID and TAXON pair: at row <strong>%s</strong>, "
+                                                       "SPECIMEN_ID <strong>%s</strong> has already been used for "
+                                                     "a specimen with TAXON_ID "
+                                                       "<strong>%s</strong>"
 }

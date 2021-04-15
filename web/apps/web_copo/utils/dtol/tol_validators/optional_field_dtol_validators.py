@@ -12,6 +12,7 @@ class DtolEnumerationValidator(TolValidtor):
 
     def validate(self):
         whole_used_specimens = set()
+        manifest_specimen_taxon_pairs = {}
         regex_human_readable = ""
         p_type = Profile().get_type(profile_id=self.profile_id)
         barcoding_fields = ["PLATE_ID_FOR_BARCODING", "TUBE_OR_WELL_ID_FOR_BARCODING",
@@ -142,7 +143,26 @@ class DtolEnumerationValidator(TolValidtor):
                                         lookup.SPECIMEN_PREFIX["PARTNER"].get(current_partner, "XXX")
                                     ))
                                     self.flag = False
-                            # TODO check if SPECIMEN_ID in db, if it is check it refers to the same TAXON_ID if target
+                            #only do this if this is target
+                            if self.data.at[cellcount - 1, "SYMBIONT"].strip().upper() != "SYMBIONT":
+                                #check if SPECIMEN_ID in db, if it is check it refers to the same TAXON_ID if target
+                                existing_samples = Sample().get_target_by_specimen_id(c.strip())
+                                if existing_samples:
+                                    for exsam in existing_samples:
+                                        if exsam["species_list"][0]["TAXON_ID"] != self.data.at[cellcount -1, "TAXON_ID"]:
+                                            self.errors.append(msg["validation_message_wrong_specimen_taxon_pair"] % (
+                                                str(cellcount + 1), c.strip(), exsam["species_list"][0]["TAXON_ID"]
+                                            ))
+                                            self.flag = False
+                                #check the same in spreadsheet
+                                if c.strip() in manifest_specimen_taxon_pairs:
+                                    if manifest_specimen_taxon_pairs[c.strip()] != self.data.at[cellcount -1, "TAXON_ID"]:
+                                        self.errors.append(msg["validation_message_wrong_specimen_taxon_pair"] % (
+                                                str(cellcount + 1), c.strip(), manifest_specimen_taxon_pairs[c.strip()]
+                                            ))
+                                        self.flag = False
+                                else:
+                                    manifest_specimen_taxon_pairs[c.strip()] = self.data.at[cellcount -1, "TAXON_ID"]
 
                         # if TISSUE_REMOVED_FOR_BARCODING is not YES, the barcoding columns will be overwritten
                         elif header == "TISSUE_REMOVED_FOR_BARCODING" and c.strip() != "Y":
