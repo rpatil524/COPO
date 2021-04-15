@@ -1275,7 +1275,7 @@
   },
   {
     "help_tip": "",
-    "required": "false",
+    "required": "true",
     "control_meta": {},
     "dwc": "",
     "versions": [
