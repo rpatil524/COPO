@@ -154,11 +154,13 @@ class DtolEnumerationValidator(TolValidtor):
                                                 str(cellcount + 1), c.strip(), exsam["species_list"][0]["TAXON_ID"]
                                             ))
                                             self.flag = False
+                                            break
                                 #check the same in spreadsheet
                                 if c.strip() in manifest_specimen_taxon_pairs:
                                     if manifest_specimen_taxon_pairs[c.strip()] != self.data.at[cellcount -1, "TAXON_ID"]:
                                         self.errors.append(msg["validation_message_wrong_specimen_taxon_pair"] % (
-                                                str(cellcount + 1), c.strip(), manifest_specimen_taxon_pairs[c.strip()]
+                                                str(cellcount + 1), c.strip(), manifest_specimen_taxon_pairs[c.strip()]+
+                                                " in this manifest"
                                             ))
                                         self.flag = False
                                 else:
