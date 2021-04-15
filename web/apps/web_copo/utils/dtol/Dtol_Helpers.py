@@ -59,7 +59,7 @@ def check_taxon_ena_submittable(taxon):
             try:
                 errors.append(
                     "ENA returned - " + taxinfo.get("error", "no error returned") + " - for TAXON_ID " + taxon)
-            except NameError:
+            except (NameError, AttributeError):
                 errors.append(
                     "ENA returned - " + receipt.decode("utf-8") + " - for TAXON_ID " + taxon)
         else:
