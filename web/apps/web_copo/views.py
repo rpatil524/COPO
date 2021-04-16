@@ -1,7 +1,7 @@
 import os
 import shutil
 import uuid
-
+import pandas
 import requests
 from allauth.account.forms import LoginForm
 from allauth.socialaccount.models import SocialAccount
@@ -14,7 +14,7 @@ from django.shortcuts import render
 from jsonpickle import encode
 from pexpect import run
 from rauth import OAuth2Service
-
+from io import StringIO
 import web.apps.web_copo.templatetags.html_tags as htags
 from api.handlers.general import *
 from dal import cursor_to_list
@@ -49,14 +49,28 @@ def login(request):
     }
     return render(request, 'copo/auth/login.html', context)
 
+
 def test_view(request):
-    return render(request, "copo/test_1.html")
+    r = requests.get("https://copo-project.org/api/stats/combined_stats_csv")
+    stats = dict()
+    if r.status_code == 200:
+        data = r.content
+        data = StringIO(data.decode("utf-8"))
+        df = pandas.read_csv(data)
+        stats["datafiles"] = df[["date", "datafiles"]].to_csv(index=False)
+        stats["samples"] = df[["date", "samples"]].to_csv(index=False)
+        stats["profiles"] = df[["profiles", "date"]].to_csv(index=False)
+        stats["users"] = df[["users", "date"]].to_csv(index=False)
+
+    return render(request, context={"stats": json.dumps(stats)}, template_name="copo/test_1.html")
+
 
 '''
 def test_submission(request):
     delegate_submission(request)
     return render(request, 'copo/copo_annotate_pdf.html', {})
 '''
+
 
 @login_required
 def copo_repository(request, profile_id):
@@ -75,7 +89,6 @@ def authenticate_figshare(request):
                   {'message': 'COPO needs permission to submit to Figshare on your behalf.<br/>' +
                               'Please sign into Figshare and try again.',
                    'control': HTML_TAGS['oauth_required']})
-
 
 
 def test_dataverse_submit(request):
@@ -108,10 +121,8 @@ def view_templates(request, profile_id):
     return render(request, 'copo/metadata_templates.html', {'profile_id': profile_id, 'profile': profile})
 
 
-
 @login_required
 def author_template(request, template_id):
-
     record = MetadataTemplate().get_by_id(template_id)
     context = {"template_name": record["template_name"], "template_id": template_id}
     return render(request, "copo/author_metadata_template.html", context)
@@ -132,10 +143,12 @@ def copo_people(request, profile_id):
 
     return render(request, 'copo/copo_people.html', {'profile_id': profile_id, 'profile': profile})
 
+
 @login_required
 def copo_repositories(request):
     user = request.user.id
     return render(request, 'copo/my_repositories.html')
+
 
 @login_required
 def copo_samples(request, profile_id):
@@ -144,9 +157,11 @@ def copo_samples(request, profile_id):
     groups = group_functions.get_group_membership_asString()
     return render(request, 'copo/copo_sample.html', {'profile_id': profile_id, 'profile': profile, 'groups': groups})
 
+
 @login_required
 def copo_sample_accept_reject(request):
     return render(request, 'copo/copo_sample_accept_reject.html', {})
+
 
 @login_required()
 def annotate_meta(request, file_id):
@@ -178,7 +193,7 @@ def annotate_meta(request, file_id):
             with open(os.path.join(full_path, "index.html"), 'r') as f:
                 html = f.read()
             shutil.rmtree(full_path)
-            #request.session["annotation_html"] = html
+            # request.session["annotation_html"] = html
         else:
             print("using session text data")
             html = request.session["annotation_html"]
