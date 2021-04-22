@@ -922,7 +922,7 @@ class Submission(DAComponent):
                                                 {"dtol_samples": 1, "dtol_status": 1, "profile_id": 1,
                                                  "date_modified": 1})
         sub = cursor_to_list(sub)
-        out = list()
+        return sub
 
     def get_incomplete_submissions_for_user(self, user_id, repo):
         doc = self.get_collection_handle().find(
