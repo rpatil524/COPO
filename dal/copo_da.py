@@ -1501,6 +1501,9 @@ class DataFile(DAComponent):
                                                                                         "column_idx": str(col_idx)}}})
         return docs
 
+    def get_num_pending_samples(self, sub_id):
+        doc = self.get_collection_handle().find_one({"_id", ObjectId(sub_id)})
+
 
 class Profile(DAComponent):
     def __init__(self, profile=None):
