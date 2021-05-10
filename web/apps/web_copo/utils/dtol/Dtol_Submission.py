@@ -568,6 +568,7 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
         l.log("ENA RECEIPT " + str(receipt), type=Logtype.FILE)
         print(receipt)
     except Exception as e:
+        l.log("Curl Error " + str(e), type=Logtype.FILE)
         message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
             pass_word, "xxxxxx")
         notify_dtol_status(data={"profile_id": profile_id}, msg=message, action="error",
@@ -580,6 +581,7 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
     try:
         tree = ET.fromstring(receipt)
     except ET.ParseError as e:
+        l.log("Unrecognized response from ENA " + str(e), type=Logtype.FILE)
         message = " Unrecognized response from ENA - " + str(
             receipt) + " Please try again later, if it persists contact admins"
         notify_dtol_status(data={"profile_id": profile_id}, msg=message, action="error",
@@ -607,6 +609,7 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
                 sampleobj.add_rejected_status(status, sample_id)
 
         # print('error')
+        l.log("Succes False" + str(msg), type=Logtype.FILE)
         return status
     else:
         # retrieve id and update record
