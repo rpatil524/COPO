@@ -128,6 +128,7 @@ def process_pending_dtol_samples():
                     assert len(sour) == 1, "more than one source for SPECIMEN_ID " + sam["SPECIMEN_ID"]
                 except AssertionError:
                     l.log("AssertionError: more than one source for SPECIMEN_ID " + sam["SPECIMEN_ID"], type=Logtype.FILE)
+                    return False
                 sour = sour[0]
                 if not sour['public_name']:
                     #retrieve public name
