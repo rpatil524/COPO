@@ -96,7 +96,8 @@ def process_pending_dtol_samples():
             try:
                 assert len(specimen_sample) <= 1
             except AssertionError:
-                reset_submission_status(submission['_id'])
+                l.log("Multiple sources for SPECIMEN_ID " + sam["SPECIMEN_ID"], type=Logtype.FILE)
+                return False
             specimen_accession = ""
             if specimen_sample:
                 specimen_accession = specimen_sample[0].get("biosampleAccession", "")
@@ -586,10 +587,12 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
                            html_id="dtol_sample_info")
         os.remove(submissionfile)
         os.remove(samplefile)
+
+        reset_submission_status(collection_id)
         return False
         # print(message)
-    finally:
-        reset_submission_status(collection_id)
+
+
 
     try:
         tree = ET.fromstring(receipt)
@@ -601,9 +604,9 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
                            html_id="dtol_sample_info")
         os.remove(submissionfile)
         os.remove(samplefile)
-        return False
-    finally:
         reset_submission_status(collection_id)
+        return False
+
 
     os.remove(submissionfile)
     os.remove(samplefile)
