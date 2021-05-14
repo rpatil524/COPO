@@ -53,8 +53,9 @@ def process_pending_dtol_samples():
         # check if study exist for this submission and/or create one
         profile_id = submission["profile_id"]
         type_submission = submission["type"]
-        if not Submission().get_study(submission['_id']):
-            create_study(submission['profile_id'], collection_id=submission['_id'])
+        #removing study for general case, will be useful for subset of submissions
+        '''if not Submission().get_study(submission['_id']):
+            create_study(submission['profile_id'], collection_id=submission['_id'])'''
         file_subfix = str(uuid.uuid4())  # use this to recover bundle sample file
         build_bundle_sample_xml(file_subfix)
         s_ids = []
@@ -705,7 +706,7 @@ def create_study(profile_id, collection_id):
     submissionfile = "submission_" + profile_id + ".xml"
     build_submission_xml(profile_id, hold=date.today().strftime("%Y-%m-%d"))
 
-    curl_cmd = 'curl -u ' + user_token + ':' + pass_word \
+    curl_cmd = 'curl -u -m 300' + user_token + ':' + pass_word \
                + ' -F "SUBMISSION=@' \
                + submissionfile \
                + '" -F "PROJECT=@' \
