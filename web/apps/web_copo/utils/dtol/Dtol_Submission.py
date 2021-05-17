@@ -176,6 +176,7 @@ def process_pending_dtol_samples():
                 msg="Connection issue - please try resubmit later"
                 notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
                                    html_id="dtol_sample_info")
+                Submission().make_dtol_status_pending(submission['_id'])
                 break
             #set appropriate relationship to specimen level sample
             if issymbiont == "SYMBIONT":
@@ -187,6 +188,15 @@ def process_pending_dtol_samples():
             else:
                 Sample().add_field("sampleDerivedFrom", specimen_accession, sam['_id'])
                 sam["sampleDerivedFrom"] = specimen_accession
+
+            #making sure relationship between sample and specimen level sample is set
+            try:
+                updated_sample = Sample().get_record(sam['_id'])
+                assert any([updated_sample.get("sampleSymbiontOf", ""), updated_sample.get("sampleSameAs", ""), updated_sample.get("sampleDerivedFrom", "")])
+            except AssertionError:
+                l.log("Missing relationship to parent sample for sample " + sam["_id"], type=Logtype.FILE)
+                Submission().make_dtol_status_pending(submission['_id'])
+                return False
 
             notify_dtol_status(data={"profile_id": profile_id}, msg="Adding to Sample Batch: " + sam["SPECIMEN_ID"],
                                action="info",
@@ -593,8 +603,6 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
         return False
         # print(message)
 
-
-
     try:
         tree = ET.fromstring(receipt)
     except ET.ParseError as e:
@@ -607,7 +615,6 @@ def submit_biosample(subfix, sampleobj, collection_id, type="sample"):
         os.remove(samplefile)
         reset_submission_status(collection_id)
         return False
-
 
     os.remove(submissionfile)
     os.remove(samplefile)
