@@ -2,15 +2,15 @@ $(document).ready(function () {
     var label = d3.select(".label");
     // Set the dimensions of the canvas / graph
     var margin = {top: 30, right: 20, bottom: 30, left: 50},
-        width = 800 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
+        width = 500 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
 
     // Parse the date / time
     var parseDate = d3.time.format("%Y-%m-%d").parse;
 
     // Set the ranges
     var x = d3.time.scale().range([0, width]);
-    var y = d3.scale.linear().domain([24000, 28000]).range([height, 0]);
+    var y = d3.scale.linear()
 
     // Define the axes
     var xAxis = d3.svg.axis().scale(x)
@@ -52,6 +52,12 @@ $(document).ready(function () {
             return d.close;
         })]);
         */
+        y.domain([d3.min(data, function (d) {
+                return d.x - 10;
+            }), d3.max(data, function (d) {
+                return d.x + 10;
+            })]
+        ).range([height, 0]);
         // Add the valueline path.
         svg.append("path")
             .datum(data)

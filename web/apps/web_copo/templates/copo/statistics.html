@@ -39,6 +39,13 @@
         fill: steelblue;
     }
 
+    .ul_style {
+        list-style-type: none;
+        padding-left: 0;
+        cursor: pointer;
+    }
+
+
     </style>
 
 
@@ -87,10 +94,20 @@
 
 
 
+    <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-2">
+            <h2 class="h2">COPO Statistics</h2>
 
-    <div id="graph"></div>
+            <ul class="ul_style">
+                <li class="h4">Stats over time</li>
+            </ul>
 
 
+        </div>
+        <div class="col-lg-10 col-md-2 col-sm-10">
+            <div id="graph"></div>
+        </div>
+    </div>
 
     <p class="label">Test</p>
     <!-- load the d3.js library -->

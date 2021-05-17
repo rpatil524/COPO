@@ -50,7 +50,7 @@ def login(request):
     return render(request, 'copo/auth/login.html', context)
 
 
-def test_view(request):
+def stats(request):
     r = requests.get("https://copo-project.org/api/stats/combined_stats_csv")
     stats = dict()
     if r.status_code == 200:
@@ -62,7 +62,7 @@ def test_view(request):
         stats["profiles"] = df[["profiles", "date"]].to_csv(index=False)
         stats["users"] = df[["users", "date"]].to_csv(index=False)
 
-    return render(request, context={"stats": json.dumps(stats)}, template_name="copo/test_1.html")
+    return render(request, context={"stats": json.dumps(stats)}, template_name="copo/statistics.html")
 
 
 '''
