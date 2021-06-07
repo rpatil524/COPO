@@ -20,6 +20,7 @@ from web.apps.web_copo.lookup.lookup import SRA_SUBMISSION_TEMPLATE, SRA_SAMPLE_
 from web.apps.web_copo.utils.dtol.Dtol_Helpers import query_public_name_service
 from bson import ObjectId
 from django_tools.middlewares.ThreadLocal import get_current_request
+import re
 
 with open(settings, "r") as settings_stream:
     sra_settings = json.loads(settings_stream.read())["properties"]
@@ -163,11 +164,13 @@ def process_pending_dtol_samples():
                 accessions = submit_biosample(str(sour['_id']), Source(), submission['_id'], type="source")
                 print(accessions)
                 if accessions.get("status", "") == "error":
+                    handle_common_ENA_error(accessions.get("msg", ""))
                     msg = "Submission Rejected: specimen level " + sam["SPECIMEN_ID"] + "<p>" + accessions[
                         "msg"] + "</p>"
                     notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
                                        html_id="dtol_sample_info")
-                    break
+                    Submission().make_dtol_status_pending(submission['_id'])
+                    return False
                 specimen_accession = Source().get_specimen_biosample(sam["SPECIMEN_ID"])[0].get("biosampleAccession",
                                                                                                 "")
 
@@ -764,6 +767,88 @@ def create_study(profile_id, collection_id):
         notify_dtol_status(data={"profile_id": profile_id}, msg=msg, action="info",
                            html_id="dtol_sample_info")
 
+def handle_common_ENA_error(error_to_parse):
+
+    if "The object being added already exists in the submission account with accession" in error_to_parse:
+        #catch alias and accession
+        pattern_accession = "ERS\d{7}"
+        accession = re.search(pattern_accession, error_to_parse).group()
+    else:
+        return False
+
+    curl_cmd = 'curl -m 300 -u ' + user_token + ':' + pass_word \
+               + ' ' + ena_service \
+               + accession
+    try:
+        registered_sample = subprocess.check_output(curl_cmd, shell = True)
+        l.log("ENA RECEIPT REGISTERED SAMPLE for sample " + accession + " " + str(registered_sample), type=Logtype.FILE)
+    except Exception as e:
+        l.log("General Error " + str(e), type=Logtype.FILE)
+        return False
+
+    try:
+        tree = ET.fromstring(receipt)
+    except ET.ParseError as e:
+        l.log("Unrecognized response from ENA " + str(e), type=Logtype.FILE)
+        return False
+
+    #parsing submitted XML to retrieve accessions
+    tree = ET.ElementTree(tree)
+
+    #on hold
+    '''build_submission_xml(alias, actionxml="RECEIPT", alias=alias)
+
+    submissionfile = "submission_" + str(alias) + ".xml"
+    curl_cmd = 'curl -m 300 -u ' + user_token + ':' + pass_word \
+               + ' -F "SUBMISSION=@' \
+               + submissionfile \
+               + '" "' + ena_service \
+               + '"'
+
+    try:
+        receipt = subprocess.check_output(curl_cmd, shell=True)
+
+        l.log("ENA RECEIPT " + str(receipt), type=Logtype.FILE)
+        print(receipt)
+    except Exception as e:
+        l.log("General Error " + str(e), type=Logtype.FILE)
+        message = 'API call error ' + "Submitting project xml to ENA via CURL. CURL command is: " + curl_cmd.replace(
+            pass_word, "xxxxxx")
+        notify_dtol_status(data={"profile_id": profile_id}, msg=message, action="error",
+                           html_id="dtol_sample_info")
+        os.remove(submissionfile)
+        return False
+
+    try:
+        tree = ET.fromstring(receipt)
+    except ET.ParseError as e:
+        l.log("Unrecognized response from ENA " + str(e), type=Logtype.FILE)
+        message = " Unrecognized response from ENA - " + str(
+            receipt) + " Please try again later, if it persists contact admins"
+        notify_dtol_status(data={"profile_id": profile_id}, msg=message, action="error",
+                           html_id="dtol_sample_info")
+        os.remove(submissionfile)
+        return False
+
+    os.remove(submissionfile)
+    success_status = tree.get('success')
+    if success_status == 'false':
+
+        msg = ""
+        error_blocks = tree.find('MESSAGES').findall('ERROR')
+        for error in error_blocks:
+            msg += error.text + "<br>"
+        if not msg:
+            msg = "Undefined error"
+        status = {"status": "error", "msg": msg}
+
+        # print('error')
+        l.log("Success False" + str(msg), type=Logtype.FILE)
+        return status
+    else:
+        # retrieve id and update record
+        # return get_biosampleId(receipt, sample_id, collection_id)
+        return get_bundle_biosampleId(receipt, collection_id, type)'''
 
 '''def query_public_name_service(sample_list):
     headers = {"api-key": API_KEY}
