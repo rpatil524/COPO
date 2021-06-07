@@ -40,6 +40,6 @@ def samples_stats_csv(request):
     stats = da.cursor_to_list(
         da.handle_dict["stats"].find({}, {"_id": 0, "date": 1, "samples": 1, }).sort('date', pymongo.ASCENDING))
     df = pandas.DataFrame(stats, index=None)
-    df = df.rename(columns={"samples": "close"})
+    df = df.rename(columns={"samples": "num"})
     x = df.to_json(orient="records")
     return HttpResponse(x, content_type="text/json")

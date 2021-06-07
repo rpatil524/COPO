@@ -51,18 +51,8 @@ def login(request):
 
 
 def stats(request):
-    r = requests.get("https://copo-project.org/api/stats/combined_stats_csv")
-    stats = dict()
-    if r.status_code == 200:
-        data = r.content
-        data = StringIO(data.decode("utf-8"))
-        df = pandas.read_csv(data)
-        stats["datafiles"] = df[["date", "datafiles"]].to_csv(index=False)
-        stats["samples"] = df[["date", "samples"]].to_csv(index=False)
-        stats["profiles"] = df[["profiles", "date"]].to_csv(index=False)
-        stats["users"] = df[["users", "date"]].to_csv(index=False)
 
-    return render(request, context={"stats": json.dumps(stats)}, template_name="copo/statistics.html")
+    return render(request, context={}, template_name="copo/statistics.html")
 
 
 '''

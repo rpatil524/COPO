@@ -5,10 +5,7 @@
 
 
 {% block stylesheet_block %}
-    <link rel="stylesheet" href="{% static 'copo/css/copo/browse_style.css' %}" xmlns="http://www.w3.org/1999/html">
 
-    <script src="https://d3js.org/d3.v6.min.js"></script>
-    <script href="js/graphing.js"></script>
     <style> /* set the CSS */
 
     body {
@@ -110,10 +107,7 @@
     </div>
 
     <p class="label">Test</p>
-    <!-- load the d3.js library -->
-    <script src="http://d3js.org/d3.v3.min.js"></script>
 
-    <script href="{% static '/assets/js/graphing.js' %}"></script>
 
 
 {% endblock %}
@@ -121,8 +115,10 @@
 
 {% block js_block %}
 
-    <script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"
+            integrity="sha512-FHsFVKQ/T1KWJDGSbrUhTJyS1ph3eRrxI228ND0EGaEp6v4a/vGwPWd3Dtd/+9cI7ccofZvl/wulICEurHN1pg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
 
-    </script>
-    <script src="{% static 'assets/js/graphing.js' %}"></script>
+    <script src="{% static 'copo/js/graphing.js' %}" defer></script>
+
 {% endblock %}
