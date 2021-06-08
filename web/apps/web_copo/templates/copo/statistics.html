@@ -1,0 +1,95 @@
+{% extends 'copo/base_1col.html' %}
+
+{% load static %}
+{% load web_tags %}
+
+
+{% block stylesheet_block %}
+
+    <style> /* set the CSS */
+    .ul_style {
+        list-style-type: none;
+        padding-left: 0;
+        cursor: pointer;
+    }
+
+
+    </style>
+
+
+{% endblock %}
+
+
+
+
+
+
+{% block title_block %} Index {% endblock %}
+
+{% block tagline_block %}
+
+
+
+{% endblock %}
+
+{% block page_banner %}
+    <!--
+    <div class="page-header warning-banner">
+        <div class="icon">
+            <i class="fa fa-cloud-upload fa-4x"></i>
+        </div>
+        <div class="resume-text">
+            <h3 class="h3">Resume Submission?</h3>
+            It looks like you were in the middle of a submission. <a href="http://www.google.com"> Click here to resume</a>
+        </div>
+
+    </div>
+    -->
+{% endblock %}
+
+
+{% block breadcrumb_block %}
+
+{% endblock %}
+
+{% block browse_header_block %}
+
+
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+
+
+
+    <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-2">
+            <h2 class="h2">COPO Statistics</h2>
+
+            <ul class="ul_style">
+                <li class="h4">Stats over time</li>
+            </ul>
+
+
+        </div>
+        <div class="col-lg-10 col-md-2 col-sm-10">
+            <div id="graph" align="center"></div>
+        </div>
+    </div>
+
+    <p class="label">Test</p>
+
+
+
+{% endblock %}
+
+
+{% block js_block %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"
+            integrity="sha512-FHsFVKQ/T1KWJDGSbrUhTJyS1ph3eRrxI228ND0EGaEp6v4a/vGwPWd3Dtd/+9cI7ccofZvl/wulICEurHN1pg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+
+    <script src="{% static 'copo/js/graphing.js' %}" defer></script>
+
+{% endblock %}

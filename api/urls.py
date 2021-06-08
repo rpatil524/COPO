@@ -50,8 +50,10 @@ stats_api_patterns = [
             name='get_number_of_profiles'),
     re_path(r'stats/number_of_datafiles', stats.get_number_of_datafiles,
             name='get_number_of_datafiles'),
-    re_path(r'stats/combined_stats_csv', stats.combined_stats_csv,
+    re_path(r'stats/combined_stats_json', stats.combined_stats_json,
             name='combined_stats_csv'),
+    re_path(r'stats/sample_stats_csv', stats.samples_stats_csv,
+            name='samples_stats_csv'),
 ]
 
 urlpatterns = generic_api_patterns + dtol_api_patterns + stats_api_patterns
