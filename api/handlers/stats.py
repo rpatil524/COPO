@@ -30,10 +30,10 @@ def get_number_of_datafiles(request):
     return HttpResponse(number)
 
 
-def combined_stats_csv(request):
+def combined_stats_json(request):
     stats = da.cursor_to_list(da.handle_dict["stats"].find({}, {"_id": 0}).sort('date', pymongo.DESCENDING))
     df = pandas.DataFrame(stats, index=None)
-    return HttpResponse(df.to_csv(index=False))
+    return HttpResponse(df.reset_index().to_json(orient='records'))
 
 
 def samples_stats_csv(request):
