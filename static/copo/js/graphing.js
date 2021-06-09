@@ -9,11 +9,11 @@ async function draw_line_graph() {
 
     let dimensions = {
         width: window.innerWidth * 0.3,
-        height: window.innerHeight * 0.45,
+        height: window.innerHeight * 0.7,
         margin: {
-            top: 15,
+            top: 30,
             right: 15,
-            bottom: 40,
+            bottom: 100,
             left: 60,
         },
     }
@@ -47,10 +47,11 @@ async function draw_line_graph() {
         const yScale = d3.scaleLinear()
             .domain(d3.extent(dataset, yAccessor))
             .range([dimensions.boundedHeight, 0])
+            .nice()
         const xScale = d3.scaleTime()
             .domain(d3.extent(dataset, xAccessor))
             .range([0, dimensions.boundedWidth])
-
+            .nice()
         //draw
         const lineGenerator = d3.line()
             .x(d => xScale(xAccessor(d)))
@@ -68,25 +69,35 @@ async function draw_line_graph() {
             .append("circle")
             .attr("cx", d => xScale(xAccessor(d)))
             .attr("cy", d => yScale(yAccessor(d)))
-            .attr("r", 3)
-            .attr("fill", "steelblue")
+            .attr("r", 1)
+            .attr("fill", "white")
 
         // Draw peripherals
 
         const yAxisGenerator = d3.axisLeft()
             .scale(yScale)
+            .ticks(10, ",d")
+
 
         const yAxis = bounds.append("g")
             .call(yAxisGenerator)
 
+
         const xAxisGenerator = d3.axisBottom()
             .scale(xScale)
+            .tickFormat(d3.timeFormat("%Y-%m-%d"))
+
 
         const xAxis = bounds.append("g")
             .call(xAxisGenerator)
             .style("transform", `translateY(${
                 dimensions.boundedHeight
             }px)`)
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");
 
         const yAxisLabel = yAxis.append("text")
             .attr("x", -dimensions.boundedHeight / 2)
