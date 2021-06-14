@@ -3,18 +3,16 @@ async function draw_line_graph() {
     const dataset = await d3.json("/api/stats/combined_stats_json")
     // accessors
     console.log(dataset)
-    const yAccessor = d => d.users
-    const dateParser = d3.timeParse("%Y-%m-%d")
-    const xAccessor = d => dateParser(d.date)
+
 
     let dimensions = {
-        width: window.innerWidth * 0.3,
+        width: $("#graph").innerWidth() * 0.7,
         height: window.innerHeight * 0.7,
         margin: {
             top: 30,
             right: 15,
             bottom: 100,
-            left: 60,
+            left: 100,
         },
     }
     dimensions.boundedWidth = dimensions.width
@@ -25,24 +23,47 @@ async function draw_line_graph() {
         - dimensions.margin.bottom
 
 
-    const draw_line = metric => {
+    //Draw canvas
+    const wrapper = d3.select("#graph")
+        .append("svg")
+        .attr("width", dimensions.width)
+        .attr("height", dimensions.height)
+
+    const bounds = wrapper.append("g")
+        .style("transform", `translate(${
+            dimensions.margin.left
+        }px, ${
+            dimensions.margin.top
+        }px)`)
+
+    bounds.append("g")
+        .attr("class", "x-axis")
+        .style("transform", `translateY(${dimensions.boundedHeight}px)`)
+        .append("text")
+        .attr("class", "x-axis-label")
+        .attr("x", dimensions.boundedWidth / 2)
+        .attr("y", dimensions.margin.bottom - 10)
+
+    bounds.append("g").append("path")
+        .attr("class", "line")
+        .style("transform", "none")
+        .style("fill", "none")
+        .style("stroke", "steelblue")
+        .style("stroke-width", "3")
+    bounds.append("g")
+        .attr("class", "y-axis")
+
+    bounds.append("g")
+        .append("text")
+        .attr("class", "y-axis-label")
+
+
+    function update(metric) {
+        console.log(metric)
+        const updateTrans = d3.transition().duration(600).ease(d3.easeSinInOut)
         const yAccessor = d => d[metric]
         const dateParser = d3.timeParse("%Y-%m-%d")
         const xAccessor = d => dateParser(d.date)
-
-        //Draw canvas
-        const wrapper = d3.select("#graph")
-            .append("svg")
-            .attr("width", dimensions.width)
-            .attr("height", dimensions.height)
-
-        const bounds = wrapper.append("g")
-            .style("transform", `translate(${
-                dimensions.margin.left
-            }px, ${
-                dimensions.margin.top
-            }px)`)
-
         // scales
         const yScale = d3.scaleLinear()
             .domain(d3.extent(dataset, yAccessor))
@@ -54,23 +75,32 @@ async function draw_line_graph() {
             .nice()
         //draw
         const lineGenerator = d3.line()
+            .curve(d3.curveMonotoneX)
             .x(d => xScale(xAccessor(d)))
             .y(d => yScale(yAccessor(d)))
 
-        const line = bounds.append("path")
+        const line = bounds.select(".line")
+            .transition(updateTrans)
             .attr("d", lineGenerator(dataset))
-            .attr("fill", "none")
-            .attr("stroke", "cornflowerblue")
-            .attr("stroke-width", 3)
+
 
         let dots = bounds.selectAll("circle")
             .data(dataset)
-            .enter()
+
+        dots.transition()
+            .duration(750)
+            .attr("cx", d => xScale(xAccessor(d)))
+            .attr("cy", d => yScale(yAccessor(d)))
+            .attr("r", 2)
+
+        const old_dots = dots.exit().selectAll("circle").remove()
+        dots.enter()
             .append("circle")
             .attr("cx", d => xScale(xAccessor(d)))
             .attr("cy", d => yScale(yAccessor(d)))
-            .attr("r", 1)
-            .attr("fill", "white")
+            .attr("r", 2)
+            .attr("fill", "black")
+
 
         // Draw peripherals
 
@@ -79,7 +109,8 @@ async function draw_line_graph() {
             .ticks(10, ",d")
 
 
-        const yAxis = bounds.append("g")
+        const yAxis = bounds.select(".y-axis")
+            .transition(updateTrans)
             .call(yAxisGenerator)
 
 
@@ -88,7 +119,8 @@ async function draw_line_graph() {
             .tickFormat(d3.timeFormat("%Y-%m-%d"))
 
 
-        const xAxis = bounds.append("g")
+        const xAxis = bounds.select(".x-axis")
+            .transition(updateTrans)
             .call(xAxisGenerator)
             .style("transform", `translateY(${
                 dimensions.boundedHeight
@@ -99,24 +131,37 @@ async function draw_line_graph() {
             .attr("dy", ".15em")
             .attr("transform", "rotate(-65)");
 
-        const yAxisLabel = yAxis.append("text")
-            .attr("x", -dimensions.boundedHeight / 2)
-            .attr("y", -dimensions.margin.left + 10)
+        const yAxisLabel = bounds.select(".y-axis-label")
+
+
+            .attr("y", 0 - dimensions.margin.left / 2)
+            .attr("x", 0 - dimensions.boundedHeight / 2)
+            .attr("transform", "rotate(-90)")
+
+            .text("number of " + metric)
             .attr("fill", "black")
             .attr("font-size", "1.4em")
-            .text("number of " + metric)
-            .style("transform", "rotate(-90deg)")
             .style("text-anchor", "middle")
+
     }
+
 
     const metrics = [
         "samples",
         "datafiles",
+        "profiles",
         "users",
-        "profiles"
-    ]
 
-    metrics.forEach(draw_line)
+    ]
+    let selectedMetricIndex = 0
+    $(document).on("change", "#changeChartMetric", function () {
+        var val = $(this).children("option:selected").val()
+        var selectedMetricIndex = parseInt(val)
+        update(metrics[selectedMetricIndex])
+    })
+    update(metrics[0])
 }
 
 draw_line_graph()
+
+
