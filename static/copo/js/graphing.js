@@ -149,12 +149,14 @@ async function draw_line_graph() {
     const metrics = [
         "samples",
         "datafiles",
+        "profiles",
         "users",
-        "profiles"
+
     ]
     let selectedMetricIndex = 0
-    $(document).on("click", "#changeChartMetric", function () {
-        selectedMetricIndex = (selectedMetricIndex + 1) % metrics.length
+    $(document).on("change", "#changeChartMetric", function () {
+        var val = $(this).children("option:selected").val()
+        var selectedMetricIndex = parseInt(val)
         update(metrics[selectedMetricIndex])
     })
     update(metrics[0])
