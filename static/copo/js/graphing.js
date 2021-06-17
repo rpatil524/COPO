@@ -60,6 +60,12 @@ async function draw_line_graph() {
 
     function update(metric) {
         console.log(metric)
+        const listeningRect = bounds.append("rect")
+            .attr("class", "listening-rect")
+            .attr("width", dimensions.boundedWidth)
+            .attr("height", dimensions.boundedHeight)
+            .on("mousemove", onMouseMove)
+            .on("mouseleave", onMouseLeave)
         const updateTrans = d3.transition().duration(600).ease(d3.easeSinInOut)
         const yAccessor = d => d[metric]
         const dateParser = d3.timeParse("%Y-%m-%d")
@@ -142,6 +148,58 @@ async function draw_line_graph() {
             .attr("fill", "black")
             .attr("font-size", "1.4em")
             .style("text-anchor", "middle")
+
+        const tooltip = d3.select("#tooltip")
+        const tooltipCircle = bounds.append("circle")
+            .attr("r", 6)
+            .attr("stroke", "white")
+            .attr("fill", "steelblue")
+            .attr("stroke-width", 2)
+            .style("opacity", 0)
+
+        tooltip.select("#metric")
+            .text(metric)
+
+        function onMouseMove(e, datum) {
+            const mousePosition = d3.pointer(e)
+            const hoverDate = xScale.invert(mousePosition[0])
+            const getDistanceFromHoverDate = d => Math.abs(
+                xAccessor(d) - hoverDate
+            )
+            const closestIndex = d3.scan(dataset, (a, b) => (
+                getDistanceFromHoverDate(a) - getDistanceFromHoverDate(b)
+            ))
+            const closestDataPoint = dataset[closestIndex]
+            const closestXValue = xAccessor(closestDataPoint)
+            const closestYValue = yAccessor(closestDataPoint)
+            const formatDate = d3.timeFormat("%B %A %-d, %Y")
+            tooltip.select("#date")
+                .text(formatDate(closestXValue))
+
+            const formatTemp = d => `${d3.format(".1f")(d)}F`
+            tooltip.select("#num_metric")
+                .text(closestYValue)
+
+            const x = xScale(closestXValue) + dimensions.margin.left
+            const y = yScale(closestYValue) + dimensions.margin.top
+
+            tooltip.style("transform", `translate(`
+                + `calc(-50% + ${x}px),`
+                + `calc(-100% + ${y}px)`
+                + `)`
+            )
+            tooltipCircle
+                .attr("cx", xScale(closestXValue))
+                .attr("cy", yScale(closestYValue))
+                .style("opacity", 1)
+            tooltip.style("opacity", "1")
+
+        }
+
+        function onMouseLeave() {
+            tooltip.style("opacity", "0")
+            tooltipCircle.style("opacity", "0")
+        }
 
     }
 
