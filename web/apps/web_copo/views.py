@@ -50,9 +50,12 @@ def login(request):
     return render(request, 'copo/auth/login.html', context)
 
 
-def stats(request):
-
-    return render(request, context={}, template_name="copo/statistics.html")
+def stats(request, view):
+    print(view)
+    if False:
+        return render(request, context={}, template_name="copo/stats/statistics.html")
+    else:
+        return error_page(request)
 
 
 '''
@@ -60,6 +63,10 @@ def test_submission(request):
     delegate_submission(request)
     return render(request, 'copo/copo_annotate_pdf.html', {})
 '''
+
+
+def error_page(request):
+    return render(request, context={}, template_name="copo/error_page.html")
 
 
 @login_required
@@ -530,3 +537,11 @@ def manage_repos(request):
 
 def manage_repositories(request):
     return render(request, 'copo/copo_repository_manage.html', {'request': request})
+
+
+def handler404(request, exception):
+    return error_page(request)
+
+
+def handler500(request):
+    return error_page(request)
