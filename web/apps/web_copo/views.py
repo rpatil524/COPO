@@ -51,11 +51,12 @@ def login(request):
 
 
 def stats(request, view):
-    print(view)
-    if False:
-        return render(request, context={}, template_name="copo/stats/statistics.html")
+    if view == "time_series":
+        return render(request, context={}, template_name="copo/stats/time_series_statistics.html")
+    elif view == "variable_histogram":
+        return render(request, context={}, template_name="copo/stats/variable_histogram_statistics.html")
     else:
-        return error_page(request)
+        return render(request, context={}, template_name="copo/stats/time_series_statistics.html")
 
 
 '''
