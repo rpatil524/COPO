@@ -43,3 +43,6 @@ def samples_stats_csv(request):
     df = df.rename(columns={"samples": "num"})
     x = df.to_json(orient="records")
     return HttpResponse(x, content_type="text/json")
+
+def samples_hist_json(request, metric):
+    return HttpResponse(metric)
