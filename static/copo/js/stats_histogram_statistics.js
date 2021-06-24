@@ -41,19 +41,20 @@ async function drawHist() {
         .attr("y", dimensions.margin.bottom - 10)
 
     async function update(data_url) {
-        console.log(data_url)
+
         const dataset = await d3.json(data_url)
+        console.table(dataset)
         // accessors
-        console.log(dataset)
+
     }
 
     $(document).on("change", "#changeHistMetric", function () {
         var val = $(this).children("option:selected").val()
         //var selectedMetricIndex = parseInt(val)
-        const url = `/api/stats/histogram_metric/GET_${val}`
+        const url = `/api/stats/histogram_metric/${val}`
         update(url)
     })
-    update(`/api/stats/histogram_metric/GET_${$(this).children("option:selected").val()}`)
+    update(`/api/stats/histogram_metric/${$(this).children("option:selected").val()}`)
 }
 
 drawHist()
