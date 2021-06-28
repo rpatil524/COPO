@@ -1,60 +1,76 @@
-async function drawHist() {
+// set the dimensions and margins of the graph
+const margin = {top: 30, right: 30, bottom: 70, left: 60},
+    width = $("#my_dataviz").innerWidth() * 0.7,
+    height = window.innerHeight * 0.7
 
 
-    let dimensions = {
-        width: $("#graph").innerWidth() * 0.7,
-        height: window.innerHeight * 0.7,
-        margin: {
-            top: 30,
-            right: 15,
-            bottom: 100,
-            left: 100,
-        },
-    }
-    dimensions.boundedWidth = dimensions.width
-        - dimensions.margin.left
-        - dimensions.margin.right
-    dimensions.boundedHeight = dimensions.height
-        - dimensions.margin.top
-        - dimensions.margin.bottom
+// append the svg object to the body of the page
+const svg = d3.select("#my_dataviz")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
 
-    //Draw canvas
-    const wrapper = d3.select("#graph")
-        .append("svg")
-        .attr("width", dimensions.width)
-        .attr("height", dimensions.height)
+// A function that create / update the plot for a given variable:
+function update(val) {
 
-    const bounds = wrapper.append("g")
-        .style("transform", `translate(${
-            dimensions.margin.left
-        }px, ${
-            dimensions.margin.top
-        }px)`)
+    const updateTrans = d3.transition().duration(600).ease(d3.easeSinInOut)
+    // Parse the Data
+    d3.json(`/api/stats/histogram_metric/` + val).then(function (data) {
+        // X axis
+        const x = d3.scaleBand()
+            .range([0, width])
+            .domain(data.map(d => d.k))
+            .padding(0.1);
+        svg.append("g")
+            .transition(updateTrans)
+            .attr("transform", `translate(0, ${height})`)
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end");
 
-    bounds.append("g")
-        .attr("class", "x-axis")
-        .style("transform", `translateY(${dimensions.boundedHeight}px)`)
-        .append("text")
-        .attr("class", "x-axis-label")
-        .attr("x", dimensions.boundedWidth / 2)
-        .attr("y", dimensions.margin.bottom - 10)
+        // Add Y axis
+        const yAccessor = function (d) {
+            return d.v
+        }
+        const y = d3.scaleLinear()
+            .domain([0, d3.max(data, yAccessor)])
+            .range([height, 0])
+            .nice()
+        svg.append("g")
+            .transition(updateTrans)
+            .call(d3.axisLeft(y));
 
-    async function update(data_url) {
+        var u = svg.selectAll("rect")
+            .data(data)
+        u.exit().remove()
 
-        const dataset = await d3.json(data_url)
-        console.table(dataset)
-        // accessors
-
-    }
-
-    $(document).on("change", "#changeHistMetric", function () {
-        var val = $(this).children("option:selected").val()
-        //var selectedMetricIndex = parseInt(val)
-        const url = `/api/stats/histogram_metric/${val}`
-        update(url)
+        u
+            .enter()
+            .append("rect")
+            .merge(u)
+            .transition()
+            .duration(1000)
+            .attr("x", function (d) {
+                return x(d.k);
+            })
+            .attr("y", function (d) {
+                return y(d.v);
+            })
+            .attr("width", x.bandwidth())
+            .attr("height", function (d) {
+                return height - y(d.v);
+            })
+            .attr("fill", "#69b3a2")
     })
-    update(`/api/stats/histogram_metric/${$(this).children("option:selected").val()}`)
+
 }
 
-drawHist()
+update("LIFESTAGE")
+$(document).on("change", "#changeHistMetric", function () {
+    var val = $(this).children("option:selected").val()
+    update(val)
+})

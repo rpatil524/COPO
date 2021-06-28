@@ -17,9 +17,9 @@ class Command(BaseCommand):
 
         TestObjectType().get_collection_handle().remove({})
         types = ["ASG", "DTOL", "other"]
-        sexes = ["MALE", "FEMALE", "other"]
-        lifestages = ["egg", "juvenile", "adult"]
-        gals = ["Edinburgh", "Kew", "Earlham"]
+        sexes = ["MALE", "FEMALE", "other", "bipedal", "oversized"]
+        lifestages = ["egg", "juvenile", "adult", "spawn", "kid", "old"]
+        gals = ["Edinburgh", "Kew"]
         for x in range(0, 5000):
             rand = random.randint
             type = types[rand(0, len(types) - 1)]

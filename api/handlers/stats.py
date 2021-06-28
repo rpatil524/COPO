@@ -62,5 +62,7 @@ def samples_hist_json(request, metric):
 
     # now get counts of each value label in dataframe
     u = df[metric].value_counts()
-
-    return HttpResponse(json_util.dumps(u))
+    out = list()
+    for x in u.keys():
+        out.append({"k": x, "v": int(u[x])})
+    return HttpResponse(json_util.dumps(out))
