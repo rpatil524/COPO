@@ -265,6 +265,7 @@ def query_awaiting_tolids():
         l.log("samplelist to go trough is "+str(samplelist), type=Logtype.FILE)
         for samid in samplelist:
             sam = Sample().get_record(samid)
+            l.log("sample is " + str(sam), type=LogType.FILE)
             if not sam["public_name"]:
                 try:
                     public_name_list.append(
@@ -273,24 +274,24 @@ def query_awaiting_tolids():
                 except ValueError:
                     l.log("Value Error" + str(sam), type=Logtype.FILE)
                     return False
-            try:
-                assert len(public_name_list)>0
-            except AssertionError:
-                l.log("Assertion Error in query awaiting tolids", type=Logtype.FILE)
-            public_names = query_public_name_service(public_name_list)
-            #still no response, do nothing
-            #NOTE the query fails even if only one TAXON_ID can't be found
-            if not public_names:
-                l.log("No public names returned", type=Logtype.FILE)
-                return
-            #update samples and set dtol_sattus to pending
-            else:
-                for name in public_names:
-                    if name.get("tolId", ""):
-                        Sample().update_public_name(name)
-                    else:
-                        l.log("Still no tolId identified for " + str(name), type=Logtype.FILE)
-                        return
+        try:
+            assert len(public_name_list)>0
+        except AssertionError:
+            l.log("Assertion Error in query awaiting tolids", type=Logtype.FILE)
+        public_names = query_public_name_service(public_name_list)
+        #still no response, do nothing
+        #NOTE the query fails even if only one TAXON_ID can't be found
+        if not public_names:
+            l.log("No public names returned", type=Logtype.FILE)
+            return
+        #update samples and set dtol_sattus to pending
+        else:
+            for name in public_names:
+                if name.get("tolId", ""):
+                    Sample().update_public_name(name)
+                else:
+                    l.log("Still no tolId identified for " + str(name), type=Logtype.FILE)
+                    return
         Submission().make_dtol_status_pending(submission["_id"])
 
 def populate_source_fields(sampleobj):
