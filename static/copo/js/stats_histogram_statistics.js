@@ -12,6 +12,10 @@ const svg = d3.select("#my_dataviz")
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
+svg.append("g")
+    .attr("class", "x-axis")
+svg.append("g")
+    .attr("class", "y-axis")
 
 // A function that create / update the plot for a given variable:
 function update(val) {
@@ -20,30 +24,55 @@ function update(val) {
     // Parse the Data
     d3.json(`/api/stats/histogram_metric/` + val).then(function (data) {
         // X axis
-        const x = d3.scaleBand()
+        const xScale = d3.scaleBand()
             .range([0, width])
             .domain(data.map(d => d.k))
-            .padding(0.1);
-        svg.append("g")
+            .padding(0.2);
+
+
+        const xAxisGenerator = d3.axisBottom(xScale)
+
+
+        const xAxis = svg.select(".x-axis")
             .transition(updateTrans)
+            .call(xAxisGenerator)
             .attr("transform", `translate(0, ${height})`)
-            .call(d3.axisBottom(x))
             .selectAll("text")
             .attr("transform", "translate(-10,0)rotate(-45)")
             .style("text-anchor", "end");
 
+        /*
+        svg.append("g")
+
+            .attr("transform", `translate(0, ${height})`)
+
+            .call(d3.axisBottom(xScale))
+            .transition(updateTrans)
+            .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end");
+*/
         // Add Y axis
         const yAccessor = function (d) {
             return d.v
         }
-        const y = d3.scaleLinear()
+        const yScale = d3.scaleLinear()
             .domain([0, d3.max(data, yAccessor)])
             .range([height, 0])
             .nice()
-        svg.append("g")
-            .transition(updateTrans)
-            .call(d3.axisLeft(y));
 
+        const yAxisGenerator = d3.axisLeft(yScale)
+
+
+        const yAxis = svg.select(".y-axis")
+            .transition(updateTrans)
+            .call(yAxisGenerator)
+        //.attr("transform", `translate(0, ${height})`)
+        /*
+            svg.append("g")
+            .transition(updateTrans)
+            .call(d3.axisLeft(yScale));
+*/
         var u = svg.selectAll("rect")
             .data(data)
         u.exit().remove()
@@ -52,19 +81,19 @@ function update(val) {
             .enter()
             .append("rect")
             .merge(u)
-            .transition()
-            .duration(1000)
+            .transition(updateTrans)
+
             .attr("x", function (d) {
-                return x(d.k);
+                return xScale(d.k);
             })
             .attr("y", function (d) {
-                return y(d.v);
+                return yScale(d.v);
             })
-            .attr("width", x.bandwidth())
+            .attr("width", xScale.bandwidth())
             .attr("height", function (d) {
-                return height - y(d.v);
+                return height - yScale(d.v);
             })
-            .attr("fill", "#69b3a2")
+            .attr("fill", "steelblue")
     })
 
 }

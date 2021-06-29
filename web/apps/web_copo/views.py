@@ -50,7 +50,7 @@ def login(request):
     return render(request, 'copo/auth/login.html', context)
 
 
-def stats(request, view):
+def stats(request, view=""):
     if view == "time_series":
         return render(request, context={}, template_name="copo/stats/time_series_statistics.html")
     elif view == "variable_histogram":
