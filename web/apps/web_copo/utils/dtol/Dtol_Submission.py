@@ -257,6 +257,7 @@ def process_pending_dtol_samples():
 
 def query_awaiting_tolids():
     #get all submission awaiting for tolids
+    l.log("Running awaiting tolid task ", type=Logtype.FILE)
     sub_id_list = Submission().get_awaiting_tolids()
     for submission in sub_id_list:
         public_name_list = list()
@@ -270,11 +271,15 @@ def query_awaiting_tolids():
                          "sample_id": str(sam["_id"])})
                 except ValueError:
                     return False
-            assert len(public_name_list)>0
+            try:
+                assert len(public_name_list)>0
+            except AssertionError:
+                l.log("Assertion Error in query awaiting tolids", type=Logtype.FILE)
             public_names = query_public_name_service(public_name_list)
             #still no response, do nothing
             #NOTE the query fails even if only one TAXON_ID can't be found
             if not public_names:
+                l.log("No public names returned", type=Logtype.FILE)
                 return
             #update samples and set dtol_sattus to pending
             else:
@@ -282,6 +287,7 @@ def query_awaiting_tolids():
                     if name.get("tolId", ""):
                         Sample().update_public_name(name)
                     else:
+                        l.log("Still no tolId identified for " + str(name), type=Logtype.FILE)
                         return
         Submission().make_dtol_status_pending(submission["_id"])
 
