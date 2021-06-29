@@ -262,6 +262,7 @@ def query_awaiting_tolids():
     for submission in sub_id_list:
         public_name_list = list()
         samplelist = submission["dtol_samples"]
+        l.log("samplelist to go trough is "+str(samplelist), type=Logtype.FILE)
         for samid in samplelist:
             sam = Sample().get_record(samid)
             if not sam["public_name"]:
@@ -270,6 +271,7 @@ def query_awaiting_tolids():
                         {"taxonomyId": int(sam["species_list"][0]["TAXON_ID"]), "specimenId": sam["SPECIMEN_ID"],
                          "sample_id": str(sam["_id"])})
                 except ValueError:
+                    l.log("Value Error" + str(sam), type=Logtype.FILE)
                     return False
             try:
                 assert len(public_name_list)>0
