@@ -54,6 +54,8 @@ stats_api_patterns = [
             name='combined_stats_csv'),
     re_path(r'stats/sample_stats_csv', stats.samples_stats_csv,
             name='samples_stats_csv'),
+    re_path(r'stats/histogram_metric/(?P<metric>[A-Za-z0-9_]+)', stats.samples_hist_json,
+            name='samples_hist_json'),
 ]
 
 urlpatterns = generic_api_patterns + dtol_api_patterns + stats_api_patterns

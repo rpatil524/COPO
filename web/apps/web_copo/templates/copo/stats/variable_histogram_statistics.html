@@ -7,18 +7,36 @@
 {% block stylesheet_block %}
 
     <style> /* set the CSS */
-    .ul_style {
-        list-style-type: none;
-        padding-left: 0;
-        cursor: pointer;
+    .wrapper {
+        position: relative;
     }
 
-    #graph {
-        width: 100%
+    .freezing {
+        fill: #e0f3f3;
+    }
+
+    .line {
+        fill: none;
+        stroke: #af9358;
+        stroke-width: 2;
+    }
+
+    .y-axis-label {
+        fill: black;
+        font-size: 1.4em;
+        text-anchor: middle;
+        transform: rotate(-90deg);
     }
 
     .listening-rect {
-        fill: transparent
+        fill: transparent;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        padding: 5em 1em;
+        font-family: sans-serif;
     }
 
     .tooltip {
@@ -118,30 +136,34 @@
 
         </div>
         <div class="col-lg-10 col-md-2 col-sm-10">
-            <div id="tooltip" class="tooltip">
-                <div class="tooltip-date">
-                    <span id="date"></span>
-                </div>
-                <div class="tooltip-temperature">
-                    Number of <span id="metric"></span>: <span id="num_metric"></span>
-                </div>
-            </div>
+
             <div id="graph"></div>
+            <div id="my_dataviz"></div>
             <label for="changeChartMetric">Change Element</label>
-            <select autocomplete="off" class="form-control" id="changeChartMetric" style="width: 200px">
-                <option value="0" selected>Samples</option>
-                <option value="1">Datafiles</option>
-                <option value="2">Profiles</option>
-                <option value="3">Users</option>
+            <select autocomplete="off" class="form-control" id="changeHistMetric" style="width: 200px">
+                <option value="DATE_OF_COLLECTION" selected>Date of Collection</option>
+                <option value="SEX">Sex</option>
+                <option value="LIFESTAGE">Lifestage</option>
+                <option value="IDENTIFIER_AFFILIATION">Indentifier Affiliation</option>
+                <option value="COLLECTOR_AFFILIATION">Collector Affiliation</option>
+                <option value="HAZARD_GROUP">Hazard Group</option>
+                <option value="TIME_ELAPSED_FROM_COLLECTION_TO_PRESERVATION">Time Elapsed from Collection to
+                    Preservation
+                </option>
+                <option value="PRESERVATION_APPROACH">Preservation Approach</option>
+                <option value="PRESERVATIVE_SOLUTION">Preservation Solution</option>
+                <option value="GAL">GAL/PARTNER</option>
+                <option value="ORGANISM_PART">Organism Part</option>
+                <option value="IDENTIFIED_HOW">Identified How</option>
+                <option value="PURPOSE_OF_SPECIMEN">Purpose of Specimen</option>
+                <option value="TISSUE_FOR_BARCODING">Tissue for Barcoding</option>
             </select>
         </div>
-
-    </div>
     </div>
 
 
 
-    <p class="label">Test</p>
+
 
 
 
@@ -152,6 +174,6 @@
 
     <script src="https://d3js.org/d3.v6.min.js"></script>
 
-    <script src="{% static 'copo/js/graphing.js' %}" defer></script>
+    <script src="{% static 'copo/js/stats_histogram_statistics.js' %}" defer></script>
 
 {% endblock %}
