@@ -264,8 +264,11 @@ def query_awaiting_tolids():
         samplelist = submission["dtol_samples"]
         l.log("samplelist to go trough is "+str(samplelist), type=Logtype.FILE)
         for samid in samplelist:
-            sam = Sample().get_record(samid)
-            l.log("sample is " + str(sam), type=LogType.FILE)
+            try:
+                sam = Sample().get_record(samid)
+            except Exception as e:
+                l.log("error at line 270 " + str(e), type=Logtype.FILE)
+            l.log("sample is " + str(sam), type=Logtype.FILE)
             if not sam["public_name"]:
                 try:
                     public_name_list.append(
@@ -286,12 +289,15 @@ def query_awaiting_tolids():
             return
         #update samples and set dtol_sattus to pending
         else:
+            l.log("line 292", type=Logtype.FILE)
             for name in public_names:
                 if name.get("tolId", ""):
+                    l.log("line 295", type=Logtype.FILE)
                     Sample().update_public_name(name)
                 else:
                     l.log("Still no tolId identified for " + str(name), type=Logtype.FILE)
                     return
+        l.log("Changing submission status from awaiting tolids to pending", type=Logtype.FILE)
         Submission().make_dtol_status_pending(submission["_id"])
 
 def populate_source_fields(sampleobj):
