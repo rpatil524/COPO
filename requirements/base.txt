@@ -175,3 +175,4 @@ zope.interface==4.6.0
 jsonpath-rw==1.4.0
 jsonpath-rw-ext==1.2.2
 jsonref
+django-allow-cidr
