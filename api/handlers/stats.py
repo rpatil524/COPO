@@ -52,12 +52,16 @@ def samples_hist_json(request, metric):
     if metric == "GAL":
         # need to merge PARTNER and GAL columns as this field has different names between tol types
         projection = {"GAL": 1, "PARTNER": 1, "_id": 0}
-        s_list = list(Sample().get_collection_handle().find({}, projection))
+        s_list = list(Sample().get_collection_handle().find(
+            {"$or": [{"TOL_PROJECT": "DTOL"}, {"TOL_PROJECT": "ASG"}, {"sample_type": "dtol"}, {"sample_type": "asg"}]},
+            projection))
         df = pandas.DataFrame(s_list)
         df["GAL"][df["GAL"].isnull()] = df["PARTNER"][df["GAL"].isnull()]
     else:
         projection = {metric: 1, "_id": 0}
-        s_list = list(Sample().get_collection_handle().find({}, projection))
+        s_list = list(Sample().get_collection_handle().find(
+            {"$or": [{"TOL_PROJECT": "DTOL"}, {"TOL_PROJECT": "ASG"}, {"sample_type": "dtol"}, {"sample_type": "asg"}]},
+            projection))
         df = pandas.DataFrame(s_list)
 
     # now get counts of each value label in dataframe

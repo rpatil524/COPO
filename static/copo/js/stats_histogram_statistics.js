@@ -1,16 +1,20 @@
 // set the dimensions and margins of the graph
-const margin = {top: 30, right: 30, bottom: 70, left: 60},
-    width = $("#my_dataviz").innerWidth() * 0.7,
+const margin = {top: 30, right: 15, bottom: 100, left: 100},
+    width = $("#graph").innerWidth() * 0.7,
     height = window.innerHeight * 0.7
 
 
 // append the svg object to the body of the page
-const svg = d3.select("#my_dataviz")
+const svg = d3.select("#graph")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+    .style("transform", `translate(${
+        margin.left
+    }px, ${
+        margin.top
+    }px)`)
 
 svg.append("g")
     .attr("class", "x-axis")
@@ -106,4 +110,7 @@ update("LIFESTAGE")
 $(document).on("change", "#changeHistMetric", function () {
     var val = $(this).children("option:selected").val()
     update(val)
+})
+$(document).ready(function () {
+    $(".copo-main").removeClass("copo-main")
 })
